@@ -13,7 +13,8 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -21,11 +22,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @author Feng Hui
@@ -33,7 +32,7 @@ import java.util.UUID;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExpressionImpl extends BaseElementImpl implements Expression {
+public class ExpressionImpl extends ProcessBaseElementImpl implements Expression {
 
     private static final long serialVersionUID = 1663953453575781859L;
     @XmlAttribute
@@ -46,9 +45,8 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
     private String returnType;
     @XmlAttribute
     private String interpreter;
-    @XmlElementWrapper
     @XmlElement(type = ExpressionImpl.class,name = "expression")
-    private List<Expression> dependencies = Collections.emptyList();
+    private List<Expression> dependencies = new ArrayList<>();
 
     public ExpressionImpl() {
     }
@@ -88,9 +86,6 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     @Override
     public List<Expression> getDependencies() {
-        if (dependencies == null) {
-            return Collections.emptyList();
-        }
         return dependencies;
     }
 
@@ -116,14 +111,14 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     @Override
     public String toString() {
-        return "ExpressionImpl{" +
-                "name='" + name + '\'' +
-                ", content='" + content + '\'' +
-                ", expressionType='" + expressionType + '\'' +
-                ", returnType='" + returnType + '\'' +
-                ", interpreter='" + interpreter + '\'' +
-                ", dependencies=" + dependencies +
-                "} " + super.toString();
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("content", content)
+                .append("expressionType", expressionType)
+                .append("returnType", returnType)
+                .append("interpreter", interpreter)
+                .append("dependencies", dependencies)
+                .toString();
     }
 
     @Override

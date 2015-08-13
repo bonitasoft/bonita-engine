@@ -21,10 +21,10 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -34,7 +34,6 @@ import java.util.List;
 public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerDefinitionImpl implements CatchMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -8667216649689173514L;
-    @XmlElementWrapper(name = "operations")
     @XmlElement(name = "operation", type = OperationImpl.class)
     private final List<Operation> operations;
 
@@ -62,33 +61,17 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((operations == null) ? 0 : operations.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CatchMessageEventTriggerDefinitionImpl that = (CatchMessageEventTriggerDefinitionImpl) o;
+        return Objects.equals(operations, that.operations);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CatchMessageEventTriggerDefinitionImpl other = (CatchMessageEventTriggerDefinitionImpl) obj;
-        if (operations == null) {
-            if (other.operations != null) {
-                return false;
-            }
-        } else if (!operations.equals(other.operations)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), operations);
     }
 
     @Override

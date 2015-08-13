@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Objects;
 
 /**
  * @author Baptiste Mesta
@@ -26,7 +28,7 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class NamedElementImpl extends BaseElementImpl implements NamedElement {
+public abstract class NamedElementImpl extends ProcessBaseElementImpl implements NamedElement {
 
     private static final long serialVersionUID = -6260501789773631525L;
     @XmlAttribute(required = true)
@@ -48,10 +50,7 @@ public abstract class NamedElementImpl extends BaseElementImpl implements NamedE
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), name);
     }
 
     @Override
@@ -78,11 +77,9 @@ public abstract class NamedElementImpl extends BaseElementImpl implements NamedE
 
     @Override
     public String toString() {
-        final StringBuilder stb = new StringBuilder(super.toString());
-        stb.append("name: ");
-        stb.append(name);
-        stb.append("\n");
-        return stb.toString();
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .toString();
     }
 
 }

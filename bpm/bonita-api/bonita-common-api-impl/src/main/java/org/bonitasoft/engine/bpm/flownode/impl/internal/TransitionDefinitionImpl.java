@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -23,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * @author Baptiste Mesta
@@ -37,7 +39,7 @@ public class TransitionDefinitionImpl extends NamedElementImpl implements Transi
     private long source;
     @XmlAttribute
     private long target;
-    @XmlElement(type = ExpressionImpl.class)
+    @XmlElement(type = ExpressionImpl.class,name = "condition")
     private Expression expression;
 
     public TransitionDefinitionImpl(final String name) {
@@ -80,55 +82,27 @@ public class TransitionDefinitionImpl extends NamedElementImpl implements Transi
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("TransitionDefinitionImpl [name=");
-        builder.append(getName());
-        builder.append(", source=");
-        builder.append(source);
-        builder.append(", target=");
-        builder.append(target);
-        builder.append(", expression=");
-        builder.append(expression);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("source", source)
+                .append("target", target)
+                .append("expression", expression)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        TransitionDefinitionImpl that = (TransitionDefinitionImpl) o;
+        return Objects.equals(source, that.source) &&
+                Objects.equals(target, that.target) &&
+                Objects.equals(expression, that.expression);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (expression == null ? 0 : expression.hashCode());
-        result = prime * result + (int) (source ^ source >>> 32);
-        result = prime * result + (int) (target ^ target >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final TransitionDefinitionImpl other = (TransitionDefinitionImpl) obj;
-        if (expression == null) {
-            if (other.expression != null) {
-                return false;
-            }
-        } else if (!expression.equals(other.expression)) {
-            return false;
-        }
-        if (source != other.source) {
-            return false;
-        }
-        if (target != other.target) {
-            return false;
-        }
-        return true;
+        return Objects.hash(super.hashCode(), source, target, expression);
     }
 
     @Override

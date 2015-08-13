@@ -22,11 +22,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -37,9 +37,8 @@ import java.util.List;
 public abstract class MessageEventTriggerDefinitionImpl implements MessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -190616505159460399L;
-    @XmlAttribute
+    @XmlAttribute(name = "name")
     private final String messageName;
-    @XmlElementWrapper(name = "correlations")
     @XmlElement(type = CorrelationDefinitionImpl.class, name = "correlation")
     private final List<CorrelationDefinition> correlations;
 
@@ -78,41 +77,17 @@ public abstract class MessageEventTriggerDefinitionImpl implements MessageEventT
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (correlations == null ? 0 : correlations.hashCode());
-        result = prime * result + (messageName == null ? 0 : messageName.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MessageEventTriggerDefinitionImpl that = (MessageEventTriggerDefinitionImpl) o;
+        return Objects.equals(messageName, that.messageName) &&
+                Objects.equals(correlations, that.correlations);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final MessageEventTriggerDefinitionImpl other = (MessageEventTriggerDefinitionImpl) obj;
-        if (correlations == null) {
-            if (other.correlations != null) {
-                return false;
-            }
-        } else if (!correlations.equals(other.correlations)) {
-            return false;
-        }
-        if (messageName == null) {
-            if (other.messageName != null) {
-                return false;
-            }
-        } else if (!messageName.equals(other.messageName)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(messageName, correlations);
     }
 
     @Override

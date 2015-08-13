@@ -42,7 +42,7 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     private Expression targetProcess;
     @XmlElement(type = ExpressionImpl.class)
     private Expression targetFlowNode;
-    @XmlElement(type = DataDefinitionImpl.class)
+    @XmlElement(type = DataDefinitionImpl.class,name = "dataDefinition")
     private final List<DataDefinition> dataDefinitions;
 
     public ThrowMessageEventTriggerDefinitionImpl() {
@@ -112,13 +112,19 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ThrowMessageEventTriggerDefinitionImpl that = (ThrowMessageEventTriggerDefinitionImpl) o;
+        return Objects.equals(targetProcess, that.targetProcess) &&
+                Objects.equals(targetFlowNode, that.targetFlowNode) &&
+                Objects.equals(dataDefinitions, that.dataDefinitions);
+    }
+
+    @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
-        result = prime * result + (targetFlowNode == null ? 0 : targetFlowNode.hashCode());
-        result = prime * result + (targetProcess == null ? 0 : targetProcess.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), targetProcess, targetFlowNode, dataDefinitions);
     }
 
     @Override
@@ -127,17 +133,4 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         visitor.find(this, modelId);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        ThrowMessageEventTriggerDefinitionImpl that = (ThrowMessageEventTriggerDefinitionImpl) o;
-        return Objects.equals(targetProcess, that.targetProcess) &&
-                Objects.equals(targetFlowNode, that.targetFlowNode) &&
-                Objects.equals(dataDefinitions, that.dataDefinitions);
-    }
 }

@@ -12,85 +12,63 @@
  * Floor, Boston, MA 02110-1301, USA.
  ******************************************************************************/
 
-package org.bonitasoft.engine.bpm.process.impl.internal;
+package org.bonitasoft.engine.bpm.internal;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+import org.bonitasoft.engine.bpm.BaseElement;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author mazourd
  */
+@XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public class IndexLabel {
+public  abstract class ProcessBaseElementImpl  implements BaseElement {
+
+    private static final long serialVersionUID = 1L;
+    @XmlID
+    @XmlJavaTypeAdapter(type = long.class, value = LongtoStringAdapter.class)
     @XmlAttribute
-    private String index;
-    @XmlAttribute
-    private String label;
-    @XmlElement(type = ExpressionImpl.class,name = "expression")
-    private Expression value;
+    private long id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
 
-    public IndexLabel (String index,String label, Expression value){
-        this.index = index;
-        this.value = value;
-        this.label = label;
-    }
-    public IndexLabel (){
-        this.index = "-1";
-        this.value = null;
-    }
-
-    public String getIndex() {
-        return index;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Expression getValue() {
-        return value;
-    }
-
-    public void setValue(Expression value) {
-        this.value = value;
+    public ProcessBaseElementImpl() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IndexLabel that = (IndexLabel) o;
-        return Objects.equals(index, that.index) &&
-                Objects.equals(label, that.label) &&
-                Objects.equals(value, that.value);
+        ProcessBaseElementImpl that = (ProcessBaseElementImpl) o;
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(index, label, value);
+        return Objects.hash(id);
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(final long id) {
+        this.id = id;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("index", index)
-                .append("label", label)
-                .append("value", value)
+                .append("id", id)
                 .toString();
     }
+
 }

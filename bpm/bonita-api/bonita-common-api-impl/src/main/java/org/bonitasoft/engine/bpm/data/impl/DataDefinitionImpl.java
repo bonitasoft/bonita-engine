@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -23,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * @author Feng Hui
@@ -36,7 +38,7 @@ public class DataDefinitionImpl extends NamedElementImpl implements DataDefiniti
     private String description;
     @XmlAttribute
     private String type;
-    @XmlAttribute
+    @XmlAttribute(name = "transient")
     private boolean transientData;
     @XmlAttribute
     private String className;
@@ -96,80 +98,32 @@ public class DataDefinitionImpl extends NamedElementImpl implements DataDefiniti
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (className == null ? 0 : className.hashCode());
-        result = prime * result + (defaultValueExpression == null ? 0 : defaultValueExpression.hashCode());
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (transientData ? 1231 : 1237);
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        DataDefinitionImpl that = (DataDefinitionImpl) o;
+        return Objects.equals(transientData, that.transientData) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(className, that.className) &&
+                Objects.equals(defaultValueExpression, that.defaultValueExpression);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DataDefinitionImpl other = (DataDefinitionImpl) obj;
-        if (className == null) {
-            if (other.className != null) {
-                return false;
-            }
-        } else if (!className.equals(other.className)) {
-            return false;
-        }
-        if (defaultValueExpression == null) {
-            if (other.defaultValueExpression != null) {
-                return false;
-            }
-        } else if (!defaultValueExpression.equals(other.defaultValueExpression)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (transientData != other.transientData) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), description, type, transientData, className, defaultValueExpression);
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("DataDefinitionImpl [name=");
-        builder.append(getName());
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", type=");
-        builder.append(type);
-        builder.append(", transientData=");
-        builder.append(transientData);
-        builder.append(", className=");
-        builder.append(className);
-        builder.append(", defaultValueExpression=");
-        builder.append(defaultValueExpression);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("description", description)
+                .append("type", type)
+                .append("transientData", transientData)
+                .append("className", className)
+                .append("defaultValueExpression", defaultValueExpression)
+                .toString();
     }
 
     @Override

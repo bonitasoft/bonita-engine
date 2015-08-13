@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
@@ -20,10 +21,10 @@ import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -34,8 +35,7 @@ import java.util.List;
 public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements EndEventDefinition {
 
     private static final long serialVersionUID = -6726824751097930154L;
-    @XmlElementWrapper(name = "errorEventTriggers")
-    @XmlElement(type = ThrowErrorEventTriggerDefinitionImpl.class, name = "errorEventTrigger")
+    @XmlElement(type = ThrowErrorEventTriggerDefinitionImpl.class, name = "throwErrorEventTrigger")
     private final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions;
     @XmlElement(type = TerminateEventTriggerDefinitionImpl.class, name = "terminateEventTrigger")
     private TerminateEventTriggerDefinition terminateEventTriggerDefinition;
@@ -75,41 +75,25 @@ public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements 
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (errorEventTriggerDefinitions == null ? 0 : errorEventTriggerDefinitions.hashCode());
-        result = prime * result + (terminateEventTriggerDefinition == null ? 0 : terminateEventTriggerDefinition.hashCode());
-        return result;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("errorEventTriggerDefinitions", errorEventTriggerDefinitions)
+                .append("terminateEventTriggerDefinition", terminateEventTriggerDefinition)
+                .toString();
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final EndEventDefinitionImpl other = (EndEventDefinitionImpl) obj;
-        if (errorEventTriggerDefinitions == null) {
-            if (other.errorEventTriggerDefinitions != null) {
-                return false;
-            }
-        } else if (!errorEventTriggerDefinitions.equals(other.errorEventTriggerDefinitions)) {
-            return false;
-        }
-        if (terminateEventTriggerDefinition == null) {
-            if (other.terminateEventTriggerDefinition != null) {
-                return false;
-            }
-        } else if (!terminateEventTriggerDefinition.equals(other.terminateEventTriggerDefinition)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EndEventDefinitionImpl that = (EndEventDefinitionImpl) o;
+        return Objects.equals(errorEventTriggerDefinitions, that.errorEventTriggerDefinitions) &&
+                Objects.equals(terminateEventTriggerDefinition, that.terminateEventTriggerDefinition);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), errorEventTriggerDefinitions, terminateEventTriggerDefinition);
+    }
 }

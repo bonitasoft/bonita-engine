@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
@@ -37,9 +38,10 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
-import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.Visitable;
+import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,6 +54,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,31 +63,28 @@ import java.util.Set;
  */
 //@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FlowElementContainerDefinitionImpl extends BaseElementImpl implements FlowElementContainerDefinition, Visitable {
+public class FlowElementContainerDefinitionImpl extends ProcessBaseElementImpl implements FlowElementContainerDefinition, Visitable {
 
     private static final long serialVersionUID = 1L;
-    //@XmlElementWrapper(name = "activities")
     @XmlElements({
             @XmlElement(type = AutomaticTaskDefinitionImpl.class, name = "automaticTask"),
             @XmlElement(type = CallActivityDefinitionImpl.class, name = "callActivity"),
             @XmlElement(type = ManualTaskDefinitionImpl.class, name = "manualTask"),
             @XmlElement(type = ReceiveTaskDefinitionImpl.class, name = "receiveTask"),
             @XmlElement(type = SendTaskDefinitionImpl.class, name = "sendTask"),
-            @XmlElement(type = UserTaskDefinitionImpl.class, name = "userTask")
+            @XmlElement(type = UserTaskDefinitionImpl.class, name = "userTask"),
+            @XmlElement(type = SubProcessDefinitionImpl.class,name = "subProcess")
     })
     private final List<ActivityDefinition> activities;
     @XmlElementWrapper(name = "transitions")
     @XmlElement(type = TransitionDefinitionImpl.class, name = "transition")
     private final Set<TransitionDefinition> transitions;
-    @XmlElementWrapper(name = "gateways")
     @XmlElement(type = GatewayDefinitionImpl.class, name = "gateway")
     private final List<GatewayDefinition> gateways;
     @XmlElement(type = StartEventDefinitionImpl.class, name = "startEvent")
     private final List<StartEventDefinition> startEvents;
-    @XmlElementWrapper(name = "intermediateCatchEvents")
     @XmlElement(type = IntermediateCatchEventDefinitionImpl.class, name = "intermediateCatchEvent")
     private final List<IntermediateCatchEventDefinition> intermediateCatchEvents;
-    @XmlElementWrapper(name = "intermediateThrowEvents")
     @XmlElement(type = IntermediateThrowEventDefinitionImpl.class, name = "intermediateThrowEvent")
     private final List<IntermediateThrowEventDefinition> intermediateThrowEvents;
     @XmlElement(type = EndEventDefinitionImpl.class, name = "endEvent")
@@ -93,7 +93,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @XmlElements({
             @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
             @XmlElement(type = TextDataDefinitionImpl.class, name = "textDataDefinition"),
-            @XmlElement(type = XMLDataDefinitionImpl.class, name = "XMLDataDefinition")
+            @XmlElement(type = XMLDataDefinitionImpl.class, name = "xmlDataDefinition")
     })
     private final List<DataDefinition> dataDefinitions;
     @XmlElementWrapper(name = "businessDataDefinitions")
@@ -124,7 +124,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         documentDefinitions = new ArrayList<>();
         documentListDefinitions = new ArrayList<>();
         connectors = new ArrayList<>();
-       // flowNodes = new HashMap<>();
     }
 
     @Override
@@ -309,5 +308,50 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         visitor.find(this, modelId);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("activities", activities)
+                .append("transitions", transitions)
+                .append("gateways", gateways)
+                .append("startEvents", startEvents)
+                .append("intermediateCatchEvents", intermediateCatchEvents)
+                .append("intermediateThrowEvents", intermediateThrowEvents)
+                .append("endEvents", endEvents)
+                .append("dataDefinitions", dataDefinitions)
+                .append("businessDataDefinitions", businessDataDefinitions)
+                .append("documentDefinitions", documentDefinitions)
+                .append("documentListDefinitions", documentListDefinitions)
+                .append("connectors", connectors)
+                .append("elementFinder", elementFinder)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        FlowElementContainerDefinitionImpl that = (FlowElementContainerDefinitionImpl) o;
+        return Objects.equals(activities, that.activities) &&
+                Objects.equals(transitions, that.transitions) &&
+                Objects.equals(gateways, that.gateways) &&
+                Objects.equals(startEvents, that.startEvents) &&
+                Objects.equals(intermediateCatchEvents, that.intermediateCatchEvents) &&
+                Objects.equals(intermediateThrowEvents, that.intermediateThrowEvents) &&
+                Objects.equals(endEvents, that.endEvents) &&
+                Objects.equals(dataDefinitions, that.dataDefinitions) &&
+                Objects.equals(businessDataDefinitions, that.businessDataDefinitions) &&
+                Objects.equals(documentDefinitions, that.documentDefinitions) &&
+                Objects.equals(documentListDefinitions, that.documentListDefinitions) &&
+                Objects.equals(connectors, that.connectors) &&
+                Objects.equals(elementFinder, that.elementFinder);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), activities, transitions, gateways, startEvents, intermediateCatchEvents, intermediateThrowEvents, endEvents, dataDefinitions, businessDataDefinitions, documentDefinitions, documentListDefinitions, connectors, elementFinder);
     }
 }

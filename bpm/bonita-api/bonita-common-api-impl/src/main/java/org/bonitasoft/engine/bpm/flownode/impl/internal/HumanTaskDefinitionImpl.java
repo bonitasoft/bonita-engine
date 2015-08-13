@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
@@ -23,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Objects;
 
 /**
  * @author Baptiste Mesta
@@ -36,7 +38,7 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
     private static final long serialVersionUID = -7657152341382296289L;
     @XmlAttribute
     private final String actorName;
-    @XmlElement(type = UserFilterDefinitionImpl.class)
+    @XmlElement(type = UserFilterDefinitionImpl.class,name = "userFilter")
     private UserFilterDefinition userFilterDefinition;
     @XmlAttribute
     private Long expectedDuration;
@@ -90,95 +92,30 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (actorName == null ? 0 : actorName.hashCode());
-        result = prime * result + (expectedDuration == null ? 0 : expectedDuration.hashCode());
-        result = prime * result + (priority == null ? 0 : priority.hashCode());
-        result = prime * result + (userFilterDefinition == null ? 0 : userFilterDefinition.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        HumanTaskDefinitionImpl that = (HumanTaskDefinitionImpl) o;
+        return Objects.equals(actorName, that.actorName) &&
+                Objects.equals(userFilterDefinition, that.userFilterDefinition) &&
+                Objects.equals(expectedDuration, that.expectedDuration) &&
+                Objects.equals(priority, that.priority);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final HumanTaskDefinitionImpl other = (HumanTaskDefinitionImpl) obj;
-        if (actorName == null) {
-            if (other.actorName != null) {
-                return false;
-            }
-        } else if (!actorName.equals(other.actorName)) {
-            return false;
-        }
-        if (expectedDuration == null) {
-            if (other.expectedDuration != null) {
-                return false;
-            }
-        } else if (!expectedDuration.equals(other.expectedDuration)) {
-            return false;
-        }
-        if (priority == null) {
-            if (other.priority != null) {
-                return false;
-            }
-        } else if (!priority.equals(other.priority)) {
-            return false;
-        }
-        if (userFilterDefinition == null) {
-            if (other.userFilterDefinition != null) {
-                return false;
-            }
-        } else if (!userFilterDefinition.equals(other.userFilterDefinition)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), actorName, userFilterDefinition, expectedDuration, priority);
     }
 
     @Override
     public String toString() {
-        final int maxLen = 5;
-        final StringBuilder builder = new StringBuilder();
-        builder.append("HumanTaskDefinitionImpl [actorName=");
-        builder.append(actorName);
-        builder.append(", userFilterDefinition=");
-        builder.append(userFilterDefinition);
-        builder.append(", expectedDuration=");
-        builder.append(expectedDuration);
-        builder.append(", priority=");
-        builder.append(priority);
-        builder.append(", getDataDefinitions()=");
-        builder.append(getDataDefinitions() != null ? getDataDefinitions().subList(0, Math.min(getDataDefinitions().size(), maxLen)) : null);
-        builder.append(", getOperations()=");
-        builder.append(getOperations() != null ? getOperations().subList(0, Math.min(getOperations().size(), maxLen)) : null);
-        builder.append(", getLoopCharacteristics()=");
-        builder.append(getLoopCharacteristics());
-        builder.append(", getIncomingTransitions()=");
-        builder.append(getIncomingTransitions() != null ? getIncomingTransitions().subList(0, Math.min(getIncomingTransitions().size(), maxLen)) : null);
-        builder.append(", getOutgoingTransitions()=");
-        builder.append(getOutgoingTransitions() != null ? getOutgoingTransitions().subList(0, Math.min(getOutgoingTransitions().size(), maxLen)) : null);
-        builder.append(", getConnectors()=");
-        builder.append(getConnectors() != null ? getConnectors().subList(0, Math.min(getConnectors().size(), maxLen)) : null);
-        builder.append(", getDescription()=");
-        builder.append(getDescription());
-        builder.append(", getDisplayDescription()=");
-        builder.append(getDisplayDescription());
-        builder.append(", getDisplayName()=");
-        builder.append(getDisplayName());
-        builder.append(", getDisplayDescriptionAfterCompletion()=");
-        builder.append(getDisplayDescriptionAfterCompletion());
-        builder.append(", getName()=");
-        builder.append(getName());
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("actorName", actorName)
+                .append("userFilterDefinition", userFilterDefinition)
+                .append("expectedDuration", expectedDuration)
+                .append("priority", priority)
+                .toString();
     }
 
     @Override

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.parameter.impl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 
@@ -20,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * @author Matthieu Chaffotte
@@ -38,8 +40,8 @@ public class ParameterDefinitionImpl extends NamedElementImpl implements Paramet
         this.type = type;
     }
     public ParameterDefinitionImpl(){
-        super("default name");
-        this.type = "default type";
+        super();
+        this.type = "";
     }
 
     @Override
@@ -57,52 +59,26 @@ public class ParameterDefinitionImpl extends NamedElementImpl implements Paramet
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ParameterDefinitionImpl that = (ParameterDefinitionImpl) o;
+        return Objects.equals(type, that.type) &&
+                Objects.equals(description, that.description);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ParameterDefinitionImpl other = (ParameterDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, description);
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ParameterDefinitionImpl [type=");
-        builder.append(type);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("type", type)
+                .append("description", description)
+                .toString();
     }
 
 }

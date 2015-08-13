@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,6 +29,7 @@ import javax.xml.bind.annotation.XmlElement;
 public class ActorDefinitionImpl implements ActorDefinition {
 
     private static final long serialVersionUID = 1915238328442058288L;
+    @XmlID
     @XmlAttribute(required = true)
     private final String name;
     @XmlElement(required = false)
@@ -37,7 +39,7 @@ public class ActorDefinitionImpl implements ActorDefinition {
 
     /**
      * Create a actor definition with his name that is not initiator
-     * 
+     *
      * @param name
      */
     public ActorDefinitionImpl(final String name) {
@@ -69,6 +71,7 @@ public class ActorDefinitionImpl implements ActorDefinition {
         return initiator;
     }
 
+    @Override
     public void setInitiator(final boolean initiator) {
         this.initiator = initiator;
     }

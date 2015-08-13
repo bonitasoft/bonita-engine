@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.document.impl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -34,13 +35,13 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
     private static final long serialVersionUID = 2L;
     @XmlAttribute
     private String url;
-    @XmlAttribute
+    @XmlElement
     private String file;
     @XmlAttribute
     private String mimeType;
-    @XmlAttribute
+    @XmlElement
     private String description;
-    @XmlAttribute
+    @XmlElement
     private String fileName;
     @XmlElement(type = ExpressionImpl.class)
     private Expression initialValue;
@@ -138,14 +139,14 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
 
     @Override
     public String toString() {
-        return "DocumentDefinitionImpl{" +
-                "url='" + url + '\'' +
-                ", file='" + file + '\'' +
-                ", mimeType='" + mimeType + '\'' +
-                ", description='" + description + '\'' +
-                ", fileName='" + fileName + '\'' +
-                ", initialValue=" + initialValue +
-                "} " + super.toString();
+        return new ToStringBuilder(this)
+                .append("url", url)
+                .append("file", file)
+                .append("mimeType", mimeType)
+                .append("description", description)
+                .append("fileName", fileName)
+                .append("initialValue", initialValue)
+                .toString();
     }
 
     @Override

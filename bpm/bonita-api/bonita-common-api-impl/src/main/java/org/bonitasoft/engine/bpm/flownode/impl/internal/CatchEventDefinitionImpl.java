@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,17 +39,13 @@ import java.util.List;
 public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl implements CatchEventDefinition {
 
     private static final long serialVersionUID = 250215494961033080L;
-    @XmlElementWrapper(name = "timerEventTriggers")
     @XmlElement(type = TimerEventTriggerDefinitionImpl.class, name = "timerEventTrigger")
     private final List<TimerEventTriggerDefinition> timerEventTriggers;
-    @XmlElementWrapper(name = "messageEventTriggers")
-    @XmlElement(type = CatchMessageEventTriggerDefinitionImpl.class, name = "messageEventTrigger")
+    @XmlElement(type = CatchMessageEventTriggerDefinitionImpl.class, name = "catchMessageEventTrigger")
     private final List<CatchMessageEventTriggerDefinition> messageEventTriggers;
-    @XmlElementWrapper(name = "signalEventTriggers")
-    @XmlElement(type = CatchSignalEventTriggerDefinitionImpl.class, name = "signalEventTrigger")
+    @XmlElement(type = CatchSignalEventTriggerDefinitionImpl.class, name = "catchSignalEventTrigger")
     private final List<CatchSignalEventTriggerDefinition> signalEventTriggers;
-    @XmlElementWrapper(name = "errorlEventTriggers")
-    @XmlElement(type = CatchErrorEventTriggerDefinitionImpl.class, name = "errorEventTrigger")
+    @XmlElement(type = CatchErrorEventTriggerDefinitionImpl.class, name = "catchErrorEventTrigger")
     private final List<CatchErrorEventTriggerDefinition> errorEventTriggers;
     @XmlAttribute(name = "interrupting")
     private boolean isInterrupting = true;

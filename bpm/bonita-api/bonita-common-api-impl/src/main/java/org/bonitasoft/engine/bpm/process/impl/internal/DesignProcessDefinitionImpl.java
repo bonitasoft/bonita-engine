@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
@@ -33,10 +34,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -53,9 +56,6 @@ import java.util.Set;
 @XmlRootElement(name = "processDefinition")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({SubProcessDefinitionImpl.class})
-/*AutomaticTaskDefinitionImpl.class, SendTaskDefinitionImpl.class, UserTaskDefinitionImpl.class, CallActivityDefinitionImpl.class,
-        ManualTaskDefinitionImpl.class, ReceiveTaskDefinitionImpl.class, MultiInstanceLoopCharacteristicsImpl.class,
-        StandardLoopCharacteristicsImpl.class,AutomaticTaskDefinitionImpl.class })*/
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
@@ -69,6 +69,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @XmlElementWrapper(name = "actors")
     @XmlElement(type = ActorDefinitionImpl.class, name = "actor")
     private final List<ActorDefinition> actors;
+    @XmlIDREF
     @XmlElement(type = ActorDefinitionImpl.class)
     private ActorDefinition actorInitiator;
     @XmlElement(type = FlowElementContainerDefinitionImpl.class, name = "flowElements")
@@ -78,8 +79,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     private IndexLabel[] listIndex = new IndexLabel[5];
     @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
-    //@XmlElementWrapper(name = "contexts")
-    @XmlElement(type = ContextEntryImpl.class)
+    @XmlElementWrapper(name = "context")
+    @XmlElement(name="contextEntry", type = ContextEntryImpl.class,nillable = true)
     private List<ContextEntry> context = new ArrayList<>();
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
@@ -248,10 +249,16 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public List<ContextEntry> getContext() {
+        if (context == null){
+            return Collections.EMPTY_LIST;
+        }
         return context;
     }
 
     public void addContextEntry(ContextEntry contextEntry) {
+        if (context == null){
+            context = new ArrayList<>();
+        }
         context.add(contextEntry);
     }
 
@@ -305,16 +312,16 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public String toString() {
-        return "DesignProcessDefinitionImpl{" +
-                "displayName='" + displayName + '\'' +
-                ", displayDescription='" + displayDescription + '\'' +
-                ", parameters=" + parameters +
-                ", actors=" + actors +
-                ", actorInitiator=" + actorInitiator +
-                ", flowElementContainer=" + flowElementContainer +
-                ", listIndex=" + Arrays.toString(listIndex) +
-                ", contract=" + contract +
-                ", context=" + context +
-                '}';
+        return new ToStringBuilder(this)
+                .append("displayName", displayName)
+                .append("displayDescription", displayDescription)
+                .append("parameters", parameters)
+                .append("actors", actors)
+                .append("actorInitiator", actorInitiator)
+                .append("flowElementContainer", flowElementContainer)
+                .append("listIndex", listIndex)
+                .append("contract", contract)
+                .append("context", context)
+                .toString();
     }
 }

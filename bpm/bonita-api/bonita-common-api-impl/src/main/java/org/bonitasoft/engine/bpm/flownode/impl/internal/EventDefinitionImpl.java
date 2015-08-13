@@ -19,13 +19,11 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,17 +34,7 @@ import java.util.List;
 public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl implements EventDefinition {
 
     private static final long serialVersionUID = 2606127153595667535L;
-@XmlElementWrapper(name = "eventTriggers")
-@XmlElements({
-        @XmlElement(name = "ErrorEventTrigger",type = CatchErrorEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "MessageEventTrigger",type = CatchMessageEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "CatchSignalEventTrigger",type = CatchSignalEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "TerminateEventTrigger",type = TerminateEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "ThrowErrorEventTrigger",type = ThrowErrorEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "ThrowMessageEventTrigger",type = ThrowMessageEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "ThrowSignalEventTrigger",type = ThrowSignalEventTriggerDefinitionImpl.class),
-        @XmlElement(name = "TimerEventTrigger",type = TimerEventTriggerDefinitionImpl.class),
-})
+    @XmlTransient
     private final List<EventTriggerDefinition> eventTriggers;
 
     public EventDefinitionImpl(final String name) {
@@ -63,43 +51,28 @@ public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl impleme
         super();
         eventTriggers = new ArrayList<>();
     }
+
     @Override
     public List<EventTriggerDefinition> getEventTriggers() {
         return Collections.unmodifiableList(eventTriggers);
     }
 
-    protected void addEventTrigger(final EventTriggerDefinition eventTrigger) {
+    public void addEventTrigger(final EventTriggerDefinition eventTrigger) {
         eventTriggers.add(eventTrigger);
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (eventTriggers == null ? 0 : eventTriggers.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EventDefinitionImpl that = (EventDefinitionImpl) o;
+        return Objects.equals(eventTriggers, that.eventTriggers);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final EventDefinitionImpl other = (EventDefinitionImpl) obj;
-        if (eventTriggers == null) {
-            if (other.eventTriggers != null) {
-                return false;
-            }
-        } else if (!eventTriggers.equals(other.eventTriggers)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), eventTriggers);
     }
 
     @Override

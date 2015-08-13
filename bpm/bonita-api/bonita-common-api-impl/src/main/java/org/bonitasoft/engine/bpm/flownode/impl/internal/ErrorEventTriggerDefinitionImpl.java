@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
@@ -20,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -37,7 +39,7 @@ public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTrigg
     }
 
     public ErrorEventTriggerDefinitionImpl() {
-        this.errorCode = "Default error";
+        this.errorCode = null;
     }
 
     @Override
@@ -46,33 +48,23 @@ public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTrigg
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (errorCode == null ? 0 : errorCode.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ErrorEventTriggerDefinitionImpl that = (ErrorEventTriggerDefinitionImpl) o;
+        return Objects.equals(errorCode, that.errorCode);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ErrorEventTriggerDefinitionImpl other = (ErrorEventTriggerDefinitionImpl) obj;
-        if (errorCode == null) {
-            if (other.errorCode != null) {
-                return false;
-            }
-        } else if (!errorCode.equals(other.errorCode)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(errorCode);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("errorCode", errorCode)
+                .toString();
     }
 
     @Override

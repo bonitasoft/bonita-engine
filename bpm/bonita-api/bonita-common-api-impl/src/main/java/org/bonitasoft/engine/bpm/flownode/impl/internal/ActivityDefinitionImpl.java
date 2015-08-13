@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
@@ -36,6 +37,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Baptiste Mesta
@@ -66,8 +68,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
             @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class,name = "multiInstanceLoopCharacteristics" )
     })
     private LoopCharacteristics loopCharacteristics;
-    @XmlElementWrapper(name = "boundaryEventDefinitions")
-    @XmlElement(type = BoundaryEventDefinitionImpl.class, name = "boundaryEventDefinition")
+    @XmlElementWrapper(name = "boundaryEvents")
+    @XmlElement(type = BoundaryEventDefinitionImpl.class, name = "boundaryEvent")
     private final List<BoundaryEventDefinition> boundaryEventDefinitions;
 
     public ActivityDefinitionImpl(final long id, final String name) {
@@ -140,65 +142,32 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (boundaryEventDefinitions == null ? 0 : boundaryEventDefinitions.hashCode());
-        result = prime * result + (businessDataDefinitions == null ? 0 : businessDataDefinitions.hashCode());
-        result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
-        result = prime * result + (loopCharacteristics == null ? 0 : loopCharacteristics.hashCode());
-        result = prime * result + (operations == null ? 0 : operations.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ActivityDefinitionImpl that = (ActivityDefinitionImpl) o;
+        return Objects.equals(dataDefinitions, that.dataDefinitions) &&
+                Objects.equals(businessDataDefinitions, that.businessDataDefinitions) &&
+                Objects.equals(operations, that.operations) &&
+                Objects.equals(loopCharacteristics, that.loopCharacteristics) &&
+                Objects.equals(boundaryEventDefinitions, that.boundaryEventDefinitions);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ActivityDefinitionImpl other = (ActivityDefinitionImpl) obj;
-        if (boundaryEventDefinitions == null) {
-            if (other.boundaryEventDefinitions != null) {
-                return false;
-            }
-        } else if (!boundaryEventDefinitions.equals(other.boundaryEventDefinitions)) {
-            return false;
-        }
-        if (businessDataDefinitions == null) {
-            if (other.businessDataDefinitions != null) {
-                return false;
-            }
-        } else if (!businessDataDefinitions.equals(other.businessDataDefinitions)) {
-            return false;
-        }
-        if (dataDefinitions == null) {
-            if (other.dataDefinitions != null) {
-                return false;
-            }
-        } else if (!dataDefinitions.equals(other.dataDefinitions)) {
-            return false;
-        }
-        if (loopCharacteristics == null) {
-            if (other.loopCharacteristics != null) {
-                return false;
-            }
-        } else if (!loopCharacteristics.equals(other.loopCharacteristics)) {
-            return false;
-        }
-        if (operations == null) {
-            if (other.operations != null) {
-                return false;
-            }
-        } else if (!operations.equals(other.operations)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), dataDefinitions, businessDataDefinitions, operations, loopCharacteristics, boundaryEventDefinitions);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("dataDefinitions", dataDefinitions)
+                .append("businessDataDefinitions", businessDataDefinitions)
+                .append("operations", operations)
+                .append("loopCharacteristics", loopCharacteristics)
+                .append("boundaryEventDefinitions", boundaryEventDefinitions)
+                .toString();
     }
 
     @Override

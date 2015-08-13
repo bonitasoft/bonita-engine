@@ -14,12 +14,14 @@
 
 package org.bonitasoft.engine.bpm.context;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Objects;
 
@@ -29,7 +31,7 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ContextEntryImpl implements ContextEntry {
 
-    @XmlElement
+    @XmlAttribute
     private String key;
     @XmlElement(type = ExpressionImpl.class)
     private Expression expression;
@@ -62,10 +64,8 @@ public class ContextEntryImpl implements ContextEntry {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof ContextEntryImpl))
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         ContextEntryImpl that = (ContextEntryImpl) o;
         return Objects.equals(key, that.key) &&
                 Objects.equals(expression, that.expression);
@@ -78,10 +78,10 @@ public class ContextEntryImpl implements ContextEntry {
 
     @Override
     public String toString() {
-        return "ContextEntryImpl{" +
-                "key='" + key + '\'' +
-                ", expression='" + expression + '\'' +
-                '}';
+        return new ToStringBuilder(this)
+                .append("key", key)
+                .append("expression", expression)
+                .toString();
     }
 
     @Override

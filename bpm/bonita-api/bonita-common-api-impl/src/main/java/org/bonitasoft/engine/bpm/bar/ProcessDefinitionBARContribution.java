@@ -15,85 +15,27 @@ package org.bonitasoft.engine.bpm.bar;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bonitasoft.engine.bpm.bar.xml.ActorDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ActorInitiatorDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.AutomaticTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.BoundaryEventDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.BusinessDataDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CallActivityDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CallableElementBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CallableElementVersionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CatchErrorEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CatchMessageEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CatchSignalEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ConditionalExpressionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionInputBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ConstraintDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ContextDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ContextEntryBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ContractDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ContractInputBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CorrelationBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CorrelationKeyBinding;
-import org.bonitasoft.engine.bpm.bar.xml.CorrelationValueBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DataDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DataInputOperationBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DataOutputOperationBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DefaultTransitionDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DefaultValueBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DisplayDescriptionAfterCompletionExpressionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DisplayDescriptionExpressionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DisplayNameExpressionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DocumentDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.DocumentListDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.EndEventDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ExpressionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.FlowElementBinding;
-import org.bonitasoft.engine.bpm.bar.xml.GatewayDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.IncomingTransitionRefBinding;
-import org.bonitasoft.engine.bpm.bar.xml.InputDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.IntermediateCatchEventBinding;
-import org.bonitasoft.engine.bpm.bar.xml.IntermediateThrowEventDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.LeftOperandBinding;
-import org.bonitasoft.engine.bpm.bar.xml.LoopConditionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.LoopMaxBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ManualTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.MultiInstanceCompletionConditionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.MultiInstanceLoopCardinalityBinding;
-import org.bonitasoft.engine.bpm.bar.xml.MultiInstanceLoopCharacteristicsBinding;
-import org.bonitasoft.engine.bpm.bar.xml.OperationBinding;
-import org.bonitasoft.engine.bpm.bar.xml.OutgoingTransitionRefBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ParameterDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ProcessDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ReceiveTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.RightOperandBinding;
-import org.bonitasoft.engine.bpm.bar.xml.SendTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.StandardLoopCharacteristicsBinding;
-import org.bonitasoft.engine.bpm.bar.xml.StartEventDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.StringIndexBinding;
-import org.bonitasoft.engine.bpm.bar.xml.SubProcessDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.TargetFlowNodeBinding;
-import org.bonitasoft.engine.bpm.bar.xml.TargetProcessBinding;
-import org.bonitasoft.engine.bpm.bar.xml.TerminateEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.TextDataDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ThrowErrorEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ThrowMessageEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ThrowSignalEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.TimerEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.TransitionDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.UserFilterDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.UserTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.XMLDataDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
+import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
+import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
+import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.flownode.SignalEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.BoundaryEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.EndEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateCatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateThrowEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.XMLHandler;
-import org.bonitasoft.engine.io.xml.XMLNode;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 
 import javax.xml.bind.JAXBContext;
@@ -101,15 +43,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,97 +64,15 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public static final String PROCESS_INFOS_FILE = "process-infos.txt";
 
-    private XMLHandler handler;
+    private Marshaller marshaller;
+
+    private Unmarshaller unmarshaller;
 
     public ProcessDefinitionBARContribution() {
-        final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>();
-        bindings.add(ProcessDefinitionBinding.class);
-        bindings.add(ActorDefinitionBinding.class);
-        bindings.add(ActorInitiatorDefinitionBinding.class);
-        bindings.add(UserTaskDefinitionBinding.class);
-        bindings.add(ManualTaskDefinitionBinding.class);
-        bindings.add(AutomaticTaskDefinitionBinding.class);
-        bindings.add(ReceiveTaskDefinitionBinding.class);
-        bindings.add(SendTaskDefinitionBinding.class);
-        bindings.add(TransitionDefinitionBinding.class);
-        bindings.add(GatewayDefinitionBinding.class);
-        bindings.add(DefaultTransitionDefinitionBinding.class);
-        bindings.add(ConnectorDefinitionBinding.class);
-        bindings.add(ConnectorDefinitionInputBinding.class);
-        bindings.add(UserFilterDefinitionBinding.class);
-        bindings.add(ParameterDefinitionBinding.class);
-        bindings.add(StartEventDefinitionBinding.class);
-        bindings.add(StringIndexBinding.class);
-        bindings.add(IntermediateCatchEventBinding.class);
-        bindings.add(BoundaryEventDefinitionBinding.class);
-        bindings.add(TimerEventTriggerDefinitionBinding.class);
-        bindings.add(EndEventDefinitionBinding.class);
-        bindings.add(ExpressionBinding.class);
-        bindings.add(ConditionalExpressionBinding.class);
-        bindings.add(DataDefinitionBinding.class);
-        bindings.add(XMLDataDefinitionBinding.class);
-        bindings.add(BusinessDataDefinitionBinding.class);
-        bindings.add(TextDataDefinitionBinding.class);
-        bindings.add(DocumentDefinitionBinding.class);
-        bindings.add(DocumentListDefinitionBinding.class);
-        bindings.add(DefaultValueBinding.class);
-        bindings.add(DisplayDescriptionAfterCompletionExpressionBinding.class);
-        bindings.add(DisplayDescriptionExpressionBinding.class);
-        bindings.add(DisplayNameExpressionBinding.class);
-        bindings.add(OutgoingTransitionRefBinding.class);
-        bindings.add(IncomingTransitionRefBinding.class);
-        bindings.add(CatchMessageEventTriggerDefinitionBinding.class);
-        bindings.add(OperationBinding.class);
-        bindings.add(ContractInputBinding.class);
-        bindings.add(RightOperandBinding.class);
-        bindings.add(LeftOperandBinding.class);
-        bindings.add(ThrowMessageEventTriggerDefinitionBinding.class);
-        bindings.add(CatchSignalEventTriggerDefinitionBinding.class);
-        bindings.add(ThrowSignalEventTriggerDefinitionBinding.class);
-        bindings.add(IntermediateThrowEventDefinitionBinding.class);
-        bindings.add(CatchErrorEventTriggerDefinitionBinding.class);
-        bindings.add(ThrowErrorEventTriggerDefinitionBinding.class);
-        bindings.add(CorrelationBinding.class);
-        bindings.add(CorrelationKeyBinding.class);
-        bindings.add(CorrelationValueBinding.class);
-        bindings.add(StandardLoopCharacteristicsBinding.class);
-        bindings.add(MultiInstanceLoopCharacteristicsBinding.class);
-        bindings.add(LoopConditionBinding.class);
-        bindings.add(LoopMaxBinding.class);
-        bindings.add(MultiInstanceLoopCardinalityBinding.class);
-        bindings.add(MultiInstanceCompletionConditionBinding.class);
-        bindings.add(CallActivityDefinitionBinding.class);
-        bindings.add(DataInputOperationBinding.class);
-        bindings.add(DataOutputOperationBinding.class);
-        bindings.add(CallableElementBinding.class);
-        bindings.add(CallableElementVersionBinding.class);
-        bindings.add(TerminateEventTriggerDefinitionBinding.class);
-        bindings.add(TargetProcessBinding.class);
-        bindings.add(TargetFlowNodeBinding.class);
-        bindings.add(SubProcessDefinitionBinding.class);
-        bindings.add(FlowElementBinding.class);
-        bindings.add(ContractDefinitionBinding.class);
-        bindings.add(ContextDefinitionBinding.class);
-        bindings.add(ContextEntryBinding.class);
-        bindings.add(InputDefinitionBinding.class);
-        bindings.add(ConstraintDefinitionBinding.class);
-
-        //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
-        //        try {
-        //            handler = new XMLHandler(bindings, schemaStream);
-        //        } catch (final Exception e) {
-        //            throw new BonitaRuntimeException(e);
-        //        } finally {
-        //            try {
-        //                schemaStream.close();
-        //            } catch (final IOException e) {
-        //                throw new BonitaRuntimeException(e);
-        //            }
-        //        }
-
-        final URL schemaUrl = ProcessDefinitionBARContribution.class.getResource("ProcessDefinition.xsd");
         try {
-            handler = new XMLHandler(bindings, schemaUrl);
+            JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
+            marshaller = jaxbContext.createMarshaller();
+            unmarshaller = jaxbContext.createUnmarshaller();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -249,30 +108,17 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
     }
 
-    public DesignProcessDefinition deserializeProcessDefinitionOld(final File file) throws InvalidBusinessArchiveFormatException, IOException {
-        try {
-            handler.validate(file);
-            final Object objectFromXML = handler.getObjectFromXML(file);
-
-            if (!(objectFromXML instanceof DesignProcessDefinition)) {
-                throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
-            }
-            return (DesignProcessDefinition) objectFromXML;
-        } catch (final XMLParseException e) {
-            throw new InvalidBusinessArchiveFormatException(e);
-        } catch (final ValidationException e) {
-            checkVersion(IOUtil.read(file));
-            throw new InvalidBusinessArchiveFormatException(e);
-        }
-    }
     public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             Object deserializedObject = unmarshaller.unmarshal(file);
             if (!(deserializedObject instanceof DesignProcessDefinition)) {
                 throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + deserializedObject);
             }
+            DesignProcessDefinitionImpl process = (DesignProcessDefinitionImpl) deserializedObject;
+            if (process.getActorInitiator() != null) {
+                process.getActorInitiator().setInitiator(true);
+            }
+            updateEventTriggersOnProcess(process.getFlowElementContainer());
             return (DesignProcessDefinition) deserializedObject;
         } catch (final ValidationException e) {
             checkVersion(IOUtil.read(file));
@@ -299,17 +145,15 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     @Override
     public void saveToBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
-            serializeProcessDefinition(barFolder, processDefinition);
+        serializeProcessDefinition(barFolder, processDefinition);
     }
 
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
         StringWriter result = new StringWriter();
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
-            Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.marshal(processDefinition, result);
             try (FileOutputStream outputStream = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML))) {
-                outputStream.write(result.toString().getBytes());//this particular line is unreliable, needs to be changed inthe future
+                outputStream.write(result.toString().getBytes());
             }
             final String infos = generateInfosFromDefinition(processDefinition);
             IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
@@ -320,16 +164,108 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public String convertProcessToXml(DesignProcessDefinition processDefinition) throws IOException {
         final StringWriter writer = new StringWriter();
-        handler.write(getXMLNode(processDefinition), writer);
+        try {
+            marshaller.marshal(processDefinition, writer);
+        } catch (JAXBException e) {
+            throw new IOException(e);
+        }
         return writer.toString();
     }
 
     public DesignProcessDefinition convertXmlToProcess(String content) throws IOException, XMLParseException {
-        return (DesignProcessDefinition) handler.getObjectFromXML(new StringReader(content));
+        try (InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
+
+            DesignProcessDefinition process = (DesignProcessDefinition) unmarshaller.unmarshal(stream);
+            if (process.getActorInitiator() != null) {
+                process.getActorInitiator().setInitiator(true);
+            }
+            updateEventTriggersOnProcess(process.getFlowElementContainer());
+            return process;
+        } catch (java.lang.UnsupportedOperationException | JAXBException e) {
+            throw new IOException("Failed to deserialize the XML string provided", e);
+        }
     }
 
-    XMLNode getXMLNode(DesignProcessDefinition processDefinition) {
-        return new XMLProcessDefinition().getXMLProcessDefinition(processDefinition);
+    private void updateEventTriggersOnProcess(FlowElementContainerDefinition flowElementContainer) {
+        IntermediateThrowEventDefinitionImpl throwEventImpl;
+        IntermediateCatchEventDefinitionImpl catchEventImpl;
+        EndEventDefinitionImpl endEventImpl;
+        BoundaryEventDefinitionImpl boundaryEventImpl;
+        StartEventDefinitionImpl startEventImpl;
+        SubProcessDefinitionImpl subProcess;
+        for (IntermediateCatchEventDefinition catchEvent : flowElementContainer.getIntermediateCatchEvents()) {
+            catchEventImpl = (IntermediateCatchEventDefinitionImpl) catchEvent;
+            for (MessageEventTriggerDefinition messageEventTrigger : catchEvent.getMessageEventTriggerDefinitions()) {
+                catchEventImpl.addEventTrigger(messageEventTrigger);
+            }
+            for (ErrorEventTriggerDefinition errorEventTrigger : catchEvent.getErrorEventTriggerDefinitions()) {
+                catchEventImpl.addEventTrigger(errorEventTrigger);
+            }
+            for (SignalEventTriggerDefinition signalEventTrigger : catchEventImpl.getSignalEventTriggerDefinitions()) {
+                catchEventImpl.addEventTrigger(signalEventTrigger);
+            }
+            for (TimerEventTriggerDefinition timerEventTrigger : catchEventImpl.getTimerEventTriggerDefinitions()) {
+                catchEventImpl.addEventTrigger(timerEventTrigger);
+            }
+
+        }
+        for (IntermediateThrowEventDefinition throwEvent : flowElementContainer.getIntermediateThrowEvents()) {
+            throwEventImpl = (IntermediateThrowEventDefinitionImpl) throwEvent;
+            for (MessageEventTriggerDefinition messageEventTriggerDefinition : throwEventImpl.getMessageEventTriggerDefinitions()) {
+                throwEventImpl.addEventTrigger(messageEventTriggerDefinition);
+            }
+            for (SignalEventTriggerDefinition signalEventTriggerDefinition : throwEventImpl.getSignalEventTriggerDefinitions()) {
+                throwEventImpl.addEventTrigger(signalEventTriggerDefinition);
+            }
+        }
+        for (EndEventDefinition endEvent : flowElementContainer.getEndEvents()) {
+            endEventImpl = (EndEventDefinitionImpl) endEvent;
+            for (ErrorEventTriggerDefinition errorEventTrigger : endEventImpl.getErrorEventTriggerDefinitions()) {
+                endEventImpl.addEventTrigger(errorEventTrigger);
+            }
+            for (SignalEventTriggerDefinition signalEventTrigger : endEventImpl.getSignalEventTriggerDefinitions()) {
+                endEventImpl.addEventTrigger(signalEventTrigger);
+            }
+            for (MessageEventTriggerDefinition messageEventTrigger : endEventImpl.getMessageEventTriggerDefinitions()) {
+                endEventImpl.addEventTrigger(messageEventTrigger);
+            }
+        }
+        for (ActivityDefinition activity : flowElementContainer.getActivities()) {
+            for (BoundaryEventDefinition boundaryEvent : activity.getBoundaryEventDefinitions()) {
+                boundaryEventImpl = (BoundaryEventDefinitionImpl) boundaryEvent;
+                for (MessageEventTriggerDefinition messageEventTrigger : boundaryEvent.getMessageEventTriggerDefinitions()) {
+                    boundaryEventImpl.addEventTrigger(messageEventTrigger);
+                }
+                for (ErrorEventTriggerDefinition errorEventTrigger : boundaryEvent.getErrorEventTriggerDefinitions()) {
+                    boundaryEventImpl.addEventTrigger(errorEventTrigger);
+                }
+                for (SignalEventTriggerDefinition signalEventTrigger : boundaryEventImpl.getSignalEventTriggerDefinitions()) {
+                    boundaryEventImpl.addEventTrigger(signalEventTrigger);
+                }
+                for (TimerEventTriggerDefinition timerEventTrigger : boundaryEvent.getTimerEventTriggerDefinitions()) {
+                    boundaryEventImpl.addEventTrigger(timerEventTrigger);
+                }
+            }
+            if (activity.getClass() == SubProcessDefinitionImpl.class) {
+                subProcess = (SubProcessDefinitionImpl) activity;
+                updateEventTriggersOnProcess(subProcess.getSubProcessContainer());
+            }
+        }
+        for (StartEventDefinition startEvent : flowElementContainer.getStartEvents()) {
+            startEventImpl = (StartEventDefinitionImpl) startEvent;
+            for (MessageEventTriggerDefinition messageEventTrigger : startEvent.getMessageEventTriggerDefinitions()) {
+                startEventImpl.addEventTrigger(messageEventTrigger);
+            }
+            for (ErrorEventTriggerDefinition errorEventTrigger : startEvent.getErrorEventTriggerDefinitions()) {
+                startEventImpl.addEventTrigger(errorEventTrigger);
+            }
+            for (SignalEventTriggerDefinition signalEventTrigger : startEvent.getSignalEventTriggerDefinitions()) {
+                startEventImpl.addEventTrigger(signalEventTrigger);
+            }
+            for (TimerEventTriggerDefinition timerEventTrigger : startEvent.getTimerEventTriggerDefinitions()) {
+                startEventImpl.addEventTrigger(timerEventTrigger);
+            }
+        }
     }
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {
