@@ -242,6 +242,8 @@ public class LocalServerTestsInitializer {
 
     public void initPlatformAndTenant() throws Exception {
         System.out.println("=========  INIT PLATFORM =======");
+        APITestFactory.getInstance.getPlatformAPITest();
+        platAPITest.createPlatformStructure()
         new APITestUtil().createPlatformStructure();
         new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
     }

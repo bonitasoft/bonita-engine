@@ -297,7 +297,7 @@
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="CallActivityDefXMLDataDefinitionImplinition">
+    <xs:complexType name="CallActivityDefinition">
         <xs:complexContent>
             <xs:extension base="definition:ActivityDefinition">
                 <xs:sequence>
