@@ -82,7 +82,7 @@ public class ServerAPIImpl implements ServerAPI {
     private TechnicalLoggerService technicalLogger;
 
     protected enum SessionType {
-        PLATFORM, API;
+        PLATFORM, API
     }
 
     public ServerAPIImpl() {
@@ -140,7 +140,7 @@ public class ServerAPIImpl implements ServerAPI {
             throw createServerWrappedException(ute);
         } catch (final Throwable cause) {
             technicalDebugLog(cause);
-            final BonitaRuntimeException throwableToWrap = new BonitaRuntimeException(cause);
+            final BonitaRuntimeException throwableToWrap = wrapThrowable(cause);
             fillGlobalContextForException(session, throwableToWrap);
             throw createServerWrappedException(throwableToWrap);
         } finally {
@@ -149,6 +149,10 @@ public class ServerAPIImpl implements ServerAPI {
             Thread.currentThread().setContextClassLoader(baseClassLoader);
             technicalTraceLog("End ", apiInterfaceName, methodName);
         }
+    }
+
+    protected BonitaRuntimeException wrapThrowable(final Throwable cause) {
+        return new BonitaRuntimeException(cause);
     }
 
     private ServerWrappedException createServerWrappedException(final Throwable throwableToWrap) {
