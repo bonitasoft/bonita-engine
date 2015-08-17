@@ -45,12 +45,12 @@ public class FormRequiredAnalyzer {
             final DesignProcessDefinition designProcessDefinition = processDefinitionService.getDesignProcessDefinition(sFormMapping.getProcessDefinitionId());
             if (designProcessDefinition != null) {
                 if (sFormMapping.getType() == SFormMapping.TYPE_PROCESS_START) {
-                    return designProcessDefinition.getContract() != null;
+                    return designProcessDefinition.getContract() != null && designProcessDefinition.getContract().getInputs() != null && !designProcessDefinition.getContract().getInputs().isEmpty();
                 } else // if (sFormMapping.getType() == TYPE_TASK)
                 {
                     final List<ActivityDefinition> activities = designProcessDefinition.getFlowElementContainer().getActivities();
                     final UserTaskDefinition userTaskDefinition = findActivityWithName(activities, sFormMapping.getTask());
-                    return userTaskDefinition != null && userTaskDefinition.getContract() != null;
+                    return userTaskDefinition != null && userTaskDefinition.getContract() != null && userTaskDefinition.getContract().getInputs() != null && !userTaskDefinition.getContract().getInputs().isEmpty();
                 }
             }
         } catch (SBonitaException e) {
