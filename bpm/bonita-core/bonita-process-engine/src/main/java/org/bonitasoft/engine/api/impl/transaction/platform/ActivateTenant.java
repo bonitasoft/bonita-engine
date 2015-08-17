@@ -96,6 +96,7 @@ public final class ActivateTenant implements TransactionContent {
             for (final JobRegister jobRegister : jobsToRegister) {
                 registerJob(jobRegister);
             }
+            schedulerService.resumeJobs(tenantId);
         }
     }
 

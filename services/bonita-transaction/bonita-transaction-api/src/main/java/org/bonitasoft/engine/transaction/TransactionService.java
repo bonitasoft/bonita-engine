@@ -37,9 +37,7 @@ public interface TransactionService extends UserTransactionService {
      * Complete the transaction : either commit or rollback.
      *
      * @throws STransactionCommitException
-     *             TODO
      * @throws STransactionRollbackException
-     *             TODO
      */
     void complete() throws STransactionCommitException, STransactionRollbackException;
 
@@ -77,7 +75,7 @@ public interface TransactionService extends UserTransactionService {
     /**
      * Get the number of active transactions (i.e. transactions that opened but not yet completed or rolledback).
      * A transaction that was just mark as "rollbackOnly" is considered as an active one.
-     * @return
+     * @return the number of active transactions
      */
     long getNumberOfActiveTransactions();
 

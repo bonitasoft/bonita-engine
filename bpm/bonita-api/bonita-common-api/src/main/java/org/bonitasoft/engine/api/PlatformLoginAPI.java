@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.platform.InvalidPlatformCredentialsException;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformLogoutException;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -46,9 +47,11 @@ public interface PlatformLoginAPI {
      *         the session created for you, can be used to retrieve platform APIs
      * @throws PlatformLoginException
      *             occurs when an exception is thrown during login the platform
+     * @throws InvalidPlatformCredentialsException
+     *             occurs when thr username or password is not valid
      */
     @NoSessionRequired
-    PlatformSession login(String userName, String password) throws PlatformLoginException;
+    PlatformSession login(String userName, String password) throws PlatformLoginException, InvalidPlatformCredentialsException;
 
     /**
      * Logout from a platform.
