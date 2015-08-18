@@ -399,7 +399,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
 
         initializeData(sProcessDefinition, sProcessInstance);
-        initializeBusinessData(sProcessDefinition, sProcessInstance, expressionContext);
+        initializeBusinessData(sProcessDefinition, sProcessInstance);
 
         createDocuments(sProcessDefinition, sProcessInstance, userId, expressionContext, context);
         createDocumentLists(sProcessDefinition, sProcessInstance, userId, expressionContext, context);
@@ -422,9 +422,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // nothing to do
     }
 
-    private void initializeBusinessData(final SProcessDefinition sDefinition, final SProcessInstance sInstance, final SExpressionContext expressionContext)
+    private void initializeBusinessData(final SProcessDefinition sDefinition, final SProcessInstance sInstance)
             throws SBonitaException {
-        setContextContainerIfNotSet(expressionContext, sInstance);
+        SExpressionContext expressionContext = new SExpressionContext(sInstance.getId(),DataInstanceContainer.PROCESS_INSTANCE.name(),sDefinition.getId());
         final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();

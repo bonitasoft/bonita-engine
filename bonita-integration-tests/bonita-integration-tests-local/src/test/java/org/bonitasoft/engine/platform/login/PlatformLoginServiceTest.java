@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.core.platform.login.SPlatformLoginException;
+import org.bonitasoft.engine.core.platform.login.SInvalidPlatformCredentialsException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.junit.Test;
@@ -46,14 +46,14 @@ public class PlatformLoginServiceTest extends CommonBPMServicesTest {
         platformLoginService.logout(session.getId());
     }
 
-    @Test(expected = SPlatformLoginException.class)
+    @Test(expected = SInvalidPlatformCredentialsException.class)
     public void testLoginBadUser() throws Exception {
         final String username = "noAdmin";
         final String password = "platform";
         platformLoginService.login(username, password);
     }
 
-    @Test(expected = SPlatformLoginException.class)
+    @Test(expected = SInvalidPlatformCredentialsException.class)
     public void testLoginBadPassword() throws Exception {
         final String username = "platformAdmin";
         final String password = "wrong";

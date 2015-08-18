@@ -285,6 +285,7 @@ public interface DocumentAPI {
 
     /**
      * Get the last version of the named document for the specified process instance.
+     * This method does not work on archived process instances.
      *
      * @param processInstanceId
      *        The identifier of the process instance that the document is attached to
@@ -301,6 +302,7 @@ public interface DocumentAPI {
 
     /**
      * Get the version of the named document that was current when the specified process instance is instantiated.
+     * This method search in the archives for the document at the date of the process instantiation.
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -317,6 +319,7 @@ public interface DocumentAPI {
 
     /**
      * Get the version of the named document when the specified activity completed.
+     * This method search in archives for the document at the date of the activity completion.
      *
      * @param activityInstanceId
      *        The identifier of the activity instance

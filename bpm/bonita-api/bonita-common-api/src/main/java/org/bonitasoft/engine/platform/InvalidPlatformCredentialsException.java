@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,26 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.transaction;
 
-import javax.transaction.Synchronization;
+package org.bonitasoft.engine.platform;
 
-public class JTATransactionWrapper implements Synchronization {
+/**
+ * @author Baptiste Mesta
+ */
+public class InvalidPlatformCredentialsException extends PlatformLoginException {
 
-    private final BonitaTransactionSynchronization bonitaTx;
-
-    public JTATransactionWrapper(final BonitaTransactionSynchronization bonitaTx) {
-        this.bonitaTx = bonitaTx;
+    public InvalidPlatformCredentialsException(String message) {
+        super(message);
     }
-
-    @Override
-    public void beforeCompletion() {
-        bonitaTx.beforeCommit();
-    }
-
-    @Override
-    public void afterCompletion(final int status) {
-        bonitaTx.afterCompletion(JTATransactionServiceImpl.convert(status));
-    }
-
 }
