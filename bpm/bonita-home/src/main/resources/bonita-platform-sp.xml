@@ -297,12 +297,16 @@
 		<constructor-arg name="platformInformationProvider" ref="platformInformationProvider" />
 	</bean>
 
-	<bean id="transactionalPlatformInformationUpdater" class="com.bonitasoft.engine.service.platform.TransactionalPlatformInformationUpdater" >
+	<bean id="lockedTransactionExecutor" class="com.bonitasoft.engine.execution.transaction.LockedTransactionExecutor" >
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="transactionalPlatformInformationUpdater" class="com.bonitasoft.engine.service.platform.TransactionalPlatformInformationUpdater" >
+		<constructor-arg name="lockedTransactionExecutor" ref="lockedTransactionExecutor" />
 		<constructor-arg name="platformInformationManager" ref="simplePlatformInformationManager" />
 		<constructor-arg name="platformInformationProvider" ref="platformInformationProvider" />
-		<constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="updatePlatformInfoSynchronization" class="com.bonitasoft.engine.service.platform.UpdatePlatformInfoSynchronization">

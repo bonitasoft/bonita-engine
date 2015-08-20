@@ -9,77 +9,55 @@
 
 package com.bonitasoft.engine.service.platform;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import org.bonitasoft.engine.lock.BonitaLock;
-import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import com.bonitasoft.engine.execution.LockInfo;
+import com.bonitasoft.engine.execution.transaction.LockedTransactionExecutor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionalPlatformInformationUpdaterTest {
 
-    public static final int OBJECT_TO_LOCK_ID = 1;
-    public static final String OBJECT_TYPE = "platformInfo";
-    public static final int NONE_TENANT_ID = -1;
-    @Mock
-    private LockService lockService;
-
     @Mock
     private PlatformInformationManagerImpl platformInformationManager;
-
-    @Mock
-    private TransactionService transactionService;
 
     @Mock
     private PlatformInformationProvider provider;
 
     @Mock
-    private TechnicalLoggerService loggerService;
+    private LockedTransactionExecutor lockedTransactionExecutor;
 
     @InjectMocks
     private TransactionalPlatformInformationUpdater transactionalPlatformInformationUpdater;
 
     @Before
     public void setUp() throws Exception {
-        given(loggerService.isLoggable(Matchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
         given(provider.get()).willReturn(1);
 
     }
 
     @Test
-    public void run_should_execute_update_inside_a_locked_transaction_when_there_are_changes() throws Exception {
+    public void run_should_execute_update_when_there_are_changes() throws Exception {
         //given
-        BonitaLock lock = mock(BonitaLock.class);
-        given(lockService.lock(OBJECT_TO_LOCK_ID, OBJECT_TYPE, NONE_TENANT_ID)).willReturn(lock);
         given(provider.get()).willReturn(1);
 
         //when
         transactionalPlatformInformationUpdater.run();
 
         //then
-        InOrder inOrder = inOrder(lockService, transactionService);
-        inOrder.verify(lockService).lock(OBJECT_TO_LOCK_ID, OBJECT_TYPE, NONE_TENANT_ID);
-        inOrder.verify(transactionService)
-                .executeInTransaction(any(TransactionalPlatformInformationUpdater.UpdatePlatformInfoTransactionContent.class));
-        inOrder.verify(lockService).unlock(lock, -1);
+        ArgumentCaptor<LockInfo> lockInfoCaptor = ArgumentCaptor.forClass(LockInfo.class);
+        verify(lockedTransactionExecutor).executeInsideLock(lockInfoCaptor.capture(), any(TransactionalPlatformInformationUpdater.UpdatePlatformInfoTransactionContent.class));
+        assertThat(lockInfoCaptor.getValue()).isEqualToComparingFieldByField(PlatformInfoLock.build());
     }
 
     @Test
@@ -92,7 +70,7 @@ public class TransactionalPlatformInformationUpdaterTest {
 
         //then
 
-        verifyZeroInteractions(lockService, transactionService);
+        verifyZeroInteractions(lockedTransactionExecutor);
     }
 
     @Test
@@ -105,58 +83,6 @@ public class TransactionalPlatformInformationUpdaterTest {
 
         //then
         verify(platformInformationManager).update();
-    }
-
-    @Test
-    public void run_should_log_exception_when_lock_throws_exception() throws Exception {
-        //given
-        SLockException lockException = new SLockException("impossible to lock");
-        given(lockService.lock(OBJECT_TO_LOCK_ID, OBJECT_TYPE, NONE_TENANT_ID)).willThrow(lockException);
-
-        //when
-        transactionalPlatformInformationUpdater.run();
-
-        //then
-        verify(loggerService).log(TransactionalPlatformInformationUpdater.class, TechnicalLogSeverity.ERROR, "Unable to update the platform information.",
-                lockException);
-
-    }
-
-    @Test
-    public void run_should_log_exception_and_unlock_when_transactionService_throws_exception() throws Exception {
-        //given
-        BonitaLock lock = mock(BonitaLock.class);
-        given(lockService.lock(OBJECT_TO_LOCK_ID, OBJECT_TYPE, NONE_TENANT_ID)).willReturn(lock);
-
-        SPlatformUpdateException updateException = new SPlatformUpdateException("impossible to update");
-        given(transactionService.executeInTransaction(any(TransactionalPlatformInformationUpdater.UpdatePlatformInfoTransactionContent.class)))
-                .willThrow(updateException);
-
-        //when
-        transactionalPlatformInformationUpdater.run();
-
-        //then
-        verify(loggerService).log(TransactionalPlatformInformationUpdater.class, TechnicalLogSeverity.ERROR, "Unable to update the platform information.",
-                updateException);
-        verify(lockService).unlock(lock, NONE_TENANT_ID);
-
-    }
-
-    @Test
-    public void run_should_log_exception_when_unlock_throws_exception() throws Exception {
-        //given
-        BonitaLock lock = mock(BonitaLock.class);
-        given(lockService.lock(OBJECT_TO_LOCK_ID, OBJECT_TYPE, NONE_TENANT_ID)).willReturn(lock);
-        SLockException exception = new SLockException("Unable to unlock");
-        doThrow(exception).when(lockService).unlock(lock, NONE_TENANT_ID);
-
-        //when
-        transactionalPlatformInformationUpdater.run();
-
-        //then
-        verify(loggerService).log(TransactionalPlatformInformationUpdater.class, TechnicalLogSeverity.ERROR,
-                "Unable to release platform lock. Please, restart your server", exception);
-
     }
 
 }
