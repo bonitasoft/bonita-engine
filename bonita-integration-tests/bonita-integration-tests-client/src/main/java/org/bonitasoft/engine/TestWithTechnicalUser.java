@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine;
 
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.test.EngineInitializerAPIFactoryImpl;
+import org.bonitasoft.engine.test.UserTaskAPI;
 import org.junit.After;
 import org.junit.Before;
 
@@ -22,10 +25,11 @@ import org.junit.Before;
  * @since 6.4.1
  */
 public class TestWithTechnicalUser extends CommonAPIIT {
-
+    protected UserTaskAPI userTaskAPI;
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
+        userTaskAPI = EngineInitializerAPIFactoryImpl.getInstance().getUserTaskAPI(TenantAPIAccessor.getLoginAPI().login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
     }
 
     @After
