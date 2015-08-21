@@ -23,12 +23,14 @@ public class PlatformInfoUpdateScheduledExecutor implements PlatformLifecycleSer
 
     public static final int PERIOD = 5;
     private final TransactionalPlatformInformationUpdater transactionalPlatformInformationUpdater;
+    private final TransactionalPlatformInfoInitializer transactionalPlatformInfoInitializer;
     private ScheduledExecutorService scheduledExecutor;
 
     private int period;
 
-    public PlatformInfoUpdateScheduledExecutor(TransactionalPlatformInformationUpdater transactionalPlatformInformationUpdater) {
+    public PlatformInfoUpdateScheduledExecutor(TransactionalPlatformInformationUpdater transactionalPlatformInformationUpdater, TransactionalPlatformInfoInitializer transactionalPlatformInfoInitializer) {
         this.transactionalPlatformInformationUpdater = transactionalPlatformInformationUpdater;
+        this.transactionalPlatformInfoInitializer = transactionalPlatformInfoInitializer;
         this.period = PERIOD;
     }
 
@@ -45,6 +47,7 @@ public class PlatformInfoUpdateScheduledExecutor implements PlatformLifecycleSer
 
     @Override
     public void start() throws SBonitaException {
+        transactionalPlatformInfoInitializer.ensurePlatformInfoIsSet();
         getScheduledExecutor().scheduleWithFixedDelay(transactionalPlatformInformationUpdater, getPeriod(), getPeriod(), TimeUnit.SECONDS);
     }
 

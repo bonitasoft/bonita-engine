@@ -33,21 +33,25 @@ public class PlatformInfoUpdateScheduledExecutorTest {
     @Mock
     private ScheduledExecutorService executorService;
 
+    @Mock
+    private TransactionalPlatformInfoInitializer transactionalPlatformInfoInitializer;
+
     private PlatformInfoUpdateScheduledExecutor platformInfoUpdateScheduledExecutor;
 
     @Before
     public void setUp() throws Exception {
-        platformInfoUpdateScheduledExecutor = spy(new PlatformInfoUpdateScheduledExecutor(transactionalPlatformInformationUpdater));
+        platformInfoUpdateScheduledExecutor = spy(new PlatformInfoUpdateScheduledExecutor(transactionalPlatformInformationUpdater, transactionalPlatformInfoInitializer));
         given(platformInfoUpdateScheduledExecutor.getScheduledExecutor()).willReturn(executorService);
         given(platformInfoUpdateScheduledExecutor.getPeriod()).willReturn(PERIOD);
     }
 
     @Test
-    public void start_should_schedule_updater() throws Exception {
+    public void start_should_initiliaze_the_platform_info_and_schedule_updater() throws Exception {
         //when
         platformInfoUpdateScheduledExecutor.start();
 
         //then
+        verify(transactionalPlatformInfoInitializer).ensurePlatformInfoIsSet();
         verify(executorService).scheduleWithFixedDelay(transactionalPlatformInformationUpdater, PERIOD, PERIOD, TimeUnit.SECONDS);
     }
 
