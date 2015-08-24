@@ -32,12 +32,8 @@ public class TransactionalPlatformInformationUpdater implements Runnable {
     @Override
     public void run() {
         if (platformInformationProvider.get() > 0) {
-            updateInfoInTransaction();
+            lockedTransactionExecutor.executeInsideLock(PlatformInfoLock.build(), new UpdatePlatformInfoTransactionContent());
         }
-    }
-
-    private void updateInfoInTransaction() {
-        lockedTransactionExecutor.executeInsideLock(PlatformInfoLock.build(), new UpdatePlatformInfoTransactionContent());
     }
 
     protected class UpdatePlatformInfoTransactionContent implements Callable<Void> {
