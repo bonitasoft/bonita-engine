@@ -52,6 +52,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.theme.ThemeRetriever;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.builder.impl.SThemeLogBuilderImpl;
@@ -80,14 +81,17 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final ThemeRetriever themeRetriever;
+
     public ThemeServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, ThemeRetriever themeRetriever) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
+        this.themeRetriever = themeRetriever;
     }
 
     @Override
@@ -164,9 +168,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public STheme getTheme(final SThemeType type, final boolean isDefault) throws SThemeNotFoundException, SThemeReadException {
-        final SelectOneDescriptor<STheme> selectDescriptor = SelectDescriptorBuilder.getTheme(type, isDefault);
         try {
-            final STheme theme = persistenceService.selectOne(selectDescriptor);
+            final STheme theme = themeRetriever.getTheme(type, isDefault);
             if (theme == null) {
                 throw new SThemeNotFoundException(type, isDefault);
             }
@@ -301,7 +304,7 @@ public class ThemeServiceImpl implements ThemeService {
 	@Override
 	public void start() throws SBonitaException {
 		try {
-			new ThemeServiceStartupHelper(this).createOrUpdateDefaultThemes();
+			new ThemeServiceStartupHelper(this, themeRetriever).createOrUpdateDefaultThemes();
 		} catch (IOException e) {
 			throw new SBonitaRuntimeException("Failed to start theme service due to: "+ e.getMessage(), e);
 		}

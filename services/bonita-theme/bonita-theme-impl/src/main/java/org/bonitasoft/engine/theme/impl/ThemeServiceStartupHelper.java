@@ -17,15 +17,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.theme.ThemeRetriever;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.builder.SThemeBuilder;
 import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilder;
 import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilderFactory;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
-import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
-import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.exception.SThemeUpdateException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
@@ -43,34 +43,35 @@ public class ThemeServiceStartupHelper {
     private static final String ZIP = ".zip";
 
     private final ThemeService themeService;
+    private final ThemeRetriever themeRetriever;
 
-    public ThemeServiceStartupHelper(final ThemeService themeService) {
+    public ThemeServiceStartupHelper(final ThemeService themeService, ThemeRetriever themeRetriever) {
         this.themeService = themeService;
+        this.themeRetriever = themeRetriever;
     }
 
     /**
      * Create the default Portal and Mobile themes if they do not already exist else do nothing
      * 
      * @throws IOException
-     * @throws SThemeCreationException
-     * @throws SThemeReadException
+     * @throws SBonitaException
      */
-    public void createOrUpdateDefaultThemes() throws IOException, SThemeCreationException, SThemeReadException, SThemeUpdateException {
+    public void createOrUpdateDefaultThemes() throws IOException, SBonitaException {
         createOrUpdateDefaultTheme(SThemeType.MOBILE, BONITA_MOBILE_THEME_DEFAULT);
         createOrUpdateDefaultTheme(SThemeType.PORTAL, BONITA_PORTAL_THEME_DEFAULT);
     }
 
-    void createOrUpdateDefaultTheme(SThemeType portal, String themeDefault) throws IOException, SThemeReadException, SThemeUpdateException,
-            SThemeCreationException {
+    void createOrUpdateDefaultTheme(SThemeType portal, String themeDefault) throws IOException, SBonitaException {
         final byte[] defaultThemeZip = getFileContent(themeDefault + ZIP);
-        try {
-            final STheme theme = themeService.getTheme(portal, true);
+        final STheme theme = themeRetriever.getTheme(portal, true);
+        if (theme != null) {
             if (defaultThemeZip.length != theme.getContent().length) {
                 updateDefaultTheme(theme, defaultThemeZip, portal);
             }
-        } catch (SThemeNotFoundException e) {
+        } else {
             createDefaultTheme(defaultThemeZip, portal);
         }
+
     }
 
     void createDefaultTheme(byte[] defaultThemeZip, SThemeType type) throws IOException, SThemeCreationException {

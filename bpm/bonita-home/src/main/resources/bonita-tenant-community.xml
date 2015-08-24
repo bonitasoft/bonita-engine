@@ -1035,12 +1035,17 @@
         <constructor-arg name="csvSeparator" value="${bonita.tenant.timetracker.csv.separator}" />
     </bean>
 
+    <bean id="themeRetriever" class="org.bonitasoft.engine.theme.impl.ThemeRetrieverImpl" >
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+    </bean>
+
     <bean id="themeService" class="org.bonitasoft.engine.theme.impl.ThemeServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="themeRetriever" ref="themeRetriever" />
     </bean>
 
 

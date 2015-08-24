@@ -21,7 +21,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -32,10 +31,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.theme.ThemeRetriever;
 import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
-import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 import org.bonitasoft.engine.theme.model.impl.SThemeImpl;
@@ -59,10 +58,16 @@ public class ThemeServiceStartupHelperTest {
     public static final byte[] PORTAL_CONTENT = new byte[] { 6 };
     public static final byte[] PORTAL_CSS_CONTENT = new byte[] { 1, 2, 3, 4, 5 };
     private static final byte[] MOBILE_CONTENT = new byte[] { 5 };
+
     @Captor
     public ArgumentCaptor<EntityUpdateDescriptor> captor;
+
     @Mock
     private ThemeService themeService;
+
+    @Mock
+    private ThemeRetriever themeRetriever;
+
     @InjectMocks
     @Spy
     private ThemeServiceStartupHelper themeServiceStartupHelper;
@@ -75,13 +80,13 @@ public class ThemeServiceStartupHelperTest {
         doReturn(PORTAL_CSS_CONTENT).when(themeServiceStartupHelper).getCssContent(SThemeType.PORTAL);
     }
 
-    private void hasNoTheme(SThemeType type) throws SThemeNotFoundException, SThemeReadException {
-        doThrow(SThemeNotFoundException.class).when(themeService).getTheme(type, true);
+    private void hasNoTheme(SThemeType type) throws SBonitaReadException {
+        doReturn(null).when(themeRetriever).getTheme(type, true);
     }
 
-    private SThemeImpl hasThemeWithContentContent(SThemeType type, byte[] content) throws SThemeNotFoundException, SThemeReadException {
+    private SThemeImpl hasThemeWithContentContent(SThemeType type, byte[] content) throws SBonitaReadException {
         final SThemeImpl toBeReturned = new SThemeImpl();
-        doReturn(toBeReturned).when(themeService).getTheme(type, true);
+        doReturn(toBeReturned).when(themeRetriever).getTheme(type, true);
         toBeReturned.setContent(content);
         return toBeReturned;
     }
@@ -273,14 +278,14 @@ public class ThemeServiceStartupHelperTest {
 
     @Test
     public void getFileContent_should_return_null_when_file_not_in_classpath() throws IOException {
-        final ThemeServiceStartupHelper startupHelper = new ThemeServiceStartupHelper(themeService);
+        final ThemeServiceStartupHelper startupHelper = new ThemeServiceStartupHelper(themeService, themeRetriever);
 
         assertNull(startupHelper.getFileContent("filename_not_in_classpath.txt"));
     }
 
     @Test
     public void getFileContent_should_return_content_when_file_in_classpath() throws IOException {
-        final ThemeServiceStartupHelper startupHelper = new ThemeServiceStartupHelper(themeService);
+        final ThemeServiceStartupHelper startupHelper = new ThemeServiceStartupHelper(themeService, themeRetriever);
 
         final byte[] fileContent = startupHelper.getFileContent("filename_in_classpath.txt");
         assertNotNull(fileContent);
@@ -289,7 +294,7 @@ public class ThemeServiceStartupHelperTest {
 
     @Test
     public void should_getCssContent_return_null_when_mobile() throws Exception {
-        final ThemeServiceStartupHelper themeServiceStartupHelper = new ThemeServiceStartupHelper(themeService);
+        final ThemeServiceStartupHelper themeServiceStartupHelper = new ThemeServiceStartupHelper(themeService, themeRetriever);
 
         final byte[] cssContent = themeServiceStartupHelper.getCssContent(SThemeType.MOBILE);
 
@@ -298,7 +303,7 @@ public class ThemeServiceStartupHelperTest {
 
     @Test
     public void should_getCssContent_return_bonitaCss_when_portal() throws Exception {
-        final ThemeServiceStartupHelper themeServiceStartupHelper = spy(new ThemeServiceStartupHelper(themeService));
+        final ThemeServiceStartupHelper themeServiceStartupHelper = spy(new ThemeServiceStartupHelper(themeService, themeRetriever));
         doReturn(IOUtil.zip(Collections.singletonMap("bonita.css", new byte[] { 1, 2, 4 }))).when(themeServiceStartupHelper).getFileContent(
                 ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT + "-css.zip");
 
