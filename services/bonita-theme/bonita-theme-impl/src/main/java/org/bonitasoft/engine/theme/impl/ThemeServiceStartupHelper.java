@@ -44,10 +44,12 @@ public class ThemeServiceStartupHelper {
 
     private final ThemeService themeService;
     private final ThemeRetriever themeRetriever;
+    private final ThemeActionCalculator themeActionCalculator;
 
-    public ThemeServiceStartupHelper(final ThemeService themeService, ThemeRetriever themeRetriever) {
+    public ThemeServiceStartupHelper(final ThemeService themeService, ThemeRetriever themeRetriever, ThemeActionCalculator themeActionCalculator) {
         this.themeService = themeService;
         this.themeRetriever = themeRetriever;
+        this.themeActionCalculator = themeActionCalculator;
     }
 
     /**
@@ -64,21 +66,19 @@ public class ThemeServiceStartupHelper {
     void createOrUpdateDefaultTheme(SThemeType portal, String themeDefault) throws IOException, SBonitaException {
         final byte[] defaultThemeZip = getFileContent(themeDefault + ZIP);
         final STheme theme = themeRetriever.getTheme(portal, true);
-        if (theme != null) {
-            if (defaultThemeZip.length != theme.getContent().length) {
+        switch (themeActionCalculator.calculateAction(theme, defaultThemeZip)) {
+            case CREATE:
+                createDefaultTheme(defaultThemeZip, portal);
+                break;
+            case UPDATE:
                 updateDefaultTheme(theme, defaultThemeZip, portal);
-            }
-        } else {
-            createDefaultTheme(defaultThemeZip, portal);
+                break;
         }
-
     }
 
     void createDefaultTheme(byte[] defaultThemeZip, SThemeType type) throws IOException, SThemeCreationException {
-        if (defaultThemeZip != null && defaultThemeZip.length > 0) {
-            final STheme sTheme = buildSTheme(defaultThemeZip, getCssContent(type), type);
-            themeService.createTheme(sTheme);
-        }
+        final STheme sTheme = buildSTheme(defaultThemeZip, getCssContent(type), type);
+        themeService.createTheme(sTheme);
     }
 
     void updateDefaultTheme(STheme theme, byte[] defaultThemeZip, SThemeType mobile) throws IOException, SThemeUpdateException {
