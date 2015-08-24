@@ -15,6 +15,7 @@ package org.bonitasoft.engine.commons;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtilsBean;
@@ -32,6 +33,7 @@ public class TypeConverterUtil {
         convertUtilsBean = new ConvertUtilsBean();
         final DateConverter dateConverter = new DateConverter();
         dateConverter.setPatterns(datePatterns);
+        dateConverter.setTimeZone(TimeZone.getTimeZone("GMT"));
         convertUtilsBean.register(dateConverter, Date.class);
     }
 
