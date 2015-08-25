@@ -22,22 +22,6 @@ public class SPlatformLoginException extends SBonitaException {
 
     private static final long serialVersionUID = 4420091633702041899L;
 
-    public SPlatformLoginException(final Object... arguments) {
-        super(arguments);
-    }
-
-    public SPlatformLoginException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public SPlatformLoginException(final String message) {
-        super(message);
-    }
-
-    public SPlatformLoginException(final Throwable cause, final Object... arguments) {
-        super(cause, arguments);
-    }
-
     public SPlatformLoginException(final Throwable cause) {
         super(cause);
     }

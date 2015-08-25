@@ -17,10 +17,10 @@ import java.util.Date;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.core.platform.login.SInvalidPlatformCredentialsException;
+import org.bonitasoft.engine.core.platform.login.SPlatformLoginException;
+import org.bonitasoft.engine.platform.InvalidPlatformCredentialsException;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformLogoutException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
@@ -40,7 +40,7 @@ public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements Platfo
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public PlatformSession login(final String userName, final String password) throws PlatformLoginException {
+    public PlatformSession login(final String userName, final String password) throws PlatformLoginException, InvalidPlatformCredentialsException {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -49,25 +49,24 @@ public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements Platfo
             throw new PlatformLoginException(e.getMessage());
         }
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
-//        PlatformService platformService = platformAccessor.getPlatformService(); // TO UNCOMMENT lvaills
+        //        PlatformService platformService = platformAccessor.getPlatformService(); // TO UNCOMMENT lvaills
 
         // first call before create session: put the platform in cache if necessary
-//        putPlatformInCacheIfNecessary(platformAccessor, platformService); // TO UNCOMMENT lvaills
+        //        putPlatformInCacheIfNecessary(platformAccessor, platformService); // TO UNCOMMENT lvaills
 
+        final SPlatformSession platformSession;
         try {
-            final SPlatformSession platformSession = platformLoginService.login(userName, password);
-            final long id = platformSession.getId();
-            final Date creationDate = platformSession.getCreationDate();
-            final long duration = platformSession.getDuration();
-            final long userId = platformSession.getUserId();
-            return new PlatformSessionImpl(id, creationDate, duration, userName, userId);
-        } catch (final SBonitaException e) {
-            final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
-            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
-            throw new PlatformLoginException(e.getMessage());
+            platformSession = platformLoginService.login(userName, password);
+        } catch (SPlatformLoginException e) {
+            throw new PlatformLoginException(e);
+        } catch (SInvalidPlatformCredentialsException ignored) {
+            throw new InvalidPlatformCredentialsException("Wrong username of password");
         }
+        final long id = platformSession.getId();
+        final Date creationDate = platformSession.getCreationDate();
+        final long duration = platformSession.getDuration();
+        final long userId = platformSession.getUserId();
+        return new PlatformSessionImpl(id, creationDate, duration, userName, userId);
     }
 
     @Override

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
@@ -73,4 +74,21 @@ public class ActivateTenantTest {
         verify(connectorExecutor).start();
     }
 
+    @Test
+    public void should_resume_jobs_of_the_tenant() throws Exception {
+        given(platformService.activateTenant(tenantId)).willReturn(true);
+        activateTenant.execute();
+
+        verify(schedulerService).resumeJobs(tenantId);
+    }
+
+
+    @Test
+    public void should_not_do_anything_if_tenant_was_not_activated() throws Exception {
+        given(platformService.activateTenant(tenantId)).willReturn(false);
+        activateTenant.execute();
+
+        verifyZeroInteractions(schedulerService);
+        verifyZeroInteractions(connectorExecutor);
+    }
 }

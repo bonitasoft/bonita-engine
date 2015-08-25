@@ -34,7 +34,7 @@ public interface PlatformLoginService {
      * @see SPlatformSession
      * @throws SPlatformLoginException
      */
-    SPlatformSession login(String userName, String password) throws SPlatformLoginException;
+    SPlatformSession login(String userName, String password) throws SPlatformLoginException, SInvalidPlatformCredentialsException;
 
     /**
      * logout the platform by sessionId

@@ -13,11 +13,21 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
-
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
@@ -134,13 +144,8 @@ public class JTATransactionServiceImplTest {
         verify(txManager).setRollbackOnly();
     }
 
-    /**
-     * The method call has to be executed between a transaction.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testExecuteInTransactionWithCommit() throws Exception {
+    public void should_executeInTransaction_with_fail_on_execute_do_not_make_other_tx_to_fail() throws Exception {
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
 
@@ -220,22 +225,6 @@ public class JTATransactionServiceImplTest {
         verify(transaction, times(2)).registerSynchronization(Mockito.any(Synchronization.class));
     }
 
-    private class MyBeforeCommitCallable implements Callable<Void> {
-
-        private boolean called = false;
-
-        @Override
-        public Void call() throws Exception {
-            called = true;
-
-            return null;
-        }
-
-        public boolean isCalled() {
-            return called;
-        }
-    }
-
     @Test
     public void testBeforeCommitCallablesAreExecutedWhileCommit() throws Exception {
         Transaction transaction = new MyTransaction();
@@ -306,7 +295,7 @@ public class JTATransactionServiceImplTest {
     public void beginShouldResetCounterIfTransactionCreationExceptionOccurs() throws Exception {
         doReturn(Status.STATUS_PREPARED).when(txManager).getStatus();
         JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
-        doThrow(STransactionCreationException.class).when(txService).createTransaction(anyBoolean());
+        doThrow(STransactionCreationException.class).when(txService).createTransaction(any(JTATransactionServiceImpl.TransactionServiceContext.class), anyBoolean());
 
         try {
             txService.begin();
@@ -319,12 +308,28 @@ public class JTATransactionServiceImplTest {
     public void beginShouldResetCounterIfSystemExceptionOccurs() throws Exception {
         doReturn(Status.STATUS_PREPARED).when(txManager).getStatus();
         JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
-        doThrow(SystemException.class).when(txService).createTransaction(anyBoolean());
+        doThrow(SystemException.class).when(txService).createTransaction(any(JTATransactionServiceImpl.TransactionServiceContext.class), anyBoolean());
 
         try {
             txService.begin();
         } finally {
             verify(txService).resetTxCounter(any(JTATransactionServiceImpl.TransactionServiceContext.class));
+        }
+    }
+
+    private class MyBeforeCommitCallable implements Callable<Void> {
+
+        private boolean called = false;
+
+        @Override
+        public Void call() throws Exception {
+            called = true;
+
+            return null;
+        }
+
+        public boolean isCalled() {
+            return called;
         }
     }
 }

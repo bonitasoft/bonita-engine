@@ -42,67 +42,67 @@ public class SelectDescriptorBuilder {
         } else {
             queryOptions = new QueryOptions(fromIndex, maxResults, SMappedDocument.class, sortFieldOrder, orderBy);
         }
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        final Map<String, Object> parameters = new HashMap<>(1);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectListDescriptor<SMappedDocument>(queryName, parameters, SMappedDocument.class, queryOptions);
+        return new SelectListDescriptor<>(queryName, parameters, SMappedDocument.class, queryOptions);
     }
 
     public static SelectOneDescriptor<SMappedDocument> getSMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        final Map<String, Object> parameters = new HashMap<>(2);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", documentName);
-        return new SelectOneDescriptor<SMappedDocument>("getSMappedDocumentOfProcessWithName", parameters, SMappedDocument.class);
+        return new SelectOneDescriptor<>("getSMappedDocumentOfProcessWithName", parameters, SMappedDocument.class);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfSMappedDocumentOfProcess(final long processInstanceId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        final Map<String, Object> parameters = new HashMap<>(1);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectOneDescriptor<Long>("getNumberOfSMappedDocumentOfProcess", parameters, SDocument.class);
+        return new SelectOneDescriptor<>("getNumberOfSMappedDocumentOfProcess", parameters, SDocument.class);
     }
 
     public static SelectListDescriptor<SAMappedDocument> getSAMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName,
             final long time) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", documentName);
         parameters.put("time", time);
-        return new SelectListDescriptor<SAMappedDocument>("getSAMappedDocumentOfProcessWithName", parameters, SAMappedDocument.class,
+        return new SelectListDescriptor<>("getSAMappedDocumentOfProcessWithName", parameters, SAMappedDocument.class,
                 new QueryOptions(0, 1));
     }
 
     public static SelectByIdDescriptor<SAMappedDocument> getArchivedDocumentById(final long documentId) {
-        return new SelectByIdDescriptor<SAMappedDocument>("getArchivedDocumentById", SAMappedDocument.class, documentId);
+        return new SelectByIdDescriptor<>("getArchivedDocumentById", SAMappedDocument.class, documentId);
     }
 
-    public static SelectOneDescriptor<SAMappedDocument> getArchivedVersionOdDocument(final long documentId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+    public static SelectOneDescriptor<SAMappedDocument> getArchivedVersionOfDocument(final long documentId) {
+        final Map<String, Object> parameters = new HashMap<>(1);
         parameters.put("sourceObjectId", documentId);
-        return new SelectOneDescriptor<SAMappedDocument>("getArchivedVersionOfDocument", parameters, SAMappedDocument.class);
+        return new SelectOneDescriptor<>("getArchivedVersionOfDocument", parameters, SAMappedDocument.class);
     }
 
     public static SelectListDescriptor<SMappedDocument> getDocumentList(String name, long processInstanceId, QueryOptions queryOptions) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", name);
-        return new SelectListDescriptor<SMappedDocument>("getDocumentList", parameters, SMappedDocument.class,
+        return new SelectListDescriptor<>("getDocumentList", parameters, SMappedDocument.class,
                 queryOptions);
     }
 
     public static SelectListDescriptor<SAMappedDocument> getArchivedDocumentList(String name, long processInstanceId, QueryOptions queryOptions, long time) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", name);
         parameters.put("time", time);
-        return new SelectListDescriptor<SAMappedDocument>("getArchivedDocumentList", parameters, SAMappedDocument.class,
+        return new SelectListDescriptor<>("getArchivedDocumentList", parameters, SAMappedDocument.class,
                 queryOptions);
     }
 
     public static SelectListDescriptor<SMappedDocument> getDocumentListCreatedBefore(String name, long processInstanceId, QueryOptions queryOptions, long time) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        final Map<String, Object> parameters = new HashMap<>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", name);
         parameters.put("time", time);
-        return new SelectListDescriptor<SMappedDocument>("getDocumentCreatedBeforeList", parameters, SMappedDocument.class,
+        return new SelectListDescriptor<>("getDocumentCreatedBeforeList", parameters, SMappedDocument.class,
                 queryOptions);
     }
 }
