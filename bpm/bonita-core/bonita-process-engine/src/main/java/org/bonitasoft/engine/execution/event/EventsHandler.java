@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.event;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import org.bonitasoft.engine.bdm.ProcessInfos;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -68,6 +64,11 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handle event depending on its type
@@ -368,8 +369,9 @@ public class EventsHandler {
                     processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null,
-                subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
+        ProcessInfos processInfos = new ProcessInfos(operations.getOperations());
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, processInfos,operations.getContext(), null,
+                subProcflowNodeInstance.getId(), subProcessId); // Process contract inputs on EventSubProcess are not supported.
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
     }
 
@@ -397,8 +399,9 @@ public class EventsHandler {
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
             throws SProcessInstanceCreationException, SContractViolationException {
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null, -1,
-                -1, null);
+        ProcessInfos processInfos = new ProcessInfos(operations.getOperations());
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId,processInfos, operations.getContext(),null, -1,
+                -1);
     }
 
     public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {

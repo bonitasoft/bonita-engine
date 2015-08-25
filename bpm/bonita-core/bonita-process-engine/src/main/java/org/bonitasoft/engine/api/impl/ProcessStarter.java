@@ -13,12 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.bonitasoft.engine.bdm.ProcessInfos;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
@@ -53,6 +48,12 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -126,8 +127,9 @@ public class ProcessStarter {
         final SProcessInstance startedSProcessInstance;
         try {
             final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
-            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
-                    new FlowNodeSelector(sProcessDefinition, filter), instantiationInputs);
+            ProcessInfos processInfos = new ProcessInfos(instantiationInputs,sOperations,operationContext, starterUserId, starterSubstituteUserId);
+            startedSProcessInstance = processExecutor.start(processInfos, connectorsWithInput,
+                    new FlowNodeSelector(sProcessDefinition, filter));
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
             e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());

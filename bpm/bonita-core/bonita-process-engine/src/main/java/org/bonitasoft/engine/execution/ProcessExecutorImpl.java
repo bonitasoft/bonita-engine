@@ -13,17 +13,10 @@
  */
 package org.bonitasoft.engine.execution;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.ProcessInfos;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -125,6 +118,14 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Baptiste Mesta
@@ -414,7 +415,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, selectorForConnectorOnEnter);
     }
 
-    private void storeProcessInstantiationInputs(final long processInstanceId, final Map<String, Serializable> processInputs) throws SContractDataCreationException {
+    private void storeProcessInstantiationInputs(final long processInstanceId, final Map<String, Serializable> processInputs)
+            throws SContractDataCreationException {
         contractDataService.addProcessData(processInstanceId, processInputs);
     }
 
@@ -424,7 +426,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void initializeBusinessData(final SProcessDefinition sDefinition, final SProcessInstance sInstance)
             throws SBonitaException {
-        SExpressionContext expressionContext = new SExpressionContext(sInstance.getId(),DataInstanceContainer.PROCESS_INSTANCE.name(),sDefinition.getId());
+        SExpressionContext expressionContext = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), sDefinition.getId());
         final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();
@@ -760,21 +762,19 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance start(final long starterId, final long starterSubstituteId, final List<SOperation> operations, final Map<String, Object> context,
-            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector, final Map<String, Serializable> processInputs)
+    public SProcessInstance start(ProcessInfos processInfos, final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector)
             throws SProcessInstanceCreationException, SContractViolationException {
-        return start(starterId, starterSubstituteId, null, operations, context, connectorsWithInput, -1, selector, processInputs);
+        return start(processInfos, null, connectorsWithInput, -1, selector);
     }
 
     @Override
-    public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId, final long starterSubstituteId,
-            final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
-            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId,
-            final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
+    public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, ProcessInfos processInfos,
+            final SExpressionContext expressionContext, final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId,
+            final long subProcessDefinitionId) throws SProcessInstanceCreationException, SContractViolationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
-            return start(starterId, starterSubstituteId, expressionContext, operations, context, connectorsWithInput, callerId, selector, processInputs);
+            return start(processInfos, expressionContext, connectorsWithInput, callerId, selector);
         } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
             throw new SProcessInstanceCreationException(e);
         }
@@ -788,16 +788,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext,
-            final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors,
-            final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException,
+    public SProcessInstance start(ProcessInfos processInfos, SExpressionContext expressionContext, List<ConnectorDefinitionWithInputValues> connectors,
+            long callerId, FlowNodeSelector selector) throws SProcessInstanceCreationException,
             SContractViolationException {
 
         final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
 
         // Validate start process contract inputs:
         if (selector.getSubProcessDefinitionId() <= 0) {
-            validateContractInputs(processInputs, sProcessDefinition);
+            validateContractInputs(processInfos.getProcessInputs(), sProcessDefinition);
         }
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -811,11 +810,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 // ignore, just to load
             }
 
-            final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
+            final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, processInfos.getStarterId(),
+                    processInfos.getStarterSubstituteId(), callerId);
 
-            final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
-                    operations != null ? new ArrayList<>(operations) : null, context, selector.getContainer(), connectors,
-                    selector, processInputs);
+            final boolean isInitializing = initialize(processInfos.getStarterId(), sProcessDefinition, sProcessInstance, expressionContext,
+                    processInfos.getOperations() != null ? new ArrayList<>(processInfos.getOperations()) : null, processInfos.getContext(),
+                    selector.getContainer(), connectors,
+                    selector, processInfos.getProcessInputs());
             try {
                 handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
             } catch (final SProcessInstanceCreationException e) {
@@ -841,7 +842,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected void validateContractInputs(final Map<String, Serializable> processInputs, final SProcessDefinition sProcessDefinition) throws SContractViolationException {
+    protected void validateContractInputs(final Map<String, Serializable> processInputs, final SProcessDefinition sProcessDefinition)
+            throws SContractViolationException {
         final SContractDefinition contractDefinition = sProcessDefinition.getContract();
         if (contractDefinition != null) {
             final ContractValidator validator = new ContractValidatorFactory().createContractValidator(logger, expressionService);

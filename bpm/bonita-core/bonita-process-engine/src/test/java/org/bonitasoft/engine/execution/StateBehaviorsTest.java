@@ -13,29 +13,7 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.bpm.connector.ConnectorState.EXECUTING;
-import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
-import static org.bonitasoft.engine.execution.StateBehaviors.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyMap;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.bonitasoft.engine.bdm.ProcessInfos;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
@@ -70,6 +48,39 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.connector.ConnectorState.EXECUTING;
+import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
+import static org.bonitasoft.engine.execution.StateBehaviors.AFTER_ON_FINISH;
+import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_ENTER;
+import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_FINISH;
+import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_ENTER;
+import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_FINISH;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Phase order is: BEFORE_ON_ENTER > DURING_ON_ENTER > BEFORE_ON_FINISH > DURING_ON_FINISH > AFTER_ON_FINISH.
@@ -615,6 +626,7 @@ public class StateBehaviorsTest {
 
         spy.instantiateProcess(callerProcessDefinition, callActivityDefinition, callActivityInstance, 147L);
 
-        verify(processExecutor).start(147L, -1, 0, 0, context, operations, null, null, callerId, -1, evaluatedExpressions);
+        ProcessInfos processInfos = new ProcessInfos(evaluatedExpressions, operations);
+        verify(processExecutor).start(147L, -1,processInfos,context, null, callerId, -1);
     }
 }

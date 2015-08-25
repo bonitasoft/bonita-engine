@@ -13,16 +13,10 @@
  */
 package org.bonitasoft.engine.execution;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.bdm.ProcessInfos;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
@@ -125,6 +119,13 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * @author Baptiste Mesta
@@ -563,9 +564,9 @@ public class StateBehaviors {
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
 
         final Map<String, Serializable> processInputs = getEvaluatedInputExpressions(callActivityDefinition.getProcessStartContractInputs(), context);
-
+        ProcessInfos processInfos = new ProcessInfos(processInputs,operationList);
         processExecutor
-                .start(targetProcessDefinitionId, -1, 0, 0, context, operationList, null, null, callerId, -1, processInputs);
+                .start(targetProcessDefinitionId, -1, processInfos, context,null, callerId, -1);
     }
 
     protected Map<String, Serializable> getEvaluatedInputExpressions(Map<String, SExpression> contractInputs, SExpressionContext context)
