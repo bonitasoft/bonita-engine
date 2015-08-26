@@ -16,6 +16,8 @@ package org.bonitasoft.engine.api;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -125,7 +127,11 @@ public interface UserAPI {
 
     /**
      * Deletes the user.
-     *
+     * </p>
+     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
+     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
+     * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
+     * 
      * @param userId
      *        The identifier of the user
      * @throws DeletionException
@@ -133,11 +139,18 @@ public interface UserAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @see #updateUser(long, UserUpdater)
+     * @see Application
+     * @see DesignProcessDefinition
      */
     void deleteUser(long userId) throws DeletionException;
 
     /**
      * Deletes the user.
+     * </p>
+     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
+     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
+     * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
      *
      * @param userName
      *        The name of the user
@@ -146,11 +159,18 @@ public interface UserAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @see #updateUser(long, UserUpdater)
+     * @see Application
+     * @see DesignProcessDefinition
      */
     void deleteUser(String userName) throws DeletionException;
 
     /**
      * Deletes the users.
+     * </p>
+     * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
+     * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
+     * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
      *
      * @param userIds
      *        The identifiers of the users
@@ -159,6 +179,9 @@ public interface UserAPI {
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @see #updateUser(long, UserUpdater)
+     * @see Application
+     * @see DesignProcessDefinition
      */
     void deleteUsers(List<Long> userIds) throws DeletionException;
 
