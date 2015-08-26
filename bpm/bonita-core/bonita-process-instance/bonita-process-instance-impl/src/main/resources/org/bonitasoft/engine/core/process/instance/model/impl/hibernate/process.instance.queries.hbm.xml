@@ -83,6 +83,7 @@
 		WHERE g.logicalGroup4 = :parentProcessInstanceId
 		AND g.name = :name
 		AND g.terminal = FALSE
+		AND g.hitBys NOT LIKE 'FINISH%'
 	</query>
 
 	<query name="getActivitiesWithStates">
