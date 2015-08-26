@@ -20,17 +20,17 @@ import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMapp
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
 import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBuilder.aUserTask;
 import static org.bonitasoft.engine.test.persistence.builder.archive.ArchivedUserTaskInstanceBuilder.anArchivedUserTask;
 
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
 import org.junit.Before;
@@ -388,6 +388,45 @@ public class FlowNodeInstanceTests {
         // Then
         assertThat(sHumanTaskInstances.size()).isEqualTo(2);
         assertThat(sHumanTaskInstances.get(0).getId()).isEqualTo(NORMAL_HUMAN_INSTANCE_ID);
+    }
+
+    @Test
+    public void getActiveGatewayInstance_should_return_gateway_if_not_finished() {
+        // Given
+        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1").withTerminal(false).withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
+        repository.add(gatewayInstance);
+
+        // When
+        final SGatewayInstance gate1 = repository.getActiveGatewayInstanceOfProcess(ROOT_PROCESS_INSTANCE_ID, "gate1");
+
+        // Then
+        assertThat(gate1).isEqualTo(gatewayInstance);
+    }
+
+
+    @Test
+    public void getActiveGatewayInstance_should_not_return_gateway_if_finished() {
+        // Given
+        repository.add(aGatewayInstanceBuilder().withHitBys("FINISH:1").withTerminal(true).withName("gate1").withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build());
+
+        // When
+        final SGatewayInstance gate1 = repository.getActiveGatewayInstanceOfProcess(ROOT_PROCESS_INSTANCE_ID, "gate1");
+
+        // Then
+        assertThat(gate1).isNull();
+    }
+
+    @Test
+    public void getActiveGatewayInstance_should_not_return_gateway_if_wrong_name() {
+        // Given
+        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("notTheGoodGateway").withTerminal(false).withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
+        repository.add(gatewayInstance);
+
+        // When
+        final SGatewayInstance gate1 = repository.getActiveGatewayInstanceOfProcess(ROOT_PROCESS_INSTANCE_ID, "gate1");
+
+        // Then
+        assertThat(gate1).isNull();
     }
 
     private void buildAndAddAssignedTasks() {

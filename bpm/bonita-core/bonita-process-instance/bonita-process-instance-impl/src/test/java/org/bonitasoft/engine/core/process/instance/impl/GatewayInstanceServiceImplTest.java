@@ -43,6 +43,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -509,8 +510,27 @@ public class GatewayInstanceServiceImplTest {
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
 
-        assertThat(updateRecordCaptor.getValue().getFields().keySet()).contains("stateId","reachedStateDate","lastUpdateDate");
+        assertThat(updateRecordCaptor.getValue().getFields().keySet()).contains("stateId", "reachedStateDate", "lastUpdateDate");
 
+    }
+
+    @Test
+    public void should_getActiveGatewayOfProcess_return_the_gateway() throws Exception {
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        doReturn(gate).when(persistenceRead).selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
+
+        final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID, "myGate");
+
+        assertThat(myGate).isEqualTo(gate);
+    }
+
+    @Test
+    public void should_getActiveGatewayOfProcess_return_null_if_not_found() throws Exception {
+        doReturn(null).when(persistenceRead).selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(PROCESS_INSTANCE_ID, "myGate"));
+
+        final SGatewayInstance myGate = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(PROCESS_INSTANCE_ID, "myGate");
+
+        assertThat(myGate).isNull();
     }
 
 }
