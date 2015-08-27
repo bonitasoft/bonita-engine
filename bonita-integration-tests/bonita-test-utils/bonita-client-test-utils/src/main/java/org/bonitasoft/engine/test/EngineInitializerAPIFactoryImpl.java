@@ -17,6 +17,10 @@ package org.bonitasoft.engine.test;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -36,9 +40,9 @@ public class EngineInitializerAPIFactoryImpl implements EngineInitializerAPIFact
 
     private ProcessAPI processAPI;
     private IdentityAPI identityAPI;
+    private UserTaskAPI userTaskAPI;
 
-
-    private EngineInitializerAPIFactoryImpl() {
+    public EngineInitializerAPIFactoryImpl() {
 
     }
 
@@ -47,6 +51,11 @@ public class EngineInitializerAPIFactoryImpl implements EngineInitializerAPIFact
             factory = new EngineInitializerAPIFactoryImpl();
         }
         return factory;
+    }
+    public StartedProcess startProcess(long processDefintionId) throws ProcessDefinitionNotFoundException, ProcessExecutionException, ProcessActivationException {
+        ProcessInstance processInstance = processAPI.startProcess(processDefintionId);
+        StartedProcess startedProcess = new StartedProcess(processAPI,processInstance, userTaskAPI);
+        return startedProcess;
     }
 
     @Override
@@ -61,6 +70,7 @@ public class EngineInitializerAPIFactoryImpl implements EngineInitializerAPIFact
     public UserTaskAPI getUserTaskAPI(APISession session) throws Exception {
         UserTaskAPIImpl userTaskAPI = new UserTaskAPIImpl();
         userTaskAPI.usingSession(session);
+        this.userTaskAPI = userTaskAPI;
         return userTaskAPI;
     }
 
@@ -96,4 +106,11 @@ public class EngineInitializerAPIFactoryImpl implements EngineInitializerAPIFact
         return this;
     }
 
+    public UserTaskAPI getUserTaskAPI() {
+        return userTaskAPI;
+    }
+
+    public void setUserTaskAPI(UserTaskAPI userTaskAPI) {
+        this.userTaskAPI = userTaskAPI;
+    }
 }

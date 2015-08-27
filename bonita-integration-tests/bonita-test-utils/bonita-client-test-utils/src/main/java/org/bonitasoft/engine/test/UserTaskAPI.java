@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -40,6 +41,8 @@ public interface UserTaskAPI {
 
     Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,
             final int timeout) throws Exception;
+
+    ProcessAPI getProcessAPI();
 
     ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception;
 

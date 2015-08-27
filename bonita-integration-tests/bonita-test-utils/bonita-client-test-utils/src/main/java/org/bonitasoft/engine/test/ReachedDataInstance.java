@@ -14,24 +14,25 @@
 
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.bpm.data.DataInstance;
+
+import java.io.Serializable;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author mazourd
  */
-public interface IdentityAnalyserTestAPI {
+public class ReachedDataInstance {
+    private DataInstance dataInstance;
 
-    User createUser(final String userName, final String password, final long managerId) throws BonitaException;
+    public ReachedDataInstance(DataInstance dataInstance) {
 
-    void deleteUsers(final User... users) throws BonitaException;
+        this.dataInstance = dataInstance;
+    }
 
-    void deleteRoles(final Role... roles) throws BonitaException;
 
-    void deleteGroups(final Group... groups) throws BonitaException;
-
-    UserMembership createUserMembership(final String userName, final String roleName, final String groupName) throws BonitaException;
+    public  void hasValue(Serializable value) {
+        assertThat(dataInstance.getValue()).isEqualTo(value);
+    }
 }

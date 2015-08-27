@@ -25,11 +25,17 @@ import org.junit.Before;
  * @since 6.4.1
  */
 public class TestWithTechnicalUser extends CommonAPIIT {
+
     protected UserTaskAPI userTaskAPI;
+    protected EngineInitializerAPIFactoryImpl engineInitializer = new EngineInitializerAPIFactoryImpl();
+
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        userTaskAPI = EngineInitializerAPIFactoryImpl.getInstance().getUserTaskAPI(TenantAPIAccessor.getLoginAPI().login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
+        userTaskAPI = engineInitializer.getUserTaskAPI(
+                TenantAPIAccessor.getLoginAPI().login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
+        engineInitializer.createProcessAPIandIdentityAPIfromSession(TenantAPIAccessor.getLoginAPI().login(DEFAULT_TECHNICAL_LOGGER_USERNAME,
+                DEFAULT_TECHNICAL_LOGGER_PASSWORD));
     }
 
     @After

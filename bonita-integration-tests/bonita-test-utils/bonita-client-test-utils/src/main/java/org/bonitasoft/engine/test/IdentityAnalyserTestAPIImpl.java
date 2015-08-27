@@ -22,8 +22,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserMembership;
 
-import java.util.List;
-
 /**
  * @author mazourd
  */
@@ -51,7 +49,7 @@ public class IdentityAnalyserTestAPIImpl implements IdentityAnalyserTestAPI {
     }
 
     @Override
-    public void deleteUsers(final List<User> users) throws BonitaException {
+    public void deleteUsers(final User... users) throws BonitaException {
         if (users != null) {
             for (final User user : users) {
                 getIdentityAPI().deleteUser(user.getId());
@@ -60,7 +58,7 @@ public class IdentityAnalyserTestAPIImpl implements IdentityAnalyserTestAPI {
     }
 
     @Override
-    public void deleteRoles(final List<Role> roles) throws BonitaException {
+    public void deleteRoles(final Role... roles) throws BonitaException {
         if (roles != null) {
             for (final Role role : roles) {
                 getIdentityAPI().deleteRole(role.getId());
@@ -69,7 +67,7 @@ public class IdentityAnalyserTestAPIImpl implements IdentityAnalyserTestAPI {
     }
 
     @Override
-    public void deleteGroups(final List<Group> groups) throws BonitaException {
+    public void deleteGroups(final Group... groups) throws BonitaException {
         if (groups != null) {
             for (final Group group : groups) {
                 getIdentityAPI().deleteGroup(group.getId());
