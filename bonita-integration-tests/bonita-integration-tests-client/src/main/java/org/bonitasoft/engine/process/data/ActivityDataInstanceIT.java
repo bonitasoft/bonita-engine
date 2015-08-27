@@ -80,7 +80,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
     }
 
     private void assertDataOnActivityIntances(final String actorName, final DesignProcessDefinition processDef, final int expectedNumber) throws Exception {
-
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, actorName, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
@@ -115,7 +114,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(addUserTask.getProcess(), ACTOR_NAME, user);
         StartedProcess process = engineInitializer.startProcess(processDefinition.getId());
         process.waitForUserTask("step1").hasOnlyActivityDataInstance("var1").hasValue(defaultDataValue);
-        process.updateAndCheckActivityDataInstance("var1", updatedDataValue).hasValue(updatedDataValue);
+        process.updateActivityDataInstance("var1", updatedDataValue).hasOnlyActivityDataInstance("var1").hasValue(updatedDataValue);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -129,7 +128,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         process.waitForUserTask("step1");
         // Update data instance
         final String updatedValue = "afterUpdate";
-        process.updateAndCheckActivityInstanceVariablesWithOperations(updatedValue, "dataName", false).hasValue(updatedValue);
+        process.updateActivityInstanceVariablesWithOperations(updatedValue, "dataName", false).hasValue(updatedValue);
         // Clean
         disableAndDeleteProcess(processDefinition);
     }
@@ -145,7 +144,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final String updatedValue = "afterUpdate";
         final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
         variables.put("dataName", updatedValue);
-        process.updateAndCheckActivityInstanceVariables(variables).hasValue(updatedValue);
+        process.updateActivityInstanceVariables(variables).hasValue(updatedValue);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -327,7 +326,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
         StartedProcess process = engineInitializer.startProcess(processDefinition.getId());
         process.waitForUserTask("step");
-        process.updateAndCheckActivityDataInstance(dataName, "2").hasValue(
+        process.updateActivityDataInstance(dataName, "2").hasOnlyActivityDataInstance(dataName).hasValue(
                 process.getProcessAPI().getArchivedActivityDataInstance(dataName, process.getTemporaryUserTaskId()).getValue());
         disableAndDeleteProcess(processDefinition);
     }
@@ -342,14 +341,11 @@ public class ActivityDataInstanceIT extends TestWithUser {
         builder.addUserTask("step", ACTOR_NAME).addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long userTaskId = waitForUserTask(processInstance, "step");
-        getProcessAPI().updateActivityDataInstance(dataName, userTaskId, "2");
-        assignAndExecuteStep(userTaskId, user.getId());
-        waitForProcessToFinish(processInstance.getId());
-
-        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTaskId);
-        assertEquals("2", archivedData.getValue());
+        StartedProcess process = engineInitializer.startProcess(processDefinition.getId());
+        process.waitForUserTask("step");
+        process.updateActivityDataInstance(dataName, "2").assignAndExecuteTask(user.getId());
+        userTaskAPI.waitForProcessToFinish(process.getProcessInstance().getId(), -1);
+        process.getArchivedData(dataName).hasValue("2");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -365,35 +361,15 @@ public class ActivityDataInstanceIT extends TestWithUser {
         taskDefinitionBuilder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
         taskDefinitionBuilder.addShortTextData("job", new ExpressionBuilder().createConstantStringExpression("job"));
         taskDefinitionBuilder.addShortTextData("desc", new ExpressionBuilder().createConstantStringExpression("desc"));
-
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long userTaskId = waitForUserTask(processInstance, "step");
-        getProcessAPI().updateActivityDataInstance(dataName, userTaskId, "2");
-        assignAndExecuteStep(userTaskId, user);
-        waitForProcessToFinish(processInstance.getId());
-
-        List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTaskId, 0, 10);
-        assertEquals(3, archivedDataInstances.size());
-        ArchivedDataInstance archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
-        assertEquals("2", archivedDataInstance.getValue());
-        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
-        assertEquals("job", archivedDataInstance.getValue());
-        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
-        assertEquals("desc", archivedDataInstance.getValue());
-
-        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTaskId, 0, 1);
-        assertEquals(1, archivedDataInstances.size());
-        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
-        assertEquals("2", archivedDataInstance.getValue());
-
-        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTaskId, 1, 10);
-        assertEquals(2, archivedDataInstances.size());
-        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
-        assertEquals("job", archivedDataInstance.getValue());
-        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
-        assertEquals("desc", archivedDataInstance.getValue());
-
+        String[] dataNames = new String[] { "2", "job", "desc" };
+        StartedProcess process = engineInitializer.startProcess(processDefinition.getId());
+        process.waitForUserTask("step");
+        process.updateActivityDataInstance(dataName, "2").assignAndExecuteTask(user.getId());
+        userTaskAPI.waitForProcessToFinish(process.getProcessInstance().getId(), -1);
+        process.getArchivedDatas(0, 10).hasSize(3).containsValues(dataNames);
+        process.getArchivedDatas(0,1).hasSize(1).containsValue("2");
+        process.getArchivedDatas(1,10).hasSize(2).containsValue("job").containsValue("desc");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -406,13 +382,12 @@ public class ActivityDataInstanceIT extends TestWithUser {
         builder.addUserTask("step", ACTOR_NAME);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long userTaskId = waitForUserTask(processInstance, "step");
-
+        StartedProcess process = engineInitializer.startProcess(processDefinition.getId());
+        process.waitForUserTask("step");
         try {
-            getProcessAPI().getArchivedProcessDataInstance("o", userTaskId);
+            process.getArchivedData("o");
             fail("The data named 'o' does not exists");
-        } catch (final ArchivedDataNotFoundException dnfe) {
+        }catch (final ArchivedDataNotFoundException dnfe) {
             // Do nothing
         } finally {
             disableAndDeleteProcess(processDefinition);
@@ -444,34 +419,27 @@ public class ActivityDataInstanceIT extends TestWithUser {
                 .addDescription("Delivery all day and night long")
                 .addUserTask("step1", ACTOR_NAME).addData("data", List.class.getName(), null).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, ACTOR_NAME, user);
-
+        StartedProcess process = engineInitializer.startProcess(processDefinition.getId());
+        process.waitForUserTask("step1");
         // test execution
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long step1Id = waitForUserTask(processInstance, "step1");
-
         // verify the retrieved data
         try {
-            getProcessAPI().updateActivityDataInstance("data", step1Id, "wrong value");
+            process.updateActivityDataInstance("data","wrong value");
             fail();
         } catch (final UpdateException e) {
-            assertEquals("USERNAME=" + USERNAME + " | DATA_NAME=data | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+            assertEquals("USERNAME=" + DEFAULT_TECHNICAL_LOGGER_USERNAME+ " | DATA_NAME=data | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
                     + "] is not compatible with the type of the data.", e.getMessage());
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
             assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
             assertEquals("data", exceptionContext.get(ExceptionContext.DATA_NAME));
         }
 
-        // retrieve data after the update
-        final List<DataInstance> activityDataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
-        assertEquals(1, activityDataInstances.size());
-        assertEquals(null, activityDataInstances.get(0).getValue());
-
-        // Evaluate the data
+        process.getArchivedDatas(0,10).hasSize(1).containsValue(null);
         final List<Expression> dependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("data", List.class.getName()));
         final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("Script",
                 "data = new ArrayList<String>(); data.add(\"plop\"); return data;", List.class.getName(), dependencies);
         final Map<Expression, Map<String, Serializable>> expressions = Collections.singletonMap(longExpression, Collections.<String, Serializable> emptyMap());
-        getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
+        process.getProcessAPI().evaluateExpressionsOnActivityInstance(process.getTemporaryUserTaskId(), expressions);
 
         disableAndDeleteProcess(processDefinition);
     }

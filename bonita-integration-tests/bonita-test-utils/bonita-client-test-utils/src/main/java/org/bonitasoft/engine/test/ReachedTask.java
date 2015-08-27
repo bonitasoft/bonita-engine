@@ -17,6 +17,8 @@ package org.bonitasoft.engine.test;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
+import org.bonitasoft.engine.exception.UpdateException;
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class ReachedTask {
 
     private long taskId;
 
-    ProcessAPI processAPI;
+    private ProcessAPI processAPI;
 
 
     public ReachedTask(long taskId,ProcessAPI processAPI) {
@@ -43,6 +45,10 @@ public class ReachedTask {
         return processAPI;
     }
 
+    public void assignAndExecuteTask (long userId) throws FlowNodeExecutionException, UpdateException {
+        getProcessAPI().assignUserTask(taskId, userId);
+        getProcessAPI().executeFlowNode(taskId);
+    }
     public void hasSameNameAs(String name) throws ActivityInstanceNotFoundException {
         assertThat(processAPI.getActivityInstance(taskId).getName()).isEqualTo(name);
     }
