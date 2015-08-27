@@ -36,17 +36,13 @@ public class PlatformInformationManagerImpl implements PlatformInformationManage
         int toUpdate = platformInformationProvider.getAndReset();
         if (toUpdate > 0) {
             SPlatform platform = platformRetriever.getPlatform();
-            String newInfo = calculateNewInfo(toUpdate, platform.getInformation());
+            String newInfo = calculateNewInfo(platform.getInformation(), toUpdate);
             platformInformationService.updatePlatformInfo(platform, newInfo);
         }
     }
 
-    private String calculateNewInfo(final int toUpdate, final String currentInfo) throws SPlatformUpdateException {
-        String newInfo = currentInfo;
-        for (int i = 0; i < toUpdate; i++) {
-            newInfo = getManager().calculateNewPlatformInfo(newInfo);
-        }
-        return newInfo;
+    private String calculateNewInfo(final String currentInfo, final int toUpdate) throws SPlatformUpdateException {
+        return getManager().calculateNewPlatformInfo(currentInfo,toUpdate);
     }
 
     protected Manager getManager() {

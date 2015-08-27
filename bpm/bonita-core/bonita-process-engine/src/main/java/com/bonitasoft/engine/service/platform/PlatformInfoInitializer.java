@@ -36,8 +36,7 @@ public class PlatformInfoInitializer {
     public void ensurePlatformInfoIsSet() throws SBonitaException {
         SPlatform platform = platformRetriever.getPlatform();
         if(platform.getInformation() == null) {
-            String platformInfo = manager.calculateNewPlatformInfo(platform.getInformation());
-            platformInformationService.updatePlatformInfo(platform, platformInfo);
+            platformInformationService.updatePlatformInfo(platform, manager.initPlatformInfo());
         }
     }
 

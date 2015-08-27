@@ -11,6 +11,7 @@ package com.bonitasoft.engine.service.platform;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -43,7 +44,8 @@ public class PlatformInformationManagerImplTest {
 
     @InjectMocks
     private PlatformInformationManagerImpl infoManager;
-    private PlatformInformationManagerImpl sypInfoManager;
+
+    private PlatformInformationManagerImpl spyInfoManager;
 
     @Mock
     Manager manager;
@@ -54,8 +56,8 @@ public class PlatformInformationManagerImplTest {
     @Before
     public void setUp() throws Exception {
 
-        sypInfoManager = spy(infoManager);
-        given(sypInfoManager.getManager()).willReturn(manager);
+        spyInfoManager = spy(infoManager);
+        given(spyInfoManager.getManager()).willReturn(manager);
 
     }
 
@@ -68,11 +70,11 @@ public class PlatformInformationManagerImplTest {
         SPlatformImpl platform = buildPlatform(initialInfo);
 
         given(platformRetriever.getPlatform()).willReturn(platform);
-        given(manager.calculateNewPlatformInfo(initialInfo)).willReturn(newInfo);
+        given(manager.calculateNewPlatformInfo(initialInfo,1)).willReturn(newInfo);
         given(provider.getAndReset()).willReturn(1);
 
         // when
-        sypInfoManager.update();
+        spyInfoManager.update();
 
         //then
         verify(platformInformationService).updatePlatformInfo(platform, newInfo);
@@ -90,28 +92,27 @@ public class PlatformInformationManagerImplTest {
         given(provider.getAndReset()).willReturn(0);
 
         // when
-        sypInfoManager.update();
+        spyInfoManager.update();
 
         //then
         verify(platformInformationService, never()).updatePlatformInfo(any(SPlatform.class), anyString());
-        verify(manager, never()).calculateNewPlatformInfo(anyString());
+        verify(manager, never()).calculateNewPlatformInfo(anyString(),anyInt());
     }
 
     @Test
     public void update_should_process_several_calls() throws Throwable {
         //given
+        final int numberOfStartedCases = 3;
         String initialInfo = "initialInfo";
         String [] newInfo = {"newInfo1", "newInfo2", "newInfo3"};
+        given(provider.getAndReset()).willReturn(numberOfStartedCases);
         SPlatformImpl platform = buildPlatform(initialInfo);
 
-        given(provider.getAndReset()).willReturn(3);
         given(platformRetriever.getPlatform()).willReturn(platform);
-        given(manager.calculateNewPlatformInfo(initialInfo)).willReturn(newInfo[0]);
-        given(manager.calculateNewPlatformInfo(newInfo[0])).willReturn(newInfo[1]);
-        given(manager.calculateNewPlatformInfo(newInfo[1])).willReturn(newInfo[2]);
+        given(manager.calculateNewPlatformInfo(initialInfo, numberOfStartedCases)).willReturn(newInfo[2]);
 
         // when
-        sypInfoManager.update();
+        spyInfoManager.update();
 
         //then
         verify(platformInformationService).updatePlatformInfo(platform, newInfo[2]);
@@ -125,7 +126,7 @@ public class PlatformInformationManagerImplTest {
 
         given(platformRetriever.getPlatform()).willReturn(platform);
         IllegalStateException illegalStateException = new IllegalStateException("error");
-        given(manager.calculateNewPlatformInfo(initialInfo)).willThrow(illegalStateException);
+        given(manager.calculateNewPlatformInfo(initialInfo,1)).willThrow(illegalStateException);
         given(provider.getAndReset()).willReturn(1);
 
         //then
@@ -133,7 +134,7 @@ public class PlatformInformationManagerImplTest {
         expectedException.expectMessage("error");
 
         // when
-        sypInfoManager.update();
+        spyInfoManager.update();
 
     }
 
