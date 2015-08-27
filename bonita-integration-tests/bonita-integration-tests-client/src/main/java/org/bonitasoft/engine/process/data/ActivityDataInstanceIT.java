@@ -15,6 +15,7 @@ package org.bonitasoft.engine.process.data;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.test.ReachedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -37,11 +38,14 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.test.StartedProcess;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -128,7 +132,11 @@ public class ActivityDataInstanceIT extends TestWithUser {
         process.waitForUserTask("step1");
         // Update data instance
         final String updatedValue = "afterUpdate";
-        process.updateActivityInstanceVariablesWithOperations(updatedValue, "dataName", false).hasValue(updatedValue);
+        final Operation stringOperation = BuildTestUtil.buildStringOperation("dataName", updatedValue, false);
+        final List<Operation> operations = new ArrayList<Operation>();
+        operations.add(stringOperation);
+        process.getProcessAPI().updateActivityInstanceVariables(operations, process.getTemporaryUserTaskId(), null);
+        new ReachedDataInstance(process.getProcessAPI().getActivityDataInstances(process.getTemporaryUserTaskId(), 0, 10).get(0)).hasValue(updatedValue);
         // Clean
         disableAndDeleteProcess(processDefinition);
     }
@@ -424,7 +432,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         // test execution
         // verify the retrieved data
         try {
-            process.updateActivityDataInstance("data","wrong value");
+            process.updateActivityDataInstance("data", "wrong value");
             fail();
         } catch (final UpdateException e) {
             assertEquals("USERNAME=" + DEFAULT_TECHNICAL_LOGGER_USERNAME+ " | DATA_NAME=data | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()

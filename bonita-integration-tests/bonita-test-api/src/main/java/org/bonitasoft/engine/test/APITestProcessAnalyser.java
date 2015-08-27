@@ -16,8 +16,6 @@ package org.bonitasoft.engine.test;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
@@ -28,9 +26,5 @@ public interface APITestProcessAnalyser {
     void checkFlowNodeWasntExecuted(final long processInstancedId, final String flowNodeName);
 
     void checkWasntExecuted(final ProcessInstance parentProcessInstance, final String flowNodeName) throws InvalidSessionException, SearchException;
-
-    void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
-            final boolean isTransient)
-            throws InvalidExpressionException, UpdateException;
 
 }

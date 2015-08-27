@@ -30,6 +30,7 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.test.TestStates;
 
 import java.util.List;
 import java.util.concurrent.TimeoutException;

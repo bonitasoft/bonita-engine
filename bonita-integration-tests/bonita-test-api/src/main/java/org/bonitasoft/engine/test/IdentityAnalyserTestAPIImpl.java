@@ -28,9 +28,6 @@ import org.bonitasoft.engine.identity.UserMembership;
 
 public class IdentityAnalyserTestAPIImpl implements IdentityAnalyserTestAPI {
 
-    public static final String PROCESS_VERSION = BuildTestUtil.PROCESS_VERSION;
-    public static final String PROCESS_NAME = BuildTestUtil.PROCESS_NAME;
-
     public IdentityAnalyserTestAPIImpl(IdentityAPI identityAPI) {
         this.identityAPI = identityAPI;
     }

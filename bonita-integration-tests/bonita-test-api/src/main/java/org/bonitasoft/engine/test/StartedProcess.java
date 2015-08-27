@@ -26,8 +26,6 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.operation.Operation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -85,15 +83,6 @@ public class StartedProcess {
     public ReachedTask updateActivityDataInstance(String dataName, Serializable dataValue) throws UpdateException {
         processAPI.updateActivityDataInstance(dataName, temporaryUserTaskId, dataValue);
         return new ReachedTask(temporaryUserTaskId,processAPI);
-    }
-
-    public ReachedDataInstance updateActivityInstanceVariablesWithOperations(final String updatedValue, final String dataName, final boolean isTransient)
-            throws InvalidExpressionException, UpdateException {
-        final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
-        final List<Operation> operations = new ArrayList<Operation>();
-        operations.add(stringOperation);
-        getProcessAPI().updateActivityInstanceVariables(operations, temporaryUserTaskId, null);
-        return new ReachedDataInstance(getProcessAPI().getActivityDataInstances(temporaryUserTaskId, 0, 10).get(0));
     }
 
     public ReachedDataInstance accessDataInTask(String dataInstanceName) throws DataNotFoundException {

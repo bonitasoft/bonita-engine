@@ -13,12 +13,6 @@
  **/
 package org.bonitasoft.engine.test;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.command.CommandDescriptor;
@@ -29,6 +23,12 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.APISession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Utility methods to get maps that match process as wanted

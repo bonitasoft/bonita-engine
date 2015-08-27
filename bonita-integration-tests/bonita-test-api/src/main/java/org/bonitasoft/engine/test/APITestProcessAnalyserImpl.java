@@ -21,14 +21,10 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
@@ -62,15 +58,6 @@ public class APITestProcessAnalyserImpl implements APITestProcessAnalyser {
         assertTrue(searchArchivedActivities.getCount() == 0);
     }
 
-    @Override
-    public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
-            final boolean isTransient)
-            throws InvalidExpressionException, UpdateException {
-        final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
-        final List<Operation> operations = new ArrayList<Operation>();
-        operations.add(stringOperation);
-        getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
-    }
 
     public ProcessAPI getProcessAPI() {
         return processAPI;
