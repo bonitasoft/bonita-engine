@@ -46,7 +46,7 @@ public class PlatformInfoInitializerTest {
         //given
         SPlatformImpl platform = buildPlatform(null);
         given(platformRetriever.getPlatform()).willReturn(platform);
-        given(manager.calculateNewPlatformInfo(null)).willReturn("firstInfo");
+        given(manager.initPlatformInfo()).willReturn("firstInfo");
 
         //when
         platformInfoInitializer.ensurePlatformInfoIsSet();
