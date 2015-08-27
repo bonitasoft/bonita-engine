@@ -9,12 +9,14 @@
 package com.bonitasoft.engine.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -186,5 +188,13 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @since 6.0
      */
     SearchResult<Tenant> searchTenants(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Retrieves a {@link Map} containing all relevant platform information
+     * @return a {@link Map} containing all relevant platform information
+     * @throws PlatformNotFoundException if the platform does not exist
+     * @since 7.1.0
+     */
+    Map<String, String> getInformation() throws PlatformNotFoundException;
 
 }

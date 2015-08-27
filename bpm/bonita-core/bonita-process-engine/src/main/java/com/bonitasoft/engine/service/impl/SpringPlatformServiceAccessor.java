@@ -8,13 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
-import org.bonitasoft.engine.service.impl.SpringFileSystemBeanAccessorFactory;
-import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
-
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.platform.PlatformRetriever;
+import org.bonitasoft.engine.service.impl.SpringFileSystemBeanAccessorFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -25,6 +24,8 @@ public class SpringPlatformServiceAccessor extends org.bonitasoft.engine.service
     private PlatformMonitoringService platformMonitoringService;
 
     private SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor;
+
+    private PlatformRetriever platformRetriever;
 
     @Override
     public SearchPlatformEntitiesDescriptor getSearchPlatformEntitiesDescriptor() {
@@ -48,4 +49,11 @@ public class SpringPlatformServiceAccessor extends org.bonitasoft.engine.service
         return platformMonitoringService;
     }
 
+    @Override
+    public PlatformRetriever getPlatformRetriever() {
+        if (platformRetriever == null) {
+            platformRetriever = SpringFileSystemBeanAccessorFactory.getPlatformAccessor().getService(PlatformRetriever.class);
+        }
+        return platformRetriever;
+    }
 }
