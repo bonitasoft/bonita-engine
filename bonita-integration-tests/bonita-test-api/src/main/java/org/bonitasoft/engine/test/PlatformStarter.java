@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,62 +10,125 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 
-package org.bonitasoft.engine;
+package org.bonitasoft.engine.test;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.ApiAccessType;
+import org.bonitasoft.engine.api.EJB3ServerAPI;
+import org.bonitasoft.engine.api.HTTPServerAPI;
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.TCPServerAPI;
+import org.bonitasoft.engine.api.impl.ClientInterceptor;
+import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
+import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.platform.PlatformState;
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.util.APITypeManager;
 
 import javax.naming.Context;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-public class LocalServerTestsInitializer {
+import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformAPI;
+import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformLoginAPI;
+import static org.bonitasoft.engine.api.TenantAPIAccessor.getLoginAPI;
+
+/**
+ * @author mazourd
+ */
+public class PlatformStarter {
+
+    private PlatformLoginAPI platformLoginAPI;
+
+    private PlatformAPI platformAPI;
 
     private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
-    private static LocalServerTestsInitializer INSTANCE;
+    public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
+
+    public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
+
+    private static final int BUFFER_SIZE = 4096;
+
     private Object h2Server;
 
-    public static LocalServerTestsInitializer getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LocalServerTestsInitializer();
-        }
-        return INSTANCE;
-    }
-
-    public static void beforeAll() throws Exception {
-        LocalServerTestsInitializer.getInstance().before();
-    }
-
-    public static void afterAll() throws Exception {
-        LocalServerTestsInitializer.getInstance().after();
-
-    }
-
-    protected void before() throws Exception {
-        System.out.println("=====================================================");
-        System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
-        System.out.println("=====================================================");
-
-        final long startTime = System.currentTimeMillis();
+    public void startEngine() throws Exception {
+        unzip("/home/mazourd/work/bonita-engine/bonita-integration-tests/bonita-test-api/target/bonita-home-7.1.0-SNAPSHOT.zip",
+                "/home/mazourd/work/bonita-engine/bonita-integration-tests/bonita-test-api/target");
         prepareEnvironment();
-
         initPlatformAndTenant();
+        final LoginAPI loginAPI = getLoginAPI();
+        loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+    }
 
-        System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+    public void stopEngine() throws ClassNotFoundException, BonitaException, InvocationTargetException, IllegalAccessException, NoSuchMethodException,
+            InterruptedException {
+        shutdown();
+        checkThreadsAreStopped();
+        final ServerAPI serverAPI = getServerAPI();
+        final ClientInterceptor sessionInterceptor = new ClientInterceptor(LoginAPI.class.getName(), serverAPI);
+        final LoginAPI loginAPI = (LoginAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { LoginAPI.class }, sessionInterceptor);
+        loginAPI.logout(loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
+    }
+
+    public void unzip(String zipFilePath, String destDirectory) throws IOException {
+        File destDir = new File(destDirectory);
+        if (!destDir.exists()) {
+            destDir.mkdir();
+        }
+        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipEntry entry = zipIn.getNextEntry();
+        // iterates over entries in the zip file
+        while (entry != null) {
+            String filePath = destDirectory + File.separator + entry.getName();
+            if (!entry.isDirectory()) {
+                // if the entry is a file, extracts it
+                extractFile(zipIn, filePath);
+            } else {
+                // if the entry is a directory, make the directory
+                File dir = new File(filePath);
+                dir.mkdir();
+            }
+            zipIn.closeEntry();
+            entry = zipIn.getNextEntry();
+        }
+        zipIn.close();
+    }
+
+    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        byte[] bytesIn = new byte[BUFFER_SIZE];
+        int read = 0;
+        while ((read = zipIn.read(bytesIn)) != -1) {
+            bos.write(bytesIn, 0, read);
+        }
+        bos.close();
     }
 
     public void prepareEnvironment() throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException,
@@ -95,7 +158,7 @@ public class LocalServerTestsInitializer {
         final int h2Port = 6666;
         //        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
 
-        final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
+        final Class<?> h2ServerClass = Thread.currentThread().getContextClassLoader().loadClass("org.h2.tools.Server");
         final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", String[].class);
 
         int nbTry = -1;
@@ -142,7 +205,17 @@ public class LocalServerTestsInitializer {
 
     public void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         try {
-            deleteTenantAndPlatform();
+            System.out.println("=========  CLEAN PLATFORM =======");
+            final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
+            if (platformAPI.isNodeStarted()) {
+                final LoginAPI loginAPI = getLoginAPI();
+                final APISession apiSession = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+                ClientEventUtil.undeployCommand(apiSession);
+                loginAPI.logout(apiSession);
+                platformAPI.stopNode();
+                platformAPI.cleanPlatform();
+            }
+            platformLoginAPI.logout(session);
         } finally {
             cleanupEnvironment();
         }
@@ -155,12 +228,14 @@ public class LocalServerTestsInitializer {
         }
     }
 
-    public void deleteTenantAndPlatform() throws BonitaException {
-        System.out.println("=========  CLEAN PLATFORM =======");
-        final APITestUtil apiTestUtil = new APITestUtil();
-        apiTestUtil.stopAndCleanPlatformAndTenant(true);
-        apiTestUtil.deletePlatformStructure();
-    }
+    /*
+     * public void deleteTenantAndPlatform() throws BonitaException {
+     * System.out.println("=========  CLEAN PLATFORM =======");
+     * final APITestUtil apiTestUtil = new APITestUtil();
+     * apiTestUtil.stopAndCleanPlatformAndTenant(true);
+     * apiTestUtil.deletePlatformStructure();
+     * }
+     */
 
     private void checkThreadsAreStopped() throws InterruptedException {
         System.out.println("=========  CHECK ENGINE IS SHUTDOWN =======");
@@ -241,8 +316,64 @@ public class LocalServerTestsInitializer {
 
     public void initPlatformAndTenant() throws Exception {
         System.out.println("=========  INIT PLATFORM =======");
-        new APITestUtil().createPlatformStructure();
-        new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
+        platformLoginAPI = getPlatformLoginAPI();
+        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
+        platformAPI = getPlatformAPI(session);
+        if (platformAPI.isPlatformCreated()) {
+            if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
+                platformAPI.stopNode();
+            }
+            platformAPI.cleanPlatform();
+            platformAPI.deletePlatform();
+        }
+        platformAPI.createPlatform();
+
+        platformLoginAPI.logout(session);
+        platformAPI.initializePlatform();
+        platformAPI.startNode();
+        final ServerAPI serverAPI = getServerAPI();
+        final ClientInterceptor sessionInterceptor = new ClientInterceptor(LoginAPI.class.getName(), serverAPI);
+        final LoginAPI loginAPI = (LoginAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { LoginAPI.class }, sessionInterceptor);
+        final APISession apiSession = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+        ClientEventUtil.deployCommand(apiSession);
+        loginAPI.logout(apiSession);
+    }
+
+    private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        final ApiAccessType apiType;
+        try {
+            apiType = APITypeManager.getAPIType();
+        } catch (IOException e) {
+            throw new ServerAPIException(e);
+        }
+        Map<String, String> parameters = null;
+        switch (apiType) {
+            case LOCAL:
+                return LocalServerAPIFactory.getServerAPI();
+            case EJB3:
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
+                return new EJB3ServerAPI(parameters);
+            case HTTP:
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
+                return new HTTPServerAPI(parameters);
+            case TCP:
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
+                return new TCPServerAPI(parameters);
+            default:
+                throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
+        }
     }
 
     private static String setSystemPropertyIfNotSet(final String property, final String value) {
