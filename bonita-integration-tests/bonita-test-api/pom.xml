@@ -52,6 +52,76 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.bonitasoft.engine.synchro</groupId>
+            <artifactId>bonita-synchro-register</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.authentication</groupId>
+            <artifactId>bonita-authentication-api-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.login</groupId>
+            <artifactId>bonita-login-api-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.xml</groupId>
+            <artifactId>bonita-xml-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.filter</groupId>
+            <artifactId>bonita-user-filter-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.work</groupId>
+            <artifactId>bonita-work-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.connector</groupId>
+            <artifactId>bonita-connector-executor-api-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.data</groupId>
+            <artifactId>bonita-business-data-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-parameter-propertyfile</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.expression</groupId>
+            <artifactId>bonita-expression-api-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-expression-resolver-api-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.connector</groupId>
+            <artifactId>bonita-connector-service-api-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.archive</groupId>
+            <artifactId>bonita-archive-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.session</groupId>
+            <artifactId>bonita-session-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-sql</artifactId>
             <version>7.1.0-SNAPSHOT</version>

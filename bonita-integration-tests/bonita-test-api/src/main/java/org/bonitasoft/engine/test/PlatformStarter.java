@@ -89,12 +89,15 @@ public class PlatformStarter {
 
     public void stopEngine() throws ClassNotFoundException, BonitaException, InvocationTargetException, IllegalAccessException, NoSuchMethodException,
             InterruptedException {
+        System.out.println("=====================================================");
+        System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
+        System.out.println("=====================================================");
         shutdown();
         checkThreadsAreStopped();
-        final ServerAPI serverAPI = getServerAPI();
+        /*final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(LoginAPI.class.getName(), serverAPI);
         final LoginAPI loginAPI = (LoginAPI) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { LoginAPI.class }, sessionInterceptor);
-        loginAPI.logout(loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
+        loginAPI.logout(loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));*/
     }
 
     public void unzip(String zipFilePath, String destDirectory) throws IOException {
@@ -228,15 +231,6 @@ public class PlatformStarter {
         }
     }
 
-    /*
-     * public void deleteTenantAndPlatform() throws BonitaException {
-     * System.out.println("=========  CLEAN PLATFORM =======");
-     * final APITestUtil apiTestUtil = new APITestUtil();
-     * apiTestUtil.stopAndCleanPlatformAndTenant(true);
-     * apiTestUtil.deletePlatformStructure();
-     * }
-     */
-
     private void checkThreadsAreStopped() throws InterruptedException {
         System.out.println("=========  CHECK ENGINE IS SHUTDOWN =======");
         final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
@@ -317,7 +311,7 @@ public class PlatformStarter {
     public void initPlatformAndTenant() throws Exception {
         System.out.println("=========  INIT PLATFORM =======");
         platformLoginAPI = getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
+        PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         platformAPI = getPlatformAPI(session);
         if (platformAPI.isPlatformCreated()) {
             if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
@@ -329,6 +323,8 @@ public class PlatformStarter {
         platformAPI.createPlatform();
 
         platformLoginAPI.logout(session);
+        session = platformLoginAPI.login("platformAdmin", "platform");
+        platformAPI = getPlatformAPI(session);
         platformAPI.initializePlatform();
         platformAPI.startNode();
         final ServerAPI serverAPI = getServerAPI();
