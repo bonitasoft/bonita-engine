@@ -52,6 +52,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.bonitasoft.engine.data.definition</groupId>
+            <artifactId>bonita-data-definition-model-impl</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.synchro</groupId>
             <artifactId>bonita-synchro-register</artifactId>
             <version>7.1.0-SNAPSHOT</version>
