@@ -19,6 +19,9 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -36,10 +39,13 @@ import static junit.framework.TestCase.assertTrue;
 public class APITestProcessAnalyserImpl implements APITestProcessAnalyser {
 
     private ProcessAPI processAPI;
+    private UserTaskAPI userTaskAPI;
 
-    public APITestProcessAnalyserImpl(ProcessAPI processAPI){
+    public APITestProcessAnalyserImpl(ProcessAPI processAPI,UserTaskAPI userTaskAPI){
         this.processAPI = processAPI;
+        this.userTaskAPI = userTaskAPI;
     }
+
     @Override
     public void checkFlowNodeWasntExecuted(final long processInstancedId, final String flowNodeName) {
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstancedId, 0, 200,
@@ -56,6 +62,11 @@ public class APITestProcessAnalyserImpl implements APITestProcessAnalyser {
         searchOptionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, flowNodeName);
         final SearchResult<ArchivedFlowNodeInstance> searchArchivedActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchOptionsBuilder.done());
         assertTrue(searchArchivedActivities.getCount() == 0);
+    }
+    public StartedProcess startProcess(long processDefintionId) throws ProcessDefinitionNotFoundException, ProcessExecutionException, ProcessActivationException {
+        ProcessInstance processInstance = processAPI.startProcess(processDefintionId);
+        StartedProcess startedProcess = new StartedProcess(processAPI,processInstance, userTaskAPI);
+        return startedProcess;
     }
 
 
