@@ -69,11 +69,11 @@ public class SchemaManagerTest {
     protected void updateAndDropSchema(final BusinessObjectModel bom) {
         final List<Exception> updateExceptions = schemaManager.update(bom.getBusinessObjectsClassNames());
         if (!updateExceptions.isEmpty()) {
-            fail("Upating schema fails due to: " + updateExceptions);
+            fail("Updating schema fails due to: " + updateExceptions);
         }
         final List<Exception> dropExceptions = schemaManager.drop(bom.getBusinessObjectsClassNames());
         if (!dropExceptions.isEmpty()) {
-            fail("Upating schema fails due to: " + dropExceptions);
+            fail("Updating schema fails due to: " + dropExceptions);
         }
     }
 
