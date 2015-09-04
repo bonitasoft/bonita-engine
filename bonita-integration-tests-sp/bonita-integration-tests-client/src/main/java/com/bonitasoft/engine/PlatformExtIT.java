@@ -54,8 +54,8 @@ public class PlatformExtIT {
         Map<String, String> information = platformAPI.getInformation();
 
         //then
-        assertThat(information).containsKeys("subscriptionStartPeriod", "subscriptionEndPeriod", "allowedInstances", "recordedInstances");
-        assertThat(Integer.valueOf(information.get("recordedInstances"))).isGreaterThanOrEqualTo(0);
-        assertThat(Integer.valueOf(information.get("allowedInstances"))).isGreaterThan(0);
+        assertThat(information).containsKeys("subscriptionStartPeriod", "subscriptionEndPeriod", "caseCounterLimit", "caseCounter");
+        assertThat(Integer.valueOf(information.get("caseCounter"))).isGreaterThanOrEqualTo(0);
+        assertThat(Integer.valueOf(information.get("caseCounterLimit"))).isGreaterThan(0);
     }
 }
