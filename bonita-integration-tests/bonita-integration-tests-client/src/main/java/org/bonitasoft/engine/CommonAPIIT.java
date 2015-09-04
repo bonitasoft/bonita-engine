@@ -13,20 +13,12 @@
  **/
 package org.bonitasoft.engine;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.filter.user.GroupUserFilter;
 import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
@@ -37,10 +29,15 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 public abstract class CommonAPIIT extends APITestUtil {
 
