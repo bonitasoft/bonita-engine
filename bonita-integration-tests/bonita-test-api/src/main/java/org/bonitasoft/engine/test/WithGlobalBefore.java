@@ -51,7 +51,6 @@ public class WithGlobalBefore extends Statement {
             } catch (Exception e) {
                 //ignore for now
             }
-            System.out.println("Bye.");
         }
     }
 }

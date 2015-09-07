@@ -14,12 +14,12 @@
 
 package org.bonitasoft.engine.test;
 
+import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
+
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
-
-import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
 
 /**
  * @author mazourd
@@ -34,7 +34,6 @@ public class Engine extends BlockJUnit4ClassRunner {
      */
     public Engine(Class<?> klass) throws Exception {
         super(klass);
-        System.out.println("start du runner");
     }
 
     static class Message extends Thread {
@@ -45,7 +44,6 @@ public class Engine extends BlockJUnit4ClassRunner {
             } catch (Exception e) {
                 //ignore for now
             }
-            System.out.println("Bye.");
         }
     }
 
