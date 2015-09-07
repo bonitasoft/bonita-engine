@@ -45,6 +45,7 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -59,11 +60,12 @@ import static org.junit.Assert.fail;
 /**
  * @author mazourd
  */
-//@RunWith(Engine.class)
+@RunWith(Engine.class)
 public class ActivityDataInstanceITBis {
 
     private User user;
     private UserTaskAPI userTaskAPI;
+    @EngineAnnotationInterface
     private EngineInitializer engineInitializer = new EngineInitializer();
     private ProcessDeployerAPITest processDeployer;
     private ProcessAPI processAPI;

@@ -16,38 +16,54 @@ package org.bonitasoft.engine.test;
 
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
-
-import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
 
 /**
  * @author mazourd
  */
 public class Engine extends BlockJUnit4ClassRunner {
 
-    /**
-     * Creates a BlockJUnit4ClassRunner to run {@code klass}
-     *
-     * @param klass
-     * @throws InitializationError if the test class is malformed.
-     */
+
+    private EngineInitializer initializer = new EngineInitializer();
     public Engine(Class<?> klass) throws Exception {
         super(klass);
+        //processAnnotedField(klass);
         System.out.println("start du runner");
     }
 
-    static class Message extends Thread {
+    /*private void processAnnotedField(Class<?> klass) {
+        Field[] fields = klass.getDeclaredFields();
+        for (Field field : fields) {
+            System.out.println("========");
+            System.out.println(field.getName());
+            System.out.println(field.getType());
+            for (Annotation annotation : field.getDeclaredAnnotations()) {
+                System.out.println(annotation);
+                System.out.println(annotation.annotationType());
+                if (annotation.annotationType().equals(BusinessArchive.class)) {
+                    //deploy
+                    field.setAccessible(true);
 
-        public void run() {
-            try {
-                stopEngine();
-            } catch (Exception e) {
-                //ignore for now
+                    businessArchives.put(field, ((BusinessArchive) annotation).resource());
+                }
+                if (annotation.annotationType().equals(Engine.class)) {
+                    //deploy
+                    field.setAccessible(true);
+                    engineField = field;
+                    Engine engineAnnotation = (Engine) annotation;
+                    String type = engineAnnotation.type();
+                    String url = engineAnnotation.url();
+                    String name = engineAnnotation.name();
+
+                    if (type == null || type.isEmpty() || type.equals("LOCAL")) {
+                        engine = BonitaTestEngine.defaultLocalEngine();
+                    } else if (type.equals("HTTP")) {
+                        engine = BonitaTestEngine.remoteHttp(url, name);
+                    }
+                }
             }
-            System.out.println("Bye.");
         }
-    }
+    }*/
 
     @Override
     protected Statement classBlock(final RunNotifier notifier) {
@@ -61,4 +77,7 @@ public class Engine extends BlockJUnit4ClassRunner {
         return new WithGlobalBefore(statement, this);
     }
 
+    public EngineInitializer getInitializer() {
+        return initializer;
+    }
 }

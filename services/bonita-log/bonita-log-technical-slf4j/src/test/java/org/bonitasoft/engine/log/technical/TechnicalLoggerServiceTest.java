@@ -13,11 +13,6 @@
  **/
 package org.bonitasoft.engine.log.technical;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +20,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
