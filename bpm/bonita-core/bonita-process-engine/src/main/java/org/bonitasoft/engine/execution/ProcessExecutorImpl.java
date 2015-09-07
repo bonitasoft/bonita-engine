@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.SArchivingException;
-import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
@@ -78,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -93,7 +91,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -297,53 +294,33 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return null;
     }
 
+    /*
+     * this method is called when a flow node having a transition that goes to a gateway is finished
+     * it get the active gateway pointed by this transition, update the tokens of this gateway and execute it if merged
+     */
     private void executeGateway(final SProcessDefinition sProcessDefinition, final STransitionDefinition sTransitionDefinition,
             final SFlowNodeInstance flowNodeThatTriggeredTheTransition) throws SBonitaException {
         final long parentProcessInstanceId = flowNodeThatTriggeredTheTransition.getParentProcessInstanceId();
         final long rootProcessInstanceId = flowNodeThatTriggeredTheTransition.getRootProcessInstanceId();
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionDefinition.getName());
-        final Long processDefinitionId = sProcessDefinition.getId();
-
-        final boolean isGateway = SFlowNodeType.GATEWAY.equals(sFlowNodeDefinition.getType());
-        boolean toExecute = false;
-        final Long nextFlowNodeInstanceId;
         try {
-            List<SGatewayInstance> otherMergedGateways = null;
+            List<SGatewayInstance> gatewaysToExecute = new ArrayList<>(1);
             final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
             final SStateCategory stateCategory = parentProcessInstance.getStateCategory();
-            if (isGateway) {
-                final SGatewayInstance gatewayInstance = getActivateGateway(sProcessDefinition, sFlowNodeDefinition, stateCategory, parentProcessInstanceId,
-                        rootProcessInstanceId);
-                gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(sTransitionDefinition.getName()));
-                nextFlowNodeInstanceId = gatewayInstance.getId();
-                if (gatewayInstanceService.checkMergingCondition(sProcessDefinition, gatewayInstance)) {
-                    otherMergedGateways = gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance);
-                    toExecute = true;
-                }
-            } else {
-                final SFlowNodeInstance sFlowNodeInstance = bpmInstancesCreator.toFlowNodeInstance(processDefinitionId,
-                        flowNodeThatTriggeredTheTransition.getRootContainerId(), flowNodeThatTriggeredTheTransition.getParentContainerId(),
-                        SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, true, -1, stateCategory, -1
-                        );
-                new CreateEventInstance((SEventInstance) sFlowNodeInstance, eventInstanceService).call();
-                nextFlowNodeInstanceId = sFlowNodeInstance.getId();
-                toExecute = true;
+            final SGatewayInstance gatewayInstance = getActiveGatewayOrCreateIt(sProcessDefinition, sFlowNodeDefinition, stateCategory,
+                    parentProcessInstanceId,
+                    rootProcessInstanceId);
+            gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(sTransitionDefinition.getName()));
+            if (gatewayInstanceService.checkMergingCondition(sProcessDefinition, gatewayInstance)) {
+                gatewaysToExecute.add(gatewayInstance);
+                gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
             }
-            if (toExecute) {
-                workService.registerWork(WorkFactory
-                        .createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, nextFlowNodeInstanceId, null, null));
-                if (otherMergedGateways != null) {
-                    for (final SGatewayInstance otherMergedGateway : otherMergedGateways) {
-                        workService.registerWork(WorkFactory
-                                .createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, otherMergedGateway.getId(), null, null));
-                    }
-                }
+            for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
+                executeFlowNode(gatewayToExecute.getId(), null, null, parentProcessInstanceId, null, null);
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-            }
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             throw e;
         }
     }
@@ -352,14 +329,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * try to gate active gateway.
      * if the gateway is already hit by this transition or by the same token, we create a new gateway
      */
-    private SGatewayInstance getActivateGateway(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
+    SGatewayInstance getActiveGatewayOrCreateIt(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
             final SStateCategory stateCategory, final long parentProcessInstanceId, final long rootProcessInstanceId) throws SBonitaException {
-        SGatewayInstance gatewayInstance;
-        try {
-            gatewayInstance = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(parentProcessInstanceId, flowNodeDefinition.getName());
-        } catch (final SGatewayNotFoundException e) {
+        SGatewayInstance gatewayInstance = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(parentProcessInstanceId, flowNodeDefinition.getName());
+        if (gatewayInstance == null) {
             // no gateway found we create one
-            return createGateway(sProcessDefinition.getId(), flowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId);
+            gatewayInstance = createGateway(sProcessDefinition.getId(), flowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId);
         }
         return gatewayInstance;
     }
@@ -414,7 +389,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, selectorForConnectorOnEnter);
     }
 
-    private void storeProcessInstantiationInputs(final long processInstanceId, final Map<String, Serializable> processInputs) throws SContractDataCreationException {
+    private void storeProcessInstantiationInputs(final long processInstanceId, final Map<String, Serializable> processInputs)
+            throws SContractDataCreationException {
         contractDataService.addProcessData(processInstanceId, processInputs);
     }
 
@@ -424,7 +400,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void initializeBusinessData(final SProcessDefinition sDefinition, final SProcessInstance sInstance)
             throws SBonitaException {
-        SExpressionContext expressionContext = new SExpressionContext(sInstance.getId(),DataInstanceContainer.PROCESS_INSTANCE.name(),sDefinition.getId());
+        SExpressionContext expressionContext = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), sDefinition.getId());
         final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();
@@ -719,17 +695,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "some branches died, will check again all inclusive gateways");
             final List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService.getInclusiveGatewaysOfProcessInstanceThatShouldFire(
                     processDefinition, processInstanceId);
+            List<SGatewayInstance> gatewaysToExecute = new ArrayList<>(inclusiveGatewaysOfProcessInstance);
             for (final SGatewayInstance gatewayInstance : inclusiveGatewaysOfProcessInstance) {
-                final List<SGatewayInstance> otherMergedGateways = gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(processDefinition,
-                        gatewayInstance);
-                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinition.getId(), processInstanceId, gatewayInstance.getId(), null,
-                        null));
-                if (otherMergedGateways != null) {
-                    for (final SGatewayInstance otherMergedGateway : otherMergedGateways) {
-                        workService.registerWork(WorkFactory
-                                .createExecuteFlowNodeWork(processDefinition.getId(), processInstanceId, otherMergedGateway.getId(), null, null));
-                    }
-                }
+                gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(processDefinition,
+                        gatewayInstance));
+            }
+            for(final SGatewayInstance gatewayToExecute : gatewaysToExecute){
+                executeFlowNode(gatewayToExecute.getId(), null, null, gatewayToExecute.getParentProcessInstanceId(), null, null);
             }
 
         }
@@ -841,7 +813,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected void validateContractInputs(final Map<String, Serializable> processInputs, final SProcessDefinition sProcessDefinition) throws SContractViolationException {
+    protected void validateContractInputs(final Map<String, Serializable> processInputs, final SProcessDefinition sProcessDefinition)
+            throws SContractViolationException {
         final SContractDefinition contractDefinition = sProcessDefinition.getContract();
         if (contractDefinition != null) {
             final ContractValidator validator = new ContractValidatorFactory().createContractValidator(logger, expressionService);
