@@ -168,7 +168,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     protected void update(final Set<String> annotatedClassNames) throws SBusinessDataRepositoryDeploymentException {
         final List<Exception> exceptions = schemaManager.update(annotatedClassNames);
         if (!exceptions.isEmpty()) {
-            throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
+            throw new SBusinessDataRepositoryDeploymentException("Updating schema fails due to: " + exceptions);
         }
     }
 
@@ -269,7 +269,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                 final BusinessObjectModel model = IOUtils.unmarshallXMLtoObject(content, BusinessObjectModel.class, xsd);
                 final List<Exception> exceptions = schemaManager.drop(model.getBusinessObjectsClassNames());
                 if (!exceptions.isEmpty()) {
-                    throw new SBusinessDataRepositoryDeploymentException("Upating schema fails due to: " + exceptions);
+                    throw new SBusinessDataRepositoryDeploymentException("Updating schema fails due to: " + exceptions);
                 }
                 uninstall(tenantId);
             } catch (final IOException ioe) {
