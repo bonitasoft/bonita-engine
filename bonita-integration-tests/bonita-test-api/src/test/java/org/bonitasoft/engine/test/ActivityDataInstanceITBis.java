@@ -65,8 +65,12 @@ public class ActivityDataInstanceITBis {
 
     private User user;
     private UserTaskAPI userTaskAPI;
-    @EngineAnnotationInterface
+
+    @EngineAnnotationInterface(user = "william.jobs",password = "bpm")
     private EngineInitializer engineInitializer = new EngineInitializer();
+
+
+
     private ProcessDeployerAPITest processDeployer;
     private ProcessAPI processAPI;
     private APITestProcessAnalyserImpl processAnalyser;
