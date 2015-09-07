@@ -11,25 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+package org.bonitasoft.engine.platform.model.impl;
 
-/**
- * @author Charles Souillard
- */
-public interface SPlatform extends PersistentObject {
+import static org.bonitasoft.engine.platform.model.impl.SPlatformImplAssert.assertThat;
 
-    String getVersion();
+import org.junit.Test;
 
-    String getPreviousVersion();
+public class SPlatformImplTest {
 
-    String getInitialVersion();
+    @Test
+    public void should_create_consistent_platform() throws Exception {
+        //given
+        long created = System.currentTimeMillis();
+        SPlatformImpl platform = new SPlatformImpl("7.0", "6.5", "6.4", "admin", created);
+        platform.setInformation("info");
 
-    long getCreated();
-
-    String getCreatedBy();
-
-    String getInformation();
+        //then
+        assertThat(platform).hasVersion("7.0").hasPreviousVersion("6.5").hasInitialVersion("6.4").hasCreatedBy("admin").hasCreated(created)
+                .hasInformation("info");
+    }
 
 }
