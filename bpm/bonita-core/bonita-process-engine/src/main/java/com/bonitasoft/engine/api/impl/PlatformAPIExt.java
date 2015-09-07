@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.impl.platform.GeneralInformationProvider;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
@@ -29,7 +30,7 @@ import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.platform.TenantUpdater;
 import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.profile.ProfilesImporterExt;
+import com.bonitasoft.engine.profile.DefaultProfilesUpdaterExt;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -38,7 +39,6 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.manager.Features;
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
@@ -72,6 +72,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
@@ -92,29 +93,6 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
-
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
-import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
-import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
-import com.bonitasoft.engine.platform.Tenant;
-import com.bonitasoft.engine.platform.TenantActivationException;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantCriterion;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
-import com.bonitasoft.engine.platform.TenantUpdater;
-import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.profile.DefaultProfilesUpdaterExt;
-import com.bonitasoft.engine.search.SearchTenants;
-import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
@@ -718,4 +696,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         });
     }
 
+    @Override
+    public Map<String, String> getInformation() throws PlatformNotFoundException {
+        try {
+            return new GeneralInformationProvider(getPlatformAccessor().getPlatformRetriever()).getInfo();
+        } catch (PlatformNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
 }

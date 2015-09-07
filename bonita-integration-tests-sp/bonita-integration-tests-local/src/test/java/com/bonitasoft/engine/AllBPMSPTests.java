@@ -28,7 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
         IdentityServiceUsingEventServiceTest.class,
         RecorderAndEventServiceTest.class,
         // Last test suite in order to check the correct begin/complete transactions
-        MonitoringTests.class
+        MonitoringTests.class,
+        PlatformExtIT.class
 })
 public class AllBPMSPTests {
 

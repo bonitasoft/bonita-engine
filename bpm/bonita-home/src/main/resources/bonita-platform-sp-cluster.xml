@@ -131,6 +131,7 @@
 				<ref bean="classLoaderService" />
 				<ref bean="normalClassLoader" />
 				<ref bean="platformCacheService" />
+				<ref bean="platformInfoScheduler" />
 			</list>
 		</property>
 		<property name="jobListeners">
