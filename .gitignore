@@ -10,3 +10,4 @@ Temporary*.java
 .idea
 *.orig
 engine-it.exec
+bonita-integration-tests/bonita-test-api/src/main/resources/bonita-home.zip

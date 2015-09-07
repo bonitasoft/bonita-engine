@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.test;
 
+import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
+
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.Statement;
@@ -27,8 +29,6 @@ public class Engine extends BlockJUnit4ClassRunner {
     private EngineInitializer initializer = new EngineInitializer();
     public Engine(Class<?> klass) throws Exception {
         super(klass);
-
-        System.out.println("start du runner");
     }
 
     @Override

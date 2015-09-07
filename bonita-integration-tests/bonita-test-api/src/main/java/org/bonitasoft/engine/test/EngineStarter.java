@@ -14,34 +14,16 @@
 
 package org.bonitasoft.engine.test;
 
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.api.APIAccessor;
-import org.bonitasoft.engine.api.ApiAccessType;
-import org.bonitasoft.engine.api.EJB3ServerAPI;
-import org.bonitasoft.engine.api.HTTPServerAPI;
-import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.api.TCPServerAPI;
-import org.bonitasoft.engine.api.impl.ClientInterceptor;
-import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
-import org.bonitasoft.engine.api.internal.ServerAPI;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
-import org.bonitasoft.engine.platform.PlatformState;
-import org.bonitasoft.engine.platform.exception.STenantUpdateException;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.util.APITypeManager;
+import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformAPI;
+import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformLoginAPI;
+import static org.bonitasoft.engine.api.TenantAPIAccessor.getLoginAPI;
 
-import javax.naming.Context;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -54,37 +36,92 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformAPI;
-import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformLoginAPI;
-import static org.bonitasoft.engine.api.TenantAPIAccessor.getLoginAPI;
+import javax.naming.Context;
+
+import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.ApiAccessType;
+import org.bonitasoft.engine.api.EJB3ServerAPI;
+import org.bonitasoft.engine.api.HTTPServerAPI;
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.TCPServerAPI;
+import org.bonitasoft.engine.api.impl.ClientInterceptor;
+import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
+import org.bonitasoft.engine.api.internal.ServerAPI;
+import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.platform.PlatformState;
+import org.bonitasoft.engine.platform.exception.STenantUpdateException;
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.util.APITypeManager;
 
 /**
  * @author mazourd
  */
 public class EngineStarter {
 
-    private PlatformLoginAPI platformLoginAPI;
-
-    private PlatformAPI platformAPI;
-
-    private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
+    public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
+    public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
+    private static final String BONITA_HOME_DEFAULT_PATH = "target";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
-
-    public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
-
-    public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
-
     private static final int BUFFER_SIZE = 4096;
-
     private static boolean isInitialized = false;
-
+    private PlatformLoginAPI platformLoginAPI;
+    private PlatformAPI platformAPI;
     private Object h2Server;
+
+    private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        final ApiAccessType apiType;
+        try {
+            apiType = APITypeManager.getAPIType();
+        } catch (IOException e) {
+            throw new ServerAPIException(e);
+        }
+        Map<String, String> parameters = null;
+        switch (apiType) {
+            case LOCAL:
+                return LocalServerAPIFactory.getServerAPI();
+            case EJB3:
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
+                return new EJB3ServerAPI(parameters);
+            case HTTP:
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
+                return new HTTPServerAPI(parameters);
+            case TCP:
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
+                return new TCPServerAPI(parameters);
+            default:
+                throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
+        }
+    }
+
+    private static String setSystemPropertyIfNotSet(final String property, final String value) {
+        final String finalValue = System.getProperty(property, value);
+        System.setProperty(property, finalValue);
+        return finalValue;
+    }
 
     public void startEngine() throws Exception {
         if (!isInitialized) {
-            unzip("/home/mazourd/work/bonita-engine/bonita-integration-tests/bonita-test-api/target/bonita-home-7.1.0-SNAPSHOT.zip",
-                    "target");
             prepareEnvironment();
             initPlatformAndTenant();
             final LoginAPI loginAPI = getLoginAPI();
@@ -95,11 +132,11 @@ public class EngineStarter {
 
     public void stopEngine() throws ClassNotFoundException, BonitaException, InvocationTargetException, IllegalAccessException, NoSuchMethodException,
             InterruptedException, IOException, InstantiationException, STenantUpdateException {
-            System.out.println("=====================================================");
-            System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
-            System.out.println("=====================================================");
-            shutdown();
-            checkThreadsAreStopped();
+        System.out.println("=====================================================");
+        System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
+        System.out.println("=====================================================");
+        shutdown();
+        checkThreadsAreStopped();
     }
 
     public void unzip(String zipFilePath, String destDirectory) throws IOException {
@@ -129,7 +166,7 @@ public class EngineStarter {
     private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
-        int read = 0;
+        int read;
         while ((read = zipIn.read(bytesIn)) != -1) {
             bos.write(bytesIn, 0, read);
         }
@@ -140,7 +177,7 @@ public class EngineStarter {
             InvocationTargetException {
 
         System.out.println("=========  PREPARE ENVIRONMENT =======");
-        String bonitaHome = setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
+        String bonitaHome = prepareBonitaHome();
         final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
         // paste the default local server properties
@@ -156,6 +193,21 @@ public class EngineStarter {
         if ("h2".equals(dbVendor)) {
             this.h2Server = startH2Server();
         }
+    }
+
+    String prepareBonitaHome() throws IOException {
+        final String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
+        if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
+            final InputStream bonitaHomeIS = this.getClass().getResourceAsStream("/bonita-home.zip");
+            if (bonitaHomeIS == null) {
+                throw new IllegalStateException("No bonita home found in the class path");
+            }
+            final File outputFolder = new File(BONITA_HOME_DEFAULT_PATH);
+            outputFolder.mkdir();
+            IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
+            System.setProperty(BONITA_HOME_PROPERTY, outputFolder.getAbsolutePath() + "/bonita-home");
+        }
+        return bonitaHomePath;
     }
 
     private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException,
@@ -326,48 +378,5 @@ public class EngineStarter {
         final APISession apiSession = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
         ClientEventUtil.deployCommand(apiSession);
         loginAPI.logout(apiSession);
-    }
-
-    private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ApiAccessType apiType;
-        try {
-            apiType = APITypeManager.getAPIType();
-        } catch (IOException e) {
-            throw new ServerAPIException(e);
-        }
-        Map<String, String> parameters = null;
-        switch (apiType) {
-            case LOCAL:
-                return LocalServerAPIFactory.getServerAPI();
-            case EJB3:
-                try {
-                    parameters = APITypeManager.getAPITypeParameters();
-                } catch (IOException e) {
-                    throw new ServerAPIException(e);
-                }
-                return new EJB3ServerAPI(parameters);
-            case HTTP:
-                try {
-                    parameters = APITypeManager.getAPITypeParameters();
-                } catch (IOException e) {
-                    throw new ServerAPIException(e);
-                }
-                return new HTTPServerAPI(parameters);
-            case TCP:
-                try {
-                    parameters = APITypeManager.getAPITypeParameters();
-                } catch (IOException e) {
-                    throw new ServerAPIException(e);
-                }
-                return new TCPServerAPI(parameters);
-            default:
-                throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
-        }
-    }
-
-    private static String setSystemPropertyIfNotSet(final String property, final String value) {
-        final String finalValue = System.getProperty(property, value);
-        System.setProperty(property, finalValue);
-        return finalValue;
     }
 }
