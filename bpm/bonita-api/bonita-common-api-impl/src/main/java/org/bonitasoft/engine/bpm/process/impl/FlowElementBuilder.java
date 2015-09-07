@@ -309,6 +309,17 @@ public interface FlowElementBuilder {
     CallActivityBuilder addCallActivity(String name, Expression callableElement, Expression callableElementVersion);
 
     /**
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.CallActivityDefinition} on this element. Convenience variant of the standard addCallActivity, in case
+     * the name and the version of the process are already known
+     * 
+     * @param name
+     * @param processName
+     * @param processVersion
+     * @return
+     */
+    CallActivityBuilder addCallActivity(String name, String processName, String processVersion);
+
+    /**
      * Adds a {@link org.bonitasoft.engine.bpm.process.SubProcessDefinition} on this element
      *
      * @param name

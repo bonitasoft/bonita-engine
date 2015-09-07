@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,23 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.local;
 
-import java.util.Hashtable;
+package org.bonitasoft.engine.bpm.bar;
 
-import javax.naming.Context;
-import javax.naming.spi.InitialContextFactory;
+import org.bonitasoft.engine.exception.BonitaException;
 
 /**
- * A factory of a naming context that uses the memory as dictionary of objects. Useful to tests
- * objects using JNDI to get dependencies.
+ * @author mazourd
  */
-public class SimpleMemoryContextFactory implements InitialContextFactory {
+public class XmlMarshallException extends BonitaException {
 
-    private static final SimpleMemoryContext context = new SimpleMemoryContext();
-
-    @Override
-    public Context getInitialContext(final Hashtable<?, ?> environment) {
-        return context;
+    public XmlMarshallException(final String message, final Exception e) {
+        super(message, e);
     }
+
 }

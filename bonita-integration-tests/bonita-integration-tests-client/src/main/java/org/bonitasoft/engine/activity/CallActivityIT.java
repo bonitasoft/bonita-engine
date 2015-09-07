@@ -13,13 +13,6 @@
  */
 package org.bonitasoft.engine.activity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
@@ -75,6 +68,13 @@ import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -133,11 +133,6 @@ public class CallActivityIT extends TestWithTechnicalUser {
     private ProcessDefinition buildProcessWithCallActivity(final boolean addInputOperations, final boolean addOutputOperations,
             final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion) throws BonitaException {
 
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
-        Expression targetProcessVersionExpr = null;
-        if (strTargetVersion != null) {
-            targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(strTargetVersion);
-        }
         final Expression expressionTrue = new ExpressionBuilder().createConstantBooleanExpression(true);
 
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
@@ -147,7 +142,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         processDefBuilder.addIntegerData("pNumber", null);
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addStartEvent("start");
-        final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+        final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessName, strTargetVersion);
         addDataInputOperationsIfNeed(addInputOperations, callActivityBuilder);
         callActivityBuilder.addShortTextData("callActivityData", new ExpressionBuilder().createConstantStringExpression("defaultValue"));
         if (loopNb > 0) {
@@ -307,13 +302,13 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
             final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
-            waitForUserTaskAndExecuteIt("Step1", cascao);
-            final ActivityInstance read = waitForUserTaskAndGetIt("Read");
+            userTaskAPI.waitForUserTaskAndExecuteIt(-1, "Step1", cascao);
+            final ActivityInstance read = userTaskAPI.waitForUserTaskAndGetIt(-1, "Read", -1);
             final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
             assertThat(copyMsg.getValue()).isEqualTo("data");
             assignAndExecuteStep(read, cascao.getId());
 
-            waitForProcessToFinish(mainProcessInstance);
+            userTaskAPI.waitForProcessToFinish(mainProcessInstance.getId(),-1);
         } finally {
             disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
         }
@@ -373,12 +368,12 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 
             final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
-            waitForUserTaskAndExecuteIt("Step1", cascao);
-            final ActivityInstance read = waitForUserTaskAndGetIt("Read");
+            userTaskAPI.waitForUserTaskAndExecuteIt(-1, "Step1", cascao);
+            final ActivityInstance read = userTaskAPI.waitForUserTaskAndGetIt(-1, "Read", -1);
             final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
             assertThat(copyMsg.getValue()).isEqualTo("data");
             assignAndExecuteStep(read, cascao.getId());
-            waitForProcessToFinish(mainProcessInstance);
+            userTaskAPI.waitForProcessToFinish(mainProcessInstance.getId(),-1);
         } finally {
             disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
         }
@@ -415,8 +410,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
-        waitForUserTaskAndExecuteIt(callingProcessInstance, "tStep1", cebolinha);
-        waitForUserTask(callingProcessInstance, "step1");
+        userTaskAPI.waitForUserTaskAndExecuteIt(callingProcessInstance.getId(), "tStep1", cebolinha);
+        userTaskAPI.waitForUserTask(callingProcessInstance.getId(), "step1", -1);
 
         /*
          * check the data have the value of the clientNumber of the called process
@@ -478,7 +473,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         assertThat(targetPI.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
         assertThat(targetPI.getCallerId()).isEqualTo(callActivityInstance.getId());
 
-        ActivityInstance activityInstance = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
+        ActivityInstance activityInstance = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "tStep1", -1);
         assertThat(activityInstance.getParentProcessInstanceId()).isEqualTo(targetPI.getId());
         assertThat(activityInstance.getRootContainerId()).isEqualTo(callingProcessInstance.getId());
         checkDataInputOperations(addInputOperations, targetPI);
@@ -486,14 +481,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
         // execute step in the target process
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
-        activityInstance = waitForUserTaskAndGetIt(callingProcessInstance, "step1");
+        activityInstance = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "step1", -1);
         checkOutputOperations(addOutputOperations, callingProcessInstance);
-        waitForProcessToFinish(targetPI);
+        userTaskAPI.waitForProcessToFinish(targetPI.getId(),-1);
         assertThat(activityInstance.getParentProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
 
         assignAndExecuteStep(activityInstance, cascao.getId());
 
-        waitForProcessToFinish(callingProcessInstance);
+        userTaskAPI.waitForProcessToFinish(callingProcessInstance.getId(),-1);
 
         disableAndDeleteProcess(callingProcessDef, targetProcessDef1, targetProcessDef2, targetProcessDef3);
     }
@@ -547,11 +542,11 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(procInstLevels[i].getProcessDefinitionId()).as("Level of process : " + i).isEqualTo(processDefLevels[i].getId());
         }
 
-        waitForUserTaskAndExecuteIt(procInstLevels[0], "tStep1", cebolinha);
-        waitForProcessToFinish(procInstLevels[nbLevel - 1]);
+        userTaskAPI.waitForUserTaskAndExecuteIt(procInstLevels[0].getId(), "tStep1", cebolinha);
+        userTaskAPI.waitForProcessToFinish(procInstLevels[nbLevel - 1].getId(),-1);
         for (int i = nbLevel - 2; i >= 0; i--) {
-            waitForUserTaskAndExecuteIt(procInstLevels[0], "step1", cascao);
-            waitForProcessToFinish(procInstLevels[i]);
+            userTaskAPI.waitForUserTaskAndExecuteIt(procInstLevels[0].getId(), "step1", cascao);
+            userTaskAPI.waitForProcessToFinish(procInstLevels[i].getId(),-1);
         }
 
         disableAndDeleteProcess(processDefLevels);
@@ -576,7 +571,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
         assertThat(processInstances).hasSize(1);
 
-        final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
+        final ActivityInstance waitForTaskToFail = userTaskAPI.waitForTaskToFail(processInstance);
         assertThat(waitForTaskToFail.getState()).isEqualTo(TestStates.FAILED.getStateName());
         disableAndDeleteProcess(processDef);
     }
@@ -591,14 +586,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
         waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
         for (int i = 0; i < nbLoop; i++) {
-            long tStep1 = waitForUserTask("tStep1");
+            long tStep1 = userTaskAPI.waitForUserTask(-1, "tStep1", -1);
             FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(tStep1);
             assignAndExecuteStep(tStep1, cebolinha);
-            waitForProcessToFinish(flowNodeInstance.getParentProcessInstanceId());
+            userTaskAPI.waitForProcessToFinish(flowNodeInstance.getParentProcessInstanceId(),-1);
         }
 
-        waitForUserTaskAndExecuteIt(callingProcessInstance, "step1", cascao);
-        waitForProcessToFinish(callingProcessInstance);
+        userTaskAPI.waitForUserTaskAndExecuteIt(callingProcessInstance.getId(), "step1", cascao);
+        userTaskAPI.waitForProcessToFinish(callingProcessInstance.getId(),-1);
 
         disableAndDeleteProcess(callingProcessDef, targetProcessDef);
     }
@@ -633,8 +628,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
         final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
-        waitForUserTaskAndExecuteIt(callingProcessInstance, "tStep1", cebolinha); // first loop execution
-        waitForProcessToFinish(targetPI);
+        userTaskAPI.waitForUserTaskAndExecuteIt(callingProcessInstance.getId(), "tStep1", cebolinha); // first loop execution
+        userTaskAPI.waitForProcessToFinish(targetPI.getId(),-1);
 
         final WaitForFinalArchivedActivity waitForFinalArchivedActivity = waitForFinalArchivedActivity("callActivity", callingProcessInstance);
         assertThat(waitForFinalArchivedActivity.getResult().getType()).isEqualTo(FlowNodeType.CALL_ACTIVITY);
@@ -659,7 +654,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", "unexisting_version_4.0");
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
-        final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
+        final ActivityInstance failedTask = userTaskAPI.waitForTaskToFail(callingProcessInstance);
         assertThat(failedTask.getName()).isEqualTo("callActivity");
 
         disableAndDeleteProcess(callingProcessDef);
@@ -671,7 +666,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", null);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
-        final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
+        final ActivityInstance failedTask = userTaskAPI.waitForTaskToFail(callingProcessInstance);
         assertThat(failedTask.getName()).isEqualTo("callActivity");
 
         disableAndDeleteProcess(callingProcessDef);
@@ -687,7 +682,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
         final List<Operation> operations = getStartOperations();
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
-        final ActivityInstance tStep1 = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
+        final ActivityInstance tStep1 = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "tStep1", -1);
 
         try {
             getProcessAPI().deleteProcessInstance(tStep1.getParentProcessInstanceId());
@@ -716,7 +711,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
         final List<Operation> operations = getStartOperations();
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
-        waitForUserTask(callingProcessInstance, "tStep1");
+        userTaskAPI.waitForUserTask(callingProcessInstance.getId(), "tStep1", -1);
 
         getProcessAPI().disableProcess(targetProcessDef1.getId());
         try {
@@ -766,16 +761,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
             assertThat(targetPI.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assertThat(targetPI.getCallerId()).isEqualTo(callActivityInstance.getId());
-            final HumanTaskInstance tStep1 = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
+            final HumanTaskInstance tStep1 = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "tStep1", -1);
             assertThat(tStep1.getParentProcessInstanceId()).isEqualTo(targetPI.getId());
             assertThat(tStep1.getRootContainerId()).isEqualTo(callingProcessInstance.getId());
             // execute step in the target process
             assignAndExecuteStep(tStep1, cebolinha.getId());
-            final HumanTaskInstance step1 = waitForUserTaskAndGetIt(callingProcessInstance, "step1");
-            waitForProcessToFinish(targetPI);
+            final HumanTaskInstance step1 = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "step1", -1);
+            userTaskAPI.waitForProcessToFinish(targetPI.getId(),-1);
             assertThat(step1.getParentProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assignAndExecuteStep(step1, cascao.getId());
-            waitForProcessToFinish(callingProcessInstance);
+            userTaskAPI.waitForProcessToFinish(callingProcessInstance.getId(),-1);
         } finally {
             disableAndDeleteProcess(callingProcessDef, targetProcessDef);
         }
@@ -818,16 +813,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(callActivityInstance.getDisplayName()).isEqualTo("callActivityDisplayName");
             assertThat(callActivityInstance.getDescription()).isEqualTo("callActivityDescription");
             assertThat(callActivityInstance.getDisplayDescription()).isEqualTo("callActivityDisplayDescription");
-            final HumanTaskInstance tStep1 = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
+            final HumanTaskInstance tStep1 = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "tStep1", -1);
             assertThat(tStep1.getParentProcessInstanceId()).isEqualTo(targetPI.getId());
             assertThat(tStep1.getRootContainerId()).isEqualTo(callingProcessInstance.getId());
             // execute step in the target process
             assignAndExecuteStep(tStep1, cebolinha.getId());
-            final HumanTaskInstance step1 = waitForUserTaskAndGetIt(callingProcessInstance, "step1");
-            waitForProcessToFinish(targetPI);
+            final HumanTaskInstance step1 = userTaskAPI.waitForUserTaskAndGetIt(callingProcessInstance.getId(), "step1", -1);
+            userTaskAPI.waitForProcessToFinish(targetPI.getId(),-1);
             assertThat(step1.getParentProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assignAndExecuteStep(step1, cascao.getId());
-            waitForProcessToFinish(callingProcessInstance);
+            userTaskAPI.waitForProcessToFinish(callingProcessInstance.getId(),-1);
         } finally {
             disableAndDeleteProcess(callingProcessDef, targetProcessDef);
         }
@@ -885,8 +880,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
             callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
             // Execute step in the target process
-            waitForUserTaskAndExecuteIt(callingProcessInstance, "tStep1", cebolinha);
-            waitForProcessToFinish(callingProcessInstance);
+            userTaskAPI.waitForUserTaskAndExecuteIt(callingProcessInstance.getId(), "tStep1", cebolinha);
+            userTaskAPI.waitForProcessToFinish(callingProcessInstance.getId(),-1);
             // Search archived process
             assertThat(getProcessAPI().getNumberOfArchivedProcessInstances()).isEqualTo(1L);
             final SearchOptionsBuilder searchOptions = new SearchOptionsBuilder(0, 10);
@@ -927,7 +922,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         processDefBuilder.addTransition("callActivity", "end");
         final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-        final long tStep1Id = waitForUserTask(callingProcessInstance.getId(), "tStep1");
+        final long tStep1Id = userTaskAPI.waitForUserTask(callingProcessInstance.getId(), "tStep1", -1);
 
         final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromActivityInstanceId(tStep1Id);
         assertThat(processDefinitionId).isEqualTo(targetProcessDefinition.getId());
@@ -963,7 +958,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             processDefBuilder.addTransition("callActivity", "end");
             callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-            final long tStep1Id = waitForUserTask(callingProcessInstance, "tStep1");
+            final long tStep1Id = userTaskAPI.waitForUserTask(callingProcessInstance.getId(), "tStep1", -1);
             assertThat(getProcessAPI().getActivityDataInstance("rootProcId", tStep1Id).getValue()).isEqualTo(callingProcessInstance.getId());
         } finally {
             disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
@@ -1014,7 +1009,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
             callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-            final long endId = waitForUserTask(callingProcessInstance, "end");
+            final long endId = userTaskAPI.waitForUserTask(callingProcessInstance.getId(), "end", -1);
             assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", endId).getValue()).isEqualTo("parentDefault");
             assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnFinish", endId).getValue()).isEqualTo("subModified");
         } finally {
@@ -1063,13 +1058,13 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessInstance instance = getProcessAPI().startProcess(parentProcDefinition.getId());
 
         // Check that contract input has been correctly passed by CallActivity:
-        final long childTask = waitForUserTask("childTask");
+        final long childTask = userTaskAPI.waitForUserTask(-1, "childTask", -1);
         final HumanTaskInstance humanTaskInstance = getProcessAPI().getHumanTaskInstance(childTask);
         final DataInstance dataOk = getProcessAPI().getActivityDataInstance("dataOk", humanTaskInstance.getId());
         assertThat(((Boolean) dataOk.getValue())).isTrue();
 
         assignAndExecuteStep(childTask, cascao);
-        waitForUserTask("parentTask");
+        userTaskAPI.waitForUserTask(-1, "parentTask", -1);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", instance.getId());
         assertThat(dataInstance.getValue()).isEqualTo("World");
@@ -1136,7 +1131,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
 
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-            waitForUserTask(callingProcessInstance, "end");
+            userTaskAPI.waitForUserTask(callingProcessInstance.getId(), "end", -1);
         } finally {
             disableAndDeleteProcess(callingProcessDefinition);
             disableAndDeleteProcess(targetProcessDefinition);

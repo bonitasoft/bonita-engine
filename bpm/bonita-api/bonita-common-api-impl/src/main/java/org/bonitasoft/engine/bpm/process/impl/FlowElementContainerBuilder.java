@@ -13,15 +13,17 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author Matthieu Chaffotte
@@ -44,7 +46,7 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
      * @return
      *         the process being build
      * @throws InvalidProcessDefinitionException
-     *             when the process definition is inconsistent. The exception contains causes
+     *         when the process definition is inconsistent. The exception contains causes
      */
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return processDefinitionBuilder.done();
@@ -121,6 +123,24 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     }
 
     @Override
+    public CallActivityBuilder addCallActivity(String name, String processName, String processVersion) {
+
+        Expression targetProcessVersionExpr = null;
+        Expression targetProcessNameExpr = null;
+        try {
+            targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(processName);
+            if (processVersion != null) {
+                targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(processVersion);
+            }
+        } catch (InvalidExpressionException e) {
+            //should never happen
+
+        }
+        return new CallActivityBuilder(processDefinitionBuilder, container, name, targetProcessNameExpr,
+                targetProcessVersionExpr);
+    }
+
+    @Override
     public SubProcessActivityDefinitionBuilder addSubProcess(final String name, final boolean triggeredByEvent) {
         return new SubProcessActivityDefinitionBuilder(processDefinitionBuilder, container, name, triggeredByEvent);
     }
@@ -194,7 +214,6 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
     public DataDefinitionBuilder addData(final String name, final String className, final Expression defaultValue) {
         return new DataDefinitionBuilder(processDefinitionBuilder, container, name, className, defaultValue);
     }
-
 
     protected FlowElementContainerDefinitionImpl getContainer() {
         return container;

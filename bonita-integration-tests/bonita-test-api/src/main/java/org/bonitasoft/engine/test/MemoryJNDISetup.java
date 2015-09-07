@@ -11,15 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.local;
-
-import java.util.Map;
-
-import javax.naming.NamingException;
+package org.bonitasoft.engine.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jndi.JndiTemplate;
+
+import javax.naming.NamingException;
+import java.util.Map;
 
 public class MemoryJNDISetup {
 

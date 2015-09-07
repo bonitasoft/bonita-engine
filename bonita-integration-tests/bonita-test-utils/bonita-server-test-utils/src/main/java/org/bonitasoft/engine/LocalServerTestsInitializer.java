@@ -14,6 +14,11 @@
 
 package org.bonitasoft.engine;
 
+import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.test.APITestUtil;
+
 import javax.naming.Context;
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +29,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.test.APITestUtil;
 
 public class LocalServerTestsInitializer {
 
@@ -68,7 +68,8 @@ public class LocalServerTestsInitializer {
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
-    public void prepareEnvironment() throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
+    public void prepareEnvironment() throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException,
+            InvocationTargetException {
 
         System.out.println("=========  PREPARE ENVIRONMENT =======");
         String bonitaHome = setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
@@ -81,17 +82,18 @@ public class LocalServerTestsInitializer {
         FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
 
         // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
 
         if ("h2".equals(dbVendor)) {
             this.h2Server = startH2Server();
         }
     }
 
-    private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
+    private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException,
+            InvocationTargetException {
         final int h2Port = 6666;
-//        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
+        //        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
 
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
         final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", String[].class);
@@ -111,8 +113,8 @@ public class LocalServerTestsInitializer {
     }
 
     private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
+        final String[] args = new String[] { "-tcp", "-tcpAllowOthers", "-tcpPort", h2Port };
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[] { args });
         final Method start = server.getClass().getMethod("start");
         try {
             start.invoke(server);
@@ -189,7 +191,8 @@ public class LocalServerTestsInitializer {
         boolean fail = nbOfThreads > nbOfExpectedThreads;
         System.out.println(nbOfThreads + " are alive. " + nbOfExpectedThreads + " are expected.");
         if (cacheManagerThreads.size() > 2) {
-            System.out.println("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but " + cacheManagerThreads.size() + " are found:");
+            System.out.println("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
+                    + cacheManagerThreads.size() + " are found:");
             for (Thread thread : cacheManagerThreads) {
                 printThread(thread);
             }
@@ -201,16 +204,15 @@ public class LocalServerTestsInitializer {
             }
         }
         if (fail) {
-            throw new IllegalStateException("Some threads are still active : \nCacheManager potential issues:" + cacheManagerThreads + "\nOther threads:" + unexpectedThreads);
+            throw new IllegalStateException("Some threads are still active : \nCacheManager potential issues:" + cacheManagerThreads + "\nOther threads:"
+                    + unexpectedThreads);
         }
         System.out.println("All engine threads are stopped properly");
     }
 
-
     private boolean isCacheManager(Thread thread) {
         return thread.getName().startsWith("net.sf.ehcache.CacheManager");
     }
-
 
     private void printThread(final Thread thread) {
         System.out.println("\n");
@@ -219,7 +221,6 @@ public class LocalServerTestsInitializer {
             System.out.println("        at " + stackTraceElement.toString());
         }
     }
-
 
     private boolean isExpectedThread(final Thread thread) {
         final String name = thread.getName();

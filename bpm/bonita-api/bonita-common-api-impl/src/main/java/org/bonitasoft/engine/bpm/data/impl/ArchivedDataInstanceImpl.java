@@ -13,10 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 
 /**
  * @author Matthieu Chaffotte
@@ -58,5 +58,6 @@ public class ArchivedDataInstanceImpl extends DataInstanceImpl implements Archiv
     public void setValue(final Serializable value) {
         this.value = value;
     }
+
 
 }

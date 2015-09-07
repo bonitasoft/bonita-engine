@@ -58,9 +58,19 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
+import javax.lang.model.SourceVersion;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Builder to define a process.
@@ -672,6 +682,24 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     @Override
     public CallActivityBuilder addCallActivity(final String name, final Expression callableElement, final Expression callableElementVersion) {
         return new CallActivityBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, callableElement, callableElementVersion);
+    }
+
+    @Override
+    public CallActivityBuilder addCallActivity(String name, String processName, String processVersion) {
+
+        Expression targetProcessVersionExpr = null;
+        Expression targetProcessNameExpr = null;
+        try {
+            targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(processName);
+            if (processVersion != null) {
+                targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(processVersion);
+            }
+        } catch (InvalidExpressionException e) {
+            //should never happen
+
+        }
+        return new CallActivityBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, targetProcessNameExpr,
+                targetProcessVersionExpr);
     }
 
     @Override

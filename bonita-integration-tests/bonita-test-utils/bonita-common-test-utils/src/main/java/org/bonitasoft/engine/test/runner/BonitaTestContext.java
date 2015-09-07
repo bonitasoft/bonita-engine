@@ -14,14 +14,14 @@
 
 package org.bonitasoft.engine.test.runner;
 
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.junit.runner.Runner;
+import org.junit.runners.model.InitializationError;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.Runner;
-import org.junit.runners.model.InitializationError;
 
 /**
  * @author Baptiste Mesta

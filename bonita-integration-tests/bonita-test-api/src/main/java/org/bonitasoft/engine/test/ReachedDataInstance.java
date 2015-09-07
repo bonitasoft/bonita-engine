@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,23 +10,29 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.local;
+ */
 
-import javax.naming.CompositeName;
-import javax.naming.Name;
-import javax.naming.NameParser;
-import javax.naming.NamingException;
+package org.bonitasoft.engine.test;
 
-public class SimpleNameParser implements NameParser {
+import org.bonitasoft.engine.bpm.data.DataInstance;
 
-    public SimpleNameParser(final String name) {
-        // TODO Auto-generated constructor stub
+import java.io.Serializable;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * @author mazourd
+ */
+public class ReachedDataInstance {
+    private DataInstance dataInstance;
+
+    public ReachedDataInstance(DataInstance dataInstance) {
+
+        this.dataInstance = dataInstance;
     }
 
-    @Override
-    public Name parse(final String name) throws NamingException {
-        return new CompositeName(name);
-    }
 
+    public  void hasValue(Serializable value) {
+        assertThat(dataInstance.getValue()).isEqualTo(value);
+    }
 }
