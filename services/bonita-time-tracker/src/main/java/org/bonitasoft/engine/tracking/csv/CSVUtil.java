@@ -54,50 +54,33 @@ public class CSVUtil {
         return array;
     }
 
-    public static void writeCSV(final File file, final List<List<String>> array, final String csvSeparator) throws IOException {
-        final FileWriter writer = new FileWriter(file);
-        for (final List<String> row : array) {
-            boolean first = true;
-            for (final String value : row) {
-                if (first) {
-                    writer.append(value);
-                    first = false;
-                } else {
-                    writer.append(csvSeparator);
-                    writer.append(value);
-                }
+    public static void writeCSVRow(final FileWriter writer, final List<String> row, final String csvSeparator) throws IOException {
+        boolean first = true;
+        for (final String value : row) {
+            if (first) {
+                writer.append(value);
+                first = false;
+            } else {
+                writer.append(csvSeparator);
+                writer.append(value);
             }
-            writer.append("\n");
-            writer.flush();
         }
+        writer.append("\n");
+        writer.flush();
+    }
+
+    public static void writeCSVRow(final File file, final List<String> row, final String csvSeparator) throws IOException {
+        final FileWriter writer = new FileWriter(file, true);
+        writeCSVRow(writer, row, csvSeparator);
         writer.close();
     }
 
-    public static String getFileTimestamp(final long time) {
-        final StringBuilder fileSuffix = new StringBuilder();
-        final GregorianCalendar c = new GregorianCalendar();
-        c.setTimeInMillis(time);
-
-        fileSuffix.append(getIntOnTwoNumbers(c.get(Calendar.YEAR)));
-        fileSuffix.append("_");
-        fileSuffix.append(getIntOnTwoNumbers(c.get(Calendar.MONTH) + 1));
-        fileSuffix.append("_");
-        fileSuffix.append(getIntOnTwoNumbers(c.get(Calendar.DAY_OF_MONTH)));
-        fileSuffix.append("_");
-        fileSuffix.append(getIntOnTwoNumbers(c.get(Calendar.HOUR_OF_DAY)));
-        fileSuffix.append("h");
-        fileSuffix.append(getIntOnTwoNumbers(c.get(Calendar.MINUTE)));
-        fileSuffix.append("m");
-        fileSuffix.append(getIntOnTwoNumbers(c.get(Calendar.SECOND)));
-        fileSuffix.append("s");
-        return fileSuffix.toString();
-    }
-
-    public static String getIntOnTwoNumbers(final int i) {
-        if (i < 10) {
-            return "0" + i;
+    public static void writeCSVRows(final File file, final List<List<String>> array, final String csvSeparator) throws IOException {
+        final FileWriter writer = new FileWriter(file, true);
+        for (final List<String> row : array) {
+            writeCSVRow(writer, row, csvSeparator);
         }
-        return Integer.toString(i);
+        writer.close();
     }
 
 }

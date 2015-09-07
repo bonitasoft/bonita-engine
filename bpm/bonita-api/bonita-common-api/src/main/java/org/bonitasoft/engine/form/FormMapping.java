@@ -35,6 +35,7 @@ public class FormMapping implements BaseElement {
     private String pageMappingKey;
     private long lastUpdatedBy;
     private Date lastUpdateDate;
+    private boolean formRequired;
 
     public FormMapping() {
     }
@@ -125,12 +126,20 @@ public class FormMapping implements BaseElement {
         this.lastUpdateDate = lastUpdateDate;
     }
 
-       public FormMappingTarget getTarget() {
+    public FormMappingTarget getTarget() {
         return target;
     }
 
     public void setTarget(FormMappingTarget target) {
         this.target = target;
+    }
+
+    public boolean isFormRequired() {
+        return formRequired;
+    }
+
+    public void setFormRequired(boolean required) {
+        this.formRequired = required;
     }
 
     @Override

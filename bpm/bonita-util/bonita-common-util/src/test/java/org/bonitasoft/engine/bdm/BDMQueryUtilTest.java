@@ -21,8 +21,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.Query;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
@@ -32,6 +30,7 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.junit.Test;
 
 /**
  * @author Romain Bioteau
@@ -91,7 +90,7 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        assertThat(queries).hasSize(3);
+        assertThat(queries).hasSize(4);
     }
 
     @Test
@@ -106,7 +105,7 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        assertThat(queries).hasSize(2);
+        assertThat(queries).hasSize(3);
     }
 
     protected SimpleField aStringField(final String name) {
@@ -197,7 +196,7 @@ public class BDMQueryUtilTest {
         f2.setReference(bo);
         bo.addField(f2);
 
-        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).containsOnly("findByName", "find");
+        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).doesNotContain("findByName2");
     }
 
     @Test
@@ -268,6 +267,39 @@ public class BDMQueryUtilTest {
                 "SELECT addresses_1 FROM Employee employee_0 JOIN employee_0.addresses as addresses_1 WHERE employee_0.persistenceId= :persistenceId");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).extracting("name", "className").contains(tuple(Field.PERSISTENCE_ID, Long.class.getName()));
+    }
+
+    @Test
+    public void should_generate_findByPersistenceId_query_in_provided_queries_names() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final SimpleField field = new SimpleField();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+
+        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).contains("findByPersistenceId");
+    }
+
+    @Test
+    public void should_generate_findByPersistenceId_query_in_provided_queries() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+
+        assertThat(BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)).extracting("name", "content", "returnType")
+                .contains(tuple("findByPersistenceId", "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n", "org.bonita.Employee"));
+    }
+
+    @Test
+    public void should_not_generate_findByPersistenceId_query_in_provided_queries_names_if_already_defined_in_custom_queries() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final SimpleField field = new SimpleField();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+        bo.getQueries().add(new Query("findByPersistenceId", "", ""));
+        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).doesNotContain("findByPersistenceId");
     }
 
 }

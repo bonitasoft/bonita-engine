@@ -11,24 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.tracking.csv;
+package org.bonitasoft.engine.tracking;
 
-import java.io.File;
+public class FlushEventListenerResult {
 
-import org.bonitasoft.engine.tracking.FlushEvent;
-import org.bonitasoft.engine.tracking.FlushResult;
+    private final FlushEvent flushEvent;
 
-public class CSVFlushResult extends FlushResult {
-
-    private final File outputFile;
-
-    public CSVFlushResult(final FlushEvent flushEvent, final File outputFile) {
-        super(flushEvent);
-        this.outputFile = outputFile;
+    public FlushEventListenerResult(final FlushEvent flushEvent) {
+        super();
+        this.flushEvent = flushEvent;
     }
 
-    public File getOutputFile() {
-        return outputFile;
+    public FlushEvent getFlushEvent() {
+        return flushEvent;
     }
 
 }

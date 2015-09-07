@@ -17,13 +17,13 @@ public class Record {
 
     private final long timestamp;
 
-    private final String name;
+    private final TimeTrackerRecords name;
 
     private final String description;
 
     private final long duration;
 
-    public Record(long timestamp, String name, String description, long duration) {
+    public Record(long timestamp, TimeTrackerRecords name, String description, long duration) {
         super();
         this.timestamp = timestamp;
         this.name = name;
@@ -35,7 +35,7 @@ public class Record {
         return timestamp;
     }
 
-    public String getName() {
+    public TimeTrackerRecords getName() {
         return name;
     }
 

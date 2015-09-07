@@ -52,11 +52,12 @@ public class TypeConvertUtilTest {
         assertThat((Boolean) typeConverterUtil.convertToType(Boolean.class, "true")).isTrue();
         assertThat((Boolean) typeConverterUtil.convertToType(Boolean.class, "false")).isFalse();
 
-        checkDateConvert(1422658800000L, "2015-01-31");
-        checkDateConvert(1422742559000L, "2015-01-31 23:15:59");
-        checkDateConvert(1422742559000L, "2015-01-31T23:15:59");
-        checkDateConvert(1422742559001L, "2015-01-31T23:15:59.001");
-        checkDateConvert(39600000L, "12:00:00");
+        checkDateConvert("2015-08-06T22:00:00.000", 1438898400000L);
+        checkDateConvert("2015-01-31", 1422662400000L);
+        checkDateConvert("2015-01-31 23:15:59", 1422746159000L);
+        checkDateConvert("2015-01-31T23:15:59", 1422746159000L);
+        checkDateConvert("2015-01-31T23:15:59.001", 1422746159001L);
+        checkDateConvert("12:00:00", 43200000L);
 
     }
 
@@ -68,10 +69,10 @@ public class TypeConvertUtilTest {
         typeConverterUtil.convertToType(Date.class, "not a date");
     }
 
-    private void checkDateConvert(long dateLong, String dateToConvert) {
-        final Date expectedDate = new Date(dateLong);
+    private void checkDateConvert(String dateToConvert, long expectedDateAsLong) {
+        final Date expectedDate = new Date(expectedDateAsLong);
         final Date returnedDate = (Date) typeConverterUtil.convertToType(Date.class, dateToConvert);
-        assertThat(returnedDate.getTime()).as("error with date:" + dateToConvert).isEqualTo(expectedDate.getTime());
+        assertThat(returnedDate).as("error while converting date:" + dateToConvert + " (assuming provided date is GMT)").hasTime(expectedDateAsLong).isEqualTo(expectedDate);
     }
 
 

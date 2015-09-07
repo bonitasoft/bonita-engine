@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.bdm.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Strings.concat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aRelationField;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Strings.concat;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,11 +33,6 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
 import org.assertj.core.util.FilesException;
-import org.bonitasoft.engine.commons.io.IOUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.CompilableCode;
@@ -49,6 +44,11 @@ import org.bonitasoft.engine.bdm.model.QueryParameter;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.bonitasoft.engine.commons.io.IOUtil;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
 
@@ -366,7 +366,6 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-
         assertThat(file).hasContentEqualTo(expected);
     }
 

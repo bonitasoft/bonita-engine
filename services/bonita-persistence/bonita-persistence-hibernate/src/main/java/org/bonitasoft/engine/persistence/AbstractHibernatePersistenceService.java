@@ -17,11 +17,6 @@ import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PAR
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
 
-import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,12 +27,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
@@ -258,12 +251,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), 0));
                 session.delete(pe);
             }
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
         }
@@ -293,12 +282,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final Query query = getSession(true).getNamedQuery("deleteAll" + mappedClass.getSimpleName());
         try {
             query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
         }
@@ -312,12 +297,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         setId(entity);
         try {
             session.save(entity);
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
         }
@@ -412,12 +393,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         try {
             return (T) session.get(mappedClass, selectDescriptor.getId());
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SBonitaReadException(he);
         }
@@ -439,12 +416,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         query.setMaxResults(1);
         try {
             return (T) query.uniqueResult();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SBonitaReadException(he);
         }
@@ -743,15 +716,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 return list;
             }
             return Collections.emptyList();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException e) {
-            throw new SBonitaReadException(e, selectDescriptor);
-        } catch (final SPersistenceException e) {
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
+        } catch (final HibernateException | SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
     }
@@ -788,67 +755,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    private void doExecuteSQLThroughHibernate(final String sqlResource, final List<String> commands) throws SPersistenceException {
-        final Session session = getSession(false);
-        for (final String command : commands) {
-            try {
-                session.createSQLQuery(command).executeUpdate();// FIXME autocommit
-                // session.flush();
-                // session.clear(); // lvaills : Why clearing the session ? the tx is not committed.
-            } catch (final AssertionFailure af) {
-                throw new SRetryableException("Unable to execute command of file " + sqlResource + " content:\n " + command, af);
-            } catch (final LockAcquisitionException lae) {
-                throw new SRetryableException("Unable to execute command of file " + sqlResource + " content:\n " + command, lae);
-            } catch (final StaleStateException sse) {
-                throw new SRetryableException("Unable to execute command of file " + sqlResource + " content:\n " + command, sse);
-            } catch (final HibernateException e) {
-                throw new SPersistenceException("Unable to execute command of file " + sqlResource + " content:\n " + command, e);
-            }
-        }
-    }
-
-    private void doExecuteSQLThroughJDBC(final List<String> commands) throws SPersistenceException {
-        try {
-            final Connection connection = datasource.getConnection();
-            connection.setAutoCommit(false);
-            try {
-                for (final String command : commands) {
-                    final Statement stmt = connection.createStatement();
-                    try {
-                        stmt.execute(command);
-                    } catch (final SQLException e) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Following SQL command failed: " + command);
-                        throw e;
-                    } finally {
-                        stmt.close();
-                    }
-                }
-                connection.commit();
-            } catch (final SQLException sqe) {
-                connection.rollback();
-                throw sqe;
-            } finally {
-                connection.close();
-            }
-        } catch (final SQLException e) {
-            throw new SPersistenceException(e);
-        }
-    }
-
-    private String fillTemplate(final Map<String, String> replacements, final String command) {
-        String trimmedCommand = command.trim();
-        if (trimmedCommand.isEmpty() || replacements == null) {
-            return trimmedCommand;
-        }
-
-        for (final Map.Entry<String, String> tableMapping : replacements.entrySet()) {
-            final String stringToReplace = tableMapping.getKey();
-            final String value = tableMapping.getValue();
-            trimmedCommand = trimmedCommand.replaceAll(stringToReplace, value);
-        }
-        return trimmedCommand;
-    }
-
     public Map<String, String> getClassAliasMappings() {
         return classAliasMappings;
     }
@@ -860,12 +766,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         query.setLong("id", id);
         try {
             query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
         } catch (final HibernateException he) {
             throw new SPersistenceException(he);
         }
@@ -878,14 +780,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         query.setParameterList("ids", ids);
         try {
             query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
+        } catch (final HibernateException sse) {
+            throw new SPersistenceException(sse);
         }
     }
 

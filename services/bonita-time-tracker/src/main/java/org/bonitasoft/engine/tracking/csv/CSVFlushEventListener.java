@@ -18,25 +18,26 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.UUID;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.AbstractFlushEventListener;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.FlushEventListener;
 import org.bonitasoft.engine.tracking.Record;
 
-public class CSVFlushEventListener implements FlushEventListener {
+public class CSVFlushEventListener extends AbstractFlushEventListener {
 
     private final String csvSeparator;
 
     private final String outputFolder;
 
-    private final TechnicalLoggerService logger;
+    public static final String FILE_PREFIX = "bonita_timetracker_";
 
-    public CSVFlushEventListener(final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
-        super();
-        this.logger = logger;
+    public static final String FILE_SUFFIX = ".csv";
+
+    public CSVFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
+        super(activateAtStart, logger);
         this.outputFolder = outputFolder;
         this.csvSeparator = csvSeparator;
 
@@ -50,24 +51,46 @@ public class CSVFlushEventListener implements FlushEventListener {
     }
 
     @Override
-    public CSVFlushResult flush(final FlushEvent flushEvent) throws Exception {
+    public CSVFlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
+        final long flushTime = flushEvent.getFlushTime();
         final List<Record> records = flushEvent.getRecords();
         final List<List<String>> csvContent = new ArrayList<List<String>>();
-        csvContent.add(getHeaderRow());
         for (final Record record : records) {
             final List<String> row = getRow(record);
             csvContent.add(row);
         }
-        final String timestamp = CSVUtil.getFileTimestamp(System.currentTimeMillis());
 
-        final File outputFile = new File(outputFolder, timestamp + "_bonita_timetracker_" + UUID.randomUUID().toString() + ".csv");
+        final File outputFile = getDayFile(flushTime, outputFolder, FILE_PREFIX, FILE_SUFFIX);
 
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Generating csv file to: " + outputFile);
+        if (!outputFile.exists()) {
+            log(TechnicalLogSeverity.INFO, "Generating new csv file to: " + outputFile);
+            CSVUtil.writeCSVRow(outputFile, getHeaderRow(), csvSeparator);
+        } else {
+            log(TechnicalLogSeverity.INFO, "Reusing csv file: " + outputFile);
         }
-        CSVUtil.writeCSV(outputFile, csvContent, csvSeparator);
-        return new CSVFlushResult(flushEvent, outputFile);
+        CSVUtil.writeCSVRows(outputFile, csvContent, csvSeparator);
+        return new CSVFlushEventListenerResult(flushEvent, outputFile);
     }
+
+
+    @Override
+    public String getStatus() {
+        String status = super.getStatus() + "\n";
+        status += "outputFolder: " + outputFolder + "\n";
+        return status;
+    }
+
+
+    @Override
+    public void notifyStopTracking() {
+        //nothing to do
+    }
+
+    @Override
+    public void notifyStartTracking() {
+        //nothing to do
+    }
+
 
     private List<String> getRow(final Record record) {
         final long timestamp = record.getTimestamp();
@@ -79,7 +102,7 @@ public class CSVFlushEventListener implements FlushEventListener {
         final int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
         final int minute = cal.get(Calendar.MINUTE);
         final int second = cal.get(Calendar.SECOND);
-        final int milisecond = cal.get(Calendar.MILLISECOND);
+        final int millisecond = cal.get(Calendar.MILLISECOND);
 
         final List<String> row = new ArrayList<String>();
         row.add(String.valueOf(timestamp));
@@ -89,9 +112,9 @@ public class CSVFlushEventListener implements FlushEventListener {
         row.add(String.valueOf(hourOfDay));
         row.add(String.valueOf(minute));
         row.add(String.valueOf(second));
-        row.add(String.valueOf(milisecond));
+        row.add(String.valueOf(millisecond));
         row.add(String.valueOf(record.getDuration()));
-        row.add(record.getName());
+        row.add(record.getName().name());
         row.add(record.getDescription());
         return row;
     }
@@ -105,11 +128,35 @@ public class CSVFlushEventListener implements FlushEventListener {
         header.add("hourOfDay");
         header.add("minute");
         header.add("second");
-        header.add("milisecond");
+        header.add("millisecond");
         header.add("duration");
         header.add("name");
         header.add("description");
         return header;
+    }
+
+    private String getIntOnTwoNumbers(final int i) {
+        if (i < 10) {
+            return "0" + i;
+        }
+        return Integer.toString(i);
+    }
+
+    private File getDayFile(long time, String folder, String filePrefix, String fileSuffix) {
+        final StringBuilder sb = new StringBuilder();
+        final GregorianCalendar c = new GregorianCalendar();
+        c.setTimeInMillis(time);
+
+        sb.append(getIntOnTwoNumbers(c.get(Calendar.YEAR)));
+        sb.append("_");
+        sb.append(getIntOnTwoNumbers(c.get(Calendar.MONTH) + 1));
+        sb.append("_");
+        sb.append(getIntOnTwoNumbers(c.get(Calendar.DAY_OF_MONTH)));
+
+        final String timestamp = sb.toString();
+        final String fileName = filePrefix + timestamp + fileSuffix;
+
+        return new File(folder, fileName);
     }
 
 }
