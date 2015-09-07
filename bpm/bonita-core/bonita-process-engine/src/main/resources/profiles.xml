@@ -136,6 +136,13 @@
                 <type>link</type>
                 <page>thememoredetailsadminext</page>
             </parentProfileEntry>
+			<parentProfileEntry name="License" isCustom="false">
+                <parentName>NULL</parentName>
+                <index>10</index>
+                <description>License</description>
+                <type>link</type>
+                <page>licensemonitoringadmin</page>
+            </parentProfileEntry>
         </profileEntries>
     </profile>
     <profile name="Process manager" isDefault="true">
