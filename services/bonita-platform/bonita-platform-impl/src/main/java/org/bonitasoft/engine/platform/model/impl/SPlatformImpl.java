@@ -36,6 +36,8 @@ public class SPlatformImpl implements SPlatform {
 
     private String version;
 
+    private String information;
+
     private SPlatformImpl() {
         // for mybatis
     }
@@ -113,6 +115,15 @@ public class SPlatformImpl implements SPlatform {
     @Override
     public String getDiscriminator() {
         return SPlatform.class.getName();
+    }
+
+    @Override
+    public String getInformation() {
+        return information;
+    }
+
+    public void setInformation(final String information) {
+        this.information = information;
     }
 
     @Override

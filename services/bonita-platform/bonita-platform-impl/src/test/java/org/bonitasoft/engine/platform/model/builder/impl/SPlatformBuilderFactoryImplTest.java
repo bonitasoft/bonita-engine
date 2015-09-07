@@ -11,36 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model.impl;
+
+package org.bonitasoft.engine.platform.model.builder.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class SProcessInstanceImplTest {
+public class SPlatformBuilderFactoryImplTest {
 
     @Test
-    public void defaultInterruptingEventIdShouldBeMinusOne() {
-        assertThat(new SProcessInstanceImpl().getInterruptingEventId()).isEqualTo(-1L);
-    }
-
-    @Test
-    public void should_be_root_instance_when_callerId_is_less_than_zero() throws Exception {
+    public void getInformationKey_should_return_string_information() throws Exception {
         //given
-        SProcessInstanceImpl instance = new SProcessInstanceImpl();
-        instance.setCallerId(-1);
+        SPlatformBuilderFactoryImpl builderFactory = new SPlatformBuilderFactoryImpl();
 
         //then
-        assertThat(instance.isRootInstance()).isTrue();
+        assertThat(builderFactory.getInformationKey()).isEqualTo("information");
     }
 
-    @Test
-    public void should_not_be_root_instance_when_callerId_is_greater_than_zero() throws Exception {
-        //given
-        SProcessInstanceImpl instance = new SProcessInstanceImpl();
-        instance.setCallerId(1);
-
-        //then
-        assertThat(instance.isRootInstance()).isFalse();
-    }
 }

@@ -276,6 +276,11 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
     }
 
     @Override
+    public boolean isRootInstance() {
+        return callerId <= 0;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;

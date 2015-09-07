@@ -59,4 +59,8 @@ public class SPlatformBuilderFactoryImpl implements SPlatformBuilderFactory {
         return "version";
     }
 
+    @Override
+    public String getInformationKey() {
+        return "information";
+    }
 }
