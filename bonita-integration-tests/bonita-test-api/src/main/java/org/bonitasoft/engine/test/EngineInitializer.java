@@ -18,8 +18,11 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 
@@ -34,10 +37,10 @@ public class EngineInitializer {
 
     public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
 
-    public static String[] userAndPassword = new String[2];
     private ProcessAPI processAPI;
     private IdentityAPI identityAPI;
     private UserTaskAPI userTaskAPI;
+    private User user;
     private static EngineStarter engineStarter = new EngineStarter();
 
     public EngineInitializer() {
@@ -50,10 +53,6 @@ public class EngineInitializer {
     public static EngineInitializer getInstance() throws Exception {
         if (factory == null) {
             factory = new EngineInitializer();
-            factory.defaultLogin();
-            if (userAndPassword != new String[] { "defaultUser", "defaultPassword" }) {
-                factory.getIdentityAPI().createUser(userAndPassword[0],userAndPassword[1]);
-            }
         }
         return factory;
     }
@@ -88,11 +87,11 @@ public class EngineInitializer {
         return userTaskAPI;
     }
 
-    public APITestProcessAnalyser getAPITestProcessAnalyser(ProcessAPI processAPI) {
+    public APITestProcessAnalyserImpl getAPITestProcessAnalyser(ProcessAPI processAPI) {
         return new APITestProcessAnalyserImpl(processAPI, userTaskAPI);
     }
 
-    public APITestProcessAnalyser getAPITestProcessAnalyser() {
+    public APITestProcessAnalyserImpl getAPITestProcessAnalyser() {
         return new APITestProcessAnalyserImpl(processAPI, userTaskAPI);
     }
 
@@ -135,7 +134,17 @@ public class EngineInitializer {
         return identityAPI;
     }
 
-    public static void setUserAndPassword(String[] userAndPassword) {
-        EngineInitializer.userAndPassword = userAndPassword;
+    public User getUser() {
+        return user;
+    }
+
+    public User createUser(String userName, String password) throws CreationException {
+        this.user = getIdentityAPI().createUser(userName, password);
+        return this.user;
+    }
+
+    public void deleteUser(String userName) throws DeletionException {
+        getIdentityAPI().deleteUser(userName);
+        this.user = null;
     }
 }

@@ -25,7 +25,7 @@ import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
  */
 public class WithGlobalBefore extends Statement {
 
-    private static boolean onlyOneHook = false;
+    private static boolean hookAdded = false;
 
     private final Statement classBlock;
 
@@ -37,9 +37,9 @@ public class WithGlobalBefore extends Statement {
     public void evaluate() throws Throwable {
         startEngine();
 
-        if (!onlyOneHook) {
+        if (!hookAdded) {
             Runtime.getRuntime().addShutdownHook(new Message());
-            onlyOneHook = true;
+            hookAdded = true;
         }
         classBlock.evaluate();
     }

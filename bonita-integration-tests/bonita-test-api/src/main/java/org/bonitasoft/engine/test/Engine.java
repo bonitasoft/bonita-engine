@@ -28,7 +28,7 @@ public class Engine extends BlockJUnit4ClassRunner {
 
     private Field engineField;
     private EngineInitializer initializer = new EngineInitializer();
-
+    private String[] userAndPassword = new String[]{"defaultUser"};
     public Engine(Class<?> klass) throws Exception {
         super(klass);
         processAnnotedField(klass);
@@ -37,18 +37,12 @@ public class Engine extends BlockJUnit4ClassRunner {
     private void processAnnotedField(Class<?> klass) throws Exception {
         Field[] fields = klass.getDeclaredFields();
         for (Field field : fields) {
-            System.out.println("========");
-            System.out.println(field.getName());
-            System.out.println(field.getType());
             for (Annotation annotation : field.getDeclaredAnnotations()) {
                 if (annotation.annotationType().equals(EngineAnnotationInterface.class)) {
-
                     field.setAccessible(true);
                     engineField = field;
                     EngineAnnotationInterface engineAnnotation = (EngineAnnotationInterface) annotation;
-                    String user = engineAnnotation.user();
-                    String password = engineAnnotation.password();
-                    initializer.setUserAndPassword(new String[] { user, password });
+                    userAndPassword = new String[]{engineAnnotation.user(), engineAnnotation.password()};
                 }
             }
         }
@@ -60,6 +54,24 @@ public class Engine extends BlockJUnit4ClassRunner {
         Statement statement = super.classBlock(notifier);
         statement = withGlobalBefore(statement);
         return statement;
+    }
+
+    @Override
+    protected Object createTest() throws Exception {
+        Object test = super.createTest();
+        initializer.defaultLogin();
+        if(userAndPassword[0] != "defaultUser") {
+            try {
+                initializer.deleteUser(userAndPassword[0]);
+            } catch (Exception e) {
+                //ignore
+            }
+            initializer.createUser(userAndPassword[0], userAndPassword[1]);
+        }
+        if (engineField != null) {
+            engineField.set(test, initializer);
+        }
+        return test;
     }
 
     private Statement withGlobalBefore(final Statement statement) {

@@ -41,7 +41,6 @@ public class TheTest {
 
     @Before
     public void before() throws Exception {
-        engineInitializer = engineInitializer.getInstance();
         userTaskAPI = engineInitializer.getUserTaskAPI();
         processDeployer = engineInitializer.getProcessDeployer();
         user = engineInitializer.getIdentityAPI().createUser("william.jobs", "bpm");
