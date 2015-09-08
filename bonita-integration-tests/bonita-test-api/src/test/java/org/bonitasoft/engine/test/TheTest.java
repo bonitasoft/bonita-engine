@@ -34,13 +34,14 @@ public class TheTest {
 
     protected User user;
     protected UserTaskAPI userTaskAPI;
-    protected EngineInitializer engineInitializer = new EngineInitializer();
+    @EngineAnnotationInterface
+    protected EngineInitializer engineInitializer;
     private ProcessDeployerAPITest processDeployer;
     private APITestProcessAnalyserImpl processAnalyser;
 
     @Before
     public void before() throws Exception {
-        engineInitializer.defaultLogin();
+        engineInitializer = engineInitializer.getInstance();
         userTaskAPI = engineInitializer.getUserTaskAPI();
         processDeployer = engineInitializer.getProcessDeployer();
         user = engineInitializer.getIdentityAPI().createUser("william.jobs", "bpm");

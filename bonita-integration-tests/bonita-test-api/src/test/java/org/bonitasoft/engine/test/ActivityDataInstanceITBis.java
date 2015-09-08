@@ -44,6 +44,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -64,34 +65,35 @@ import static org.junit.Assert.fail;
 public class ActivityDataInstanceITBis {
 
     private User user;
-    private UserTaskAPI userTaskAPI;
+    private static UserTaskAPI userTaskAPI;
 
-    @EngineAnnotationInterface(user = "william.jobs",password = "bpm")
-    private EngineInitializer engineInitializer = new EngineInitializer();
+    @EngineAnnotationInterface(user = "william.jobs", password = "bpm")
+    private static EngineInitializer engineInitializer;
 
-
-
-    private ProcessDeployerAPITest processDeployer;
-    private ProcessAPI processAPI;
-    private APITestProcessAnalyserImpl processAnalyser;
+    private static ProcessDeployerAPITest processDeployer;
+    private static ProcessAPI processAPI;
+    private static APITestProcessAnalyserImpl processAnalyser;
     String ACTOR_NAME = "william.jobs";
 
-    @Before
-    public void before() throws Exception {
-        System.out.println(engineInitializer.test);
-        //engineInitializer.defaultLogin();
+    @BeforeClass
+    public static void beforeAll() throws Exception {
+        engineInitializer = engineInitializer.getInstance();
         userTaskAPI = engineInitializer.getUserTaskAPI();
         processDeployer = engineInitializer.getProcessDeployer();
-        user = engineInitializer.getIdentityAPI().createUser("william.jobs", "bpm");
+        engineInitializer.getIdentityAPI().deleteUser("william.jobs");
         processAPI = engineInitializer.getProcessAPI();
         processAnalyser = (APITestProcessAnalyserImpl) engineInitializer.getAPITestProcessAnalyser();
     }
 
-    @After
-    public void after() throws DeletionException {
-            engineInitializer.getIdentityAPI().deleteUser("william.jobs");
+    @Before
+    public void before() throws Exception {
+        user = engineInitializer.getIdentityAPI().createUser("william.jobs", "bpm");
     }
 
+    @After
+    public void after() throws DeletionException {
+        engineInitializer.getIdentityAPI().deleteUser("william.jobs");
+    }
 
     @Test
     public void getDataFromActivity() throws Exception {
@@ -200,7 +202,7 @@ public class ActivityDataInstanceITBis {
         final ProcessDeploymentInfo processDeploymentInfo = processAPI.getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = processAPI.startProcess(processDeploymentInfo.getProcessId());
-        final long activityInstanceId = userTaskAPI.waitForUserTask(processInstance.getId(), "step1",-1);
+        final long activityInstanceId = userTaskAPI.waitForUserTask(processInstance.getId(), "step1", -1);
         final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
         variables.put("dataName1", "afterUpdate");
         try {
@@ -258,29 +260,29 @@ public class ActivityDataInstanceITBis {
 
         // Start first process, and wait the first step
         final ProcessInstance processInstance1 = processAPI.startProcess(processDefinition.getId());
-        final Long step1_1Id = userTaskAPI.waitForUserTask(processInstance1.getId(), "step1",-1);
+        final Long step1_1Id = userTaskAPI.waitForUserTask(processInstance1.getId(), "step1", -1);
         // Set data to true, for the first instance
         processAPI.updateActivityDataInstance("booleanData", step1_1Id, true);
 
         // Start second process, and wait the first step
         final ProcessInstance processInstance2 = processAPI.startProcess(processDefinition.getId());
-        final Long step1_2Id = userTaskAPI.waitForUserTask(processInstance2.getId(), "step1",-1);
+        final Long step1_2Id = userTaskAPI.waitForUserTask(processInstance2.getId(), "step1", -1);
         // Set data to false, for the second instance
         processAPI.updateActivityDataInstance("booleanData", step1_2Id, false);
 
         // Start third process, and wait the first step
         final ProcessInstance processInstance3 = processAPI.startProcess(processDefinition.getId());
-        final Long step1_3Id = userTaskAPI.waitForUserTask(processInstance3.getId(), "step1",-1);
+        final Long step1_3Id = userTaskAPI.waitForUserTask(processInstance3.getId(), "step1", -1);
         // Set data to true, for the third instance
         processAPI.updateActivityDataInstance("booleanData", step1_3Id, true);
 
         // Execute all step1
         assignAndExecuteStep(step1_1Id, user.getId());
-        userTaskAPI.waitForUserTask(processInstance1.getId(), "step2",-1);
+        userTaskAPI.waitForUserTask(processInstance1.getId(), "step2", -1);
         assignAndExecuteStep(step1_2Id, user.getId());
-        userTaskAPI.waitForUserTask(processInstance2.getId(), "step3",-1);
+        userTaskAPI.waitForUserTask(processInstance2.getId(), "step3", -1);
         assignAndExecuteStep(step1_3Id, user.getId());
-        userTaskAPI.waitForUserTask(processInstance3.getId(), "step2",-1);
+        userTaskAPI.waitForUserTask(processInstance3.getId(), "step2", -1);
 
         // Check that only these 3 steps are pending
         assertEquals(3, processAPI.getNumberOfPendingHumanTaskInstances(user.getId()));
@@ -300,7 +302,6 @@ public class ActivityDataInstanceITBis {
         process.waitForTaskToFail().hasSameNameAs("step1");
         processDeployer.disableAndDeleteProcess(processDefinition);
     }
-
 
     @Test
     public void processWithDataHavingSameNameInTwoContainer() throws Exception {
@@ -336,12 +337,12 @@ public class ActivityDataInstanceITBis {
         return processDefinitionBuilder;
     }
 
-   @Test
+    @Test
     public void canGetDataInstanceWhenThereAreTransientData() throws Exception {
         final String userTaskName = "task1";
         final ProcessDefinition processDefinition = deployAndEnableProcWithPersistedAndTransientVariable(userTaskName);
         final ProcessInstance processInstance = processAPI.startProcess(processDefinition.getId());
-        final Long userTaskId = userTaskAPI.waitForUserTask(processInstance.getId(), userTaskName,-1);
+        final Long userTaskId = userTaskAPI.waitForUserTask(processInstance.getId(), userTaskName, -1);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
@@ -477,7 +478,6 @@ public class ActivityDataInstanceITBis {
 
         processDeployer.disableAndDeleteProcess(processDefinition);
     }
-
 
     private static Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
             throws InvalidExpressionException {

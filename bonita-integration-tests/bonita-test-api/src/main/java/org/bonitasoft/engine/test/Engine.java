@@ -48,8 +48,7 @@ public class Engine extends BlockJUnit4ClassRunner {
                     EngineAnnotationInterface engineAnnotation = (EngineAnnotationInterface) annotation;
                     String user = engineAnnotation.user();
                     String password = engineAnnotation.password();
-                    initializer.defaultLogin();
-                    initializer.setTest(user+password);
+                    initializer.setUserAndPassword(new String[] { user, password });
                 }
             }
         }

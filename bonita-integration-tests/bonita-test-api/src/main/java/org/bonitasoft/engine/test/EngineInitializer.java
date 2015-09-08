@@ -34,7 +34,7 @@ public class EngineInitializer {
 
     public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
 
-    public String test;
+    public static String[] userAndPassword = new String[2];
     private ProcessAPI processAPI;
     private IdentityAPI identityAPI;
     private UserTaskAPI userTaskAPI;
@@ -44,13 +44,16 @@ public class EngineInitializer {
 
     }
 
-    public void setTest(String test) {
-        this.test = test;
-    }
-
-    public static EngineInitializer getInstance() {
+    /*
+     * To use once at the beginning of each test to get the engine initializer
+     */
+    public static EngineInitializer getInstance() throws Exception {
         if (factory == null) {
             factory = new EngineInitializer();
+            factory.defaultLogin();
+            if (userAndPassword != new String[] { "defaultUser", "defaultPassword" }) {
+                factory.getIdentityAPI().createUser(userAndPassword[0],userAndPassword[1]);
+            }
         }
         return factory;
     }
@@ -58,6 +61,7 @@ public class EngineInitializer {
     public static void startEngine() throws Exception {
         engineStarter.startEngine();
     }
+
     public static void stopEngine() throws Exception {
         engineStarter.stopEngine();
     }
@@ -69,11 +73,11 @@ public class EngineInitializer {
                 DEFAULT_TECHNICAL_LOGGER_PASSWORD));
     }
 
-    public APITestProcessCleaner getProcessCleaner(ProcessAPI processAPI){
+    public APITestProcessCleaner getProcessCleaner(ProcessAPI processAPI) {
         return new APITestProcessCleanerImpl(processAPI);
     }
 
-    public APITestProcessCleaner getProcessCleaner(){
+    public APITestProcessCleaner getProcessCleaner() {
         return new APITestProcessCleanerImpl(processAPI);
     }
 
@@ -84,33 +88,29 @@ public class EngineInitializer {
         return userTaskAPI;
     }
 
-
     public APITestProcessAnalyser getAPITestProcessAnalyser(ProcessAPI processAPI) {
-        return new APITestProcessAnalyserImpl(processAPI,userTaskAPI);
+        return new APITestProcessAnalyserImpl(processAPI, userTaskAPI);
     }
-
 
     public APITestProcessAnalyser getAPITestProcessAnalyser() {
-        return new APITestProcessAnalyserImpl(processAPI,userTaskAPI);
+        return new APITestProcessAnalyserImpl(processAPI, userTaskAPI);
     }
-
 
     public IdentityAnalyserTestAPI getIdentityBuilderAPI(IdentityAPI identityAPI) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException, LoginException {
         return new IdentityAnalyserTestAPIImpl(identityAPI);
     }
 
-    public IdentityAnalyserTestAPI getIdentityBuilderAPI(){
+    public IdentityAnalyserTestAPI getIdentityBuilderAPI() {
         return new IdentityAnalyserTestAPIImpl(identityAPI);
     }
-
 
     private void createProcessAPIandIdentityAPIfromSession(APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         this.processAPI = TenantAPIAccessor.getProcessAPI(session);
         this.identityAPI = TenantAPIAccessor.getIdentityAPI(session);
     }
 
-    public ProcessDeployerAPITest getProcessDeployer(){
+    public ProcessDeployerAPITest getProcessDeployer() {
         return new ProcessDeployerAPITest(processAPI);
     }
 
@@ -135,4 +135,7 @@ public class EngineInitializer {
         return identityAPI;
     }
 
+    public static void setUserAndPassword(String[] userAndPassword) {
+        EngineInitializer.userAndPassword = userAndPassword;
+    }
 }
