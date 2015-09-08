@@ -11,25 +11,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+package org.bonitasoft.engine.platform;
+
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.model.SPlatform;
 
 /**
- * @author Charles Souillard
+ * @author Elias Ricken de Medeiros
  */
-public interface SPlatform extends PersistentObject {
+public interface PlatformRetriever {
 
-    String getVersion();
-
-    String getPreviousVersion();
-
-    String getInitialVersion();
-
-    long getCreated();
-
-    String getCreatedBy();
-
-    String getInformation();
-
+   SPlatform getPlatform() throws SPlatformNotFoundException;
 }

@@ -872,6 +872,7 @@ CREATE TABLE platform (
   initialVersion VARCHAR2(50 CHAR) NOT NULL,
   created NUMBER(19, 0) NOT NULL,
   createdBy VARCHAR2(50 CHAR) NOT NULL,
+  information CLOB,
   PRIMARY KEY (id)
 );
 
