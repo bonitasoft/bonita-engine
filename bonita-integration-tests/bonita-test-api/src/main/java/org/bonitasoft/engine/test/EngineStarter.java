@@ -14,30 +14,6 @@
 
 package org.bonitasoft.engine.test;
 
-import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformAPI;
-import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformLoginAPI;
-import static org.bonitasoft.engine.api.TenantAPIAccessor.getLoginAPI;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.naming.Context;
-
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -60,6 +36,29 @@ import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
+
+import javax.naming.Context;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformAPI;
+import static org.bonitasoft.engine.api.PlatformAPIAccessor.getPlatformLoginAPI;
+import static org.bonitasoft.engine.api.TenantAPIAccessor.getLoginAPI;
 
 /**
  * @author mazourd
@@ -207,7 +206,7 @@ public class EngineStarter {
             IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
             System.setProperty(BONITA_HOME_PROPERTY, outputFolder.getAbsolutePath() + "/bonita-home");
         }
-        return bonitaHomePath;
+        return System.getProperty(BONITA_HOME_PROPERTY);
     }
 
     private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException,

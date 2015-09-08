@@ -36,6 +36,7 @@ public class WithGlobalBefore extends Statement {
     @Override
     public void evaluate() throws Throwable {
         startEngine();
+
         if (!onlyOneHook) {
             Runtime.getRuntime().addShutdownHook(new Message());
             onlyOneHook = true;

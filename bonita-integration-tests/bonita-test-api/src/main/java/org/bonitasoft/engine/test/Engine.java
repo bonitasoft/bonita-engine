@@ -14,21 +14,45 @@
 
 package org.bonitasoft.engine.test;
 
-import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
-
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.Statement;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  * @author mazourd
  */
 public class Engine extends BlockJUnit4ClassRunner {
 
-
+    private Field engineField;
     private EngineInitializer initializer = new EngineInitializer();
+
     public Engine(Class<?> klass) throws Exception {
         super(klass);
+        processAnnotedField(klass);
+    }
+
+    private void processAnnotedField(Class<?> klass) throws Exception {
+        Field[] fields = klass.getDeclaredFields();
+        for (Field field : fields) {
+            System.out.println("========");
+            System.out.println(field.getName());
+            System.out.println(field.getType());
+            for (Annotation annotation : field.getDeclaredAnnotations()) {
+                if (annotation.annotationType().equals(EngineAnnotationInterface.class)) {
+
+                    field.setAccessible(true);
+                    engineField = field;
+                    EngineAnnotationInterface engineAnnotation = (EngineAnnotationInterface) annotation;
+                    String user = engineAnnotation.user();
+                    String password = engineAnnotation.password();
+                    initializer.defaultLogin();
+                    initializer.setTest(user+password);
+                }
+            }
+        }
     }
 
     @Override

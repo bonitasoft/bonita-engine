@@ -78,7 +78,8 @@ public class ActivityDataInstanceITBis {
 
     @Before
     public void before() throws Exception {
-        engineInitializer.defaultLogin();
+        System.out.println(engineInitializer.test);
+        //engineInitializer.defaultLogin();
         userTaskAPI = engineInitializer.getUserTaskAPI();
         processDeployer = engineInitializer.getProcessDeployer();
         user = engineInitializer.getIdentityAPI().createUser("william.jobs", "bpm");

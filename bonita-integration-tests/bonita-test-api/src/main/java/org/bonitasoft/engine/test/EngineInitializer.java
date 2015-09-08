@@ -34,6 +34,7 @@ public class EngineInitializer {
 
     public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
 
+    public String test;
     private ProcessAPI processAPI;
     private IdentityAPI identityAPI;
     private UserTaskAPI userTaskAPI;
@@ -41,6 +42,10 @@ public class EngineInitializer {
 
     public EngineInitializer() {
 
+    }
+
+    public void setTest(String test) {
+        this.test = test;
     }
 
     public static EngineInitializer getInstance() {
