@@ -21,10 +21,11 @@ import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
-import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
+import org.bonitasoft.engine.bar.ResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
+import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -179,7 +181,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private CacheService cacheService;
 
-    private DependencyResolver dependencyResolver;
+    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
     private WorkService workService;
 
@@ -234,6 +236,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private GenericAuthenticationService genericAuthenticationService;
     private ReadPersistenceService readPersistenceService;
     private Recorder recorder;
+    private BusinessArchiveService businessArchiveService;
+    private ResourcesService resourcesService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
@@ -652,11 +656,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public DependencyResolver getDependencyResolver() {
-        if (dependencyResolver == null) {
-            dependencyResolver = beanAccessor.getService(DependencyResolver.class);
+    public BusinessArchiveArtifactsManager getBusinessArchiveArtifactsManager() {
+        if (businessArchiveArtifactsManager == null) {
+            businessArchiveArtifactsManager = beanAccessor.getService(BusinessArchiveArtifactsManager.class);
         }
-        return dependencyResolver;
+        return businessArchiveArtifactsManager;
     }
 
     @Override
@@ -833,6 +837,15 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public BusinessArchiveService getBusinessArchiveService() {
+        if (businessArchiveService == null) {
+            businessArchiveService = beanAccessor.getService(BusinessArchiveService.class);
+        }
+        return businessArchiveService;
+    }
+
+
+    @Override
     public BusinessDataService getBusinessDataService() {
         if (businessDataService == null) {
             businessDataService = beanAccessor.getService(BusinessDataService.class);
@@ -854,5 +867,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             pageMappingService = beanAccessor.getService(PageMappingService.class);
         }
         return pageMappingService;
+    }
+
+    @Override
+    public ResourcesService getResourcesService() {
+        if (resourcesService == null) {
+            resourcesService = beanAccessor.getService(ResourcesService.class);
+        }
+        return resourcesService;
     }
 }

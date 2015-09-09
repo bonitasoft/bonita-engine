@@ -55,8 +55,6 @@ import org.bonitasoft.engine.core.process.definition.model.builder.impl.SProcess
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -108,7 +106,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private final SessionService sessionService;
     private final ReadSessionAccessor sessionAccessor;
     private final QueriableLoggerService queriableLoggerService;
-    private final DependencyService dependencyService;
     private final CacheService cacheService;
     protected ProcessDefinitionBARContribution processDefinitionBARContribution;
 
@@ -121,7 +118,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.queriableLoggerService = queriableLoggerService;
-        this.dependencyService = dependencyService;
         this.cacheService = cacheService;
         processDefinitionBARContribution = new ProcessDefinitionBARContribution();
     }
@@ -149,8 +145,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final DeleteRecord deleteRecord = new DeleteRecord(processDefinitionDeployInfo);
             recorder.recordDelete(deleteRecord, deleteEvent);
             log(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
-            dependencyService.deleteDependencies(processId, ScopeType.PROCESS);
-        } catch (final SRecorderException | SDependencyException e) {
+        } catch (final SRecorderException e) {
             log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         }

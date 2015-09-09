@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.PlatformCommandAPI;
-import org.bonitasoft.engine.api.impl.transaction.dependency.DeleteSDependency;
 import org.bonitasoft.engine.api.impl.transaction.platform.AddSPlatformCommandDependency;
 import org.bonitasoft.engine.api.impl.transaction.platform.CreateSPlatformCommand;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteSPlatformCommand;
@@ -92,9 +91,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final DependencyService dependencyService = platformAccessor.getDependencyService();
 
-        final DeleteSDependency deleteSDependency = new DeleteSDependency(dependencyService, name);
         try {
-            deleteSDependency.execute();
+            dependencyService.deleteDependency(name);
         } catch (final SDependencyNotFoundException sdnfe) {
             throw new DependencyNotFoundException(sdnfe);
         } catch (final SBonitaException sbe) {

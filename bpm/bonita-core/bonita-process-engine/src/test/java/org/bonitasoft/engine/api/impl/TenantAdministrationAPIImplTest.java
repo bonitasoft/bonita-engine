@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
@@ -102,7 +102,7 @@ public class TenantAdministrationAPIImplTest {
     private BroadcastService broadcastService;
 
     @Mock
-    private DependencyResolver dependencyResolver;
+    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
     @Mock
     private TechnicalLoggerService technicalLoggerService;
@@ -125,7 +125,7 @@ public class TenantAdministrationAPIImplTest {
         when(platformServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
 
-        when(tenantServiceAccessor.getDependencyResolver()).thenReturn(dependencyResolver);
+        when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(tenantServiceAccessor.getSessionService()).thenReturn(sessionService);
 
@@ -211,7 +211,7 @@ public class TenantAdministrationAPIImplTest {
     public void resume_should_resolve_dependecies_for_deployed_processes() throws Exception {
         tenantManagementAPI.resume();
 
-        verify(dependencyResolver).resolveDependenciesForAllProcesses(tenantServiceAccessor);
+        verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(tenantServiceAccessor);
     }
 
     @Test

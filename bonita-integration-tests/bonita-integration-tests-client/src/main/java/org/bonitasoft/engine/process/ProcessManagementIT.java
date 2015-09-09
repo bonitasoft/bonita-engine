@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -541,7 +540,7 @@ public class ProcessManagementIT extends TestWithUser {
         // deploy the process to unzip the .bar in BONITA_HOME:
         final ProcessDefinition processDefinition = deployProcess(businessArchiveBuilder.done());
         final Map<String, byte[]> resources = getProcessAPI().getProcessResources(processDefinition.getId(), ".*/.*\\.txt");
-        assertEquals(2, resources.size());
+        assertThat(resources).hasSize(2);
         assertTrue("Searched resource not returned", resources.containsKey(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + dummyFile));
         assertTrue("Searched resource not returned", resources.containsKey(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + documentFile));
         final byte[] dum = resources.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + dummyFile);

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
-
 /**
  * @author Charles Souillard
  */
@@ -168,11 +166,6 @@ class FolderMgr {
 
     public static Folder getTenantWorkProcessClasspathFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
         return getFolder(getTenantWorkProcessFolder(bonitaHomeFolder, tenantId, processId), "classpath");
-    }
-
-    public static void deleteTenantWorkProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
-        final Folder processFolder = getTenantWorkProcessFolder(bonitaHomeFolder, tenantId, processId);
-        processFolder.delete();
     }
 
     public static void deleteTenantTempProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {

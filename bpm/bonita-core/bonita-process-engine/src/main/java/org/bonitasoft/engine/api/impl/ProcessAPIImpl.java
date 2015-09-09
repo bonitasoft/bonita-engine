@@ -1,4 +1,3 @@
-
 /**
  * Copyright (C) 2015 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
@@ -17,9 +16,9 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,10 +31,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -47,7 +47,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
 import org.bonitasoft.engine.api.impl.connector.ResetAllFailedConnectorStrategy;
 import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
-import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyDeployer;
+import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactManager;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
@@ -74,8 +74,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromP
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
 import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
-import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
-import org.bonitasoft.engine.api.impl.transaction.connector.GetNumberOfConnectorImplementations;
 import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
@@ -108,6 +106,10 @@ import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfAssignedUserTa
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
 import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bar.BARResourceType;
+import org.bonitasoft.engine.bar.BusinessArchiveService;
+import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.bar.SBARResource;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
@@ -118,6 +120,8 @@ import org.bonitasoft.engine.bpm.actor.ActorUpdater;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
@@ -199,8 +203,10 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -299,11 +305,9 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ContractDataNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -337,7 +341,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
@@ -352,7 +355,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -495,13 +497,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
         builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
         final SearchOptions searchOptions = builder.done();
-
         try {
             final boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasOpenProcessInstances);
             final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
             checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasArchivedProcessInstances);
-
             processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
         } catch (final Exception e) {
             throw new DeletionException(e);
@@ -590,7 +590,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
             final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService, final List<Long> processInstanceIds)
-            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+                    throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         for (final Long processInstanceId : processInstanceIds) {
             try {
                 deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
@@ -648,8 +648,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         BusinessArchive businessArchive;
         try {
             businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        } catch (final InvalidBusinessArchiveFormatException ibafe) {
-            throw new InvalidProcessDefinitionException(ibafe.getMessage());
+        } catch (final InvalidBusinessArchiveFormatException e) {
+            throw new InvalidProcessDefinitionException(e.getMessage());
         }
         return deployAndEnableProcess(businessArchive);
     }
@@ -660,8 +660,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinition processDefinition = deploy(businessArchive);
         try {
             enableProcess(processDefinition.getId());
-        } catch (final ProcessDefinitionNotFoundException pdnfe) {
-            throw new ProcessEnablementException(pdnfe.getMessage());
+        } catch (final ProcessDefinitionNotFoundException e) {
+            throw new ProcessEnablementException(e.getMessage());
         }
         return processDefinition;
     }
@@ -672,45 +672,22 @@ public class ProcessAPIImpl implements ProcessAPI {
             final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                     .done();
             return deploy(businessArchive);
-        } catch (final InvalidBusinessArchiveFormatException ibafe) {
-            throw new ProcessDeployException(ibafe);
+        } catch (final InvalidBusinessArchiveFormatException e) {
+            throw new ProcessDeployException(e);
         }
     }
 
     @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
-
-        SProcessDefinition sProcessDefinition;
+        final BusinessArchiveService businessArchiveService = tenantAccessor.getBusinessArchiveService();
         try {
-            try {
-                processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(), designProcessDefinition.getVersion());
-                throw new AlreadyExistsException("The process " + designProcessDefinition.getName() + " in version " + designProcessDefinition.getVersion()
-                        + " already exists.");
-            } catch (final SProcessDefinitionNotFoundException e) {
-                // ok
-            }
-            sProcessDefinition = processDefinitionService.store(designProcessDefinition);
-            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());
-            final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
-            if (isResolved) {
-                tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
-                        sProcessDefinition);
-            }
-        } catch (final BonitaHomeNotSetException | IOException | SBonitaException e) {
+            return ModelConvertor.toProcessDefinition(businessArchiveService.deploy(businessArchive));
+        } catch (SObjectCreationException e) {
             throw new ProcessDeployException(e);
+        } catch (SAlreadyExistsException e) {
+            throw new AlreadyExistsException(e.getMessage());
         }
-
-        final ProcessDefinition processDefinition = ModelConvertor.toProcessDefinition(sProcessDefinition);
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has installed process <"
-                    + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
-        }
-        return processDefinition;
     }
 
     @Override
@@ -722,27 +699,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final long tenantId = tenantAccessor.getTenantId();
+        File barExport = null;
         try {
-            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId), exportParameters(tenantAccessor, processDefinitionId));
-        } catch (Exception e) {
+            barExport = File.createTempFile("barExport", ".bar");
+            barExport.delete();
+            final BusinessArchive export = getTenantAccessor().getBusinessArchiveService().export(processDefinitionId);
+            BusinessArchiveFactory.writeBusinessArchiveToFile(export, barExport);
+            return FileUtils.readFileToByteArray(barExport);
+        } catch (IOException | InvalidBusinessArchiveFormatException | SBonitaException e) {
             throw new ProcessExportException(e);
+        } finally {
+            if (barExport != null && barExport.exists()) {
+                barExport.delete();
+            }
         }
-    }
-    protected String exportParameters(TenantServiceAccessor tenantAccessor, long processDefinitionId) throws IOException, SParameterProcessNotFoundException, SBonitaReadException {
-        final Map<String, String> all = tenantAccessor.getParameterService().getAll(processDefinitionId);
-        final Properties properties = new Properties();
-        properties.putAll(all);
-        final StringWriter writer = new StringWriter();
-        properties.store(writer,"");
-        return writer.toString();
-    }
-    protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
-            throws BonitaHomeNotSetException, IOException {
-        BonitaHomeServer.getInstance().getProcessManager().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
     }
 
     @Override
@@ -1138,7 +1109,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SActorMember actorMember = actorMappingService.addUserToActor(actorId, userId);
             final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
             final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
             return clientActorMember;
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -1183,7 +1154,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SActorMember actorMember = actorMappingService.addGroupToActor(actorId, groupId);
             final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
             final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
             return clientActorMember;
         } catch (final SBonitaException e) {
             throw new CreationException(e);
@@ -1229,7 +1200,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SActorMember actorMember = actorMappingService.addRoleToActor(actorId, roleId);
             final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
             final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
             return clientActorMember;
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -1285,7 +1256,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SActorMember actorMember = actorMappingService.addRoleAndGroupToActor(actorId, roleId, groupId);
             final long processDefinitionId = actorMappingService.getActor(actorId).getScopeId();
             final ActorMember clientActorMember = ModelConvertor.toActorMember(actorMember);
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
             return clientActorMember;
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -1318,7 +1289,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             removeActorMember.execute();
             final SActorMember actorMember = removeActorMember.getResult();
             final long processDefinitionId = getActor(actorMember.getActorId()).getProcessDefinitionId();
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SBonitaException | ActorNotFoundException sbe) {
             throw new DeletionException(sbe);
         }
@@ -1622,7 +1593,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(criterion);
             return ModelConvertor.toActivityInstances(
                     activityInstanceService.getOpenActivityInstances(processInstanceId, startIndex, maxResults, orderAndField.getField(),
-                            orderAndField.getOrder()), flowNodeStateManager);
+                            orderAndField.getOrder()),
+                    flowNodeStateManager);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -2157,8 +2129,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<DataDefinition> getActivityDataDefinitions(final long processDefinitionId, final String activityName, final int startIndex, final int maxResults)
-            throws ActivityDefinitionNotFoundException, ProcessDefinitionNotFoundException {
+    public List<DataDefinition> getActivityDataDefinitions(final long processDefinitionId, final String activityName, final int startIndex,
+            final int maxResults)
+                    throws ActivityDefinitionNotFoundException, ProcessDefinitionNotFoundException {
         List<DataDefinition> subDataDefinitionList = Collections.emptyList();
         List<SDataDefinition> sdataDefinitionList = Collections.emptyList();
         final TenantServiceAccessor tenantAccessor;
@@ -2267,15 +2240,28 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
-        final Map<String, byte[]> processResources;
+        final Map<String, byte[]> processResources = new HashMap<>();
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        ResourcesService resourcesService = tenantAccessor.getResourcesService();
+        List<SBARResource> sbarResources;
+        Pattern pattern = Pattern.compile(filenamesPattern);
+        int from = 0;
         try {
-            processResources = BonitaHomeServer.getInstance().getProcessManager().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
-        } catch (BonitaHomeNotSetException e) {
-            throw new RetrieveException(e);
-        } catch (IOException e) {
+            sbarResources = resourcesService.get(processDefinitionId, BARResourceType.EXTERNAL, from, BATCH_SIZE);
+            do {
+                from += BATCH_SIZE;
+                for (SBARResource sbarResource : sbarResources) {
+                    String name = ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + sbarResource.getName();
+                    if (pattern.matcher(name).matches()) {
+                        processResources.put(name, sbarResource.getContent());
+                    }
+                }
+            } while (sbarResources.size() == BATCH_SIZE);
+
+            return processResources;
+        } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         }
-        return processResources;
     }
 
     @Override
@@ -2379,7 +2365,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue,
             ClassLoader classLoader)
-            throws UpdateException, SDataInstanceException {
+                    throws UpdateException, SDataInstanceException {
         verifyTypeOfNewDataValue(sDataInstance, dataNewValue, classLoader);
 
         final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataNewValue);
@@ -2601,8 +2587,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
-                new ImportActorMapping(actorMappingService,identityService).importActorMappingFromXml(xmlContent,processDefinitionId);
-                tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+                new ImportActorMapping(actorMappingService, identityService).importActorMappingFromXml(xmlContent, processDefinitionId);
+                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
             } catch (final SBonitaException sbe) {
                 throw new ActorMappingImportException(sbe);
             }
@@ -3198,7 +3184,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessDefinition(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processDefinitionId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnProcessDefinitionWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processDefinitionId);
     }
@@ -3238,7 +3224,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (processDef != null) {
                 expcontext.setProcessDefinition(processDef);
             }
-            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+            final ConnectorResult connectorResult = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
             if (operations != null) {
                 // execute operations
@@ -3305,7 +3291,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
-            final SetTaskPriority transactionContent = new SetTaskPriority(activityInstanceService, humanTaskInstanceId, STaskPriority.valueOf(priority.name()));
+            final SetTaskPriority transactionContent = new SetTaskPriority(activityInstanceService, humanTaskInstanceId,
+                    STaskPriority.valueOf(priority.name()));
             transactionContent.execute();
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -3998,14 +3985,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws CreationException, AlreadyExistsException {
+    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId)
+            throws CreationException, AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setUserId(userId);
         return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws CreationException, AlreadyExistsException {
+    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId)
+            throws CreationException, AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setRoleId(roleId);
         return createSupervisor(supervisorBuilder.done());
@@ -4234,8 +4223,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     /**
-     * @param orAssignedToUser
-     *        do we also want to retrieve tasks directly assigned to this user ?
+     * @param orAssignedToUser do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
@@ -4543,11 +4531,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForConnectorImplementation(sortingCriterion);
-        final GetConnectorImplementations transactionContent = new GetConnectorImplementations(connectorService, processDefinitionId,
-                tenantAccessor.getTenantId(), startIndex, maxsResults, orderAndField.getField(), orderAndField.getOrder());
         try {
-            transactionContent.execute();
-            final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = transactionContent.getResult();
+            final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = connectorService
+                    .getConnectorImplementations(processDefinitionId, startIndex, maxsResults, orderAndField.getField(), orderAndField.getOrder());;
             return ModelConvertor.toConnectorImplementationDescriptors(sConnectorImplementationDescriptors);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -4559,11 +4545,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
-        final GetNumberOfConnectorImplementations transactionContent = new GetNumberOfConnectorImplementations(connectorService, processDefinitionId,
-                tenantAccessor.getTenantId());
         try {
-            transactionContent.execute();
-            return transactionContent.getResult();
+            return connectorService.getNumberOfConnectorImplementations(processDefinitionId);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -5011,7 +4994,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        final List<ProcessDependencyDeployer> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
+        final List<BusinessArchiveArtifactManager> resolvers = tenantAccessor.getBusinessArchiveArtifactsManager().getArtifactManagers();
         SProcessDefinition processDefinition;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -5019,8 +5002,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(e);
         }
         final List<Problem> problems = new ArrayList<Problem>();
-        for (final ProcessDependencyDeployer resolver : resolvers) {
-            final List<Problem> problem = resolver.checkResolution(tenantAccessor, processDefinition);
+        for (final BusinessArchiveArtifactManager resolver : resolvers) {
+            final List<Problem> problem = resolver.checkResolution(processDefinition);
             if (problem != null) {
                 problems.addAll(problem);
             }
@@ -5227,7 +5210,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public SearchResult<User> searchUsersWhoCanStartProcessDefinition(final long processDefinitionId, final SearchOptions searchOptions) throws SearchException {
+    public SearchResult<User> searchUsersWhoCanStartProcessDefinition(final long processDefinitionId, final SearchOptions searchOptions)
+            throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -5253,7 +5237,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
                 // if it exists and is initializing or started
                 final int stateId = processInstance.getStateId();
-                if (stateId == 0/* initializing */|| stateId == 1/* started */) {
+                if (stateId == 0/* initializing */ || stateId == 1/* started */) {
                     // the evaluation date is either now (initializing) or the start date if available
                     final long evaluationDate = stateId == 0 ? System.currentTimeMillis() : processInstance.getStartDate();
                     return evaluateExpressionsInstanceLevelAndArchived(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
@@ -5531,7 +5515,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId).getLogicalGroup(processDefinitionIndex);
+            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId)
+                    .getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
@@ -5580,7 +5565,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId).getLogicalGroup(processDefinitionIndex);
+            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId)
+                    .getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
 
@@ -5950,7 +5936,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     Map<String, Serializable> evaluateContext(ExpressionResolverService expressionResolverService, SExpressionContext expressionContext,
             List<SContextEntry> context) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException,
-            SInvalidExpressionException {
+                    SInvalidExpressionException {
         if (context.isEmpty()) {
             return Collections.emptyMap();
         }

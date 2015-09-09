@@ -61,10 +61,10 @@ public class ConnectorServiceDecoratorTest {
         parameters.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
         parameters.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
         final ConnectorResult toBeReturned = new ConnectorResult(null, result);
-        doReturn(toBeReturned).when(connectorService).executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+        doReturn(toBeReturned).when(connectorService).executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                 connectorDefinitionVersion, parameters, inputValues, classLoader, sexpContext);
 
-        final ConnectorResult connectorResult = connectorServiceDecorator.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+        final ConnectorResult connectorResult = connectorServiceDecorator.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                 connectorDefinitionVersion, connectorInputParameters, inputValues, classLoader, sexpContext);
         assertEquals(toBeReturned, connectorResult);
     }

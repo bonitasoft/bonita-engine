@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.bonitasoft.engine.bar.BARResourceType;
+import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.bar.SBARResource;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
@@ -33,19 +36,16 @@ import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.filter.UserFilter;
-import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -64,22 +64,22 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     private final CacheService cacheService;
 
-    private final ReadSessionAccessor sessionAccessor;
-
     private final ExpressionResolverService expressionResolverService;
 
     private final Parser parser;
 
     private final TechnicalLoggerService logger;
 
-    public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService, final ReadSessionAccessor sessionAccessor,
-            final ExpressionResolverService expressionResolverService, final ParserFactory parserFactory, final TechnicalLoggerService logger) {
+    private final ResourcesService resourcesService;
+
+    public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService,
+                                 final ExpressionResolverService expressionResolverService, final ParserFactory parserFactory, final TechnicalLoggerService logger, ResourcesService resourcesService) {
         super();
         this.connectorExecutor = connectorExecutor;
         this.cacheService = cacheService;
-        this.sessionAccessor = sessionAccessor;
         this.expressionResolverService = expressionResolverService;
         this.logger = logger;
+        this.resourcesService = resourcesService;
         final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>(2);
         bindings.add(JarDependenciesBinding.class);
         bindings.add(UserFilterImplementationBinding.class);
@@ -88,13 +88,12 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     @Override
     public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition, final Map<String, SExpression> inputs,
-            final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException {
+                                      final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException {
         final FilterResult filterResult;
         try {
             UserFilterImplementationDescriptor descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
             if (descriptor == null) {
-                final String tenantId = String.valueOf(sessionAccessor.getTenantId());
-                loadUserFilters(processDefinitionId, Long.valueOf(tenantId));
+                loadUserFilters(processDefinitionId);
                 descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
                 if (descriptor == null) {
                     throw new SUserFilterExecutionException("unable to load descriptor for filter " + sUserFilterDefinition.getUserFilterId());
@@ -134,11 +133,11 @@ public class UserFilterServiceImpl implements UserFilterService {
     }
 
     private String getUserFilterImplementationIdInCache(final long processDefinitionId, final String userFilterId, final String version) {
-        return processDefinitionId + ':' + userFilterId + '-' + version;
+        return String.valueOf(processDefinitionId) + ":" + userFilterId + "-" + version;
     }
 
     private FilterResult executeFilterInClassloader(final String implementationClassName, final Map<String, SExpression> parameters,
-            final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws InstantiationException,
+                                                    final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws InstantiationException,
             IllegalAccessException, ClassNotFoundException, SUserFilterExecutionException, SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -165,39 +164,39 @@ public class UserFilterServiceImpl implements UserFilterService {
     }
 
     @Override
-    public boolean loadUserFilters(final long processDefinitionId, final long tenantId) throws SUserFilterLoadingException {
-        boolean resolved = true;// should return false if there is nothing loaded + something in the definition
+    public void removeUserFilters(final long processDefinitionId) throws SBonitaReadException, SRecorderException {
+        resourcesService.removeAll(processDefinitionId, BARResourceType.USER_FILTER);
+    }
+
+    @Override
+    public boolean loadUserFilters(final long processDefinitionId) throws SUserFilterLoadingException {
+        String name = null;
         try {
-            final List<BonitaResource> listFiles = BonitaHomeServer.getInstance().getProcessManager().getUserFiltersFiles(tenantId, processDefinitionId);
+            final List<SBARResource> listFiles = resourcesService.get(processDefinitionId, BARResourceType.USER_FILTER, 0, 1000);//FIXME
             final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
-            for (final BonitaResource file : listFiles) {
-                final String name = file.getName();
+            for (final SBARResource file : listFiles) {
+                name = file.getName();
                 if (pattern.matcher(name).matches()) {
-                    UserFilterImplementationDescriptor userFilterImplementationDescriptor = null;
-                    try {
-                        final Object objectFromXML = parser.getObjectFromXML(file.getContent());
-                        userFilterImplementationDescriptor = (UserFilterImplementationDescriptor) objectFromXML;
-                        if (userFilterImplementationDescriptor == null) {
-                            throw new SUserFilterLoadingException("Can not parse ConnectorImplementation XML. The file name is " + name);
-                        }
-                        cacheService.store(
-                                FILTER_CACHE_NAME,
-                                getUserFilterImplementationIdInCache(processDefinitionId, userFilterImplementationDescriptor.getDefinitionId(),
-                                        userFilterImplementationDescriptor.getDefinitionVersion()), userFilterImplementationDescriptor);
-                    } catch (final IOException | SXMLParseException e) {
-                        throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
-                    } catch (final SCacheException e) {
-                        throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);
+                    UserFilterImplementationDescriptor userFilterImplementationDescriptor;
+                    final Object objectFromXML = parser.getObjectFromXML(file.getContent());
+                    userFilterImplementationDescriptor = (UserFilterImplementationDescriptor) objectFromXML;
+                    if (userFilterImplementationDescriptor == null) {
+                        throw new SUserFilterLoadingException("Can not parse ConnectorImplementation XML. The file name is " + name);
                     }
-                    resolved = true;
+                    cacheService.store(
+                            FILTER_CACHE_NAME,
+                            getUserFilterImplementationIdInCache(processDefinitionId, userFilterImplementationDescriptor.getDefinitionId(),
+                                    userFilterImplementationDescriptor.getDefinitionVersion()), userFilterImplementationDescriptor);
                 }
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home is not set.", e);
-        } catch (IOException e) {
-            throw new BonitaRuntimeException(e);
+            return true;
+        } catch (final IOException | SXMLParseException e) {
+            throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
+        } catch (final SCacheException e) {
+            throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);
+        } catch (SBonitaReadException e) {
+            throw new SUserFilterLoadingException("Unable to list the user filter implementations", e);
         }
-        return resolved;
     }
 
 }
