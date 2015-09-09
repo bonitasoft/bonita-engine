@@ -55,3 +55,4 @@ DELETE FROM theme WHERE tenantid = ${tenantid};
 DELETE FROM form_mapping WHERE tenantid = ${tenantid};
 DELETE FROM page_mapping WHERE tenantid = ${tenantid};
 DELETE FROM process_content WHERE tenantid = ${tenantid};
+DELETE FROM proc_parameter WHERE tenantid = ${tenantid};

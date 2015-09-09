@@ -114,6 +114,8 @@ DELETE FROM form_mapping
 GO
 DELETE FROM page_mapping
 GO
+DELETE FROM proc_parameter
+GO
 
 -- do NOT clear directly PLATFORM table, Hibernate needs to update its cache to know the platform has been deleted
  
