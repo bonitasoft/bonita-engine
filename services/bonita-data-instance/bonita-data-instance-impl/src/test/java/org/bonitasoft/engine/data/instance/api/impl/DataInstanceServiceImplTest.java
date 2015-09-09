@@ -13,29 +13,39 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -58,6 +68,9 @@ public class DataInstanceServiceImplTest {
 
     @Mock
     private ParentContainerResolver parentContainerResolver;
+
+    @Captor
+    private ArgumentCaptor<ArchiveInsertRecord> archiveInsertRecordArgumentCaptor;
 
     @InjectMocks
     private DataInstanceServiceImpl dataInstanceServiceImpl;
@@ -93,7 +106,7 @@ public class DataInstanceServiceImplTest {
     public final void getLastSADataInstancesFromContainer() throws SBonitaException {
         final List<SADataInstance> archiveInstances = Collections.emptyList();
         doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doReturn(archiveInstances).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SADataInstance>> any());
+        doReturn(archiveInstances).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SADataInstance>>any());
 
         final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);
@@ -116,6 +129,35 @@ public class DataInstanceServiceImplTest {
 
         final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);
+    }
+
+    @Test
+    public final void should_createDataInstance_archive_the_first_value() throws Exception {
+        //given
+        SShortTextDataInstanceImpl dataInstance = new SShortTextDataInstanceImpl();
+        dataInstance.setValue("theValue");
+        //when
+        dataInstanceServiceImpl.createDataInstance(dataInstance);
+        //then
+        verify(archiveService).recordInsert(anyLong(), archiveInsertRecordArgumentCaptor.capture());
+        final SAShortTextDataInstanceImpl entity = (SAShortTextDataInstanceImpl) archiveInsertRecordArgumentCaptor.getValue().getEntity();
+        assertThat(entity.getValue()).isEqualTo("theValue");
+    }
+
+    @Test
+    public final void should_updateDataInstance_archive_the_new_value() throws Exception {
+        //given
+        SShortTextDataInstanceImpl dataInstance = new SShortTextDataInstanceImpl();
+        //set directly to "theNewValue" because the set is done by the persistence service
+        dataInstance.setValue("theNewValue");
+        EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        updateDescriptor.addField("value","theNewValue");
+        //when
+        dataInstanceServiceImpl.updateDataInstance(dataInstance, updateDescriptor);
+        //then
+        verify(archiveService).recordInsert(anyLong(), archiveInsertRecordArgumentCaptor.capture());
+        final SAShortTextDataInstanceImpl entity = (SAShortTextDataInstanceImpl) archiveInsertRecordArgumentCaptor.getValue().getEntity();
+        assertThat(entity.getValue()).isEqualTo("theNewValue");
     }
 
 }

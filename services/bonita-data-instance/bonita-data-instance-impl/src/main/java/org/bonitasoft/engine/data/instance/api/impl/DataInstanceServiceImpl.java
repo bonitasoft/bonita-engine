@@ -99,16 +99,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceException {
-        archiveDataInstance(sDataInstance, System.currentTimeMillis());
-    }
-
-    @Override
-    public void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceException {
         if (!sDataInstance.isTransientData()) {
             try {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
-                archiveService.recordInsert(archiveDate, archiveInsertRecord);
+                archiveService.recordInsert(System.currentTimeMillis(), archiveInsertRecord);
             } catch (final SRecorderException e) {
                 logOnExceptionMethod("updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
