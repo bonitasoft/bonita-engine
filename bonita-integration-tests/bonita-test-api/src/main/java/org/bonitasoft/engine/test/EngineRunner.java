@@ -24,12 +24,12 @@ import java.lang.reflect.Field;
 /**
  * @author mazourd
  */
-public class Engine extends BlockJUnit4ClassRunner {
+public class EngineRunner extends BlockJUnit4ClassRunner {
 
     private Field engineField;
     private EngineInitializer initializer = new EngineInitializer();
     private String[] userAndPassword = new String[]{"defaultUser"};
-    public Engine(Class<?> klass) throws Exception {
+    public EngineRunner(Class<?> klass) throws Exception {
         super(klass);
         processAnnotedField(klass);
     }
@@ -38,10 +38,10 @@ public class Engine extends BlockJUnit4ClassRunner {
         Field[] fields = klass.getDeclaredFields();
         for (Field field : fields) {
             for (Annotation annotation : field.getDeclaredAnnotations()) {
-                if (annotation.annotationType().equals(EngineAnnotationInterface.class)) {
+                if (annotation.annotationType().equals(EngineInterface.class)) {
                     field.setAccessible(true);
                     engineField = field;
-                    EngineAnnotationInterface engineAnnotation = (EngineAnnotationInterface) annotation;
+                    EngineInterface engineAnnotation = (EngineInterface) annotation;
                     userAndPassword = new String[]{engineAnnotation.user(), engineAnnotation.password()};
                 }
             }

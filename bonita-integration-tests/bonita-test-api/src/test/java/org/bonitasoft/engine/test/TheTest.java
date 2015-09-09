@@ -29,12 +29,12 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(Engine.class)
+@RunWith(EngineRunner.class)
 public class TheTest {
 
     protected User user;
     protected UserTaskAPI userTaskAPI;
-    @EngineAnnotationInterface
+    @EngineInterface
     protected EngineInitializer engineInitializer;
     private ProcessDeployerAPITest processDeployer;
     private APITestProcessAnalyserImpl processAnalyser;

@@ -55,10 +55,10 @@ import static org.junit.Assert.fail;
 /**
  * @author mazourd
  */
-@RunWith(Engine.class)
+@RunWith(EngineRunner.class)
 public class ActivityDataInstanceITBis {
 
-    @EngineAnnotationInterface(user = "william.jobs", password = "bpm")
+    @EngineInterface(user = "william.jobs", password = "bpm")
     private EngineInitializer engineInitializer;
 
     String ACTOR_NAME = "william.jobs";

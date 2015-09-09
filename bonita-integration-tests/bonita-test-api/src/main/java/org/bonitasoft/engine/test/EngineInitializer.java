@@ -26,6 +26,8 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 
+import java.util.LinkedList;
+
 /**
  * @author mazourd
  */
@@ -39,8 +41,8 @@ public class EngineInitializer {
 
     private ProcessAPI processAPI;
     private IdentityAPI identityAPI;
-    private UserTaskAPI userTaskAPI;
-    private User user;
+    private UserTaskAPIImpl userTaskAPI;
+    private LinkedList<User> users;
     private static EngineStarter engineStarter = new EngineStarter();
 
     public EngineInitializer() {
@@ -118,11 +120,11 @@ public class EngineInitializer {
         return this;
     }
 
-    public UserTaskAPI getUserTaskAPI() {
+    public UserTaskAPIImpl getUserTaskAPI() {
         return userTaskAPI;
     }
 
-    public void setUserTaskAPI(UserTaskAPI userTaskAPI) {
+    public void setUserTaskAPI(UserTaskAPIImpl userTaskAPI) {
         this.userTaskAPI = userTaskAPI;
     }
 
@@ -135,16 +137,30 @@ public class EngineInitializer {
     }
 
     public User getUser() {
-        return user;
+        return users.getFirst();
     }
 
     public User createUser(String userName, String password) throws CreationException {
-        this.user = getIdentityAPI().createUser(userName, password);
-        return this.user;
+        if(users == null){
+            users = new LinkedList<>();
+        }
+        this.users.addLast(getIdentityAPI().createUser(userName, password));
+        return this.users.getLast();
+    }
+
+    public LinkedList<User> getUsers() {
+        return users;
     }
 
     public void deleteUser(String userName) throws DeletionException {
+        for (User user : users){
+            if(user.getUserName().equals(userName)){
+               users.remove(user);
+            }
+        }
         getIdentityAPI().deleteUser(userName);
-        this.user = null;
+        if(users.isEmpty()){
+            this.users = null;
+        }
     }
 }
