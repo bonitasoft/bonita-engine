@@ -8,21 +8,11 @@
 		<version>7.2.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-parameter-propertyfile</artifactId>
+	<artifactId>bonita-parameter-impl</artifactId>
 
 	<name>Bonita Parameter: Service Implementation (Properties)</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-parameter-api</artifactId>
@@ -43,8 +33,28 @@
 			<artifactId>bonita-cache-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.recorder</groupId>
+            <artifactId>bonita-recorder-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>

@@ -19,6 +19,7 @@ import static java.util.Collections.singletonMap;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -350,6 +352,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -721,14 +724,22 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
-        final long tenantId = getTenantAccessor().getTenantId();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final long tenantId = tenantAccessor.getTenantId();
         try {
-            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
+            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId), exportParameters(tenantAccessor, processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
     }
-
+    protected String exportParameters(TenantServiceAccessor tenantAccessor, long processDefinitionId) throws IOException, SParameterProcessNotFoundException, SBonitaReadException {
+        final Map<String, String> all = tenantAccessor.getParameterService().getAll(processDefinitionId);
+        final Properties properties = new Properties();
+        properties.putAll(all);
+        final StringWriter writer = new StringWriter();
+        properties.store(writer,"");
+        return writer.toString();
+    }
     protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
             throws BonitaHomeNotSetException, IOException {
         BonitaHomeServer.getInstance().getProcessManager().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);

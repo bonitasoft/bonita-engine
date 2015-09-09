@@ -21,11 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.commons.io.PropertiesManager;
+import org.bonitasoft.engine.bpm.bar.ParameterContribution;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.IOUtil;
 
@@ -113,28 +112,6 @@ public class ProcessManager {
         return FolderMgr.getTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
     }
 
-    private File getParameterFile(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return getProcessFolder(tenantId, processId).getFile("parameters.properties");
-    }
-
-    public Properties getParameters(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return PropertiesManager.getProperties(getParameterFile(tenantId, processId));
-    }
-
-    public void storeParameters(long tenantId, long processId, Properties properties) throws BonitaHomeNotSetException, IOException {
-        PropertiesManager.saveProperties(properties, getParameterFile(tenantId, processId));
-    }
-
-    public boolean hasParameters(long tenantId, long processId) throws IOException, BonitaHomeNotSetException {
-        final File file = getParameterFile(tenantId, processId);
-        return file.exists();
-    }
-
-    public boolean deleteParameters(long tenantId, long processId) throws IOException, BonitaHomeNotSetException {
-        final File file = getParameterFile(tenantId, processId);
-        return file.delete();
-    }
-
     public List<BonitaResource> getUserFiltersFiles(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
         final Map<String, byte[]> resourceMap = getUserFiltersFolder(tenantId, processId).listFilesAsResources();
         final List<BonitaResource> bonitaResources = new ArrayList<>(resourceMap.size());
@@ -152,12 +129,17 @@ public class ProcessManager {
         return FileUtils.readFileToByteArray(documentsFolder.getFile(documentName));
     }
 
-    public byte[] exportBarProcessContentUnderHome(long tenantId, long processId, final String actorMappingContent) throws IOException,
+    public byte[] exportBarProcessContentUnderHome(long tenantId, long processId, final String actorMappingContent, String parameters) throws IOException,
             BonitaHomeNotSetException {
-        final FileOutputStream actorMappingOS = getProcessDefinitionFileOutputstream(tenantId, processId, "actorMapping.xml");
-        IOUtil.writeContentToFileOutputStream(actorMappingContent, actorMappingOS);
+        writeFile(tenantId, processId, actorMappingContent, "actorMapping.xml");
+        writeFile(tenantId, processId, parameters, ParameterContribution.PARAMETERS_FILE);
         final Folder processFolder = getProcessFolder(tenantId, processId);
         return processFolder.zip(processFolder);
+    }
+
+    void writeFile(long tenantId, long processId, String actorMappingContent, String fileName) throws BonitaHomeNotSetException, IOException {
+        final FileOutputStream actorMappingOS = getProcessDefinitionFileOutputstream(tenantId, processId, fileName);
+        IOUtil.writeContentToFileOutputStream(actorMappingContent, actorMappingOS);
     }
 
     public void writeBusinessArchive(long tenantId, long processId, BusinessArchive businessArchive) throws BonitaHomeNotSetException, IOException {

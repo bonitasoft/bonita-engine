@@ -44,7 +44,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
-import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -189,14 +188,15 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         try {
             final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
             final SParameter parameter = parameterService.get(processDefinitionId, parameterName);
+            if(parameter == null){
+                throw new NotFoundException("the parameter with name " + parameterName + " and process with id " + processDefinitionId + " was not found.");
+            }
             final String name = parameter.getName();
             final String value = parameter.getValue();
             final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
             final String description = parameterDefinition.getDescription();
             final String type = parameterDefinition.getType();
             return new ParameterImpl(name, description, value, type);
-        } catch (final SParameterProcessNotFoundException e) {
-            throw new NotFoundException("the parameter with name " + parameterName + " and process with id " + processDefinitionId + " was not found.");
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }

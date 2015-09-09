@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -41,6 +42,7 @@ public class DeleteProcess extends DeleteArchivedProcessInstances {
     private final ClassLoaderService classLoaderService;
     private final FormMappingService formMappingService;
     private final PageService pageService;
+    private final ParameterService parameterService;
 
     public DeleteProcess(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) {
         super(tenantAccessor, processDefinitionId);
@@ -49,12 +51,14 @@ public class DeleteProcess extends DeleteArchivedProcessInstances {
         classLoaderService = tenantAccessor.getClassLoaderService();
         formMappingService = tenantAccessor.getFormMappingService();
         pageService = tenantAccessor.getPageService();
+        parameterService = tenantAccessor.getParameterService();
     }
 
     @Override
     public void execute() throws SBonitaException {
         super.execute();
         actorMappingService.deleteActors(getProcessDefinitionId());
+        parameterService.deleteAll(getProcessDefinitionId());
         deleteFormMapping();
         deleteProcessPages();
         try {
