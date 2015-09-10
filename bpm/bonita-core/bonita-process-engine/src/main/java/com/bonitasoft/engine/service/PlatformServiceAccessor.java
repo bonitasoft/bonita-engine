@@ -10,6 +10,7 @@ package com.bonitasoft.engine.service;
 
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import org.bonitasoft.engine.platform.PlatformRetriever;
 
 /**
  * @author Matthieu Chaffotte
@@ -25,5 +26,7 @@ public interface PlatformServiceAccessor extends org.bonitasoft.engine.service.P
     TenantServiceAccessor getTenantServiceAccessor(long tenantId);
 
     PlatformMonitoringService getPlatformMonitoringService();
+
+    PlatformRetriever getPlatformRetriever();
 
 }
