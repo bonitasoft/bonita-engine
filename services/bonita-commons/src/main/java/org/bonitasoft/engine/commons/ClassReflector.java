@@ -45,7 +45,7 @@ public class ClassReflector {
     private static final Map<String, Method> methods;
 
     static {
-        methods = new HashMap<String, Method>();
+        methods = new HashMap<>();
     }
 
     private static final Object MUTEX = new Object();
@@ -113,8 +113,8 @@ public class ClassReflector {
     public static void invokeSetter(final Object entity, final String setterName, final Class<?> parameterType, final Object parameterValue)
             throws SReflectException {
         try {
-            final Method setter = getMethod(entity.getClass(), setterName, new Class[] { parameterType });
-            setter.invoke(entity, new Object[] { parameterValue });
+            final Method setter = getMethod(entity.getClass(), setterName, parameterType);
+            setter.invoke(entity, parameterValue);
         } catch (final Exception e) {
             throw new SReflectException(e);
         }
@@ -153,11 +153,7 @@ public class ClassReflector {
     }
 
     public static Method getMethodByName(final Class<?> clazz, final String methodName) {
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(clazz.getName());
-        stringBuilder.append('.');
-        stringBuilder.append(methodName);
-        final String key = stringBuilder.toString();
+        final String key = clazz.getName() + '.' + methodName;
         putIfAbsent(clazz, methodName, key);
         return methods.get(key);
     }
@@ -272,8 +268,7 @@ public class ClassReflector {
     public static Method[] getDeclaredGetters(final Class<?> clazz) {
         final List<Method> getters = new ArrayList<Method>();
         final Method[] methods = clazz.getDeclaredMethods();
-        for (int i = 0; i < methods.length; i++) {
-            final Method method = methods[i];
+        for (final Method method : methods) {
             if (isAGetterMethod(method)) {
                 getters.add(method);
             }
