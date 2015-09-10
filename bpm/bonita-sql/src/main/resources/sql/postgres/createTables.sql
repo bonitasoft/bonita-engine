@@ -878,6 +878,7 @@ CREATE TABLE platform (
   initialVersion VARCHAR(50) NOT NULL,
   created INT8 NOT NULL,
   createdBy VARCHAR(50) NOT NULL,
+  information TEXT,
   PRIMARY KEY (id)
 );
 

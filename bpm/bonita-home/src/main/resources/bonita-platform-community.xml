@@ -97,8 +97,14 @@
         </property>
     </bean>
 
+
+    <bean id="platformRetriever" class="org.bonitasoft.engine.platform.impl.PlatformRetrieverImpl" >
+        <constructor-arg name="platformPersistenceService" ref="platformPersistenceService"/>
+    </bean>
+
     <bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
         <constructor-arg ref="platformPersistenceService" />
+        <constructor-arg name="platformRetriever" ref="platformRetriever" />
         <constructor-arg name="tenantPersistenceServices">
             <list>
                 <ref bean="persistenceService" />

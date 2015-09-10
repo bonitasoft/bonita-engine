@@ -10,6 +10,7 @@
     <property name="initialVersion" column="initialVersion" type="java.lang.String"/>
     <property name="previousVersion" column="previousVersion" type="java.lang.String"/>
     <property name="version" column="version" type="java.lang.String"/>
+    <property name="information" column="information" type="text"/>
   </class>
 
   <class name="STenantImpl" table="tenant">
