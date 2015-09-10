@@ -55,11 +55,11 @@ import static org.junit.Assert.fail;
 /**
  * @author mazourd
  */
-@RunWith(EngineRunner.class)
+@RunWith(BonitaEngineRunner.class)
 public class ActivityDataInstanceITBis {
 
-    @EngineInterface(user = "william.jobs", password = "bpm")
-    private EngineInitializer engineInitializer;
+    @InjectEngine(user = "william.jobs", password = "bpm")
+    private BonitaEngineTester bonitaEngineTester;
 
     String ACTOR_NAME = "william.jobs";
 
@@ -91,15 +91,15 @@ public class ActivityDataInstanceITBis {
     }
 
     private void assertDataOnActivityIntances(final String actorName, final DesignProcessDefinition processDef, final int expectedNumber) throws Exception {
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(processDef, actorName, engineInitializer.getUser());
-        final ProcessDeploymentInfo processDeploymentInfo = engineInitializer.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(processDef, actorName, bonitaEngineTester.getUser());
+        final ProcessDeploymentInfo processDeploymentInfo = bonitaEngineTester.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDeploymentInfo.getProcessId());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDeploymentInfo.getProcessId());
         process.waitForUserTask("step1").hasOnlyActivityDataInstance("var1").hasValue(expectedNumber);
 
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDeploymentInfo.getProcessId());
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDeploymentInfo.getProcessId());
     }
 
     @Test
@@ -122,20 +122,20 @@ public class ActivityDataInstanceITBis {
         } else {
             throw new Exception("This test does not support data type different from (boolean, integer)");
         }
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(addUserTask.getProcess(), ACTOR_NAME, engineInitializer.getUser());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(addUserTask.getProcess(), ACTOR_NAME, bonitaEngineTester.getUser());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step1").hasOnlyActivityDataInstance("var1").hasValue(defaultDataValue);
         process.updateActivityDataInstance("var1", updatedDataValue).hasOnlyActivityDataInstance("var1").hasValue(updatedDataValue);
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void updateActivityInstanceOperationsWithStringDataNotTransient() throws Exception {
         final DesignProcessDefinition designProcessDefinition = createProcessWithActorAndHumanTaskAndInitStringDataNotTransient();
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, engineInitializer.getUser());
-        final ProcessDeploymentInfo processDeploymentInfo = engineInitializer.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, bonitaEngineTester.getUser());
+        final ProcessDeploymentInfo processDeploymentInfo = bonitaEngineTester.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step1");
         // Update data instance
         final String updatedValue = "afterUpdate";
@@ -145,43 +145,43 @@ public class ActivityDataInstanceITBis {
         process.getProcessAPI().updateActivityInstanceVariables(operations, process.getTemporaryUserTaskId(), null);
         new ReachedDataInstance(process.getProcessAPI().getActivityDataInstances(process.getTemporaryUserTaskId(), 0, 10).get(0)).hasValue(updatedValue);
         // Clean
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
     public void updateActivityInstanceVariable() throws Exception {
         final DesignProcessDefinition processDef = createProcessWithActorAndHumanTaskAndInitStringDataNotTransient();
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, engineInitializer.getUser());
-        final ProcessDeploymentInfo processDeploymentInfo = engineInitializer.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, bonitaEngineTester.getUser());
+        final ProcessDeploymentInfo processDeploymentInfo = bonitaEngineTester.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step1");
         final String updatedValue = "afterUpdate";
         final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
         variables.put("dataName", updatedValue);
         process.updateActivityInstanceVariables(variables).hasValue(updatedValue);
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test(expected = UpdateException.class)
     public void cannotUpdateAnActivityInstanceVariable() throws Exception {
         final DesignProcessDefinition processDef = createProcessWithActorAndHumanTaskAndInitStringDataNotTransient();
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, engineInitializer.getUser());
-        final ProcessDeploymentInfo processDeploymentInfo = engineInitializer.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, bonitaEngineTester.getUser());
+        final ProcessDeploymentInfo processDeploymentInfo = bonitaEngineTester.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        final ProcessInstance processInstance = engineInitializer.getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        final long activityInstanceId = engineInitializer.getUserTaskAPI().waitForUserTask(processInstance.getId(), "step1", -1);
+        final ProcessInstance processInstance = bonitaEngineTester.getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        final long activityInstanceId = bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance.getId(), "step1", -1);
         final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
         variables.put("dataName1", "afterUpdate");
         try {
-            engineInitializer.getProcessAPI().updateActivityInstanceVariables(activityInstanceId, variables);
+            bonitaEngineTester.getProcessAPI().updateActivityInstanceVariables(activityInstanceId, variables);
         } finally {
-            engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+            bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
         }
     }
 
     private DataInstance getActivityDataInstance(final long activityInstanceId) {
-        final List<DataInstance> activityDataInstances = engineInitializer.getProcessAPI().getActivityDataInstances(activityInstanceId, 0, 10);
+        final List<DataInstance> activityDataInstances = bonitaEngineTester.getProcessAPI().getActivityDataInstances(activityInstanceId, 0, 10);
         assertEquals(1, activityDataInstances.size());
         return activityDataInstances.get(0);
     }
@@ -191,28 +191,28 @@ public class ActivityDataInstanceITBis {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(ACTOR_NAME)
                 .addDescription("Delivery all day and night long").addUserTask("step1", ACTOR_NAME)
                 .addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1)).getProcess();
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, engineInitializer.getUser());
-        final ProcessDeploymentInfo processDeploymentInfo = engineInitializer.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, bonitaEngineTester.getUser());
+        final ProcessDeploymentInfo processDeploymentInfo = bonitaEngineTester.getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
-        final ProcessInstance processInstance = engineInitializer.getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = bonitaEngineTester.getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step1").hasOnlyActivityDataInstance("var1").hasValue(1);
 
         // verify the retrieved data
-        List<DataInstance> processDataInstances = engineInitializer.getProcessAPI().getActivityDataInstances(process.getTemporaryUserTaskId(), 0, 10);
+        List<DataInstance> processDataInstances = bonitaEngineTester.getProcessAPI().getActivityDataInstances(process.getTemporaryUserTaskId(), 0, 10);
         // Execute pending task
-        final List<ActivityInstance> activities = engineInitializer.getProcessAPI().getActivities(processInstance.getId(), 0, 200);
+        final List<ActivityInstance> activities = bonitaEngineTester.getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.iterator().next();
-        assignAndExecuteStep(activityInstance.getId(), engineInitializer.getUser().getId());
-        engineInitializer.getUserTaskAPI().waitForProcessToFinish(processInstance.getId(), -1);
+        assignAndExecuteStep(activityInstance.getId(), bonitaEngineTester.getUser().getId());
+        bonitaEngineTester.getUserTaskAPI().waitForProcessToFinish(processInstance.getId(), -1);
 
         // retrieve data after process has finished
         try {
-            processDataInstances = engineInitializer.getProcessAPI().getActivityDataInstances(processInstance.getId(), 0, 10);
+            processDataInstances = bonitaEngineTester.getProcessAPI().getActivityDataInstances(processInstance.getId(), 0, 10);
         } finally {
-            engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+            bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -224,39 +224,39 @@ public class ActivityDataInstanceITBis {
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addBooleanData("booleanData", null);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2", dataExpr).addDefaultTransition("step1", "step3");
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, engineInitializer.getUser());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, bonitaEngineTester.getUser());
 
         // Start first process, and wait the first step
-        final ProcessInstance processInstance1 = engineInitializer.getProcessAPI().startProcess(processDefinition.getId());
-        final Long step1_1Id = engineInitializer.getUserTaskAPI().waitForUserTask(processInstance1.getId(), "step1", -1);
+        final ProcessInstance processInstance1 = bonitaEngineTester.getProcessAPI().startProcess(processDefinition.getId());
+        final Long step1_1Id = bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance1.getId(), "step1", -1);
         // Set data to true, for the first instance
-        engineInitializer.getProcessAPI().updateActivityDataInstance("booleanData", step1_1Id, true);
+        bonitaEngineTester.getProcessAPI().updateActivityDataInstance("booleanData", step1_1Id, true);
 
         // Start second process, and wait the first step
-        final ProcessInstance processInstance2 = engineInitializer.getProcessAPI().startProcess(processDefinition.getId());
-        final Long step1_2Id = engineInitializer.getUserTaskAPI().waitForUserTask(processInstance2.getId(), "step1", -1);
+        final ProcessInstance processInstance2 = bonitaEngineTester.getProcessAPI().startProcess(processDefinition.getId());
+        final Long step1_2Id = bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance2.getId(), "step1", -1);
         // Set data to false, for the second instance
-        engineInitializer.getProcessAPI().updateActivityDataInstance("booleanData", step1_2Id, false);
+        bonitaEngineTester.getProcessAPI().updateActivityDataInstance("booleanData", step1_2Id, false);
 
         // Start third process, and wait the first step
-        final ProcessInstance processInstance3 = engineInitializer.getProcessAPI().startProcess(processDefinition.getId());
-        final Long step1_3Id = engineInitializer.getUserTaskAPI().waitForUserTask(processInstance3.getId(), "step1", -1);
+        final ProcessInstance processInstance3 = bonitaEngineTester.getProcessAPI().startProcess(processDefinition.getId());
+        final Long step1_3Id = bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance3.getId(), "step1", -1);
         // Set data to true, for the third instance
-        engineInitializer.getProcessAPI().updateActivityDataInstance("booleanData", step1_3Id, true);
+        bonitaEngineTester.getProcessAPI().updateActivityDataInstance("booleanData", step1_3Id, true);
 
         // Execute all step1
-        assignAndExecuteStep(step1_1Id, engineInitializer.getUser().getId());
-        engineInitializer.getUserTaskAPI().waitForUserTask(processInstance1.getId(), "step2", -1);
-        assignAndExecuteStep(step1_2Id, engineInitializer.getUser().getId());
-        engineInitializer.getUserTaskAPI().waitForUserTask(processInstance2.getId(), "step3", -1);
-        assignAndExecuteStep(step1_3Id, engineInitializer.getUser().getId());
-        engineInitializer.getUserTaskAPI().waitForUserTask(processInstance3.getId(), "step2", -1);
+        assignAndExecuteStep(step1_1Id, bonitaEngineTester.getUser().getId());
+        bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance1.getId(), "step2", -1);
+        assignAndExecuteStep(step1_2Id, bonitaEngineTester.getUser().getId());
+        bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance2.getId(), "step3", -1);
+        assignAndExecuteStep(step1_3Id, bonitaEngineTester.getUser().getId());
+        bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance3.getId(), "step2", -1);
 
         // Check that only these 3 steps are pending
-        assertEquals(3, engineInitializer.getProcessAPI().getNumberOfPendingHumanTaskInstances(engineInitializer.getUser().getId()));
+        assertEquals(3, bonitaEngineTester.getProcessAPI().getNumberOfPendingHumanTaskInstances(bonitaEngineTester.getUser().getId()));
 
         // Clean-up
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -265,10 +265,10 @@ public class ActivityDataInstanceITBis {
         createNewInstance.addAutomaticTask("step1").addIntegerData("intdata",
                 new ExpressionBuilder().createExpression("d", "d", Integer.class.getName(), ExpressionType.TYPE_CONSTANT));
 
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcess(createNewInstance.done());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcess(createNewInstance.done());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForTaskToFail().hasSameNameAs("step1");
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -279,15 +279,15 @@ public class ActivityDataInstanceITBis {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME).addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("step2"));
         processDefinitionBuilder.addShortTextData("a", new ExpressionBuilder().createConstantStringExpression("process"));
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, engineInitializer.getUser());
-        final ProcessInstance processInstance = engineInitializer.getProcessAPI().startProcess(processDefinition.getId());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, bonitaEngineTester.getUser());
+        final ProcessInstance processInstance = bonitaEngineTester.getProcessAPI().startProcess(processDefinition.getId());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step1").hasSameNameAs(
-                (String) engineInitializer.getUserTaskAPI().getProcessAPI().getActivityDataInstance("a", process.getTemporaryUserTaskId()).getValue());
+                (String) bonitaEngineTester.getUserTaskAPI().getProcessAPI().getActivityDataInstance("a", process.getTemporaryUserTaskId()).getValue());
         process.waitForUserTask("step2").hasSameNameAs(
-                (String) engineInitializer.getUserTaskAPI().getProcessAPI().getActivityDataInstance("a", process.getTemporaryUserTaskId()).getValue());
+                (String) bonitaEngineTester.getUserTaskAPI().getProcessAPI().getActivityDataInstance("a", process.getTemporaryUserTaskId()).getValue());
         process.accessDataInTask("a").hasValue("process");
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     private DesignProcessDefinition createProcessWithActorAndHumanTaskAndInitStringDataNotTransient() throws Exception {
@@ -309,8 +309,8 @@ public class ActivityDataInstanceITBis {
     public void canGetDataInstanceWhenThereAreTransientData() throws Exception {
         final String userTaskName = "task1";
         final ProcessDefinition processDefinition = deployAndEnableProcWithPersistedAndTransientVariable(userTaskName);
-        final ProcessInstance processInstance = engineInitializer.getProcessAPI().startProcess(processDefinition.getId());
-        final Long userTaskId = engineInitializer.getUserTaskAPI().waitForUserTask(processInstance.getId(), userTaskName, -1);
+        final ProcessInstance processInstance = bonitaEngineTester.getProcessAPI().startProcess(processDefinition.getId());
+        final Long userTaskId = bonitaEngineTester.getUserTaskAPI().waitForUserTask(processInstance.getId(), userTaskName, -1);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
@@ -318,11 +318,11 @@ public class ActivityDataInstanceITBis {
         expressions.put(persistedVariableExpression, (Map<String, Serializable>) null);
         expressions.put(transientVariableExpression, (Map<String, Serializable>) null);
 
-        final Map<String, Serializable> expressionResult = engineInitializer.getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskId, expressions);
+        final Map<String, Serializable> expressionResult = bonitaEngineTester.getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskId, expressions);
         assertEquals("default", expressionResult.get(persistedVariableExpression.getName()));
         assertEquals("default", expressionResult.get(transientVariableExpression.getName()));
 
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition.getId());
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition.getId());
     }
 
     @Test
@@ -332,12 +332,12 @@ public class ActivityDataInstanceITBis {
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step", ACTOR_NAME).addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
 
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, engineInitializer.getUser());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, bonitaEngineTester.getUser());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step");
         process.updateActivityDataInstance(dataName, "2").hasOnlyActivityDataInstance(dataName).hasValue(
                 process.getProcessAPI().getArchivedActivityDataInstance(dataName, process.getTemporaryUserTaskId()).getValue());
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -347,13 +347,13 @@ public class ActivityDataInstanceITBis {
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step", ACTOR_NAME).addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
 
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, engineInitializer.getUser());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, bonitaEngineTester.getUser());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step");
-        process.updateActivityDataInstance(dataName, "2").assignAndExecuteTask(engineInitializer.getUser().getId());
-        engineInitializer.getUserTaskAPI().waitForProcessToFinish(process.getProcessInstance().getId(), -1);
+        process.updateActivityDataInstance(dataName, "2").assignAndExecuteTask(bonitaEngineTester.getUser().getId());
+        bonitaEngineTester.getUserTaskAPI().waitForProcessToFinish(process.getProcessInstance().getId(), -1);
         process.getArchivedData(dataName).hasValue("2");
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -366,16 +366,16 @@ public class ActivityDataInstanceITBis {
         taskDefinitionBuilder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
         taskDefinitionBuilder.addShortTextData("job", new ExpressionBuilder().createConstantStringExpression("job"));
         taskDefinitionBuilder.addShortTextData("desc", new ExpressionBuilder().createConstantStringExpression("desc"));
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, engineInitializer.getUser());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, bonitaEngineTester.getUser());
         String[] dataNames = new String[] { "2", "job", "desc" };
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step");
-        process.updateActivityDataInstance(dataName, "2").assignAndExecuteTask(engineInitializer.getUser().getId());
-        engineInitializer.getUserTaskAPI().waitForProcessToFinish(process.getProcessInstance().getId(), -1);
+        process.updateActivityDataInstance(dataName, "2").assignAndExecuteTask(bonitaEngineTester.getUser().getId());
+        bonitaEngineTester.getUserTaskAPI().waitForProcessToFinish(process.getProcessInstance().getId(), -1);
         process.getArchivedDatas(0, 10).hasSize(3).containsValues(dataNames);
         process.getArchivedDatas(0, 1).hasSize(1).containsValue("2");
         process.getArchivedDatas(1, 10).hasSize(2).containsValue("job").containsValue("desc");
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -384,8 +384,8 @@ public class ActivityDataInstanceITBis {
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step", ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, engineInitializer.getUser());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, bonitaEngineTester.getUser());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step");
         try {
             process.getArchivedData("o");
@@ -393,7 +393,7 @@ public class ActivityDataInstanceITBis {
         } catch (final ArchivedDataNotFoundException dnfe) {
             // Do nothing
         } finally {
-            engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+            bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
         }
     }
 
@@ -412,7 +412,7 @@ public class ActivityDataInstanceITBis {
         builder.addTransition(startName, userTaskName);
         builder.addTransition(userTaskName, endName);
 
-        return engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, engineInitializer.getUser());
+        return bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, bonitaEngineTester.getUser());
     }
 
     @Test
@@ -420,8 +420,8 @@ public class ActivityDataInstanceITBis {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(ACTOR_NAME)
                 .addDescription("Delivery all day and night long")
                 .addUserTask("step1", ACTOR_NAME).addData("data", List.class.getName(), null).getProcess();
-        final ProcessDefinition processDefinition = engineInitializer.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, engineInitializer.getUser());
-        StartedProcess process = engineInitializer.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = bonitaEngineTester.getProcessDeployer().deployAndEnableProcessWithActor(processDef, ACTOR_NAME, bonitaEngineTester.getUser());
+        StartedProcess process = bonitaEngineTester.getAPITestProcessAnalyser().startProcess(processDefinition.getId());
         process.waitForUserTask("step1");
         // test execution
         // verify the retrieved data
@@ -444,7 +444,7 @@ public class ActivityDataInstanceITBis {
         final Map<Expression, Map<String, Serializable>> expressions = Collections.singletonMap(longExpression, Collections.<String, Serializable> emptyMap());
         process.getProcessAPI().evaluateExpressionsOnActivityInstance(process.getTemporaryUserTaskId(), expressions);
 
-        engineInitializer.getProcessDeployer().disableAndDeleteProcess(processDefinition);
+        bonitaEngineTester.getProcessDeployer().disableAndDeleteProcess(processDefinition);
     }
 
     private static Operation buildStringOperation(final String dataInstanceName, final String newConstantValue, final boolean isTransient)
@@ -459,7 +459,7 @@ public class ActivityDataInstanceITBis {
     }
 
     private void assignAndExecuteStep(final long activityInstanceId, final long userId) throws BonitaException {
-        engineInitializer.getProcessAPI().assignUserTask(activityInstanceId, userId);
-        engineInitializer.getProcessAPI().executeFlowNode(activityInstanceId);
+        bonitaEngineTester.getProcessAPI().assignUserTask(activityInstanceId, userId);
+        bonitaEngineTester.getProcessAPI().executeFlowNode(activityInstanceId);
     }
 }

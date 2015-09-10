@@ -313,7 +313,7 @@ public class EngineStarter {
         if (unexpectedThreads.size() > 0) {
             System.out.println("The following list of threads is not expected:");
             for (Thread thread : unexpectedThreads) {
-                printThread(thread);
+                //printThread(thread);FIXME Thread-7 still alive at this point
             }
         }
         if (fail) {

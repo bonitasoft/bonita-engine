@@ -31,9 +31,9 @@ import java.util.LinkedList;
 /**
  * @author mazourd
  */
-public class EngineInitializer {
+public class BonitaEngineTester {
 
-    private static EngineInitializer factory;
+    private static BonitaEngineTester factory;
 
     public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
 
@@ -45,16 +45,16 @@ public class EngineInitializer {
     private LinkedList<User> users;
     private static EngineStarter engineStarter = new EngineStarter();
 
-    public EngineInitializer() {
+    public BonitaEngineTester() {
 
     }
 
     /*
      * To use once at the beginning of each test to get the engine initializer
      */
-    public static EngineInitializer getInstance() throws Exception {
+    public static BonitaEngineTester getInstance() throws Exception {
         if (factory == null) {
-            factory = new EngineInitializer();
+            factory = new BonitaEngineTester();
         }
         return factory;
     }
@@ -115,7 +115,7 @@ public class EngineInitializer {
         return new ProcessDeployerAPITest(processAPI);
     }
 
-    public EngineInitializer usingProcessAPI(ProcessAPI processAPI) {
+    public BonitaEngineTester usingProcessAPI(ProcessAPI processAPI) {
         this.processAPI = processAPI;
         return this;
     }

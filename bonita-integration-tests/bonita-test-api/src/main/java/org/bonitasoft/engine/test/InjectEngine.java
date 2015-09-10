@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author mazourd
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EngineInterface {
+public @interface InjectEngine {
 
     String user() default "defaultUser";
     String password() default "defaultPassword";

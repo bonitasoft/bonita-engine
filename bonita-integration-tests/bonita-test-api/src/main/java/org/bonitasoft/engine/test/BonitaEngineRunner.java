@@ -14,6 +14,9 @@
 
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.Statement;
@@ -24,12 +27,15 @@ import java.lang.reflect.Field;
 /**
  * @author mazourd
  */
-public class EngineRunner extends BlockJUnit4ClassRunner {
+public class BonitaEngineRunner extends BlockJUnit4ClassRunner {
 
     private Field engineField;
-    private EngineInitializer initializer = new EngineInitializer();
+    private Field processBARField;
+    private BonitaEngineTester initializer = new BonitaEngineTester();
     private String[] userAndPassword = new String[]{"defaultUser"};
-    public EngineRunner(Class<?> klass) throws Exception {
+    private String barToBeDeployed;
+    private ProcessDefinition processDefinition;
+    public BonitaEngineRunner(Class<?> klass) throws Exception {
         super(klass);
         processAnnotedField(klass);
     }
@@ -38,11 +44,16 @@ public class EngineRunner extends BlockJUnit4ClassRunner {
         Field[] fields = klass.getDeclaredFields();
         for (Field field : fields) {
             for (Annotation annotation : field.getDeclaredAnnotations()) {
-                if (annotation.annotationType().equals(EngineInterface.class)) {
+                if (annotation.annotationType().equals(InjectEngine.class)) {
                     field.setAccessible(true);
                     engineField = field;
-                    EngineInterface engineAnnotation = (EngineInterface) annotation;
+                    InjectEngine engineAnnotation = (InjectEngine) annotation;
                     userAndPassword = new String[]{engineAnnotation.user(), engineAnnotation.password()};
+                }
+                if (annotation.annotationType().equals(DeployBAR.class)){
+                    field.setAccessible(true);
+                    processBARField = field;
+                    barToBeDeployed = new String(((DeployBAR) annotation).name());
                 }
             }
         }
@@ -50,9 +61,15 @@ public class EngineRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected Statement classBlock(final RunNotifier notifier) {
-
         Statement statement = super.classBlock(notifier);
         statement = withGlobalBefore(statement);
+        if (processBARField != null) {
+            try {
+                initializer.getProcessDeployer().disableAndDeleteProcess(processDefinition.getId());
+            } catch (Exception e) {
+                //ignore
+            }
+        }
         return statement;
     }
 
@@ -71,6 +88,13 @@ public class EngineRunner extends BlockJUnit4ClassRunner {
         if (engineField != null) {
             engineField.set(test, initializer);
         }
+        if(barToBeDeployed != "noBar" && barToBeDeployed != null){
+            BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(this.getClass().getResourceAsStream(barToBeDeployed));
+            processDefinition = initializer.getProcessDeployer().deployAndEnableProcess(businessArchive);
+        }
+        if (processBARField != null){
+            processBARField.set(test,processDefinition);
+        }
         return test;
     }
 
@@ -78,7 +102,7 @@ public class EngineRunner extends BlockJUnit4ClassRunner {
         return new WithGlobalBefore(statement, this);
     }
 
-    public EngineInitializer getInitializer() {
+    public BonitaEngineTester getInitializer() {
         return initializer;
     }
 }

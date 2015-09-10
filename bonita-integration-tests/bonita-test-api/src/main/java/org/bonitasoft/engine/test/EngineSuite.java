@@ -21,8 +21,8 @@ import org.junit.runners.model.RunnerBuilder;
 
 import java.util.List;
 
-import static org.bonitasoft.engine.test.EngineInitializer.startEngine;
-import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
+import static org.bonitasoft.engine.test.BonitaEngineTester.startEngine;
+import static org.bonitasoft.engine.test.BonitaEngineTester.stopEngine;
 
 /**
  * @author mazourd

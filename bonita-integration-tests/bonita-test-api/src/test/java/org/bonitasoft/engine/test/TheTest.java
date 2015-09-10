@@ -29,32 +29,32 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(EngineRunner.class)
+@RunWith(BonitaEngineRunner.class)
 public class TheTest {
 
     protected User user;
     protected UserTaskAPI userTaskAPI;
-    @EngineInterface
-    protected EngineInitializer engineInitializer;
+    @InjectEngine
+    protected BonitaEngineTester bonitaEngineTester;
     private ProcessDeployerAPITest processDeployer;
     private APITestProcessAnalyserImpl processAnalyser;
 
     @Before
     public void before() throws Exception {
-        userTaskAPI = engineInitializer.getUserTaskAPI();
-        processDeployer = engineInitializer.getProcessDeployer();
-        user = engineInitializer.getIdentityAPI().createUser("william.jobs", "bpm");
-        processAnalyser = (APITestProcessAnalyserImpl) engineInitializer.getAPITestProcessAnalyser();
+        userTaskAPI = bonitaEngineTester.getUserTaskAPI();
+        processDeployer = bonitaEngineTester.getProcessDeployer();
+        user = bonitaEngineTester.getIdentityAPI().createUser("william.jobs", "bpm");
+        processAnalyser = (APITestProcessAnalyserImpl) bonitaEngineTester.getAPITestProcessAnalyser();
     }
 
     @After
     public void after() throws DeletionException {
-        engineInitializer.getIdentityAPI().deleteUser("william.jobs");
+        bonitaEngineTester.getIdentityAPI().deleteUser("william.jobs");
     }
 
     @Test
     public void aTest() throws Exception {
-        ProcessAPI processAPI = engineInitializer.getProcessAPI();
+        ProcessAPI processAPI = bonitaEngineTester.getProcessAPI();
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.1").addActor("william.jobs")
                 .addDescription("Delivery all day and night long").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(1))
                 .addUserTask("step1", "william.jobs").addIntegerData("var1", new ExpressionBuilder().createConstantIntegerExpression(2)).getProcess();

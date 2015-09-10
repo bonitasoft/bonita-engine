@@ -17,8 +17,8 @@ package org.bonitasoft.engine.test;
 import org.junit.runner.Runner;
 import org.junit.runners.model.Statement;
 
-import static org.bonitasoft.engine.test.EngineInitializer.startEngine;
-import static org.bonitasoft.engine.test.EngineInitializer.stopEngine;
+import static org.bonitasoft.engine.test.BonitaEngineTester.startEngine;
+import static org.bonitasoft.engine.test.BonitaEngineTester.stopEngine;
 
 /**
  * @author mazourd
