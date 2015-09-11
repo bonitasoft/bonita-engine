@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
@@ -53,24 +54,30 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
-import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -370,4 +377,30 @@ public class ProcessExecutorImplTest {
         // then, we call the validator:
         verify(processDef).getId();
     }
+
+    @Test
+    public void should_getActivateGatewayOrCreateIt_create_it_if_not_found() throws Exception {
+        final SProcessDefinition processDef = mock(SProcessDefinition.class);
+        final SFlowNodeDefinition gatewayDefinition = new SGatewayDefinitionImpl(12, "myGate", SGatewayType.INCLUSIVE);
+        final SGatewayInstance gatewayInstanceToBeReturned = mock(SGatewayInstance.class);
+        doReturn(gatewayInstanceToBeReturned).when(bpmInstancesCreator).createFlowNodeInstance(anyLong(), anyLong(), anyLong(), eq(SFlowElementsContainerType.PROCESS),
+                eq(gatewayDefinition), anyLong(), anyLong(), eq(false), eq(0), eq(SStateCategory.NORMAL), anyLong());
+
+        final SGatewayInstance gatewayInstance = processExecutorImpl.getActiveGatewayOrCreateIt(processDef, gatewayDefinition, SStateCategory.NORMAL, 45l, 46l);
+
+        assertThat(gatewayInstance).isEqualTo(gatewayInstanceToBeReturned);
+    }
+
+    @Test
+    public void should_getActivateGatewayOrCreateIt_return_the_existing_gateway() throws Exception {
+        final SProcessDefinition processDef = mock(SProcessDefinition.class);
+        final SFlowNodeDefinition gatewayDefinition = new SGatewayDefinitionImpl(12, "myGate", SGatewayType.INCLUSIVE);
+        final SGatewayInstance gatewayInstanceToBeReturned = mock(SGatewayInstance.class);
+        doReturn(gatewayInstanceToBeReturned).when(gatewayInstanceService).getActiveGatewayInstanceOfTheProcess(45l,"myGate");
+
+        final SGatewayInstance gatewayInstance = processExecutorImpl.getActiveGatewayOrCreateIt(processDef, gatewayDefinition, SStateCategory.NORMAL, 45l, 46l);
+
+        assertThat(gatewayInstance).isEqualTo(gatewayInstanceToBeReturned);
+    }
+
 }

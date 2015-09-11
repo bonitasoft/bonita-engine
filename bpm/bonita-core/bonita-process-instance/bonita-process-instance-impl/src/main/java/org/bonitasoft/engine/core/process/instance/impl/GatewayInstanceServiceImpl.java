@@ -296,12 +296,12 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void setState(final SGatewayInstance gatewayInstance, final int stateId) throws SGatewayModificationException {
-        updateOneColumAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getStateIdKey(), stateId, GATEWAYINSTANCE_STATE);
+        updateOneColumnAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getStateIdKey(), stateId, GATEWAYINSTANCE_STATE);
     }
 
     @Override
     public void hitTransition(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SGatewayModificationException {
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Hit gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId()
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Hit gateway " + gatewayInstance.getName() +" ("+gatewayInstance.getId()+")" + " of instance " + gatewayInstance.getRootProcessInstanceId()
                 + " with transition index " + transitionIndex);
         final String hitBys = gatewayInstance.getHitBys();
         String columnValue;
@@ -310,10 +310,10 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         } else {
             columnValue = hitBys + "," + transitionIndex;
         }
-        updateOneColumAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
+        updateOneColumnAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
-    private void updateOneColumAndMetaData(final SGatewayInstance gatewayInstance, final String columnName, final Serializable columnValue, final String event)
+    private void updateOneColumnAndMetaData(final SGatewayInstance gatewayInstance, final String columnName, final Serializable columnValue, final String event)
             throws SGatewayModificationException {
         final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
@@ -337,18 +337,19 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     @Override
     public SGatewayInstance getActiveGatewayInstanceOfTheProcess(final long parentProcessInstanceId, final String name) throws SGatewayNotFoundException,
             SGatewayReadException {
-        SGatewayInstance selectOne;
         try {
-            selectOne = persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));
+            return persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));
         } catch (final SBonitaReadException e) {
             throw new SGatewayReadException(e);
         }
-        if (selectOne == null) {
-            throw new SGatewayNotFoundException(parentProcessInstanceId, name);
-        }
-        return selectOne;
     }
 
+    /*
+     set the gateway to finish, then if there is some transition that arrived at the gateway multiple times (e.g. a loop with an inclusive gateway)
+     it is possible that some of the token are not merged.
+     in that case a new gateway is created with these remaining token and we check if this new gateway is already merged
+     new gateway that are already merged are returned
+     */
     @Override
     public List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition, final SGatewayInstance gatewayInstance) throws SBonitaException {
         List<String> hitBys = getHitByTransitionList(gatewayInstance);
@@ -363,6 +364,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         SGatewayInstance newGatewayInstance = createGatewayWithRemainingTokens(gatewayInstance, remaining);
         if(checkMergingCondition(processDefinition,newGatewayInstance)){
             toFire.add(newGatewayInstance);
+            //recursively add newly created gateway that are already merged
             toFire.addAll(setFinishAndCreateNewGatewayForRemainingToken(processDefinition, newGatewayInstance));
         }
         return toFire;
@@ -426,7 +428,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     void setFinished(SGatewayInstance gatewayInstance, int numberOfTokenToMerge) throws SGatewayModificationException {
         final String columnValue = FINISH + numberOfTokenToMerge;
         logger.log(TAG, TechnicalLogSeverity.TRACE, "set finish on gateway " + gatewayInstance.getName() + " " + columnValue);
-        updateOneColumAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
+        updateOneColumnAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
 
