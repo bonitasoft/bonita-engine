@@ -8,17 +8,18 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -38,12 +39,9 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.runner.BonitaTestRunner;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Laurent Leseigneur
@@ -54,11 +52,6 @@ import org.slf4j.LoggerFactory;
 //- twoTenantPauseMode
 //- can_executeConnectorOnActivityInstance_after_resume_tenant
 public class TenantMaintenanceIT extends CommonAPISPIT {
-
-    private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";
-
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(TenantMaintenanceIT.class);
 
     @Before
     public void before() throws BonitaException {
@@ -71,62 +64,70 @@ public class TenantMaintenanceIT extends CommonAPISPIT {
     }
 
     @Test
-    public void twoTenantPauseMode() throws Exception {
+    public void pause_one_tenant_should_not_impact_another_tenant() throws Exception {
         // given
+        // first tenant
         final long tenantId1 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser().getTenantId();
         final User userForTenant1 = BPMTestSPUtil.createUserOnTenantWithDefaultTechnicalLogger(USERNAME, PASSWORD, tenantId1);
-        final ProcessDefinition processDefinitionForTenant1 = createProcessOnTenant(tenantId1);
 
+        // second tenant (with deployed process)
         final long tenantId2 = createAndActivateTenant("TenantPauseTestSP3");
         final User userForTenant2 = BPMTestSPUtil.createUserOnTenantWithDefaultTechnicalLogger(USERNAME, PASSWORD, tenantId2);
         final ProcessDefinition processDefinitionForTenant2 = createProcessOnTenant(tenantId2);
 
-        // given a timer triggered process
-        waitArchivedProcessCount(1, tenantId2);
-        final long numberOfArchivedJobsBefore = getNumberOfArchivedJobs(tenantId2);
-
         // when a tenant is paused mode
         pauseTenant(tenantId1);
-        waitForPauseTime();
-        waitArchivedProcessCount(2, tenantId2);
-        final long numberOfArchivedJobsAfter = getNumberOfArchivedJobs(tenantId2);
 
-        // then the other tenant is still working
-        Assert.assertTrue("second tenant should work",
-                numberOfArchivedJobsAfter >= numberOfArchivedJobsBefore);
+        //then
+        assertCannotLoginOnTenant(tenantId1);
+        assertCanLoginOnTenantAndStartProcess(tenantId2, processDefinitionForTenant2);
 
         // cleanup
         resumeTenant(tenantId1);
-        disableAndDeleteProcess(tenantId1, processDefinitionForTenant1.getId());
         deleteUser(userForTenant1);
         disableAndDeleteProcess(tenantId2, processDefinitionForTenant2.getId());
         deleteUser(userForTenant2);
-        logNumberOfProcess(tenantId2, "TenantPauseTestSP3");
         BPMTestSPUtil.deactivateAndDeleteTenant(tenantId2);
     }
 
+    private void assertCannotLoginOnTenant(final long tenantId) throws Exception{
+        try {
+            loginOnTenantWith(USERNAME, PASSWORD, tenantId);
+            fail("Expected that user is not able to do login, but he is");
+        } catch (TenantStatusException e) {
+            assertThat(e.getMessage()).contains("in pause");
+        }
+    }
+
+    private void assertCanLoginOnTenantAndStartProcess(final long tenantId, final ProcessDefinition processDefinition) throws Exception{
+        loginOnTenantWith(USERNAME, PASSWORD, tenantId);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(processInstance, "step1");
+        logoutOnTenant();
+    }
+
     @Test
-    public void oneTenantPauseMode() throws Exception {
+    public void should_be_able_to_start_process_after_pause_resume() throws Exception {
+        //given
         final long tenantId = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser().getTenantId();
         final User user = BPMTestSPUtil.createUserOnTenantWithDefaultTechnicalLogger(USERNAME, PASSWORD, tenantId);
         final ProcessDefinition processDefinition = createProcessOnTenant(tenantId);
-        waitArchivedProcessCount(1, tenantId);
-        final long numberOfArchivedJobsBeforeTenantPause = getNumberOfArchivedJobs(tenantId);
 
-        // when the tenant is paused and then resume
+        // when
         pauseTenant(tenantId);
-        waitForPauseTime();
+
+        //then
+        assertCannotLoginOnTenant(tenantId);
+
+        //when
         resumeTenant(tenantId);
 
-        // then process is resume
-        waitArchivedProcessCount(2, tenantId);
-        final long numberOfArchivedJobsAfterTenantPauseAfterResume = getNumberOfArchivedJobs(tenantId);
-        Assert.assertTrue(numberOfArchivedJobsAfterTenantPauseAfterResume >= numberOfArchivedJobsBeforeTenantPause);
+        // then
+        assertCanLoginOnTenantAndStartProcess(tenantId, processDefinition);
 
         // cleanup
         disableAndDeleteProcess(tenantId, processDefinition.getId());
         deleteUser(user);
-        logNumberOfProcess(tenantId, "defaultTenant");
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation", "EngineExecutionContext" }, jira = "BS-8687")
@@ -171,38 +172,6 @@ public class TenantMaintenanceIT extends CommonAPISPIT {
         deleteUser(user);
     }
 
-    private void waitForPauseTime() throws InterruptedException {
-        LOGGER.info("start pause time");
-        Thread.sleep(3000);
-        LOGGER.info("end pause time");
-    }
-
-    private void waitArchivedProcessCount(final long processCount, final long tenantId) throws Exception {
-        final long timeout = (processCount + 1) * 1000;
-        final long limit = new Date().getTime() + timeout;
-        long count = 0;
-        while (count < processCount && new Date().getTime() < limit) {
-            count = getNumberOfArchivedJobs(tenantId);
-        }
-    }
-
-    private void logNumberOfProcess(final long tenantId, final String tenantName) throws Exception {
-        loginOnTenantWithTechnicalLogger(tenantId);
-        final long numberOfProcessInstances = getProcessAPI()
-                .getNumberOfProcessInstances();
-        final long numberOfArchivedProcessInstances = getProcessAPI()
-                .getNumberOfArchivedProcessInstances();
-
-        LOGGER.info(String.format(
-                "tenant: %d %s process instance:%d archived process:%d", tenantId, tenantName,
-                numberOfProcessInstances, numberOfArchivedProcessInstances));
-    }
-
-    private long getNumberOfArchivedJobs(final long tenantId) throws Exception {
-        loginOnTenantWithTechnicalLogger(tenantId);
-        return getProcessAPI().getNumberOfArchivedProcessInstances();
-    }
-
     private ProcessDefinition createProcessOnTenant(final long tenantId) throws Exception {
         loginOnTenantWith(USERNAME, PASSWORD, tenantId);
         final String processName = new StringBuilder().append(PROCESS_NAME).append(tenantId).toString();
@@ -211,11 +180,7 @@ public class TenantMaintenanceIT extends CommonAPISPIT {
                         PROCESS_VERSION)
                 .addActor(ACTOR_NAME)
                 .addStartEvent("start event")
-                .addTimerEventTriggerDefinition(
-                        TimerType.CYCLE,
-                        new ExpressionBuilder()
-                                .createConstantStringExpression(CRON_EXPRESSION_EACH_SECOND))
-                .addAutomaticTask("step1")
+                .addUserTask("step1", ACTOR_NAME)
                 .addEndEvent("end event").getProcess();
 
         return deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, getSession().getUserId());
