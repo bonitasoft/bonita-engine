@@ -143,6 +143,7 @@ public class TenantAdministrationAPIImplTest {
         // Then tenant service with lifecycle should be pause
         verify(tenantManagementAPI).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(eq(platformServiceAccessor), eq(tenantId),
                 isA(PauseServiceStrategy.class));
+        verify(schedulerService).pauseJobs(tenantId);
         verify(tenantManagementAPI, never()).setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(eq(platformServiceAccessor), eq(tenantId),
                 isA(ResumeServiceStrategy.class));
     }
@@ -162,7 +163,7 @@ public class TenantAdministrationAPIImplTest {
     @Test(expected = UpdateException.class)
     public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_fail() throws Exception {
         // Given
-        TaskResult<Void> taskResult = new TaskResult<Void>(new SWorkException("plop"));
+        TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
         doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).execute(any(SetServiceState.class), eq(tenantId));
 
         // When a tenant moved to available mode
@@ -172,7 +173,7 @@ public class TenantAdministrationAPIImplTest {
     @Test(expected = UpdateException.class)
     public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_is_time_out() throws Exception {
         // Given
-        TaskResult<Void> taskResult = new TaskResult<Void>(5l, TimeUnit.HOURS);
+        TaskResult<Void> taskResult = new TaskResult<>(5l, TimeUnit.HOURS);
         doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).execute(any(SetServiceState.class), eq(tenantId));
 
         // When a tenant moved to available mode
@@ -227,7 +228,7 @@ public class TenantAdministrationAPIImplTest {
     }
 
     @Test
-    public void resume_should_pause_jobs() throws Exception {
+    public void resume_should_resume_jobs() throws Exception {
         tenantManagementAPI.resume();
 
         verify(schedulerService).resumeJobs(tenantId);

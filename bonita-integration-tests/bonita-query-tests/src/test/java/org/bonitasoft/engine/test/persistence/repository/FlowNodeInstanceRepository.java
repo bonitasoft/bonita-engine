@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
-import java.util.Map;
 
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -38,6 +38,14 @@ public class FlowNodeInstanceRepository extends TestRepository {
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());
         return (List<Long>) namedQuery.list();
+    }
+    @SuppressWarnings("unchecked")
+    public SGatewayInstance getActiveGatewayInstanceOfProcess(long parentProcessInstanceId, String name) {
+        getSessionWithTenantFilter();
+        final Query namedQuery = getNamedQuery("getActiveGatewayInstanceOfProcess");
+        namedQuery.setParameter("parentProcessInstanceId",parentProcessInstanceId);
+        namedQuery.setParameter("name",name);
+        return (SGatewayInstance) namedQuery.uniqueResult();
     }
 
     public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId, final long userId) {

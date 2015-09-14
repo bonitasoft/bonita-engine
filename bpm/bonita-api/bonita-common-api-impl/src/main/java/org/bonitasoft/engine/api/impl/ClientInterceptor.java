@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static java.util.logging.Level.FINEST;
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -22,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bonitasoft.engine.api.NoSessionRequired;
@@ -34,8 +35,6 @@ import org.bonitasoft.engine.session.Session;
  * @author Matthieu Chaffotte
  */
 public class ClientInterceptor implements InvocationHandler, Serializable {
-
-    private static final Level LOG_LEVEL = Level.FINEST;
 
     /**
      * This interceptor is used only to access the PlatformLoginAPI or the Tenant Login API
@@ -69,39 +68,31 @@ public class ClientInterceptor implements InvocationHandler, Serializable {
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         try {
             final Class<?>[] parameterTypes = method.getParameterTypes();
-            final List<String> classNameParameters = new ArrayList<String>();
+            final List<String> classNameParameters = new ArrayList<>();
             for (final Class<?> parameterType : parameterTypes) {
                 classNameParameters.add(parameterType.getName());
             }
-            if (LOGGER.isLoggable(LOG_LEVEL)) {
-                LOGGER.log(LOG_LEVEL, "Calling method " + method.getName() + " on API " + this.api.getClass().getName());
+            if (LOGGER.isLoggable(FINEST)) {
+                LOGGER.log(FINEST, "Calling method " + method.getName() + " on API " + this.api.getClass().getName());
             }
-            Map<String, Serializable> options = new HashMap<String, Serializable>();
+            Map<String, Serializable> options;
             if (method.isAnnotationPresent(NoSessionRequired.class)) {
                 options = Collections.emptyMap();
             } else {
-                options = new HashMap<String, Serializable>();
+                options = new HashMap<>();
                 options.put("session", this.session);
             }
-
             // invoke ServerAPI unique method
             final Object object = this.api.invokeMethod(options, this.interfaceName, method.getName(), classNameParameters, args);
-            if (LOGGER.isLoggable(LOG_LEVEL)) {
-                LOGGER.log(LOG_LEVEL, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName());
+            if (LOGGER.isLoggable(FINEST)) {
+                LOGGER.log(FINEST, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName());
             }
             return object;
-        } catch (final ServerWrappedException e) {
-            if (LOGGER.isLoggable(LOG_LEVEL)) {
-                LOGGER.log(LOG_LEVEL, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName() + " with exception " + e.getMessage());
+        } catch (final ServerWrappedException | RemoteException e) {
+            if (LOGGER.isLoggable(FINEST)) {
+                LOGGER.log(FINEST, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName() + " with exception " + e.getMessage());
             }
-            final Throwable cause = e.getCause();
-            throw cause;
-        } catch (final RemoteException e) {
-            if (LOGGER.isLoggable(LOG_LEVEL)) {
-                LOGGER.log(LOG_LEVEL, "Quitting method " + method.getName() + " on API " + this.api.getClass().getName() + " with exception " + e.getMessage());
-            }
-            final Throwable cause = e.getCause();
-            throw cause;
+            throw e.getCause();
         }
     }
 }

@@ -740,7 +740,7 @@ public class GatewayExecutionIT extends TestWithUser {
      * Expected : step5
      * BS-13596
      */
-   @Test
+    @Test
     public void exclusiveThenInclusive() throws Exception {
         createTrueAndFalseExpression();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
@@ -749,7 +749,8 @@ public class GatewayExecutionIT extends TestWithUser {
                 .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.INCLUSIVE).addGateway("gateway3", GatewayType.INCLUSIVE)
                 .addTransition("step1", "gateway1")
                 .addTransition("gateway1", "step6", falseExpression)
-                .addDefaultTransition("gateway1", "gateway2").addTransition("gateway2", "step2", trueExpression).addTransition("gateway2", "step3", trueExpression)
+                .addDefaultTransition("gateway1", "gateway2").addTransition("gateway2", "step2", trueExpression)
+                .addTransition("gateway2", "step3", trueExpression)
                 .addDefaultTransition("gateway2", "step4").addTransition("step2", "gateway3").addTransition("step3", "gateway3")
                 .addTransition("step4", "gateway3").addTransition("gateway3", "step5").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
@@ -803,7 +804,8 @@ public class GatewayExecutionIT extends TestWithUser {
                 .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
                 .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4").addUserTask("step5", ACTOR_NAME)
                 .addGateway("gateway1", GatewayType.PARALLEL).addGateway("gateway2", GatewayType.EXCLUSIVE).addTransition("step1", "gateway1")
-                .addTransition("gateway1", "step2").addTransition("gateway1", "step3").addTransition("gateway1", "step4").addTransition("step2", "gateway2")
+                .addTransition("gateway1", "step2").addTransition("gateway1", "step3").addTransition("gateway1", "step4")
+                .addTransition("step2", "gateway2")
                 .addTransition("step3", "gateway2").addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
