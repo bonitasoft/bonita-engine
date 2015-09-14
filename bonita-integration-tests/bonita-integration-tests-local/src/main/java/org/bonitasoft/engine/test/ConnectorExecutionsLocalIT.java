@@ -605,7 +605,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final List<BarResource> resources = new ArrayList<BarResource>();
+        final List<BarResource> resources = new ArrayList<>();
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/connector-with-custom-type.bak", "connector-with-custom-type.jar");
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -639,7 +639,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final List<BarResource> resources = new ArrayList<BarResource>();
+        final List<BarResource> resources = new ArrayList<>();
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorWithCustomType.impl", "TestConnectorWithCustomType.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/connector-with-custom-type.bak", "connector-with-custom-type.jar");
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -697,6 +697,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_FINISH);
     }
 
+
     protected void executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(final ConnectorEvent connectorEvent) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithNonSerializableOutputConnector", "1.0");
         processBuilder.addStartEvent("start").addEndEvent("end");
@@ -751,7 +752,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         BlockingConnector.semaphore.acquire();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression("ascripte", "a+b+c", String.class.getName(),
                         new ExpressionBuilder().createDataExpression("a", String.class.getName()),
@@ -770,7 +771,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         assignAndExecuteStep(userTaskId, userId);
         // Try to evaluate expression on non-completed activity:
         final Expression engineConstantExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID);
-        final Map<Expression, Map<String, Serializable>> exprToEvaluate = new HashMap<Expression, Map<String, Serializable>>(1);
+        final Map<Expression, Map<String, Serializable>> exprToEvaluate = new HashMap<>(1);
         exprToEvaluate.put(engineConstantExpr, Collections.<String, Serializable> emptyMap());
         final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTaskId, exprToEvaluate);
         assertEquals(processInstance.getId(), ((Long) evaluatedExpressions.get("processInstanceId")).longValue());
