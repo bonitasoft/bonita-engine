@@ -16,12 +16,9 @@ package org.bonitasoft.engine.test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -392,7 +389,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
     }
 
     @Cover(classes = { Connector.class, HumanTaskInstance.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "User task",
-            "Boundary event", "Timer event", "Starting State" }, story = "Test connector on finish on starting state of an user task, with a boundary timer evnet.", jira = "ENGINE-604")
+            "Boundary event", "Timer event", "Starting State" }, story = "Test connector on finish on starting state of an user task, with a boundary timer event.", jira = "ENGINE-604")
     @Test
     public void executeConnectorOnFinishStateOfAnUserTaskWithTimerEvent() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -406,11 +403,13 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                 TestConnector.INPUT1, new ExpressionBuilder().createConstantStringExpression(valueOfInput1));
         processBuilder.addStartEvent("start");
         userTaskDefinitionBuilder.addBoundaryEvent("timer", true).addTimerEventTriggerDefinition(TimerType.DURATION,
-                new ExpressionBuilder().createConstantLongExpression(3000));
+                new ExpressionBuilder().createConstantLongExpression(30000));
         userTaskDefinitionBuilder.addUserTask("exceptionStep", ACTOR_NAME);
         processBuilder.addEndEvent("end");
         processBuilder.addUserTask("step2", ACTOR_NAME);
+        processBuilder.addTransition("start", "step1");
         processBuilder.addTransition("step1", "step2");
+        processBuilder.addTransition("step2", "end");
         processBuilder.addTransition("timer", "exceptionStep");
 
         // Deploy and start process
