@@ -81,10 +81,6 @@ public class ServerAPIImpl implements ServerAPI {
 
     private TechnicalLoggerService technicalLogger;
 
-    protected enum SessionType {
-        PLATFORM, API
-    }
-
     public ServerAPIImpl() {
         this(true);
     }
@@ -100,7 +96,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     /**
      * For Test Mock usage
-     * 
+     *
      * @param cleanSession
      * @param accessResolver
      */
@@ -228,7 +224,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
-            final PlatformServiceAccessor platformServiceAccessor, final Session session) throws  SBonitaException, BonitaHomeNotSetException, IOException,
+            final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 
         checkTenantSession(platformServiceAccessor, session);
@@ -275,17 +271,20 @@ public class ServerAPIImpl implements ServerAPI {
         // No session required means that there is no transaction
         if (method.isAnnotationPresent(CustomTransactions.class) || method.isAnnotationPresent(NoSessionRequired.class)) {
             return invokeAPIOutsideTransaction(parametersValues, apiImpl, method, apiInterfaceName, session);
-        }else{
+        } else {
             return invokeAPIInTransaction(parametersValues, apiImpl, method, session, apiInterfaceName);
         }
     }
 
-    protected Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session) throws Throwable {
+    protected Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session)
+            throws Throwable {
         checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */false);
-        return invokeAPI(parametersValues, apiImpl, method);
+        return invokeAPI(method, apiImpl, parametersValues);
     }
 
-    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session, boolean isInTransaction) {
+    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session,
+            boolean isInTransaction) {
+        warnIfDeprecated(method, apiInterfaceName);
         if (!isNodeInAValidStateFor(method)) {
             logNodeNotStartedMessage(apiInterfaceName, method);
             throw new NodeNotStartedException();
@@ -299,10 +298,9 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-
     protected void checkTenantIsInAValidModeFor(final Object apiImpl, final Method method, final String apiInterfaceName, final long tenantId,
-                                                final Session session,
-                                                boolean isInTransaction) {
+            final Session session,
+            boolean isInTransaction) {
         final boolean tenantRunning = isTenantAvailable(tenantId, session, isInTransaction);
         final AvailableWhenTenantIsPaused methodAnnotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
         AvailableWhenTenantIsPaused annotation = null;
@@ -316,7 +314,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     protected void checkIsValidModeFor(final boolean tenantRunning, final AvailableWhenTenantIsPaused annotation, final long tenantId, final Object apiImpl,
-                                       final Method method, final String apiInterfaceName) {
+            final Method method, final String apiInterfaceName) {
         // On running tenant, annotation must not be present, or present without ONLY flag:
         boolean okOnRunningTenant = isMethodAvailableOnRunningTenant(tenantRunning, annotation);
         // On paused tenant, annotation must be present (without consideration on ONLY flag):
@@ -353,11 +351,11 @@ public class ServerAPIImpl implements ServerAPI {
 
     /**
      * @param tenantId
-     *            the ID of the tenant to check
+     *        the ID of the tenant to check
      * @param session
-     *            the session to user
+     *        the session to user
      * @param isInTransaction
-     *          if the request is made in a transaction
+     *        if the request is made in a transaction
      * @return true if the tenant is available, false otherwise (if the tenant is paused)
      */
     protected boolean isTenantAvailable(final long tenantId, final Session session, boolean isInTransaction) {
@@ -366,9 +364,9 @@ public class ServerAPIImpl implements ServerAPI {
             apiImpl = accessResolver.getAPIImplementation(TenantAdministrationAPI.class.getName());
             final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_PAUSED);
             final Boolean paused;
-            if(isInTransaction){
-                paused = (Boolean) invokeAPI(new Object[0], apiImpl, method);
-            }else{
+            if (isInTransaction) {
+                paused = (Boolean) invokeAPI(method, apiImpl);
+            } else {
                 final UserTransactionService userTransactionService = selectUserTransactionService(session, getSessionType(session));
 
                 final Callable<Object> callable = new Callable<Object>() {
@@ -376,7 +374,7 @@ public class ServerAPIImpl implements ServerAPI {
                     @Override
                     public Object call() throws Exception {
                         try {
-                            return invokeAPI(new Object[0], apiImpl, method);
+                            return invokeAPI(method, apiImpl);
                         } catch (final Throwable cause) {
                             throw new ServerAPIRuntimeException(cause);
                         }
@@ -390,7 +388,6 @@ public class ServerAPIImpl implements ServerAPI {
             throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible", e);
         }
     }
-
 
     protected void logNodeNotStartedMessage(final String apiInterfaceName, final Method method) {
         logTechnicalErrorMessage("Node not started. Method '" + apiInterfaceName + "." + method.getName()
@@ -415,14 +412,15 @@ public class ServerAPIImpl implements ServerAPI {
     private boolean isNodeStarted() {
         try {
             final Object apiImpl = accessResolver.getAPIImplementation(PlatformAPI.class.getName());
-            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_NODE_STARTED_METHOD_NAME, new Class[0]);
-            return (Boolean) invokeAPI(new Object[0], apiImpl, method);
+            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_NODE_STARTED_METHOD_NAME);
+            return (Boolean) invokeAPI(method, apiImpl);
         } catch (final Throwable e) {
             return false;
         }
     }
 
-    protected Object invokeAPIInTransaction(final Object[] parametersValues, final Object apiImpl, final Method method, final Session session, final String apiInterfaceName) throws Throwable {
+    protected Object invokeAPIInTransaction(final Object[] parametersValues, final Object apiImpl, final Method method, final Session session,
+            final String apiInterfaceName) throws Throwable {
         if (session == null) {
             throw new BonitaRuntimeException("session is null");
         }
@@ -434,7 +432,7 @@ public class ServerAPIImpl implements ServerAPI {
             public Object call() throws Exception {
                 try {
                     checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */true);
-                    return invokeAPI(parametersValues, apiImpl, method);
+                    return invokeAPI(method, apiImpl, parametersValues);
                 } catch (final Throwable cause) {
                     throw new ServerAPIRuntimeException(cause);
                 }
@@ -446,7 +444,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     protected UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
             InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        UserTransactionService transactionService = null;
+        UserTransactionService transactionService;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
         switch (sessionType) {
@@ -463,11 +461,18 @@ public class ServerAPIImpl implements ServerAPI {
         return transactionService;
     }
 
-    protected Object invokeAPI(final Object[] parametersValues, final Object apiImpl, final Method method) throws Throwable {
+    protected Object invokeAPI(final Method method, final Object apiImpl, final Object... parametersValues) throws Throwable {
         try {
             return method.invoke(apiImpl, parametersValues);
         } catch (final InvocationTargetException e) {
             throw e.getCause();
+        }
+    }
+
+    private void warnIfDeprecated(Method method, String apiInterfaceName) {
+        if (technicalLogger != null && method.isAnnotationPresent(Deprecated.class)) {
+            technicalLogger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The API method " + apiInterfaceName + "." + method.getName()
+                    + " is deprecated. It will be deleted in a future release. Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.");
         }
     }
 
@@ -477,7 +482,7 @@ public class ServerAPIImpl implements ServerAPI {
             parameterTypes = new Class<?>[classNameParameters.size()];
             for (int i = 0; i < parameterTypes.length; i++) {
                 final String className = classNameParameters.get(i);
-                Class<?> classType = null;
+                Class<?> classType;
                 if ("int".equals(className)) {
                     classType = int.class;
                 } else if ("long".equals(className)) {
@@ -529,7 +534,7 @@ public class ServerAPIImpl implements ServerAPI {
                     }
 
                 });
-            } catch (final Exception e) {
+            } catch (final Exception ignored) {
                 // do not throw exceptions: it's just in case the platform was not in cache
             }
         }
@@ -538,6 +543,10 @@ public class ServerAPIImpl implements ServerAPI {
             classLoader = classLoaderService.getGlobalClassLoader();
         }
         return classLoader;
+    }
+
+    protected enum SessionType {
+        PLATFORM, API
     }
 
 }

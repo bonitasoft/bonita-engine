@@ -29,9 +29,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
@@ -42,9 +40,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -69,7 +64,6 @@ import org.powermock.api.mockito.PowerMockito;
 /**
  * @author Celine Souchet
  * @author Aurelien Pupier
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ServerAPIImplTest {
@@ -87,6 +81,9 @@ public class ServerAPIImplTest {
     private ServerWrappedException serverWrappedException;
 
     @Mock
+    private TechnicalLoggerService technicalLoggerService;
+
+    @Mock
     private AvailableWhenTenantIsPaused annotation;
 
     private ServerAPIImpl serverAPIImpl;
@@ -94,8 +91,8 @@ public class ServerAPIImplTest {
     @Before
     public void createServerAPI() {
         serverAPIImpl = new ServerAPIImpl(true, accessResolver);
+        serverAPIImpl.setTechnicalLogger(technicalLoggerService);
     }
-
 
     /**
      * Test method for
@@ -114,11 +111,7 @@ public class ServerAPIImplTest {
     }
 
     private void testCatchAndLogged(final Throwable toBeThrown)
-            throws BonitaHomeNotSetException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException,
-            BonitaHomeConfigurationException, IOException,
-            NoSuchMethodException, InvocationTargetException, SBonitaException,
-            Throwable, ServerWrappedException {
+            throws Throwable {
         final String apiInterfaceName = "apiInterfaceName";
         final String methodName = "methodName";
         final List<String> classNameParameters = new ArrayList<String>();
@@ -153,25 +146,29 @@ public class ServerAPIImplTest {
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(new Object());
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
-        doThrow(BonitaRuntimeException.class).when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
-        doReturn(new UserTransactionService(){
+        doThrow(BonitaRuntimeException.class).when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session),
+                eq(false));
+        doReturn(new UserTransactionService() {
+
             @Override
             public <T> T executeInTransaction(Callable<T> callable) throws Exception {
                 return callable.call();
             }
+
             @Override
             public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
             }
+
             @Override
             public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
             }
-        }).when(mockedServerAPIImpl).selectUserTransactionService(any(Session.class),any(ServerAPIImpl.SessionType.class));
+        }).when(mockedServerAPIImpl).selectUserTransactionService(any(Session.class), any(ServerAPIImpl.SessionType.class));
         try {
             // when:
             mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
         } finally {
             // then:
-            verify(mockedServerAPIImpl, never()).invokeAPI(any(Object[].class), anyString(), any(Method.class));
+            verify(mockedServerAPIImpl, never()).invokeAPI(any(Method.class), anyString(), any(Object[].class));
         }
     }
 
@@ -195,7 +192,7 @@ public class ServerAPIImplTest {
             mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
         } finally {
             // then:
-            verify(mockedServerAPIImpl).invokeAPI(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName));
+            verify(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
             verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), anyString());
         }
     }
@@ -214,14 +211,14 @@ public class ServerAPIImplTest {
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
         doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
-        doReturn(null).when(mockedServerAPIImpl).invokeAPI(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName));
+        doReturn(null).when(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
 
         try {
             // when:
             mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
         } finally {
             // then:
-            verify(mockedServerAPIImpl).invokeAPI(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName));
+            verify(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
             verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), anyString());
         }
     }
@@ -240,7 +237,8 @@ public class ServerAPIImplTest {
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
         doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
-        doReturn(null).when(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session, apiInterfaceName);
+        doReturn(null).when(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session,
+                apiInterfaceName);
 
         try {
             // when:
@@ -248,7 +246,7 @@ public class ServerAPIImplTest {
         } finally {
             // then:
             verify(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session, apiInterfaceName);
-            verify(mockedServerAPIImpl, never()).invokeAPI(any(Object[].class), anyString(), any(Method.class));
+            verify(mockedServerAPIImpl, never()).invokeAPI(any(Method.class), anyString(), any(Object[].class));
         }
     }
 
@@ -262,7 +260,7 @@ public class ServerAPIImplTest {
 
         // When:
         serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant", new Class[0]), session, false);
+                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant"), session, false);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -277,7 +275,7 @@ public class ServerAPIImplTest {
 
         // When:
         serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelFullyAccessibleAPI(), FakeTenantLevelFullyAccessibleAPI.class.getName(),
-                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod", new Class[0]), session, false);
+                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod"), session, false);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -292,7 +290,7 @@ public class ServerAPIImplTest {
 
         // When:
         serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
+                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant"), session, false);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -308,7 +306,7 @@ public class ServerAPIImplTest {
         try {
             // when:
             serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                    FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
+                    FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant"), session, false);
             fail("Should have thrown TenantStatusException");
         } catch (final TenantStatusException e) {
             assertThat(e.getMessage()).isEqualTo("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
@@ -327,7 +325,7 @@ public class ServerAPIImplTest {
         try {
             // when:
             serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                    FakeTenantLevelAPI.class.getMethod("canOnlyBeCalledOnPausedTenant", new Class[0]), session, false);
+                    FakeTenantLevelAPI.class.getMethod("canOnlyBeCalledOnPausedTenant"), session, false);
             fail("Should have thrown TenantStatusException");
         } catch (final TenantStatusException e) {
             // then:
@@ -347,7 +345,7 @@ public class ServerAPIImplTest {
 
         // When:
         serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
+                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant"), session, false);
 
     }
 
@@ -359,7 +357,7 @@ public class ServerAPIImplTest {
 
         // When:
         serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]), session, false);
+                FakeTenantLevelAPI.class.getMethod("platformAPIMethod"), session, false);
 
         // Then:
         verify(serverAPIImplSpy, never()).isTenantAvailable(anyLong(), any(Session.class), eq(false));
@@ -421,6 +419,63 @@ public class ServerAPIImplTest {
 
     protected APISessionImpl buildSession() {
         return buildSession(14L);
+    }
+
+    @Test
+    public void should_checkMethodAccessibility_do_not_warn_user_when_method_is_not_deprecated() throws Throwable {
+        //given
+        final Method callMe = MyObjectImpl.class.getDeclaredMethod("callMeNew");
+
+        //when
+        serverAPIImpl.checkMethodAccessibility(new MyObjectImpl(), MyObject.class.getName(), callMe, null, true);
+
+        //then
+        verify(technicalLoggerService, never()).log(
+                any(Class.class),
+                eq(TechnicalLogSeverity.WARNING),
+                anyString());
+
+    }
+
+    @Test
+    public void should_checkMethodAccessibility_warn_user_when_method_is_deprecated() throws Throwable {
+        //given
+        final Method callMe = MyObjectImpl.class.getDeclaredMethod("callMeOld");
+
+        //when
+        serverAPIImpl.checkMethodAccessibility(new MyObjectImpl(), MyObject.class.getName(), callMe, null, true);
+
+        //then
+        verify(technicalLoggerService).log(
+                ServerAPIImpl.class,
+                TechnicalLogSeverity.WARNING,
+                "The API method " + this.getClass().getName()
+                        + "$MyObject.callMeOld is deprecated. It will be deleted in a future release. Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.");
+
+    }
+
+    interface MyObject {
+
+        @Deprecated
+        @AvailableOnStoppedNode
+        void callMeOld();
+
+        @AvailableOnStoppedNode
+        void callMeNew();
+    }
+
+    class MyObjectImpl implements MyObject {
+
+        @Deprecated
+        @AvailableOnStoppedNode
+        public void callMeOld() {
+
+        }
+
+        @AvailableOnStoppedNode
+        public void callMeNew() {
+
+        }
     }
 
 }
