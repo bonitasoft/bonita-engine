@@ -1798,7 +1798,6 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final Expression queryBusinessDataExpression = new ExpressionBuilder().createQueryBusinessDataExpression("findQuery",
                 "Employee.find", List.class.getName(),
-                //                new ExpressionBuilder().createConstantStringExpression("lastName", "notExists")
                 dependencyStartIndex, dependencyMaxResults);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
