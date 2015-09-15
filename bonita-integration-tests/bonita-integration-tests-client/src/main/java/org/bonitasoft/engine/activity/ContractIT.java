@@ -192,17 +192,22 @@ public class ContractIT extends CommonAPIIT {
     public void should_getUserTaskContract_return_contract_with_complex_inputs() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
+        builder.addDocumentDefinition("myDoc")
+                .addInitialValue(new ExpressionBuilder().createContractInputExpression("reportInit", FileInputValue.class.getName()));
         //given
-        final ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME).addContract();
+        ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME).addContract();
         contractDefinitionBuilder
                 .addComplexInput("expenseLine", "expense report line", true)
                 .addInput("date", Type.DATE, "expense date")
                 .addInput("amount", Type.DECIMAL, "expense amount")
                 .addComplexInput("date", "expense date").addInput("expenseType", Type.TEXT, "describe expense type");
         contractDefinitionBuilder.addFileInput("report", "myReport");
+        contractDefinitionBuilder = builder.addContract();
+        contractDefinitionBuilder.addFileInput("reportInit", "myReport");
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
-        getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
+                Collections.<String, Serializable>singletonMap("reportInit", new FileInputValue("theFile", "theContent".getBytes())));
         final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
 
         //then
@@ -217,6 +222,9 @@ public class ContractIT extends CommonAPIIT {
         assertThat(fileInput.getInputs()).hasSize(2);
         assertThat(fileInput.getInputs()).containsExactly(new InputDefinitionImpl("filename", "Name of the file"),
                 new InputDefinitionImpl("content", "Content of the file"));
+        final Document myDoc = getProcessAPI().getLastDocument(processInstance.getId(), "myDoc");
+        final byte[] documentContent = getProcessAPI().getDocumentContent(myDoc.getContentStorageId());
+        assertThat(new String(documentContent)).isEqualTo("theContent");
 
         //clean up
         disableAndDeleteProcess(processDefinition);
