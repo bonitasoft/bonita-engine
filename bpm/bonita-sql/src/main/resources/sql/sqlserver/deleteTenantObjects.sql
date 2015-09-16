@@ -26,8 +26,6 @@ DELETE FROM arch_flownode_instance WHERE tenantid = ${tenantid}
 GO
 DELETE FROM arch_process_instance WHERE tenantid = ${tenantid}
 GO
-DELETE FROM arch_transition_instance  WHERE tenantid = ${tenantid}
-GO
 DELETE FROM arch_connector_instance  WHERE tenantid = ${tenantid}
 GO
 DELETE FROM multi_biz_data WHERE tenantid = ${tenantid}
