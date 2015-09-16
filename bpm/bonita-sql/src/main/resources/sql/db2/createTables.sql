@@ -103,7 +103,6 @@ CREATE TABLE process_definition (
   deployedBy BIGINT NOT NULL,
   activationState VARCHAR(90) NOT NULL,
   configurationState VARCHAR(90) NOT NULL,
-  migrationDate BIGINT,
   displayName VARCHAR(225),
   displayDescription VARCHAR(765),
   lastUpdateDate BIGINT,
@@ -173,7 +172,6 @@ CREATE TABLE arch_process_instance (
   lastUpdate BIGINT NOT NULL,
   rootProcessInstanceId BIGINT,
   callerId BIGINT,
-  migration_plan BIGINT,
   sourceObjectId BIGINT NOT NULL,
   stringIndex1 VARCHAR(765),
   stringIndex2 VARCHAR(765),
@@ -196,7 +194,7 @@ CREATE TABLE arch_flownode_instance (
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
   name VARCHAR(765) NOT NULL,
-  displayName VARCHAR(765) ,
+  displayName VARCHAR(765),
   displayDescription VARCHAR(765),
   stateId INT NOT NULL,
   stateName VARCHAR(150),
@@ -296,7 +294,6 @@ CREATE TABLE process_instance (
   callerId BIGINT,
   callerType VARCHAR(150),
   interruptingEventId BIGINT,
-  migration_plan BIGINT,
   stringIndex1 VARCHAR(765),
   stringIndex2 VARCHAR(765),
   stringIndex3 VARCHAR(765),
@@ -454,18 +451,6 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
-
-CREATE TABLE breakpoint (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	state_id INT NOT NULL,
-  	int_state_id INT NOT NULL,
-  	elem_name VARCHAR(765) NOT NULL,
-  	inst_scope SMALLINT NOT NULL,
-  	inst_id BIGINT NOT NULL,
-  	def_id BIGINT NOT NULL,
-  	PRIMARY KEY (tenantid, id)
-);
 
 CREATE TABLE ref_biz_data_inst (
 	tenantid BIGINT NOT NULL,
@@ -893,6 +878,7 @@ CREATE TABLE platform (
   initialVersion VARCHAR(150) NOT NULL,
   created BIGINT NOT NULL,
   createdBy VARCHAR(150) NOT NULL,
+  information CLOB(2G),
   PRIMARY KEY (id)
 );
 
@@ -1007,6 +993,7 @@ CREATE TABLE form_mapping (
   page_mapping_id BIGINT,
   lastUpdateDate BIGINT,
   lastUpdatedBy BIGINT,
+  target VARCHAR(48) NOT NULL,
   PRIMARY KEY (tenantId, id)
 );
 
