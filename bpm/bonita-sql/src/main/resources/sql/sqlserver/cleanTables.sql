@@ -22,8 +22,6 @@ DELETE FROM document
 GO
 DELETE FROM document_mapping
 GO
-DELETE FROM arch_transition_instance
-GO
 DELETE FROM arch_flownode_instance
 GO
 DELETE FROM arch_process_instance

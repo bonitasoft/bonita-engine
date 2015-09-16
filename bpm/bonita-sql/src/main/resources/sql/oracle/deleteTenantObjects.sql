@@ -12,7 +12,6 @@ DELETE FROM document WHERE tenantid = ${tenantid};
 DELETE FROM document_mapping WHERE tenantid = ${tenantid};
 DELETE FROM arch_flownode_instance WHERE tenantid = ${tenantid};
 DELETE FROM arch_process_instance WHERE tenantid = ${tenantid};
-DELETE FROM arch_transition_instance  WHERE tenantid = ${tenantid};
 DELETE FROM arch_connector_instance  WHERE tenantid = ${tenantid};
 DELETE FROM multi_biz_data WHERE tenantid = ${tenantid};
 DELETE FROM ref_biz_data_inst WHERE tenantid = ${tenantid};
