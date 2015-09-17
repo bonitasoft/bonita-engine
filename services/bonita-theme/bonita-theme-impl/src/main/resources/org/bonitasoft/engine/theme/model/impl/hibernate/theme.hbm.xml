@@ -12,8 +12,8 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<property name="isDefault" column="isDefault" />
-		<property name="content" column="content" />
-		<property name="cssContent" column="cssContent" />
+		<property name="content" type="materialized_blob" column="content" />
+		<property name="cssContent" type="materialized_blob" column="cssContent" />
 		<property name="lastUpdateDate" column="lastUpdateDate" />
 		<property name="type" column="type">
 			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">

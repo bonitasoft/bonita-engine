@@ -17,6 +17,11 @@ import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PAR
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
 
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -140,6 +146,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         if (dialect != null) {
             if (dialect.contains("PostgreSQL")) {
                 configuration.setInterceptor(new PostgresInterceptor());
+                configuration.registerTypeOverride(new PostgresMaterializedBlobType());
             } else if (dialect.contains("SQLServer")) {
                 configuration.setInterceptor(new SQLServerInterceptor());
             }
@@ -754,6 +761,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             }
         }
     }
+
 
     public Map<String, String> getClassAliasMappings() {
         return classAliasMappings;

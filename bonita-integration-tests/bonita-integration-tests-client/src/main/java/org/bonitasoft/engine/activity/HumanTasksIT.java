@@ -64,8 +64,8 @@ public class HumanTasksIT extends TestWithUser {
     "Column too short" })
     @Test
     public void can_creatte_FlowNodeInstance_with_several_non_ascii_characters() throws Exception {
-        final String taskDisplayName = "Žingsnis, kuriame paraiškos teikėjas gali laisvai užpildyti duomenis, ąčęė ";
-        final String taskName = "task1क्तु क्तु क्तु क्तु क्तु paraiškos teikėjas Ž";
+        final String taskDisplayName = "àéò€çhahaאת ארץ בדפים מוסיקה לעברית. בקר גם טיפול פיסיקה, דת מתן בישול רומנית תחבורה. אל בידור מדויקים ואלקטרוניקה זאת נפלו.أملاً النزاع الصعداء بل الى. ان اتفاقية بالمطالبة ويكيبيديا، جُل. في كان بالجانب والديون الإتفاقية. لها المسرح وبولندا وبلجيكا، أي.";
+        final String taskName = "task1क्तु क्तु क्तु क्तु क्तु paraiškos teikėjas Žcheck this out 新フリぶ番高ホアリメ医意治せ羽装セヱ青済ルよじえ痛楽ぜは性位加嶋ケナ日者コ球量ミルシ異本たてふ火8在な日治じわあひ掲図トおぜ発審員ルをさレ。小スユヱイ写多キクオラ里数ンたレだ異分準ヲ念67券ド角続構ソ打政リレウテ社式築ワカエ川顔せー料開みドょわ北真メヲ齢記ヒチ山抱診露えっン。載ル定出へえぴ勝上ふのこ八抹なおぞ現負よッや新4省1開盛ょべせ東87令計のご導応ヘユレ対純霊真接スさほ。";
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
