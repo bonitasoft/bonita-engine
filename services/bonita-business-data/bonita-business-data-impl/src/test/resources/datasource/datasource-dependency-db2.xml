@@ -29,6 +29,7 @@
                 <prop key="portNumber">${db.server.port}</prop>
                 <prop key="databaseName">${db.database.name}</prop>
                 <prop key="retrieveMessagesFromServerOnGetMessage">true</prop>
+                <prop key="driverType">4</prop>
 			</props>
 		</property>
 	</bean>
