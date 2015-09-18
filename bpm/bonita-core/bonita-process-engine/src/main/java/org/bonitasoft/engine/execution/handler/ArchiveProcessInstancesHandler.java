@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.handler;
 
 import java.util.UUID;
 
-import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -27,7 +26,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -66,17 +64,14 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final ArchiveService archiveService = tenantServiceAccessor.getArchiveService();
             final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-            final DataInstanceService dataInstanceService = tenantServiceAccessor.getDataInstanceService();
             final DocumentService documentService = tenantServiceAccessor.getDocumentService();
             final SCommentService commentService = tenantServiceAccessor.getCommentService();
             final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
             final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
             ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
 
-            ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentService,
+            ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService,
                     logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService);
-        } catch (final SArchivingException e) {
-            throw new SHandlerExecutionException(e);
         } catch (SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }

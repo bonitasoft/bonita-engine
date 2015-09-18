@@ -83,10 +83,9 @@ public class ProcessArchiver {
     private static final int BATCH_SIZE = 100;
 
     public static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
-            final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
-            final DocumentService documentService, final TechnicalLoggerService logger,
+            final ProcessInstanceService processInstanceService, final DocumentService documentService, final TechnicalLoggerService logger,
             final SCommentService commentService, final ProcessDefinitionService processDefinitionService,
-                                              final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) throws SArchivingException {
+            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) throws SArchivingException {
 
         //set the classloader to this process because we need it e.g. to archive data instance
 
@@ -101,34 +100,31 @@ public class ProcessArchiver {
         Thread.currentThread().setContextClassLoader(processClassLoader);
         try {
 
-        final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
-        final long archiveDate = saProcessInstance.getEndDate();
+            final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
+            final long archiveDate = saProcessInstance.getEndDate();
 
-        SProcessDefinition processDefinition = null;
-        try {
-            processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-        } catch (final SBonitaException e) {
-            throw new SArchivingException(e);
-        }
-        if (!processDefinition.getProcessContainer().getDataDefinitions().isEmpty()) {
-            // Archive SADataInstance
-            archiveDataInstances(processDefinition, processInstance, dataInstanceService, archiveDate);
-        }
-        // Archive SComment
-        archiveComments(processDefinition, processInstance, commentService, archiveDate);
+            SProcessDefinition processDefinition;
+            try {
+                processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+            } catch (final SBonitaException e) {
+                throw new SArchivingException(e);
+            }
+            // The archive of data instance is not done because it is done on creation + when updating.
+            // Archive SComment
+            archiveComments(processDefinition, processInstance, commentService, archiveDate);
 
-        // archive document mappings
-        archiveDocumentMappings(processDefinition, processInstance, documentService, archiveDate);
+            // archive document mappings
+            archiveDocumentMappings(processDefinition, processInstance, documentService, archiveDate);
 
-        if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
-            archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
-        }
+            if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
+                archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
+            }
 
-        // Archive
-        archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
+            // Archive
+            archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
-    }
+        }
 
     }
 
@@ -218,30 +214,6 @@ public class ProcessArchiver {
         e.setProcessDefinitionIdOnContext(processInstance.getProcessDefinitionId());
         e.setProcessDefinitionNameOnContext(processDefinition.getName());
         e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
-    }
-
-    private static void archiveDataInstances(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final DataInstanceService dataInstanceService, final long archiveDate) throws SArchivingException {
-        try {
-            final long processInstanceId = processInstance.getId();
-            final int archiveBatchSize = 50;
-            int currentIndex = 0;
-            List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId,
-                    DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
-                    archiveBatchSize);
-
-            while (sDataInstances != null && sDataInstances.size() > 0) {
-                for (final SDataInstance sDataInstance : sDataInstances) {
-                    dataInstanceService.archiveDataInstance(sDataInstance, archiveDate);
-                }
-                currentIndex += archiveBatchSize;
-                sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
-                        archiveBatchSize);
-            }
-        } catch (final SDataInstanceException e) {
-            setExceptionContext(processDefinition, processInstance, e);
-            throw new SArchivingException("Unable to archive the process instance.", e);
-        }
     }
 
     private static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final ArchiveService archiveService, final long archiveDate)

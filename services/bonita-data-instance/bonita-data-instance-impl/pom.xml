@@ -87,5 +87,11 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.events</groupId>
+            <artifactId>bonita-events-api-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
