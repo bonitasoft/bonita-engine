@@ -30,6 +30,9 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.IOUtil;
 
 /**
+ *
+ * Handles process related files of the bonita home
+ *
  * @author Baptiste Mesta
  */
 public class ProcessManager {

@@ -24,6 +24,9 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.PropertiesManager;
 
 /**
+ *
+ * Handles tenant creation/deletion in the bonita home
+ *
  * @author Baptiste Mesta
  */
 public class TenantManager {

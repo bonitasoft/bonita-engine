@@ -22,6 +22,10 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.IOUtil;
 
 /**
+ *
+ * Handles tenant related files of the bonita home, mainly bdm and security scripts
+ *
+ *
  * @author Baptiste Mesta
  */
 public class TenantStorage {
