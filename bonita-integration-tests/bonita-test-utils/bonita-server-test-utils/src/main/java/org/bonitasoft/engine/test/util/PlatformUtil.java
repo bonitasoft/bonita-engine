@@ -47,7 +47,7 @@ public class PlatformUtil {
                     false);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
-            BonitaHomeServer.getInstance().createTenant(tenant.getId());
+            BonitaHomeServer.getInstance().getTenantManager().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
             return tenant.getId();
         } finally {
@@ -65,7 +65,7 @@ public class PlatformUtil {
                     .createNewInstance(tenantName, createdBy, created, status, true);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
-            BonitaHomeServer.getInstance().createTenant(tenant.getId());
+            BonitaHomeServer.getInstance().getTenantManager().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
             return tenant.getId();
         } finally {

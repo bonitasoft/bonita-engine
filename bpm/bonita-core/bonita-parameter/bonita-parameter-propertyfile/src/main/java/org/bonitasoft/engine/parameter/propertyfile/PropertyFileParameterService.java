@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -91,17 +90,17 @@ public class PropertyFileParameterService implements ParameterService {
 
     private void saveProperties(final Properties properties, final long tenantId, final long processId) throws IOException, SCacheException, BonitaHomeNotSetException {
         cacheService.store(CACHE_NAME, getCacheKey(tenantId, processId), properties);
-        BonitaHomeServer.getInstance().storeParameters(tenantId, processId, properties);
+        BonitaHomeServer.getInstance().getProcessManager().storeParameters(tenantId, processId, properties);
     }
 
     @Override
     public void deleteAll(final long processDefinitionId) throws SParameterProcessNotFoundException {
         try {
             final long tenantId = sessionAccessor.getTenantId();
-            if (!BonitaHomeServer.getInstance().hasParameters(tenantId, processDefinitionId)) {
+            if (!BonitaHomeServer.getInstance().getProcessManager().hasParameters(tenantId, processDefinitionId)) {
                 throw new SParameterProcessNotFoundException("The process definition " + processDefinitionId + " does not exist");
             }
-            final boolean isDeleted = BonitaHomeServer.getInstance().deleteParameters(tenantId, processDefinitionId);
+            final boolean isDeleted = BonitaHomeServer.getInstance().getProcessManager().deleteParameters(tenantId, processDefinitionId);
             if (!isDeleted) {
                 throw new SParameterProcessNotFoundException("The property file was not deleted properly");
             }
@@ -195,7 +194,7 @@ public class PropertyFileParameterService implements ParameterService {
         if (object != null) {
             properties = (Properties) object;
         } else {
-            properties = BonitaHomeServer.getInstance().getParameters(tenantId, processId);
+            properties = BonitaHomeServer.getInstance().getProcessManager().getParameters(tenantId, processId);
             cacheService.store(CACHE_NAME, key, properties);
         }
         return properties;

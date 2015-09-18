@@ -34,6 +34,11 @@ import java.util.Properties;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.home.ProcessManager;
+import org.bonitasoft.engine.parameter.OrderBy;
+import org.bonitasoft.engine.parameter.SParameter;
+import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
+import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,11 +46,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-
-import org.bonitasoft.engine.parameter.OrderBy;
-import org.bonitasoft.engine.parameter.SParameter;
-import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
-import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -61,6 +61,8 @@ public class PropertyFileParameterServiceTest {
 
     @Mock
     private BonitaHomeServer bonitaHomeServer;
+    @Mock
+    private ProcessManager processManager;
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
@@ -77,6 +79,7 @@ public class PropertyFileParameterServiceTest {
         mockStatic(BonitaHomeServer.class);
 
         when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
+        when(bonitaHomeServer.getProcessManager()).thenReturn(processManager);
 
         when(sessionAccessor.getTenantId()).thenReturn(T_ID);
 
@@ -97,15 +100,15 @@ public class PropertyFileParameterServiceTest {
     public void update() throws Exception {
         final Map<String, String> initial = Collections.<String, String> singletonMap("aParam", "paramValue");
         propertyFileParameterService.addAll(P_ID, initial);
-        verify(bonitaHomeServer, times(1)).storeParameters(T_ID, P_ID, getProperties(initial));
+        verify(processManager, times(1)).storeParameters(T_ID, P_ID, getProperties(initial));
 
-        doReturn(getProperties(initial)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(initial)).when(processManager).getParameters(T_ID, P_ID);
         propertyFileParameterService.update(P_ID, "aParam", "newValue");
         final Map<String, String> updated = Collections.<String, String> singletonMap("aParam", "newValue");
-        verify(bonitaHomeServer, times(1)).storeParameters(T_ID, P_ID, getProperties(updated));
+        verify(processManager, times(1)).storeParameters(T_ID, P_ID, getProperties(updated));
 
 
-        doReturn(getProperties(updated)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(updated)).when(processManager).getParameters(T_ID, P_ID);
         assertEquals("newValue", propertyFileParameterService.get(P_ID, "aParam").getValue());
     }
 
@@ -113,7 +116,7 @@ public class PropertyFileParameterServiceTest {
     public void updateParameterWithNullValue() throws Exception {
         final Map<String, String> initial = Collections.<String, String> singletonMap("aParam", "paramValue");
         propertyFileParameterService.addAll(P_ID, initial);
-        doReturn(getProperties(initial)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(initial)).when(processManager).getParameters(T_ID, P_ID);
         propertyFileParameterService.update(P_ID, "aParam", null);
 
         assertEquals(null, propertyFileParameterService.get(P_ID, "aParam").getValue());
@@ -121,7 +124,7 @@ public class PropertyFileParameterServiceTest {
 
     @Test(expected = SParameterNameNotFoundException.class)
     public void updateUnexistingParameter() throws Exception {
-        doReturn(new Properties()).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(new Properties()).when(processManager).getParameters(T_ID, P_ID);
         propertyFileParameterService.update(P_ID, "aParam", "newValue");
     }
 
@@ -133,8 +136,8 @@ public class PropertyFileParameterServiceTest {
         parameters.put("param3", "value3");
         propertyFileParameterService.addAll(P_ID, parameters);
         final Properties properties = getProperties(parameters);
-        doReturn(properties).when(bonitaHomeServer).getParameters(T_ID, P_ID);
-        verify(bonitaHomeServer, times(1)).storeParameters(T_ID, P_ID, properties);
+        doReturn(properties).when(processManager).getParameters(T_ID, P_ID);
+        verify(processManager, times(1)).storeParameters(T_ID, P_ID, properties);
         assertEquals("value1", propertyFileParameterService.get(P_ID, "param1").getValue());
         assertEquals("value2", propertyFileParameterService.get(P_ID, "param2").getValue());
         assertEquals("value3", propertyFileParameterService.get(P_ID, "param3").getValue());
@@ -143,19 +146,19 @@ public class PropertyFileParameterServiceTest {
     @Test
     public void deleteAll() throws Exception {
         propertyFileParameterService.addAll(P_ID, Collections.<String, String> singletonMap("param", "test"));
-        doReturn(true).when(bonitaHomeServer).hasParameters(T_ID, P_ID);
-        doReturn(true).when(bonitaHomeServer).deleteParameters(T_ID, P_ID);
+        doReturn(true).when(processManager).hasParameters(T_ID, P_ID);
+        doReturn(true).when(processManager).deleteParameters(T_ID, P_ID);
         propertyFileParameterService.deleteAll(P_ID);
-        doReturn(false).when(bonitaHomeServer).hasParameters(T_ID, P_ID);
+        doReturn(false).when(processManager).hasParameters(T_ID, P_ID);
         propertyFileParameterService.addAll(P_ID, null);
-        doReturn(new Properties()).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(new Properties()).when(processManager).getParameters(T_ID, P_ID);
         final List<SParameter> list = propertyFileParameterService.get(P_ID, 0, 10, OrderBy.NAME_ASC);
         assertTrue(list.isEmpty());
     }
 
     @Test(expected = SParameterProcessNotFoundException.class)
     public void deleteAllWhenParametersDoesNotExists() throws Exception {
-        doReturn(false).when(bonitaHomeServer).hasParameters(T_ID, P_ID);
+        doReturn(false).when(processManager).hasParameters(T_ID, P_ID);
         propertyFileParameterService.deleteAll(P_ID);
     }
 
@@ -163,7 +166,7 @@ public class PropertyFileParameterServiceTest {
     public void containsNullValues() throws Exception {
         final Map<String, String> initial = Collections.<String, String> singletonMap("nullParam", null);
         propertyFileParameterService.addAll(P_ID, initial);
-        doReturn(getProperties(initial)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(initial)).when(processManager).getParameters(T_ID, P_ID);
         assertTrue(propertyFileParameterService.containsNullValues(P_ID));
     }
 
@@ -171,7 +174,7 @@ public class PropertyFileParameterServiceTest {
     public void notContainsNullValues() throws Exception {
         final Map<String, String> initial = Collections.<String, String> singletonMap("param", "test");
         propertyFileParameterService.addAll(P_ID, initial);
-        doReturn(getProperties(initial)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(initial)).when(processManager).getParameters(T_ID, P_ID);
         assertFalse(propertyFileParameterService.containsNullValues(P_ID));
     }
 
@@ -185,7 +188,7 @@ public class PropertyFileParameterServiceTest {
     public void getParameter() throws Exception {
         final Map<String, String> initial = Collections.<String, String> singletonMap("aParam", "paramValue");
         propertyFileParameterService.addAll(P_ID, initial);
-        doReturn(getProperties(initial)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(initial)).when(processManager).getParameters(T_ID, P_ID);
 
         final SParameter sParameter = propertyFileParameterService.get(P_ID, "aParam");
         assertEquals("paramValue", sParameter.getValue());
@@ -206,7 +209,7 @@ public class PropertyFileParameterServiceTest {
     public void getUnexistingParameter() throws Exception {
         final Map<String, String> initial = Collections.<String, String> singletonMap("otherParam", "paramValue");
         propertyFileParameterService.addAll(P_ID, initial);
-        doReturn(getProperties(initial)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(initial)).when(processManager).getParameters(T_ID, P_ID);
         propertyFileParameterService.get(P_ID, "aParam");
     }
 
@@ -217,7 +220,7 @@ public class PropertyFileParameterServiceTest {
         map.put("a", "value1");
         map.put("b", "value2");
         propertyFileParameterService.addAll(P_ID, map);
-        doReturn(getProperties(map)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(map)).when(processManager).getParameters(T_ID, P_ID);
 
         final List<SParameter> list = propertyFileParameterService.get(P_ID, 0, 10, OrderBy.NAME_ASC);
         assertEquals("value1", list.get(0).getValue());
@@ -233,7 +236,7 @@ public class PropertyFileParameterServiceTest {
         map.put("a", "value1");
         map.put("b", "value2");
         propertyFileParameterService.addAll(P_ID, map);
-        doReturn(getProperties(map)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(map)).when(processManager).getParameters(T_ID, P_ID);
 
         final List<SParameter> list = propertyFileParameterService.get(P_ID, 0, 10, OrderBy.NAME_DESC);
         assertEquals("value3", list.get(0).getValue());
@@ -251,7 +254,7 @@ public class PropertyFileParameterServiceTest {
         map.put("d", "value4");
         map.put("e", "value5");
         propertyFileParameterService.addAll(P_ID, map);
-        doReturn(getProperties(map)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(map)).when(processManager).getParameters(T_ID, P_ID);
 
         final List<SParameter> list = propertyFileParameterService.get(P_ID, 2, 2, OrderBy.NAME_ASC);
         assertEquals("value3", list.get(0).getValue());
@@ -265,7 +268,7 @@ public class PropertyFileParameterServiceTest {
         map.put("a", "value1");
         map.put("b", "value2");
         propertyFileParameterService.addAll(P_ID, map);
-        doReturn(getProperties(map)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(map)).when(processManager).getParameters(T_ID, P_ID);
 
         final List<SParameter> list = propertyFileParameterService.get(P_ID, 2, 10, OrderBy.NAME_ASC);
         assertEquals(0, list.size());
@@ -278,7 +281,7 @@ public class PropertyFileParameterServiceTest {
         map.put("emptyParam", "");
         map.put("notEmptyParam", "value");
         propertyFileParameterService.addAll(P_ID, map);
-        doReturn(getProperties(map)).when(bonitaHomeServer).getParameters(T_ID, P_ID);
+        doReturn(getProperties(map)).when(processManager).getParameters(T_ID, P_ID);
 
         final List<SParameter> nullValues = propertyFileParameterService.getNullValues(P_ID, 0, 10, OrderBy.NAME_ASC);
 

@@ -770,7 +770,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         final long tenantId = getTenantAccessor().getTenantId();
         try {
-            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
+            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
@@ -778,7 +778,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
             throws BonitaHomeNotSetException, IOException {
-        BonitaHomeServer.getInstance().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
+        BonitaHomeServer.getInstance().getProcessManager().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
     }
 
     @Override
@@ -2353,7 +2353,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
         final Map<String, byte[]> processResources;
         try {
-            processResources = BonitaHomeServer.getInstance().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
+            processResources = BonitaHomeServer.getInstance().getProcessManager().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
         } catch (BonitaHomeNotSetException e) {
             throw new RetrieveException(e);
         } catch (IOException e) {
