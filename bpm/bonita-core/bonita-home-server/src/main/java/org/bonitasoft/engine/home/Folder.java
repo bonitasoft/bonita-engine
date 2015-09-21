@@ -72,6 +72,12 @@ public class Folder {
         return new File(folder, name);
     }
 
+    public byte[] getFileContent(final String name) throws IOException {
+        checkFolderExists();
+        final File file = new File(folder, name);
+        return IOUtil.getAllContentFrom(file);
+    }
+
     public File newFile(final String name) throws IOException {
         checkFolderExists();
         final File newFile = new File(folder, name);

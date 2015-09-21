@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.filter.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +42,7 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -168,14 +168,14 @@ public class UserFilterServiceImpl implements UserFilterService {
     public boolean loadUserFilters(final long processDefinitionId, final long tenantId) throws SUserFilterLoadingException {
         boolean resolved = true;// should return false if there is nothing loaded + something in the definition
         try {
-            final File[] listFiles = BonitaHomeServer.getInstance().getUserFiltersFiles(tenantId, processDefinitionId);
+            final List<BonitaResource> listFiles = BonitaHomeServer.getInstance().getProcessManager().getUserFiltersFiles(tenantId, processDefinitionId);
             final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
-            for (final File file : listFiles) {
+            for (final BonitaResource file : listFiles) {
                 final String name = file.getName();
                 if (pattern.matcher(name).matches()) {
                     UserFilterImplementationDescriptor userFilterImplementationDescriptor = null;
                     try {
-                        final Object objectFromXML = parser.getObjectFromXML(file);
+                        final Object objectFromXML = parser.getObjectFromXML(file.getContent());
                         userFilterImplementationDescriptor = (UserFilterImplementationDescriptor) objectFromXML;
                         if (userFilterImplementationDescriptor == null) {
                             throw new SUserFilterLoadingException("Can not parse ConnectorImplementation XML. The file name is " + name);
@@ -184,9 +184,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                                 FILTER_CACHE_NAME,
                                 getUserFilterImplementationIdInCache(processDefinitionId, userFilterImplementationDescriptor.getDefinitionId(),
                                         userFilterImplementationDescriptor.getDefinitionVersion()), userFilterImplementationDescriptor);
-                    } catch (final IOException e) {
-                        throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
-                    } catch (final SXMLParseException e) {
+                    } catch (final IOException | SXMLParseException e) {
                         throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
                     } catch (final SCacheException e) {
                         throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);

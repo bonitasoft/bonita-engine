@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.incident;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
     private final Map<Long, Logger> loggers;
 
     public FileLoggerIncidentHandler() {
-        loggers = new HashMap<Long, Logger>(2);
+        loggers = new HashMap<>(2);
     }
 
     @Override
@@ -52,11 +51,7 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
             if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
                 logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);
             }
-        } catch (final SecurityException e) {
-            e.printStackTrace();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        } catch (BonitaHomeNotSetException e) {
+        } catch (final SecurityException | IOException | BonitaHomeNotSetException e) {
             e.printStackTrace();
         }
     }
@@ -65,7 +60,7 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
         Logger logger = loggers.get(tenantId);
         if (logger == null) {
             logger = Logger.getLogger("INCIDENT" + tenantId);
-            final FileHandler fh = BonitaHomeServer.getInstance().getIncidentFileHandler(tenantId);
+            final FileHandler fh = BonitaHomeServer.getInstance().getTenantStorage().getIncidentFileHandler(tenantId);
             logger.addHandler(fh);
             final SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
