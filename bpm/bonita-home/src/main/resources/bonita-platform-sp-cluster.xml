@@ -59,6 +59,7 @@
 				<property name="instanceName" value="${bonita.cluster.name}" />
 				<property name="networkConfig">
 					<bean class="com.hazelcast.config.NetworkConfig">
+						<property name="portAutoIncrement" value="${bonita.platform.cluster.hazelcast.portAutoIncrement:true}"/>
 						<property name="join">
 							<bean class="com.hazelcast.config.JoinConfig">
 								<property name="multicastConfig">
@@ -66,6 +67,25 @@
 										<property name="enabled" value="${bonita.platform.cluster.hazelcast.multicast.enabled}" />
 										<property name="multicastGroup" value="${bonita.platform.cluster.hazelcast.multicast.multicastGroup}" />
 										<property name="multicastPort" value="${bonita.platform.cluster.hazelcast.multicast.multicastPort}" />
+									</bean>
+								</property>
+								<property name="tcpIpConfig">
+									<bean class="com.hazelcast.config.TcpIpConfig">
+										<property name="enabled" value="${bonita.platform.cluster.hazelcast.tcpip.enabled:false}" />
+										<property name="members" value="${bonita.platform.cluster.hazelcast.tcpip.members:separatedByCommaAddresses}" />
+									</bean>
+								</property>
+								<property name="awsConfig">
+									<bean class="com.hazelcast.config.AwsConfig">
+										<property name="enabled" value="${bonita.platform.cluster.hazelcast.aws.enabled:false}" />
+										<property name="accessKey" value="${bonita.platform.cluster.hazelcast.aws.accessKey:accessKey}" />
+										<property name="secretKey" value="${bonita.platform.cluster.hazelcast.aws.secretKey:secretKey}" />
+										<property name="region" value="${bonita.platform.cluster.hazelcast.aws.region:eu-west-1}" />
+										<property name="securityGroupName" value="${bonita.platform.cluster.hazelcast.aws.securityGroupName:#{null}}" />
+										<property name="tagKey" value="${bonita.platform.cluster.hazelcast.aws.tagKey:#{null}}" />
+										<property name="tagValue" value="${bonita.platform.cluster.hazelcast.aws.tagValue:#{null}}" />
+										<property name="hostHeader" value="${bonita.platform.cluster.hazelcast.aws.hostHeader:ec2.amazonaws.com}" />
+										<property name="connectionTimeoutSeconds" value="${bonita.platform.cluster.hazelcast.aws.connectionTimeoutSeconds:5}" />
 									</bean>
 								</property>
 							</bean>
