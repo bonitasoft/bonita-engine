@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.bpm.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.bonitasoft.engine.bpm.bar.actorMapping.Actor;
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -34,9 +34,10 @@ public class BusinessArchiveBuilderTest {
     BusinessArchiveBuilder archive;
 
     @Before
-    public void initialization(){
+    public void initialization() {
         archive.createNewBusinessArchive();
     }
+
     @Test
     public void addFormMappingsShouldAddFileWithProperName() throws Exception {
         final FormMappingModel inputModel = new FormMappingModel();
@@ -50,10 +51,10 @@ public class BusinessArchiveBuilderTest {
     }
 
     @Test
-    public void Utest_deprecated_Import_Actor_Mapping() throws Exception {
-        String xmlString = "<?xml version=" + '"' + "1.0" + '"' + " encoding=" + '"' + "UTF-8" + '"' + "?>"
-                + "<actormappings:actorMappings xmlns:actormappings=" + '"' + "http://www.bonitasoft.org/ns/actormapping/6.0" + '"' + ">"
-                + "<actorMapping name=" + '"' + "Employee actor" + '"' + ">"
+    public void ensure_deprecated_setActorMapping_still_works() throws Exception {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<actorMappings xmlns=\"http://www.bonitasoft.org/ns/actormapping/6.0\">"
+                + "<actorMapping name=\"Employee actor\">"
                 + "<users>"
                 + "<user>john</user>"
                 + "</users>"
@@ -70,9 +71,16 @@ public class BusinessArchiveBuilderTest {
                 + "</membership>"
                 + "</memberships>"
                 + "</actorMapping>"
-                + "</actormappings:actorMappings>";
+                + "</actorMappings>";
         byte[] xmlContent = xmlString.getBytes();
         archive.setActorMapping(xmlContent);
-        verify(archive, times(1)).setActorMapping((ActorMapping) any());
+        final ActorMapping actorMapping = new ActorMapping();
+        final Actor actor = new Actor("Employee actor");
+        actorMapping.addActor(actor);
+        actor.addUser("john");
+        actor.addRole("dev");
+        actor.addGroup("/RD");
+        actor.addMembership("/RD", "dev");
+        verify(archive, times(1)).setActorMapping(actorMapping);
     }
 }

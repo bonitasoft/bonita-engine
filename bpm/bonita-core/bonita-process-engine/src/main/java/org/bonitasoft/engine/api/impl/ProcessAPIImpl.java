@@ -554,7 +554,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
-            throws SBonitaException {
+            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         List<ProcessInstance> processInstances;
         final int maxResults = 1000;
         do {
@@ -566,7 +566,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<ProcessInstance> processInstances, final long tenantId) throws SBonitaException {
+            final List<ProcessInstance> processInstances, final long tenantId) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final List<Long> processInstanceIds = new ArrayList<Long>(processInstances.size());
         for (final ProcessInstance processInstance : processInstances) {
             processInstanceIds.add(processInstance.getId());
@@ -575,7 +575,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesInsideLocksFromIds(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<Long> processInstanceIds, final long tenantId) throws SBonitaException {
+            final List<Long> processInstanceIds, final long tenantId) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         final List<Long> lockedProcesses = new ArrayList<Long>();
@@ -613,7 +613,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesInTransaction(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<Long> processInstanceIds) throws SBonitaException {
+            final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -622,7 +622,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
             final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService, final List<Long> processInstanceIds)
-            throws SBonitaException {
+            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         for (final Long processInstanceId : processInstanceIds) {
             try {
                 deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
@@ -639,7 +639,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstance(final ProcessInstanceService processInstanceService, final Long processInstanceId,
-            final ActivityInstanceService activityInstanceService) throws SBonitaException {
+            final ActivityInstanceService activityInstanceService) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
         final long callerId = sProcessInstance.getCallerId();
         if (callerId > 0) {
@@ -1723,7 +1723,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Category createCategory(final String name, final String description) throws CreationException {
+    public Category createCategory(final String name, final String description) throws AlreadyExistsException, CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
 
@@ -1795,7 +1795,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void addCategoriesToProcess(final long processDefinitionId, final List<Long> categoryIds) throws CreationException {
+    public void addCategoriesToProcess(final long processDefinitionId, final List<Long> categoryIds) throws AlreadyExistsException, CreationException {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
@@ -1821,7 +1821,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws CreationException {
+    public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws AlreadyExistsException, CreationException {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
@@ -1840,7 +1840,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds) throws CreationException {
+    public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds) throws AlreadyExistsException, CreationException {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
@@ -2714,7 +2714,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws
+    public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws ProcessInstanceNotFoundException,
             BonitaException {
         return new ProcessInvolvementAPIImpl(this).isManagerOfUserInvolvedInProcessInstance(managerUserId, processInstanceId);
     }
@@ -4107,21 +4107,22 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws CreationException {
+    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws CreationException, AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setUserId(userId);
         return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws CreationException {
+    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws CreationException, AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setRoleId(roleId);
         return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException {
+    public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException,
+            AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setGroupId(groupId);
         return createSupervisor(supervisorBuilder.done());
@@ -4129,7 +4130,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessSupervisor createProcessSupervisorForMembership(final long processDefinitionId, final long groupId, final long roleId)
-            throws CreationException {
+            throws CreationException, AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setGroupId(groupId);
         supervisorBuilder.setRoleId(roleId);
@@ -4141,7 +4142,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         return sProcessSupervisorBuilderFactory.createNewInstance(processDefinitionId);
     }
 
-    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException {
+    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException, AlreadyExistsException {
         final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
         final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
@@ -5844,7 +5845,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void throwContractViolationExceptionIfContractIsInvalid(final boolean wrapInTransaction, final Map<String, Serializable> inputs,
-            final TenantServiceAccessor tenantAccessor, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+            final TenantServiceAccessor tenantAccessor, final SFlowNodeInstance flowNodeInstance) throws SBonitaException, SContractViolationException {
         final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                 (SUserTaskInstance) flowNodeInstance);
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);

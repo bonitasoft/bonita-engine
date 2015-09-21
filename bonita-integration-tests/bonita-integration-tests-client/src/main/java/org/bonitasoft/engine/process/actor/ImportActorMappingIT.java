@@ -218,7 +218,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         getProcessAPI()
                 .importActorMapping(
                         processDefinition.getId(),
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actormappings:actorMappings xmlns:actormappings=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actormappings:actorMappings>"
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actormappings xmlns=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actormappings>"
                                 .getBytes());
 
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -238,7 +238,6 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
         ActorMapping actormapping = new ActorMappingMarshaller().deserializeFromXML(xmlToByteArray(xmlFileName));
-        //final byte[] actormapping = xmlToByteArray(xmlFileName);
         if (actormapping != null) {
             businessArchive.setActorMapping(actormapping);
         }

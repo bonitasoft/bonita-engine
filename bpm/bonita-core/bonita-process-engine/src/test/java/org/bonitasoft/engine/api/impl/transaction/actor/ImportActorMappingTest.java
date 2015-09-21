@@ -16,10 +16,7 @@ package org.bonitasoft.engine.api.impl.transaction.actor;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,41 +44,50 @@ public class ImportActorMappingTest {
 
     @Mock
     private ActorMappingService actorMappingService;
+
     @Mock
     private IdentityService identityService;
-    @Mock
-    private ActorMapping actorMapping;
+
     @InjectMocks
     private ImportActorMapping importActorMapping;
-    private long ACTOR_ID = 12;
 
     @Test
-    public void Execute_method_should_create_SActors_for_all_actors_and_correctly_add_users_roles_and_groups() throws SBonitaException {
+    public void execute_method_should_create_SActors_for_all_actors_and_correctly_add_users_roles_and_groups() throws SBonitaException {
         //given
-        ArrayList<String> mocklist = new ArrayList<String>();
+        ArrayList<String> mocklist = new ArrayList<>();
         mocklist.add("mock");
         Actor actor1 = new Actor("Lulu");
         Actor actor2 = new Actor("Lala");
         Actor actor3 = new Actor("Sisi");
         List<Actor> actors = new ArrayList<>();
-        SActorImpl sActor = new SActorImpl("Lulu", ACTOR_ID, true);
-        SUserImpl sUser = new SUserImpl();
-        sUser.setId(ACTOR_ID);
-        sActor.setId(ACTOR_ID);
-        SRoleImpl sRole = new SRoleImpl();
-        sRole.setId(ACTOR_ID);
-        SGroupImpl sGroup = new SGroupImpl();
-        sGroup.setId(ACTOR_ID);
         actors.add(actor1);
         actors.add(actor2);
         actors.add(actor3);
+        ActorMapping actorMapping = new ActorMapping();
+        actorMapping.setActors(actors);
+        long ACTOR_ID = 12;
+        SActorImpl sActor = new SActorImpl("Lulu", 1458714L, true);
+        sActor.setId(ACTOR_ID);
+
+        SUserImpl sUser = new SUserImpl();
+        final long userId = 111L;
+        sUser.setId(userId);
+
+        SRoleImpl sRole = new SRoleImpl();
+        final long roleId = 222L;
+        sRole.setId(roleId);
+
+        SGroupImpl sGroup = new SGroupImpl();
+        final long groupId = 333L;
+        sGroup.setId(groupId);
+
+        int cpt = 0;
         for (final Actor actor : actors) {
-            actor.addUser("mockUser");
+            actor.addUser("mockUser" + cpt++);
             actor.addRole("mockRole");
             actor.addGroup("mockGroup");
             actor.addMembership("mockRole", "mockGroup");
         }
-        doReturn(actors).when(actorMapping).getActors();
         when(actorMappingService.getActor(anyString(), anyLong())).thenReturn(sActor);
         when(identityService.getUserByUserName(anyString())).thenReturn(sUser);
         when(identityService.getRoleByName(anyString())).thenReturn(sRole);
@@ -89,12 +95,14 @@ public class ImportActorMappingTest {
 
         //when
         importActorMapping.execute(actorMapping, ACTOR_ID);
-        //then
-        verify(identityService, times(3)).getUserByUserName(anyString());
-        verify(actorMappingService, times(3)).addRoleToActor(anyLong(), anyLong());
-        verify(actorMappingService, times(3)).addGroupToActor(anyLong(), anyLong());
-        verify(actorMappingService, times(3)).addRoleAndGroupToActor(anyLong(), anyLong(), anyLong());
-    }
 
+        //then
+        verify(identityService).getUserByUserName("mockUser0");
+        verify(identityService).getUserByUserName("mockUser1");
+        verify(identityService).getUserByUserName("mockUser2");
+        verify(actorMappingService, times(3)).addRoleToActor(ACTOR_ID, roleId);
+        verify(actorMappingService, times(3)).addGroupToActor(ACTOR_ID, groupId);
+        verify(actorMappingService, times(3)).addRoleAndGroupToActor(ACTOR_ID, roleId, groupId);
+    }
 
 }

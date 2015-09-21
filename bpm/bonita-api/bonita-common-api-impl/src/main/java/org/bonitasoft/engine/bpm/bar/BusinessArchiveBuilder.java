@@ -14,14 +14,14 @@
 
 package org.bonitasoft.engine.bpm.bar;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * <b>Creates {@link BusinessArchive}</b>

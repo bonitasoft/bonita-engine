@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
+import java.util.List;
+
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
@@ -33,8 +35,6 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-
-import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
@@ -65,7 +65,7 @@ public class ExportActorMapping implements TransactionContentWithResult<String> 
         try {
             xmlContent = new String(marshaller.serializeToXML(mapping));
         } catch (XmlMarshallException e) {
-            throw new SBonitaReadException("Failed to generate xml from actorMapping",e);
+            throw new SBonitaReadException("Failed to generate xml from actorMapping", e);
         }
     }
 

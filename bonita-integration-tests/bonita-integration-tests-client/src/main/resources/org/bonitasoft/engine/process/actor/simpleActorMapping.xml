@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:actorMappings xmlns:ns2="http://www.bonitasoft.org/ns/actormapping/6.0">
+<actorMappings xmlns="http://www.bonitasoft.org/ns/actormapping/6.0">
     <actorMapping name="Employee actor">
         <users>
             <user>william.jobs</user>
         </users>
-        <groups/>
-        <roles/>
-        <memberships/>
+        <groups />
+        <roles />
+        <memberships />
     </actorMapping>
-</ns2:actorMappings>
+</actorMappings>

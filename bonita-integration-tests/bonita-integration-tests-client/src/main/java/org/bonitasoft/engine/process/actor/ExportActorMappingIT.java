@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.process.actor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.io.InputStream;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
@@ -25,12 +31,6 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.junit.Test;
-
-import java.io.InputStream;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * @author Matthieu Chaffotte

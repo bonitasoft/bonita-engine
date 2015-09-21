@@ -48,7 +48,7 @@ public class ActorMappingContribution extends GenericFileContribution {
         if (file.exists()) {
             final byte[] content = IOUtil.getContent(file);
             try {
-                businessArchive.setActorMapping(ActorMappingMarshaller.deserializeFromXML(content));
+                businessArchive.setActorMapping(new ActorMappingMarshaller().deserializeFromXML(content));
             } catch (XmlMarshallException e) {
                 return false;
             }

@@ -17,6 +17,7 @@ package org.bonitasoft.engine.bpm.bar.actorMapping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,17 +27,17 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Danila Mazour
  */
-@XmlRootElement(name = "actorMappings", namespace = "http://www.bonitasoft.org/ns/actormapping/6.0")
+@XmlRootElement(name = "actorMappings")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActorMapping {
-
 
     @XmlElement(name = "actorMapping", required = false)
     private List<Actor> actors;
 
     public ActorMapping() {
-        actors = new ArrayList<Actor>(10);
+        actors = new ArrayList<>(10);
     }
 
     public List<Actor> getActors() {

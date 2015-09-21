@@ -14,7 +14,10 @@
 
 package org.bonitasoft.engine.bpm.bar;
 
-import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -22,10 +25,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URL;
+
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 
 /**
  * @author mazourd
@@ -40,11 +41,11 @@ public class ActorMappingMarshaller {
         xsdUrl = ActorMapping.class.getResource(XSD_MODEL);
     }
 
-    public static ActorMapping deserializeFromXML(final byte[] xmlModel) throws XmlMarshallException {
+    public ActorMapping deserializeFromXML(final byte[] xmlModel) throws XmlMarshallException {
         return unmarshall(xmlModel);
     }
 
-    private static ActorMapping unmarshall(final byte[] model) throws XmlMarshallException {
+    private ActorMapping unmarshall(final byte[] model) throws XmlMarshallException {
         if (model == null) {
             return null;
         }
@@ -54,8 +55,8 @@ public class ActorMappingMarshaller {
             final StreamSource ss = new StreamSource(bais);
             final JAXBElement<ActorMapping> jaxbElement = um.unmarshal(ss, ActorMapping.class);
             return jaxbElement.getValue();
-        } catch (JAXBException| IOException e) {
-            throw new XmlMarshallException("Failed to deserialize the ActorMapping",e);
+        } catch (JAXBException | IOException e) {
+            throw new XmlMarshallException("Failed to deserialize the ActorMapping", e);
         }
     }
 
@@ -65,14 +66,14 @@ public class ActorMappingMarshaller {
 
     private byte[] marshall(final ActorMapping model) throws XmlMarshallException {
 
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             final JAXBContext contextObj = JAXBContext.newInstance(model.getClass());
-        final Marshaller m = contextObj.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.marshal(model, baos);
+            final Marshaller m = contextObj.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(model, baos);
             return baos.toByteArray();
-        } catch (JAXBException| IOException e){
-            throw new XmlMarshallException("Failed to serialize the ActorMapping",e);
+        } catch (JAXBException | IOException e) {
+            throw new XmlMarshallException("Failed to serialize the ActorMapping", e);
         }
     }
 

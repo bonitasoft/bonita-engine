@@ -14,6 +14,9 @@
 
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
+import java.util.List;
+import java.util.Set;
+
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorMemberAlreadyExistsException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -28,9 +31,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Matthieu Chaffotte
@@ -145,7 +145,7 @@ public class ImportActorMapping {
     private ActorMapping getActorMappingFromXML(String xmlContent) throws SBonitaException {
         byte[] b = xmlContent.getBytes();
         try {
-            return ActorMappingMarshaller.deserializeFromXML(b);
+            return new ActorMappingMarshaller().deserializeFromXML(b);
         } catch (XmlMarshallException e) {
             throw new SBonitaReadException("Unable to read the actor mapping xml", e);
         }

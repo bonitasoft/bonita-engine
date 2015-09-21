@@ -36,9 +36,13 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 public class BusinessArchive implements Serializable {
 
     private static final long serialVersionUID = -6410347766671025202L;
-    private final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+
+    private final Map<String, byte[]> resources = new HashMap<>();
+
     private DesignProcessDefinition processDefinition;
+
     private Map<String, String> parameters;
+
     private FormMappingModel formMappingModel = new FormMappingModel();
 
     private ActorMapping actorMapping = null;
@@ -108,7 +112,11 @@ public class BusinessArchive implements Serializable {
      * Retrieves a byte array representing the content of the resource identified by the given path.
      * <br>
      * <p>Example:</p>
-     * <pre>businessArchive.getResource("actorMapping.xml")</pre>
+     * 
+     * <pre>
+     * businessArchive.getResource("actorMapping.xml")
+     * </pre>
+     * 
      * <br>
      *
      * @param resourcePath the complete resource path
@@ -123,7 +131,11 @@ public class BusinessArchive implements Serializable {
      * resource paths and the {@code Map} values store the resource content.
      * <br>
      * <p>Example:</p>
-     * <pre>businessArchive.getResources("^classpath/.*$")</pre>
+     * 
+     * <pre>
+     * businessArchive.getResources("^classpath/.*$")
+     * </pre>
+     * 
      * <br>
      *
      * @param regex the regular expression used to match the resource path

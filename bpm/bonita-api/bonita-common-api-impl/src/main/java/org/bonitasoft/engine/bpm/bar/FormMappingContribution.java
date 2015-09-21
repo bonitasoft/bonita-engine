@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm.bar;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.xml.bind.JAXBException;
+
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
-
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Emmanuel Duchastenier

@@ -14,6 +14,10 @@
 
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.ActorMappingMarshaller;
 import org.bonitasoft.engine.bpm.bar.XmlMarshallException;
@@ -21,10 +25,6 @@ import org.bonitasoft.engine.bpm.bar.actorMapping.Actor;
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.InputStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author mazourd
@@ -39,7 +39,7 @@ public class ActorMappingMarshallerTest {
     }
 
     @Test
-    public void should_Correctly_Read_an_Old_Actor_Mapping_Xml() throws Exception {
+    public void should_correctly_read_an_old_actor_mapping_xml() throws Exception {
         InputStream xmlStream = ActorMappingMarshallerTest.class.getResourceAsStream("/complexActorMapping.xml");
         ActorMapping actorMappingFromXML = marshaller.deserializeFromXML(IOUtils.toByteArray(xmlStream));
         Actor actorTest = new Actor("Employee actor");
@@ -52,14 +52,14 @@ public class ActorMappingMarshallerTest {
     }
 
     @Test(expected = XmlMarshallException.class)
-    public void should_Throw_Exception_On_Non_Valid_Xml_Reading() throws Exception {
+    public void should_throw_exception_on_non_valid_xml_reading() throws Exception {
         InputStream xmlStream = ActorMappingMarshallerTest.class.getResourceAsStream("/testThatShouldFail.xml");
         String xmlContent = IOUtils.toString(xmlStream);
-            ActorMapping actorMappingFromXML = marshaller.deserializeFromXML(xmlContent.getBytes());
+        marshaller.deserializeFromXML(xmlContent.getBytes());
     }
 
     @Test
-    public void should_Correctly_Read_a_Null_Actor_Mapping() throws Exception {
+    public void should_correctly_read_an_empty_actor_mapping() throws Exception {
         ActorMapping employeeActor = new ActorMapping();
         byte[] bytes = marshaller.serializeToXML(employeeActor);
         Object actors = marshaller.deserializeFromXML(bytes);
@@ -67,29 +67,29 @@ public class ActorMappingMarshallerTest {
     }
 
     @Test
-    public void should_Read_Correctly_an_Actor_Mapping_With_an_Empty_Actor() throws Exception {
+    public void should_read_correctly_an_actor_mapping_with_an_empty_actor() throws Exception {
         ActorMapping employeeActor = new ActorMapping();
         Actor actor = new Actor("lulu");
         employeeActor.addActor(actor);
-        byte[] result;
-        result = marshaller.serializeToXML(employeeActor);
+        byte[] result = marshaller.serializeToXML(employeeActor);
         ActorMapping result2 = marshaller.deserializeFromXML(result);
         assertThat(employeeActor).isEqualTo(result2);
     }
 
     @Test
-    public void should_Read_and_Write_Correctly_a_Complete_Actor_Mapping() throws Exception {
+    public void should_read_and_write_correctly_a_complete_actor_mapping() throws Exception {
         ActorMapping employeeActor = new ActorMapping();
         employeeActor.addActor(new Actor("EmployeeMembership1"));
         employeeActor.addActor(new Actor("EmployeeMembership2"));
-        employeeActor.getActors().get(0).addUser("william.jobs");
-        employeeActor.getActors().get(0).addGroup("RD");
-        employeeActor.getActors().get(0).addRole("dev");
-        employeeActor.getActors().get(1).addUser("lala.ru");
-        employeeActor.getActors().get(1).addMembership("group1", "role1");
-        employeeActor.getActors().get(0).setDescription("Just here for the tests");
-        byte[] result;
-        result = marshaller.serializeToXML(employeeActor);
+        final Actor actor = employeeActor.getActors().get(0);
+        actor.addUser("william.jobs");
+        actor.addGroup("RD");
+        actor.addRole("dev");
+        actor.setDescription("Just here for the tests");
+        final Actor actor1 = employeeActor.getActors().get(1);
+        actor1.addUser("lala.ru");
+        actor1.addMembership("group1", "role1");
+        byte[] result = marshaller.serializeToXML(employeeActor);
         Object actors = marshaller.deserializeFromXML(result);
         assertThat(employeeActor).isEqualToComparingFieldByField((ActorMapping) actors);
     }
