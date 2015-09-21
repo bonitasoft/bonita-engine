@@ -13,16 +13,23 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.powermock.api.mockito.PowerMockito.doNothing;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +49,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.home.ProcessManager;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -77,6 +85,8 @@ public class ConnectorServiceImplTest {
 
     @Mock
     private BonitaHomeServer bonitaHomeServer;
+    @Mock
+    private ProcessManager processManager;
 
     private ConnectorServiceImpl connectorService;
 
@@ -101,6 +111,7 @@ public class ConnectorServiceImplTest {
         mockStatic(BonitaHomeServer.class);
 
         when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
+        when(bonitaHomeServer.getProcessManager()).thenReturn(processManager);
 
         doReturn(parser).when(parserFactory).createParser(anyList());
 
@@ -159,24 +170,24 @@ public class ConnectorServiceImplTest {
         Map<String, byte[]> zipFileMap = new HashMap<>(3);
         final byte[] implBytes = "tototo".getBytes();
         zipFileMap.put("HoogardenBeerConnector.impl", implBytes);
-        final byte[] dep1Bytes = { 12, 94, 14, 12 };
+        final byte[] dep1Bytes = {12, 94, 14, 12};
         zipFileMap.put("some1.jar", dep1Bytes);
-        final byte[] hoogardenConnectorBytes = { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 };
+        final byte[] hoogardenConnectorBytes = {12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65};
         zipFileMap.put("HoogardenConnector.jar", hoogardenConnectorBytes);
         final byte[] zip1 = IOUtil.zip(zipFileMap);
         final Map<String, byte[]> returnedMap = new HashMap<>();
-        returnedMap.put("file.jar", new byte[] { 1 });
-        returnedMap.put("file.impl", new byte[] { 2 });
-        when(parser.getObjectFromXML(eq(new byte[] { 2 }))).thenReturn(oldConnectorDescriptor);
+        returnedMap.put("file.jar", new byte[]{1});
+        returnedMap.put("file.impl", new byte[]{2});
+        when(parser.getObjectFromXML(eq(new byte[]{2}))).thenReturn(oldConnectorDescriptor);
         when(parser.getObjectFromXML(eq(implBytes))).thenReturn(hoogardenConnectorDescriptor);
 
-        doReturn(returnedMap).when(bonitaHomeServer).getConnectorFiles(tenantId, processDefId);
+        doReturn(returnedMap).when(processManager).getConnectorFiles(tenantId, processDefId);
         connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
-        verify(bonitaHomeServer, times(1)).storeClasspathFile(tenantId, processDefId, "HoogardenConnector.jar", hoogardenConnectorBytes);
-        verify(bonitaHomeServer, times(1)).storeClasspathFile(tenantId, processDefId, "some1.jar", dep1Bytes);
-        verify(bonitaHomeServer, times(1)).storeConnectorFile(tenantId, processDefId, "HoogardenBeerConnector.impl", implBytes);
-        verify(bonitaHomeServer, times(1)).deleteClasspathFiles(tenantId, processDefId, "file.jar");
-        verify(bonitaHomeServer, times(1)).deleteConnectorFile(tenantId, processDefId, "file.impl");
+        verify(processManager, times(1)).storeClasspathFile(tenantId, processDefId, "HoogardenConnector.jar", hoogardenConnectorBytes);
+        verify(processManager, times(1)).storeClasspathFile(tenantId, processDefId, "some1.jar", dep1Bytes);
+        verify(processManager, times(1)).storeConnectorFile(tenantId, processDefId, "HoogardenBeerConnector.impl", implBytes);
+        verify(processManager, times(1)).deleteClasspathFiles(tenantId, processDefId, "file.jar");
+        verify(processManager, times(1)).deleteConnectorFile(tenantId, processDefId, "file.impl");
     }
 
     @Test
@@ -196,15 +207,7 @@ public class ConnectorServiceImplTest {
 
         spy.unzipNewImplementation(sProcessDef, tenantId, zip, connectorDefId, connectorDefVersion);
 
-        verify(bonitaHomeServer, times(0)).storeConnectorFile(eq(tenantId), eq(processDefId), anyString(), any(byte[].class));
-    }
-
-    private List<String> names(final List<File> files) {
-        final ArrayList<String> names = new ArrayList<>();
-        for (final File file : files) {
-            names.add(file.getName());
-        }
-        return names;
+        verify(processManager, times(0)).storeConnectorFile(eq(tenantId), eq(processDefId), anyString(), any(byte[].class));
     }
 
     @Test
@@ -256,7 +259,7 @@ public class ConnectorServiceImplTest {
         zipFileMap.put("HoogardenConnector.jar", new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
         final byte[] zip1 = IOUtil.zip(zipFileMap);
 
-        doReturn(zipFileMap).when(bonitaHomeServer).getConnectorFiles(tenantId, processDefId);
+        doReturn(zipFileMap).when(processManager).getConnectorFiles(tenantId, processDefId);
 
         //setConnectorImplementation store to cache
         connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
