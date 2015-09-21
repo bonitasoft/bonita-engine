@@ -17,6 +17,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,7 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -1237,7 +1239,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addCallActivity("call",
                 new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getName()),
                 new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getVersion())).addProcessStartContractInput("theInput",
-                new ExpressionBuilder().createConstantStringExpression("theValue"));
+                        new ExpressionBuilder().createConstantStringExpression("theValue"));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("call", "step2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -1744,8 +1746,90 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
+    @Test
+    public void should_initialize_a_bo_with_empty_query_result() throws Exception {
+        //given
+        final Expression queryBusinessDataExpression = new ExpressionBuilder().createQueryBusinessDataExpression("findQuery",
+                "Employee." + GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createConstantStringExpression("lastName", "notExists"));
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
+                "emptyQueryResult", "1.0");
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, queryBusinessDataExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+
+        //when
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(processInstance, "step1");
+
+        //then
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
+        final String expressionEmployee = "retrieve_Employee";
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee,
+                        " if (" + bizDataName + "==null) { return Boolean.TRUE } else {return Boolean.FALSE} ",
+                        Boolean.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression(bizDataName, EMPLOYEE_QUALIFIED_NAME)),
+                null);
+
+        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+        assertThat(evaluatedExpressions).as("should not have a reference to business data").contains(entry(expressionEmployee, Boolean.TRUE));
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void should_initialize_a_multiple_bo_with_empty_query_result() throws Exception {
+        //given
+        final ExpressionImpl dependencyStartIndex = new ExpressionImpl();
+        dependencyStartIndex.setExpressionType(ExpressionType.TYPE_CONSTANT.name());
+        dependencyStartIndex.setName("startIndex");
+        dependencyStartIndex.setReturnType(Integer.class.getName());
+        dependencyStartIndex.setContent("0");
+
+        final ExpressionImpl dependencyMaxResults = new ExpressionImpl();
+        dependencyMaxResults.setExpressionType(ExpressionType.TYPE_CONSTANT.name());
+        dependencyMaxResults.setName("maxResults");
+        dependencyMaxResults.setReturnType(Integer.class.getName());
+        dependencyMaxResults.setContent("10");
+
+        final Expression queryBusinessDataExpression = new ExpressionBuilder().createQueryBusinessDataExpression("findQuery",
+                "Employee.find", List.class.getName(),
+                dependencyStartIndex, dependencyMaxResults);
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
+                "multipleEmptyQueryResult", "1.0");
+        final String bizDataName = "myEmployees";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, queryBusinessDataExpression).setMultiple(true);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+
+        //when
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(processInstance, "step1");
+
+        //then
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
+        final String expressionEmployee = "retrieve_Employee";
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee,
+                        bizDataName + ".toString()",
+                        String.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression(bizDataName, List.class.getName())),
+                null);
+
+        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+        assertThat(evaluatedExpressions).as("should not have a reference to business data").contains(entry(expressionEmployee, "[]"));
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
     public Long getNumberOfAddresses(final long processInstanceId) throws Exception {
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countAddresses", "Address.countAddress", Long.class.getName()),
                 Collections.<String, Serializable> emptyMap());
 
@@ -1754,7 +1838,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     public String getAddressAsAString(final String addressName, final long processInstanceId) throws Exception {
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression("getAddress", "\"Address [street=\" + " + addressName
                         + ".street + \", city=\" + " + addressName + ".city + \"]\";", String.class.getName(),
@@ -1765,7 +1849,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     private String getEmployeeAsAString(final String businessDataName, final long processInstanceId) throws InvalidExpressionException {
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(5);
         final String expressionEmployee = "retrieve_Employee";
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee,

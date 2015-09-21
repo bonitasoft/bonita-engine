@@ -237,29 +237,6 @@ CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(kind, logical
 CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId);
 
-CREATE TABLE arch_transition_instance (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  rootContainerId INT8 NOT NULL,
-  parentContainerId INT8 NOT NULL,
-  source INT8,
-  target INT8,
-  state VARCHAR(50),
-  terminal BOOLEAN NOT NULL,
-  stable BOOLEAN ,
-  stateCategory VARCHAR(50) NOT NULL,
-  logicalGroup1 INT8 NOT NULL,
-  logicalGroup2 INT8 NOT NULL,
-  logicalGroup3 INT8,
-  logicalGroup4 INT8 NOT NULL,
-  description VARCHAR(255),
-  sourceObjectId INT8,
-  archiveDate INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
-
-CREATE INDEX idx1_arch_transition_instance ON arch_transition_instance (tenantid, rootcontainerid);
-
 CREATE TABLE arch_connector_instance (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,

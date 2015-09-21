@@ -32,4 +32,3 @@ ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid;
 ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_AFln_tenId;
 ALTER TABLE arch_process_comment DROP CONSTRAINT fk_AProcCom_tenId;
 ALTER TABLE arch_process_instance DROP CONSTRAINT fk_AProc_tenId;
-ALTER TABLE arch_transition_instance DROP CONSTRAINT fk_ATrans_tenId;

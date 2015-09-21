@@ -12,7 +12,6 @@ DROP TABLE document_mapping cascade constraints purge;
 DROP TABLE document cascade constraints purge;
 DROP TABLE arch_flownode_instance cascade constraints purge;
 DROP TABLE arch_process_instance cascade constraints purge;
-DROP TABLE arch_transition_instance cascade constraints purge;
 DROP TABLE arch_connector_instance cascade constraints purge;
 DROP TABLE multi_biz_data cascade constraints purge;
 DROP TABLE ref_biz_data_inst cascade constraints purge;
