@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.io;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,15 +30,25 @@ import java.util.Properties;
  */
 public class PropertiesManager {
 
+    public static void saveProperties(final Properties properties, final String pathName) throws IOException {
+        saveProperties(properties, new File(pathName));
+    }
+
     public static void saveProperties(final Properties properties, final File file) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+        final FileOutputStream outputStream = new FileOutputStream(file);
+        try {
             properties.store(outputStream, "Storing modified properties");
+        } finally {
+            outputStream.close();
         }
     }
 
     public static Properties getProperties(final URL url) throws IOException {
-        try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
+        final InputStreamReader reader = new InputStreamReader(url.openStream());
+        try {
             return getProperties(reader);
+        } finally {
+            reader.close();
         }
     }
 
@@ -46,8 +57,11 @@ public class PropertiesManager {
     }
 
     public static Properties getProperties(final File file) throws IOException {
-        try (FileReader reader = new FileReader(file)) {
+        final FileReader reader = new FileReader(file);
+        try {
             return getProperties(reader);
+        } finally {
+            reader.close();
         }
     }
 
@@ -55,6 +69,26 @@ public class PropertiesManager {
         final Properties properties = new Properties();
         properties.load(reader);
         return properties;
+    }
+
+    public static void savePropertiesToXML(final Properties properties, final File file) throws IOException {
+        final FileOutputStream outputStream = new FileOutputStream(file);
+        try {
+            properties.storeToXML(outputStream, "Storing modified properties", "UTF-8");
+        } finally {
+            outputStream.close();
+        }
+    }
+
+    public static Properties getPropertiesFromXML(final File file) throws IOException {
+        final Properties properties = new Properties();
+        final FileInputStream fileInputStream = new FileInputStream(file);
+        try {
+            properties.loadFromXML(fileInputStream);
+            return properties;
+        } finally {
+            fileInputStream.close();
+        }
     }
 
 }
