@@ -23,7 +23,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,14 +47,14 @@ public class WorkServiceTest extends CommonBPMServicesTest {
 
     @Test(expected = SWorkRegisterException.class)
     public void testWorkOnNotActiveTransaction() throws Exception {
-        final List<String> works = new ArrayList<String>();
+        final List<String> works = new ArrayList<>();
         getWorkService().registerWork(new ListAdder(works, "1"));
     }
 
     @Test
     public void testWorkInMultipleTransactions() throws Exception {
         getTransactionService().begin();
-        final List<String> works = new ArrayList<String>();
+        final List<String> works = new ArrayList<>();
         final WorkService workService = getWorkService();
         workService.registerWork(new ListAdder(works, "1"));
         getTransactionService().complete();
@@ -74,9 +73,10 @@ public class WorkServiceTest extends CommonBPMServicesTest {
     @Test
     public void testMultipleContinuation() throws Exception {
         getTransactionService().begin();
-        final List<String> works = new ArrayList<String>();
+        final List<String> works = new ArrayList<>();
         getWorkService().registerWork(new ListAdder(works, "1"));
         getWorkService().registerWork(new ListAdder(works, "2"));
+
         getWorkService().registerWork(new ListAdder(works, "3"));
         getWorkService().registerWork(new ListAdder(works, "4"));
         getWorkService().registerWork(new ListAdder(works, "5"));
@@ -86,17 +86,21 @@ public class WorkServiceTest extends CommonBPMServicesTest {
         assertThat(works).contains("1", "2", "3", "4", "5");
     }
 
-    public void waitFor(final int number, final List<String> works) throws InterruptedException {
+    public void waitFor(final int expected, final List<String> works) throws InterruptedException {
         final long timeout = System.currentTimeMillis() + 2000;
         boolean reached = false;
+        int size = -1;
         do {
-            if (works.size() == number) {
+            size = works.size();
+            if (size == expected) {
                 reached = true;
             } else {
                 Thread.sleep(50);
             }
         } while (!reached && timeout > System.currentTimeMillis());
-        assertThat(reached).isTrue();
+        assertThat(reached).as("List of works should contain " + expected + " elements instead of " + works.size() + " (was " + size
+                + " last time we checked. If value is reached now, update this test by increasing max timeout)")
+                .isTrue();
     }
 
 }

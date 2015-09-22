@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -59,10 +60,14 @@ import org.xml.sax.SAXException;
  */
 public class IOUtil {
 
-    public static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
-    public static final String FILE_ENCODING = "UTF-8";
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    public static final String TMP_DIRECTORY = System.getProperty("java.io.tmpdir");
+
     private static final int BUFFER_SIZE = 100000;
+
+    public static final String FILE_ENCODING = "UTF-8";
+
     private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
 
     public static byte[] generateJar(final Class<?>... classes) throws IOException {
@@ -74,7 +79,7 @@ public class IOUtil {
             final String message = "No classes available";
             throw new IOException(message);
         }
-        final Map<String, byte[]> resources = new HashMap<>();
+        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         for (final Class<?> clazz : classes) {
             resources.put(clazz.getName().replace(".", "/") + ".class", getClassData(clazz));
             for (final Class<?> internalClass : clazz.getDeclaredClasses()) {
@@ -90,12 +95,17 @@ public class IOUtil {
             throw new IOException(message);
         }
         final String resource = clazz.getName().replace('.', '/') + ".class";
-        byte[] data;
-        try (InputStream inputStream = clazz.getClassLoader().getResourceAsStream(resource)) {
+        final InputStream inputStream = clazz.getClassLoader().getResourceAsStream(resource);
+        byte[] data = null;
+        try {
             if (inputStream == null) {
                 throw new IOException("Impossible to get stream from class: " + clazz.getName() + ", className= " + resource);
             }
             data = IOUtil.getAllContentFrom(inputStream);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
         return data;
     }
@@ -106,16 +116,27 @@ public class IOUtil {
             throw new IOException(message);
         }
 
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                JarOutputStream jarOutStream = new JarOutputStream(new BufferedOutputStream(baos))) {
+        ByteArrayOutputStream baos = null;
+        JarOutputStream jarOutStream = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            jarOutStream = new JarOutputStream(new BufferedOutputStream(baos));
             for (final Map.Entry<String, byte[]> resource : resources.entrySet()) {
                 jarOutStream.putNextEntry(new JarEntry(resource.getKey()));
                 jarOutStream.write(resource.getValue());
             }
             jarOutStream.flush();
             baos.flush();
-            return baos.toByteArray();
+        } finally {
+            if (jarOutStream != null) {
+                jarOutStream.close();
+            }
+            if (baos != null) {
+                baos.close();
+            }
         }
+
+        return baos.toByteArray();
     }
 
     /**
@@ -135,15 +156,26 @@ public class IOUtil {
         }
         final byte[] buffer = new byte[BUFFER_SIZE];
         final byte[] resultArray;
+        BufferedInputStream bis = null;
+        ByteArrayOutputStream result = null;
 
-        try (BufferedInputStream bis = new BufferedInputStream(in);
-                ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+        try {
+            bis = new BufferedInputStream(in);
+            result = new ByteArrayOutputStream();
             int amountRead;
             while ((amountRead = bis.read(buffer)) > 0) {
                 result.write(buffer, 0, amountRead);
             }
             resultArray = result.toByteArray();
             result.flush();
+
+        } finally {
+            if (bis != null) {
+                bis.close();
+            }
+            if (result != null) {
+                result.close();
+            }
         }
         return resultArray;
     }
@@ -159,8 +191,14 @@ public class IOUtil {
      *         If an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final File file) throws IOException {
-        try (InputStream in = new FileInputStream(file)) {
+        InputStream in = null;
+        try {
+            in = new FileInputStream(file);
             return getAllContentFrom(in);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
         }
     }
 
@@ -176,8 +214,11 @@ public class IOUtil {
      *         if an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final URL url) throws IOException {
-        try (InputStream in = url.openStream()) {
+        final InputStream in = url.openStream();
+        try {
             return getAllContentFrom(in);
+        } finally {
+            in.close();
         }
     }
 
@@ -268,7 +309,7 @@ public class IOUtil {
         File tmpFile = null;
         final int retryNumber = 10;
         int j = 0;
-        boolean succeeded = false;
+        boolean succeded = false;
         do {
             try {
                 /*
@@ -286,18 +327,18 @@ public class IOUtil {
                 /* Create the file */
                 tmpFile = File.createTempFile(fileName, suffix, directory);
 
-                succeeded = true;
+                succeded = true;
             } catch (final IOException e) {
                 if (j == retryNumber) {
                     throw e;
                 }
                 try {
                     Thread.sleep(100);
-                } catch (final InterruptedException ignored) {
+                } catch (final InterruptedException e1) {
                 }
                 j++;
             }
-        } while (!succeeded);
+        } while (!succeded);
         return tmpFile;
     }
 
@@ -310,7 +351,7 @@ public class IOUtil {
             retries--;
             try {
                 Thread.sleep(sleepTime);
-            } catch (final InterruptedException ignored) {
+            } catch (final InterruptedException e) {
             }
         }
         return retries > 0;
@@ -318,13 +359,16 @@ public class IOUtil {
 
     public static byte[] zip(final Map<String, byte[]> files) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+        try {
             for (final Entry<String, byte[]> file : files.entrySet()) {
                 zos.putNextEntry(new ZipEntry(file.getKey()));
                 zos.write(file.getValue());
                 zos.closeEntry();
             }
             return baos.toByteArray();
+        } finally {
+            zos.close();
         }
     }
 
@@ -340,6 +384,7 @@ public class IOUtil {
     public static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {
         final File zipDir = new File(dir2zip);
         final byte[] readBuffer = new byte[BUFFER_SIZE];
+        int bytesIn = 0;
 
         for (final String pathName : zipDir.list()) {
             final File file = new File(zipDir, pathName);
@@ -348,10 +393,11 @@ public class IOUtil {
                 zipDir(path, zos, root);
                 continue;
             }
+
             try {
                 final ZipEntry anEntry = new ZipEntry(path.substring(root.length() + 1, path.length()).replace(String.valueOf(File.separatorChar), "/"));
                 zos.putNextEntry(anEntry);
-                copyFileToZip(zos, readBuffer, file);
+                bytesIn = +copyFileToZip(zos, readBuffer, file, bytesIn);
                 zos.flush();
             } finally {
                 zos.closeEntry();
@@ -359,12 +405,16 @@ public class IOUtil {
         }
     }
 
-    private static int copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file) throws IOException {
-        int bytesIn;
-        try (FileInputStream fis = new FileInputStream(file)) {
+    private static int copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file, final int bytesInOfZip) throws FileNotFoundException,
+            IOException {
+        final FileInputStream fis = new FileInputStream(file);
+        int bytesIn = bytesInOfZip;
+        try {
             while ((bytesIn = fis.read(readBuffer)) != -1) {
                 zos.write(readBuffer, 0, bytesIn);
             }
+        } finally {
+            fis.close();
         }
         return bytesIn;
     }
@@ -398,7 +448,7 @@ public class IOUtil {
             if (isFirst) {
                 text.append(scanner.nextLine());
             } else {
-                text.append(LINE_SEPARATOR).append(scanner.nextLine());
+                text.append(LINE_SEPARATOR + scanner.nextLine());
             }
             isFirst = false;
         }
@@ -409,31 +459,45 @@ public class IOUtil {
      * Read the contents of the given file.
      * 
      * @param file
-     *        the file to read
      */
     public static String read(final File file) throws IOException {
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
             return read(fileInputStream);
+        } finally {
+            if (fileInputStream != null) {
+                fileInputStream.close();
+            }
         }
     }
 
     public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
-        try (ZipInputStream zipInputstream = new ZipInputStream(inputStream)) {
+        final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
+
+        try {
             extractZipEntries(zipInputstream, outputFolder);
+        } finally {
+            zipInputstream.closeEntry();
+            zipInputstream.close();
         }
     }
 
     private static boolean mkdirs(final File file) {
-        return file.exists() || file.mkdirs();
+        if (!file.exists()) {
+            return file.mkdirs();
+        }
+        return true;
     }
 
-    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws
+    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws FileNotFoundException,
             IOException {
-        ZipEntry zipEntry;
+        ZipEntry zipEntry = null;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
                 // For each entry, a file is created in the output directory "folder"
                 final File outputFile = new File(outputFolder.getAbsolutePath(), zipEntry.getName());
+
                 // If the entry is a directory, it creates in the output folder, and we go to the next entry (continue).
                 if (zipEntry.isDirectory()) {
                     mkdirs(outputFile);
@@ -449,7 +513,8 @@ public class IOUtil {
     private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
         // The input is a file. An FileOutputStream is created to write the content of the new file.
         mkdirs(outputFile.getParentFile());
-        try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
+        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        try {
             // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
             int bytesRead;
             final byte[] buffer = new byte[BUFFER_SIZE];
@@ -461,6 +526,8 @@ public class IOUtil {
             // In case of error, the file is deleted
             outputFile.delete();
             throw ioe;
+        } finally {
+            fileOutputStream.close();
         }
     }
 
@@ -470,30 +537,55 @@ public class IOUtil {
     }
 
     public static void writeContentToFileOutputStream(final String content, final FileOutputStream fileOutput) throws IOException {
-        try (OutputStreamWriter out = new OutputStreamWriter(fileOutput, FILE_ENCODING)) {
+        OutputStreamWriter out = null;
+        try {
+            out = new OutputStreamWriter(fileOutput, FILE_ENCODING);
             out.write(content);
             out.flush();
         } finally {
+            if (out != null) {
+                out.close();
+            }
             fileOutput.close();
         }
     }
 
-    public static void write(final File file, final byte[] fileContent) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(file);
-                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+    public static void write(final File file, final byte[] fileContent) throws FileNotFoundException, IOException {
+        FileOutputStream fos = null;
+        BufferedOutputStream bos = null;
+        try {
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
             bos.write(fileContent);
             bos.flush();
+        } finally {
+            if (bos != null) {
+                bos.close();
+            }
+            if (fos != null) {
+                fos.close();
+            }
         }
     }
 
-    public static byte[] getContent(final File file) throws IOException {
-        try (FileInputStream fin = new FileInputStream(file);
-                FileChannel ch = fin.getChannel()) {
+    public static byte[] getContent(final File file) throws FileNotFoundException, IOException {
+        FileChannel ch = null;
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(file);
+            ch = fin.getChannel();
             final int size = (int) ch.size();
             final MappedByteBuffer buf = ch.map(MapMode.READ_ONLY, 0, size);
             final byte[] bytes = new byte[size];
             buf.get(bytes);
             return bytes;
+        } finally {
+            if (ch != null) {
+                ch.close();
+            }
+            if (fin != null) {
+                fin.close();
+            }
         }
     }
 
@@ -504,17 +596,19 @@ public class IOUtil {
         if (schemaURL == null) {
             throw new IllegalArgumentException("schemaURL is null");
         }
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema = sf.newSchema(schemaURL);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
-        {
+        try {
             final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
             final Marshaller m = contextObj.createMarshaller();
             m.setSchema(schema);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(jaxbModel, baos);
-            return baos.toByteArray();
+        } finally {
+            baos.close();
         }
+        return baos.toByteArray();
     }
 
     public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL) throws JAXBException, IOException,
@@ -530,10 +624,13 @@ public class IOUtil {
         final JAXBContext contextObj = JAXBContext.newInstance(objectClass);
         final Unmarshaller um = contextObj.createUnmarshaller();
         um.setSchema(schema);
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(xmlObject)) {
-            final StreamSource ss = new StreamSource(bais);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(xmlObject);
+        final StreamSource ss = new StreamSource(bais);
+        try {
             final JAXBElement<T> jaxbElement = um.unmarshal(ss, objectClass);
             return jaxbElement.getValue();
+        } finally {
+            bais.close();
         }
     }
 

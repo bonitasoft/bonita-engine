@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.profile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +36,15 @@ import org.junit.Test;
 
 public class ProfileMemberIT extends AbstractProfileIT {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Group" }, story = "Create and delete group to profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete",
+            "Group" }, story = "Create and delete group to profile.", jira = "")
     @Test
     public void createAndDeleteGroupToProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("group", null, group1.getId(), null);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role", "Group" }, story = "Create and delete role and group to profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role",
+            "Group" }, story = "Create and delete role and group to profile.", jira = "")
     @Test
     public void createAndDeleteRoleAndGroupToProfile() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
@@ -55,25 +55,29 @@ public class ProfileMemberIT extends AbstractProfileIT {
         checkCreateAndDeleProfileMember("roleAndGroup", null, group1.getId(), role1.getId());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role" }, story = "Create and delete role to profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete",
+            "Role" }, story = "Create and delete role to profile.", jira = "")
     @Test
     public void createAndDeleteRoleToProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("role", null, null, role3.getId());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete" }, story = "Create and delete user profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create",
+            "Delete" }, story = "Create and delete user profile.", jira = "")
     @Test
     public void createandDeleteUserProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("user", user2.getId(), null, null);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member",
+            "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = CreationException.class)
     public void createProfileMemberWithWrongParameter() throws Exception {
         getProfileAPI().createProfileMember(856L, null, null, null);
     }
 
-    @Cover(classes = { ProfileAPI.class, ProfileMember.class, Group.class, Role.class, User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-808", keywords = { "delete organization profile  mapping" })
+    @Cover(classes = { ProfileAPI.class, ProfileMember.class, Group.class, Role.class,
+            User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-808", keywords = { "delete organization profile  mapping" })
     @Test
     public void deleteOrganizationRemoveProfileMember() throws BonitaException {
         // create user and add profile
@@ -109,7 +113,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals(numberOfProfileMembersBeforeCreation, searchedProfileMember.getCount());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member",
+            "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = DeletionException.class)
     public void deleteProfileMemberWithWrongParameter() throws Exception {
         getProfileAPI().deleteProfileMember(856L);
@@ -150,49 +155,53 @@ public class ProfileMemberIT extends AbstractProfileIT {
     @Test
     public void getProfileForUser() throws BonitaException {
         // Get Profile For User
-        final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId());
+        final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(1, profiles.size());
         assertEquals("Administrator", profiles.get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group" }, story = "Get profile for user must return same profil only once", jira = "ENGINE-979")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User",
+            "Group" }, story = "Get profile for user must return same profil only once", jira = "ENGINE-979")
     @Test
     public void getProfileForUserReturnDisctinctProfiles() throws BonitaException {
         // user 1 is mapped to profile "Administrator" through direct "userName1" mapping + through "role1" mapping:
         getIdentityAPI().addUserMembership(user1.getId(), group2.getId(), role1.getId());
 
         // Get Profile For User
-        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId());
+        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
 
         assertEquals(1, getUserProfiles.size());
         assertEquals("Administrator", getUserProfiles.get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group" }, story = "Get profile for user from group.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User",
+            "Group" }, story = "Get profile for user from group.", jira = "")
     @Test
     public void getProfileForUserFromGroup() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
 
         // Get Profile For User
-        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId());
+        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(2, getUserProfiles.size());
         assertEquals("Administrator", getUserProfiles.get(0).getName());
         assertEquals("User", getUserProfiles.get(1).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Role" }, story = "Get profile for user from role.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User",
+            "Role" }, story = "Get profile for user from role.", jira = "")
     @Test
     public void getProfileForUserFromRole() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
 
         // Get Profile For User
-        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId());
+        final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(2, getUserProfiles.size());
         assertEquals("Administrator", getUserProfiles.get(0).getName());
         assertEquals("User", getUserProfiles.get(1).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group", "Role" }, story = "Get profile for user from role and group.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group",
+            "Role" }, story = "Get profile for user from role and group.", jira = "")
     @Test
     public void getProfileForUserFromRoleAndGroup() throws BonitaException {
         getIdentityAPI().addUserMembership(user5.getId(), group3.getId(), role3.getId());
@@ -200,28 +209,30 @@ public class ProfileMemberIT extends AbstractProfileIT {
         getIdentityAPI().addUserMembership(user3.getId(), group3.getId(), role2.getId());
 
         // Get Profile For User
-        List<Profile> userProfiles = getProfileAPI().getProfilesForUser(user5.getId());
+        List<Profile> userProfiles = getProfileAPI().getProfilesForUser(user5.getId(), 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(1, userProfiles.size());
         assertEquals("Process owner", userProfiles.get(0).getName());
 
         // For profile "Process owner", good group, but bad role:
-        userProfiles = getProfileAPI().getProfilesForUser(user2.getId());
+        userProfiles = getProfileAPI().getProfilesForUser(user2.getId(), 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(0, userProfiles.size());
 
         // For profile "Process owner", good role, but bad group:
-        userProfiles = getProfileAPI().getProfilesForUser(user3.getId());
+        userProfiles = getProfileAPI().getProfilesForUser(user3.getId(), 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(1, userProfiles.size());
         assertEquals("Administrator", userProfiles.get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member",
+            "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
     @Test
     public void getProfilesForUserWithWrongParameter() throws Exception {
-        final List<Profile> profilesForUser = getProfileAPI().getProfilesForUser(564162L);
+        final List<Profile> profilesForUser = getProfileAPI().getProfilesForUser(564162L, 0, 10, ProfileCriterion.NAME_ASC);
         assertEquals(0, profilesForUser.size());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Search" }, story = "Search user profile members for proile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User",
+            "Search" }, story = "Search user profile members for proile.", jira = "")
     @Test
     public void searchUserProfileMembersForProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -236,7 +247,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Search" }, story = "Search group profile members for profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group",
+            "Search" }, story = "Search group profile members for profile.", jira = "")
     @Test
     public void searchGroupProfileMembersForProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -252,7 +264,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertTrue(displayNamePart3 == null || displayNamePart3.isEmpty());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Search" }, story = "Search role profile members for profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role",
+            "Search" }, story = "Search role profile members for profile.", jira = "")
     @Test
     public void searchRoleProfileMembersForProfile() throws BonitaException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -280,7 +293,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals("role2", searchedProfileMember.getResult().get(1).getDisplayNamePart1());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group", "Search" }, story = "Search role and group of profile members for profile.", jira = "")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group",
+            "Search" }, story = "Search role and group of profile members for profile.", jira = "")
     @Test
     public void searchRoleAndGroupProfileMembersForProfile() throws BonitaException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -306,7 +320,7 @@ public class ProfileMemberIT extends AbstractProfileIT {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member" }, story = "Get number of profile members.", jira = "")
     @Test
     public void getNumberOfProfileMembers() {
-        final List<Long> profileIds = new ArrayList<Long>();
+        final List<Long> profileIds = new ArrayList<>();
         profileIds.add(adminProfileId);
         profileIds.add(userProfileId);
         final Map<Long, Long> numberOfProfileMembers = getProfileAPI().getNumberOfProfileMembers(profileIds);
@@ -316,13 +330,15 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals(Long.valueOf(1L), numberOfProfileMembers.get(userProfileId));
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member",
+            "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = SearchException.class)
     public void searchProfileMembersForProfileWithWrongParameter() throws Exception {
         getProfileAPI().searchProfileMembers("plop", null);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-1989")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User",
+            "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-1989")
     @Test
     public void searchUserProfileMembersOfUser() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -334,7 +350,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group",
+            "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
     @Test
     public void searchUserProfileMembersOfGroup() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -344,7 +361,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals("group1", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role",
+            "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
     @Test
     public void searchUserProfileMembersOfRole() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -354,7 +372,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertEquals("role1", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group",
+            "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
     @Test
     public void searchUserProfileMembersOfRoleAndGroup() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);

@@ -65,5 +65,4 @@ ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid;
 ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_arch_flownode_instance_tenantId;
 ALTER TABLE arch_process_comment DROP CONSTRAINT fk_arch_process_comment_tenantId;
 ALTER TABLE arch_process_instance DROP CONSTRAINT fk_arch_process_instance_tenantId;
-ALTER TABLE arch_transition_instance DROP CONSTRAINT fk_arch_transition_instance_tenantId;
 ALTER TABLE arch_data_instance DROP CONSTRAINT fk_arch_data_instance_tenantId;

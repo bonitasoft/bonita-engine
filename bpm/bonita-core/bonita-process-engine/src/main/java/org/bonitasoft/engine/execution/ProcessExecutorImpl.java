@@ -451,6 +451,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private Long saveBusinessData(final Entity entity) throws SObjectCreationException {
         try {
             final Entity mergedBusinessData = businessDataRepository.merge(ServerProxyfier.unProxy(entity));
+            if (mergedBusinessData==null){
+                return null;
+            }
             return mergedBusinessData.getPersistenceId();
         } catch (IllegalArgumentException | IllegalAccessException e) {
             throw new SObjectCreationException("Unable to save the business data", e);
@@ -496,7 +499,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     byte[] getProcessDocumentContent(final SProcessDefinition sDefinition, final SDocumentDefinition document) throws BonitaHomeNotSetException, IOException,
             STenantIdNotSetException {
         final String file = document.getFile();// should always exists...validation on BusinessArchive
-        return BonitaHomeServer.getInstance().getProcessManager().getInitialProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
+        return BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
     }
 
     private Map<SExpression, DocumentValue> evaluateInitialExpressionsOfDocument(final SProcessInstance processInstance,
