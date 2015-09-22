@@ -51,10 +51,9 @@ public class MemoryLockService implements LockService {
     private final int lockPoolSize;
 
     /**
-     * @param logger
-     * @param sessionAccessor
      * @param lockTimeout
-     *            timeout to obtain a lock in seconds
+     *        timeout to obtain a lock in seconds
+     * @param lockPoolSize the size of the lock pool
      */
     public MemoryLockService(final TechnicalLoggerService logger, final int lockTimeout, final int lockPoolSize) {
         this.logger = logger;
@@ -74,12 +73,6 @@ public class MemoryLockService implements LockService {
     }
 
     private static final class MemoryLockServiceMutex {
-
-    }
-
-    private static final class MemoryLockServiceReentrantLock extends ReentrantLock {
-
-        private static final long serialVersionUID = -4360812005753126401L;
 
     }
 
@@ -229,14 +222,4 @@ public class MemoryLockService implements LockService {
         return locks.get(key);
     }
 
-    TechnicalLogSeverity selectSeverity(final long time) {
-        if (time > 150) {
-            return TechnicalLogSeverity.INFO;
-        } else if (time > 50) {
-            return TechnicalLogSeverity.DEBUG;
-        } else {
-            // No need to log anything
-            return null;
-        }
-    }
 }
