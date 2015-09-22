@@ -532,7 +532,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         try {
-            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId,
+            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId,
                     exportActorMapping(processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
