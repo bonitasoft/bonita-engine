@@ -93,7 +93,7 @@ public class HazelcastStatExtractor implements Runnable {
 
         System.out.println("Saving hazelcast statistics in " + file);
 
-        statsList = new ArrayList<>();
+        statsList = new ArrayList<String>();
         statsList.add(EXECUTING_WORK_QUEUE_ITEM_COUNT);
         statsList.add(EXECUTING_WORK_QUEUE_OFFER_COUNT);
         statsList.add(EXECUTING_WORK_QUEUE_POLL_COUNT);
@@ -126,9 +126,9 @@ public class HazelcastStatExtractor implements Runnable {
 
     @Override
     public void run() {
-        ArrayList<String> header = new ArrayList<>(statsList);
+        ArrayList<String> header = new ArrayList<String>(statsList);
         header.add(0, "Time");
-        CSVWriter csvWriter = new CSVWriter(fileWriter, header.toArray(new String[header.size()]));
+        CSVWriter csvWriter = new CSVWriter(fileWriter, header.toArray(new String[] {}));
         while (true) {
             try {
                 Thread.sleep(statsPrintInterval);
@@ -137,7 +137,7 @@ public class HazelcastStatExtractor implements Runnable {
             }
             Collection<DistributedObject> distributedObjects = hazelcastInstance.getDistributedObjects();
             long nblock = 0;
-            HashMap<String, Long> stats = new HashMap<>();
+            HashMap<String, Long> stats = new HashMap<String, Long>();
             for (DistributedObject distributedObject : distributedObjects) {
                 if (distributedObject instanceof ILock) {
                     nblock++;
@@ -183,7 +183,7 @@ public class HazelcastStatExtractor implements Runnable {
                 }
             }
             stats.put(NUMBER_OF_LOCKS, nblock);
-            ArrayList<String> counts = new ArrayList<>();
+            ArrayList<String> counts = new ArrayList<String>();
             counts.add(String.valueOf(System.currentTimeMillis()));
             for (String name : statsList) {
                 Long count = stats.get(name);
