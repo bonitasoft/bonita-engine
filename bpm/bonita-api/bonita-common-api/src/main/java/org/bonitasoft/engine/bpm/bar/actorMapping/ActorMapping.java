@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.bpm.bar.actorMapping;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +32,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 @XmlRootElement(name = "actorMappings")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ActorMapping {
+public class ActorMapping implements Serializable {
 
     @XmlElement(name = "actorMapping", required = false)
     private List<Actor> actors;

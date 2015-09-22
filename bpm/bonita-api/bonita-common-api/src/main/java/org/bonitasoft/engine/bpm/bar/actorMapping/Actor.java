@@ -14,10 +14,12 @@
 
 package org.bonitasoft.engine.bpm.bar.actorMapping;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,10 +33,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @author Baptiste Mesta
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Actor {
+public class Actor implements Serializable {
 
     @XmlAccessorType(XmlAccessType.FIELD)
-    public static class Membership {
+    public static class Membership implements Serializable {
 
         private String role;
 
@@ -87,24 +89,24 @@ public class Actor {
     private String description;
     @XmlElementWrapper(name = "users", required = false)
     @XmlElement(name = "user")
-    private Set<String> users = new HashSet<String>();;
+    private Set<String> users = new HashSet<>();;
     @XmlElementWrapper(name = "groups", required = false)
     @XmlElement(name = "group")
-    private Set<String> groups = new HashSet<String>();
+    private Set<String> groups = new HashSet<>();
     @XmlElementWrapper(name = "roles", required = false)
     @XmlElement(name = "role")
-    private Set<String> roles = new HashSet<String>();
+    private Set<String> roles = new HashSet<>();
     @XmlElementWrapper(name = "memberships", required = false)
     @XmlElement(name = "membership")
     private Set<Membership> memberships = null;
 
     public Actor(final String name) {
         this.name = name;
-        memberships = new HashSet<Membership>();
+        memberships = new HashSet<>();
     }
 
     public Actor() {
-        memberships = new HashSet<Membership>();
+        memberships = new HashSet<>();
     }
 
     public String getName() {
@@ -124,7 +126,7 @@ public class Actor {
     }
 
     public void addGroups(final List<String> groups) {
-        this.groups = new HashSet<String>(groups);
+        this.groups = new HashSet<>(groups);
     }
 
     public Set<String> getGroups() {
@@ -136,7 +138,7 @@ public class Actor {
     }
 
     public void addRoles(final List<String> roles) {
-        this.roles = new HashSet<String>(roles);
+        this.roles = new HashSet<>(roles);
     }
 
     public Set<String> getRoles() {
@@ -148,7 +150,7 @@ public class Actor {
     }
 
     public void addUsers(final List<String> userNames) {
-        users = new HashSet<String>(userNames);
+        users = new HashSet<>(userNames);
     }
 
     public Set<String> getUsers() {
