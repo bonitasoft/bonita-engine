@@ -15,6 +15,9 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static java.util.Arrays.asList;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -49,6 +53,7 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -85,7 +90,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public byte[] getClientBDMZip() throws SBusinessDataRepositoryException {
         try {
-            return BonitaHomeServer.getInstance().getTenantStorage().getClientBDMZip(tenantId);
+            return BonitaHomeServer.getInstance().getClientBDMZip(tenantId);
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryException(e);
         }
@@ -170,7 +175,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private void createClientBDMZip(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         try {
             final byte[] clientBdmJar = generateClientBDMZip(model);
-            BonitaHomeServer.getInstance().getTenantStorage().writeClientBDMZip(tenantId, clientBdmJar);
+            BonitaHomeServer.getInstance().writeClientBDMZip(tenantId, clientBdmJar);
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
@@ -209,7 +214,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         //Add bom.xml
         try {
             resources.put(BOM_NAME, new BusinessObjectModelConverter().zip(model));
-        } catch (final JAXBException | SAXException e) {
+        } catch (final JAXBException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final SAXException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
 
@@ -246,7 +253,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throw new SBusinessDataRepositoryException(sde);
         }
         try {
-            BonitaHomeServer.getInstance().getTenantStorage().removeBDMZip(tenantId);
+            BonitaHomeServer.getInstance().removeBDMZip(tenantId);
         } catch (Exception e) {
             throw new SBusinessDataRepositoryException(e);
         }
@@ -265,8 +272,12 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
                     throw new SBusinessDataRepositoryDeploymentException("Updating schema fails due to: " + exceptions);
                 }
                 uninstall(tenantId);
-            } catch (final IOException | JAXBException | SAXException ioe) {
+            } catch (final IOException ioe) {
                 throw new SBusinessDataRepositoryException(ioe);
+            } catch (final JAXBException jaxbe) {
+                throw new SBusinessDataRepositoryException(jaxbe);
+            } catch (final SAXException saxe) {
+                throw new SBusinessDataRepositoryException(saxe);
             }
         }
     }

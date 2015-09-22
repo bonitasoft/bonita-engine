@@ -162,10 +162,12 @@ public class DependencyResolver {
      */
     public void resolveAndCreateDependencies(final long tenantId, final ProcessDefinitionService processDefinitionService,
             final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
-        Map<String, byte[]> resources;
+        Map<String, byte[]> resources = null;
         try {
-            resources = BonitaHomeServer.getInstance().getProcessManager().getProcessClasspath(tenantId, processDefinitionId);
-        } catch (final IOException | BonitaHomeNotSetException e) {
+            resources = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
+        } catch (final IOException e) {
+            throw new SDependencyCreationException(e);
+        } catch (BonitaHomeNotSetException e) {
             throw new SDependencyCreationException(e);
         }
         addDependencies(resources, dependencyService, processDefinitionId);

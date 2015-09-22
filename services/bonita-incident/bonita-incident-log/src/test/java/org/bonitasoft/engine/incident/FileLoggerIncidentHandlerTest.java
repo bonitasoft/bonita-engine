@@ -24,7 +24,6 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.home.TenantStorage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -42,8 +41,6 @@ public class FileLoggerIncidentHandlerTest {
 
     @Mock
     private BonitaHomeServer bonitaHomeServer;
-    @Mock
-    private TenantStorage tenantStorage;
 	
     @Test
     public void should_write_into_file_when_handle_incident() throws Exception {
@@ -58,8 +55,7 @@ public class FileLoggerIncidentHandlerTest {
         final FileHandler fh = new FileHandler(incidentFile.getAbsolutePath());
 
         when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
-        when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
-        doReturn(fh).when(tenantStorage).getIncidentFileHandler(tenantId);
+        doReturn(fh).when(bonitaHomeServer).getIncidentFileHandler(tenantId);
 
     	final Incident incident = new Incident("test", "recovery", new Exception("an unexpected exception"), new Exception("unable to handle failure"));
         FileLoggerIncidentHandler fileLoggerIncidentHandler = new FileLoggerIncidentHandler();
