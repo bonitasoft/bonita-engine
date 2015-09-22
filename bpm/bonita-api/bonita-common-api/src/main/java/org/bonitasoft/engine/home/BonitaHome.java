@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.home;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
@@ -54,7 +55,7 @@ public abstract class BonitaHome {
         return this.home;
     }
 
-    public File getBonitaHomeFolder() throws BonitaHomeNotSetException {
+    public final File getBonitaHomeFolder() throws BonitaHomeNotSetException {
         return new File(getBonitaHomeFolderPath());
     }
 
