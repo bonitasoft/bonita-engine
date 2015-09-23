@@ -8,40 +8,22 @@
  *******************************************************************************/
 package com.bonitasoft.engine.services.monitoring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
 import com.bonitasoft.engine.CommonBPMServicesSPTest;
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
-import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
-import com.bonitasoft.engine.monitoring.mbean.impl.SServiceMXBeanImpl;
+import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.test.util.TestUtil;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
@@ -97,52 +79,27 @@ public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
     @Test
     public void getActiveTransactionTest() throws Exception {
+        //given
         // start the ServiceMXBean
         final SServiceMXBean svcMB = getServiceMXBean();
         svcMB.start();
-
         final String numberOfActiveTransactions = "NumberOfActiveTransactions";
-        assertEquals(0L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
 
-        // create a transaction in new thread to avoid an exception
-        final Thread createTransactionThread = new Thread(new CreateTransactionThread(getTransactionService()));
-        createTransactionThread.start();
-        Thread.sleep(500);// wait thread start transaction
+        //when
+        //open transactions
+        getTransactionService().begin();
+        //get number of active transactions just after beginning a transaction
+        Long activeTransitions = (Long) mbserver.getAttribute(serviceMB, numberOfActiveTransactions);
 
-        // check the transaction has been successfully counted
-        assertEquals(1L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
-
-        final WaitFor waitForNoActiveTransactions = new WaitFor(50, 10000) {
-
-            @Override
-            boolean check() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
-                return (Long) mbserver.getAttribute(serviceMB, numberOfActiveTransactions) == 0l;
-            }
-        };
-        // check the number of executing job has incremented
-        assertTrue(waitForNoActiveTransactions.waitFor());
+        //close transaction
+        getTransactionService().complete();
         svcMB.stop();
-    }
 
-    private class CreateTransactionThread implements Runnable {
-
-        private final TransactionService txService;
-
-        public CreateTransactionThread(final TransactionService txService) {
-            this.txService = txService;
-        }
-
-        @Override
-        public void run() {
-            try {
-                txService.begin();
-                Thread.sleep(4000);
-                txService.complete();
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-
-        }
+        //then
+        // check the transaction has been successfully counted
+        // use a soft assertions because asynchronous code can also create transactions (like QuartzJobs)
+        // so the number of active transactions can be greater than 1
+        assertThat(activeTransitions).isGreaterThanOrEqualTo(1L);
 
     }
 
