@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,6 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.bpm.bar;
 
 import java.io.Serializable;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 
@@ -35,18 +37,34 @@ public class BusinessArchive implements Serializable {
 
     private static final long serialVersionUID = -6410347766671025202L;
 
+    private final Map<String, byte[]> resources = new HashMap<>();
+
     private DesignProcessDefinition processDefinition;
 
     private Map<String, String> parameters;
 
-    private final Map<String, byte[]> resources = new HashMap<String, byte[]>();
-
     private FormMappingModel formMappingModel = new FormMappingModel();
+
+    private ActorMapping actorMapping = null;
 
     /**
      * Default constructor. Creates an instance of {@code BusinessArchive}
      */
     public BusinessArchive() {
+    }
+
+    /*
+     * Retrieves the actorMapping from the bar
+     */
+    public ActorMapping getActorMapping() {
+        return actorMapping;
+    }
+
+    /*
+     * Sets the actorMapping in the bar
+     */
+    public void setActorMapping(ActorMapping actorMapping) {
+        this.actorMapping = actorMapping;
     }
 
     /**
@@ -94,7 +112,11 @@ public class BusinessArchive implements Serializable {
      * Retrieves a byte array representing the content of the resource identified by the given path.
      * <br>
      * <p>Example:</p>
-     * <pre>businessArchive.getResource("actorMapping.xml")</pre>
+     * 
+     * <pre>
+     * businessArchive.getResource("actorMapping.xml")
+     * </pre>
+     * 
      * <br>
      *
      * @param resourcePath the complete resource path
@@ -109,7 +131,11 @@ public class BusinessArchive implements Serializable {
      * resource paths and the {@code Map} values store the resource content.
      * <br>
      * <p>Example:</p>
-     * <pre>businessArchive.getResources("^classpath/.*$")</pre>
+     * 
+     * <pre>
+     * businessArchive.getResources("^classpath/.*$")
+     * </pre>
+     * 
      * <br>
      *
      * @param regex the regular expression used to match the resource path

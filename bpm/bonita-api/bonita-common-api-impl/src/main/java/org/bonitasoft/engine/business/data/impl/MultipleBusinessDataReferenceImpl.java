@@ -17,8 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**

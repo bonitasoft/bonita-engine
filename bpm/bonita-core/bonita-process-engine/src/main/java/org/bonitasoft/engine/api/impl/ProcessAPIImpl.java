@@ -1,6 +1,7 @@
+
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,6 +12,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
@@ -314,7 +316,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -352,7 +353,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -432,8 +432,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.XMLWriter;
 
 /**
  * @author Baptiste Mesta
@@ -453,17 +451,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     private static final String CONTAINER_TYPE_PROCESS_INSTANCE = "PROCESS_INSTANCE";
 
     private static final String CONTAINER_TYPE_ACTIVITY_INSTANCE = "ACTIVITY_INSTANCE";
-
-    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
-
-    private final DocumentAPI documentAPI;
     protected final ProcessConfigurationAPIImpl processConfigurationAPI;
+    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
+    private final DocumentAPI documentAPI;
 
     public ProcessAPIImpl() {
         this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIImpl());
     }
 
-    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI, ProcessConfigurationAPIImpl processConfigurationAPI) {
+    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI,
+            ProcessConfigurationAPIImpl processConfigurationAPI) {
         processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
         this.processConfigurationAPI = processConfigurationAPI;
@@ -726,7 +723,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();;
+        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
 
         SProcessDefinition sProcessDefinition;
         try {
@@ -1674,7 +1671,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final int totalNumber = activityInstanceService.getNumberOfOpenActivityInstances(processInstanceId);
             // If there are no instances, return an empty list:
             if (totalNumber == 0) {
-                return Collections.<ActivityInstance> emptyList();
+                return Collections.emptyList();
             }
             final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(criterion);
             return ModelConvertor.toActivityInstances(
@@ -2684,9 +2681,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final IdentityService identityService = tenantAccessor.getIdentityService();
-            final Parser parser = tenantAccessor.getActorMappingParser();
             try {
-                new ImportActorMapping(actorMappingService, identityService, parser, processDefinitionId, xmlContent).execute();
+                new ImportActorMapping(actorMappingService,identityService).importActorMappingFromXml(xmlContent,processDefinitionId);
                 tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
             } catch (final SBonitaException sbe) {
                 throw new ActorMappingImportException(sbe);
@@ -2699,9 +2695,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final XMLWriter writer = tenantAccessor.getXMLWriter();
         try {
-            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, writer, processDefinitionId);
+            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, processDefinitionId);
             exportActorMapping.execute();
             return exportActorMapping.getResult();
         } catch (final SBonitaException sbe) {
