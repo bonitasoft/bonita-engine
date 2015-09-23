@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -538,27 +536,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(0, outOfRangeCategories.size());
     }
 
-    @Test
-    @Deprecated
-    public void oldRemoveProcessDefinitionsOfCategory() throws Exception {
-        // generate category
-        final Category category = getProcessAPI().createCategory(name, description);
-        categories.add(category);
-        // generate process definitions
-        processDefinitions = generateProcessDefinition(3, "process", "version");
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
-        for (final ProcessDefinition processDefinition : processDefinitions) {
-            processDefinitionIds.add(processDefinition.getId());
-        }
-        // add process definitions to category
-        getProcessAPI().addProcessDefinitionsToCategory(category.getId(), processDefinitionIds);
-        // test
-        getProcessAPI().removeAllProcessDefinitionsFromCategory(category.getId());
-        final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getProcessDeploymentInfosOfCategory(category.getId(), 0, 10,
-                ProcessDeploymentInfoCriterion.ACTIVATION_STATE_ASC);
-        assertNotNull(processDeploymentInfos);
-        assertEquals(0, processDeploymentInfos.size());
-    }
 
     @Test
     public void removeProcessDefinitionsOfCategory() throws Exception {
@@ -582,42 +559,11 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Deprecated
-    public void oldRemoveProcessDefinitionsOfUnknownCategoryDoesntThrowException() throws Exception {
-        // generate process definitions
-        processDefinitions = generateProcessDefinition(3, "process", "version");
-        // test
-        getProcessAPI().removeAllProcessDefinitionsFromCategory(Long.MAX_VALUE);
-    }
-
-    @Test
     public void removeProcessDefinitionsOfUnknownCategoryDoesntThrowException() throws Exception {
         // generate process definitions
         processDefinitions = generateProcessDefinition(3, "process", "version");
         // test
         getProcessAPI().removeProcessDefinitionsFromCategory(Long.MAX_VALUE, 0, 0);
-    }
-
-    @Test
-    @Deprecated
-    public void oldRemoveProcessDefinitionFromCategory() throws Exception {
-        // generate categories
-        categories = generateCategory(3, "category", "test remove one specified process definition from all categories ");
-        // generate process definition
-        final ProcessDefinition processDefinition = generateProcessDefinition(1, "process", "version").get(0);
-        processDefinitions.add(processDefinition);
-        final long processDefinitionId = processDefinition.getId();
-
-        // add
-        for (final Category category : categories) {
-            getProcessAPI().addProcessDefinitionToCategory(category.getId(), processDefinitionId);
-        }
-        long count = getProcessAPI().getNumberOfCategories(processDefinitionId);
-        assertEquals(3, count);
-        // test
-        getProcessAPI().removeAllCategoriesFromProcessDefinition(processDefinitionId);
-        count = getProcessAPI().getNumberOfCategories(processDefinitionId);
-        assertEquals(0, count);
     }
 
     @Test
@@ -639,12 +585,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().removeCategoriesFromProcessDefinition(processDefinitionId, 0, 2);
         count = getProcessAPI().getNumberOfCategories(processDefinitionId);
         assertEquals(1, count);
-    }
-
-    @Test
-    @Deprecated
-    public void oldRemoveUnknowProcessDefinitionFromCategoryDontThrowsException() throws Exception {
-        getProcessAPI().removeAllCategoriesFromProcessDefinition(0);
     }
 
     @Test

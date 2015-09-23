@@ -24,7 +24,7 @@ import org.bonitasoft.engine.test.WaitUntil;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @deprecated use {@link APITestUtil} .waitFor...
+ * @deprecated use {@link org.bonitasoft.engine.test.APITestUtil} .waitFor...
  */
 @Deprecated
 public final class CheckNbPendingTaskOf extends WaitUntil {

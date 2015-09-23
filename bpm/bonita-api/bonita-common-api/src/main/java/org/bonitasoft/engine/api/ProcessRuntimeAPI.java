@@ -290,35 +290,6 @@ public interface ProcessRuntimeAPI {
     void deleteProcessInstance(long processInstanceId) throws DeletionException;
 
     /**
-     * Delete all instances of a specified process definition.
-     * If the process definition id does not match anything, no exception is thrown, but nothing is deleted.
-     *
-     * @param processDefinitionId
-     *        The identifier of the processDefinition.
-     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
-     *         If a process instance cannot be deleted because of a parent that still exists.
-     * @throws DeletionException
-     *         If other deletion problem occurs.
-     * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int)} and {@link #deleteArchivedProcessInstances(long, int, int)}.
-     *             As these new methods are paginated, to delete ALL archived and non-archived process instances, use some code like:
-     *             <pre>
-     *             <code>
-     *             long nbDeleted = 0;
-     *             processAPI.disableProcess(processDefinitionId);
-     *             do {
-     *             nbDeleted = processAPI.deleteProcessInstances(processDefinitionId, 0, 100);
-     *             } while (nbDeleted &gt; 0);
-     *             do {
-     *             nbDeleted = processAPI.deleteArchivedProcessInstances(processDefinitionId, 0, 100);
-     *             } while (nbDeleted &gt; 0);
-     *             </code>
-     *             </pre>
-     */
-    @Deprecated
-    void deleteProcessInstances(long processDefinitionId) throws DeletionException;
-
-    /**
      * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters.
      * Passing {@link Integer#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
      * Instead, to delete all Process instances of a specific process definition, should you should use a loop and delete instances in bulk.
