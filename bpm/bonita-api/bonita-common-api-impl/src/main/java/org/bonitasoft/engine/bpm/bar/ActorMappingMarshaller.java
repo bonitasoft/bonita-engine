@@ -17,7 +17,6 @@ package org.bonitasoft.engine.bpm.bar;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -35,10 +34,7 @@ public class ActorMappingMarshaller {
 
     private static final String XSD_MODEL = "/actorMapping.xsd";
 
-    private final URL xsdUrl;
-
     public ActorMappingMarshaller() {
-        xsdUrl = ActorMapping.class.getResource(XSD_MODEL);
     }
 
     public ActorMapping deserializeFromXML(final byte[] xmlModel) throws XmlMarshallException {

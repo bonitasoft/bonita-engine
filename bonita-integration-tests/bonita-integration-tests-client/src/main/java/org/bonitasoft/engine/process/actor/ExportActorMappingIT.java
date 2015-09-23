@@ -47,7 +47,7 @@ public class ExportActorMappingIT extends TestWithUser {
         final InputStream xmlStream = ImportActorMappingIT.class.getResourceAsStream("simpleActorMapping.xml");
         try {
             final byte[] actormapping = IOUtils.toByteArray(xmlStream);
-            assertEquals(removewhitespaces(new String(actormapping)), removewhitespaces(xmlContent));
+            assertThatXmlHaveNoDifferences(new String(actormapping), xmlContent);
         } finally {
             xmlStream.close();
         }
@@ -179,7 +179,7 @@ public class ExportActorMappingIT extends TestWithUser {
         final InputStream xmlStream = ImportActorMappingIT.class.getResourceAsStream("complexActorMapping.xml");
         try {
             final byte[] actormapping = IOUtils.toByteArray(xmlStream);
-            assertEquals(removewhitespaces(new String(actormapping)), removewhitespaces(xmlContent));
+            assertThatXmlHaveNoDifferences(new String(actormapping), xmlContent);
         } finally {
             xmlStream.close();
         }
@@ -187,11 +187,6 @@ public class ExportActorMappingIT extends TestWithUser {
         getIdentityAPI().deleteRole(role.getId());
         deleteUser(john);
         deleteProcess(definition);
-    }
-
-    private String removewhitespaces(final String content) {
-        String replace = content.replaceAll("\\s+", "");
-        return replace = replace.replaceAll("\n", "");
     }
 
 }

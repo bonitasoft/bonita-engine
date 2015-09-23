@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<actorMappings xmlns="http://www.bonitasoft.org/ns/actormapping/6.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<actorMappings:actorMappings xmlns:actorMappings="http://www.bonitasoft.org/ns/actormapping/6.0">
     <actorMapping name="Employee actor">
         <users>
             <user>john</user>
@@ -17,4 +17,4 @@
             </membership>
         </memberships>
     </actorMapping>
-</actorMappings>
+</actorMappings:actorMappings>

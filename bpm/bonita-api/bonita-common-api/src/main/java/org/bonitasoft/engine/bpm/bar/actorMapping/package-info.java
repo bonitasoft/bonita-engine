@@ -16,7 +16,8 @@
  * Contains Actor mapping model classes.
  * </p>
  */
-@XmlSchema(namespace = "http://www.bonitasoft.org/ns/actormapping/6.0", elementFormDefault = XmlNsForm.QUALIFIED)
+@XmlSchema(namespace = "http://www.bonitasoft.org/ns/actormapping/6.0", elementFormDefault = XmlNsForm.UNSET, xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/actormapping/6.0", prefix = "actorMappings") })
 package org.bonitasoft.engine.bpm.bar.actorMapping;
 
 import javax.xml.bind.annotation.XmlNsForm;

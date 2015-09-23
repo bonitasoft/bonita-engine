@@ -218,7 +218,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         getProcessAPI()
                 .importActorMapping(
                         processDefinition.getId(),
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actormappings xmlns=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actormappings>"
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actorMappings:actorMappings xmlns:actorMappings=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actorMappings:actorMappings>"
                                 .getBytes());
 
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
