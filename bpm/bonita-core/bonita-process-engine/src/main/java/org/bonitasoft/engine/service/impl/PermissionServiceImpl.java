@@ -13,14 +13,10 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import groovy.lang.GroovyClassLoader;
-
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
-import groovy.lang.GroovyResourceLoader;
+import groovy.lang.GroovyClassLoader;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
@@ -30,7 +26,6 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PermissionService;
@@ -103,11 +98,9 @@ public class PermissionServiceImpl implements PermissionService {
         groovyClassLoader = new GroovyClassLoader(classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId));
         groovyClassLoader.setShouldRecompile(true);
         try {
-            final File folder = BonitaHomeServer.getInstance().getSecurityScriptsFolder(tenantId);
+            final File folder = BonitaHomeServer.getInstance().getTenantStorage().getSecurityScriptsFolder(tenantId);
             groovyClassLoader.addClasspath(folder.getAbsolutePath());
-        } catch (BonitaHomeNotSetException e) {
-            throw new SExecutionException(e);
-        } catch (IOException e) {
+        } catch (BonitaHomeNotSetException | IOException e) {
             throw new SExecutionException(e);
         }
     }

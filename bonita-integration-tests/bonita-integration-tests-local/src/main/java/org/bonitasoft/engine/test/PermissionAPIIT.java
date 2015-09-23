@@ -15,13 +15,11 @@ package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -106,7 +104,7 @@ public class PermissionAPIIT extends CommonAPILocalIT {
     }
 
     private void writeScriptToBonitaHome(final String scriptFileContent, final String fileName, final String... folders) throws IOException, SBonitaException, BonitaHomeNotSetException {
-        BonitaHomeServer.getInstance().storeSecurityScript(getSession().getTenantId(), scriptFileContent, fileName + ".groovy", folders);
+        BonitaHomeServer.getInstance().getTenantStorage().storeSecurityScript(getSession().getTenantId(), scriptFileContent, fileName + ".groovy", folders);
 
         //System.out.println("write to file " + fileName + " in folders: " + folders);
         final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
