@@ -107,7 +107,6 @@
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
         <constructor-arg name="containerRegistry" ref="containerRegistry" />

@@ -48,7 +48,7 @@ public class ContractInputExpressionExecutorStrategyTest {
     @InjectMocks
     private ContractInputExpressionExecutorStrategy strategy;
 
-    private Map<String, Object> buildInitialContext(final long containerId) {
+    private Map<String, Object> buildInitialContext(final Long containerId) {
         final Map<String, Object> context = new HashMap<String, Object>(2);
         context.put(SExpressionContext.CONTAINER_ID_KEY, containerId);
         context.put(SExpressionContext.CONTAINER_TYPE_KEY, DataInstanceContainer.ACTIVITY_INSTANCE.name());
@@ -76,6 +76,14 @@ public class ContractInputExpressionExecutorStrategyTest {
         final SExpression expression = buildInputContractExpression("comment", String.class);
         final Map<String, Object> context = buildInitialContext(465465L);
         when(contractDataService.getUserTaskDataValue(465465L, "comment")).thenThrow(new SContractDataNotFoundException("exception"));
+
+        strategy.evaluate(expression, context, null, null);
+    }
+
+    @Test(expected = SExpressionEvaluationException.class)
+    public void should_evaluate_throw_exception_when_no_containerId() throws Exception {
+        final SExpression expression = buildInputContractExpression("comment", String.class);
+        final Map<String, Object> context = buildInitialContext(null);
 
         strategy.evaluate(expression, context, null, null);
     }

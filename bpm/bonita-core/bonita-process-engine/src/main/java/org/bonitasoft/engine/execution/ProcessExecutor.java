@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -41,17 +40,13 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 public interface ProcessExecutor extends ContainerExecutor {
 
     SProcessInstance start(long processDefinitionId, long targetSFlowNodeDefinitionId, long starterId, long starterSubstituteId,
-                           SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
-            List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId, Map<String, Serializable> processInputs)
+                           SExpressionContext expressionContext, List<SOperation> operations,
+                           long callerId, long subProcessDefinitionId, Map<String, Serializable> processInputs)
             throws SProcessInstanceCreationException, SContractViolationException;
 
     SProcessInstance start(long starterId, long starterSubstituteId, List<SOperation> operations,
             Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector,
             Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException;
-
-    SProcessInstance start(long starterId, long starterSubstituteId, SExpressionContext expressionContext, List<SOperation> operations,
-            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectors, long callerId, FlowNodeSelector selector,
-            Map<String, Serializable> instantiationInputs) throws SProcessInstanceCreationException, SContractViolationException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
                               FlowNodeSelector selector) throws SBonitaException;

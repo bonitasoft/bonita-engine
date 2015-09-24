@@ -507,10 +507,9 @@ public class BPMInstancesCreator {
 
     public SLoopActivityInstanceBuilder createLoopActivityInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final long rootProcessInstanceId, final long parentProcessInstanceId, final SActivityDefinition activityDefinition) {
-        final SLoopActivityInstanceBuilder builder = BuilderFactory.get(SLoopActivityInstanceBuilderFactory.class).createNewOuterTaskInstance(
+        return BuilderFactory.get(SLoopActivityInstanceBuilderFactory.class).createNewOuterTaskInstance(
                 activityDefinition.getName(), activityDefinition.getId(), rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId,
                 parentProcessInstanceId);
-        return builder;
     }
 
     private SHumanTaskInstanceBuilder createHumanTaskInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
@@ -546,72 +545,65 @@ public class BPMInstancesCreator {
         final List<SConnectorInstance> connectorInstances = new ArrayList<SConnectorInstance>(connectors.size());
         int executionOrder = 0;
         for (final SConnectorDefinition sConnectorDefinition : connectors) {
-            connectorInstances.add(BuilderFactory
-                    .get(SConnectorInstanceBuilderFactory.class)
-                    .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
-                            sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
-                            executionOrder++)
-                    .done());
+            final SConnectorInstance connectorInstance = createConnectorInstanceObject(container, containerType, sConnectorDefinition, executionOrder++);
+            connectorInstances.add(connectorInstance);
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
         transaction.execute();
     }
 
+    SConnectorInstance createConnectorInstanceObject(PersistentObject container, String containerType, SConnectorDefinition sConnectorDefinition, int executionOrder) {
+        return BuilderFactory
+                        .get(SConnectorInstanceBuilderFactory.class)
+                        .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
+                                sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
+                                executionOrder)
+                        .done();
+    }
+
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
-            final SProcessDefinition processDefinition, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Map<String, Object> context) throws SDataInstanceNotWellFormedException, SExpressionTypeUnknownException, SExpressionEvaluationException,
+                                    final SProcessDefinition processDefinition, final SExpressionContext expressionContext, final List<SOperation> operations,
+                                    final Map<String, Object> context, SExpressionContext expressionContextToEvaluateOperations) throws SDataInstanceNotWellFormedException, SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException, SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         final List<SDataDefinition> sDataDefinitions = processContainer.getDataDefinitions();
-        final List<SDataInstance> sDataInstances = new ArrayList<SDataInstance>(sDataDefinitions.size());
+        final List<SDataInstance> sDataInstances = new ArrayList<>(sDataDefinitions.size());
         for (final SDataDefinition sDataDefinition : sDataDefinitions) {
-            Serializable defaultValue = null;
-            boolean hasOperation = false;
-            SExpression expression = null;
-            SExpressionContext currentExpressionContext = null;
-            if (operations != null) {
-                final SOperation operation = getOperationToSetData(sDataDefinition.getName(), operations);
-                if (operation != null) {
-                    hasOperation = true;
-                    expression = operation.getRightOperand();
-                    if (expressionContext != null) {
-                        expressionContext.setInputValues(context);
-                        currentExpressionContext = expressionContext;
-                    } else {
-                        currentExpressionContext = new SExpressionContext(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
-                                processInstance.getProcessDefinitionId());
-                        currentExpressionContext.setInputValues(context);
-                    }
-                    operations.remove(operation);
-                }
-            }
-            // If there was no operations in entry OR if no operation should set the current data, we take the default data definition value:
-            if (!hasOperation) {
-                expression = sDataDefinition.getDefaultValueExpression();
-                currentExpressionContext = new SExpressionContext(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
-                        processInstance.getProcessDefinitionId());
-            }
-            if (expression != null) {
-                defaultValue = (Serializable) expressionResolverService.evaluate(expression, currentExpressionContext);
-            } else if (sDataDefinition.isTransientData()) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                            "Creating a transient data instance with a null expression is not a good practice.");
-                }
-            }
-            try {
-                final SDataInstance dataInstance = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(sDataDefinition)
-                        .setContainerId(processInstance.getId())
-                        .setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name()).setValue(defaultValue).done();
-                sDataInstances.add(dataInstance);
-            } catch (final ClassCastException e) {
-                throw new SDataInstanceNotWellFormedException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: "
-                        + e.getMessage());
-            }
+            sDataInstances.add(createDataInstance(processInstance, expressionContext, operations, context, expressionContextToEvaluateOperations, sDataDefinition));
+
         }
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
             // we create here only normal data, not transient because there is no transient on process
-            createDataForProcess(processInstance, processDefinition, sDataInstances);
+            createDataForProcess(sDataInstances);
         }
+        debugLogVariableInitialized(processInstance, processDefinition);
+    }
+
+    SDataInstance createDataInstance(SProcessInstance processInstance, SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context, SExpressionContext expressionContextToEvaluateOperations, SDataDefinition sDataDefinition) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SDataInstanceNotWellFormedException {
+        SExpression expression;
+        SExpressionContext currentExpressionContext;
+        final SOperation operation;
+        if ((operation = getOperationToSetData(sDataDefinition.getName(), operations)) != null) {
+            expression = operation.getRightOperand();
+            currentExpressionContext = expressionContextToEvaluateOperations != null ? expressionContextToEvaluateOperations : expressionContext;
+            currentExpressionContext.setInputValues(context);
+            operations.remove(operation);
+        } else {
+            expression = sDataDefinition.getDefaultValueExpression();
+            currentExpressionContext = expressionContext;
+        }
+        return createDataInstanceObject(processInstance, sDataDefinition, evaluateExpression(sDataDefinition, expression, currentExpressionContext));
+    }
+
+    private Serializable evaluateExpression(SDataDefinition sDataDefinition, SExpression expression, SExpressionContext currentExpressionContext) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        if (expression != null) {
+            return (Serializable) expressionResolverService.evaluate(expression, currentExpressionContext);
+        } else if (sDataDefinition.isTransientData()) {
+            warningWhenTransientDataWithNullValue();
+        }
+        return null;
+    }
+
+    void debugLogVariableInitialized(SProcessInstance processInstance, SProcessDefinition processDefinition) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("Initialized variables for process instance [name: <");
@@ -635,8 +627,26 @@ public class BPMInstancesCreator {
         }
     }
 
-    private void createDataForProcess(final SProcessInstance processInstance, final SProcessDefinition processDefinition,
-            final List<SDataInstance> sDataInstances)
+    SDataInstance createDataInstanceObject(SProcessInstance processInstance, SDataDefinition sDataDefinition, Serializable dataValue)
+            throws SDataInstanceNotWellFormedException {
+        try {
+            return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(sDataDefinition)
+                    .setContainerId(processInstance.getId())
+                    .setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name()).setValue(dataValue).done();
+        } catch (final ClassCastException e) {
+            throw new SDataInstanceNotWellFormedException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: "
+                    + e.getMessage());
+        }
+    }
+
+    void warningWhenTransientDataWithNullValue() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                    "Creating a transient data instance with a null expression is not a good practice.");
+        }
+    }
+
+    private void createDataForProcess(final List<SDataInstance> sDataInstances)
             throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         if (!sDataInstances.isEmpty()) {
             for (final SDataInstance sDataInstance : sDataInstances) {
@@ -692,10 +702,7 @@ public class BPMInstancesCreator {
                 if (defaultValueExpression != null) {
                     dataValue = (Serializable) expressionResolverService.evaluate(dataDefinition.getDefaultValueExpression(), expressionContext);
                 } else if (dataDefinition.isTransientData()) {
-                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                                "Creating a transient data instance with a null expression is not a good practice.");
-                    }
+                    warningWhenTransientDataWithNullValue();
                 }
             }
             final SDataInstance dataInstance;
@@ -735,12 +742,12 @@ public class BPMInstancesCreator {
             } else {
                 expressionContext = sExpressionContext;
             }
-            return createDataInstances(processContainer, activityDefinition, flowNodeInstance, expressionContext);
+            return createDataInstances(activityDefinition, flowNodeInstance, expressionContext);
         }
         return false;
     }
 
-    private boolean createDataInstances(final SFlowElementContainerDefinition processContainer, final SActivityDefinition activityDefinition,
+    private boolean createDataInstances(final SActivityDefinition activityDefinition,
             final SFlowNodeInstance flowNodeInstance, final SExpressionContext expressionContext) throws SActivityStateExecutionException {
         final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
         final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
@@ -793,10 +800,8 @@ public class BPMInstancesCreator {
                 final SRefBusinessDataInstance inputRefInstance = instanceFactory.createNewInstanceForFlowNode(inputBusinessData.getName(),
                         flowNodeInstance.getId(), dataIds.get(flowNodeInstance.getLoopCounter()), inputBusinessData.getClassName()).done();
                 addRefBusinessData(inputRefInstance);
-            } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
-                throw new SDataInstanceException(srbdinfe);
-            } catch (final SBonitaReadException sbe) {
-                throw new SDataInstanceException(sbe);
+            } catch (final SRefBusinessDataInstanceNotFoundException | SBonitaReadException e) {
+                throw new SDataInstanceException(e);
             }
         }
     }
@@ -804,8 +809,8 @@ public class BPMInstancesCreator {
     private void addRefBusinessData(final SRefBusinessDataInstance instance) throws SDataInstanceException {
         try {
             refBusinessDataService.addRefBusinessDataInstance(instance);
-        } catch (final SRefBusinessDataInstanceCreationException sbrdice) {
-            throw new SDataInstanceException(sbrdice);
+        } catch (final SRefBusinessDataInstanceCreationException e) {
+            throw new SDataInstanceException(e);
         }
     }
 
