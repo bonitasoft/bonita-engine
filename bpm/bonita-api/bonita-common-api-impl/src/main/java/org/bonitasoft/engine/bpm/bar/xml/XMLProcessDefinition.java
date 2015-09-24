@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -10,7 +10,8 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
+
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.HashMap;
@@ -259,158 +260,68 @@ public class XMLProcessDefinition {
     public static final String PARAMETER_TYPE = "type";
 
     public static final String BOS_VERSION = "bos_version";
-
-    private static final String BOS_CURRENT_VERSION = "6.0-SNAPSHOT";
-
     public static final String DEFAULT_VALUE_NODE = "defaultValue";
-
     public static final String TIMER_EVENT_TRIGGER_NODE = "timerEventTrigger";
-
     public static final String CATCH_MESSAGE_EVENT_TRIGGER_NODE = "catchMessageEventTrigger";
-
     public static final String THROW_MESSAGE_EVENT_TRIGGER_NODE = "throwMessageEventTrigger";
-
     public static final String CATCH_SIGNAL_EVENT_TRIGGER_NODE = "catchSignalEventTrigger";
-
     public static final String CATCH_ERROR_EVENT_TRIGGER_NODE = "catchErrorEventTrigger";
-
     public static final String THROW_SIGNAL_EVENT_TRIGGER_NODE = "throwSignalEventTrigger";
-
     public static final String THROW_ERROR_EVENT_TRIGGER_NODE = "throwErrorEventTrigger";
-
     public static final String TERMINATE_EVENT_TRIGGER_NODE = "terminateEventTrigger";
-
     public static final String TIMER_EVENT_TRIGGER_TIMER_TYPE = "type";
-
     public static final String ERROR_CODE = "errorCode";
-
     public static final String CORRELATION_NODE = "correlation";
-
     public static final String TARGET_PROCESS = "targetProcess";
-
     public static final String TARGET_FLOW_NODE = "targetFlowNode";
-
     public static final String OPERATION_NODE = "operation";
-
     public static final String OPERATION_RIGHT_OPERAND = "rightOperand";
-
     public static final String OPERATION_LEFT_OPERAND = "leftOperand";
-
     public static final String OPERATION_OPERATOR_TYPE = "operatorType";
-
     public static final String OPERATION_OPERATOR = "operator";
-
     public static final String LEFT_OPERAND_NAME = "name";
-
     public static final String LEFT_OPERAND_TYPE = "type";
-
     public static final String CONNECTOR_INPUTS_NODE = "inputs";
-
     public static final String CONNECTOR_OUTPUTS_NODE = "outputs";
-
     public static final String CONNECTOR_VERSION = "version";
-
     public static final String STANDARD_LOOP_CHARACTERISTICS_NODE = "standardLoopCharacteristics";
-
     public static final String LOOP_CONDITION = "loopCondition";
-
     public static final String TEST_BEFORE = "testBefore";
-
     public static final String LOOP_MAX = "loopMax";
-
     public static final String MULTI_INSTANCE_LOOP_CHARACTERISTICS_NODE = "multiInstanceLoopCharacteristics";
-
     public static final String MULTI_INSTANCE_IS_SEQUENTIAL = "isSequential";
-
     public static final String MULTI_INSTANCE_DATA_INPUT_ITEM_REF = "dataInputItemRef";
-
     public static final String MULTI_INSTANCE_DATA_OUTPUT_ITEM_REF = "dataOutputItemRef";
-
     public static final String MULTI_INSTANCE_LOOP_DATA_INPUT = "loopDataInputRef";
-
     public static final String MULTI_INSTANCE_LOOP_DATA_OUTPUT = "loopDataOutputRef";
-
     public static final String MULTI_INSTANCE_LOOP_CARDINALITY = "loopCardinality";
-
     public static final String MULTI_INSTANCE_COMPLETION_CONDITION = "completionCondition";
-
     public static final String PRIORITY = "priority";
-
     public static final String EXPECTED_DURATION = "expectedDuration";
-
     public static final String XML_DATA_DEFINITION_NAMESPACE = "namespace";
-
     public static final String XML_DATA_DEFINITION_ELEMENT = "element";
-
     public static final String XML_DATA_DEFINITION_NODE = "xmlDataDefinition";
-
     public static final String TEXT_DATA_DEFINITION_NODE = "textDataDefinition";
-
     public static final String TEXT_DATA_DEFINITION_LONG = "longText";
-
     public static final String SUB_PROCESS = "subProcess";
-
     public static final String TRIGGERED_BY_EVENT = "triggeredByEvent";
-
     public static final String CONTRACT_NODE = "contract";
-
-    private static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
-
     public static final String CONTRACT_INPUT_NODE = "inputDefinition";
-
     public static final String TYPE = "type";
-
     public static final String CONSTRAINT_TYPE = "type";
-
     public static final String MULTIPLE = "multiple";
-
     public static final String CONTRACT_CONSTRAINTS_NODE = "constraintDefinitions";
-
     public static final String CONTRACT_CONSTRAINT_NODE = "constraintDefinition";
-
     public static final String CONSTRAINT_EXPRESSION = "conditionalExpression";
-
     public static final String CONSTRAINT_EXPLANATION = "explanation";
-
     public static final String INPUT_NAMES = "inputDefinitionNames";
-
     public static final String INPUT_NAME = "inputDefinitionName";
-
     public static final String CONTEXT_NODE = "context";
-
     public static final String CONTEXT_ENTRY_NODE = "contextEntry";
-
     public static final String CONTEXT_ENTRY_KEY = "key";
-
+    private static final String BOS_CURRENT_VERSION = "6.0-SNAPSHOT";
+    private static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
     public Map<Object, String> objectToId = new HashMap<Object, String>();
-
-    public static final class BEntry<K, V> implements Map.Entry<K, V> {
-
-        private final K k;
-
-        private V v;
-
-        public BEntry(final K k, final V v) {
-            this.k = k;
-            this.v = v;
-        }
-
-        @Override
-        public K getKey() {
-            return k;
-        }
-
-        @Override
-        public V getValue() {
-            return v;
-        }
-
-        @Override
-        public V setValue(final V value) {
-            v = value;
-            return v;
-        }
-    }
 
     public XMLNode getXMLProcessDefinition(final DesignProcessDefinition processDefinition) {
         final XMLNode rootNode = new XMLNode(PROCESS_NODE);
@@ -1188,5 +1099,4 @@ public class XMLProcessDefinition {
             transitionNode.addChild(condition);
         }
     }
-
 }
