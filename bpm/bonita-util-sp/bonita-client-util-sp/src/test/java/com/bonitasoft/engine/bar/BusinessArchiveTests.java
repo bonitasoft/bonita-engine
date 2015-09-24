@@ -8,9 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +25,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -145,7 +144,8 @@ public class BusinessArchiveTests {
                 "myLeaveRequest",
                 "org.bonitasoft.hr.LeaveRequest",
                 new ExpressionBuilder().createGroovyScriptExpression("leaveRequestGroovy", "return new org.bonitasoft.hr.LeaveRequest(\"toto\", 17L);",
-                        "org.bonitasoft.hr.LeaveRequest")).addDescription("This is the leave request I will handle in the current process");
+                        "org.bonitasoft.hr.LeaveRequest"))
+                .addDescription("This is the leave request I will handle in the current process");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1").addTimerEventTriggerDefinition(TimerType.CYCLE,
                 new ExpressionBuilder().createConstantStringExpression("*/3 * * * * ?"));
@@ -153,7 +153,8 @@ public class BusinessArchiveTests {
         processDefinitionBuilder
                 .addAutomaticTask("auto1")
                 .addOperation(new LeftOperandBuilder().createNewInstance().setName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
-                        trueExpression).addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
+                        trueExpression)
+                .addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
         processDefinitionBuilder
                 .addManualTask("manual1", "Truck Driver")
                 .addPriority("urgent")
@@ -315,7 +316,7 @@ public class BusinessArchiveTests {
         initialParameters.put("myKey1", "myValue1");
         initialParameters.put("myKey2", "myValue2");
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process)
-                .setParameters(initialParameters).setActorMapping(null).done();
+                .setParameters(initialParameters).setActorMapping((ActorMapping) null).done();
         com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         final InputStream inputStream = new FileInputStream(barFile);

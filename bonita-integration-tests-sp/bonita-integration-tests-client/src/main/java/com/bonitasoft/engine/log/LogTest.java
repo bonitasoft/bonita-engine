@@ -8,20 +8,18 @@
  *******************************************************************************/
 package com.bonitasoft.engine.log;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -334,7 +332,8 @@ public class LogTest extends CommonAPISPIT {
         }
     }
 
-    private void addCorrelations(final List<BEntry<Expression, Expression>> correlations, final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder) {
+    private void addCorrelations(final List<BEntry<Expression, Expression>> correlations,
+            final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder) {
         if (correlations != null) {
             for (final Entry<Expression, Expression> entry : correlations) {
                 throwMessageEventTriggerBuilder.addCorrelation(entry.getKey(), entry.getValue());
