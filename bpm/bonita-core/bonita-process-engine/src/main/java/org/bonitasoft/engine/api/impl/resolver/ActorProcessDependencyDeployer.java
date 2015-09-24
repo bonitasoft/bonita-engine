@@ -1,6 +1,7 @@
+
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,13 +12,8 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.resolver;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+package org.bonitasoft.engine.api.impl.resolver;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -26,8 +22,8 @@ import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
-import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.Problem.Level;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
@@ -36,11 +32,17 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.xml.Parser;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Baptiste Mesta
@@ -56,12 +58,6 @@ public class ActorProcessDependencyDeployer implements ProcessDependencyDeployer
         BuilderFactory.getInstance();
         final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.get(SActorBuilderFactory.class);
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        Parser parser = null;
-        try {
-            parser = tenantAccessor.getActorMappingParser();
-        } catch (final IllegalArgumentException e) {
-            throw new ActorMappingImportException("unable to instantiate parser of actor mapping", e);
-        }
         final Set<SActorDefinition> actors = processDefinition.getActors();
         final Set<SActor> sActors = new HashSet<SActor>(actors.size() + 1);
         final SActorDefinition actorInitiator = processDefinition.getActorInitiator();
@@ -81,19 +77,14 @@ public class ActorProcessDependencyDeployer implements ProcessDependencyDeployer
         }
         try {
             actorMappingService.addActors(sActors);
-            final byte[] actorMappingXML = businessArchive.getResource(ActorMappingContribution.ACTOR_MAPPING_FILE);
-            if (actorMappingXML != null) {
-                final String actorMapping = new String(actorMappingXML);
-                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService, identityService, parser, processDefinition.getId(),
-                        actorMapping);
-                try {
-                    importActorMapping.execute();
-                } catch (final SBonitaException e) {
-                    // ignore
-                }
+            ActorMapping actorMapping = businessArchive.getActorMapping();
+            if (actorMapping != null) {
+                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService,identityService);
+                    importActorMapping.execute(actorMapping,processDefinition.getId());
             }
-        } catch (final SBonitaException e) {
             // ignored
+        } catch (SBonitaException e) {
+            tenantAccessor.getTechnicalLoggerService().log(this.getClass(), TechnicalLogSeverity.WARNING,"Error in importing the actor-mapping",e);
         }
         return checkResolution(actorMappingService, processDefinition.getId()).isEmpty();
     }

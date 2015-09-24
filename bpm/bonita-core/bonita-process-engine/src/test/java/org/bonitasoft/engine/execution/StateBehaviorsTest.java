@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,12 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.EXECUTING;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
-import static org.bonitasoft.engine.execution.StateBehaviors.*;
+import static org.bonitasoft.engine.execution.StateBehaviors.AFTER_ON_FINISH;
+import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_ENTER;
+import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_FINISH;
+import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_ENTER;
+import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_FINISH;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -24,9 +29,15 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,7 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -79,6 +90,23 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class StateBehaviorsTest {
 
+    private final static Map<Integer, String> phaseNames = new HashMap<Integer, String>(5);
+    private static final List<Integer> KNOWN_PHASES = Arrays.asList(BEFORE_ON_ENTER, // 1
+            DURING_ON_ENTER, // 2
+            BEFORE_ON_FINISH, // 4
+            DURING_ON_FINISH, // 8
+            AFTER_ON_FINISH); // 16
+
+    static {
+        phaseNames.put(1, "BEFORE_ON_ENTER");
+        phaseNames.put(2, "DURING_ON_ENTER");
+        phaseNames.put(4, "BEFORE_ON_FINISH");
+        phaseNames.put(5, "DURING_ON_FINISH");
+        phaseNames.put(16, "AFTER_ON_FINISH");
+    }
+
+    final long flownodeInstanceId = 3541L;
+    final long processDefinitionId = 4567L;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     @Mock
@@ -103,24 +131,6 @@ public class StateBehaviorsTest {
     private ExpressionResolverService expressionResolverService;
     @InjectMocks
     private StateBehaviors behaviors;
-
-    final long flownodeInstanceId = 3541L;
-    final long processDefinitionId = 4567L;
-
-    private final static Map<Integer, String> phaseNames = new HashMap<Integer, String>(5);
-    static {
-        phaseNames.put(1, "BEFORE_ON_ENTER");
-        phaseNames.put(2, "DURING_ON_ENTER");
-        phaseNames.put(4, "BEFORE_ON_FINISH");
-        phaseNames.put(5, "DURING_ON_FINISH");
-        phaseNames.put(16, "AFTER_ON_FINISH");
-    }
-
-    private static final List<Integer> KNOWN_PHASES = Arrays.asList(BEFORE_ON_ENTER, // 1
-            DURING_ON_ENTER, // 2
-            BEFORE_ON_FINISH, // 4
-            DURING_ON_FINISH, // 8
-            AFTER_ON_FINISH); // 16
 
     @Before
     public void setConstants() {

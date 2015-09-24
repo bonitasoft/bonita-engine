@@ -11,28 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.actor.xml;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * @author Matthieu Chaffotte
+ * <p>
+ * Contains Actor mapping model classes.
+ * </p>
  */
-public class ActorMapping {
+@XmlSchema(namespace = "http://www.bonitasoft.org/ns/actormapping/6.0", elementFormDefault = XmlNsForm.UNSET, xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/actormapping/6.0", prefix = "actorMappings") })
+package org.bonitasoft.engine.bpm.bar.actorMapping;
 
-    private final List<Actor> actors;
-
-    public ActorMapping() {
-        actors = new ArrayList<Actor>(10);
-    }
-
-    public List<Actor> getActors() {
-        return actors;
-    }
-
-    public void addActor(final Actor actor) {
-        actors.add(actor);
-    }
-
-}
+import javax.xml.bind.annotation.XmlNsForm;
+import javax.xml.bind.annotation.XmlSchema;

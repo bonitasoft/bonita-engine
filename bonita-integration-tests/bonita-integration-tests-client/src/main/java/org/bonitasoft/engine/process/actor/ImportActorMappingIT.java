@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,6 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.process.actor;
 
 import static org.junit.Assert.assertEquals;
@@ -26,8 +27,10 @@ import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
+import org.bonitasoft.engine.bpm.bar.ActorMappingMarshaller;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -215,7 +218,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         getProcessAPI()
                 .importActorMapping(
                         processDefinition.getId(),
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actormappings:actorMappings xmlns:actormappings=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actormappings:actorMappings>"
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actorMappings:actorMappings xmlns:actorMappings=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actorMappings:actorMappings>"
                                 .getBytes());
 
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -234,18 +237,15 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         final DesignProcessDefinition processDefinition = createProcessDefinitionBuilder().done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-
-        final byte[] actormapping = xmlToByteArray(xmlFileName);
+        ActorMapping actormapping = new ActorMappingMarshaller().deserializeFromXML(xmlToByteArray(xmlFileName));
         if (actormapping != null) {
             businessArchive.setActorMapping(actormapping);
         }
-
         return businessArchive;
     }
 
     /**
      * @param xmlFileName
-     * @param businessArchive
      * @return
      * @throws IOException
      * @since 6.0
@@ -289,7 +289,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
 
     /**
      * @param user
-     * @param string
+     * @param xmlFileName
      * @throws Exception
      * @since 6.0
      */

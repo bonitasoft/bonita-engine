@@ -4,12 +4,12 @@
         <users>
             <user>john</user>
         </users>
-        <groups>
-            <group>/RD</group>
-        </groups>
         <roles>
             <role>dev</role>
         </roles>
+        <groups>
+            <group>/RD</group>
+        </groups>
         <memberships>
             <membership>
                 <role>dev</role>
