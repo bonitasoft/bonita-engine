@@ -141,11 +141,9 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
         }
     }
 
-    //REFACTOR-ME: too many parameters
-    @Override
-    public SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
+    protected SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContextToEvaluateOperations, final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
         verifyPlatformInfo(callerId);
-        SProcessInstance instance = startSuper(starterId, starterSubstituteId, expressionContext, operations, context, connectors, callerId, selector, processInputs);
+        SProcessInstance instance = startSuper(starterId, starterSubstituteId, expressionContextToEvaluateOperations, operations, context, connectors, callerId, selector, processInputs);
         updatePlatformInfo(instance);
         return instance;
     }
