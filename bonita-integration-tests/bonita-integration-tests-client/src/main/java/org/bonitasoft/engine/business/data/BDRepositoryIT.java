@@ -621,7 +621,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().uninstallBusinessDataModel();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
