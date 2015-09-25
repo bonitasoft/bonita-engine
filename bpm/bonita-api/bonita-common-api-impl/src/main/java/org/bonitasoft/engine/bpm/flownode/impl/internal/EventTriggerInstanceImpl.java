@@ -14,14 +14,16 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
-import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
+
+import java.util.Objects;
 
 /**
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0
  */
-public class EventTriggerInstanceImpl extends BaseElementImpl implements EventTriggerInstance {
+public class EventTriggerInstanceImpl extends ProcessBaseElementImpl implements EventTriggerInstance {
 
     private static final long serialVersionUID = 1894571490582208753L;
 
@@ -43,25 +45,16 @@ public class EventTriggerInstanceImpl extends BaseElementImpl implements EventTr
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (eventInstanceId ^ (eventInstanceId >>> 32));
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EventTriggerInstanceImpl that = (EventTriggerInstanceImpl) o;
+        return Objects.equals(eventInstanceId, that.eventInstanceId);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        EventTriggerInstanceImpl other = (EventTriggerInstanceImpl) obj;
-        if (eventInstanceId != other.eventInstanceId)
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), eventInstanceId);
     }
-
 }

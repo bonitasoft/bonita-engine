@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
@@ -26,6 +23,10 @@ import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+
+import java.io.Serializable;
+import java.util.Date;
+
 
 /**
  * @author Matthieu Chaffotte

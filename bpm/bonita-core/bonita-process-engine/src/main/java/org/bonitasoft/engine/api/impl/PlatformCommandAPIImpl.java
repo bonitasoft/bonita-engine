@@ -107,7 +107,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
             CreationException {
         CommandDescriptor existingCommandDescriptor = null;
         try {
-            existingCommandDescriptor = get(name);
+            existingCommandDescriptor = getCommand(name);
         } catch (final CommandNotFoundException unfe) {
         } finally {
             if (existingCommandDescriptor != null) {
@@ -169,11 +169,6 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
-    }
-
-    @Override
-    public CommandDescriptor get(final String platformCommandName) throws CommandNotFoundException {
-        return getCommand(platformCommandName);
     }
 
     @Override

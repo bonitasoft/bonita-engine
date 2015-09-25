@@ -153,39 +153,6 @@ public interface ProcessManagementAPI {
     ProcessDefinition getProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException;
 
     /**
-     * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled.
-     *
-     * @param processDefinitionId
-     *        The identifier of the process definition.
-     * @throws DeletionException
-     *         If an exception occurs during process deletion.
-     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
-     *         If a process instance cannot be deleted because of a parent that is still active
-     * @since 6.0
-     * @see #deleteProcessDefinition(long)
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinition(long)}
-     */
-    @Deprecated
-    void deleteProcess(long processDefinitionId) throws DeletionException;
-
-    /**
-     * Deletes process definitions by giving their identifiers. If any specified identifier does not refer to a real process definition, or if an exception
-     * occurs, no process definition is deleted.
-     *
-     * @param processDefinitionIds
-     *        The list of identifiers of process definitions.
-     * @throws DeletionException
-     *         If an exception occurs during process deletion.
-     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
-     *         If a process instance cannot be deleted because of a parent that is still active
-     * @see #deleteProcessDefinitions(List)
-     * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinitions(List)}
-     */
-    @Deprecated
-    void deleteProcesses(List<Long> processDefinitionIds) throws DeletionException;
-
-    /**
      * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
      *
      * @param processDefinitionId
@@ -204,7 +171,7 @@ public interface ProcessManagementAPI {
      *        The list of identifiers of process definitions.
      * @throws DeletionException
      *         If an exception occurs during process deletion.
-     * @see #deleteProcess(long)
+     * @see #deleteProcessDefinition(long)
      * @since 6.1
      */
     void deleteProcessDefinitions(List<Long> processDefinitionIds) throws DeletionException;
@@ -258,25 +225,6 @@ public interface ProcessManagementAPI {
      * @since 6.0
      */
     List<Problem> getProcessResolutionProblems(long processDefinitionId) throws ProcessDefinitionNotFoundException;
-
-    /**
-     * Disables and deletes the process.
-     *
-     * @param processDefinitionId
-     *        The process definition identifier.
-     * @throws ProcessDefinitionNotFoundException
-     *         If the identifier does not refer to an existing process definition.
-     * @throws ProcessActivationException
-     *         If an exception occurs while disabling the process.
-     * @throws DeletionException
-     *         If an exception occurs while deleting the process.
-     * @see #disableProcess(long)
-     * @see #deleteProcess(long)
-     * @deprecated As of release 6.1, replaced by {@link #disableAndDeleteProcessDefinition(long)}
-     * @since 6.0
-     */
-    @Deprecated
-    void disableAndDelete(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
 
     /**
      * Gets the current number of process definitions in all states.
@@ -819,20 +767,6 @@ public interface ProcessManagementAPI {
     void deleteCategory(long categoryId) throws DeletionException;
 
     /**
-     * Deletes the associations of all the process definitions related to the category.
-     * It does not delete the associated process definitions.
-     *
-     * @param categoryId
-     *        The identifier of the category.
-     * @throws DeletionException
-     *         If an error occurs while removing the process definitions of category.
-     * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #removeProcessDefinitionsFromCategory(long, int, int)}
-     */
-    @Deprecated
-    void removeAllProcessDefinitionsFromCategory(long categoryId) throws DeletionException;
-
-    /**
      * Deletes the associations of all the process definitions related to the category given as input parameter respecting the pagination parameters.
      * It does not delete the associated process definitions.
      *
@@ -848,21 +782,6 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException;
-
-    /**
-     * Deletes the associations of all categories related the process definition.
-     * The process definition and categories are not deleted, but there is no longer an
-     * association between them.
-     *
-     * @param processDefinitionId
-     *        The identifier of the process definition.
-     * @throws DeletionException
-     *         If an error occurs while removing the process definition from category.
-     * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #removeCategoriesFromProcessDefinition(long, int, int)}
-     */
-    @Deprecated
-    void removeAllCategoriesFromProcessDefinition(long processDefinitionId) throws DeletionException;
 
     /**
      * Deletes the associations of categories related the process definition given as input parameter respecting the pagination parameters.
@@ -1098,23 +1017,6 @@ public interface ProcessManagementAPI {
      * @return The number and the list of processes that the user can start.
      * @throws SearchException
      *         If an exception occurs when getting the processes.
-     * @since 6.0
-     * @deprecated since 6.3.3
-     * @see ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)
-     */
-    @Deprecated
-    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(long userId, SearchOptions searchOptions) throws SearchException;
-
-    /**
-     * Searches for the number and the list of processes that the user can start.
-     *
-     * @param userId
-     *        The identifier of the user.
-     * @param searchOptions
-     *        The search criteria.
-     * @return The number and the list of processes that the user can start.
-     * @throws SearchException
-     *         If an exception occurs when getting the processes.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedBy(long userId, SearchOptions searchOptions) throws SearchException;
@@ -1184,22 +1086,6 @@ public interface ProcessManagementAPI {
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
-
-    @Deprecated
-    /**
-     * Searches the number and the list of processes that the user can start which have no category.
-     *
-     * @param userId
-     *            The identifier of the user.
-     * @param searchOptions
-     *            The search criteria.
-     * @return The number and the list of uncategorized processes that the user can start.
-     * @throws SearchException
-     *             If an exception occurs when searching the process deployment information.
-     * @since 6.0
-     * @deprecated since 6.3.3 @see {@link ProcessManagementAPI#searchUncategorizedProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)}
-     */
-    SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Searches the number and the list of processes that the user can start which have no category.
@@ -1425,32 +1311,12 @@ public interface ProcessManagementAPI {
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for all process definitions that can be started by users who report to the specified manager.
+     * Search for process definitions that can be started by users managed by a specific user.
      *
      * @param managerUserId
      *        The identifier of the manager.
      * @param searchOptions
-     *        The search crtierion.
-     * @return
-     *         The list of process definitions that have at least one initiator who is mapped to a user to who reports to the specified manager.
-     * @throws SearchException
-     *         If an exception occurs when getting the process deployment information.
-     * @since 6.0
-     * @deprecated 6.3.3
-     * @see ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long, SearchOptions)
-     */
-    @Deprecated
-    SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(long managerUserId, SearchOptions searchOptions)
-            throws SearchException;
-
-    /**
-     * TODO do not understand the behavior of this
-     * Search for all process definitions that can be started by users managed by a specific user.
-     *
-     * @param managerUserId
-     *        The identifier of the manager.
-     * @param searchOptions
-     *        The search criterion.
+     *        The search criteria.
      * @return
      *         The list of process definitions that have at least one initiator who is mapped to a user to who reports to the specified manager.
      * @throws SearchException
@@ -1704,7 +1570,7 @@ public interface ProcessManagementAPI {
      * @throws DeletionException
      *         If an exception occurs while deleting the process.
      * @see #disableProcess(long)
-     * @see #deleteProcess(long)
+     * @see #deleteProcessDefinition(long)
      * @since 6.1
      */
     void disableAndDeleteProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
@@ -1764,15 +1630,14 @@ public interface ProcessManagementAPI {
      */
     void purgeClassLoader(long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException;
 
-
     /**
      * Gets how many parameters the process definition contains.
      *
      * @param processDefinitionId
-     *            The identifier of the processDefinition
+     *        The identifier of the processDefinition
      * @return The number of parameters of a process definition
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 7.0.0
      */
     int getNumberOfParameterInstances(long processDefinitionId);
@@ -1781,14 +1646,14 @@ public interface ProcessManagementAPI {
      * Get a parameter instance by process definition UUID
      *
      * @param processDefinitionId
-     *            The identifier of the processDefinition
+     *        The identifier of the processDefinition
      * @param parameterName
-     *            The parameter name for get ParameterInstance
+     *        The parameter name for get ParameterInstance
      * @return The ParameterInstance of the process with processDefinitionUUID and name parameterName
      * @throws org.bonitasoft.engine.exception.NotFoundException
-     *             Error thrown if the given parameter is not found.
+     *         Error thrown if the given parameter is not found.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 7.0.0
      */
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException;
@@ -1797,16 +1662,16 @@ public interface ProcessManagementAPI {
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
      *
      * @param processDefinitionId
-     *            The identifier of the processDefinition
+     *        The identifier of the processDefinition
      * @param startIndex
-     *            The index of the page to be returned. First page has index 0.
+     *        The index of the page to be returned. First page has index 0.
      * @param maxResults
-     *            The number of result per page. Maximum number of result returned.
+     *        The number of result per page. Maximum number of result returned.
      * @param sort
-     *            The criterion to sort the result
+     *        The criterion to sort the result
      * @return The ordered list of parameter instances
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 7.0.0
      */
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);

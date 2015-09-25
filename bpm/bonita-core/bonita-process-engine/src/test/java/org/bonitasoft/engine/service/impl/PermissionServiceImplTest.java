@@ -38,6 +38,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.home.TenantStorage;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -54,7 +55,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -82,6 +82,8 @@ public class PermissionServiceImplTest {
 
     @Mock
     private BonitaHomeServer bonitaHomeServer;
+    @Mock
+    private TenantStorage tenantStorage;
 
     private File securityFolder = new File(System.getProperty("java.io.tmpdir"));
 
@@ -94,7 +96,8 @@ public class PermissionServiceImplTest {
 
         mockStatic(BonitaHomeServer.class);
         when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
-        doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
+        when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
+        doReturn(securityFolder).when(tenantStorage).getSecurityScriptsFolder(anyLong());
     }
 
     @Test

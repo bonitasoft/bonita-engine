@@ -13,17 +13,22 @@
  */
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.bonitasoft.engine.bpm.BaseElement;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.bonitasoft.engine.bpm.BaseElement;
 
 public class ElementFinder implements Serializable {
 
     public ElementFinder() {
     }
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return true;
+    }
     public <T extends BaseElement> T getElementById(final Collection<T> elements, final long id) {
         T element = null;
         boolean found = false;

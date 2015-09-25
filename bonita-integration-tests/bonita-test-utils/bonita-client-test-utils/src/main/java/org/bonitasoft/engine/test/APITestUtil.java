@@ -13,25 +13,6 @@
  */
 package org.bonitasoft.engine.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
@@ -75,7 +56,6 @@ import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
@@ -95,7 +75,6 @@ import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -139,6 +118,28 @@ import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Duchastenier
@@ -268,13 +269,6 @@ public class APITestUtil extends PlatformTestUtil {
         loginOnDefaultTenantWith(userName, password);
     }
 
-    public User addMappingAndActor(final String actorName, final String userName, final String password, final ProcessDefinition processDefinition)
-            throws BonitaException {
-        final User user = getIdentityAPI().createUser(userName, password);
-        getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
-        return user;
-    }
-
     public void addMappingOfActorsForRole(final String actorName, final long roleId, final ProcessDefinition definition) throws BonitaException {
         getProcessAPI().addRoleToActor(actorName, definition, roleId);
     }
@@ -397,17 +391,12 @@ public class APITestUtil extends PlatformTestUtil {
                 getIdentityAPI().getRoleByName(roleName).getId());
     }
 
-    public void deleteUserAndProcess(final String johnName, final ProcessDefinition definition) throws BonitaException {
-        deleteUser(johnName);
-        deleteProcess(definition);
+    public void deleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
+        deleteProcess(Arrays.asList(processDefinitions));
     }
 
     public void deleteProcess(final ProcessDefinition processDefinition) throws BonitaException {
         deleteProcess(processDefinition.getId());
-    }
-
-    public void deleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
-        deleteProcess(Arrays.asList(processDefinitions));
     }
 
     public void deleteProcess(final List<ProcessDefinition> processDefinitions) throws BonitaException {
@@ -450,7 +439,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
             throws BonitaException {
-        return deployAndEnableProcessWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
+        return deployAndEnableProcessWithActor(designProcessDefinition, Collections.singletonList(actorName), Collections.singletonList(user));
     }
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
@@ -472,7 +461,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final User user, final Map<String, String> parameters) throws BonitaException {
-        return deployAndEnableProcessWithActorAndParameters(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user), parameters);
+        return deployAndEnableProcessWithActorAndParameters(designProcessDefinition, Collections.singletonList(actorName), Collections.singletonList(user),
+                parameters);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
@@ -606,15 +596,15 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String connectorImplName,
             final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
         return deployAndEnableProcessWithConnector(processDefinitionBuilder,
-                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
-                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
+                Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
+                Collections.singletonList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final String name, final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
-                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
-                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
+                Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+                Collections.singletonList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
@@ -646,8 +636,8 @@ public class APITestUtil extends PlatformTestUtil {
             final String actorName, final User user, final Map<String, String> parameters, final String name, final Class<? extends AbstractConnector> clazz,
             final String jarName) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
-                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
-                Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), parameters);
+                Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+                Collections.singletonList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), parameters);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
@@ -733,15 +723,15 @@ public class APITestUtil extends PlatformTestUtil {
         return false;
     }
 
-    public Group createGroup(final String groupName) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String groupName) throws CreationException {
         return createGroup(groupName, null);
     }
 
-    public Group createGroup(final String groupName, final String parentGroupPath) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String groupName, final String parentGroupPath) throws CreationException {
         return getIdentityAPI().createGroup(groupName, parentGroupPath);
     }
 
-    public Group createGroup(final String name, final String displayName, final String description) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String name, final String displayName, final String description) throws CreationException {
         final GroupCreator groupCreator = new GroupCreator(name);
         groupCreator.setDisplayName(displayName).setDescription(description);
         return getIdentityAPI().createGroup(groupCreator);
@@ -799,8 +789,7 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndAssigneIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception,
-            UpdateException {
+    public HumanTaskInstance waitForUserTaskAndAssigneIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;
@@ -1218,13 +1207,13 @@ public class APITestUtil extends PlatformTestUtil {
             final boolean isTransient)
             throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
-        final List<Operation> operations = new ArrayList<Operation>();
+        final List<Operation> operations = new ArrayList<>();
         operations.add(stringOperation);
         getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
     }
 
     public List<String> checkNoCategories() throws DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final long numberOfCategories = getProcessAPI().getNumberOfCategories();
         if (numberOfCategories > 0) {
             final List<Category> categories = getProcessAPI().getCategories(0, 5000, CategoryCriterion.NAME_ASC);
@@ -1239,14 +1228,14 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoFlowNodes() throws SearchException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<FlowNodeInstance> searchResult = getProcessAPI().searchFlowNodeInstances(build.done());
         final List<FlowNodeInstance> flowNodeInstances = searchResult.getResult();
         if (searchResult.getCount() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("FlowNodes are still present: ");
             for (final FlowNodeInstance flowNodeInstance : flowNodeInstances) {
-                messageBuilder.append("{" + flowNodeInstance.getName() + " - ").append(flowNodeInstance.getType() + "}").append(", ");
+                messageBuilder.append("{").append(flowNodeInstance.getName()).append(" - ").append(flowNodeInstance.getType()).append("}").append(", ");
             }
             messages.add(messageBuilder.toString());
         }
@@ -1254,7 +1243,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoArchivedFlowNodes() throws SearchException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<ArchivedFlowNodeInstance> searchResult = getProcessAPI().searchArchivedFlowNodeInstances(build.done());
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = searchResult.getResult();
@@ -1269,7 +1258,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoComments() throws SearchException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<Comment> searchResult = getProcessAPI().searchComments(build.done());
         final List<Comment> comments = searchResult.getResult();
@@ -1284,7 +1273,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoArchivedComments() throws SearchException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(build.done());
         final List<ArchivedComment> archivedComments = searchResult.getResult();
@@ -1299,7 +1288,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoProcessDefinitions() throws BonitaException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
         if (processes.size() > 0) {
             final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
@@ -1316,8 +1305,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoWaitingEvent() throws BonitaException {
-        final List<String> messages = new ArrayList<String>();
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final List<String> messages = new ArrayList<>();
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put("searchOptions", new SearchOptionsBuilder(0, 200).done());
 
         @SuppressWarnings("unchecked")
@@ -1325,9 +1314,9 @@ public class APITestUtil extends PlatformTestUtil {
         if (waitingEvents.size() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("Waiting Event are still present: ");
             for (final WaitingEvent waitingEvent : waitingEvents) {
-                messageBuilder.append(
-                        "[process instance:" + waitingEvent.getProcessName() + ", flow node instance:" + waitingEvent.getFlowNodeInstanceId() + "]").append(
-                        ", ");
+                messageBuilder.append("[process instance:").append(waitingEvent.getProcessName()).append(", flow node instance:")
+                        .append(waitingEvent.getFlowNodeInstanceId()).append("]").append(
+                                ", ");
             }
             messages.add(messageBuilder.toString());
         }
@@ -1335,7 +1324,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoSupervisors() throws SearchException, DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 200);
         builder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
         final List<ProcessSupervisor> supervisors = getProcessAPI().searchProcessSupervisors(builder.done()).getResult();
@@ -1352,7 +1341,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoProcessIntances() throws DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
         if (!processInstances.isEmpty()) {
             final StringBuilder stb = new StringBuilder("Process instances are still present: ");
@@ -1366,7 +1355,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoArchivedProcessIntances() throws DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
         if (!archivedProcessInstances.isEmpty()) {
             final StringBuilder stb = new StringBuilder("Archived process instances are still present: ");
@@ -1380,7 +1369,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoGroups() throws DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
         if (numberOfGroups > 0) {
             final List<Group> groups = getIdentityAPI().getGroups(0, Long.valueOf(numberOfGroups).intValue(), GroupCriterion.NAME_ASC);
@@ -1395,7 +1384,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoRoles() throws DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final long numberOfRoles = getIdentityAPI().getNumberOfRoles();
         if (numberOfRoles > 0) {
             final List<Role> roles = getIdentityAPI().getRoles(0, Long.valueOf(numberOfRoles).intValue(), RoleCriterion.NAME_ASC);
@@ -1410,7 +1399,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoUsers() throws DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         if (numberOfUsers > 0) {
             final List<User> users = getIdentityAPI().getUsers(0, Long.valueOf(numberOfUsers).intValue(), UserCriterion.USER_NAME_ASC);
@@ -1425,7 +1414,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<String> checkNoCommands() throws SearchException, CommandNotFoundException, DeletionException {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.EXECUTE_EVENTS_COMMAND);
@@ -1582,8 +1571,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
-            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
-        final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
+            final List<String> stepNames, final List<Boolean> isHuman) throws BonitaException {
+        final List<ProcessDefinition> processDefinitions = new ArrayList<>();
         final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
                 isHuman);
 
@@ -1620,17 +1609,7 @@ public class APITestUtil extends PlatformTestUtil {
             zos.write("return \"\";".getBytes());
 
             zos.putNextEntry(new ZipEntry("page.properties"));
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("name=");
-            stringBuilder.append(pageName);
-            stringBuilder.append("\n");
-            stringBuilder.append("displayName=");
-            stringBuilder.append(displayName);
-            stringBuilder.append("\n");
-            stringBuilder.append("description=");
-            stringBuilder.append(description);
-            stringBuilder.append("\n");
-            zos.write(stringBuilder.toString().getBytes());
+            zos.write(("name=" + pageName + "\n" + "displayName=" + displayName + "\n" + "description=" + description + "\n").getBytes());
 
             zos.closeEntry();
             return baos.toByteArray();

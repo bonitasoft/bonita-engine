@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.event.trigger.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -30,6 +26,11 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCorrel
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * @author Elias Ricken de Medeiros

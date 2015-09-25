@@ -23,6 +23,7 @@ public class BoundaryEventDefinitionImpl extends CatchEventDefinitionImpl implem
 
     private static final long serialVersionUID = 767407581506994148L;
 
+    public BoundaryEventDefinitionImpl(){}
     public BoundaryEventDefinitionImpl(final String name) {
         super(name);
     }

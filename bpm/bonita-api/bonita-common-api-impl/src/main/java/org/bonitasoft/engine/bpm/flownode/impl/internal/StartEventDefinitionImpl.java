@@ -23,6 +23,9 @@ public class StartEventDefinitionImpl extends CatchEventDefinitionImpl implement
 
     private static final long serialVersionUID = 8886895490450427588L;
 
+    public StartEventDefinitionImpl(){
+        super();
+    }
     public StartEventDefinitionImpl(final String name) {
         super(name);
     }

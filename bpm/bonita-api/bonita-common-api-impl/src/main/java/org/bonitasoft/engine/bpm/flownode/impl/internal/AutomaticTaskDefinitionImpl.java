@@ -23,6 +23,10 @@ public class AutomaticTaskDefinitionImpl extends TaskDefinitionImpl implements A
 
     private static final long serialVersionUID = 7628761663350426698L;
 
+    public AutomaticTaskDefinitionImpl() {
+        super();
+    }
+
     public AutomaticTaskDefinitionImpl(final String name) {
         super(name);
     }

@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import java.util.List;
-import java.util.Map;
-
-import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -28,6 +24,9 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Updates of creates a document of the process.

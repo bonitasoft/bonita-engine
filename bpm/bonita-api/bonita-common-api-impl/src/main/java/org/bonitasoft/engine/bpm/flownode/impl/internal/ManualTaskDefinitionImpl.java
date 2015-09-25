@@ -28,6 +28,9 @@ public class ManualTaskDefinitionImpl extends HumanTaskDefinitionImpl implements
         super(name, actorName);
     }
 
+    public ManualTaskDefinitionImpl() {
+    }
+
     public ManualTaskDefinitionImpl(final long id, final String name, final String actorName) {
         super(id, name, actorName);
     }
