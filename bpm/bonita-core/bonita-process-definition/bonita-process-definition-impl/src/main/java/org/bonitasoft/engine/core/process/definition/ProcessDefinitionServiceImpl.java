@@ -354,7 +354,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                         .setObject(sProcessDefinitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
-            storeProcessDefinitionInCache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
+            //storeProcessDefinitionInCache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
             log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
         } catch (final Exception e) {
             log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
