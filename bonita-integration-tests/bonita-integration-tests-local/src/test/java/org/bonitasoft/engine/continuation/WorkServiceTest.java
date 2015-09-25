@@ -16,6 +16,7 @@ package org.bonitasoft.engine.continuation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
@@ -54,7 +55,7 @@ public class WorkServiceTest extends CommonBPMServicesTest {
     @Test
     public void testWorkInMultipleTransactions() throws Exception {
         getTransactionService().begin();
-        final List<String> works = new ArrayList<>();
+        final List<String> works = Collections.synchronizedList(new ArrayList<String>());
         final WorkService workService = getWorkService();
         workService.registerWork(new ListAdder(works, "1"));
         getTransactionService().complete();
@@ -73,7 +74,7 @@ public class WorkServiceTest extends CommonBPMServicesTest {
     @Test
     public void testMultipleContinuation() throws Exception {
         getTransactionService().begin();
-        final List<String> works = new ArrayList<>();
+        final List<String> works = Collections.synchronizedList(new ArrayList<String>());
         getWorkService().registerWork(new ListAdder(works, "1"));
         getWorkService().registerWork(new ListAdder(works, "2"));
 
@@ -87,9 +88,9 @@ public class WorkServiceTest extends CommonBPMServicesTest {
     }
 
     public void waitFor(final int expected, final List<String> works) throws InterruptedException {
-        final long timeout = System.currentTimeMillis() + 2000;
+        final long timeout = System.currentTimeMillis() + 3000;
         boolean reached = false;
-        int size = -1;
+        int size;
         do {
             size = works.size();
             if (size == expected) {
