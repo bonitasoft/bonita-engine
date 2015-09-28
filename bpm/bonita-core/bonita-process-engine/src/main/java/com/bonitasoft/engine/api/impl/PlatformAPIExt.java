@@ -188,12 +188,12 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     return platformService.createTenant(tenant);
                 }
             });
-            BonitaHomeServer.getInstance().createTenant(tenantId);
+            BonitaHomeServer.getInstance().getTenantManager().createTenant(tenantId);
             bhTenantCreated = true;
             // modify user name and password
             final String userName = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.USERNAME);
             final String password = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.PASSWORD);
-            BonitaHomeServer.getInstance().modifyTechnicalUser(tenant.getId(), userName, password);
+            BonitaHomeServer.getInstance().getTenantManager().modifyTechnicalUser(tenant.getId(), userName, password);
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             final SessionService sessionService = tenantServiceAccessor.getSessionService();
@@ -231,7 +231,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             if (bhTenantCreated) {
                 try {
-                    BonitaHomeServer.getInstance().deleteTenant(tenantId);
+                    BonitaHomeServer.getInstance().getTenantManager().deleteTenant(tenantId);
                 } catch (Exception e1) {
                     throw new CreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", e1);
                 }
@@ -272,7 +272,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            BonitaHomeServer.getInstance().deleteTenant(tenantId);
+            BonitaHomeServer.getInstance().getTenantManager().deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new DeletionException(e);
@@ -555,7 +555,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final String username = (String) updatedFields.get(TenantField.USERNAME);
             final String password = (String) updatedFields.get(TenantField.PASSWOWRD);
             if (username != null || password != null) {
-                BonitaHomeServer.getInstance().modifyTechnicalUser(tenantId, username, password);
+                BonitaHomeServer.getInstance().getTenantManager().modifyTechnicalUser(tenantId, username, password);
             }
             // update tenant in database
             final STenantUpdateBuilder tenantUpdateBuilder = getTenantUpdateDescriptor(udpater);

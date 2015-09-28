@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.services.monitoring;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -26,7 +25,9 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import com.bonitasoft.engine.CommonBPMServicesSPTest;
-import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
+import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
+import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
+import com.bonitasoft.engine.monitoring.mbean.impl.SPlatformServiceMXBeanImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
@@ -36,10 +37,6 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.Test;
-
-import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
-import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
-import com.bonitasoft.engine.monitoring.mbean.impl.SPlatformServiceMXBeanImpl;
 
 public class SPlatformServiceMXBeanTest extends CommonBPMServicesSPTest {
 
@@ -98,7 +95,7 @@ public class SPlatformServiceMXBeanTest extends CommonBPMServicesSPTest {
         final Date now = new Date();
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(IncrementAVariable.class.getName(), "IncrementAVariable").setDescription("increment a variable").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+        final List<SJobParameter> parameters = new ArrayList<>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", theResponse).done());
         final Trigger trigger = new OneShotTrigger("events-" + UUID.randomUUID().toString(), now, 10);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -166,25 +163,28 @@ public class SPlatformServiceMXBeanTest extends CommonBPMServicesSPTest {
 
     @Test
     public void getActiveTransactionTest() throws Exception {
-
+        //given
         // start the ServiceMXBean
         final SPlatformServiceMXBean svcMB = getPlatformServiceMXBean();
-
         svcMB.start();
 
         final String numberOfActiveTransactions = "NumberOfActiveTransactions";
-        assertEquals(0L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
 
+        //when
         // create a transaction
         getTransactionService().begin();
 
-        // check the transaction has been successfully counted
-        assertEquals(1L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
+        //get number of active transactions just after beginning a transaction
+        Long activeTransactions = (Long) mbserver.getAttribute(serviceMB, numberOfActiveTransactions);
+
         // close the transaction
         getTransactionService().complete();
-
-        assertEquals(0L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
         svcMB.stop();
+
+        // check the transaction has been successfully counted
+        // use a soft assertions because asynchronous code can also create transactions (like QuartzJobs)
+        // so the number of active transactions can be greater than 1
+        assertThat(activeTransactions).isGreaterThanOrEqualTo(1L);
     }
 
 }

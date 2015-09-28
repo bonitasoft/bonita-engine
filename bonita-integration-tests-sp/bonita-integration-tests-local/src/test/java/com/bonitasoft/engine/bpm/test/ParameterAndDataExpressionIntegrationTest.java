@@ -16,22 +16,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.CommonBPMServicesSPTest;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
+import org.bonitasoft.engine.transaction.STransactionCommitException;
+import org.bonitasoft.engine.transaction.STransactionCreationException;
+import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
@@ -85,7 +90,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         // create expression
         // check
         assertEquals("baptiste", createAndEvaluateParameterExpression(nameParameter, deployId, "processDefinitionId"));
-        processAPIImpl.deleteProcess(deploy.getId());
+        deleteProcess(deploy);
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -97,8 +102,15 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         try {
             createAndEvaluateParameterExpression("nonExistingParameter", deployId, "processDefinitionId");
         } finally {
-            processAPIImpl.deleteProcess(deploy.getId());
+            deleteProcess(deploy);
         }
+    }
+
+    protected void deleteProcess(ProcessDefinition processDefinition)
+            throws STransactionCreationException, DeletionException, STransactionCommitException, STransactionRollbackException {
+        getTransactionService().begin();
+        processAPIImpl.deleteProcessDefinition(processDefinition.getId());
+        getTransactionService().complete();
     }
 
     @Test
