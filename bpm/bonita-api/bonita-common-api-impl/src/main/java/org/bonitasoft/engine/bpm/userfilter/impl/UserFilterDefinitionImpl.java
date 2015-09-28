@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MapAdapterExpression;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.expression.Expression;
@@ -35,7 +35,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFilterDefinition {
+public class UserFilterDefinitionImpl extends NamedDefinitionElementImpl implements UserFilterDefinition {
 
     private static final long serialVersionUID = -6045216424839658552L;
     @XmlAttribute(name = "userFilterId")

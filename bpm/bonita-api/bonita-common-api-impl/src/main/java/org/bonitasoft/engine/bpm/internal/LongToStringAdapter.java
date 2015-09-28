@@ -20,14 +20,17 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @author mazourd
  */
 public class LongToStringAdapter extends XmlAdapter<String, Long> {
+
     @Override
     public Long unmarshal(String id) throws Exception {
-        return  Long.parseLong(id);
+        return Long.parseLong(id);
     }
 
     @Override
     public String marshal(Long id) throws Exception {
-        if(id==null) return "" ;
-            return id.toString();
+        if (id == null) {
+            return "";
+        }
+        return id.toString();
     }
 }

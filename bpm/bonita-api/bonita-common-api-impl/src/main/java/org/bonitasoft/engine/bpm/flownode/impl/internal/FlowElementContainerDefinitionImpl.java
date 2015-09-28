@@ -53,7 +53,7 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
-import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
@@ -64,7 +64,7 @@ import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FlowElementContainerDefinitionImpl extends ProcessBaseElementImpl implements FlowElementContainerDefinition, Visitable {
+public class FlowElementContainerDefinitionImpl extends BaseDefinitionElementImpl implements FlowElementContainerDefinition, Visitable {
 
     private static final long serialVersionUID = 1L;
     @XmlElements({

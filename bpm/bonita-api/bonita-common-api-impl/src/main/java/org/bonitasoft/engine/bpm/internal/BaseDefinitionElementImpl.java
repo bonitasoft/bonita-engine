@@ -32,7 +32,7 @@ import org.bonitasoft.engine.bpm.BaseElement;
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public  abstract class ProcessBaseElementImpl  implements BaseElement {
+public  abstract class BaseDefinitionElementImpl implements BaseElement {
 
     private static final long serialVersionUID = 1L;
     @XmlID
@@ -40,14 +40,14 @@ public  abstract class ProcessBaseElementImpl  implements BaseElement {
     @XmlAttribute
     private long id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
 
-    public ProcessBaseElementImpl() {
+    public BaseDefinitionElementImpl() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProcessBaseElementImpl that = (ProcessBaseElementImpl) o;
+        BaseDefinitionElementImpl that = (BaseDefinitionElementImpl) o;
         return Objects.equals(id, that.id);
     }
 

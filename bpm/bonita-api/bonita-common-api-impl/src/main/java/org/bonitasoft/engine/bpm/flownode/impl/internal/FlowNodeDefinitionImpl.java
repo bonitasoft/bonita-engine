@@ -30,7 +30,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
@@ -42,7 +42,7 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements FlowNodeDefinition {
+public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl implements FlowNodeDefinition {
 
     private static final long serialVersionUID = 429640943678358154L;
     @XmlIDREF

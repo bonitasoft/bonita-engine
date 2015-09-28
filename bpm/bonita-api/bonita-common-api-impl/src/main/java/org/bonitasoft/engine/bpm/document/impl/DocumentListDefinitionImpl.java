@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
@@ -27,7 +27,7 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Baptiste Mesta
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DocumentListDefinitionImpl extends NamedElementImpl implements DocumentListDefinition {
+public class DocumentListDefinitionImpl extends NamedDefinitionElementImpl implements DocumentListDefinition {
 
     private static final long serialVersionUID = 1L;
     @XmlElement

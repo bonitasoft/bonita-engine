@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.expression.impl;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExpressionImpl extends ProcessBaseElementImpl implements Expression {
+public class ExpressionImpl extends BaseDefinitionElementImpl implements Expression {
 
     private static final long serialVersionUID = 1663953453575781859L;
     @XmlAttribute

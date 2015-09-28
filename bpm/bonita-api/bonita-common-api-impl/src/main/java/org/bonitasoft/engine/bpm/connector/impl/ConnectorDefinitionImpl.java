@@ -31,7 +31,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MapAdapterExpression;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
@@ -41,7 +41,7 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
  * @author Baptiste Mesta
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ConnectorDefinitionImpl extends NamedElementImpl implements ConnectorDefinition {
+public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implements ConnectorDefinition {
 
     private static final long serialVersionUID = 1892648036453422626L;
     @XmlAttribute

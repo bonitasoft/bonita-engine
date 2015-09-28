@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
@@ -33,7 +33,7 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TransitionDefinitionImpl extends NamedElementImpl implements TransitionDefinition {
+public class TransitionDefinitionImpl extends NamedDefinitionElementImpl implements TransitionDefinition {
 
     private static final long serialVersionUID = -5629473055955264480L;
     @XmlAttribute

@@ -16,14 +16,14 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.Objects;
 
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
-import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseDefinitionElementImpl;
 
 /**
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0
  */
-public class EventTriggerInstanceImpl extends ProcessBaseElementImpl implements EventTriggerInstance {
+public class EventTriggerInstanceImpl extends BaseDefinitionElementImpl implements EventTriggerInstance {
 
     private static final long serialVersionUID = 1894571490582208753L;
 

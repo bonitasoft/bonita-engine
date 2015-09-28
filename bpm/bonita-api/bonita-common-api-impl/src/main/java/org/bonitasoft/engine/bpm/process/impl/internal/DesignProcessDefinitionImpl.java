@@ -56,7 +56,7 @@ import org.bonitasoft.engine.expression.Expression;
  */
 @XmlRootElement(name = "processDefinition")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso({SubProcessDefinitionImpl.class})
+@XmlSeeAlso({ SubProcessDefinitionImpl.class })
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
@@ -73,7 +73,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @XmlIDREF
     @XmlElement(type = ActorDefinitionImpl.class)
     private ActorDefinition actorInitiator;
-    @XmlElement(type = FlowElementContainerDefinitionImpl.class, name = "flowElements")
+    @XmlElement(type = FlowElementContainerDefinitionImpl.class, name = "flowElements", nillable = true)
     private FlowElementContainerDefinition flowElementContainer;
     @XmlElementWrapper(name = "stringIndexes", required = false, nillable = true)
     @XmlElement(name = "stringIndex")
@@ -81,7 +81,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
     @XmlElementWrapper(name = "context")
-    @XmlElement(name="contextEntry", type = ContextEntryImpl.class,nillable = true)
+    @XmlElement(name = "contextEntry", type = ContextEntryImpl.class, nillable = true)
     private List<ContextEntry> context = new ArrayList<>();
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
@@ -252,14 +252,14 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     @Override
     public List<ContextEntry> getContext() {
-        if (context == null){
-            return Collections.EMPTY_LIST;
+        if (context == null) {
+            return Collections.emptyList();
         }
         return context;
     }
 
     public void addContextEntry(ContextEntry contextEntry) {
-        if (context == null){
+        if (context == null) {
             context = new ArrayList<>();
         }
         context.add(contextEntry);

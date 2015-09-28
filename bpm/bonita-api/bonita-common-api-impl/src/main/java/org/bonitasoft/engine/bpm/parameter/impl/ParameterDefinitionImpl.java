@@ -21,14 +21,14 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 
 /**
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ParameterDefinitionImpl extends NamedElementImpl implements ParameterDefinition {
+public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implements ParameterDefinition {
 
     private static final long serialVersionUID = -3997656451808629180L;
     @XmlAttribute(required = true)

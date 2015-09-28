@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author Baptiste Mesta
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DocumentDefinitionImpl extends NamedElementImpl implements DocumentDefinition {
+public class DocumentDefinitionImpl extends NamedDefinitionElementImpl implements DocumentDefinition {
 
     private static final long serialVersionUID = 2L;
     @XmlElement
