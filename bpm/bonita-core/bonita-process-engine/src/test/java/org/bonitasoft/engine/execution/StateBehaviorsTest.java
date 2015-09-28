@@ -625,6 +625,6 @@ public class StateBehaviorsTest {
 
         spy.instantiateProcess(callerProcessDefinition, callActivityDefinition, callActivityInstance, 147L);
 
-        verify(processExecutor).start(147L, -1, 0, 0, context, operations, null, null, callerId, -1, evaluatedExpressions);
+        verify(processExecutor).start(147L, -1, 0, 0, context, operations, callerId, -1, evaluatedExpressions);
     }
 }

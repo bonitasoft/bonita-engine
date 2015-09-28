@@ -261,7 +261,4 @@ public interface DataInstanceService {
      */
     void deleteLocalDataInstances(long containerId, String dataInstanceContainerType, boolean dataPresent) throws SDataInstanceException;
 
-    void archiveDataInstance(SDataInstance sDataInstance, long archiveDate) throws SDataInstanceException;
-
-
 }

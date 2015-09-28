@@ -566,7 +566,7 @@ public class StateBehaviors {
         final Map<String, Serializable> processInputs = getEvaluatedInputExpressions(callActivityDefinition.getProcessStartContractInputs(), context);
 
         processExecutor
-                .start(targetProcessDefinitionId, -1, 0, 0, context, operationList, null, null, callerId, -1, processInputs);
+                .start(targetProcessDefinitionId, -1, 0, 0, context, operationList, callerId, -1, processInputs);
     }
 
     protected Map<String, Serializable> getEvaluatedInputExpressions(Map<String, SExpression> contractInputs, SExpressionContext context)

@@ -15,17 +15,15 @@ package org.bonitasoft.engine.bpm.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -36,22 +34,20 @@ import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.operation.model.impl.SOperationImpl;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @PrepareForTest(BuilderFactory.class)
 public class BPMInstancesCreatorTest {
 
@@ -61,53 +57,39 @@ public class BPMInstancesCreatorTest {
     @Mock
     private ConnectorInstanceService connectorInstanceService;
 
-    @Mock
-    private SConnectorInstanceBuilderFactory connectorBuilderFact;
+    @Spy
+    @InjectMocks
+    private BPMInstancesCreator bpmInstancesCreator;
+
 
     @Before
     public void setUp() {
-        PowerMockito.mockStatic(BuilderFactory.class);
 
-        connectorBuilderFact = mock(SConnectorInstanceBuilderFactory.class);
-        Mockito.when(BuilderFactory.get(SConnectorInstanceBuilderFactory.class)).thenReturn(connectorBuilderFact);
     }
 
     @Test
     public void testExecutionOrder() throws Exception {
-        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, connectorInstanceService, null,
-                null, null, null, null, null);
-        final SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
-        final SConnectorInstanceBuilder connectorBuilder = mock(SConnectorInstanceBuilder.class);
-        when(connectorBuilderFact.createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), anyInt()))
-                .thenReturn(connectorBuilder);
-        when(connectorBuilder.done()).thenReturn(connectorInstance);
-
         final PersistentObject container = mock(PersistentObject.class);
         final List<SConnectorDefinition> connectors = getConnectorList();
 
         bpmInstancesCreator.createConnectorInstances(container, connectors, SConnectorInstance.FLOWNODE_TYPE);
-        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class),
-                eq(0));
-        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class),
-                eq(1));
-        ignoreStubs(transactionExecutor);
-        ignoreStubs(connectorInstanceService);
+
+        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class),eq(0));
+        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class),eq(1));
     }
 
     @Test
     public void should_getOperationToSetData_return_the_operation_for_the_data() {
         // given
-        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, null, null,
-                null, null, null, null, null);
         SLeftOperandImpl leftOp1 = new SLeftOperandImpl();
-        leftOp1.setName(new String("Plop1"));
-        leftOp1.setType(new String(SLeftOperand.TYPE_DATA));
+        leftOp1.setName("Plop1");
+        leftOp1.setType(SLeftOperand.TYPE_DATA);
         SOperationImpl op1 = new SOperationImpl();
         op1.setLeftOperand(leftOp1);
         op1.setType(SOperatorType.ASSIGNMENT);
         SLeftOperandImpl leftOp2 = new SLeftOperandImpl();
-        leftOp2.setName(new String("Plop2"));
-        leftOp2.setType(new String(SLeftOperand.TYPE_DATA));
+        leftOp2.setName("Plop2");
+        leftOp2.setType(SLeftOperand.TYPE_DATA);
         SOperationImpl op2 = new SOperationImpl();
         op2.setType(SOperatorType.ASSIGNMENT);
         op2.setLeftOperand(leftOp2);

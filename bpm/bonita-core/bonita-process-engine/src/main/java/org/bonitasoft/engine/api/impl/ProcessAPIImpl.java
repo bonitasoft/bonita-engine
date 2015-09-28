@@ -69,7 +69,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.GetCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories;
 import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategoriesOfProcess;
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.category.RemoveProcessDefinitionsOfCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
 import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
@@ -84,7 +83,6 @@ import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
-import org.bonitasoft.engine.api.impl.transaction.process.DeleteArchivedProcessInstances;
 import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
@@ -235,7 +233,6 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
@@ -521,38 +518,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    @CustomTransactions
-    @Deprecated
-    public void deleteProcess(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // multiple tx here because we must lock instances when deleting them
-        // but if the second tx crash we can relaunch delete process without issues
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
-        try {
-            userTransactionService.executeInTransaction(new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
-                    deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
-                    try {
-                        processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
-                    } catch (final BonitaHomeNotSetException e) {
-                        throw new SProcessDeletionException(e, processDefinitionId);
-                    } catch (final IOException e) {
-                        throw new SProcessDeletionException(e, processDefinitionId);
-                    }
-                    return null;
-                }
-            });
-
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final Exception e) {
-            throw new DeletionException(e);
-        }
-    }
-
     private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
             throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         List<ProcessInstance> processInstances;
@@ -675,15 +640,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    @CustomTransactions
-    @Deprecated
-    public void deleteProcesses(final List<Long> processDefinitionIds) throws DeletionException {
-        for (final Long processDefinitionId : processDefinitionIds) {
-            deleteProcess(processDefinitionId);
-        }
-    }
-
-    @Override
     public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition) throws ProcessDeployException,
             ProcessEnablementException, AlreadyExistsException, InvalidProcessDefinitionException {
         BusinessArchive businessArchive;
@@ -767,7 +723,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         final long tenantId = getTenantAccessor().getTenantId();
         try {
-            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
+            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
@@ -775,28 +731,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
             throws BonitaHomeNotSetException, IOException {
-        BonitaHomeServer.getInstance().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
-    }
-
-    @Override
-    @CustomTransactions
-    @Deprecated
-    public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
-        try {
-            transactionExecutor.execute(new TransactionContent() {
-
-                @Override
-                public void execute() throws SBonitaException {
-                    processManagementAPIImplDelegate.disableProcess(processDefinitionId);
-                }
-            });
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new ProcessActivationException(e);
-        }
-        deleteProcess(processDefinitionId);
+        BonitaHomeServer.getInstance().getProcessManager().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
     }
 
     @Override
@@ -2048,33 +1983,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Deprecated
-    @Override
-    public void removeAllCategoriesFromProcessDefinition(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final TransactionContent transactionContent = new RemoveProcessDefinitionsOfCategory(processDefinitionId, categoryService);
-        try {
-            transactionContent.execute();
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
-        }
-    }
-
-    @Deprecated
-    @Override
-    public void removeAllProcessDefinitionsFromCategory(final long categoryId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-
-        final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, categoryId);
-        try {
-            remove.execute();
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
-        }
-    }
-
     @Override
     public long removeCategoriesFromProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -2350,7 +2258,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
         final Map<String, byte[]> processResources;
         try {
-            processResources = BonitaHomeServer.getInstance().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
+            processResources = BonitaHomeServer.getInstance().getProcessManager().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
         } catch (BonitaHomeNotSetException e) {
             throw new RetrieveException(e);
         } catch (IOException e) {
@@ -3393,20 +3301,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    @Deprecated
-    public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
-            new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId).execute();
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-    }
-
     private void deleteProcessInstanceInTransaction(final TenantServiceAccessor tenantAccessor, final long processInstanceId) throws SBonitaException {
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -3869,13 +3763,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         return transactionSearch.getResult();
     }
 
-    @Deprecated
-    @Override
-    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final long userId, final SearchOptions searchOptions) throws RetrieveException,
-            SearchException {
-        return searchProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
-    }
-
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final long managerUserId,
             final SearchOptions searchOptions) throws SearchException {
@@ -3891,13 +3778,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         return transactionSearch.getResult();
-    }
-
-    @Deprecated
-    @Override
-    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final SearchOptions searchOptions)
-            throws SearchException {
-        return searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
     }
 
     @Override
@@ -4195,13 +4075,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 .getRoleIdKey(), roleId == null ? -1 : roleId));
 
         return supervisorService.searchProcessSupervisors(new QueryOptions(0, 1, oderByOptions, filterOptions, null));
-    }
-
-    @Deprecated
-    @Override
-    public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(final long userId, final SearchOptions searchOptions)
-            throws SearchException {
-        return searchUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
     @Override

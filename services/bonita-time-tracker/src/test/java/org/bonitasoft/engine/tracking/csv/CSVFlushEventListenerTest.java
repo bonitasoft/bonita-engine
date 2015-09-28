@@ -13,92 +13,93 @@
  **/
 package org.bonitasoft.engine.tracking.csv;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractTimeTrackerTest;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.Record;
+import org.bonitasoft.engine.tracking.RecordAssert;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
-import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
 
-    private static final TimeTrackerRecords REC = TimeTrackerRecords.EVALUATE_EXPRESSION;
+    private static final TimeTrackerRecords TIME_TRACKER_RECORDS = TimeTrackerRecords.EVALUATE_EXPRESSION;
 
-    @After
-    public void after() {
-        final FilenameFilter filter = new FilenameFilter() {
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.matches("(.*)bonita_timetracker(.*).csv");
-            }
-        };
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-        final File temp_dir = new File(IOUtil.TMP_DIRECTORY);
-        final String[] list = temp_dir.list(filter);
-        for (final String fileName : list) {
-            IOUtil.deleteFile(new File(temp_dir, fileName), 1, 0);
-        }
+    @Mock
+    private TechnicalLoggerService logger;
+
+    @Test
+    public void should_work_if_output_folder_is_a_folder() throws Exception {
+        new CSVFlushEventListener(true, logger, temporaryFolder.newFolder().getAbsolutePath(), ";");
     }
 
     @Test
-    public void should_work_if_output_folder_is_a_folder() {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        new CSVFlushEventListener(true, logger, IOUtil.TMP_DIRECTORY, ";");
-    }
-
-    @Test(expected = RuntimeException.class)
     public void should_fail_if_output_folder_unknown() {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        //then
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Output folder does not exist");
+
+        //when
         new CSVFlushEventListener(true, logger, "unknownFolder", ";");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void should_fail_if_outputfolder_is_a_file() throws Exception {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final File file = IOUtil.createTempFile("test", ".txt", new File(IOUtil.TMP_DIRECTORY));
-        file.createNewFile();
+        //then
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Output folder is not a directory");
 
-        new CSVFlushEventListener(true, logger, file.getAbsolutePath(), ";");
+        //when
+        new CSVFlushEventListener(true, logger, temporaryFolder.newFile().getAbsolutePath(), ";");
     }
 
     @Test
     public void flushedCsv() throws Exception {
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true, logger, System.getProperty("java.io.tmpdir"), ";");
-        final Record rec1 = new Record(System.currentTimeMillis(), REC, "rec1Desc", 100);
-        final Record rec2 = new Record(System.currentTimeMillis(), REC, "rec2Desc", 200);
+        //given
+        final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true, logger, temporaryFolder.newFolder().getAbsolutePath(), ";");
+        final Record rec1 = new Record(System.currentTimeMillis(), TIME_TRACKER_RECORDS, "rec1Desc", 100);
+        final Record rec2 = new Record(System.currentTimeMillis(), TIME_TRACKER_RECORDS, "rec2Desc", 200);
 
+        //when
         final CSVFlushEventListenerResult csvFlushResult = csvFlushEventListener.flush(new FlushEvent(System.currentTimeMillis(), Arrays.asList(rec1, rec2)));
-
-
         final File csvFile = csvFlushResult.getOutputFile();
+
+        //then
         final List<List<String>> csvValues = CSVUtil.readCSV(true, csvFile, ";");
-        assertEquals(2, csvValues.size());
+        assertThat(csvValues).as("should contains 2 records").hasSize(2);
         checkCSVRecord(rec1, csvValues.get(0));
         checkCSVRecord(rec2, csvValues.get(1));
 
         final List<Record> records = csvFlushResult.getFlushEvent().getRecords();
-        assertEquals(2, records.size());
+        assertThat(records).as("should contains 2 records").hasSize(2);
         checkRecord(rec1, records.get(0));
         checkRecord(rec2, records.get(1));
     }
 
     private void checkCSVRecord(final Record record, final List<String> csvValues) {
         // timestamp, year, month, day, hour, minute, second, millisecond, duration, name, description]
-        assertEquals(11, csvValues.size());
+        assertThat(csvValues).hasSize(11);
 
         final long timestamp = record.getTimestamp();
         final GregorianCalendar cal = new GregorianCalendar();
@@ -111,18 +112,20 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         final int second = cal.get(Calendar.SECOND);
         final int millisecond = cal.get(Calendar.MILLISECOND);
 
-        assertEquals(timestamp, Long.valueOf(csvValues.get(0)).longValue());
-        assertEquals(year, Integer.valueOf(csvValues.get(1)).intValue());
-        assertEquals(month, Integer.valueOf(csvValues.get(2)).intValue());
-        assertEquals(dayOfMonth, Integer.valueOf(csvValues.get(3)).intValue());
-        assertEquals(hourOfDay, Integer.valueOf(csvValues.get(4)).intValue());
-        assertEquals(minute, Integer.valueOf(csvValues.get(5)).intValue());
-        assertEquals(second, Integer.valueOf(csvValues.get(6)).intValue());
-        assertEquals(millisecond, Integer.valueOf(csvValues.get(7)).intValue());
+        RecordAssert.assertThat(record)
+                .hasTimestamp(Long.valueOf(csvValues.get(0)).longValue())
+                .hasDuration(Long.valueOf(csvValues.get(8)).longValue())
+                .hasDescription(csvValues.get(10))
+                .hasName(TimeTrackerRecords.EVALUATE_EXPRESSION);
 
-        assertEquals(record.getDuration(), Long.valueOf(csvValues.get(8)).longValue());
-        assertEquals(record.getName().name(), csvValues.get(9));
-        assertEquals(record.getDescription(), csvValues.get(10));
+        assertThat(timestamp).isEqualTo(Long.valueOf(csvValues.get(0)).longValue());
+        assertThat(year).isEqualTo(Integer.valueOf(csvValues.get(1)).intValue());
+        assertThat(month).isEqualTo(Integer.valueOf(csvValues.get(2)).intValue());
+        assertThat(dayOfMonth).isEqualTo(Integer.valueOf(csvValues.get(3)).intValue());
+        assertThat(hourOfDay).isEqualTo(Integer.valueOf(csvValues.get(4)).intValue());
+        assertThat(minute).isEqualTo(Integer.valueOf(csvValues.get(5)).intValue());
+        assertThat(second).isEqualTo(Integer.valueOf(csvValues.get(6)).intValue());
+        assertThat(millisecond).isEqualTo(Integer.valueOf(csvValues.get(7)).intValue());
 
     }
 

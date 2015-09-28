@@ -182,33 +182,6 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     @Test
-    @Deprecated
-    public void oldDeleteProcessInstances() throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME);
-        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-
-        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition.getId());
-        final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition.getId());
-        assertEquals(5, getProcessAPI().getNumberOfProcessInstances());
-
-        waitForUserTask(processInstance1, "step1");
-        waitForUserTask(processInstance2, "step1");
-        waitForUserTask(processInstance3, "step1");
-        waitForUserTask(processInstance4, "step1");
-        waitForUserTask(processInstance5, "step1");
-        getProcessAPI().deleteProcessInstances(processDefinition.getId());
-        assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
-
-        // Clean up
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    @Test
     @Ignore("ENGINE-915 - ArchivedProcessInstance.getStartDate() returns null")
     public void getArchivedProcessInstance() throws Exception {
         getArchivedProcessInstances();

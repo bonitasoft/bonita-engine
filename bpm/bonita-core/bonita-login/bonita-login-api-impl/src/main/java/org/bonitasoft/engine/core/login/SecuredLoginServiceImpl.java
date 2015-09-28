@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
-import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -39,13 +38,11 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Matthieu Chaffotte
- * @author Anthony Birembaut add technical logs
+ * @author Anthony Birembaut
  */
 public class SecuredLoginServiceImpl implements LoginService {
 
-    private AuthenticationService authenticationService = null;
-
-    private GenericAuthenticationService genericAuthenticationService = null;
+    private GenericAuthenticationService authenticationService;
 
     private final SessionService sessionService;
 
@@ -55,19 +52,9 @@ public class SecuredLoginServiceImpl implements LoginService {
     
     private final TechnicalLoggerService logger;
 
-    @Deprecated
-    public SecuredLoginServiceImpl(@SuppressWarnings("deprecation") final AuthenticationService authenticationService, final SessionService sessionService,
+    public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService, final SessionService sessionService,
             final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService) {
         this.authenticationService = authenticationService;
-        this.sessionService = sessionService;
-        this.sessionAccessor = sessionAccessor;
-        this.identityService = identityService;
-        this.logger = tenantTechnicalLoggerService;
-    }
-
-    public SecuredLoginServiceImpl(final GenericAuthenticationService genericAuthenticationService, final SessionService sessionService,
-            final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService) {
-        this.genericAuthenticationService = genericAuthenticationService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.identityService = identityService;
@@ -98,7 +85,7 @@ public class SecuredLoginServiceImpl implements LoginService {
                 isTechnicalUser = true;
                 userId = -1;
             } else {
-                userName = loginChoosingAppropriateAuthenticationService(credentials);
+                userName = authenticationService.checkUserCredentials(credentials);
                 if (StringUtils.isNotBlank(userName)) {
                     debugLog("Authenticated as regular user");
                     final SUser user = identityService.getUserByUserName(userName);
@@ -128,10 +115,8 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     /**
-     * process the failed SpringTenantFileSystemBeanAccessor.java:127authentication behaviour
+     * Processes the failed authentication behaviour.
      * 
-     * @param authenticationException
-     *            the authentication that may have risen from authentication service
      * @throws SLoginException
      *             the appropriate exception
      */
@@ -145,33 +130,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     /**
-     * login to the internal authentication service if it is not null or to the Generic Authentication Service
-     * 
-     * @since 6.3
-     *        Ensure backward compatibility with previous version
-     * 
-     * @param credentials
-     *            the credentials to use to login
-     * @return the username of the logged in user
-     */
-    protected String loginChoosingAppropriateAuthenticationService(final Map<String, Serializable> credentials) throws AuthenticationException, SLoginException {
-        if (authenticationService != null) {
-            debugLog("Authenticating with authentication service: " + authenticationService.getClass().getName());
-            final String userName = retrieveUsernameFromCredentials(credentials);
-            final String password = retrievePasswordFromCredentials(credentials);
-            if (authenticationService.checkUserCredentials(userName, password)) {
-                return userName;
-            }
-            return null;
-        } else if (genericAuthenticationService != null) {
-            debugLog("Authenticating with generic authentication service: " + genericAuthenticationService.getClass().getName());
-            return genericAuthenticationService.checkUserCredentials(credentials);
-        }
-        throw new AuthenticationException("no implementation of authentication supplied");
-    }
-
-    /**
-     * retrieve password from credentials assuming it is stored under the {@link AuthenticationConstants.BASIC_PASSWORD} key
+     * retrieve password from credentials assuming it is stored under the {@link AuthenticationConstants#BASIC_PASSWORD} key
      * 
      * @param credentials
      *            the credentials to check
@@ -188,7 +147,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     /**
-     * retrieve username from credentials assuming it is stored under the {@link AuthenticationConstants.BASIC_USERNAME} key
+     * retrieve username from credentials assuming it is stored under the {@link AuthenticationConstants#BASIC_USERNAME} key
      * 
      * @param credentials
      *            the credentials to check
@@ -226,9 +185,7 @@ public class SecuredLoginServiceImpl implements LoginService {
             final String userName = (String) properties.get("userName");
             final String password = (String) properties.get("userPassword");
             return new TechnicalUser(userName, password);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SLoginException(e);
-        } catch (final IOException e) {
+        } catch (final BonitaHomeNotSetException | IOException e) {
             throw new SLoginException(e);
         }
     }
