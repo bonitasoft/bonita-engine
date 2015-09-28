@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -29,20 +30,22 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
  * @author mazourd
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class IndexLabel {
+public class IndexLabel implements Serializable {
+
     @XmlAttribute
     private String index;
     @XmlAttribute
     private String label;
-    @XmlElement(type = ExpressionImpl.class,name = "expression")
+    @XmlElement(type = ExpressionImpl.class, name = "expression")
     private Expression value;
 
-    public IndexLabel (String index,String label, Expression value){
+    public IndexLabel(String index, String label, Expression value) {
         this.index = index;
         this.value = value;
         this.label = label;
     }
-    public IndexLabel (){
+
+    public IndexLabel() {
         this.index = "-1";
         this.value = null;
     }
@@ -73,8 +76,10 @@ public class IndexLabel {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         IndexLabel that = (IndexLabel) o;
         return Objects.equals(index, that.index) &&
                 Objects.equals(label, that.label) &&
