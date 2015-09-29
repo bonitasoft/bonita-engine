@@ -52,6 +52,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -76,6 +77,9 @@ public class BusinessDataServiceImplTest {
     private BusinessDataRepository businessDataRepository;
 
     @Mock
+    private BusinessDataReloader businessDataReloader;
+
+    @Mock
     private Entity businessData;
 
     @Mock
@@ -90,7 +94,7 @@ public class BusinessDataServiceImplTest {
     public void before() throws Exception {
         final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
         typeConverterUtil = new TypeConverterUtil(datePatterns);
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil));
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil, businessDataReloader));
     }
 
     @Test
@@ -144,7 +148,7 @@ public class BusinessDataServiceImplTest {
     @Test(expected = SBusinessDataNotFoundException.class)
     public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNotFound() throws Exception {
         //given
-        doThrow(SBusinessDataNotFoundException.class).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doThrow(SBusinessDataNotFoundException.class).when(businessDataReloader).reloadEntitySoftly(pojo);
 
         //when
         businessDataService.callJavaOperation(pojo, new EntityPojo(1L), "getName", String.class.getName());
@@ -161,7 +165,7 @@ public class BusinessDataServiceImplTest {
     @Test
     public void callJavaOperationShouldSetValue() throws Exception {
         //given
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -174,7 +178,7 @@ public class BusinessDataServiceImplTest {
     @Test
     public void callJavaOperationSetValueToNull() throws Exception {
         //given
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -191,7 +195,7 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo compositionEntity = new EntityPojo(2L);
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -208,7 +212,7 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo compositionEntity = new EntityPojo(2L);
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -227,15 +231,18 @@ public class BusinessDataServiceImplTest {
         ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
         EntityPojo proxyfiedEntity = proxyfier.proxify(entity);
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
         businessDataService.callJavaOperation(pojo, proxyfiedEntity, "setAggregationEntity",
                 Entity.class.getName());
 
-        verify(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
-        verify(businessDataRepository).findById(entity.getClass(), entity.getPersistenceId());
+        verify(businessDataReloader).reloadEntitySoftly(pojo);
+
+        ArgumentCaptor<EntityPojo> captor = ArgumentCaptor.forClass(EntityPojo.class);
+        verify(businessDataReloader).reloadEntity(captor.capture());
+        assertThat(captor.getValue().getPersistenceId()).isEqualTo(2L);
     }
 
     @Test
@@ -245,7 +252,7 @@ public class BusinessDataServiceImplTest {
         ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
         EntityPojo proxyfiedEntity = proxyfier.proxify(entity);
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -265,7 +272,7 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> entities = Arrays.asList(entity1, entity2);
         final List<Long> keys = Arrays.asList(persistenceId1, persistenceId2);
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
@@ -287,7 +294,7 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> entities = Arrays.asList(entity1, entity2);
         final List<Long> keys = Arrays.asList(persistenceId1, persistenceId2);
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         //   doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
@@ -326,7 +333,7 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> entities = Arrays.asList();
         final List<Long> keys = Arrays.asList();
 
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
@@ -341,7 +348,7 @@ public class BusinessDataServiceImplTest {
     public void callJavaOperationShouldSetListValue() throws Exception {
         //given
         final List<Long> longs = Arrays.asList(1L, 2L);
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -356,7 +363,7 @@ public class BusinessDataServiceImplTest {
     public void callJavaOperationShouldSetListToNull() throws Exception {
         //given
         final List<Long> longs = Arrays.asList(1L, 2L);
-        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
@@ -379,12 +386,12 @@ public class BusinessDataServiceImplTest {
 
         final List<EntityPojo> newEntities = Arrays.asList(entity2);
         final List<Long> keys2 = Arrays.asList(persistenceId2);
-        doReturn(entityPojo).when(businessDataRepository).findById(entityPojo.getClass(), entityPojo.getPersistenceId());
+        doReturn(entityPojo).when(businessDataReloader).reloadEntitySoftly(entityPojo);
         doReturn(newEntities).when(businessDataRepository).findByIds(entity2.getClass(), keys2);
         doReturn(entityPojo).when(businessDataRepository).merge(entityPojo);
 
         //when
-        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(pojo, newEntities, "setAggregationEntities", List.class.getName());
+        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(entityPojo, newEntities, "setAggregationEntities", List.class.getName());
 
         assertThat(resultPojo).as("should return object").isNotNull();
         assertThat(resultPojo.getAggregationEntities()).as("should have set entities").containsExactly(entity2);

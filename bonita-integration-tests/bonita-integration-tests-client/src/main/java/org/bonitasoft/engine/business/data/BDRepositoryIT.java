@@ -902,6 +902,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData("address", ADDRESS_QUALIFIED_NAME, createNewAddressExpression);
         processDefinitionBuilder.addBusinessData("country", COUNTRY_QUALIFIED_NAME, createNewCountryExpression);
+        String retrievedCountryData = "retrievedCountry";
+        processDefinitionBuilder.addBusinessData(retrievedCountryData, COUNTRY_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData("noneAddress", ADDRESS_QUALIFIED_NAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
@@ -923,20 +925,35 @@ public class BDRepositoryIT extends CommonAPIIT {
                                 countryQueryExpression))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setAddress", ADDRESS_QUALIFIED_NAME,
-                                new ExpressionBuilder().createBusinessDataExpression("noneAddress", ADDRESS_QUALIFIED_NAME)));
-        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+                                new ExpressionBuilder().createBusinessDataExpression("noneAddress", ADDRESS_QUALIFIED_NAME)))
+                .addAutomaticTask("step2")
+                .addOperation(
+                        new OperationBuilder().attachBusinessDataSetAttributeOperation(retrievedCountryData, countryQueryExpression))
+                .addOperation(
+                            new OperationBuilder().createBusinessDataSetAttributeOperation(retrievedCountryData, "setName", String.class.getName(),
+                                    new ExpressionBuilder().createConstantStringExpression("FRANCE")));
+        processDefinitionBuilder.addUserTask("step3", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("step2", "step3");
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTask(processInstance, "step2");
+        waitForUserTask(processInstance, "step3");
 
         Expression getEmployeeAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("getEmployeeAddress",
                 "if (" + businessDataName2 + ".address == null) return \"null\"\n" + businessDataName2 + ".address.city", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(businessDataName2, EMPLOYEE_QUALIFIED_NAME));
+        Expression getCountryExpression = new ExpressionBuilder().createGroovyScriptExpression("getCountry",
+                "if (" + retrievedCountryData + " == null) return \"null\"\n" + retrievedCountryData + ".name", String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(retrievedCountryData, COUNTRY_QUALIFIED_NAME));
+
+        Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
+        expressions.put(getEmployeeAddressExpression, null);
+        expressions.put(getCountryExpression, null);
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(),
-                Collections.singletonMap(getEmployeeAddressExpression, (Map<String, Serializable>) null));
+                expressions);
         assertThat(result.get(getEmployeeAddressExpression.getName())).isEqualTo("null");
+        assertThat(result.get(getCountryExpression.getName())).isEqualTo("FRANCE");
 
         disableAndDeleteProcess(definition.getId());
     }
