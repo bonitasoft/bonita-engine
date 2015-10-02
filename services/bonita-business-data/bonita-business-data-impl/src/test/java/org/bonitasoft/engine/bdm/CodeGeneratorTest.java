@@ -249,13 +249,6 @@ public class CodeGeneratorTest {
     }
 
     @Test
-    public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() {
-        System.err
-                .println(
-                        "***************** PLEASE Implement test org.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
-    }
-
-    @Test
     public void should_add_and_remove_generate_on_boolean_list() throws Exception {
         //given
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Demo");
