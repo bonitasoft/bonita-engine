@@ -317,7 +317,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     protected void registerJob(final SchedulerService schedulerService, final JobRegister jobRegister) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
-        final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+        final List<SJobParameter> jobParameters = new ArrayList<>();
         for (final Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
             jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
         }
@@ -540,17 +540,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
-        } catch (final SBonitaException e) {
-            throw new StopNodeException(e);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new StopNodeException(e);
-        } catch (final InstantiationException e) {
-            throw new StopNodeException(e);
-        } catch (final IllegalAccessException e) {
-            throw new StopNodeException(e);
-        } catch (final ClassNotFoundException e) {
-            throw new StopNodeException(e);
-        } catch (final IOException e) {
+        } catch (final SBonitaException | BonitaHomeNotSetException |InstantiationException | IllegalAccessException | ClassNotFoundException | IOException e) {
             throw new StopNodeException(e);
         } catch (final BonitaHomeConfigurationException e) {
             throw new StopNodeException(e.getMessage());
@@ -843,10 +833,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final STenantActivationException stae) {
             log(platformAccessor, stae);
             throw stae;
-        } catch (final STenantNotFoundException stnfe) {
-            log(platformAccessor, stnfe);
-            throw new STenantActivationException(stnfe);
-        } catch (final Exception e) {
+        }  catch (final Exception e) {
             log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
@@ -942,8 +929,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             platformAccessor.getSchedulerService().rescheduleErroneousTriggers();
-        } catch (final SSchedulerException sse) {
-            throw new UpdateException(sse);
         } catch (final Exception e) {
             throw new UpdateException(e);
         }
