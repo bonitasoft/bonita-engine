@@ -132,48 +132,48 @@ public class Employee implements org.bonitasoft.engine.bdm.Entity
             return false;
         }
         Employee other = ((Employee) obj);
-        if (persistenceId == null) {
+        if (this.persistenceId == null) {
             if (other.persistenceId!= null) {
                 return false;
             }
         } else {
-            if (!persistenceId.equals(other.persistenceId)) {
+            if (!this.persistenceId.equals(other.persistenceId)) {
                 return false;
             }
         }
-        if (persistenceVersion == null) {
+        if (this.persistenceVersion == null) {
             if (other.persistenceVersion!= null) {
                 return false;
             }
         } else {
-            if (!persistenceVersion.equals(other.persistenceVersion)) {
+            if (!this.persistenceVersion.equals(other.persistenceVersion)) {
                 return false;
             }
         }
-        if (firstName == null) {
+        if (this.firstName == null) {
             if (other.firstName!= null) {
                 return false;
             }
         } else {
-            if (!firstName.equals(other.firstName)) {
+            if (!this.firstName.equals(other.firstName)) {
                 return false;
             }
         }
-        if (addresses == null) {
+        if (this.addresses == null) {
             if (other.addresses!= null) {
                 return false;
             }
         } else {
-            if (!addresses.equals(other.addresses)) {
+            if (!this.addresses.equals(other.addresses)) {
                 return false;
             }
         }
-        if (skills == null) {
+        if (this.skills == null) {
             if (other.skills!= null) {
                 return false;
             }
         } else {
-            if (!skills.equals(other.skills)) {
+            if (!this.skills.equals(other.skills)) {
                 return false;
             }
         }
@@ -185,28 +185,28 @@ public class Employee implements org.bonitasoft.engine.bdm.Entity
         final int prime = 31;
         int result = 1;
         int persistenceIdCode = 0;
-        if (persistenceId!= null) {
-            persistenceIdCode = persistenceId.hashCode();
+        if (this.persistenceId!= null) {
+            persistenceIdCode = this.persistenceId.hashCode();
         }
         result = ((prime*result)+ persistenceIdCode);
         int persistenceVersionCode = 0;
-        if (persistenceVersion!= null) {
-            persistenceVersionCode = persistenceVersion.hashCode();
+        if (this.persistenceVersion!= null) {
+            persistenceVersionCode = this.persistenceVersion.hashCode();
         }
         result = ((prime*result)+ persistenceVersionCode);
         int firstNameCode = 0;
-        if (firstName!= null) {
-            firstNameCode = firstName.hashCode();
+        if (this.firstName!= null) {
+            firstNameCode = this.firstName.hashCode();
         }
         result = ((prime*result)+ firstNameCode);
         int addressesCode = 0;
-        if (addresses!= null) {
-            addressesCode = addresses.hashCode();
+        if (this.addresses!= null) {
+            addressesCode = this.addresses.hashCode();
         }
         result = ((prime*result)+ addressesCode);
         int skillsCode = 0;
-        if (skills!= null) {
-            skillsCode = skills.hashCode();
+        if (this.skills!= null) {
+            skillsCode = this.skills.hashCode();
         }
         result = ((prime*result)+ skillsCode);
         return result;

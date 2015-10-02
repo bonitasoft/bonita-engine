@@ -27,12 +27,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.bdm.CodeGenerator;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
@@ -252,7 +251,8 @@ public class CodeGeneratorTest {
     @Test
     public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() {
         System.err
-                .println("***************** PLEASE Implement test org.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
+                .println(
+                        "***************** PLEASE Implement test org.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
     }
 
     @Test
