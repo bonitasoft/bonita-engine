@@ -31,8 +31,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -48,8 +46,6 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
 
     private final ProcessInstanceService processInstanceService;
 
-    private final DataInstanceService dataInstanceService;
-
     private final TechnicalLoggerService logger;
 
     private final ArchiveService archiveService;
@@ -64,14 +60,13 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     private final DocumentService documentService;
 
     public CompletingCallActivityStateImpl(final StateBehaviors stateBehaviors, final OperationService operationService,
-            final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
+            final ProcessInstanceService processInstanceService,
             final DocumentService documentService, final TechnicalLoggerService logger,
             final ArchiveService archiveService, final SCommentService commentService,
             final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
         super(stateBehaviors);
         this.operationService = operationService;
         this.processInstanceService = processInstanceService;
-        this.dataInstanceService = dataInstanceService;
         this.documentService = documentService;
         this.logger = logger;
         this.archiveService = archiveService;
@@ -99,7 +94,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             expressionContext.setParentProcessDefinitionId(instance.getProcessDefinitionId());
             operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
             // archive child process instance
-            ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentService, logger,
+            ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
                     commentService, processDefinitionService, connectorInstanceService, classLoaderService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);

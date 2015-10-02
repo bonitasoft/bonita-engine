@@ -47,7 +47,7 @@ public class ExportActorMappingIT extends TestWithUser {
         final InputStream xmlStream = ImportActorMappingIT.class.getResourceAsStream("simpleActorMapping.xml");
         try {
             final byte[] actormapping = IOUtils.toByteArray(xmlStream);
-            assertEquals(removewhitespaces(new String(actormapping)), removewhitespaces(xmlContent));
+            assertThatXmlHaveNoDifferences(new String(actormapping), xmlContent);
         } finally {
             xmlStream.close();
         }
@@ -66,7 +66,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         disableAndDeleteProcess(definition);
-        assertFalse(xmlContent.contains("group") || xmlContent.contains("sale"));
+        assertFalse(xmlContent.contains("<group>") || xmlContent.contains("<sale>"));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         disableAndDeleteProcess(definition);
-        assertFalse(xmlContent.contains("user") || xmlContent.contains("john"));
+        assertFalse(xmlContent.contains("<user>") || xmlContent.contains("john"));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         deleteProcess(definition);
-        assertFalse(xmlContent.contains("group") || xmlContent.contains("role"));
+        assertFalse(xmlContent.contains("<group>") || xmlContent.contains("<role>"));
         deleteGroups(group);
     }
 
@@ -132,7 +132,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         deleteProcess(definition);
-        assertFalse(xmlContent, xmlContent.contains("group") || xmlContent.contains("sale"));
+        assertFalse(xmlContent, xmlContent.contains("<group>") || xmlContent.contains("<sale>"));
     }
 
     @Test
@@ -147,7 +147,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         disableAndDeleteProcess(definition);
-        assertFalse(xmlContent.contains("role") || xmlContent.contains("sale"));
+        assertFalse(xmlContent.contains("<role>") || xmlContent.contains("<sale>"));
     }
 
     @Test
@@ -179,20 +179,14 @@ public class ExportActorMappingIT extends TestWithUser {
         final InputStream xmlStream = ImportActorMappingIT.class.getResourceAsStream("complexActorMapping.xml");
         try {
             final byte[] actormapping = IOUtils.toByteArray(xmlStream);
-            assertEquals(removewhitespaces(new String(actormapping)), removewhitespaces(xmlContent));
+            assertThatXmlHaveNoDifferences(new String(actormapping), xmlContent);
         } finally {
             xmlStream.close();
         }
-        // getIdentityAPI().deleteUserMembership(createUserMembership.getId());
         getIdentityAPI().deleteGroup(rd.getId());
         getIdentityAPI().deleteRole(role.getId());
         deleteUser(john);
         deleteProcess(definition);
-    }
-
-    private String removewhitespaces(final String content) {
-        String replace = content.replaceAll("\\s+", "");
-        return replace = replace.replaceAll("\n", "");
     }
 
 }
