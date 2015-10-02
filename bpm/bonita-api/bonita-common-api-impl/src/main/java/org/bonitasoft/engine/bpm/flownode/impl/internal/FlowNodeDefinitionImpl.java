@@ -63,7 +63,7 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
     private Expression displayDescriptionAfterCompletion;
     @XmlIDREF
     @XmlElement(type = TransitionDefinitionImpl.class)
-    private TransitionDefinition defaultTransition;
+    private TransitionDefinitionImpl defaultTransition;
 
     public FlowNodeDefinitionImpl(final long id, final String name) {
         super(name);
@@ -83,7 +83,8 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
     }
 
     public void setDefaultTransition(final TransitionDefinition defaultTransition) {
-        this.defaultTransition = defaultTransition;
+        //cast due to JAXB bug on java 1.7 embedded version
+        this.defaultTransition = (TransitionDefinitionImpl) defaultTransition;
     }
 
     @Override

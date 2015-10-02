@@ -72,7 +72,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     private final List<ActorDefinition> actors;
     @XmlIDREF
     @XmlElement(type = ActorDefinitionImpl.class)
-    private ActorDefinition actorInitiator;
+    private ActorDefinitionImpl actorInitiator;
     @XmlElement(type = FlowElementContainerDefinitionImpl.class, name = "flowElements", nillable = true)
     private FlowElementContainerDefinition flowElementContainer;
     @XmlElementWrapper(name = "stringIndexes", required = false, nillable = true)
@@ -152,7 +152,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     public void setActorInitiator(final ActorDefinition actorInitiator) {
-        this.actorInitiator = actorInitiator;
+        //cast due to JAXB bug on java 1.7 embedded version
+        this.actorInitiator = (ActorDefinitionImpl) actorInitiator;
     }
 
     @Override
