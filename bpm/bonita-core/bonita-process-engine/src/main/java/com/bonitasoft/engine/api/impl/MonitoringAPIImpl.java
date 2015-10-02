@@ -62,13 +62,6 @@ public class MonitoringAPIImpl implements MonitoringAPI {
     }
 
     @Override
-    public long getNumberOfExecutingProcesses() {
-        checkLicenceAndFeature(Features.BPM_MONITORING);
-        // FIXME
-        return 0;
-    }
-
-    @Override
     public long getNumberOfUsers() throws MonitoringException {
         checkLicenceAndFeature(Features.BPM_MONITORING);
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
