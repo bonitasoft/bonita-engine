@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm;
 
+import static org.bonitasoft.engine.bdm.JExprHelper.buildFieldRef;
+
 import java.util.Map.Entry;
 
 import com.sun.codemodel.JBlock;
@@ -41,31 +43,35 @@ public class HashCodeBuilder {
             final JType type = fieldVar.type();
             if (!type.isPrimitive()) {
                 final JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), fieldVar.name() + "Code", JExpr.lit(0));
-                body._if(fieldVar.ne(JExpr._null()))._then().assign(refHashCode, fieldVar.invoke("hashCode"));
+                body._if(buildFieldRef(fieldVar).ne(JExpr._null()))._then().assign(refHashCode, buildFieldRef(fieldVar).invoke("hashCode"));
                 body.assign(result, prime.mul(result).plus(refHashCode));
             } else {
                 if (type.name().equals(boolean.class.getSimpleName())) {
                     final JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), fieldVar.name() + "Code", JExpr.lit(1237));
-                    body._if(fieldVar)._then().assign(refHashCode, JExpr.lit(1231));
+                    body._if(buildFieldRef(fieldVar))._then().assign(refHashCode, JExpr.lit(1231));
                     body.assign(result, prime.mul(result).plus(refHashCode));
+                } else if (type.name().equals(int.class.getSimpleName())) {
+                    body.assign(
+                            result,
+                            prime.mul(result).plus(buildFieldRef(fieldVar)));
                 } else if (type.name().equals(long.class.getSimpleName())) {
                     body.assign(
                             result,
                             prime.mul(result).plus(
                                     JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()),
-                                            JExpr.direct(fieldVar.name() + " ^ (" + fieldVar.name() + " >>> 32)"))));
+                                            buildFieldRef(fieldVar).xor(buildFieldRef(fieldVar).shrz(JExpr.lit(32))))));
                 } else if (type.name().equals(double.class.getSimpleName())) {
                     final JClass doubleType = definedClass.owner().ref(Double.class.getName());
                     final JVar temp = body.decl(JType.parse(definedClass.owner(), long.class.getName()), fieldVar.name() + "temp",
-                            doubleType.staticInvoke("doubleToLongBits").arg(fieldVar));
+                            doubleType.staticInvoke("doubleToLongBits").arg(buildFieldRef(fieldVar)));
                     body.assign(
                             result,
                             prime.mul(result).plus(
                                     JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()),
-                                            JExpr.direct(temp.name() + " ^ (" + temp.name() + " >>> 32)"))));
+                                            temp.xor(temp.shrz(JExpr.lit(32))))));
                 } else if (type.name().equals(float.class.getSimpleName())) {
                     final JClass floatType = definedClass.owner().ref(Float.class.getName());
-                    body.assign(result, prime.mul(result).plus(floatType.staticInvoke("floatToIntBits").arg(fieldVar)));
+                    body.assign(result, prime.mul(result).plus(floatType.staticInvoke("floatToIntBits").arg(buildFieldRef(fieldVar))));
                 }
             }
         }

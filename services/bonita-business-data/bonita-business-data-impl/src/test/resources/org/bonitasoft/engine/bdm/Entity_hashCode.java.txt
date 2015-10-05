@@ -1,0 +1,78 @@
+
+package org.bonitasoft;
+
+import java.util.Date;
+
+public class Entity {
+
+    private String name;
+    private String nameCode;
+    private Integer age;
+    private int agePr;
+    private Float height;
+    private float heightPR;
+    private Boolean isMarried;
+    private boolean isMarriedPr;
+    private Long timestamp;
+    private long timestampPr;
+    private Double weight;
+    private double weightPr;
+    private Date returnDate;
+
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        int nameCode = 0;
+        if (this.name!= null) {
+            nameCode = this.name.hashCode();
+        }
+        result = ((prime*result)+ nameCode);
+        int nameCodeCode = 0;
+        if (this.nameCode!= null) {
+            nameCodeCode = this.nameCode.hashCode();
+        }
+        result = ((prime*result)+ nameCodeCode);
+        int ageCode = 0;
+        if (this.age!= null) {
+            ageCode = this.age.hashCode();
+        }
+        result = ((prime*result)+ ageCode);
+        result = ((prime*result)+ this.agePr);
+        int heightCode = 0;
+        if (this.height!= null) {
+            heightCode = this.height.hashCode();
+        }
+        result = ((prime*result)+ heightCode);
+        result = ((prime*result)+ Float.floatToIntBits(this.heightPR));
+        int isMarriedCode = 0;
+        if (this.isMarried!= null) {
+            isMarriedCode = this.isMarried.hashCode();
+        }
+        result = ((prime*result)+ isMarriedCode);
+        int isMarriedPrCode = 1237;
+        if (this.isMarriedPr) {
+            isMarriedPrCode = 1231;
+        }
+        result = ((prime*result)+ isMarriedPrCode);
+        int timestampCode = 0;
+        if (this.timestamp!= null) {
+            timestampCode = this.timestamp.hashCode();
+        }
+        result = ((prime*result)+ timestampCode);
+        result = ((prime*result)+((int)(this.timestampPr^(this.timestampPr >>> 32))));
+        int weightCode = 0;
+        if (this.weight!= null) {
+            weightCode = this.weight.hashCode();
+        }
+        result = ((prime*result)+ weightCode);
+        long weightPrtemp = Double.doubleToLongBits(this.weightPr);
+        result = ((prime*result)+((int)(weightPrtemp^(weightPrtemp >>> 32))));
+        int returnDateCode = 0;
+        if (this.returnDate!= null) {
+            returnDateCode = this.returnDate.hashCode();
+        }
+        result = ((prime*result)+ returnDateCode);
+        return result;
+    }
+
+}
