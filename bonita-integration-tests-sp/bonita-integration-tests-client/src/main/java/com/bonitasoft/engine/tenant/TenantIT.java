@@ -273,7 +273,9 @@ public class TenantIT {
                 return searchArchivedProcessInstances.getCount() > 1;
             }
         }.waitUntil();
-        processAPI.disableAndDelete(deploy.getId());
+        processAPI.deleteProcessInstances(deploy.getId(), 0, 100);
+        processAPI.deleteArchivedProcessInstances(deploy.getId(), 0, 100);
+        processAPI.disableAndDeleteProcessDefinition(deploy.getId());
     }
 
     @Test

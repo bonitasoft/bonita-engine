@@ -30,20 +30,6 @@ public interface MonitoringAPI {
     long getNumberOfActiveTransactions() throws MonitoringException;
 
     /**
-     * Get the number of all executing processes
-     * If no executing processes there, return 0
-     * 
-     * @return The total number of executing process
-     * @throws MonitoringException
-     *         occurs when an exception is thrown during monitoring
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @deprecated since 6.3.0, use {@link ProcessAPI#getNumberOfProcessInstances()}
-     */
-    @Deprecated
-    long getNumberOfExecutingProcesses() throws MonitoringException;
-
-    /**
      * Get the number of users in the organization of the current tenant.
      * If there are no users return 0
      * 

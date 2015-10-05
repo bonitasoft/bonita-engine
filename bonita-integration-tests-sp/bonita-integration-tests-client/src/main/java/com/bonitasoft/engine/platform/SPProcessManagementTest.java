@@ -94,7 +94,7 @@ public class SPProcessManagementTest extends CommonAPISPIT {
         assertEquals(10, processes.size());
         assertEquals(PROCESS_NAME + "09", processes.get(0).getName());
         assertEquals(PROCESS_NAME + "00", processes.get(9).getName());
-        getProcessAPI().deleteProcesses(ids);
+        getProcessAPI().deleteProcessDefinitions(ids);
         assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
 
         logoutThenlogin();
@@ -104,7 +104,7 @@ public class SPProcessManagementTest extends CommonAPISPIT {
         for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
             ids.add(processDeploymentInfo.getProcessId());
         }
-        getProcessAPI().deleteProcesses(ids);
+        getProcessAPI().deleteProcessDefinitions(ids);
         assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
 
         logoutOnTenant();

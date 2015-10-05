@@ -10,7 +10,6 @@ package com.bonitasoft.engine.monitoring;
 
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -27,7 +26,7 @@ public class MonitoringAPITest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -85,12 +84,5 @@ public class MonitoringAPITest extends CommonAPISPIT {
     // assertEquals(0L, numberOfUsers);
     // assertEquals(0L, t2NumberOfUsers);
     // }
-
-    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Executing process" }, story = "Get number of executing processes.", jira = "")
-    @Test
-    public void getNumberOfExecutingProcesses() throws BonitaException {
-        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfExecutingProcesses();
-        assertEquals(0, numberOfActiveTransactions);
-    }
 
 }
