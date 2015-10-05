@@ -64,13 +64,11 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -673,27 +671,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new BonitaRuntimeException(e);
         }
         return platformAccessor;
-    }
-
-    // @Override
-    protected void startServices(final TechnicalLoggerService logger, final long tenantId,
-            final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor)
-            throws SBonitaException {
-        // super.startServices(logger, tenantId, tenantServiceAccessor);
-        tenantServiceAccessor.getTransactionExecutor().execute(new TransactionContent() {
-
-            @Override
-            public void execute() throws SBonitaException {
-                PageService pageService;
-                try {
-                    pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
-                } catch (final MissingServiceException e) {
-                    // if not in the configuration just ignore it
-                    return;
-                }
-                pageService.start();
-            }
-        });
     }
 
     @Override
