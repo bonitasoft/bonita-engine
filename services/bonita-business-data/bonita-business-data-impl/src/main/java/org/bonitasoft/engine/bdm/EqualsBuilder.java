@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.bdm;
 
+import static org.bonitasoft.engine.bdm.JExprHelper.buildFieldRef;
+
 import java.util.Map.Entry;
 
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -56,10 +57,6 @@ public class EqualsBuilder {
 
         body._return(JExpr.TRUE);
         return equalsMethod;
-    }
-
-    private JFieldRef buildFieldRef(JFieldVar fieldVar) {
-        return JExpr._this().ref(fieldVar);
     }
 
 }

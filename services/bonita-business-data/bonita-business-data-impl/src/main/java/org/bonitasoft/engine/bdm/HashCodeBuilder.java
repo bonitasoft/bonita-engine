@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.bdm;
 
+import static org.bonitasoft.engine.bdm.JExprHelper.buildFieldRef;
+
 import java.util.Map.Entry;
 
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -77,10 +78,6 @@ public class HashCodeBuilder {
 
         body._return(result);
         return hashCodeMethod;
-    }
-
-    private JFieldRef buildFieldRef(JFieldVar fieldVar) {
-        return JExpr._this().ref(fieldVar);
     }
 
 }
