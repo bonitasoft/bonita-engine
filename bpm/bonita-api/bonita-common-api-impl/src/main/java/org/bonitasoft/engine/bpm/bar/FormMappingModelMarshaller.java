@@ -25,13 +25,13 @@ import org.xml.sax.SAXException;
 /**
  * @author Emmanuel Duchastenier
  */
-public class FormMappingModelConverter {
+public class FormMappingModelMarshaller {
 
     private static final String XSD_MODEL = "/form-mapping.xsd";
 
     private final URL xsdUrl;
 
-    public FormMappingModelConverter() {
+    public FormMappingModelMarshaller() {
         xsdUrl = FormMappingModel.class.getResource(XSD_MODEL);
     }
 

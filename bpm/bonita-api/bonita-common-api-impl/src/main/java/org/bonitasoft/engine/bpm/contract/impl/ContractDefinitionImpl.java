@@ -19,7 +19,6 @@ import java.util.Objects;
 
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 
 /**
  * @author Matthieu Chaffotte

@@ -368,7 +368,7 @@ public class EventsHandler {
                     processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null,
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
                 subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
     }
@@ -397,7 +397,7 @@ public class EventsHandler {
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
             throws SProcessInstanceCreationException, SContractViolationException {
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null, -1,
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), -1,
                 -1, null);
     }
 

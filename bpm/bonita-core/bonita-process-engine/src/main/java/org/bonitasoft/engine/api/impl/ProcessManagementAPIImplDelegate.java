@@ -89,7 +89,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processDefinitionId);
         deleteProcess.execute();
 
-        BonitaHomeServer.getInstance().deleteProcess(tenantAccessor.getTenantId(), processDefinitionId);
+        BonitaHomeServer.getInstance().getProcessManager().deleteProcess(tenantAccessor.getTenantId(), processDefinitionId);
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"

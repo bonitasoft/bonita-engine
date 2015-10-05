@@ -1,6 +1,7 @@
+
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,6 +12,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
@@ -67,7 +69,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.GetCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories;
 import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategoriesOfProcess;
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.category.RemoveProcessDefinitionsOfCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
 import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
@@ -82,7 +83,6 @@ import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
-import org.bonitasoft.engine.api.impl.transaction.process.DeleteArchivedProcessInstances;
 import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
@@ -233,7 +233,6 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
@@ -314,7 +313,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -352,7 +350,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -432,8 +429,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.XMLWriter;
 
 /**
  * @author Baptiste Mesta
@@ -453,17 +448,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     private static final String CONTAINER_TYPE_PROCESS_INSTANCE = "PROCESS_INSTANCE";
 
     private static final String CONTAINER_TYPE_ACTIVITY_INSTANCE = "ACTIVITY_INSTANCE";
-
-    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
-
-    private final DocumentAPI documentAPI;
     protected final ProcessConfigurationAPIImpl processConfigurationAPI;
+    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
+    private final DocumentAPI documentAPI;
 
     public ProcessAPIImpl() {
         this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIImpl());
     }
 
-    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI, ProcessConfigurationAPIImpl processConfigurationAPI) {
+    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI,
+            ProcessConfigurationAPIImpl processConfigurationAPI) {
         processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
         this.processConfigurationAPI = processConfigurationAPI;
@@ -521,38 +515,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteProcessDefinitions(final List<Long> processDefinitionIds) throws DeletionException {
         for (final Long processDefinitionId : processDefinitionIds) {
             deleteProcessDefinition(processDefinitionId);
-        }
-    }
-
-    @Override
-    @CustomTransactions
-    @Deprecated
-    public void deleteProcess(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // multiple tx here because we must lock instances when deleting them
-        // but if the second tx crash we can relaunch delete process without issues
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
-        try {
-            userTransactionService.executeInTransaction(new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
-                    deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
-                    try {
-                        processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
-                    } catch (final BonitaHomeNotSetException e) {
-                        throw new SProcessDeletionException(e, processDefinitionId);
-                    } catch (final IOException e) {
-                        throw new SProcessDeletionException(e, processDefinitionId);
-                    }
-                    return null;
-                }
-            });
-
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final Exception e) {
-            throw new DeletionException(e);
         }
     }
 
@@ -678,15 +640,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    @CustomTransactions
-    @Deprecated
-    public void deleteProcesses(final List<Long> processDefinitionIds) throws DeletionException {
-        for (final Long processDefinitionId : processDefinitionIds) {
-            deleteProcess(processDefinitionId);
-        }
-    }
-
-    @Override
     public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition) throws ProcessDeployException,
             ProcessEnablementException, AlreadyExistsException, InvalidProcessDefinitionException {
         BusinessArchive businessArchive;
@@ -726,7 +679,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();;
+        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
 
         SProcessDefinition sProcessDefinition;
         try {
@@ -770,7 +723,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         final long tenantId = getTenantAccessor().getTenantId();
         try {
-            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
+            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
@@ -778,28 +731,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
             throws BonitaHomeNotSetException, IOException {
-        BonitaHomeServer.getInstance().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
-    }
-
-    @Override
-    @CustomTransactions
-    @Deprecated
-    public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
-        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
-        try {
-            transactionExecutor.execute(new TransactionContent() {
-
-                @Override
-                public void execute() throws SBonitaException {
-                    processManagementAPIImplDelegate.disableProcess(processDefinitionId);
-                }
-            });
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new ProcessActivationException(e);
-        }
-        deleteProcess(processDefinitionId);
+        BonitaHomeServer.getInstance().getProcessManager().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
     }
 
     @Override
@@ -1674,7 +1606,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final int totalNumber = activityInstanceService.getNumberOfOpenActivityInstances(processInstanceId);
             // If there are no instances, return an empty list:
             if (totalNumber == 0) {
-                return Collections.<ActivityInstance> emptyList();
+                return Collections.emptyList();
             }
             final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(criterion);
             return ModelConvertor.toActivityInstances(
@@ -2051,33 +1983,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Deprecated
-    @Override
-    public void removeAllCategoriesFromProcessDefinition(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-        final TransactionContent transactionContent = new RemoveProcessDefinitionsOfCategory(processDefinitionId, categoryService);
-        try {
-            transactionContent.execute();
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
-        }
-    }
-
-    @Deprecated
-    @Override
-    public void removeAllProcessDefinitionsFromCategory(final long categoryId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final CategoryService categoryService = tenantAccessor.getCategoryService();
-
-        final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, categoryId);
-        try {
-            remove.execute();
-        } catch (final SBonitaException sbe) {
-            throw new DeletionException(sbe);
-        }
-    }
-
     @Override
     public long removeCategoriesFromProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -2353,7 +2258,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
         final Map<String, byte[]> processResources;
         try {
-            processResources = BonitaHomeServer.getInstance().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
+            processResources = BonitaHomeServer.getInstance().getProcessManager().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
         } catch (BonitaHomeNotSetException e) {
             throw new RetrieveException(e);
         } catch (IOException e) {
@@ -2684,9 +2589,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final IdentityService identityService = tenantAccessor.getIdentityService();
-            final Parser parser = tenantAccessor.getActorMappingParser();
             try {
-                new ImportActorMapping(actorMappingService, identityService, parser, processDefinitionId, xmlContent).execute();
+                new ImportActorMapping(actorMappingService,identityService).importActorMappingFromXml(xmlContent,processDefinitionId);
                 tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
             } catch (final SBonitaException sbe) {
                 throw new ActorMappingImportException(sbe);
@@ -2699,9 +2603,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final XMLWriter writer = tenantAccessor.getXMLWriter();
         try {
-            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, writer, processDefinitionId);
+            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, processDefinitionId);
             exportActorMapping.execute();
             return exportActorMapping.getResult();
         } catch (final SBonitaException sbe) {
@@ -3398,20 +3301,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    @Deprecated
-    public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
-            new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId).execute();
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
-    }
-
     private void deleteProcessInstanceInTransaction(final TenantServiceAccessor tenantAccessor, final long processInstanceId) throws SBonitaException {
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -3874,13 +3763,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         return transactionSearch.getResult();
     }
 
-    @Deprecated
-    @Override
-    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final long userId, final SearchOptions searchOptions) throws RetrieveException,
-            SearchException {
-        return searchProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
-    }
-
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final long managerUserId,
             final SearchOptions searchOptions) throws SearchException {
@@ -3896,13 +3778,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         return transactionSearch.getResult();
-    }
-
-    @Deprecated
-    @Override
-    public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(final long managerUserId, final SearchOptions searchOptions)
-            throws SearchException {
-        return searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(managerUserId, searchOptions);
     }
 
     @Override
@@ -4200,13 +4075,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 .getRoleIdKey(), roleId == null ? -1 : roleId));
 
         return supervisorService.searchProcessSupervisors(new QueryOptions(0, 1, oderByOptions, filterOptions, null));
-    }
-
-    @Deprecated
-    @Override
-    public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(final long userId, final SearchOptions searchOptions)
-            throws SearchException {
-        return searchUncategorizedProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
     @Override

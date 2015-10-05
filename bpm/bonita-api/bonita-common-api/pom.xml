@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -13,6 +13,11 @@
 	<name>Bonita Common APIs</name>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -71,6 +76,7 @@
                             <includes>
                                 <include>org/bonitasoft/engine/bpm/bar/form/model/*.java</include>
                                 <include>org/bonitasoft/engine/form/*.java</include>
+                                <!--<include>org/bonitasoft/engine/bpm/bar/actorMapping/*.java</include>-->
                             </includes>
                             <outputDirectory>${project.build.directory}/schemas</outputDirectory>
                         </configuration>

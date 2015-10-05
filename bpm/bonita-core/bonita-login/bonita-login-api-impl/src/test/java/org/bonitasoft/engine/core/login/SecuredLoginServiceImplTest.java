@@ -16,12 +16,7 @@ package org.bonitasoft.engine.core.login;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.IOException;
@@ -32,7 +27,6 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
-import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -60,9 +54,6 @@ public class SecuredLoginServiceImplTest {
     private BonitaHomeServer bonitaHomeServer;
 
     @Mock
-    private AuthenticationService authenticationService;
-
-    @Mock
     private GenericAuthenticationService genericAuthenticationService;
 
     @Mock
@@ -73,7 +64,7 @@ public class SecuredLoginServiceImplTest {
 
     @Mock
     private IdentityService identityService;
-    
+
     @Mock
     private TechnicalLoggerService logger;
 
@@ -88,23 +79,12 @@ public class SecuredLoginServiceImplTest {
         properties.put("userPassword", "install");
         doReturn(properties).when(bonitaHomeServer).getTenantProperties(1);
 
-    }
-    
-    private SecuredLoginServiceImpl instantiateLoginServiceWithAuthenticationService() {
-        return new SecuredLoginServiceImpl(authenticationService, sessionService, sessionAccessor, identityService, logger);
-    }
+        securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService, logger);
 
-    private SecuredLoginServiceImpl instantiateLoginServiceWithNoAuthenticationService() {
-        return new SecuredLoginServiceImpl((AuthenticationService) null, sessionService, sessionAccessor, identityService, logger);
-    }
-
-    private SecuredLoginServiceImpl instantiateLoginServieWithGenericAuthenticationService() {
-        return new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService, logger);
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullCredentials() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
+    public void testSecuredLoginServiceWithNullCredentials() throws SUserNotFoundException {
         try {
             securedLoginServiceImpl.login(null);
             fail();
@@ -114,24 +94,22 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullLogin() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
+    public void testSecuredLoginServiceWithNullLogin() throws SUserNotFoundException {
         try {
-            final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+            final Map<String, Serializable> credentials = new HashMap<>();
             final Long tenantId = new Long(1);
             credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
             securedLoginServiceImpl.login(credentials);
             fail();
         } catch (final SLoginException e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, username is blank");
+            assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
     }
 
     @Test
     public void testSecuredLoginServiceWithWrongCredentials() {
-        securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
         try {
-            final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+            final Map<String, Serializable> credentials = new HashMap<>();
             final Long tenantId = new Long(1);
             final String login = "login";
             final String password = "password";
@@ -144,28 +122,26 @@ public class SecuredLoginServiceImplTest {
             assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
     }
-    
-    @Test(expected=SUserNotFoundException.class)
+
+    @Test(expected = SUserNotFoundException.class)
     public void testSecuredLoginServiceWithUnknownUserThrowSUserNotFoundException() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-            final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-            final Long tenantId = new Long(1);
-            final String login = "login";
-            final String password = "password";
-            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-            credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-            credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        final Map<String, Serializable> credentials = new HashMap<>();
+        final Long tenantId = new Long(1);
+        final String login = "login";
+        final String password = "password";
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
 
-            when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
-            when(identityService.getUserByUserName(login)).thenThrow(new SUserNotFoundException(login));
+        when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
+        when(identityService.getUserByUserName(login)).thenThrow(new SUserNotFoundException(login));
 
-            securedLoginServiceImpl.login(credentials);
+        securedLoginServiceImpl.login(credentials);
     }
 
     @Test
     public void testSecuredLoginServiceWithInvalidPlatformCredentials() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = new Long(1);
         final Long userId = new Long(-1);
         final String login = "install";
@@ -186,8 +162,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testSecuredLoginServiceWithInvalidPlatformCredentialsWithGenericAuthenticationService() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = new Long(1);
         final Long userId = new Long(-1);
         final String login = "julien";
@@ -215,8 +190,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testSecuredLoginServiceWithPlatformCredentialsWithGenericAuthenticationService() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = new Long(1);
         final Long userId = new Long(-1);
         final String login = "install";
@@ -239,8 +213,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testSecuredLoginServiceWithPlatformCredentials() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = new Long(1);
         final Long userId = new Long(-1);
         final String login = "install";
@@ -252,9 +225,12 @@ public class SecuredLoginServiceImplTest {
         final SSession sSession = mock(SSession.class);
         when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
 
-        final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
+        final SecuredLoginServiceImpl spy = spy(securedLoginServiceImpl);
 
-        verify(authenticationService, times(0)).checkUserCredentials(login, password);
+        final SSession sSessionResult = spy.login(credentials);
+
+        verify(genericAuthenticationService, times(0)).checkUserCredentials(credentials);
+        verify(spy).getTechnicalUser(tenantId);
         verify(sessionAccessor, times(1)).deleteSessionId();
         verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
         assertThat(sSessionResult).isSameAs(sSession);
@@ -262,8 +238,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testSecuredLoginServiceWithStandardUserCredentials() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = new Long(1);
         final Long userId = new Long(112345);
         final String login = "julien";
@@ -290,8 +265,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrievePasswordFromCredentials() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final String password = "julien";
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
 
@@ -300,8 +274,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrievePasswordFromEmptyCredentials() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         try {
             securedLoginServiceImpl.retrievePasswordFromCredentials(credentials);
             fail();
@@ -312,8 +285,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrievePasswordFromNullPassword() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final String password = null;
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         try {
@@ -326,7 +298,6 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrievePasswordFromNullCredentials() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
         try {
             securedLoginServiceImpl.retrievePasswordFromCredentials(null);
             fail();
@@ -337,8 +308,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrieveUsernameFromCredentials() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final String username = "julien";
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, username);
 
@@ -347,8 +317,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrieveUserNameFromEmptyCredentials() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         try {
             securedLoginServiceImpl.retrieveUsernameFromCredentials(credentials);
             fail();
@@ -359,8 +328,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrieveUserNameFromBlankPassword() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final String username = "   ";
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, username);
         try {
@@ -373,8 +341,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrieveUserNameFromNullPassword() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         final String username = null;
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, username);
         try {
@@ -387,7 +354,6 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testRetrieveUserNameFromNullCredentials() {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
         try {
             securedLoginServiceImpl.retrieveUsernameFromCredentials(null);
             fail();
@@ -397,88 +363,18 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testLoginChoosingGenericAuthenticationService() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-
-        final String login = "julien";
-        final String password = "julien";
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
-        final String result = securedLoginServiceImpl.loginChoosingAppropriateAuthenticationService(credentials);
-        verify(genericAuthenticationService, times(1)).checkUserCredentials(credentials);
-        assertThat(result).isSameAs(login);
-    }
-
-    @Test
-    public void testLoginChoosingAuthenticationService() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-
-        final String login = "julien";
-        final String password = "julien";
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        when(authenticationService.checkUserCredentials(login, password)).thenReturn(true);
-        final String result = securedLoginServiceImpl.loginChoosingAppropriateAuthenticationService(credentials);
-        verify(authenticationService, times(1)).checkUserCredentials(login, password);
-        assertThat(result).isSameAs(login);
-    }
-
-    @Test
-    public void testLoginChoosingAuthenticationServiceFails() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-
-        final String login = "julien";
-        final String password = "julien";
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        when(authenticationService.checkUserCredentials(login, password)).thenReturn(false);
-        final String result = securedLoginServiceImpl.loginChoosingAppropriateAuthenticationService(credentials);
-        verify(authenticationService, times(1)).checkUserCredentials(login, password);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    public void testLoginChoosingNullAuthenticationService() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithNoAuthenticationService();
-        try {
-            securedLoginServiceImpl.loginChoosingAppropriateAuthenticationService(null);
-        } catch (final AuthenticationException e) {
-            assertThat(e.getMessage()).isEqualTo("no implementation of authentication supplied");
-            return;
-        }
-        fail();
-    }
-
-    @Test
-    public void testLoginChoosingNullGenericAuthenticationService() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServiceWithNoAuthenticationService();
-        try {
-            securedLoginServiceImpl.loginChoosingAppropriateAuthenticationService(null);
-        } catch (final AuthenticationException e) {
-            assertThat(e.getMessage()).isEqualTo("no implementation of authentication supplied");
-            return;
-        }
-        fail();
-
-    }
-
-    @Test
     public void should_login_with_technical_user__return_technical_session() throws Exception {
-        securedLoginServiceImpl = spy(instantiateLoginServiceWithAuthenticationService());
+        SecuredLoginServiceImpl spy = spy(securedLoginServiceImpl);
         final Long tenantId = new Long(1);
         final String username = "john";
         final String password = "bpm";
-        doReturn(new TechnicalUser(username, password)).when(securedLoginServiceImpl).getTechnicalUser(1);
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        doReturn(new TechnicalUser(username, password)).when(spy).getTechnicalUser(1);
+        final Map<String, Serializable> credentials = new HashMap<>();
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        
-        securedLoginServiceImpl.login(credentials);
+
+        spy.login(credentials);
 
         verify(sessionService).createSession(1, -1, "john", true);
     }

@@ -26,10 +26,10 @@ public interface GenericAuthenticationService {
      * Check user credentials by give user name and passwordHash
      * 
      * @param credentials
-     *            the credentials elements to use to authenticate
-     * @return true if user is authenticated
+     *        the credentials elements to use to authenticate
+     * @return the username of the user authenticated.
      * @throws AuthenticationException
-     *             Error thrown if either the password is invalid or the user is not found.
+     *         Error thrown if either the password is invalid or the user is not found.
      */
     String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException;
 }
