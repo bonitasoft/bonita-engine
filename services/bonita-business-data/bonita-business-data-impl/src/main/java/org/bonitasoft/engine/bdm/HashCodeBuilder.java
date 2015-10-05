@@ -58,7 +58,7 @@ public class HashCodeBuilder {
                             result,
                             prime.mul(result).plus(
                                     JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()),
-                                            JExpr.direct("this." + fieldVar.name() + " ^ (this." + fieldVar.name() + " >>> 32)"))));
+                                            buildFieldRef(fieldVar).xor(buildFieldRef(fieldVar).shrz(JExpr.lit(32))))));
                 } else if (type.name().equals(double.class.getSimpleName())) {
                     final JClass doubleType = definedClass.owner().ref(Double.class.getName());
                     final JVar temp = body.decl(JType.parse(definedClass.owner(), long.class.getName()), fieldVar.name() + "temp",
@@ -67,7 +67,7 @@ public class HashCodeBuilder {
                             result,
                             prime.mul(result).plus(
                                     JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()),
-                                            JExpr.direct(temp.name() + " ^ (" + temp.name() + " >>> 32)"))));
+                                            temp.xor(temp.shrz(JExpr.lit(32))))));
                 } else if (type.name().equals(float.class.getSimpleName())) {
                     final JClass floatType = definedClass.owner().ref(Float.class.getName());
                     body.assign(result, prime.mul(result).plus(floatType.staticInvoke("floatToIntBits").arg(buildFieldRef(fieldVar))));
