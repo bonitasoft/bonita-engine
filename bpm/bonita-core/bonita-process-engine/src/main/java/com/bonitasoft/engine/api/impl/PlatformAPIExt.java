@@ -81,7 +81,6 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.BroadcastService;
@@ -238,7 +237,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void registerTenantJobListeners(final PlatformServiceAccessor platformServiceAccessor, final Long tenantId) throws SSchedulerException {
+    private void registerTenantJobListeners(final PlatformServiceAccessor platformServiceAccessor, final Long tenantId) {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
         final RegisterTenantJobListeners registerTenantJobListeners = new RegisterTenantJobListeners(tenantId);
         broadcastService.execute(registerTenantJobListeners, tenantId);
@@ -559,12 +558,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final STenantUpdateBuilder tenantUpdateBuilder = getTenantUpdateDescriptor(udpater);
             platformService.updateTenant(tenant, tenantUpdateBuilder.done());
             return SPModelConvertor.toTenant(tenant);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new UpdateException(e);
-        } catch (final IOException e) {
-            throw new UpdateException(e);
-        } catch (final SBonitaException e) {
-            throw new UpdateException(e);
         } catch (final Exception e) {
             throw new UpdateException(e);
         }
@@ -642,25 +635,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             if (loggerService.isLoggable(PlatformAPIExt.class, TechnicalLogSeverity.ERROR)) {
                 loggerService.log(PlatformAPIExt.class, TechnicalLogSeverity.ERROR, "The engine was stopped due to '" + message + "'.");
             }
-        } catch (final BonitaHomeNotSetException bhnse) {
-            throw new StopNodeException(bhnse);
-        } catch (final BonitaHomeConfigurationException bhce) {
-            throw new StopNodeException(bhce);
-        } catch (final InstantiationException ie) {
-            throw new StopNodeException(ie);
-        } catch (final IllegalAccessException iae) {
-            throw new StopNodeException(iae);
-        } catch (final ClassNotFoundException cnfe) {
-            throw new StopNodeException(cnfe);
-        } catch (final IOException ioe) {
-            throw new StopNodeException(ioe);
+        } catch (final BonitaHomeNotSetException | BonitaHomeConfigurationException | InstantiationException | ClassNotFoundException | IllegalAccessException | IOException e) {
+            throw new StopNodeException(e);
         }
     }
 
     protected PlatformService getPlatformService() {
-        final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        return platformService;
+        return getPlatformAccessorNoException().getPlatformService();
     }
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
