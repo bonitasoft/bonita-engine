@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-work</artifactId>
 		<groupId>com.bonitasoft.engine.work</groupId>
-		<version>7.1.2-SNAPSHOT</version>
+		<version>7.1.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-work-parallel</artifactId>

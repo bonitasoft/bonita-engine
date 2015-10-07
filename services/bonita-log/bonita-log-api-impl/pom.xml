@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bonita-log</artifactId>
         <groupId>com.bonitasoft.engine.log</groupId>
-        <version>7.1.2-SNAPSHOT</version>
+        <version>7.1.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-log-api-impl</artifactId>
