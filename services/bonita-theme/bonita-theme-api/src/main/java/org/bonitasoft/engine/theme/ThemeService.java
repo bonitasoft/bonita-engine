@@ -47,6 +47,8 @@ public interface ThemeService extends TenantLifecycleService {
      */
     STheme createTheme(STheme theme) throws SThemeCreationException;
 
+    long getLastUpdateDate(SThemeType type) throws SBonitaReadException;
+
     /**
      * Update a theme by the given theme and the new content
      * 

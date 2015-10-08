@@ -210,6 +210,11 @@ public class ThemeServiceImpl implements ThemeService {
             throw new SThemeReadException(e);
         }
     }
+    @Override
+    public long getLastUpdateDate(final SThemeType type) throws SBonitaReadException {
+        final SelectOneDescriptor<Long> selectDescriptor = SelectDescriptorBuilder.getLastUpdateDate(type);
+        return persistenceService.selectOne(selectDescriptor);
+    }
 
     @Override
     public STheme updateTheme(final STheme sTheme, final EntityUpdateDescriptor descriptor) throws SThemeUpdateException {

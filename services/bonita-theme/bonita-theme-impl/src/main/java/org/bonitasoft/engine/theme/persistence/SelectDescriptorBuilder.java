@@ -74,4 +74,10 @@ public class SelectDescriptorBuilder {
         inputParameters.put("type", type);
         return new SelectOneDescriptor<STheme>("getLastModifiedTheme", inputParameters, STheme.class);
     }
+
+    public static SelectOneDescriptor<Long> getLastUpdateDate(SThemeType type) {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
+        inputParameters.put("type", type);
+        return new SelectOneDescriptor<Long>("getLastUpdateDate", inputParameters, STheme.class);
+    }
 }
