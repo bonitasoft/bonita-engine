@@ -11,34 +11,12 @@ package com.bonitasoft.engine.api.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.platform.GeneralInformationProvider;
-import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
-import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
-import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
-import com.bonitasoft.engine.platform.Tenant;
-import com.bonitasoft.engine.platform.TenantActivationException;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantCriterion;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
-import com.bonitasoft.engine.platform.TenantUpdater;
-import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.profile.DefaultProfilesUpdaterExt;
-import com.bonitasoft.engine.search.SearchTenants;
-import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.manager.Features;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
@@ -53,6 +31,7 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -90,6 +69,31 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
+
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.impl.platform.GeneralInformationProvider;
+import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
+import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
+import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantActivationException;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantCriterion;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
+import com.bonitasoft.engine.platform.TenantUpdater;
+import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
+import com.bonitasoft.engine.profile.DefaultProfilesUpdaterExt;
+import com.bonitasoft.engine.search.SearchTenants;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.platform.PlatformInfoUpdateScheduledExecutor;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
@@ -635,13 +639,37 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             if (loggerService.isLoggable(PlatformAPIExt.class, TechnicalLogSeverity.ERROR)) {
                 loggerService.log(PlatformAPIExt.class, TechnicalLogSeverity.ERROR, "The engine was stopped due to '" + message + "'.");
             }
-        } catch (final BonitaHomeNotSetException | BonitaHomeConfigurationException | InstantiationException | ClassNotFoundException | IllegalAccessException | IOException e) {
+        } catch (final BonitaHomeNotSetException | BonitaHomeConfigurationException | InstantiationException | ClassNotFoundException | IllegalAccessException
+                | IOException e) {
             throw new StopNodeException(e);
         }
     }
 
     protected PlatformService getPlatformService() {
         return getPlatformAccessorNoException().getPlatformService();
+    }
+
+    @Override
+    protected List<PlatformLifecycleService> getPlatformServicesToStart(NodeConfiguration platformConfiguration) throws StartNodeException {
+        List<PlatformLifecycleService> servicesToStart = super.getPlatformServicesToStart(platformConfiguration);
+        checkMandatoryService(servicesToStart);
+        return servicesToStart;
+    }
+
+    private void checkMandatoryService(List<PlatformLifecycleService> servicesToStart) throws StartNodeException {
+        Iterator<PlatformLifecycleService> iterator = servicesToStart.iterator();
+        boolean found = false;
+        Class<PlatformInfoUpdateScheduledExecutor> mandatoryServiceClass = PlatformInfoUpdateScheduledExecutor.class;
+        while (iterator.hasNext() && !found) {
+            PlatformLifecycleService service = iterator.next();
+            if (mandatoryServiceClass.equals(service.getClass())) {
+                found = true;
+            }
+        }
+        if (!found) {
+            throw new StartNodeException("Unable to start node because the mandatory service '" + mandatoryServiceClass.getName()
+                    + "' is not available. The bonita.home content is probably not up to date.");
+        }
     }
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
