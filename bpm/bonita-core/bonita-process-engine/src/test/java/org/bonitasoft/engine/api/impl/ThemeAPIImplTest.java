@@ -14,15 +14,56 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 
+import java.util.Date;
+
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.theme.ThemeType;
+import org.bonitasoft.engine.theme.model.SThemeType;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ThemeAPIImplTest {
+
+    @Mock
+    private ThemeService themeService;
+    @Mock
+    private TenantServiceAccessor tenantAccessor;
+    @Spy
+    private ThemeAPIImpl themeAPI;
+
+
+    @Before
+    public void before(){
+        doReturn(tenantAccessor).when(themeAPI).getTenantAccessor();
+        doReturn(themeService).when(tenantAccessor).getThemeService();
+    }
 
     @Test
     public void shouldBeAvalableWhenTenantIsPause() throws Exception {
         assertThat(ThemeAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as("should theme api be available when tenant is paused")
                 .isTrue();
     }
+
+    @Test
+    public void should_getLastUpdateDate_call_themeService_method() throws SBonitaReadException {
+        final long timestamp = 1234;
+        final Date date = new Date(timestamp);
+        doReturn(timestamp).when(themeService).getLastUpdateDate(SThemeType.MOBILE);
+
+        final Date lastUpdateDate = themeAPI.getLastUpdateDate(ThemeType.MOBILE);
+
+        assertThat(lastUpdateDate).isEqualTo(date);
+    }
+
+
 
 }
