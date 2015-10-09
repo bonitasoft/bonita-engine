@@ -62,12 +62,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private final TypeConverterUtil typeConverterUtil;
 
+    private BusinessDataReloader businessDataReloader;
+
     public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
-            final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil) {
+            final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil,
+            BusinessDataReloader businessDataReloader) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
         this.businessDataModelRepository = businessDataModelRepository;
         this.typeConverterUtil = typeConverterUtil;
+        this.businessDataReloader = businessDataReloader;
     }
 
     @Override
@@ -127,12 +131,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith, final String methodName, final String parameterType)
             throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
-
-        Entity jpaEntity = businessObject;
-        if (businessObject.getPersistenceId() != null) {
-            jpaEntity = businessDataRepository.findById(businessObject.getClass(), businessObject.getPersistenceId());
-        }
-
+        Entity jpaEntity = businessDataReloader.reloadEntitySoftly(businessObject);
         final Object valueToSet = loadValueToSet(businessObject, valueToSetObjectWith, methodName);
         try {
             invokeJavaMethod(jpaEntity, methodName, parameterType, valueToSet);
@@ -191,7 +190,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findById(ServerProxyfier.getRealClass(entity), entity.getPersistenceId());
+            return businessDataReloader.reloadEntity(entity);
         } else {
             return entity;
         }
