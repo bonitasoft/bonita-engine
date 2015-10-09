@@ -468,11 +468,11 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
+    void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws SBonitaException, StartNodeException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        final List<PlatformLifecycleService> servicesToStart = platformConfiguration.getLifecycleServices();
+        final List<PlatformLifecycleService> servicesToStart = getPlatformServicesToStart(platformConfiguration);
         for (final PlatformLifecycleService serviceWithLifecycle : servicesToStart) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform : " + serviceWithLifecycle.getClass().getName());
@@ -483,6 +483,10 @@ public class PlatformAPIImpl implements PlatformAPI {
                 serviceWithLifecycle.start();
             }
         }
+    }
+
+    protected List<PlatformLifecycleService> getPlatformServicesToStart(NodeConfiguration platformConfiguration) throws StartNodeException {
+        return platformConfiguration.getLifecycleServices();
     }
 
     private void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final long tenantId) throws Exception {
@@ -520,7 +524,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
-            final List<PlatformLifecycleService> otherServicesToStop = nodeConfiguration.getLifecycleServices();
+            final List<PlatformLifecycleService> otherServicesToStop = getPlatformServicesToStart(nodeConfiguration);
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
             if (nodeConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
