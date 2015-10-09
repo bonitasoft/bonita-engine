@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -63,6 +63,7 @@ import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceSearchDescriptor;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
@@ -109,7 +110,7 @@ public class TenantIT {
         createTenant();
     }
 
-    private static void createTenant() throws CreationException, AlreadyExistsException, TenantNotFoundException, TenantActivationException {
+    private static void createTenant() throws CreationException, TenantNotFoundException, TenantActivationException {
         tenantId = platformAPI.createTenant(new TenantCreator("tenant", "tenant", "testIconName", "testIconPath", userName, password));
         platformAPI.activateTenant(tenantId);
         tenantId = platformAPI.getTenantByName("tenant").getId();
@@ -156,6 +157,7 @@ public class TenantIT {
             identityAPI.getNumberOfUsers();
             fail("should not be able to call an api on a deactivated tenant");
         } catch (final InvalidSessionException e) {
+            // Oracle deadlock can occur here, but does not appear to have functional issue:
             platformAPI.activateTenant(tenantId);
         }
 
@@ -246,36 +248,56 @@ public class TenantIT {
 
         processDefinitionBuilderExt.addStartEvent("start").addTimerEventTriggerDefinition(TimerType.CYCLE,
                 new ExpressionBuilder().createConstantStringExpression("* * * * * ?"));
-        processDefinitionBuilderExt.addAutomaticTask("auto").addShortTextData(
-                "data",
-                new ExpressionBuilder().createGroovyScriptExpression("script", "System.out.println(\"Executed process!!!!!!!\");return \"test\";",
-                        String.class.getName()));
+        processDefinitionBuilderExt.addAutomaticTask("auto").addShortTextData("data", new ExpressionBuilder().createGroovyScriptExpression("script",
+                "System.out.println(\"Process started from timer\");return \"test\";", String.class.getName()));
         processDefinitionBuilderExt.addTransition("start", "auto");
-        final ProcessDefinition deploy = processAPI.deploy(new BusinessArchiveBuilder().createNewBusinessArchive()
+        final ProcessDefinition process = processAPI.deploy(new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(processDefinitionBuilderExt.done()).done());
-        processAPI.enableProcess(deploy.getId());
+        processAPI.enableProcess(process.getId());
         loginAPI.logout(apiSession);
         logAsPlatformAdmin();
-        platformAPI.deactiveTenant(tenantId);
+        platformAPI.deactiveTenant(tenantId); // Oracle deadlock can occur here, but does not appear to have functional issue
         platformAPI.activateTenant(tenantId);
         apiSession = loginAPI.login(tenantId, userName, password);
         processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
         final ProcessAPI fprocessAPI = processAPI;
         // the timer should have created at least 1 instance after the activate
-        new WaitUntil(100, 20000) {
+        new WaitUntil(30, 20000) {
 
             @Override
             protected boolean check() throws Exception {
                 final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-                searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, deploy.getId());
+                searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, process.getId());
                 final SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances = fprocessAPI.searchArchivedProcessInstances(searchOptionsBuilder
                         .done());
                 return searchArchivedProcessInstances.getCount() > 1;
             }
         }.waitUntil();
-        processAPI.deleteProcessInstances(deploy.getId(), 0, 100);
-        processAPI.deleteArchivedProcessInstances(deploy.getId(), 0, 100);
-        processAPI.disableAndDeleteProcessDefinition(deploy.getId());
+        waitForInstancesToFinishAndRemoveProcess(process, fprocessAPI);
+
+    }
+
+    protected void waitForInstancesToFinishAndRemoveProcess(final ProcessDefinition process, final ProcessAPI processAPI) throws Exception {
+        // Disable the process, so that no new instances are started:
+        processAPI.disableProcess(process.getId());
+
+        // Wait for running instances to finish:
+        new WaitUntil(30, 20000) {
+
+            @Override
+            protected boolean check() throws Exception {
+                final SearchResult<ProcessInstance> processInstances = processAPI
+                        .searchProcessInstances(new SearchOptionsBuilder(0, 1).filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, process.getId())
+                                .done());
+                return processInstances.getCount() == 0;
+            }
+        }.waitUntil();
+
+        long nbDeletedArchivedProcessInstances;
+        do {
+            nbDeletedArchivedProcessInstances = processAPI.deleteArchivedProcessInstances(process.getId(), 0, 100);
+        } while (nbDeletedArchivedProcessInstances > 0);
+        processAPI.deleteProcessDefinition(process.getId());
     }
 
     @Test
