@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -88,7 +92,6 @@ import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -1602,8 +1605,8 @@ public class ProcessManagementIT extends TestWithUser {
         try {
             getProcessAPI().startProcess(processDefinition.getId(), Arrays.asList(stringOperation), context);
         } catch (final ExecutionException e) {
-            assertThat(e.getMessage(), CoreMatchers.containsString("aData"));
-            assertThat(e.getMessage(), CoreMatchers.containsString("incompatible type"));
+            assertThat(e.getMessage()).contains("aData");
+            assertThat(e.getMessage()).contains("incompatible type");
         }
 
         disableAndDeleteProcess(processDefinition);
@@ -1624,8 +1627,8 @@ public class ProcessManagementIT extends TestWithUser {
         try {
             getProcessAPI().startProcess(processDefinition.getId(), Arrays.asList(stringOperation), context);
         } catch (final ExecutionException e) {
-            assertThat(e.getMessage(), CoreMatchers.containsString("aData"));
-            assertThat(e.getMessage(), CoreMatchers.containsString("incompatible type"));
+            assertThat(e.getMessage()).contains("aData");
+            assertThat(e.getMessage()).contains("incompatible type");
         }
 
         disableAndDeleteProcess(processDefinition);
@@ -1648,8 +1651,8 @@ public class ProcessManagementIT extends TestWithUser {
         try {
             getProcessAPI().startProcess(processDefinition.getId(), operations, context);
         } catch (final ExecutionException e) {
-            assertThat(e.getMessage(), CoreMatchers.containsString("aData"));
-            assertThat(e.getMessage(), CoreMatchers.containsString("incompatible type"));
+            assertThat(e.getMessage()).contains("aData");
+            assertThat(e.getMessage()).contains("incompatible type");
         }
 
         disableAndDeleteProcess(processDefinition);
