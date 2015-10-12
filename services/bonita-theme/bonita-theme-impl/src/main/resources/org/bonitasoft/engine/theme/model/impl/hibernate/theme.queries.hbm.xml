@@ -18,16 +18,18 @@
 		WHERE isDefault = :isDefault
 			AND type = :type
 	</query>
-	
+
 	<query name="getLastModifiedTheme">
 		SELECT theme
 		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
 		WHERE type = :type
-			AND lastUpdateDate IN (
-			SELECT MAX(lastUpdateDate)
-			FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS t
-			WHERE t.type = :type
-				AND t.tenantId = theme.tenantId
-			)
+		ORDER BY lastUpdateDate DESC
+	</query>
+
+	<query name="getLastUpdateDate">
+		SELECT theme.lastUpdateDate
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		WHERE type = :type
+		ORDER BY lastUpdateDate DESC
 	</query>
 </hibernate-mapping>

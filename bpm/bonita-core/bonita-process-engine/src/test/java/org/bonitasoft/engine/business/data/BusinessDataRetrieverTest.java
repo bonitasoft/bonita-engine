@@ -130,7 +130,7 @@ public class BusinessDataRetrieverTest {
         BusinessDataRetriever retrieverSpy = spy(retriever);
         SProcessMultiRefBusinessDataInstance dataRef = buildMultiRefBusinessData(Employee.class.getName());
         Employee employee = new Employee(5L, 1L, "John", "Doe");
-        given(retrieverSpy.getMultiBusinessData(dataRef, Employee.class)).willReturn(Collections.<Entity> singletonList(employee));
+        given(retrieverSpy.getMultiBusinessData(dataRef, Employee.class)).willReturn(Collections.<Entity>singletonList(employee));
 
         //when
         List<Entity> businessData = (List<Entity>) retrieverSpy.getBusinessData(dataRef);

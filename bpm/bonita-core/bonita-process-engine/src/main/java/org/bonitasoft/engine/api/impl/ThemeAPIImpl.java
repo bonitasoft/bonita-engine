@@ -19,6 +19,7 @@ import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -79,7 +80,13 @@ public class ThemeAPIImpl implements ThemeAPI {
 
     @Override
     public Date getLastUpdateDate(final ThemeType type) {
-        return getCurrentTheme(type).getLastUpdatedDate();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+        try {
+            return new Date(themeService.getLastUpdateDate(SThemeType.valueOf(type.name())));
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
     }
 
 }

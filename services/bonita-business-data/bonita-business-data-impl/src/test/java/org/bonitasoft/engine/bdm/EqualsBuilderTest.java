@@ -57,6 +57,7 @@ public class EqualsBuilderTest extends CompilableCode {
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
         codeGenerator.addField(definedClass, "name", String.class);
         codeGenerator.addField(definedClass, "age", Integer.class);
+        codeGenerator.addField(definedClass, "agePr", int.class);
         codeGenerator.addField(definedClass, "returnDate", codeGenerator.getModel().ref(Date.class));
         final JMethod equalsMethod = equalsBuilder.generate(definedClass);
         assertThat(equalsMethod).isNotNull();
@@ -69,7 +70,9 @@ public class EqualsBuilderTest extends CompilableCode {
         assertThat(body.getContents()).isNotEmpty();
 
         codeGenerator.getModel().build(destDir);
-        assertCompilationSuccessful(new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "Entity.java"));
+        File generatedFile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "Entity.java");
+        assertCompilationSuccessful(generatedFile);
+        assertThat(generatedFile).hasContentEqualTo(new File(getClass().getResource("Entity_equals.java.txt").toURI()));
     }
 
 }
