@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Charles Souillard
@@ -96,6 +98,7 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     public void destroy() {
+        XStreamFactory.remove(this);
         if (classloader != null) {
             classloader.destroy();
         }

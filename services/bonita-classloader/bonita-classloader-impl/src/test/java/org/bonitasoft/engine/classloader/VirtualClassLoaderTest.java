@@ -26,8 +26,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.junit.Test;
 
 public class VirtualClassLoaderTest {
@@ -96,5 +98,29 @@ public class VirtualClassLoaderTest {
 
         // To clean
         bonitaClassLoader.destroy();
+    }
+
+    @Test
+    public void destroy_should_update_XStream_instance() throws Exception {
+        //given
+        // set class loader to new VirtualClassLoader
+        ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, previousClassLoader);
+        Thread.currentThread().setContextClassLoader(vcl);
+
+        // retrieve the XStream instance related to this class loader
+        XStream xStreamBeforeDestroy = XStreamFactory.getXStream();
+
+        //when
+        // destroy the VirtualClassLoader
+        vcl.destroy();
+
+        //then
+        // the XStream instance retrieved after destroy must have changed
+        XStream xStreamAfterDestroy = XStreamFactory.getXStream();
+        assertThat(xStreamAfterDestroy).isNotSameAs(xStreamBeforeDestroy);
+
+        //clean up
+        Thread.currentThread().setContextClassLoader(previousClassLoader);
     }
 }
