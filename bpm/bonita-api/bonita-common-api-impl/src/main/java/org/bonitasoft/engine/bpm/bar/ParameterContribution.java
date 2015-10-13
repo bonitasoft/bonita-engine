@@ -27,7 +27,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  */
 public class ParameterContribution implements BusinessArchiveContribution {
 
-    private static final String PARAMETERS_FILE = "parameters.properties";
+    public static final String PARAMETERS_FILE = "parameters.properties";
 
     private static final String NULL = "-==NULLL==-";
 

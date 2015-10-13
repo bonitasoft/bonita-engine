@@ -987,3 +987,12 @@ CREATE TABLE page_mapping (
 );
 
 ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);
+
+CREATE TABLE proc_parameter (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  process_id BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  value VARCHAR(1024) NULL,
+  PRIMARY KEY (tenantId, id)
+);

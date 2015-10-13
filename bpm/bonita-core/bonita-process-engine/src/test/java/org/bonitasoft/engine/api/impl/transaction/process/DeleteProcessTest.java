@@ -31,6 +31,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +65,8 @@ public class DeleteProcessTest {
     private SPage sPage;
     @Mock
     private SFormMapping formMapping;
+    @Mock
+    private ParameterService parameterService;
 
     @Before
     public void before() {
@@ -73,6 +76,7 @@ public class DeleteProcessTest {
         when(tenantAccessor.getFormMappingService()).thenReturn(formMappingService);
         when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
         when(tenantAccessor.getPageService()).thenReturn(pageService);
+        when(tenantAccessor.getParameterService()).thenReturn(parameterService);
     }
 
     /**
