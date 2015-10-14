@@ -21,7 +21,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 public class XStreamFactory {
 
-    private static final Map<ClassLoader, XStream> XSTREAM_MAP = new WeakHashMap<ClassLoader, XStream>();
+    private static final Map<ClassLoader, XStream> XSTREAM_MAP = new WeakHashMap<>();
 
     public static XStream getXStream() {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -31,5 +31,13 @@ public class XStreamFactory {
             XSTREAM_MAP.put(classLoader, xStream);
         }
         return xStream;
+    }
+
+    /**
+     * Removes the XStream object related from given ClassLoader from the cache
+     * @param classLoader classLoader related to the XStreamObject to be removed.
+     */
+    public static void remove(ClassLoader classLoader) {
+        XSTREAM_MAP.remove(classLoader);
     }
 }

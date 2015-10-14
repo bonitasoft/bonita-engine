@@ -25,8 +25,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.junit.Test;
 
 public class VirtualClassLoaderTest {
@@ -34,7 +36,7 @@ public class VirtualClassLoaderTest {
     @Test
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
         VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
+        final Map<String, byte[]> resources = new HashMap<>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
@@ -58,7 +60,7 @@ public class VirtualClassLoaderTest {
     @Test
     public void loadStudentInformation_toVirtualClassLoader_should_be_usable_via_JavaMethodInvoker() throws Exception {
         final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
+        final Map<String, byte[]> resources = new HashMap<>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
@@ -95,5 +97,29 @@ public class VirtualClassLoaderTest {
 
         // To clean
         bonitaClassLoader.destroy();
+    }
+
+    @Test
+    public void destroy_should_update_XStream_instance() throws Exception {
+        //given
+        // set class loader to new VirtualClassLoader
+        ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, previousClassLoader);
+        Thread.currentThread().setContextClassLoader(vcl);
+
+        // retrieve the XStream instance related to this class loader
+        XStream xStreamBeforeDestroy = XStreamFactory.getXStream();
+
+        //when
+        // destroy the VirtualClassLoader
+        vcl.destroy();
+
+        //then
+        // the XStream instance retrieved after destroy must have changed
+        XStream xStreamAfterDestroy = XStreamFactory.getXStream();
+        assertThat(xStreamAfterDestroy).isNotSameAs(xStreamBeforeDestroy);
+
+        //clean up
+        Thread.currentThread().setContextClassLoader(previousClassLoader);
     }
 }
