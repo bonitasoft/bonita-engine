@@ -40,6 +40,10 @@ public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implemen
         super(parameterName);
         this.type = type;
     }
+    public ParameterDefinitionImpl(){
+        super();
+        this.type = "";
+    }
 
     @Override
     public String getType() {
