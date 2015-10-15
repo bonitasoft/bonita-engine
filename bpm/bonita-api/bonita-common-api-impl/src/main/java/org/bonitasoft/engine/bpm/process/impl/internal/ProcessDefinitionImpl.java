@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.process.impl.internal;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
@@ -28,20 +29,25 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessDefinitionImpl extends NamedDefinitionElementImpl implements ProcessDefinition {
+
     private static final long serialVersionUID = -6292790136832048011L;
+
     @XmlAttribute(required = true)
     private final String version;
-    @XmlAttribute(required = true)
+
+    @XmlElement(required = true)
     private String description;
 
     public ProcessDefinitionImpl(final String name, final String version) {
         super(name);
         this.version = version;
     }
-    public ProcessDefinitionImpl(){
+
+    public ProcessDefinitionImpl() {
         super();
         this.version = "default version";
     }
+
     @Override
     public String getVersion() {
         return version;

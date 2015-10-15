@@ -35,7 +35,7 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 public class DataDefinitionImpl extends NamedDefinitionElementImpl implements DataDefinition {
 
     private static final long serialVersionUID = -4126105713210029929L;
-    @XmlAttribute
+    @XmlElement
     private String description;
     @XmlAttribute
     private String type;

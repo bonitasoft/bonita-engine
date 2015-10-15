@@ -62,7 +62,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     private static final long serialVersionUID = -4719128363958199300L;
     @XmlAttribute
     private String displayName;
-    @XmlAttribute(required = true)
+    @XmlElement(required = true)
     private String displayDescription;
     @XmlElementWrapper(name = "parameters")
     @XmlElement(type = ParameterDefinitionImpl.class, name = "parameter")

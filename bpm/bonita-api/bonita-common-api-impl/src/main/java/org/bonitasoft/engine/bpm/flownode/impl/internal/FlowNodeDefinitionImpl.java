@@ -17,10 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
@@ -53,7 +51,7 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
     private final List<TransitionDefinition> outgoings = new ArrayList<>();
     @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
     private final List<ConnectorDefinition> connectors = new ArrayList<>();
-    @XmlAttribute
+    @XmlElement
     private String description;
     @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescription;
