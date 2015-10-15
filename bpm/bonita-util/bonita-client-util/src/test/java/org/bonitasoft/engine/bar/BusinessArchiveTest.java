@@ -15,11 +15,7 @@
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,8 +86,6 @@ import org.junit.Test;
 
 /**
  * @author Baptiste Mesta
- *
- *
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
  */
@@ -367,8 +361,8 @@ public class BusinessArchiveTest {
                 .addMimeType("text/plain").addInitialValue(new ExpressionBuilder().createConstantStringExpression("plop"));
         processDefinitionBuilder.addDocumentDefinition("testDocUrl").addContentFileName("testFile.txt").addUrl("http://test.com/testFile.txt")
                 .addDescription("desc");
-        processDefinitionBuilder.addDescription("a very good description");
-        processDefinitionBuilder.addDisplayDescription("A very good and clean description that will be displayed in user xp");
+        processDefinitionBuilder.addDescription("a 2-lines\ndescription");
+        processDefinitionBuilder.addDisplayDescription("A very good and clean description that will be displayed in user xp\nwith multilines");
         processDefinitionBuilder.addDisplayName("Truck Handling Process");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1").addTimerEventTriggerDefinition(TimerType.CYCLE,
@@ -377,7 +371,8 @@ public class BusinessArchiveTest {
         processDefinitionBuilder
                 .addAutomaticTask("auto1")
                 .addOperation(new LeftOperandBuilder().createNewInstance().setName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
-                        trueExpression).addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH).ignoreError();
+                        trueExpression)
+                .addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH).ignoreError();
         processDefinitionBuilder
                 .addManualTask("manual1", "Truck Driver")
                 .addPriority("urgent")

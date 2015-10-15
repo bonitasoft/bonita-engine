@@ -40,10 +40,6 @@ public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implemen
         super(parameterName);
         this.type = type;
     }
-    public ParameterDefinitionImpl(){
-        super();
-        this.type = "";
-    }
 
     @Override
     public String getType() {
@@ -61,9 +57,12 @@ public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implemen
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         ParameterDefinitionImpl that = (ParameterDefinitionImpl) o;
         return Objects.equals(type, that.type) &&
                 Objects.equals(description, that.description);
