@@ -73,6 +73,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
             marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             unmarshaller = jaxbContext.createUnmarshaller();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
@@ -189,7 +190,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     private void addEventTriggerOnEvents(FlowElementContainerDefinition flowElementContainer) {
         /*
-            Add event trigger manually
+         * Add event trigger manually
          */
         addEventTriggerOnIntermediateCatchEvent(flowElementContainer);
         addEventTriggerOnIntermediateThrowEvent(flowElementContainer);
