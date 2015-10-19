@@ -31,8 +31,8 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InputContainerDefinitionImpl implements InputContainerDefinition {
 
-    @XmlElementWrapper
-    @XmlElement(type = InputDefinitionImpl.class, name = "input")
+    @XmlElementWrapper(name = "inputDefinitions")
+    @XmlElement(type = InputDefinitionImpl.class, name = "inputDefinition")
     protected final List<InputDefinition> inputs;
 
     public InputContainerDefinitionImpl() {
