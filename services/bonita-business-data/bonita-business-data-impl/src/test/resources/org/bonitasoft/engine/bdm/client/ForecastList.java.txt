@@ -88,30 +88,30 @@ public class Forecast implements org.bonitasoft.engine.bdm.Entity
             return false;
         }
         Forecast other = ((Forecast) obj);
-        if (persistenceId == null) {
+        if (this.persistenceId == null) {
             if (other.persistenceId!= null) {
                 return false;
             }
         } else {
-            if (!persistenceId.equals(other.persistenceId)) {
+            if (!this.persistenceId.equals(other.persistenceId)) {
                 return false;
             }
         }
-        if (persistenceVersion == null) {
+        if (this.persistenceVersion == null) {
             if (other.persistenceVersion!= null) {
                 return false;
             }
         } else {
-            if (!persistenceVersion.equals(other.persistenceVersion)) {
+            if (!this.persistenceVersion.equals(other.persistenceVersion)) {
                 return false;
             }
         }
-        if (temperatures == null) {
+        if (this.temperatures == null) {
             if (other.temperatures!= null) {
                 return false;
             }
         } else {
-            if (!temperatures.equals(other.temperatures)) {
+            if (!this.temperatures.equals(other.temperatures)) {
                 return false;
             }
         }
@@ -123,18 +123,18 @@ public class Forecast implements org.bonitasoft.engine.bdm.Entity
         final int prime = 31;
         int result = 1;
         int persistenceIdCode = 0;
-        if (persistenceId!= null) {
-            persistenceIdCode = persistenceId.hashCode();
+        if (this.persistenceId!= null) {
+            persistenceIdCode = this.persistenceId.hashCode();
         }
         result = ((prime*result)+ persistenceIdCode);
         int persistenceVersionCode = 0;
-        if (persistenceVersion!= null) {
-            persistenceVersionCode = persistenceVersion.hashCode();
+        if (this.persistenceVersion!= null) {
+            persistenceVersionCode = this.persistenceVersion.hashCode();
         }
         result = ((prime*result)+ persistenceVersionCode);
         int temperaturesCode = 0;
-        if (temperatures!= null) {
-            temperaturesCode = temperatures.hashCode();
+        if (this.temperatures!= null) {
+            temperaturesCode = this.temperatures.hashCode();
         }
         result = ((prime*result)+ temperaturesCode);
         return result;

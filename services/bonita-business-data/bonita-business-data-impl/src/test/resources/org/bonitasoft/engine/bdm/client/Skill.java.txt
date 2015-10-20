@@ -68,30 +68,30 @@ public class Skill implements org.bonitasoft.engine.bdm.Entity
             return false;
         }
         Skill other = ((Skill) obj);
-        if (persistenceId == null) {
+        if (this.persistenceId == null) {
             if (other.persistenceId!= null) {
                 return false;
             }
         } else {
-            if (!persistenceId.equals(other.persistenceId)) {
+            if (!this.persistenceId.equals(other.persistenceId)) {
                 return false;
             }
         }
-        if (persistenceVersion == null) {
+        if (this.persistenceVersion == null) {
             if (other.persistenceVersion!= null) {
                 return false;
             }
         } else {
-            if (!persistenceVersion.equals(other.persistenceVersion)) {
+            if (!this.persistenceVersion.equals(other.persistenceVersion)) {
                 return false;
             }
         }
-        if (skill == null) {
+        if (this.skill == null) {
             if (other.skill!= null) {
                 return false;
             }
         } else {
-            if (!skill.equals(other.skill)) {
+            if (!this.skill.equals(other.skill)) {
                 return false;
             }
         }
@@ -103,18 +103,18 @@ public class Skill implements org.bonitasoft.engine.bdm.Entity
         final int prime = 31;
         int result = 1;
         int persistenceIdCode = 0;
-        if (persistenceId!= null) {
-            persistenceIdCode = persistenceId.hashCode();
+        if (this.persistenceId!= null) {
+            persistenceIdCode = this.persistenceId.hashCode();
         }
         result = ((prime*result)+ persistenceIdCode);
         int persistenceVersionCode = 0;
-        if (persistenceVersion!= null) {
-            persistenceVersionCode = persistenceVersion.hashCode();
+        if (this.persistenceVersion!= null) {
+            persistenceVersionCode = this.persistenceVersion.hashCode();
         }
         result = ((prime*result)+ persistenceVersionCode);
         int skillCode = 0;
-        if (skill!= null) {
-            skillCode = skill.hashCode();
+        if (this.skill!= null) {
+            skillCode = this.skill.hashCode();
         }
         result = ((prime*result)+ skillCode);
         return result;

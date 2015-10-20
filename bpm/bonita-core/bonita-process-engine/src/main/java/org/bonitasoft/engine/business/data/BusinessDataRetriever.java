@@ -78,8 +78,8 @@ public class BusinessDataRetriever {
     }
 
     /**
-     * Retrieve a Business Data or a List of Business Data related to the given {@link SRefBusinessDataInstance} depending on its type (single {@link Entity} if
-     * it's a {@link SSimpleRefBusinessDataInstance} or a List<Entity> if it's a {@link SMultiRefBusinessDataInstance}.
+     * Retrieves a Business Data or a List of Business Data related to the given {@link SRefBusinessDataInstance} depending on its type (single {@link Entity}
+     * if it's a {@link SSimpleRefBusinessDataInstance} or a List<Entity> if it's a {@link SMultiRefBusinessDataInstance}.
      * This method will use {@link #getSimpleBusinessData(SSimpleRefBusinessDataInstance, Class)} or
      * {@link #getMultiBusinessData(SMultiRefBusinessDataInstance, Class)} based on the data reference type
      *
@@ -89,7 +89,8 @@ public class BusinessDataRetriever {
      * @throws SBusinessDataNotFoundException
      * @throws SExpressionEvaluationException
      */
-    public Object getBusinessData(final SRefBusinessDataInstance refBusinessDataInstance) throws SBusinessDataNotFoundException, SExpressionEvaluationException {
+    public Object getBusinessData(final SRefBusinessDataInstance refBusinessDataInstance)
+            throws SBusinessDataNotFoundException, SExpressionEvaluationException {
         try {
             final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
@@ -98,7 +99,8 @@ public class BusinessDataRetriever {
             final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
             return getMultiBusinessData(reference, bizClass);
         } catch (final ClassNotFoundException e) {
-            throw new SExpressionEvaluationException("Unable to load class for the business data having reference '" + refBusinessDataInstance.getName() + "'", e, refBusinessDataInstance.getName());
+            throw new SExpressionEvaluationException("Unable to load class for the business data having reference '" + refBusinessDataInstance.getName() + "'",
+                    e, refBusinessDataInstance.getName());
         }
     }
 

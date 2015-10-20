@@ -56,11 +56,17 @@ public class HashCodeBuilderTest extends CompilableCode {
     public void shouldGenerate_AddHashCodeJMethodInDefinedClass() throws Exception {
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
         codeGenerator.addField(definedClass, "name", String.class);
+        codeGenerator.addField(definedClass, "nameCode", String.class);
         codeGenerator.addField(definedClass, "age", Integer.class);
+        codeGenerator.addField(definedClass, "agePr", int.class);
         codeGenerator.addField(definedClass, "height", Float.class);
+        codeGenerator.addField(definedClass, "heightPR", float.class);
         codeGenerator.addField(definedClass, "isMarried", Boolean.class);
+        codeGenerator.addField(definedClass, "isMarriedPr", boolean.class);
         codeGenerator.addField(definedClass, "timestamp", Long.class);
+        codeGenerator.addField(definedClass, "timestampPr", long.class);
         codeGenerator.addField(definedClass, "weight", Double.class);
+        codeGenerator.addField(definedClass, "weightPr", double.class);
         codeGenerator.addField(definedClass, "returnDate", codeGenerator.getModel().ref(Date.class));
         final JMethod hashcodeMethod = hashCodeBuilder.generate(definedClass);
         assertThat(hashcodeMethod).isNotNull();
@@ -73,7 +79,9 @@ public class HashCodeBuilderTest extends CompilableCode {
         assertThat(body.getContents()).isNotEmpty();
 
         codeGenerator.getModel().build(destDir);
-        assertCompilationSuccessful(new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "Entity.java"));
+        File file = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "Entity.java");
+        assertCompilationSuccessful(file);
+        assertThat(file).hasContentEqualTo(new File(getClass().getResource("Entity_hashCode.java.txt").toURI()));
     }
 
 }

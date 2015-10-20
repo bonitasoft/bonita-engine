@@ -1,0 +1,57 @@
+
+package org.bonitasoft;
+
+import java.util.Date;
+
+public class Entity {
+
+    private String name;
+    private Integer age;
+    private int agePr;
+    private Date returnDate;
+
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass()!= obj.getClass()) {
+            return false;
+        }
+        Entity other = ((Entity) obj);
+        if (this.name == null) {
+            if (other.name!= null) {
+                return false;
+            }
+        } else {
+            if (!this.name.equals(other.name)) {
+                return false;
+            }
+        }
+        if (this.age == null) {
+            if (other.age!= null) {
+                return false;
+            }
+        } else {
+            if (!this.age.equals(other.age)) {
+                return false;
+            }
+        }
+        if (this.agePr!= other.agePr) {
+            return false;
+        }
+        if (this.returnDate == null) {
+            if (other.returnDate!= null) {
+                return false;
+            }
+        } else {
+            if (!this.returnDate.equals(other.returnDate)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+}
