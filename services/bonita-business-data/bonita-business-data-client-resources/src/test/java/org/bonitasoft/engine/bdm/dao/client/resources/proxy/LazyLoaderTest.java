@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -21,10 +22,12 @@ import static org.mockito.Mockito.when;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.proxy.model.Child;
 import org.bonitasoft.engine.bdm.proxy.model.Parent;
 import org.bonitasoft.engine.session.APISession;
@@ -42,29 +45,28 @@ public class LazyLoaderTest {
 
     @Mock
     private CommandAPI commandAPI;
-    
+
     private LazyLoader lazyLoader;
-    
+
     @Before
     public void setUp() throws Exception {
         lazyLoader = spy(new LazyLoader(new FakeSession()));
         doReturn(commandAPI).when(lazyLoader).getCommandAPI();
     }
-    
+
     @Test
     public void should_load_object_through_command_api() throws Exception {
         long persistenceId = 22L;
         Child luce = new Child("Luce", 2);
         Method getChild = Parent.class.getMethod("getChild");
         when(commandAPI.execute("executeBDMQuery", parameters(getChild, persistenceId))).thenReturn(luce.toJson().getBytes());
-        
+
         Object loadedChild = lazyLoader.load(getChild, persistenceId);
-        
+
         assertThat(loadedChild).isEqualTo(luce);
     }
-    
+
     @Test
-    @SuppressWarnings("unchecked")
     public void should_load_list_of_objects_through_command_api() throws Exception {
         long persistenceId = 22L;
         Child luce = new Child("Luce", 2);
@@ -72,17 +74,39 @@ public class LazyLoaderTest {
         String json = "[" + luce.toJson() + "," + julien.toJson() + "]";
         Method getChildren = Parent.class.getMethod("getChildren");
         when(commandAPI.execute("executeBDMQuery", parameters(getChildren, persistenceId))).thenReturn(json.getBytes());
-        
+
         Object loadedChild = lazyLoader.load(getChildren, persistenceId);
-        
+
         assertThat(loadedChild).isInstanceOf(List.class);
         assertThat((List<Child>) loadedChild).containsOnly(luce, julien);
     }
-    
+
+    @Test
+    public void should_getParameters_returnType_when_return_list_is_true() throws Exception {
+        long persistenceId = 22L;
+        Method getChildren = Parent.class.getMethod("getChildren");
+
+        //when
+        final Map<String, Serializable> parameters = parameters(getChildren, persistenceId);
+
+        //then
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        queryParameters.put(Field.PERSISTENCE_ID, persistenceId);
+
+        assertThat(parameters).hasSize(6)
+                .containsOnly(
+                        entry("queryName", "Child.findChildrenByParentPersistenceId"),
+                        entry("returnsList", true),
+                        entry("startIndex", 0),
+                        entry("maxResults", Integer.MAX_VALUE),
+                        entry("returnType", Child.class.getName()),
+                        entry("queryParameters",queryParameters));
+    }
+
     private Map<String, Serializable> parameters(Method method, long persistenceId) {
         return BDMQueryCommandParameters.createCommandParameters(new EntityGetter(method), persistenceId);
     }
-    
+
     @SuppressWarnings("serial")
     private class FakeSession implements APISession {
 

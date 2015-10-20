@@ -11,15 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bdm.dao.client.resources.utils;
+package org.bonitasoft.engine.business.data.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.bonitasoft.engine.bdm.proxy.model.Address;
-import org.bonitasoft.engine.bdm.proxy.model.Employee;
 import org.junit.Test;
 
 public class EntityGetterTest {
@@ -27,7 +25,7 @@ public class EntityGetterTest {
     @Test(expected = IllegalArgumentException.class)
     public void can_only_be_applicable_to_getters() throws Exception {
         //given
-        Method setter = Employee.class.getMethod("setManager", Employee.class);
+        Method setter = Employee.class.getMethod("setLastName", String.class);
 
         //when then
         new EntityGetter(setter);
@@ -36,7 +34,7 @@ public class EntityGetterTest {
     @Test
     public void should_be_able_to_retrieve_source_entity_name() throws Exception {
         //given
-        Method methodOfEmployee = Employee.class.getMethod("getManager");
+        Method methodOfEmployee = Employee.class.getMethod("getAddress");
 
         //when
         String sourceEntityName = new EntityGetter(methodOfEmployee).getSourceEntityName();
@@ -108,13 +106,13 @@ public class EntityGetterTest {
     @Test
     public void should_be_able_to_get_associated_named_query() throws Exception {
         //given
-        Method getManager = Employee.class.getMethod("getManager");
+        Method getManager = Employee.class.getMethod("getAddresses");
 
         //when
         String namedQuery = new EntityGetter(getManager).getAssociatedNamedQuery();
 
         //then
-        assertThat(namedQuery).isEqualTo("Employee.findManagerByEmployeePersistenceId");
+        assertThat(namedQuery).isEqualTo("Address.findAddressesByEmployeePersistenceId");
     }
 
     @Test
@@ -133,7 +131,7 @@ public class EntityGetterTest {
     @Test
     public void should_be_able_to_determine_if_getter_do_not_return_a_list() throws Exception {
         //given
-        Method multipleObjectGetter = Employee.class.getMethod("getManager");
+        Method multipleObjectGetter = Employee.class.getMethod("getLastName");
 
         //when
         final EntityGetter entityGetter = new EntityGetter(multipleObjectGetter);
