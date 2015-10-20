@@ -16,7 +16,6 @@ package org.bonitasoft.engine.business.data.proxy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -44,27 +43,17 @@ public class EntityGetterTest {
     }
 
     @Test
-    public void should_be_able_to_retrieve_target_entity_class() throws Exception {
-        //given
-        Method methodReturningAdress = Employee.class.getMethod("getAddress");
-
-        //when
-        Class<?> targetEntityClass = new EntityGetter(methodReturningAdress).getTargetEntityClass();
-
-        //then
-        assertThat(targetEntityClass).isEqualTo(Address.class);
-    }
-
-    @Test
     public void should_be_able_to_retrieve_target_entity_class_even_if_method_return_a_list() throws Exception {
         //given
         Method methodReturningListOfAdresses = Employee.class.getMethod("getAddresses");
 
         //when
-        Class<?> targetEntityClass = new EntityGetter(methodReturningListOfAdresses).getTargetEntityClass();
+        final EntityGetter entityGetter = new EntityGetter(methodReturningListOfAdresses);
 
         //then
-        assertThat(targetEntityClass).isEqualTo(Address.class);
+        assertThat(entityGetter.getTargetEntityClass()).isEqualTo(Address.class);
+        assertThat(entityGetter.getReturnTypeClassName()).isEqualTo("org.bonitasoft.engine.business.data.proxy.Address");
+        assertThat(entityGetter.returnsList()).isTrue();
     }
 
     @Test
@@ -85,22 +74,12 @@ public class EntityGetterTest {
         Method uniqueObjectGetter = Employee.class.getMethod("getAddress");
 
         //when
-        String classname = new EntityGetter(uniqueObjectGetter).getReturnTypeClassName();
+        final EntityGetter entityGetter = new EntityGetter(uniqueObjectGetter);
 
         //then
-        assertThat(classname).isEqualTo(Address.class.getName());
-    }
+        assertThat(entityGetter.getReturnTypeClassName()).isEqualTo(Address.class.getName());
+        assertThat(entityGetter.returnsList()).isFalse();
 
-    @Test
-    public void should_return_list_object_class_name_if_getter_return_multiple_objects() throws Exception {
-        //given
-        Method multipleObjectGetter = Employee.class.getMethod("getAddresses");
-
-        //when
-        String className = new EntityGetter(multipleObjectGetter).getReturnTypeClassName();
-
-        //then
-        assertThat(className).isNotEqualTo(List.class.getName());
     }
 
     @Test

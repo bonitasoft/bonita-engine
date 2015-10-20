@@ -82,7 +82,7 @@ public class LazyLoaderTest {
     }
 
     @Test
-    public void should_getParameters_returnType_when_return_list_is_true() throws Exception {
+    public void should_getParameters_return_real_type_when_query_returns_list() throws Exception {
         long persistenceId = 22L;
         Method getChildren = Parent.class.getMethod("getChildren");
 
