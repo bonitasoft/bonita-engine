@@ -23,19 +23,27 @@ import java.util.List;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.Query;
+import org.bonitasoft.engine.bdm.model.assertion.QueryAssert;
+import org.bonitasoft.engine.bdm.model.QueryParameter;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
+import org.bonitasoft.engine.bdm.model.assertion.QueryParameterAssert;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Romain Bioteau
  */
 public class BDMQueryUtilTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void should_createQueryNameForUniqueConstraint_return_queryname() {
@@ -46,9 +54,33 @@ public class BDMQueryUtilTest {
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void should_createCountQueryNameForUniqueConstraint_return_queryname() {
+        final UniqueConstraint uniqueConstraint = new UniqueConstraint();
+        uniqueConstraint.setFieldNames(Arrays.asList("name"));
+        final String countQueryNameForUniqueConstraint = BDMQueryUtil.createCountQueryNameForUniqueConstraint(uniqueConstraint);
+        assertThat(countQueryNameForUniqueConstraint).isEqualTo("findByName.count");
+
+    }
+
+    @Test
     public void should_createQueryNameForUniqueConstraint_throwException_when_null_value() {
+        //then
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("uniqueConstraint cannot be null");
+
+        //when
         BDMQueryUtil.createQueryNameForUniqueConstraint(null);
+    }
+
+    @Test
+    public void should_createCountQueryNameForUniqueConstraint_throwException_when_null_value() {
+        //then
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("uniqueConstraint cannot be null");
+
+        //when
+        BDMQueryUtil.createCountQueryNameForUniqueConstraint(null);
     }
 
     @Test
@@ -57,6 +89,19 @@ public class BDMQueryUtilTest {
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryContentForUniqueConstraint = BDMQueryUtil.createQueryContentForUniqueConstraint("org.bonita.Employee", uniqueConstraint);
         assertThat(queryContentForUniqueConstraint).isNotEmpty().isEqualTo("SELECT e\nFROM Employee e\nWHERE e.name= :name\n");
+    }
+
+    @Test
+    public void should_createCountQueryContentForUniqueConstraint_return_query_count() {
+        //given
+        final UniqueConstraint uniqueConstraint = new UniqueConstraint();
+        uniqueConstraint.setFieldNames(Arrays.asList("name"));
+
+        //when
+        final String countQueryContentForUniqueConstraint = BDMQueryUtil.createCountQueryContentForUniqueConstraint("org.bonita.Employee", uniqueConstraint);
+
+        //then
+        assertThat(countQueryContentForUniqueConstraint).isNotEmpty().isEqualTo("SELECT COUNT(e)\nFROM Employee e\nWHERE e.name= :name\n");
     }
 
     @Test
@@ -90,7 +135,8 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        assertThat(queries).hasSize(4);
+        final List<String> extract = extract(queries, on(Query.class).getName());
+        assertThat(extract).containsOnly("find", "findByPersistenceId", "findByUnikAttr", "findByUnikAttr.count", "findByUnconstrainedAttr");
     }
 
     @Test
@@ -128,7 +174,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void should_createQuerForUniqueConstraint_return_query_with_parameters() {
+    public void should_createQueryForUniqueConstraint_return_query_with_parameters() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final SimpleField field = new SimpleField();
@@ -144,6 +190,29 @@ public class BDMQueryUtilTest {
         assertThat(query.getName()).isEqualTo("findByName");
         assertThat(query.getReturnType()).isEqualTo(bo.getQualifiedName());
         assertThat(query.getQueryParameters()).hasSize(1);
+    }
+
+    @Test
+    public void should_createCountQueryForUniqueConstraint_return_query_with_parameters() {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Employee");
+        final SimpleField field = new SimpleField();
+        field.setName("name");
+        field.setType(FieldType.STRING);
+        bo.addField(field);
+        final UniqueConstraint uniqueConstraint = new UniqueConstraint();
+        uniqueConstraint.setFieldNames(Arrays.asList("name"));
+
+        final Query query = BDMQueryUtil.createCountQueryForUniqueConstraint(bo, uniqueConstraint);
+        QueryAssert.assertThat(query)
+                .hasContent("SELECT COUNT(e)\nFROM Employee e\nWHERE e.name= :name\n")
+                .hasName("findByName.count")
+                .hasReturnType(bo.getQualifiedName());
+        final List<QueryParameter> queryParameters = query.getQueryParameters();
+        assertThat(queryParameters).hasSize(1);
+        QueryParameterAssert.assertThat(queryParameters.get(0))
+                .hasName("name")
+                .hasClassName(String.class.getName());
     }
 
     @Test

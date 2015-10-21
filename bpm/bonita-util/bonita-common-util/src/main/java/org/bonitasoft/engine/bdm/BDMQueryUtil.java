@@ -42,6 +42,12 @@ public class BDMQueryUtil {
 
     private static final String SELECT = "SELECT ";
 
+    public static final String COUNT = "COUNT";
+
+    public static final String OPENING_PARENTHESIS = "(";
+
+    public static final String CLOSING_PARENTHESIS = ")";
+
     private static final String FROM = "FROM ";
 
     private static final String WHERE = "WHERE ";
@@ -54,11 +60,13 @@ public class BDMQueryUtil {
 
     public static final String START_INDEX_PARAM_NAME = "startIndex";
 
+    public static final String COUNT_SUFFIX = ".count";
+
     public static String createQueryNameForUniqueConstraint(final UniqueConstraint uniqueConstraint) {
         if (uniqueConstraint == null) {
             throw new IllegalArgumentException("uniqueConstraint cannot be null");
         }
-        return getQueryName(uniqueConstraint.getFieldNames().toArray(new String[0]));
+        return getQueryName(uniqueConstraint.getFieldNames().toArray(new String[0]));//FIXME concat all fields instead of taking first field
     }
 
     public static String getQueryName(final String... fieldNames) {
@@ -148,29 +156,33 @@ public class BDMQueryUtil {
     }
 
     public static String createQueryContentForUniqueConstraint(final String businessObjectName, final UniqueConstraint uniqueConstraint) {
-        if (businessObjectName == null) {
+        checkArgumentisNotEmpty(businessObjectName);
+        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
+        final char alias = getSimpleNameAlias(simpleName);
+        final String selectBlock = buildSelectFrom(simpleName, alias);
+        return buildQueryForUniqueConstraint(uniqueConstraint, alias, selectBlock);
+    }
+
+    protected static char getSimpleNameAlias(String simpleName) {
+        return Character.toLowerCase(simpleName.charAt(0));
+    }
+
+    protected static void checkArgumentisNotEmpty(String argument) {
+        if (argument == null) {
             throw new IllegalArgumentException("businessObjectName is null");
         }
-        if (businessObjectName.isEmpty()) {
+        if (argument.isEmpty()) {
             throw new IllegalArgumentException("businessObjectName is empty");
         }
-        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char var = Character.toLowerCase(simpleName.charAt(0));
-        final StringBuilder builder = new StringBuilder();
-        builder.append(buildSelectFrom(simpleName, var));
-        builder.append(buildWhereAnd(var, uniqueConstraint.getFieldNames()));
-        return builder.toString();
     }
 
     public static String createQueryContentForField(final String businessObjectName, final Field field) {
-        if (businessObjectName == null) {
-            throw new IllegalArgumentException("businessObjectName is null");
-        }
+        checkArgumentisNotEmpty(businessObjectName);
         if (field == null) {
             throw new IllegalArgumentException("field cannot be null");
         }
         final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char var = Character.toLowerCase(simpleName.charAt(0));
+        final char var = getSimpleNameAlias(simpleName);
         final StringBuilder builder = new StringBuilder();
         builder.append(buildSelectFrom(simpleName, var));
         builder.append(buildWhere(var, field.getName()));
@@ -188,10 +200,16 @@ public class BDMQueryUtil {
             queryNames.add(query.getName());
         }
 
-        for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
-            final Query query = createQueryForUniqueConstraint(businessObject, uc);
+        for (final UniqueConstraint uniqueConstraint : businessObject.getUniqueConstraints()) {
+            final Query query = createQueryForUniqueConstraint(businessObject, uniqueConstraint);
+            final Query countQuery = createCountQueryForUniqueConstraint(businessObject, uniqueConstraint);
+
             queryNames.add(query.getName());
+            queryNames.add(countQuery.getName());
+
             queries.add(query);
+            queries.add(countQuery);
+
         }
         for (final Field f : businessObject.getFields()) {
             if (f instanceof SimpleField) {
@@ -223,9 +241,7 @@ public class BDMQueryUtil {
     }
 
     public static String createQueryContentForLazyField(final String businessObjectName, final RelationField field) {
-        if (businessObjectName == null) {
-            throw new IllegalArgumentException("businessObjectName is null");
-        }
+        checkArgumentisNotEmpty(businessObjectName);
         if (field == null) {
             throw new IllegalArgumentException("field cannot be null");
         }
@@ -293,14 +309,12 @@ public class BDMQueryUtil {
     }
 
     public static String createSelectAllQueryContent(final String businessObjectName) {
-        if (businessObjectName == null) {
-            throw new IllegalArgumentException("businessObjectName is null");
-        }
+        checkArgumentisNotEmpty(businessObjectName);
         final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char var = Character.toLowerCase(simpleName.charAt(0));
+        final char alias = getSimpleNameAlias(simpleName);
         final StringBuilder sb = new StringBuilder();
-        sb.append(buildSelectFrom(simpleName, var));
-        sb.append(buildOrderBy(var));
+        sb.append(buildSelectFrom(simpleName, alias));
+        sb.append(buildOrderBy(alias));
         return sb.toString();
     }
 
@@ -308,10 +322,21 @@ public class BDMQueryUtil {
         return getQueryName();
     }
 
-    private static String buildSelectFrom(final String simpleName, final char var) {
+    private static String buildSelectFrom(final String simpleName, final char simpleNameAlias) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(SELECT).append(var).append(NEW_LINE);
-        builder.append(FROM).append(simpleName).append(' ').append(var).append(NEW_LINE);
+        builder.append(SELECT).append(simpleNameAlias).append(NEW_LINE);
+        builder.append(FROM).append(simpleName).append(BLANK_SPACE).append(simpleNameAlias).append(NEW_LINE);
+        return builder.toString();
+    }
+
+    private static String buildCountSelectFrom(final String simpleName, final char alias) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(SELECT)
+                .append(COUNT).append(OPENING_PARENTHESIS).append(alias).append(CLOSING_PARENTHESIS)
+                .append(NEW_LINE)
+
+        .append(FROM).append(simpleName).append(BLANK_SPACE).append(alias)
+                .append(NEW_LINE);
         return builder.toString();
     }
 
@@ -362,4 +387,37 @@ public class BDMQueryUtil {
         return queries;
     }
 
+    public static String createCountQueryNameForUniqueConstraint(UniqueConstraint uniqueConstraint) {
+        return new StringBuilder().append(createQueryNameForUniqueConstraint(uniqueConstraint)).append(COUNT_SUFFIX).toString();
+    }
+
+    public static String createCountQueryContentForUniqueConstraint(String businessObjectName, UniqueConstraint uniqueConstraint) {
+        checkArgumentisNotEmpty(businessObjectName);
+        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
+        final char alias = getSimpleNameAlias(simpleName);
+
+        final String selectBlock = buildCountSelectFrom(simpleName, alias);
+
+        return buildQueryForUniqueConstraint(uniqueConstraint, alias, selectBlock);
+    }
+
+    protected static String buildQueryForUniqueConstraint(UniqueConstraint uniqueConstraint, char alias, String selectBlock) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(selectBlock);
+        builder.append(buildWhereAnd(alias, uniqueConstraint.getFieldNames()));
+        return builder.toString();
+    }
+
+    public static Query createCountQueryForUniqueConstraint(BusinessObject businessObject, UniqueConstraint uniqueConstraint) {
+        final String name = createCountQueryNameForUniqueConstraint(uniqueConstraint);
+        final String content = createCountQueryContentForUniqueConstraint(businessObject.getQualifiedName(), uniqueConstraint);
+        final Query q = new Query(name, content, businessObject.getQualifiedName());
+        for (final String fieldName : uniqueConstraint.getFieldNames()) {
+            final Field f = getField(fieldName, businessObject);
+            if (f instanceof SimpleField) {
+                q.addQueryParameter(f.getName(), ((SimpleField) f).getType().getClazz().getName());
+            }
+        }
+        return q;
+    }
 }
