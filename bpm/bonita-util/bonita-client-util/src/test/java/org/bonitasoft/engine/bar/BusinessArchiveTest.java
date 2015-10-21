@@ -1073,6 +1073,7 @@ public class BusinessArchiveTest {
         processDefinitionBuilder.addTransition("user1", "gate1");
         processDefinitionBuilder.addTransition("user1", "end1");
         processDefinitionBuilder.addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH);
+        processDefinitionBuilder.addParameter("myParam", String.class.getName()).addDescription("an important parameter");
 
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
@@ -1102,6 +1103,8 @@ public class BusinessArchiveTest {
         processDefinitionBuilder.addTransition("user1", "gate1");
         processDefinitionBuilder.addTransition("user1", "end1");
         processDefinitionBuilder.addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH);
+        processDefinitionBuilder.addParameter("myParam", String.class.getName()).addDescription("an important parameter");
+
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done())
                 .done();
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
@@ -1212,6 +1215,14 @@ public class BusinessArchiveTest {
         } finally {
             resourceAsStream.close();
         }
+    }
+
+    @Test
+    public void parameters() {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
+        processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key.2", String.class.getCanonicalName()).addUserTask("userTask1",
+                null);
+
     }
 
 }
