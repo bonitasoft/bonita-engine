@@ -113,6 +113,11 @@ public class ProcessDefinitionBARContributionTest {
     }
 
     @Test
+    public void convertXmlToProcess_should_not_fail_with_new_7_2_content() throws Exception {
+        new ProcessDefinitionBARContribution().convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_2.xml")));
+    }
+
+    @Test
     public void should_checkVersion_with_bad_content_thrown_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage("There is no bonitasoft process namespace declaration");

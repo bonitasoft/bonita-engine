@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<processDefinition xmlns="http://www.bonitasoft.org/ns/process/client/7.2" version="1.0" displayName="Q8LV__u4bM4yfDoRDUZjJ6IVa0NdFj" stringIndexLabel1="wBdc26kRTUzsuLYJktlHPS8KY8" stringIndexLabel2="A7zoGOS0" stringIndexLabel3="wTODbcp-KZPIOi4FA1fBq.6zvtF9" stringIndexLabel4="jJTKHaBBM6cUw43oP" stringIndexLabel5="M" name="Unzo32.l0SkbcVmzErJBlK" id="-1019635836">
+<def:processDefinition xmlns:def="http://www.bonitasoft.org/ns/process/client/7.2" version="1.0" displayName="Q8LV__u4bM4yfDoRDUZjJ6IVa0NdFj" stringIndexLabel1="wBdc26kRTUzsuLYJktlHPS8KY8" stringIndexLabel2="A7zoGOS0" stringIndexLabel3="wTODbcp-KZPIOi4FA1fBq.6zvtF9" stringIndexLabel4="jJTKHaBBM6cUw43oP" stringIndexLabel5="M" name="Unzo32.l0SkbcVmzErJBlK" id="-1019635836">
     <description>zs</description>
     <displayDescription>cTns8ztMcXG3</displayDescription>
     <stringIndexes>
@@ -177,4 +177,4 @@
             </expression>
         </contextEntry>
     </context>
-</processDefinition>
+</def:processDefinition>

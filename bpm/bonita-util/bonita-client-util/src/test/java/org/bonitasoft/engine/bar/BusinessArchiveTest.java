@@ -1080,8 +1080,8 @@ public class BusinessArchiveTest {
 
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         String fileContent = IOUtil.read(file);
-        fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
-        fileContent = fileContent.replace("</processDefinition", "</porcessDefinition");
+        fileContent = fileContent.replace("<def:processDefinition", "<def:pro_cessDefinition");
+        fileContent = fileContent.replace("</def:processDefinition", "</def:pro_cessDefinition");
         file.delete();
         createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
@@ -1108,7 +1108,7 @@ public class BusinessArchiveTest {
 
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         String fileContent = IOUtil.read(file);
-        fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
+        fileContent = fileContent.replace("<def:processDefinition", "<def:pro_typo_cessDefinition");
         file.delete();
         createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
