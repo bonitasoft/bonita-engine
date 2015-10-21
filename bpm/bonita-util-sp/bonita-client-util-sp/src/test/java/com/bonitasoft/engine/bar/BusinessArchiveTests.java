@@ -24,7 +24,6 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -478,74 +477,6 @@ public class BusinessArchiveTests {
         assertEquals(process.getProcessContainer().getConnectors().iterator().next(), result.getProcessContainer().getConnectors().iterator().next());
         assertEquals(process.getParameters().size(), result.getParameters().size());
         assertEquals(process.getParameters().iterator().next(), result.getParameters().iterator().next());
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void readInvalidProcessFromBusinessArchive() throws Exception {
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
-        processDefinitionBuilder.addStartEvent("start1");
-        processDefinitionBuilder.addAutomaticTask("auto1").addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
-        processDefinitionBuilder.addUserTask("user1", "Truck Driver").addConnector("conn2", "connId2", "1.0.0", ConnectorEvent.ON_ENTER);
-        processDefinitionBuilder.addGateway("gate1", GatewayType.INCLUSIVE).addDefaultTransition("user1");
-        processDefinitionBuilder.addEndEvent("end1");
-        processDefinitionBuilder.addTransition("start1", "auto1");
-        processDefinitionBuilder.addTransition("auto1", "user1");
-        processDefinitionBuilder.addTransition("user1", "gate1");
-        processDefinitionBuilder.addTransition("user1", "end1");
-        processDefinitionBuilder.addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH);
-        processDefinitionBuilder.addParameter("myParam", String.class.getName()).addDescription("an important parameter");
-
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
-
-        final File file = new File(tempFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        String fileContent = IOUtil.read(file);
-        fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
-        fileContent = fileContent.replace("</processDefinition", "</porcessDefinition");
-        file.delete();
-        file.createNewFile();
-        IOUtil.writeContentToFile(fileContent, file);
-        BusinessArchiveFactory.readBusinessArchive(tempFolder);
-    }
-
-    @Test(expected = InvalidBusinessArchiveFormatException.class)
-    public void readInvalidXMLProcessFromBusinessArchive() throws Exception {
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("MyProcess", "1.0");
-        processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
-        processDefinitionBuilder.addStartEvent("start1");
-        processDefinitionBuilder.addAutomaticTask("auto1").addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH);
-        processDefinitionBuilder.addUserTask("user1", "Truck Driver").addConnector("conn2", "connId2", "1.0.0", ConnectorEvent.ON_ENTER);
-        processDefinitionBuilder.addGateway("gate1", GatewayType.INCLUSIVE).addDefaultTransition("user1");
-        processDefinitionBuilder.addEndEvent("end1");
-        processDefinitionBuilder.addTransition("start1", "auto1");
-        processDefinitionBuilder.addTransition("auto1", "user1");
-        processDefinitionBuilder.addTransition("user1", "gate1");
-        processDefinitionBuilder.addTransition("user1", "end1");
-        processDefinitionBuilder.addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH);
-        processDefinitionBuilder.addParameter("myParam", String.class.getName()).addDescription("an important parameter");
-
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
-
-        final File file = new File(tempFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-        String fileContent = IOUtil.read(file);
-        fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
-        file.delete();
-        file.createNewFile();
-        IOUtil.writeContentToFile(fileContent, file);
-        BusinessArchiveFactory.readBusinessArchive(tempFolder);
-        deleteDir(tempFolder);
-    }
-
-    @Test
-    public void parameters() {
-        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key.2", String.class.getCanonicalName())
-                .addUserTask("userTask1", null);
-
     }
 
 }
