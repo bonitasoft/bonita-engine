@@ -50,10 +50,7 @@ public class EntityGetter {
     }
 
     public String getReturnTypeClassName() {
-        if (returnsList()) {
-            return List.class.getName();
-        }
-        return method.getReturnType().getName();
+        return getTargetEntityClass().getName();
     }
 
     public String getAssociatedNamedQuery() {
