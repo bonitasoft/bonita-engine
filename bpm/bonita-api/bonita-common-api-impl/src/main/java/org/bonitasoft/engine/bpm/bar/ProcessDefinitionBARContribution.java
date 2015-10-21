@@ -131,15 +131,15 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     void checkVersion(final String content) throws InvalidBusinessArchiveFormatException {
-        final Pattern pattern = Pattern.compile("http://www\\.bonitasoft\\.org/ns/process/client/6.([0-9])");
+        final Pattern pattern = Pattern.compile("http://www\\.bonitasoft\\.org/ns/process/client/(\\d\\.\\d)");
         final Matcher matcher = pattern.matcher(content);
         final boolean find = matcher.find();
         if (!find) {
             throw new InvalidBusinessArchiveFormatException("There is no bonitasoft process namespace declaration");
         }
         final String group = matcher.group(1);
-        if (!group.equals("3")) {
-            throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, 6." + group
+        if (!group.equals("7.2")) {
+            throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, " + group
                     + " namespace is not compatible with your current version. Use the studio to update it.");
         }
     }
