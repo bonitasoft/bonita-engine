@@ -1285,23 +1285,6 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 TestConnectorLongToExecute.class, "TestConnectorLongToExecute.jar");
     }
 
-
-    @Test
-    public void should_search_escape_special_chars() throws Exception {
-        final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME + "12", PROCESS_VERSION + "1");
-        definitionBuilder.addUserTask("d'stàp","actor");
-        definitionBuilder.addActor("actor");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(definitionBuilder.done(), "actor", user);
-
-        getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("d'stàp");
-
-        final SearchResult<FlowNodeInstance> result = getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 10).filter("name", "d'stàp").done());
-
-        assertThat(result.getResult()).hasSize(1);
-        disableAndDeleteProcess(processDefinition);
-
-    }
     @Test
     public void should_search_prevent_injection() throws Exception {
 
