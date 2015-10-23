@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
@@ -557,7 +558,10 @@ public class ModelConvertorTest {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(new SAGatewayInstanceImpl(), flowNodeStateManager).getReachedStateDate()).isNotNull();
+        final SAGatewayInstanceImpl saFlowNode = new SAGatewayInstanceImpl();
+        final long reachedStateDate = 4534311114L;
+        saFlowNode.setReachedStateDate(reachedStateDate);
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isEqualTo(new Date(reachedStateDate));
     }
 
     @Test
@@ -605,7 +609,9 @@ public class ModelConvertorTest {
 
         final SAUserTaskInstanceImpl saFlowNode = new SAUserTaskInstanceImpl();
         saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
-        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getLastUpdateDate()).isNotNull();
+        final long lastUpdateDate = 5746354125555L;
+        saFlowNode.setLastUpdateDate(lastUpdateDate);
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getLastUpdateDate()).isEqualTo(new Date(lastUpdateDate));
     }
 
     @Test
