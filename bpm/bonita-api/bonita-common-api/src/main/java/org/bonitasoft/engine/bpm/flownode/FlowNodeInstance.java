@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
@@ -102,4 +104,14 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
      * @return the ID of the flow node definition that this <code>FlowNodeInstance</code> is an instance of.
      */
     long getFlownodeDefinitionId();
+
+    /**
+     * @return The date when the flownode instance reached its state ({@link #getState()})
+     */
+    Date getReachedStateDate();
+
+    /**
+     * @return The last date when the activity instance was updated
+     */
+    Date getLastUpdateDate();
 }

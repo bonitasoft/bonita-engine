@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
@@ -50,8 +51,12 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefin
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
@@ -65,6 +70,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThr
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -544,6 +551,78 @@ public class ModelConvertorTest {
         BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(null);
 
         assertThat(businessDataReference).isNull();
+    }
+
+    @Test
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_gateways() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SAGatewayInstanceImpl saFlowNode = new SAGatewayInstanceImpl();
+        final long reachedStateDate = 4534311114L;
+        saFlowNode.setReachedStateDate(reachedStateDate);
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isEqualTo(new Date(reachedStateDate));
+    }
+
+    @Test
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_receivetask() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SAReceiveTaskInstanceImpl receiveTaskInstance = new SAReceiveTaskInstanceImpl();
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(receiveTaskInstance, flowNodeStateManager).getReachedStateDate()).isNotNull();
+    }
+
+    @Test
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_sendtask() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SASendTaskInstanceImpl sendTaskInstance = new SASendTaskInstanceImpl();
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(sendTaskInstance, flowNodeStateManager).getReachedStateDate()).isNotNull();
+    }
+
+    @Test
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_usertask() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SAUserTaskInstanceImpl saFlowNode = new SAUserTaskInstanceImpl();
+        saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
+    }
+
+    @Test
+    public void toFlownodeInstance_should_convert_reachStateDate_for_usertask() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SUserTaskInstanceImpl sFlowNode = new SUserTaskInstanceImpl();
+        sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
+        assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getReachedStateDate()).isNotNull();
+    }
+
+    @Test
+    public void toArchivedFlownodeInstance_should_convert_lastUpdateDate_for_usertask() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SAUserTaskInstanceImpl saFlowNode = new SAUserTaskInstanceImpl();
+        saFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
+        final long lastUpdateDate = 5746354125555L;
+        saFlowNode.setLastUpdateDate(lastUpdateDate);
+        assertThat(ModelConvertor.toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager).getLastUpdateDate()).isEqualTo(new Date(lastUpdateDate));
+    }
+
+    @Test
+    public void toFlownodeInstance_should_convert_lastUpdateDate_for_usertask() throws Exception {
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SUserTaskInstanceImpl sFlowNode = new SUserTaskInstanceImpl();
+        sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
+        assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getLastUpdateDate()).isNotNull();
+        assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstanceImpl(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
     }
 
 }

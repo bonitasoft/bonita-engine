@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 
@@ -35,10 +36,7 @@ public class GatewayInstanceImpl extends FlowNodeInstanceImpl implements Gateway
 
     @Override
     public String toString() {
-        final StringBuilder stb = new StringBuilder("Gateway instance [");
-        stb.append(super.toString());
-        stb.append("]");
-        return super.toString();
+        return new ToStringBuilder(this).appendSuper(super.toString()).toString();
     }
 
 }

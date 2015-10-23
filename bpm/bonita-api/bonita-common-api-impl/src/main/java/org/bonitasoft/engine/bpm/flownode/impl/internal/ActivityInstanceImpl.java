@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.Date;
-
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 
 /**
@@ -26,30 +24,8 @@ public abstract class ActivityInstanceImpl extends FlowNodeInstanceImpl implemen
 
     private static final long serialVersionUID = 8518693723223444468L;
 
-    private Date reachedStateDate;
-
-    private Date lastUpdateDate;
-
     public ActivityInstanceImpl(final String name, final long flownodeDefinitionId) {
         super(name, flownodeDefinitionId);
-    }
-
-    @Override
-    public Date getReachedStateDate() {
-        return reachedStateDate;
-    }
-
-    public void setReachedSateDate(final Date reachedStateDate) {
-        this.reachedStateDate = reachedStateDate;
-    }
-
-    @Override
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(final Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
     }
 
 }

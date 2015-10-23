@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.bpm.ArchivedElement;
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
@@ -75,4 +77,13 @@ public interface ArchivedFlowNodeInstance extends NamedElement, BaseElement, Arc
      */
     boolean isTerminal();
 
+    /**
+     * @return the Date when this Archived flownode reached this state.
+     */
+    Date getReachedStateDate();
+
+    /**
+     * @return the Date when this Archived flownode was last updated.
+     */
+    Date getLastUpdateDate();
 }
