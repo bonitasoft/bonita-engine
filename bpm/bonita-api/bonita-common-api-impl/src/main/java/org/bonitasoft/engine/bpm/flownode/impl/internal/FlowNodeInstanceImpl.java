@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Date;
+import java.util.Objects;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.StateCategory;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
@@ -49,6 +53,10 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
     private long executedBySubstitute;
 
     private long flownodeDefinitionId;
+
+    private Date reachedStateDate;
+
+    private Date lastUpdateDate;
 
     public FlowNodeInstanceImpl(final String name, final long flownodeDefinitionId) {
         super(name);
@@ -175,98 +183,71 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
         this.flownodeDefinitionId = flownodeDefinitionId;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (int) (executedBy ^ executedBy >>> 32);
-        result = prime * result + (int) (executedBySubstitute ^ executedBySubstitute >>> 32);
-        result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
-        result = prime * result + (int) (parentProcessInstanceId ^ parentProcessInstanceId >>> 32);
-        result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
-        result = prime * result + (int) (rootContainerId ^ rootContainerId >>> 32);
-        result = prime * result + (state == null ? 0 : state.hashCode());
-        result = prime * result + (stateCategory == null ? 0 : stateCategory.hashCode());
-        result = prime * result + (int) (flownodeDefinitionId ^ flownodeDefinitionId >>> 32);
-        return result;
+    public Date getReachedStateDate() {
+        return reachedStateDate;
+    }
+
+    public void setReachedSateDate(final Date reachedStateDate) {
+        this.reachedStateDate = reachedStateDate;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(final Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), parentContainerId, state, stateCategory, rootContainerId, processDefinitionId, parentProcessInstanceId,
+                displayDescription, displayName, description, executedBy, executedBySubstitute, flownodeDefinitionId, reachedStateDate, lastUpdateDate);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (!super.equals(obj)) {
+        if (!(o instanceof FlowNodeInstanceImpl))
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (!super.equals(o))
             return false;
-        }
-        final FlowNodeInstanceImpl other = (FlowNodeInstanceImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayDescription == null) {
-            if (other.displayDescription != null) {
-                return false;
-            }
-        } else if (!displayDescription.equals(other.displayDescription)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (executedBy != other.executedBy) {
-            return false;
-        }
-        if (executedBySubstitute != other.executedBySubstitute) {
-            return false;
-        }
-        if (parentContainerId != other.parentContainerId) {
-            return false;
-        }
-        if (parentProcessInstanceId != other.parentProcessInstanceId) {
-            return false;
-        }
-        if (processDefinitionId != other.processDefinitionId) {
-            return false;
-        }
-        if (rootContainerId != other.rootContainerId) {
-            return false;
-        }
-        if (state == null) {
-            if (other.state != null) {
-                return false;
-            }
-        } else if (!state.equals(other.state)) {
-            return false;
-        }
-        if (stateCategory != other.stateCategory) {
-            return false;
-        }
-        if (flownodeDefinitionId != other.flownodeDefinitionId) {
-            return false;
-        }
-        return true;
+        FlowNodeInstanceImpl that = (FlowNodeInstanceImpl) o;
+        return Objects.equals(parentContainerId, that.parentContainerId) &&
+                Objects.equals(rootContainerId, that.rootContainerId) &&
+                Objects.equals(processDefinitionId, that.processDefinitionId) &&
+                Objects.equals(parentProcessInstanceId, that.parentProcessInstanceId) &&
+                Objects.equals(executedBy, that.executedBy) &&
+                Objects.equals(executedBySubstitute, that.executedBySubstitute) &&
+                Objects.equals(flownodeDefinitionId, that.flownodeDefinitionId) &&
+                Objects.equals(state, that.state) &&
+                Objects.equals(stateCategory, that.stateCategory) &&
+                Objects.equals(displayDescription, that.displayDescription) &&
+                Objects.equals(displayName, that.displayName) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(reachedStateDate, that.reachedStateDate) &&
+                Objects.equals(lastUpdateDate, that.lastUpdateDate);
     }
 
     @Override
     public String toString() {
-        return "FlowNodeInstanceImpl [name=" + getName() + ", parentContainerId=" + parentContainerId + ", state=" + state + ", stateCategory=" + stateCategory
-                + ", rootContainerId=" + rootContainerId + ", processDefinitionId=" + processDefinitionId + ", parentProcessInstanceId="
-                + parentProcessInstanceId + ", displayDescription=" + displayDescription + ", displayName=" + displayName + ", description=" + description
-                + ", executedBy=" + executedBy + ", flownodeDefinitionId=" + flownodeDefinitionId + "]";
+        return new ToStringBuilder(this)
+                .append("parentContainerId", parentContainerId)
+                .append("state", state)
+                .append("stateCategory", stateCategory)
+                .append("rootContainerId", rootContainerId)
+                .append("processDefinitionId", processDefinitionId)
+                .append("parentProcessInstanceId", parentProcessInstanceId)
+                .append("displayDescription", displayDescription)
+                .append("displayName", displayName)
+                .append("description", description)
+                .append("executedBy", executedBy)
+                .append("executedBySubstitute", executedBySubstitute)
+                .append("flownodeDefinitionId", flownodeDefinitionId)
+                .append("reachedStateDate", reachedStateDate)
+                .append("lastUpdateDate", lastUpdateDate)
+                .toString();
     }
-
 }
