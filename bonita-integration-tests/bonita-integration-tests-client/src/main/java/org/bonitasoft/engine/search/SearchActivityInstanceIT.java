@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
 import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
@@ -1281,6 +1283,15 @@ public class SearchActivityInstanceIT extends TestWithUser {
             final String actorName, final User user) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, null, "TestConnectorLongToExecute.impl",
                 TestConnectorLongToExecute.class, "TestConnectorLongToExecute.jar");
+    }
+
+    @Test
+    public void should_search_prevent_injection() throws Exception {
+
+        final SearchResult<FlowNodeInstance> result = getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 10).filter("name", "d');DELETE * FROM TENANTS;select * from flow_node where name=toto").done());
+
+        assertThat(result.getResult()).hasSize(0);
+
     }
 
 }
