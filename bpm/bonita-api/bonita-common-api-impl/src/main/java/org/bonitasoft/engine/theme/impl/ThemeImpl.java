@@ -16,6 +16,9 @@ package org.bonitasoft.engine.theme.impl;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.theme.Theme;
 import org.bonitasoft.engine.theme.ThemeType;
@@ -23,6 +26,7 @@ import org.bonitasoft.engine.theme.ThemeType;
 /**
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ThemeImpl extends BaseElementImpl implements Theme {
 
     private static final long serialVersionUID = 5445403438892593799L;

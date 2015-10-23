@@ -23,6 +23,7 @@ public class IntermediateCatchEventDefinitionImpl extends CatchEventDefinitionIm
 
     private static final long serialVersionUID = 640463416063488502L;
 
+    public IntermediateCatchEventDefinitionImpl(){}
     public IntermediateCatchEventDefinitionImpl(final String name) {
         super(name);
     }

@@ -23,7 +23,12 @@ public class ElementFinder implements Serializable {
 
     public ElementFinder() {
     }
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return true;
+    }
     public <T extends BaseElement> T getElementById(final Collection<T> elements, final long id) {
         T element = null;
         boolean found = false;

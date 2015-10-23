@@ -14,12 +14,12 @@
 package org.bonitasoft.engine.bpm.actor.impl;
 
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.internal.DescriptionElementImpl;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ActorInstanceImpl extends DescriptionElementImpl implements ActorInstance {
+public class ActorInstanceImpl extends NamedElementImpl implements ActorInstance {
 
     private static final long serialVersionUID = 8251013663118023803L;
 
@@ -29,8 +29,11 @@ public class ActorInstanceImpl extends DescriptionElementImpl implements ActorIn
 
     private final boolean initiator;
 
+    private final String description;
+
     public ActorInstanceImpl(final String name, final String description, final String displayName, final long processDefinitionId, final boolean initiator) {
-        super(name, description);
+        super(name);
+        this.description = description;
         this.processDefinitionId = processDefinitionId;
         this.displayName = displayName;
         this.initiator = initiator;
@@ -51,4 +54,8 @@ public class ActorInstanceImpl extends DescriptionElementImpl implements ActorIn
         return initiator;
     }
 
+    @Override
+    public String getDescription() {
+        return description;
+    }
 }

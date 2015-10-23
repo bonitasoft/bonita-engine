@@ -91,7 +91,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      *        the process name
      * @param version
      *        the process version
-     * @return
+     * @return this builder. Its ID is ZERO, as it is not deployed yet.
      */
     public ProcessDefinitionBuilder createNewInstance(final String name, final String version) {
         designErrors = new ArrayList<>(5);
@@ -99,6 +99,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             designErrors.add("name of the process is null or empty");
         }
         process = new DesignProcessDefinitionImpl(name, version);
+        process.setId(0); // To override inherited ID generation
         process.setProcessContainer(new FlowElementContainerDefinitionImpl());
         return this;
     }

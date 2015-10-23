@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.parameter.impl;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 
-
 /**
  * @author Matthieu Chaffotte
  */

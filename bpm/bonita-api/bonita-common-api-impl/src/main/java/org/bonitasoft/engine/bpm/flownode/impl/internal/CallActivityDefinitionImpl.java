@@ -18,32 +18,44 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallableElementType;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.impl.OperationImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implements CallActivityDefinition {
 
     private static final long serialVersionUID = -6798914951807258918L;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression callableElement;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression callableElementVersion;
-
+    @XmlElement(type = OperationImpl.class, name = "dataInputOperation")
     private final List<Operation> dataInputOperations;
-
+    @XmlJavaTypeAdapter(MapAdapterExpression.class)
+    @XmlElement(name="contractInput")
     private final Map<String, Expression> contractInputs;
-
+    @XmlElement(type = OperationImpl.class, name = "dataOutputOperation")
     private final List<Operation> dataOutputOperations;
-
+    @XmlAttribute
     private CallableElementType callableElementType;
 
     public CallActivityDefinitionImpl(final String name) {
@@ -60,6 +72,13 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
         contractInputs = new HashMap<>();
     }
 
+    public CallActivityDefinitionImpl() {
+        super();
+        dataInputOperations = new ArrayList<>(3);
+        dataOutputOperations = new ArrayList<>(3);
+        contractInputs = new HashMap<>();
+
+    }
     @Override
     public Expression getCallableElement() {
         return callableElement;
@@ -115,61 +134,34 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (callableElement == null ? 0 : callableElement.hashCode());
-        result = prime * result + (callableElementType == null ? 0 : callableElementType.hashCode());
-        result = prime * result + (callableElementVersion == null ? 0 : callableElementVersion.hashCode());
-        result = prime * result + (dataInputOperations == null ? 0 : dataInputOperations.hashCode());
-        result = prime * result + (dataOutputOperations == null ? 0 : dataOutputOperations.hashCode());
-        return result;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("callableElement", callableElement)
+                .append("callableElementVersion", callableElementVersion)
+                .append("dataInputOperations", dataInputOperations)
+                .append("contractInputs", contractInputs)
+                .append("dataOutputOperations", dataOutputOperations)
+                .append("callableElementType", callableElementType)
+                .toString();
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CallActivityDefinitionImpl other = (CallActivityDefinitionImpl) obj;
-        if (callableElement == null) {
-            if (other.callableElement != null) {
-                return false;
-            }
-        } else if (!callableElement.equals(other.callableElement)) {
-            return false;
-        }
-        if (callableElementType != other.callableElementType) {
-            return false;
-        }
-        if (callableElementVersion == null) {
-            if (other.callableElementVersion != null) {
-                return false;
-            }
-        } else if (!callableElementVersion.equals(other.callableElementVersion)) {
-            return false;
-        }
-        if (dataInputOperations == null) {
-            if (other.dataInputOperations != null) {
-                return false;
-            }
-        } else if (!dataInputOperations.equals(other.dataInputOperations)) {
-            return false;
-        }
-        if (dataOutputOperations == null) {
-            if (other.dataOutputOperations != null) {
-                return false;
-            }
-        } else if (!dataOutputOperations.equals(other.dataOutputOperations)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CallActivityDefinitionImpl that = (CallActivityDefinitionImpl) o;
+        return Objects.equals(callableElement, that.callableElement) &&
+                Objects.equals(callableElementVersion, that.callableElementVersion) &&
+                Objects.equals(dataInputOperations, that.dataInputOperations) &&
+                Objects.equals(contractInputs, that.contractInputs) &&
+                Objects.equals(dataOutputOperations, that.dataOutputOperations) &&
+                Objects.equals(callableElementType, that.callableElementType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), callableElement, callableElementVersion, dataInputOperations, contractInputs, dataOutputOperations, callableElementType);
     }
 
     @Override

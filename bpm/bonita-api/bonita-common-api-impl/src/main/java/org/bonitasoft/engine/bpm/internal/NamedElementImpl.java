@@ -1,6 +1,6 @@
-/**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+/*
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -10,23 +10,28 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.internal;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * author Emmanuel Duchastenier
+ * author Baptiste Mesta
  */
-public abstract class NamedElementImpl extends BaseElementImpl implements NamedElement {
-
-    private static final long serialVersionUID = -6260501789773631525L;
+public class NamedElementImpl extends BaseElementImpl implements NamedElement {
 
     private String name;
 
     public NamedElementImpl(final String name) {
         this.name = name;
+    }
+
+    public NamedElementImpl() {
+        this.name = null;
     }
 
     @Override
@@ -39,42 +44,28 @@ public abstract class NamedElementImpl extends BaseElementImpl implements NamedE
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NamedElementImpl)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        NamedElementImpl that = (NamedElementImpl) o;
+        return Objects.equals(name, that.name);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        final NamedElementImpl other = (NamedElementImpl) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name);
     }
 
     @Override
     public String toString() {
-        final StringBuilder stb = new StringBuilder(super.toString());
-        stb.append("name: ");
-        stb.append(name);
-        stb.append("\n");
-        return stb.toString();
+        return new ToStringBuilder(this).append("name", name).toString();
     }
 
 }

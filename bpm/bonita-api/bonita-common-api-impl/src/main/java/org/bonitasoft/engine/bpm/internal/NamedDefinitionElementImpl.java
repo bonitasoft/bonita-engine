@@ -11,77 +11,71 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.parameter.impl;
+package org.bonitasoft.engine.bpm.internal;
 
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
-import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
+import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
+ * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implements ParameterDefinition {
+public abstract class NamedDefinitionElementImpl extends BaseDefinitionElementImpl implements NamedElement {
 
-    private static final long serialVersionUID = -3997656451808629180L;
+    private static final long serialVersionUID = -6260501789773631525L;
     @XmlAttribute(required = true)
-    private final String type;
-    @XmlElement
-    private String description;
+    private String name;
 
-    public ParameterDefinitionImpl(final String parameterName, final String type) {
-        super(parameterName);
-        this.type = type;
+    public NamedDefinitionElementImpl(final String name) {
+        this.name = name;
     }
-    public ParameterDefinitionImpl(){
-        super();
-        this.type = "";
+
+    public NamedDefinitionElementImpl() {
+        this.name = null;
     }
 
     @Override
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (!(o instanceof NamedDefinitionElementImpl)) {
             return false;
-        if (!super.equals(o))
+        }
+        if (!super.equals(o)) {
             return false;
-        ParameterDefinitionImpl that = (ParameterDefinitionImpl) o;
-        return Objects.equals(type, that.type) &&
-                Objects.equals(description, that.description);
+        }
+        NamedDefinitionElementImpl that = (NamedDefinitionElementImpl) o;
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), type, description);
+        return Objects.hash(super.hashCode(), name);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("type", type)
-                .append("description", description)
+                .append("name", name)
                 .toString();
     }
 

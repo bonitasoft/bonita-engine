@@ -15,17 +15,22 @@ package org.bonitasoft.engine.operation.impl;
 
 import org.bonitasoft.engine.operation.LeftOperand;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class LeftOperandImpl implements LeftOperand {
 
     private static final long serialVersionUID = -6718721963287359848L;
-
+    @XmlAttribute
     private String name;
-
+    @XmlAttribute
     private String type;
 
     public LeftOperandImpl() {
