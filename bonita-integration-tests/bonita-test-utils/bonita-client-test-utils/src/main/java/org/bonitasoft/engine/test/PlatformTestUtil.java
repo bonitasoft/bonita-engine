@@ -23,8 +23,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.PlatformState;
-import org.bonitasoft.engine.platform.StartNodeException;
-import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 
@@ -36,8 +34,6 @@ public class PlatformTestUtil {
     public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
 
     public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
-
-    public static final String DEFAULT_TENANT = "default";
 
     public PlatformSession loginOnPlatform() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
@@ -68,14 +64,6 @@ public class PlatformTestUtil {
         logoutOnPlatform(session);
     }
 
-    public void deleteStopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
-        platformAPI.deletePlatform();
-        logoutOnPlatform(session);
-    }
-
     public void createPlatformStructure() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
@@ -93,14 +81,6 @@ public class PlatformTestUtil {
             platformAPI.deletePlatform();
         }
         platformAPI.createPlatform();
-    }
-
-    public void createInitializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        createPlatformStructure(platformAPI, deployCommands);
-        initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
-        logoutOnPlatform(session);
     }
 
     public void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
@@ -161,22 +141,6 @@ public class PlatformTestUtil {
 
     public static void cleanPlatform(final PlatformAPI platformAPI) throws BonitaException {
         platformAPI.cleanPlatform();
-    }
-
-    public void createEnvironmentWithoutTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        platformAPI.createAndInitializePlatform();
-        platformAPI.startNode();
-        logoutOnPlatform(session);
-    }
-
-    public void destroyEnvironmentWithoutTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        platformAPI.stopNode();
-        platformAPI.deletePlatform();
-        logoutOnPlatform(session);
     }
 
 }
