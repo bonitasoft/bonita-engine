@@ -2,6 +2,7 @@ package org.bonitasoft.engine.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,8 +20,7 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
@@ -52,12 +52,30 @@ public class TestEngine {
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
+    String prepareBonitaHome() throws IOException {
+        final String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
+        if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
+            final InputStream bonitaHomeIS = this.getClass().getResourceAsStream("/bonita-home.zip");
+            if (bonitaHomeIS == null) {
+                throw new IllegalStateException("No bonita home found in the class path");
+            }
+            final File outputFolder = new File(BONITA_HOME_DEFAULT_PATH);
+            outputFolder.mkdir();
+            IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
+            System.setProperty(BONITA_HOME_PROPERTY, outputFolder.getAbsolutePath() + "/bonita-home");
+        }
+        return System.getProperty(BONITA_HOME_PROPERTY);
+    }
+
     public void prepareEnvironment()
             throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
 
         System.out.println("=========  PREPARE ENVIRONMENT =======");
-        String bonitaHome = setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
+        final String bonitaHome = prepareBonitaHome();
+
+
         final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+
 
         // paste the default local server properties
         // TODO do not handle the default local server like this
@@ -148,7 +166,7 @@ public class TestEngine {
 
     public void deletePlatformStructure() throws BonitaException {
         final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.deletePlatform();
         logoutOnPlatform(session);
     }
@@ -159,7 +177,7 @@ public class TestEngine {
 
     public void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
         final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
         logoutOnPlatform(session);
     }
@@ -266,13 +284,13 @@ public class TestEngine {
 
     public void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
         final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
         logoutOnPlatform(session);
     }
 
     public void deployCommandsOnDefaultTenant() throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
         ClientEventUtil.deployCommand(session);
         loginAPI.logout(session);
@@ -302,15 +320,11 @@ public class TestEngine {
     public void createPlatformStructure() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = getPlatformAPI(session);
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         createPlatformStructure(platformAPI, false);
         platformLoginAPI.logout(session);
     }
 
-
-    public LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return TenantAPIAccessor.getLoginAPI();
-    }
 
     private void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         if (platformAPI.isPlatformCreated()) {
@@ -325,7 +339,7 @@ public class TestEngine {
 
     public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (undeployCommands) {
-            final LoginAPI loginAPI = getLoginAPI();
+            final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
             final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
             ClientEventUtil.undeployCommand(session);
             loginAPI.logout(session);
@@ -334,9 +348,5 @@ public class TestEngine {
         platformAPI.stopNode();
     }
 
-
-    public PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return PlatformAPIAccessor.getPlatformAPI(session);
-    }
 
 }
