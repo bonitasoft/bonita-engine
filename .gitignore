@@ -11,3 +11,4 @@ engine-sp-it.exec
 *.tmp
 **/bin
 .idea
+bonita-test-api-sp/src/main/resources/bonita-home.zip

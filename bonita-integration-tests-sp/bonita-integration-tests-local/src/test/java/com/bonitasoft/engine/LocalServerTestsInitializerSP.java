@@ -8,59 +8,31 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.test.TestEngineSP;
 import org.bonitasoft.engine.LocalServerTestsInitializer;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
 
 
     private static APITestSPUtil testUtil = new APITestSPUtil();
 
-    private static LocalServerTestsInitializerSP _INSTANCE;
+    private static TestEngineSP _INSTANCE;
 
     public static void beforeAll() throws Exception {
-        LocalServerTestsInitializerSP.getInstance().before();
+        LocalServerTestsInitializerSP.getInstance().start();
     }
 
-    public static LocalServerTestsInitializerSP getInstance() {
+    public static TestEngineSP getInstance() {
         if (_INSTANCE == null) {
-            _INSTANCE = new LocalServerTestsInitializerSP();
+            _INSTANCE = new TestEngineSP();
         }
         return _INSTANCE;
     }
 
     public static void afterAll() throws Exception {
-        LocalServerTestsInitializerSP.getInstance().after();
+        LocalServerTestsInitializerSP.getInstance().stop();
     }
 
-    @Override
-    public void deleteTenantAndPlatform() throws BonitaException {
-        BPMTestSPUtil.destroyPlatformAndTenants();
-        testUtil.deletePlatformStructure();
-    }
 
-    @Override
-    public void initPlatformAndTenant() throws Exception {
-        try {
-            testUtil.createPlatformStructure();
-        } catch (final Exception e) {
-            final Logger logger = LoggerFactory.getLogger(BonitaSuiteRunner.class);
-            logger.error("unable to create platform", e);
-            final PlatformSession session = testUtil.loginOnPlatform();
-            final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-            platformAPI.stopNode();
-            platformAPI.cleanPlatform();
-            testUtil.deletePlatformStructure();
-            testUtil.createPlatformStructure();
-        }
-
-        BPMTestSPUtil.createEnvironmentWithDefaultTenant();
-    }
 
 }

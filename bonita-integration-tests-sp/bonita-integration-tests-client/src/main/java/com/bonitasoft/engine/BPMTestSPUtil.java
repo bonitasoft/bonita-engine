@@ -12,12 +12,15 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -30,15 +33,6 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.ClientEventUtil;
 
-import com.bonitasoft.engine.api.LoginAPI;
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.platform.Tenant;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
@@ -50,14 +44,6 @@ public class BPMTestSPUtil {
     private static final String DEFAULT_TECHNICAL_USER_PASSWORD = "install";
 
     private static final String DEFAULT_TENANT_DESCRIPTION = "the default tenant";
-
-    public static final String DEFAULT_TENANT = "default";
-
-    public static final String ACTOR_NAME = "Actor1";
-
-    public static final String PROCESS_VERSION = "1.0";
-
-    public static final String PROCESS_NAME = "ProcessName";
 
     private static long defaultTenantId;
 
@@ -114,22 +100,6 @@ public class BPMTestSPUtil {
         logoutOnPlatform(session);
     }
 
-    public static void createEnvironmentWithoutTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.createAndInitializePlatform();
-        platformAPI.startNode();
-        logoutOnPlatform(session);
-    }
-
-    public static void destroyEnvironmentWithoutTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.stopNode();
-        platformAPI.deletePlatform();
-        logoutOnPlatform(session);
-    }
-
     public static long createAndActivateTenant(final String tenantName, final String iconName, final String iconPath, final String techinalUsername,
             final String password) throws BonitaException {
         final PlatformSession session = loginOnPlatform();
@@ -169,68 +139,6 @@ public class BPMTestSPUtil {
     public static void logoutOnPlatform(final PlatformSession session) throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         platformLoginAPI.logout(session);
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator, final boolean parallelActivities)
-            throws InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(processName, processVersion);
-        if (!isHuman.isEmpty() && isHuman.contains(true)) {
-            processBuilder.addActor(actorName);
-            if (addActorInitiator) {
-                processBuilder.setActorInitiator(actorName);
-            }
-        }
-        ActivityDefinitionBuilder activityDefinitionBuilder = null;
-        for (int i = 0; i < stepNames.size(); i++) {
-            final String stepName = stepNames.get(i);
-            if (isHuman.get(i)) {
-                if (activityDefinitionBuilder != null) {
-                    activityDefinitionBuilder = activityDefinitionBuilder.addUserTask(stepName, actorName);
-                } else {
-                    activityDefinitionBuilder = processBuilder.addUserTask(stepName, actorName);
-                }
-            } else {
-                if (activityDefinitionBuilder != null) {
-                    activityDefinitionBuilder = activityDefinitionBuilder.addAutomaticTask(stepName);
-                } else {
-                    activityDefinitionBuilder = processBuilder.addAutomaticTask(stepName);
-                }
-            }
-        }
-        TransitionDefinitionBuilder transitionDefinitionBuilder = null;
-        if (!parallelActivities) {
-            for (int i = 0; i < stepNames.size() - 1; i++) {
-                if (transitionDefinitionBuilder != null) {
-                    transitionDefinitionBuilder = transitionDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
-                } else if (activityDefinitionBuilder != null) {
-                    transitionDefinitionBuilder = activityDefinitionBuilder.addTransition(stepNames.get(i), stepNames.get(i + 1));
-                }
-            }
-        }
-        final DesignProcessDefinition processDefinition;
-        if (transitionDefinitionBuilder == null) {
-            processDefinition = processBuilder.done();
-        } else {
-            processDefinition = transitionDefinitionBuilder.getProcess();
-        }
-        return processDefinition;
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator)
-            throws InvalidProcessDefinitionException {
-        return createProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, actorName, addActorInitiator, false);
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
-        return createProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, ACTOR_NAME, false);
-    }
-
-    public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final List<String> stepNames, final List<Boolean> isHuman)
-            throws InvalidProcessDefinitionException {
-        return createProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME, PROCESS_VERSION, stepNames, isHuman, ACTOR_NAME, false);
     }
 
     public static APISession loginOnTenant(final String userName, final String password, final long tenantId) throws LoginException, BonitaHomeNotSetException,
