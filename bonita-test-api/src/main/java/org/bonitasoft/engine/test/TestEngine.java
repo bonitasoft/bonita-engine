@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.naming.Context;
@@ -44,16 +43,13 @@ public class TestEngine {
     private Object h2Server;
 
     public void start() throws Exception {
-        System.out.println("=====================================================");
-        System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
-        System.out.println("=====================================================");
-
+        LOGGER.info("=====================================================");
+        LOGGER.info("============  Starting Bonita BPM Engine  ===========");
+        LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
         prepareEnvironment();
-
         initPlatformAndTenant();
-
-        System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+        LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
     protected String prepareBonitaHome() throws IOException {
@@ -64,6 +60,7 @@ public class TestEngine {
                 throw new IllegalStateException("No bonita home found in the class path");
             }
             final File outputFolder = new File(BONITA_HOME_DEFAULT_PATH);
+            LOGGER.info("No bonita home specified using: " + outputFolder.getAbsolutePath());
             outputFolder.mkdir();
             IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
             System.setProperty(BONITA_HOME_PROPERTY, outputFolder.getAbsolutePath() + "/bonita-home");
@@ -71,10 +68,10 @@ public class TestEngine {
         return System.getProperty(BONITA_HOME_PROPERTY);
     }
 
-    public void prepareEnvironment()
+    protected void prepareEnvironment()
             throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
 
-        System.out.println("=========  PREPARE ENVIRONMENT =======");
+        LOGGER.info("=========  PREPARE ENVIRONMENT =======");
         final String bonitaHome = prepareBonitaHome();
 
 
@@ -92,6 +89,7 @@ public class TestEngine {
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
 
         if ("h2".equals(dbVendor)) {
+            LOGGER.info("Using h2, starting H2 server: ");
             this.h2Server = startH2Server();
         }
     }
@@ -114,7 +112,7 @@ public class TestEngine {
             throw new IOException("h2 server not started, all ports occupied");
         }
         System.setProperty("db.server.port", String.valueOf(h2Port + nbTry));
-        System.err.println("--- H2 Server started on port " + h2Port + " ---");
+        LOGGER.info("h2 server started on port: " + (h2Port + nbTry));
         return server;
     }
 
@@ -134,19 +132,19 @@ public class TestEngine {
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
         final Method stop = h2ServerClass.getMethod("stop");
         stop.invoke(h2Server);
-        System.err.println("--- H2 Server stopped ---");
+        LOGGER.info("h2 server stopped");
     }
 
     public void stop() throws Exception {
-        System.out.println("=====================================================");
-        System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
-        System.out.println("=====================================================");
+        LOGGER.info("=====================================================");
+        LOGGER.info("============ CLEANING OF TEST ENVIRONMENT ===========");
+        LOGGER.info("=====================================================");
 
         shutdown();
         checkThreadsAreStopped();
     }
 
-    public void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+    protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         try {
             deleteTenantAndPlatform();
         } finally {
@@ -154,39 +152,39 @@ public class TestEngine {
         }
     }
 
-    public void cleanupEnvironment() throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-        System.out.println("=========  CLEAN ENVIRONMENT =======");
+    protected void cleanupEnvironment() throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+        LOGGER.info("=========  CLEAN ENVIRONMENT =======");
         if (this.h2Server != null) {
             stopH2Server(this.h2Server);
         }
     }
 
-    public void deleteTenantAndPlatform() throws BonitaException {
-        System.out.println("=========  CLEAN PLATFORM =======");
+    protected void deleteTenantAndPlatform() throws BonitaException {
+        LOGGER.info("=========  CLEAN PLATFORM =======");
 
         stopAndCleanPlatformAndTenant(true);
         deletePlatformStructure();
     }
 
-    public void deletePlatformStructure() throws BonitaException {
+    protected void deletePlatformStructure() throws BonitaException {
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         platformAPI.deletePlatform();
         logoutOnPlatform(session);
     }
 
-    public static void cleanPlatform(final PlatformAPI platformAPI) throws BonitaException {
+    protected static void cleanPlatform(final PlatformAPI platformAPI) throws BonitaException {
         platformAPI.cleanPlatform();
     }
 
-    public void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
+    protected void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
         logoutOnPlatform(session);
     }
 
-    public void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
+    protected void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (platformAPI.isNodeStarted()) {
             stopPlatformAndTenant(platformAPI, undeployCommands);
             cleanPlatform(platformAPI);
@@ -195,14 +193,12 @@ public class TestEngine {
 
 
     private void checkThreadsAreStopped() throws InterruptedException {
-        System.out.println("=========  CHECK ENGINE IS SHUTDOWN =======");
+        LOGGER.info("=========  CHECK ENGINE IS SHUTDOWN =======");
         final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
         List<Thread> expectedThreads = new ArrayList<>();
         List<Thread> cacheManagerThreads = new ArrayList<>();
         List<Thread> unexpectedThreads = new ArrayList<>();
-        final Iterator<Thread> iterator = keySet.iterator();
-        while (iterator.hasNext()) {
-            final Thread thread = iterator.next();
+        for (Thread thread : keySet) {
             if (isExpectedThread(thread)) {
                 expectedThreads.add(thread);
             } else {
@@ -216,21 +212,21 @@ public class TestEngine {
         //2 cache manager threads are allowed
         // one for PlatformHibernatePersistenceService
         // one for TenantHibernatePersistenceService
-        // there is no clean way to kill them, a shutdownhook is doing this
+        // there is no clean way to kill them, a shutdown hook is doing this
         // killing them using hibernate implementation classes is causing weird behaviours
         int nbOfThreads = keySet.size();
         int nbOfExpectedThreads = expectedThreads.size() + 2;
         boolean fail = nbOfThreads > nbOfExpectedThreads;
-        System.out.println(nbOfThreads + " are alive. " + nbOfExpectedThreads + " are expected.");
+        LOGGER.info(nbOfThreads + " are alive. " + nbOfExpectedThreads + " are expected.");
         if (cacheManagerThreads.size() > 2) {
-            System.out.println("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
+            LOGGER.info("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
                     + cacheManagerThreads.size() + " are found:");
             for (Thread thread : cacheManagerThreads) {
                 printThread(thread);
             }
         }
         if (unexpectedThreads.size() > 0) {
-            System.out.println("The following list of threads is not expected:");
+            LOGGER.info("The following list of threads is not expected:");
             for (Thread thread : unexpectedThreads) {
                 printThread(thread);
             }
@@ -239,7 +235,7 @@ public class TestEngine {
             throw new IllegalStateException(
                     "Some threads are still active : \nCacheManager potential issues:" + cacheManagerThreads + "\nOther threads:" + unexpectedThreads);
         }
-        System.out.println("All engine threads are stopped properly");
+        LOGGER.info("All engine threads are stopped properly");
     }
 
     private boolean isCacheManager(Thread thread) {
@@ -247,10 +243,10 @@ public class TestEngine {
     }
 
     private void printThread(final Thread thread) {
-        System.out.println("\n");
-        System.out.println("Thread is still alive:" + thread.getName());
+        LOGGER.info("\n");
+        LOGGER.info("Thread is still alive:" + thread.getName());
         for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
-            System.out.println("        at " + stackTraceElement.toString());
+            LOGGER.info("        at " + stackTraceElement.toString());
         }
     }
 
@@ -271,41 +267,41 @@ public class TestEngine {
         return false;
     }
 
-    public void initPlatformAndTenant() throws Exception {
-        System.out.println("=========  INIT PLATFORM =======");
+    protected void initPlatformAndTenant() throws Exception {
+        LOGGER.info("=========  INIT PLATFORM =======");
         createPlatformStructure();
         initializeAndStartPlatformWithDefaultTenant(true);
     }
 
-    public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
+    protected PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
     }
 
-    public PlatformSession loginOnPlatform() throws BonitaException {
+    protected PlatformSession loginOnPlatform() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         return platformLoginAPI.login("platformAdmin", "platform");
     }
 
-    public void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
+    protected void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
         logoutOnPlatform(session);
     }
 
-    public void deployCommandsOnDefaultTenant() throws BonitaException {
+    protected void deployCommandsOnDefaultTenant() throws BonitaException {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         final APISession session = loginAPI.login(TECHNICAL_USER_NAME, TECHNICAL_USER_PASSWORD);
         ClientEventUtil.deployCommand(session);
         loginAPI.logout(session);
     }
 
-    public void logoutOnPlatform(final PlatformSession session) throws BonitaException {
+    protected void logoutOnPlatform(final PlatformSession session) throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         platformLoginAPI.logout(session);
     }
 
-    public void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
+    protected void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         platformAPI.initializePlatform();
         platformAPI.startNode();
 
@@ -314,14 +310,14 @@ public class TestEngine {
         }
     }
 
-    public static String setSystemPropertyIfNotSet(final String property, final String value) {
+    protected static String setSystemPropertyIfNotSet(final String property, final String value) {
         final String finalValue = System.getProperty(property, value);
         System.setProperty(property, finalValue);
         return finalValue;
     }
 
 
-    public void createPlatformStructure() throws BonitaException {
+    protected void createPlatformStructure() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
@@ -330,7 +326,7 @@ public class TestEngine {
     }
 
 
-    private void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
+    protected void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         if (platformAPI.isPlatformCreated()) {
             if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
                 stopPlatformAndTenant(platformAPI, deployCommands);
@@ -341,7 +337,7 @@ public class TestEngine {
         platformAPI.createPlatform();
     }
 
-    public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
+    protected void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (undeployCommands) {
             undeployCommands();
         }
