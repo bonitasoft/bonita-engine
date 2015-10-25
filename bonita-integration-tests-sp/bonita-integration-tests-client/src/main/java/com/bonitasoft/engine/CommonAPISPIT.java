@@ -11,23 +11,23 @@ package com.bonitasoft.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.test.junit.BonitaEngineSPRule;
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.platform.Tenant;
-
-@RunWith(BonitaTestRunner.class)
 public abstract class CommonAPISPIT extends APITestSPUtil {
+
+    @Rule
+    public BonitaEngineSPRule bonitaEngineSPRule = new BonitaEngineSPRule();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPIT.class);
 

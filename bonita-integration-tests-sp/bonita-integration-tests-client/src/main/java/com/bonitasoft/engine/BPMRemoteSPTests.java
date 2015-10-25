@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite.SuiteClasses;
-
 import com.bonitasoft.engine.activity.ActivityTests;
 import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import com.bonitasoft.engine.business.application.ApplicationAPIITs;
@@ -32,8 +28,11 @@ import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
 import com.bonitasoft.engine.supervisor.SupervisedTests;
 import com.bonitasoft.engine.tenant.TenantIT;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({
         // When removing this 2 test suites, maybe include BOS version instead:
         PageAPIIT.class,

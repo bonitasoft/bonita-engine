@@ -38,16 +38,13 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Laurent Leseigneur
  * @author Celine Souchet
  */
-@RunWith(BonitaTestRunner.class)
 @Deprecated // Please, do not delete this class when cleaning deprecated TenantMaintenanceAPI. The following tests must be kept:
 //- twoTenantPauseMode
 //- can_executeConnectorOnActivityInstance_after_resume_tenant

@@ -8,11 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({ ProfileSPITest.class,
         ProfileEntrySPITest.class,
         ProfileMemberSPITest.class,

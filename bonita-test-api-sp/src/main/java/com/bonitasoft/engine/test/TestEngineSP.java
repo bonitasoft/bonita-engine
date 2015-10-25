@@ -27,6 +27,7 @@ public class TestEngineSP extends TestEngine {
 
 
     private long defaultTenantId;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineSP.class.getName());
 
     private static TestEngineSP INSTANCE = new TestEngineSP();
 
@@ -37,6 +38,12 @@ public class TestEngineSP extends TestEngine {
     protected TestEngineSP() {
         super();
         replaceInstance(this);
+    }
+
+    @Override
+    protected synchronized void doStart() throws Exception {
+        LOGGER.info("Starting SP version of the engine");
+        super.doStart();
     }
 
     @Override

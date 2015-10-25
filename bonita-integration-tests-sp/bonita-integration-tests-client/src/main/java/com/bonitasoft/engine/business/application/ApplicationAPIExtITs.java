@@ -9,14 +9,13 @@
 
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @Suite.SuiteClasses({
         ApplicationExtIT.class,
         ApplicationImportExportExtIT.class

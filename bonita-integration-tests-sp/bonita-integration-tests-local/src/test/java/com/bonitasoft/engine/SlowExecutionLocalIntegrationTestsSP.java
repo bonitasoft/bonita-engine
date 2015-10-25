@@ -8,6 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import com.bonitasoft.engine.event.SPTimerBoundaryEventTest;
+import com.bonitasoft.engine.identity.SPIdentityTests;
+import com.bonitasoft.engine.platform.SPPlatformLoginTest;
+import com.bonitasoft.engine.platform.SPPlatformTest;
+import com.bonitasoft.engine.platform.SPProcessManagementTest;
+import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
 import org.bonitasoft.engine.event.InterruptingTimerBoundaryEventIT;
 import org.bonitasoft.engine.event.MessageBoundaryEventIT;
 import org.bonitasoft.engine.event.MessageEventIT;
@@ -18,19 +24,11 @@ import org.bonitasoft.engine.event.TimerEventIT;
 import org.bonitasoft.engine.event.TimerEventSubProcessIT;
 import org.bonitasoft.engine.platform.PlatformIT;
 import org.bonitasoft.engine.platform.PlatformLoginIT;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.event.SPTimerBoundaryEventTest;
-import com.bonitasoft.engine.identity.SPIdentityTests;
-import com.bonitasoft.engine.platform.SPPlatformLoginTest;
-import com.bonitasoft.engine.platform.SPPlatformTest;
-import com.bonitasoft.engine.platform.SPProcessManagementTest;
-import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
-
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({
         TestShadesSP.class,
         // Specific slow test suites below:
@@ -54,7 +52,6 @@ import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
         SPProcessManagementTest.class,
         LocalIntegrationTestsSP.class,
 })
-@Initializer(LocalServerTestsInitializerSP.class)
 public class SlowExecutionLocalIntegrationTestsSP {
 
 }

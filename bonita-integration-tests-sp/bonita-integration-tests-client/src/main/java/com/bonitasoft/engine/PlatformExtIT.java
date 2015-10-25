@@ -15,18 +15,20 @@ import java.util.Map;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.test.junit.BonitaEngineSPRule;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@RunWith(BonitaTestRunner.class)
 public class PlatformExtIT {
+
+     @Rule
+     public BonitaEngineSPRule bonitaEngineSPRule = new BonitaEngineSPRule();
 
     private APITestSPUtil apiTestUtil = new APITestSPUtil();
     private PlatformSession platformSession;

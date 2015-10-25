@@ -19,6 +19,7 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.test.TestEngineSP;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -157,7 +158,16 @@ public class BPMTestSPUtil {
 
     public static APISession loginOnDefaultTenant(final String userName, final String password) throws BonitaException {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        return loginAPI.login(defaultTenantId, userName, password);
+        return loginAPI.login(getDefaultTenantId(), userName, password);
+    }
+
+    private static long getDefaultTenantId() {
+        //TODO temporary fix
+        final long defaultTenantId = BPMTestSPUtil.defaultTenantId;
+        if(defaultTenantId == 0){
+            return TestEngineSP.getInstance().getDefaultTenantId();
+        }
+        return defaultTenantId;
     }
 
     public static User createUserOnDefaultTenant(final String userName, final String password) throws BonitaException {
@@ -225,11 +235,11 @@ public class BPMTestSPUtil {
     }
 
     public static void deactivateDefaultTenant() throws BonitaException {
-        deactivateTenant(defaultTenantId);
+        deactivateTenant(getDefaultTenantId());
     }
 
     public static void activateDefaultTenant() throws BonitaException {
-        activateTenant(defaultTenantId);
+        activateTenant(getDefaultTenantId());
     }
 
     public static void activateTenant(final long tenantId) throws BonitaException {
