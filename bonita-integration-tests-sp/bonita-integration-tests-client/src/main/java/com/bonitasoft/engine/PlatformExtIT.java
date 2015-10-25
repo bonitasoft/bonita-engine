@@ -28,7 +28,7 @@ import org.junit.Test;
 public class PlatformExtIT {
 
      @Rule
-     public BonitaEngineSPRule bonitaEngineSPRule = new BonitaEngineSPRule();
+     public BonitaEngineSPRule bonitaEngineSPRule = BonitaEngineSPRule.create();
 
     private APITestSPUtil apiTestUtil = new APITestSPUtil();
     private PlatformSession platformSession;

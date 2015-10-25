@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public abstract class CommonAPISPIT extends APITestSPUtil {
 
     @Rule
-    public BonitaEngineSPRule bonitaEngineSPRule = new BonitaEngineSPRule();
+    public BonitaEngineSPRule bonitaEngineSPRule = BonitaEngineSPRule.create();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPIT.class);
 

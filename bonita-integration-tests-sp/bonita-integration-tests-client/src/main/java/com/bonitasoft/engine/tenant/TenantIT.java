@@ -60,6 +60,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.bonitasoft.engine.theme.ThemeType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -76,7 +77,7 @@ import org.slf4j.LoggerFactory;
 public class TenantIT {
 
     @Rule
-    public BonitaEngineSPRule bonitaEngineSPRule = new BonitaEngineSPRule();
+    public BonitaEngineRule bonitaEngineSPRule = BonitaEngineSPRule.create();
 
     private final static String userName = "tenant_name";
 

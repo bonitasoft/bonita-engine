@@ -16,14 +16,14 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.TestEngine;
+import org.bonitasoft.engine.test.TestEngineImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
  */
-public class TestEngineSP extends TestEngine {
+public class TestEngineSP extends TestEngineImpl {
 
 
     private long defaultTenantId;

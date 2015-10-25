@@ -9,8 +9,17 @@ import org.bonitasoft.engine.test.junit.BonitaEngineRule;
  */
 public class BonitaEngineSPRule extends BonitaEngineRule {
 
-    @Override
-    protected TestEngine getTestEngine() {
-        return TestEngineSP.getInstance();
+
+
+    public static BonitaEngineSPRule create(){
+        return new BonitaEngineSPRule(TestEngineSP.getInstance());
+    }
+
+    public static BonitaEngineSPRule createWith(TestEngine testEngine){
+        return new BonitaEngineSPRule(testEngine);
+    }
+
+    protected BonitaEngineSPRule(TestEngine testEngine) {
+        super(testEngine);
     }
 }

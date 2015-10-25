@@ -2,6 +2,7 @@ package com.bonitasoft.engine.test;
 
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.test.junit.BonitaEngineSPRule;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import org.junit.Test;
 public class TestEngineSPIT {
 
     @Rule
-    public BonitaEngineSPRule bonitaEngineSPRule = new BonitaEngineSPRule();
+    public BonitaEngineRule bonitaEngineSPRule = BonitaEngineSPRule.create();
 
     @Test
     public void startStopEngine() throws Exception {
