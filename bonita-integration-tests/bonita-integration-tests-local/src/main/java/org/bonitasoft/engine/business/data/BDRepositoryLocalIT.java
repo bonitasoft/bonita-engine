@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.CommonAPIIT;
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -51,8 +50,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(BonitaTestRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class BDRepositoryLocalIT extends CommonAPIIT {
 
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";

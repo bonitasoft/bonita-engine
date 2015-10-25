@@ -26,7 +26,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.filter.user.GroupUserFilter;
 import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
@@ -35,14 +34,16 @@ import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class CommonAPIIT extends APITestUtil {
+
+    @Rule
+    public BonitaEngineRule bonitaEngineRule = new BonitaEngineRule();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPIIT.class);
 
@@ -91,7 +92,7 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     protected ProcessDefinition deployProcessWithTestFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user,
-            final String filterName) throws BonitaException, IOException {
+                                                            final String filterName) throws BonitaException, IOException {
         final List<BarResource> userFilters = generateFilterImplementations(filterName);
         final List<BarResource> generateFilterDependencies = generateFilterDependencies();
         return deployAndEnableProcessWithActorAndUserFilter(processDefinitionBuilder, actorName, user, generateFilterDependencies, userFilters);

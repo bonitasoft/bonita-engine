@@ -1,6 +1,5 @@
 package org.bonitasoft.engine.test.junit;
 
-import com.sun.istack.internal.logging.Logger;
 import org.bonitasoft.engine.test.TestEngine;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -13,6 +12,7 @@ import org.junit.runners.model.Statement;
  * @author Baptiste Mesta
  */
 public class BonitaEngineRule implements TestRule {
+
 
     @Override
     public Statement apply(Statement statement, Description description) {
@@ -42,7 +42,7 @@ public class BonitaEngineRule implements TestRule {
                         try {
                             testEngine.stop();
                         } catch (Exception e) {
-                            Logger.getLogger(TestEngine.class).severe("unable to stop the engine",e);
+                            e.printStackTrace();
                         }
                     }
                 });

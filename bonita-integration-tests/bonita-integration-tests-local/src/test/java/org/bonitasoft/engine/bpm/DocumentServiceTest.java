@@ -30,8 +30,10 @@ import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**

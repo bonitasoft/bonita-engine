@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -79,8 +78,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(BonitaTestRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class BPMLocalIT extends CommonAPILocalIT {
 
     public static Semaphore semaphore1 = new Semaphore(1);
