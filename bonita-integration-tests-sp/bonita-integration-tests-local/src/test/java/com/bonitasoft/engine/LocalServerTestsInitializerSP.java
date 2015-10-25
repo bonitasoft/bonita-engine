@@ -9,9 +9,8 @@
 package com.bonitasoft.engine;
 
 import com.bonitasoft.engine.test.TestEngineSP;
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 
-public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
+public class LocalServerTestsInitializerSP  {
 
     public static void beforeAll() throws Exception {
         TestEngineSP.getInstance().start();

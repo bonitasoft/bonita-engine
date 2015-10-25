@@ -13,15 +13,8 @@ import com.bonitasoft.engine.services.event.IdentityServiceUsingEventServiceTest
 import com.bonitasoft.engine.services.event.RecorderAndEventServiceTest;
 import com.bonitasoft.engine.services.monitoring.MonitoringTests;
 import org.bonitasoft.engine.AllBPMTests;
-import org.bonitasoft.engine.LocalServerTestsInitializer;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 @SuiteClasses({
         ParameterAndDataExpressionIntegrationTest.class,
         AllBPMTests.class,
@@ -33,14 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
 })
 public class AllBPMSPTests {
 
-        @BeforeClass
-        public static void beforeClass() throws Exception {
-            System.err.println("=================== AllBPMSPTests.beforeClass()");
-        }
 
-        @AfterClass
-        public static void afterClass() throws Exception {
-            System.err.println("=================== AllBPMSPTests.afterClass()");
-        }
 
     }
