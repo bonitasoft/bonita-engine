@@ -32,9 +32,8 @@ import org.slf4j.LoggerFactory;
  */
 public class TestEngine {
 
-    public static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
-
-    public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
+    public static final String TECHNICAL_USER_NAME = "install";
+    public static final String TECHNICAL_USER_PASSWORD = "install";
     private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
@@ -57,7 +56,7 @@ public class TestEngine {
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
-    String prepareBonitaHome() throws IOException {
+    protected String prepareBonitaHome() throws IOException {
         final String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
         if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
             final InputStream bonitaHomeIS = this.getClass().getResourceAsStream("/bonita-home.zip");
@@ -296,7 +295,7 @@ public class TestEngine {
 
     public void deployCommandsOnDefaultTenant() throws BonitaException {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+        final APISession session = loginAPI.login(TECHNICAL_USER_NAME, TECHNICAL_USER_PASSWORD);
         ClientEventUtil.deployCommand(session);
         loginAPI.logout(session);
     }
@@ -344,13 +343,17 @@ public class TestEngine {
 
     public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (undeployCommands) {
-            final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-            final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
-            ClientEventUtil.undeployCommand(session);
-            loginAPI.logout(session);
+            undeployCommands();
         }
 
         platformAPI.stopNode();
+    }
+
+    protected void undeployCommands() throws BonitaException {
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        final APISession session = loginAPI.login(TECHNICAL_USER_NAME, TECHNICAL_USER_PASSWORD);
+        ClientEventUtil.undeployCommand(session);
+        loginAPI.logout(session);
     }
 
 
