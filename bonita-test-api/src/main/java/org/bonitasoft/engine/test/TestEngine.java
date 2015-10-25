@@ -74,7 +74,7 @@ public class TestEngine {
         return false;
     }
 
-    synchronized void doStart() throws Exception {
+    protected synchronized void doStart() throws Exception {
         LOGGER.info("=====================================================");
         LOGGER.info("============  Starting Bonita BPM Engine  ===========");
         LOGGER.info("=====================================================");
