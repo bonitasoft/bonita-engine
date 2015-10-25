@@ -28,6 +28,17 @@ public class TestEngineSP extends TestEngine {
 
     private long defaultTenantId;
 
+    private static TestEngineSP INSTANCE = new TestEngineSP();
+
+    public static TestEngineSP getInstance() {
+        return INSTANCE;
+    }
+
+    protected TestEngineSP() {
+        super();
+        replaceInstance(this);
+    }
+
     @Override
     public void deleteTenantAndPlatform() throws BonitaException {
         destroyPlatformAndTenants();
@@ -107,8 +118,8 @@ public class TestEngineSP extends TestEngine {
             }
         });
         for (File file : files) {
-            try(FileInputStream fis = new FileInputStream(file); FileOutputStream fos = new FileOutputStream(new File(toDir,file.getName()))){
-                IOUtils.copy(fis,fos);
+            try (FileInputStream fis = new FileInputStream(file); FileOutputStream fos = new FileOutputStream(new File(toDir, file.getName()))) {
+                IOUtils.copy(fis, fos);
             }
         }
         return bonitaHome;
