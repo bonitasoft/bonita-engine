@@ -24,6 +24,8 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
@@ -36,10 +38,13 @@ public class TestEngine {
     private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class.getName());
+
     private Object h2Server;
 
     public void start() throws Exception {
-        System.out.println("Starting bonita bpm engine for test");
         System.out.println("=====================================================");
         System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
         System.out.println("=====================================================");
@@ -84,8 +89,8 @@ public class TestEngine {
         FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
 
         // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
 
         if ("h2".equals(dbVendor)) {
             this.h2Server = startH2Server();
