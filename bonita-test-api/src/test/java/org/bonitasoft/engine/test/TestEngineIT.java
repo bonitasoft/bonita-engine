@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -7,11 +10,12 @@ import org.junit.Test;
  */
 public class TestEngineIT {
 
+    @Rule
+    public BonitaEngineRule bonitaEngineRule = new BonitaEngineRule();
+
     @Test
-    public void startEngine() throws Exception {
-        final TestEngine testEngine = new TestEngine();
-        testEngine.start();
-        testEngine.stop();
+    public void checkEngineStarted() throws Exception {
+        TenantAPIAccessor.getLoginAPI().login(TestEngine.TECHNICAL_USER_NAME,TestEngine.TECHNICAL_USER_PASSWORD);
     }
 
 }

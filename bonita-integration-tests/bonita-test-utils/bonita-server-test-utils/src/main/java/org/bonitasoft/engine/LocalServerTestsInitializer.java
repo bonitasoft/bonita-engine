@@ -18,20 +18,13 @@ import org.bonitasoft.engine.test.TestEngine;
 
 public class LocalServerTestsInitializer {
 
-    private static TestEngine INSTANCE;
 
-    public static TestEngine getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new TestEngine();
-        }
-        return INSTANCE;
-    }
     public static void beforeAll() throws Exception {
-        LocalServerTestsInitializer.getInstance().start();
+        TestEngine.getInstance().start();
     }
 
     public static void afterAll() throws Exception {
-        LocalServerTestsInitializer.getInstance().stop();
+        TestEngine.getInstance().stop();
 
     }
 

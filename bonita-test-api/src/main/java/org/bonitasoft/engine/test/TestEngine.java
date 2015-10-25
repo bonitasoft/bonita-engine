@@ -40,9 +40,41 @@ public class TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class.getName());
 
+
+    private static TestEngine INSTANCE = new TestEngine();
+    private boolean started = false;
+
+    public static TestEngine getInstance() {
+        return INSTANCE;
+    }
+
+    protected TestEngine() {
+    }
+
     private Object h2Server;
 
-    public void start() throws Exception {
+    protected static void replaceInstance(TestEngine newTestEngine){
+        if(INSTANCE.started){
+            throw new IllegalStateException("trying to replace an already started instance");
+        }
+        INSTANCE = newTestEngine;
+    }
+
+    /**
+     * start the engine and return if it was effectivly started
+     * @return
+     * @throws Exception
+     */
+    public boolean start() throws Exception {
+        if(!started){
+            doStart();
+            started = true;
+            return true;
+        }
+        return false;
+    }
+
+    synchronized void doStart() throws Exception {
         LOGGER.info("=====================================================");
         LOGGER.info("============  Starting Bonita BPM Engine  ===========");
         LOGGER.info("=====================================================");
@@ -51,6 +83,24 @@ public class TestEngine {
         initPlatformAndTenant();
         LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
+
+    public void stop() throws Exception {
+        if(started){
+            doStop();
+            started = false;
+        }
+    }
+
+    private synchronized void doStop() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, InterruptedException {
+        LOGGER.info("=====================================================");
+        LOGGER.info("============ CLEANING OF TEST ENVIRONMENT ===========");
+        LOGGER.info("=====================================================");
+
+        shutdown();
+        checkThreadsAreStopped();
+    }
+
+    //--------------  engine life cycle methods
 
     protected String prepareBonitaHome() throws IOException {
         final String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
@@ -133,15 +183,6 @@ public class TestEngine {
         final Method stop = h2ServerClass.getMethod("stop");
         stop.invoke(h2Server);
         LOGGER.info("h2 server stopped");
-    }
-
-    public void stop() throws Exception {
-        LOGGER.info("=====================================================");
-        LOGGER.info("============ CLEANING OF TEST ENVIRONMENT ===========");
-        LOGGER.info("=====================================================");
-
-        shutdown();
-        checkThreadsAreStopped();
     }
 
     protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
@@ -264,7 +305,8 @@ public class TestEngine {
                 return true;
             }
         }
-        return false;
+        //shutdown hook not executed in main thread
+        return thread.getId() == Thread.currentThread().getId();
     }
 
     protected void initPlatformAndTenant() throws Exception {
