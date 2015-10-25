@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public abstract class CommonAPIIT extends APITestUtil {
 
     @Rule
-    public BonitaEngineRule bonitaEngineRule = new BonitaEngineRule();
+    public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.create();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPIIT.class);
 

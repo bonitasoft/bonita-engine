@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.test.junit;
 
 import org.bonitasoft.engine.test.TestEngine;
+import org.bonitasoft.engine.test.TestEngineImpl;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -13,9 +14,24 @@ import org.junit.runners.model.Statement;
  */
 public class BonitaEngineRule implements TestRule {
 
+    private TestEngine testEngine;
+
+    protected BonitaEngineRule(TestEngine testEngine){
+        this.testEngine = testEngine;
+    }
+
+    public static BonitaEngineRule create(){
+        return new BonitaEngineRule(TestEngineImpl.getInstance());
+    }
+
+    public static BonitaEngineRule createWith(TestEngine testEngine){
+        return new BonitaEngineRule(testEngine);
+    }
+
 
     @Override
     public Statement apply(Statement statement, Description description) {
+        //TODO parse annotations here
         return new WithTestEngine(statement, getTestEngine());
     }
 
@@ -51,6 +67,6 @@ public class BonitaEngineRule implements TestRule {
     }
 
     protected TestEngine getTestEngine() {
-        return TestEngine.getInstance();
+        return testEngine;
     }
 }

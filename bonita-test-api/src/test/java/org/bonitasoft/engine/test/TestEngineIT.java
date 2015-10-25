@@ -11,7 +11,7 @@ import org.junit.Test;
 public class TestEngineIT {
 
     @Rule
-    public BonitaEngineRule bonitaEngineRule = new BonitaEngineRule();
+    public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.create();
 
     @Test
     public void checkEngineStarted() throws Exception {

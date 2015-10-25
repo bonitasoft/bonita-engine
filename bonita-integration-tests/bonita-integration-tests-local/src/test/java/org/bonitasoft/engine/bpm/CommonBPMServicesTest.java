@@ -102,7 +102,7 @@ import org.slf4j.LoggerFactory;
 public class CommonBPMServicesTest {
 
     @Rule
-    public BonitaEngineRule bonitaEngineRule = new BonitaEngineRule();
+    public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.create();
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
     protected static SessionAccessor sessionAccessor;

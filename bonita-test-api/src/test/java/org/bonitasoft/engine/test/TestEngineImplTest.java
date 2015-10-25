@@ -13,12 +13,10 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Baptiste Mesta
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TestEngineTest {
-
-
+public class TestEngineImplTest {
 
     @Spy
-    private TestEngine testEngine;
+    private TestEngineImpl testEngine;
 
     @Test
     public void should_start_do_nothing_second_time() throws Exception {
