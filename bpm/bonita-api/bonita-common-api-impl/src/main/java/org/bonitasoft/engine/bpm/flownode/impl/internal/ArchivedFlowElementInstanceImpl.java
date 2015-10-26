@@ -69,7 +69,7 @@ public abstract class ArchivedFlowElementInstanceImpl extends NamedElementImpl i
 
     /**
      * @param description
-     *            the description to set
+     *        the description to set
      */
     public void setDescription(final String description) {
         this.description = description;

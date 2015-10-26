@@ -31,6 +31,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 
+
 /**
  * @author Elias Ricken de Medeiros
  */

@@ -49,4 +49,6 @@ public interface ActorDefinition extends Serializable {
      */
     boolean isInitiator();
 
+
+    void setInitiator(final boolean initiator);
 }

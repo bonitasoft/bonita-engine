@@ -15,9 +15,18 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
+import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
@@ -26,12 +35,18 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements UserTaskDefinition {
 
     private static final long serialVersionUID = -8168685139931497082L;
-
+    @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
+    @XmlElementWrapper(name = "context")
+    @XmlElement(name = "contextEntry", type = ContextEntryImpl.class)
     private List<ContextEntry> context = new ArrayList<>();
+
+    public UserTaskDefinitionImpl() {
+    }
 
     public UserTaskDefinitionImpl(final String name, final String actorName) {
         super(name, actorName);
@@ -65,4 +80,26 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
         visitor.find(this, modelId);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        UserTaskDefinitionImpl that = (UserTaskDefinitionImpl) o;
+        return Objects.equals(contract, that.contract) &&
+                Objects.equals(context, that.context);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), contract, context);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("contract", contract)
+                .append("context", context)
+                .toString();
+    }
 }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.bonitasoft.engine.bpm.flownode.TaskDefinition;
 
 /**
@@ -20,12 +22,17 @@ import org.bonitasoft.engine.bpm.flownode.TaskDefinition;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
 public abstract class TaskDefinitionImpl extends ActivityDefinitionImpl implements TaskDefinition {
 
     private static final long serialVersionUID = -3525871456523308720L;
 
     public TaskDefinitionImpl(final String name) {
         super(name);
+    }
+
+    public TaskDefinitionImpl() {
+        super();
     }
 
     public TaskDefinitionImpl(final long id, final String name) {

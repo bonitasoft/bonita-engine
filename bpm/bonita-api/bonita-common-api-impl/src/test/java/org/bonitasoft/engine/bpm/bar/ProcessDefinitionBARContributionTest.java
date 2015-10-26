@@ -87,7 +87,7 @@ public class ProcessDefinitionBARContributionTest {
     @Test
     public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("Wrong version");
+        exception.expectMessage("Deserialization of the ProcessDesignFailed");
         final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
         final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
 
@@ -105,6 +105,16 @@ public class ProcessDefinitionBARContributionTest {
         exception.expectMessage("6.0 namespace is not compatible with your current version");
 
         new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
+    }
+
+    @Test
+    public void checkVersion_should_accept_new_7_2_content() throws Exception {
+        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/process_7_2.xml")));
+    }
+
+    @Test
+    public void convertXmlToProcess_should_not_fail_with_new_7_2_content() throws Exception {
+        new ProcessDefinitionBARContribution().convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_2.xml")));
     }
 
     @Test

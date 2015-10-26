@@ -13,6 +13,13 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -23,12 +30,17 @@ import org.bonitasoft.engine.operation.Operation;
  * @author Julien Molinaro
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements ReceiveTaskDefinition {
 
     private static final long serialVersionUID = -5793747387538282891L;
-
+    @XmlElement(name="catchMessageEventTrigger")
     private final CatchMessageEventTriggerDefinitionImpl trigger;
 
+    public ReceiveTaskDefinitionImpl(){
+        super();
+        trigger = new CatchMessageEventTriggerDefinitionImpl("default name");
+    }
     public ReceiveTaskDefinitionImpl(final String name, final String messageName) {
         super(name);
         trigger = new CatchMessageEventTriggerDefinitionImpl(messageName);
@@ -53,33 +65,24 @@ public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements Rec
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (trigger == null ? 0 : trigger.hashCode());
-        return result;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("trigger", trigger)
+                .toString();
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ReceiveTaskDefinitionImpl other = (ReceiveTaskDefinitionImpl) obj;
-        if (trigger == null) {
-            if (other.trigger != null) {
-                return false;
-            }
-        } else if (!trigger.equals(other.trigger)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ReceiveTaskDefinitionImpl that = (ReceiveTaskDefinitionImpl) o;
+        return Objects.equals(trigger, that.trigger);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), trigger);
     }
 
     @Override

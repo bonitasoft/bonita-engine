@@ -16,7 +16,14 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
@@ -27,12 +34,14 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl implements ThrowEventDefinition {
 
     private static final long serialVersionUID = -3142554305988571206L;
-
+    @XmlElement(type = ThrowMessageEventTriggerDefinitionImpl.class, name = "throwMessageEventTrigger")
     private final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions;
-
+    @XmlElement(type = ThrowSignalEventTriggerDefinitionImpl.class, name = "throwSignalEventTrigger")
     private final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions;
 
     public ThrowEventDefinitionImpl(final String name) {
@@ -43,6 +52,12 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
 
     public ThrowEventDefinitionImpl(final long id, final String name) {
         super(id, name);
+        messageEventTriggerDefinitions = new ArrayList<>(1);
+        signalEventTriggerDefinitions = new ArrayList<>(1);
+    }
+
+    public ThrowEventDefinitionImpl() {
+        super();
         messageEventTriggerDefinitions = new ArrayList<>(1);
         signalEventTriggerDefinitions = new ArrayList<>(1);
     }
@@ -68,51 +83,26 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (messageEventTriggerDefinitions == null ? 0 : messageEventTriggerDefinitions.hashCode());
-        result = prime * result + (signalEventTriggerDefinitions == null ? 0 : signalEventTriggerDefinitions.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ThrowEventDefinitionImpl that = (ThrowEventDefinitionImpl) o;
+        return Objects.equals(messageEventTriggerDefinitions, that.messageEventTriggerDefinitions) &&
+                Objects.equals(signalEventTriggerDefinitions, that.signalEventTriggerDefinitions);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ThrowEventDefinitionImpl other = (ThrowEventDefinitionImpl) obj;
-        if (messageEventTriggerDefinitions == null) {
-            if (other.messageEventTriggerDefinitions != null) {
-                return false;
-            }
-        } else if (!messageEventTriggerDefinitions.equals(other.messageEventTriggerDefinitions)) {
-            return false;
-        }
-        if (signalEventTriggerDefinitions == null) {
-            if (other.signalEventTriggerDefinitions != null) {
-                return false;
-            }
-        } else if (!signalEventTriggerDefinitions.equals(other.signalEventTriggerDefinitions)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), messageEventTriggerDefinitions, signalEventTriggerDefinitions);
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ThrowEventDefinitionImpl{");
-        sb.append("messageEventTriggerDefinitions=").append(messageEventTriggerDefinitions);
-        sb.append(", signalEventTriggerDefinitions=").append(signalEventTriggerDefinitions);
-        sb.append('}');
-        sb.append(super.toString());
-        return sb.toString();
+        return new ToStringBuilder(this)
+                .append("messageEventTriggerDefinitions", messageEventTriggerDefinitions)
+                .append("signalEventTriggerDefinitions", signalEventTriggerDefinitions)
+                .toString();
     }
 
     @Override

@@ -11,16 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.bar.xml;
-
 /**
- * @author Baptiste Mesta
+ * <p>
+ * Contains Actor mapping model classes.
+ * </p>
  */
-public class DisplayNameExpressionBinding extends ExpressionBinding {
+@XmlSchema(namespace = "http://www.bonitasoft.org/ns/process/client/7.2", elementFormDefault = XmlNsForm.UNSET, xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/process/client/7.2", prefix = "def") })
+package org.bonitasoft.engine.bpm.process.impl.internal;
 
-    @Override
-    public String getElementTag() {
-        return XMLProcessDefinition.DISPLAY_NAME;
-    }
-
-}
+import javax.xml.bind.annotation.XmlNsForm;
+import javax.xml.bind.annotation.XmlSchema;

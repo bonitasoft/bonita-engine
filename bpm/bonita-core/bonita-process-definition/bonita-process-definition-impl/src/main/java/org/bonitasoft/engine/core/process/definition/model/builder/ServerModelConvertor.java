@@ -40,6 +40,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.operation.Operation;
 
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte

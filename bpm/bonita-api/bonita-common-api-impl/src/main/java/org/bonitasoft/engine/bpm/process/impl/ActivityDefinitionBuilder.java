@@ -27,6 +27,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 
+
 /**
  * @author Matthieu Chaffotte
  */

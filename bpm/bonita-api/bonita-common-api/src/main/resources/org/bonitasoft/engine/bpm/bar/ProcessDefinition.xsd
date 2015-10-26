@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/client/6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/client/6.3"
+<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/client/7.2" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/client/7.2"
            elementFormDefault="qualified">
 
     <xs:element name="processDefinition" type="definition:ProcessDefinition" />
@@ -54,7 +54,6 @@
                     <xs:element name="context" type="definition:ContextDefinition" minOccurs="0" maxOccurs="1" />
                 </xs:all>
                 <xs:attribute type="xs:string" name="version" use="required" />
-                <xs:attribute type="xs:string" name="bos_version" use="required" />
                 <xs:attribute type="xs:string" name="displayName" />
                 <xs:attribute type="xs:string" name="displayDescription" />
                 <xs:attribute type="xs:string" name="stringIndexLabel1" />
