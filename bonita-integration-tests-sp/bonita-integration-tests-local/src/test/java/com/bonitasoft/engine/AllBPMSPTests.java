@@ -13,6 +13,8 @@ import com.bonitasoft.engine.services.event.IdentityServiceUsingEventServiceTest
 import com.bonitasoft.engine.services.event.RecorderAndEventServiceTest;
 import com.bonitasoft.engine.services.monitoring.MonitoringTests;
 import org.bonitasoft.engine.AllBPMTests;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
@@ -24,8 +26,8 @@ import org.junit.runners.Suite.SuiteClasses;
         MonitoringTests.class,
         PlatformExtIT.class
 })
+@RunWith(Suite.class)
 public class AllBPMSPTests {
 
 
-
-    }
+}
