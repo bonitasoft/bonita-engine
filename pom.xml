@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<modules>
-		<module>bonita-test-api</module>
-	</modules>
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -475,6 +472,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
@@ -503,6 +501,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
@@ -518,6 +517,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
@@ -542,6 +542,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
@@ -572,6 +573,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
