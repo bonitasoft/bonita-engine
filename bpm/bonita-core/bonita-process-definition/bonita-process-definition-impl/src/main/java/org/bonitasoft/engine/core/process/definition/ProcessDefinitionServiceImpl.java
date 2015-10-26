@@ -273,7 +273,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     SProcessDefinition readSProcessDefinitionFromDatabase(long processId, SProcessDefinitionDeployInfo processDeploymentInfo) throws IOException, XMLParseException, SReflectException, SCacheException {
-                final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
+        final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
                         .getContent());
         SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
                 setIdOnProcessDefinition(sProcessDefinition, processId);
@@ -354,7 +354,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                         .setObject(sProcessDefinitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
-            storeProcessDefinitionInCache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
+            //storeProcessDefinitionInCache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
             log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
         } catch (final Exception e) {
             log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");

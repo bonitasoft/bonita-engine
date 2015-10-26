@@ -13,20 +13,34 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.SignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Matthieu Chaffotte
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class SignalEventTriggerDefinitionImpl implements SignalEventTriggerDefinition {
 
     private static final long serialVersionUID = 7986619065007971291L;
-
+    @XmlAttribute(name = "name")
     private final String signalName;
 
     public SignalEventTriggerDefinitionImpl(final String name) {
         this.signalName = name;
+    }
+
+    public SignalEventTriggerDefinitionImpl() {
+        this.signalName = "default name";
     }
 
     @Override
@@ -35,33 +49,23 @@ public abstract class SignalEventTriggerDefinitionImpl implements SignalEventTri
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((signalName == null) ? 0 : signalName.hashCode());
-        return result;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("signalName", signalName)
+                .toString();
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SignalEventTriggerDefinitionImpl other = (SignalEventTriggerDefinitionImpl) obj;
-        if (signalName == null) {
-            if (other.signalName != null) {
-                return false;
-            }
-        } else if (!signalName.equals(other.signalName)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SignalEventTriggerDefinitionImpl that = (SignalEventTriggerDefinitionImpl) o;
+        return Objects.equals(signalName, that.signalName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(signalName);
     }
 
     @Override

@@ -13,25 +13,35 @@
  **/
 package org.bonitasoft.engine.bpm.actor.impl;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ActorDefinitionImpl implements ActorDefinition {
 
     private static final long serialVersionUID = 1915238328442058288L;
-
+    @XmlID
+    @XmlAttribute(required = true)
     private final String name;
-
+    @XmlElement(required = false)
     private String description;
-
+    @XmlAttribute(required = false)
     private boolean initiator;
 
     /**
      * Create a actor definition with his name that is not initiator
-     * 
+     *
      * @param name
      */
     public ActorDefinitionImpl(final String name) {
@@ -39,6 +49,11 @@ public class ActorDefinitionImpl implements ActorDefinition {
         initiator = false;
     }
 
+    public ActorDefinitionImpl() {
+        this.name = "";
+        this.description = null;
+        initiator = false;
+    }
     @Override
     public String getName() {
         return name;
@@ -58,50 +73,24 @@ public class ActorDefinitionImpl implements ActorDefinition {
         return initiator;
     }
 
+    @Override
     public void setInitiator(final boolean initiator) {
         this.initiator = initiator;
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + (initiator ? 1231 : 1237);
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ActorDefinitionImpl that = (ActorDefinitionImpl) o;
+        return Objects.equals(initiator, that.initiator) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof ActorDefinitionImpl)) {
-            return false;
-        }
-        ActorDefinitionImpl other = (ActorDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (initiator != other.initiator) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(name, description, initiator);
     }
 
     @Override

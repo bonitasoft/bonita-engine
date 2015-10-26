@@ -22,6 +22,9 @@ public class ThrowErrorEventTriggerDefinitionImpl extends ErrorEventTriggerDefin
 
     private static final long serialVersionUID = -8087566164595708656L;
 
+    public  ThrowErrorEventTriggerDefinitionImpl(){
+        super();
+    }
     public ThrowErrorEventTriggerDefinitionImpl(final String errorCode) {
         super(errorCode);
     }

@@ -38,6 +38,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryE
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.operation.Operation;
 
+
 /**
  * @author Matthieu Chaffotte
  * @author Frederic Bouquet

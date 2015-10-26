@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;

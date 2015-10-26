@@ -13,16 +13,21 @@
  **/
 package org.bonitasoft.engine.bpm.internal;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Baptiste Mesta
  */
+
 public abstract class BaseElementImpl implements BaseElement {
 
     private static final long serialVersionUID = -5094021692278906536L;
-
     private long id;
+
+    public BaseElementImpl() {
+    }
 
     @Override
     public long getId() {
@@ -34,29 +39,16 @@ public abstract class BaseElementImpl implements BaseElement {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseElementImpl that = (BaseElementImpl) o;
+        return Objects.equals(id, that.id);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof BaseElementImpl)) {
-            return false;
-        }
-        BaseElementImpl other = (BaseElementImpl) obj;
-        if (id != other.id) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

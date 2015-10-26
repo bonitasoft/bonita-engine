@@ -13,25 +13,40 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinition {
 
     private static final long serialVersionUID = -1000995843357026775L;
-
+    @XmlAttribute(name = "type")
     private final TimerType timerType;
-
+    @XmlElement(type = ExpressionImpl.class,name = "expression")
     private final Expression timerValue;
 
     public TimerEventTriggerDefinitionImpl(final TimerType timerType, final Expression timerExpression) {
         this.timerType = timerType;
         timerValue = timerExpression;
+    }
+
+    public TimerEventTriggerDefinitionImpl() {
+        this.timerType = TimerType.CYCLE;
+        timerValue = new ExpressionImpl();
     }
 
     @Override
@@ -45,37 +60,25 @@ public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinit
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (timerType == null ? 0 : timerType.hashCode());
-        result = prime * result + (timerValue == null ? 0 : timerValue.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TimerEventTriggerDefinitionImpl that = (TimerEventTriggerDefinitionImpl) o;
+        return Objects.equals(timerType, that.timerType) &&
+                Objects.equals(timerValue, that.timerValue);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final TimerEventTriggerDefinitionImpl other = (TimerEventTriggerDefinitionImpl) obj;
-        if (timerType != other.timerType) {
-            return false;
-        }
-        if (timerValue == null) {
-            if (other.timerValue != null) {
-                return false;
-            }
-        } else if (!timerValue.equals(other.timerValue)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(timerType, timerValue);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("timerType", timerType)
+                .append("timerValue", timerValue)
+                .toString();
     }
 
     @Override

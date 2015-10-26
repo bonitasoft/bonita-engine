@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 
@@ -20,10 +26,12 @@ import org.bonitasoft.engine.bpm.flownode.GatewayType;
  * @author Feng Hui
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GatewayDefinitionImpl extends FlowNodeDefinitionImpl implements GatewayDefinition {
 
     private static final long serialVersionUID = 8091472342735043092L;
 
+    @XmlAttribute
     private final GatewayType gatewayType;
 
     public GatewayDefinitionImpl(final String name, final GatewayType gatewayType) {
@@ -36,35 +44,28 @@ public class GatewayDefinitionImpl extends FlowNodeDefinitionImpl implements Gat
         this.gatewayType = gatewayType;
     }
 
+    public GatewayDefinitionImpl() {
+        super();
+        gatewayType = GatewayType.EXCLUSIVE;
+    }
+
     @Override
     public GatewayType getGatewayType() {
         return gatewayType;
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (gatewayType == null ? 0 : gatewayType.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        GatewayDefinitionImpl that = (GatewayDefinitionImpl) o;
+        return Objects.equals(gatewayType, that.gatewayType);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final GatewayDefinitionImpl other = (GatewayDefinitionImpl) obj;
-        if (gatewayType != other.gatewayType) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), gatewayType);
     }
 
     @Override
