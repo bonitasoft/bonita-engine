@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -22,8 +22,20 @@ public class PageNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = 2842457668242337487L;
 
+    public enum PageAttribute {
+        NAME, MAPPING_KEY
+    }
+
+    /**
+     * @deprecated Use {@link #PageNotFoundException(String, PageAttribute)} constructor instead.
+     */
+    @Deprecated
     public PageNotFoundException(final String name) {
-        super("Unable to find page with name: " + name);
+        this(name, PageAttribute.NAME);
+    }
+
+    public PageNotFoundException(final String value, PageAttribute pageAttribute) {
+        super(String.format("Unable to find page with %s: %s", pageAttribute.name().toLowerCase(), value));
     }
 
     public PageNotFoundException(final Throwable cause) {
