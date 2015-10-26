@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.xml.StringIndex;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -72,7 +71,6 @@ public class OperationTest extends TestWithUser {
                 Collections.singletonList((Object) false));
     }
 
-    @Cover(classes = StringIndex.class, concept = BPMNConcept.OTHERS, jira = "ENGINE-679", keywords = { "string index", "operation" }, story = "update a a string index using operation")
     @Test
     public void executeStringIndexOperation() throws Exception {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("procWithStringIndexes", "1.0");
@@ -119,7 +117,6 @@ public class OperationTest extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = StringIndex.class, concept = BPMNConcept.OTHERS, jira = "ENGINE-679", keywords = { "string index", "operation" }, story = "update a a string index using operation that use data expression")
     @Test
     public void executeStringIndexOperationUsingData() throws Exception {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("procWithStringIndexes", "1.0");
