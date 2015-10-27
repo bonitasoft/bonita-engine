@@ -34,6 +34,7 @@
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+		<constructor-arg name="tenantId" value="${tenantId}"/>
 	</bean>
 
 	<bean id="inputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />

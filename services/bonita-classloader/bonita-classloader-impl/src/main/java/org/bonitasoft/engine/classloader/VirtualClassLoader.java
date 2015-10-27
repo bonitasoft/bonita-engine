@@ -16,9 +16,14 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -43,10 +48,16 @@ public class VirtualClassLoader extends ClassLoader {
 
     protected final long artifactId;
 
-    protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
+    private TechnicalLoggerService loggerService;
+
+    private List<ClassLoaderChangeHandler> changeHandlers;
+
+    protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent, TechnicalLoggerService loggerService) {
         super(parent);
         this.artifactType = artifactType;
         this.artifactId = artifactId;
+        this.loggerService = loggerService;
+        this.changeHandlers = new ArrayList<ClassLoaderChangeHandler>(5);
     }
 
     void setClassLoader(final BonitaClassLoader classloader) {
@@ -98,10 +109,35 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     public void destroy() {
+        executeHandlers();
         XStreamFactory.remove(this);
         if (classloader != null) {
             classloader.destroy();
         }
+    }
+
+    private void executeHandlers() {
+        for (ClassLoaderChangeHandler changeHandler : changeHandlers) {
+            try {
+                changeHandler.onDestroy();
+            } catch (SBonitaException e) {
+                logException(changeHandler, e);
+            }
+        }
+    }
+
+    private void logException(ClassLoaderChangeHandler changeHandler, SBonitaException e) {
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            String message = new StringBuilder()
+                    .append("Unable to execute the ClassLoaderChangeHandler '")
+                    .append(changeHandler.getClass().getName())
+                    .append("'. You may experiment ClassLoader issues. Please, consider to restart the server.").toString();
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, message, e);
+        }
+    }
+
+    public void addChangeHandler(ClassLoaderChangeHandler changeHandler) {
+        changeHandlers.add(changeHandler);
     }
 
     @Override

@@ -62,6 +62,13 @@ public interface ClassLoaderService extends PlatformLifecycleService {
     ClassLoader getLocalClassLoader(final String type, final long id) throws SClassLoaderException;
 
     /**
+     * Adds a {@link ClassLoaderChangeHandler} to the local class loader identified by the given {@link LocalClassLoaderIdentifier}
+     * @param classLoaderIdentifier the local class loader identifier
+     * @param changeHandler the change handler to be registered
+     */
+    void addClassLoaderChangeHandler(LocalClassLoaderIdentifier classLoaderIdentifier, ClassLoaderChangeHandler changeHandler);
+
+    /**
      * Remove the local ClassLoader identified by the given type and id;
      * 
      * @param type

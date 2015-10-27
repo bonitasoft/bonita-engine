@@ -52,7 +52,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final String temporaryFolder;
 
-    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    private VirtualClassLoader virtualGlobalClassLoader;
 
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
@@ -61,6 +61,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private boolean shuttingDown = false;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
+        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader(), logger);
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
@@ -122,7 +123,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public ClassLoader getLocalClassLoader(final String type, final long id) {
+    public VirtualClassLoader getLocalClassLoader(final String type, final long id) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLocalClassLoader"));
         }
@@ -138,7 +139,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
                 // here we have to check again the classloader is still not null as it can be not null if the thread executing now is the "second" one
                 if (!localClassLoaders.containsKey(key)) {
                     final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(getGlobalClassLoader(),
-                            parentClassLoaderResolver, this, type, id));
+                            parentClassLoaderResolver, this, type, id), logger);
                     localClassLoaders.put(key, virtualClassLoader);
                 }
             }
@@ -153,6 +154,11 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         // + "  *******************");
         // }
         return localClassLoaders.get(key);
+    }
+
+    @Override
+    public void addClassLoaderChangeHandler(LocalClassLoaderIdentifier classLoaderIdentifier, ClassLoaderChangeHandler changeHandler) {
+        getLocalClassLoader(classLoaderIdentifier.getType(), classLoaderIdentifier.getId()).addChangeHandler(changeHandler);
     }
 
     @Override
@@ -244,7 +250,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void start() {
         shuttingDown = false;
-        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader(), logger);
     }
 
     @Override

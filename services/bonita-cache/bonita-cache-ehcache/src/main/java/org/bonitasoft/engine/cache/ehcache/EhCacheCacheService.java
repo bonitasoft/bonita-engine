@@ -24,7 +24,6 @@ import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -33,18 +32,17 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
+    private long tenantId;
+
     public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations,
-            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
+            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath, long tenantId) {
         super(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
+        this.tenantId = tenantId;
     }
 
     @Override
     protected String getKeyFromCacheName(final String cacheName) throws SCacheException {
-        try {
-            return String.valueOf(sessionAccessor.getTenantId()) + '_' + cacheName;
-        } catch (final STenantIdNotSetException e) {
-            throw new SCacheException(e);
-        }
+        return new StringBuilder().append(tenantId).append('_').append(cacheName).toString();
     }
 
     @Override
@@ -54,17 +52,14 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
         }
         final String[] cacheNames = cacheManager.getCacheNames();
         final List<String> cacheNamesList = new ArrayList<String>(cacheNames.length);
-        String prefix;
-        try {
-            prefix = String.valueOf(sessionAccessor.getTenantId()) + '_';
-            for (final String cacheName : cacheNames) {
-                if (cacheName.startsWith(prefix)) {
-                    cacheNamesList.add(getCacheNameFromKey(cacheName));
-                }
+        String prefix = new StringBuilder().append(tenantId).append('_').toString();
+
+        for (final String cacheName : cacheNames) {
+            if (cacheName.startsWith(prefix)) {
+                cacheNamesList.add(getCacheNameFromKey(cacheName));
             }
-        } catch (final STenantIdNotSetException e) {
-            throw new RuntimeException(e);
         }
+
         return cacheNamesList;
     }
 

@@ -15,6 +15,12 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.net.URL;
@@ -30,13 +36,29 @@ import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class VirtualClassLoaderTest {
+
+    @Mock
+    private TechnicalLoggerService loggerService;
+
+    @Before
+    public void setUp() throws Exception {
+        given(loggerService.isLoggable(Matchers.<Class<?>>any(), any(TechnicalLogSeverity.class))).willReturn(true);
+    }
 
     @Test
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
-        VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
+        VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader(), loggerService);
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
@@ -60,7 +82,7 @@ public class VirtualClassLoaderTest {
      */
     @Test
     public void loadStudentInformation_toVirtualClassLoader_should_be_usable_via_JavaMethodInvoker() throws Exception {
-        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
+        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader(), loggerService);
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
@@ -105,7 +127,7 @@ public class VirtualClassLoaderTest {
         //given
         // set class loader to new VirtualClassLoader
         ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
-        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, previousClassLoader);
+        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, previousClassLoader, loggerService);
         Thread.currentThread().setContextClassLoader(vcl);
 
         // retrieve the XStream instance related to this class loader
@@ -122,5 +144,47 @@ public class VirtualClassLoaderTest {
 
         //clean up
         Thread.currentThread().setContextClassLoader(previousClassLoader);
+    }
+
+    @Test
+    public void destroy_should_call_all_classLoaderChangeHandlers() throws Exception {
+        //given
+        // set class loader to new VirtualClassLoader
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, contextClassLoader, loggerService);
+        ClassLoaderChangeHandler handler1 = mock(ClassLoaderChangeHandler.class);
+        ClassLoaderChangeHandler handler2 = mock(ClassLoaderChangeHandler.class);
+        vcl.addChangeHandler(handler1);
+        vcl.addChangeHandler(handler2);
+
+        //when
+        // destroy the VirtualClassLoader
+        vcl.destroy();
+
+        //then
+        verify(handler1).onDestroy();
+        verify(handler2).onDestroy();
+    }
+
+    @Test
+    public void destroy_should_log_and_execute_following_classLoaderChangeHandlers_on_exception() throws Exception {
+        //given
+        // set class loader to new VirtualClassLoader
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, contextClassLoader, loggerService);
+        SClassLoaderException exception = new SClassLoaderException("somme error");
+        ClassLoaderChangeHandler handler1 = new ThrowErrorClassLoaderChangeHandler(exception);
+
+        ClassLoaderChangeHandler handler2 = mock(ClassLoaderChangeHandler.class);
+        vcl.addChangeHandler(handler1);
+        vcl.addChangeHandler(handler2);
+
+        //when
+        // destroy the VirtualClassLoader
+        vcl.destroy();
+
+        //then
+        verify(loggerService).log(Matchers.<Class<?>>any(), eq(TechnicalLogSeverity.WARNING), contains(ThrowErrorClassLoaderChangeHandler.class.getName()), eq(exception));
+        verify(handler2).onDestroy();
     }
 }

@@ -13,10 +13,18 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import static org.bonitasoft.engine.classloader.LocalClassLoaderIdentifier.buildTenantClassLoaderIdentifier;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyCodeSource;
+import groovy.lang.GroovyRuntimeException;
+import groovy.lang.GroovyShell;
+import groovy.lang.MissingPropertyException;
+import groovy.lang.Script;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -28,13 +36,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.codehaus.groovy.runtime.InvokerHelper;
-
-import groovy.lang.Binding;
-import groovy.lang.GroovyCodeSource;
-import groovy.lang.GroovyRuntimeException;
-import groovy.lang.GroovyShell;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
 
 /**
  * @author Zhao na
@@ -61,11 +62,12 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
     private static int counter;
 
     public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService, final ClassLoaderService classLoaderService,
-            final TechnicalLoggerService logger) {
+            final TechnicalLoggerService logger, long tenantId) {
         this.cacheService = cacheService;
         this.classLoaderService = classLoaderService;
         this.logger = logger;
         debugEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG);
+        classLoaderService.addClassLoaderChangeHandler(buildTenantClassLoaderIdentifier(tenantId), new ClearGroovyStrategyCacheHandler(cacheService));
     }
 
     protected synchronized String generateScriptName() {

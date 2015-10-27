@@ -142,7 +142,7 @@ public class CacheServiceTest {
             public long getSessionId() {
                 return 1;
             }
-        }, cacheConfigurations, new CacheConfiguration(), "target");
+        }, cacheConfigurations, new CacheConfiguration(), "target", 1);
     }
 
 	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {

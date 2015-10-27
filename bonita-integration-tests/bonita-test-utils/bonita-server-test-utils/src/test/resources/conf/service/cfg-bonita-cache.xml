@@ -9,6 +9,7 @@
             <bean class="org.bonitasoft.engine.cache.CacheConfiguration" />
         </constructor-arg>
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.test.cache" />
+        <constructor-arg name="tenantId" value="1"/>
     </bean>
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService" destroy-method="stop">

@@ -16,6 +16,7 @@
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+		<constructor-arg name="tenantId" value="1"/>
 	</bean>
 
 	<bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
