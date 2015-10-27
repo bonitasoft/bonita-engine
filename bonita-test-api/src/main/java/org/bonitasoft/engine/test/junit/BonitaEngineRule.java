@@ -18,6 +18,7 @@ import org.junit.runners.model.Statement;
 public class BonitaEngineRule implements MethodRule {
 
     private TestEngine testEngine;
+    private boolean cleanAfterTest;
 
     protected BonitaEngineRule(TestEngine testEngine){
         this.testEngine = testEngine;
@@ -31,6 +32,13 @@ public class BonitaEngineRule implements MethodRule {
         return new BonitaEngineRule(testEngine);
     }
 
+
+    public BonitaEngineRule withCleanAfterTest(){
+        cleanAfterTest = true;
+        return this;
+    }
+
+
     @Override
     public Statement apply(Statement statement, FrameworkMethod method, Object target) {
         try {
@@ -38,7 +46,11 @@ public class BonitaEngineRule implements MethodRule {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
-        return new WithTestEngine(statement, getTestEngine());
+        Statement newStatement = new WithTestEngine(statement, getTestEngine());
+        if(cleanAfterTest){
+            newStatement = new WithCleanAfterTest(newStatement, getTestEngine());
+        }
+        return newStatement;
     }
 
     private void handleFieldsAnnotations(Object target) throws IllegalAccessException {
@@ -86,5 +98,21 @@ public class BonitaEngineRule implements MethodRule {
 
     protected TestEngine getTestEngine() {
         return testEngine;
+    }
+
+    private class WithCleanAfterTest extends Statement {
+        private Statement statement;
+        private TestEngine testEngine;
+
+        public WithCleanAfterTest(Statement statement, TestEngine testEngine) {
+            this.statement = statement;
+            this.testEngine = testEngine;
+        }
+
+        @Override
+        public void evaluate() throws Throwable {
+            statement.evaluate();
+            testEngine.clearData();
+        }
     }
 }

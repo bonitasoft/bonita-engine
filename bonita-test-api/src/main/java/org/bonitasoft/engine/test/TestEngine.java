@@ -10,4 +10,6 @@ public interface TestEngine {
     boolean start() throws Exception;
 
     void stop() throws Exception;
+
+    void clearData() throws Exception;
 }

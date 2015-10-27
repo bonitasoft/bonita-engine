@@ -7,10 +7,10 @@
 		</encoder>
 	</appender>
 
-	<logger name="org.bonitasoft" level="INFO" />
-	<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="INFO" />
+	<logger name="org.bonitasoft" level="WARN" />
+	<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="WARN" />
 
-	<root level="INFO">
+	<root level="WARN">
 		<appender-ref ref="STDOUT" />
 	</root>
 	<!-- Show events of synchro repository -->

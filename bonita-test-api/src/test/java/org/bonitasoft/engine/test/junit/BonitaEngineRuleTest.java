@@ -46,5 +46,10 @@ public class BonitaEngineRuleTest {
         public void stop() throws Exception {
 
         }
+
+        @Override
+        public void clearData() throws Exception {
+
+        }
     }
 }
