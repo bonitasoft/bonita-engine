@@ -314,7 +314,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -352,7 +351,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -5619,26 +5617,51 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            final SAProcessInstance lastArchivedProcessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
+            if (lastArchivedProcessInstance == null) {
+                throw new ArchivedDataNotFoundException("Archived process instance not found: " + processInstanceId);
+            }
+            final long processDefinitionId = lastArchivedProcessInstance.getProcessDefinitionId();
+            final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+            Thread.currentThread().setContextClassLoader(processClassLoader);
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
             return ModelConvertor.toArchivedDataInstance(dataInstance);
-        } catch (final SDataInstanceException sdie) {
-            throw new ArchivedDataNotFoundException(sdie);
+        } catch (final SDataInstanceException e) {
+            throw new ArchivedDataNotFoundException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 
     @Override
     public ArchivedDataInstance getArchivedActivityDataInstance(final String dataName, final long activityInstanceId) throws ArchivedDataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId).getLogicalGroup(processDefinitionIndex);
+            final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
+            Thread.currentThread().setContextClassLoader(processClassLoader);
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
             return ModelConvertor.toArchivedDataInstance(dataInstance);
-        } catch (final SDataInstanceException sdie) {
-            throw new ArchivedDataNotFoundException(sdie);
+        } catch (final SDataInstanceException e) {
+            throw new ArchivedDataNotFoundException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 
@@ -5646,12 +5669,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<ArchivedDataInstance> getArchivedProcessDataInstances(final long processInstanceId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            final SAProcessInstance lastArchivedProcessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
+            if (lastArchivedProcessInstance == null) {
+                throw new RetrieveException("Archived process instance not found: " + processInstanceId);
+            }
+            final long processDefinitionId = lastArchivedProcessInstance.getProcessDefinitionId();
+            final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+            Thread.currentThread().setContextClassLoader(processClassLoader);
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString(), startIndex, maxResults);
             return ModelConvertor.toArchivedDataInstances(dataInstances);
-        } catch (final SDataInstanceException sdie) {
-            throw new RetrieveException(sdie);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 
@@ -5659,12 +5694,22 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<ArchivedDataInstance> getArchivedActivityDataInstances(final long activityInstanceId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId).getLogicalGroup(processDefinitionIndex);
+            final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
+            Thread.currentThread().setContextClassLoader(processClassLoader);
+
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), startIndex, maxResults);
             return ModelConvertor.toArchivedDataInstances(dataInstances);
-        } catch (final SDataInstanceException sdie) {
-            throw new RetrieveException(sdie);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
 
