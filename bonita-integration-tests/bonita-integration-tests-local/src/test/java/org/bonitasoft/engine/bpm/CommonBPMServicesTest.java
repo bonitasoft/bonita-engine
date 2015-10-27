@@ -162,7 +162,7 @@ public class CommonBPMServicesTest {
     @Before
     public void doNotOverrideBefore() throws Exception {
         tenantServiceAccessors = new HashMap<>();
-        APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+        apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         tenantId = apiSession.getTenantId();
         if (sessionAccessor == null) {
             sessionAccessor = getServiceAccessorFactory().createSessionAccessor();

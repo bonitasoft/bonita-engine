@@ -91,6 +91,7 @@ public class TestEngineImpl implements TestEngine {
         }
     }
 
+
     private synchronized void doStop() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, InterruptedException {
         LOGGER.info("=====================================================");
         LOGGER.info("============ CLEANING OF TEST ENVIRONMENT ===========");
@@ -111,6 +112,9 @@ public class TestEngineImpl implements TestEngine {
             }
             final File outputFolder = new File(BONITA_HOME_DEFAULT_PATH);
             LOGGER.info("No bonita home specified using: " + outputFolder.getAbsolutePath());
+            if(outputFolder.exists()){
+                FileUtils.deleteDirectory(outputFolder);
+            }
             outputFolder.mkdir();
             IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
             System.setProperty(BONITA_HOME_PROPERTY, outputFolder.getAbsolutePath() + "/bonita-home");
@@ -299,7 +303,8 @@ public class TestEngineImpl implements TestEngine {
         }
         final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown", "surefire-forkedjvm");
+                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown", "surefire-forkedjvm",
+                "Restlet");
         for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
                 return true;

@@ -34,6 +34,8 @@ import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.TestEngine;
+import org.bonitasoft.engine.test.annotation.Engine;
 import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -44,6 +46,9 @@ public abstract class CommonAPIIT extends APITestUtil {
 
     @Rule
     public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.create();
+
+    @Engine
+    public TestEngine testEngine;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPIIT.class);
 
