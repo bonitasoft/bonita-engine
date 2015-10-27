@@ -1536,7 +1536,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // Create the second tenant, and login on
         final long tenant2Id = BPMTestSPUtil.createAndActivateTenantWithDefaultTechnicalLogger("Tenant 2");
 
-        loginOnTenantWithTechnicalLogger(tenant2Id);
+        loginOnTenantWithTechnicalUser(tenant2Id);
         final User userForTenant2 = createUser(USERNAME, PASSWORD);
         loginOnTenantWith(USERNAME, PASSWORD, tenant2Id);
         final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActorAndTestConnector2(designProcessDefinition, ACTOR_NAME, userForTenant2);

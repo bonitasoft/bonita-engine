@@ -52,7 +52,7 @@ public abstract class CommonAPISPIT extends APITestSPUtil {
         BPMTestSPUtil.logoutOnPlatform(platformSession);
 
         for (final Tenant tenant : tenants) {
-            loginOnTenantWithTechnicalLogger(tenant.getId());
+            loginOnTenantWithTechnicalUser(tenant.getId());
             if (getTenantAdministrationAPI().isPaused()) {
                 messages.add("Tenant was in paused state");
                 getTenantAdministrationAPI().resume();
