@@ -65,16 +65,11 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public static final String PROCESS_INFOS_FILE = "process-infos.txt";
 
-    private final Marshaller marshaller;
-
-    private final Unmarshaller unmarshaller;
+    private final JAXBContext jaxbContext;
 
     public ProcessDefinitionBARContribution() {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
-            marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            unmarshaller = jaxbContext.createUnmarshaller();
+            jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -112,6 +107,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
         try {
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             Object deserializedObject = unmarshaller.unmarshal(file);
             if (!(deserializedObject instanceof DesignProcessDefinition)) {
                 throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + deserializedObject);
@@ -153,6 +149,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
         StringWriter result = new StringWriter();
         try {
+            Marshaller marshaller = getMarshaller();
             marshaller.marshal(processDefinition, result);
             try (FileOutputStream outputStream = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML))) {
                 outputStream.write(result.toString().getBytes());
@@ -167,6 +164,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     public String convertProcessToXml(DesignProcessDefinition processDefinition) throws IOException {
         final StringWriter writer = new StringWriter();
         try {
+            Marshaller marshaller = getMarshaller();
             marshaller.marshal(processDefinition, writer);
         } catch (JAXBException e) {
             throw new IOException(e);
@@ -174,9 +172,16 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         return writer.toString();
     }
 
+    protected Marshaller getMarshaller() throws JAXBException {
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        return marshaller;
+    }
+
     public DesignProcessDefinition convertXmlToProcess(String content) throws IOException, XMLParseException {
         try (InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
 
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             DesignProcessDefinition process = (DesignProcessDefinition) unmarshaller.unmarshal(stream);
             if (process.getActorInitiator() != null) {
                 process.getActorInitiator().setInitiator(true);
