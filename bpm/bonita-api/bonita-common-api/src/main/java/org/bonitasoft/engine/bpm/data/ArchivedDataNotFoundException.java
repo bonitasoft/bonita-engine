@@ -38,4 +38,7 @@ public class ArchivedDataNotFoundException extends NotFoundException {
         super(cause);
     }
 
+    public ArchivedDataNotFoundException(String message) {
+        super(message);
+    }
 }

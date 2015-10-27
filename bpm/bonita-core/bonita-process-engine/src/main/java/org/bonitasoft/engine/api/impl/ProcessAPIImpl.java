@@ -5621,7 +5621,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long processDefinitionId = processInstanceService.getLastArchivedProcessInstance(processInstanceId).getProcessDefinitionId();
+            final SAProcessInstance lastArchivedProcessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
+            if (lastArchivedProcessInstance == null) {
+                throw new ArchivedDataNotFoundException("Archived process instance not found: " + processInstanceId);
+            }
+            final long processDefinitionId = lastArchivedProcessInstance.getProcessDefinitionId();
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, processInstanceId,
@@ -5646,7 +5650,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
+            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
@@ -5669,7 +5673,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long processDefinitionId = processInstanceService.getLastArchivedProcessInstance(processInstanceId).getProcessDefinitionId();
+            final SAProcessInstance lastArchivedProcessInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
+            if (lastArchivedProcessInstance == null) {
+                throw new RetrieveException("Archived process instance not found: " + processInstanceId);
+            }
+            final long processDefinitionId = lastArchivedProcessInstance.getProcessDefinitionId();
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(processInstanceId,
@@ -5691,7 +5699,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
+            final long parentProcessInstanceId = activityInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
 
