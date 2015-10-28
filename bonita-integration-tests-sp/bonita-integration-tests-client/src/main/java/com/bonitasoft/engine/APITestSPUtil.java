@@ -193,8 +193,8 @@ public class APITestSPUtil extends APITestUtil {
         setAPIs();
     }
 
-    protected void loginOnTenantWithTechnicalLogger(final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId));
+    protected void loginOnTenantWithTechnicalUser(final long tenantId) throws BonitaException {
+        setSession(BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId));
         setAPIs();
     }
 

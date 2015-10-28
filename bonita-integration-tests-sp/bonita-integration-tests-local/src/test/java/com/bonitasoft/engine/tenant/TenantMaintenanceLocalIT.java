@@ -47,7 +47,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPIT {
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
         // given: 1 tenant that is paused
         final long tenantId = createAndActivateTenant("MyTenant_");
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
 
         WorkService workService = getTenantAccessor(tenantId).getWorkService();
         assertFalse(workService.isStopped());
@@ -61,7 +61,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPIT {
         getProcessAPI().startProcess(pd.getId());
         logoutOnTenant();
 
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
 
         getTenantManagementAPI().pause();
         assertTrue(workService.isStopped());
@@ -75,7 +75,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPIT {
         assertTrue(workService.isStopped());
 
         // cleanup
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
         getTenantManagementAPI().resume();
         logoutThenloginAs(USERNAME, PASSWORD);
         disableAndDeleteProcess(pd);
