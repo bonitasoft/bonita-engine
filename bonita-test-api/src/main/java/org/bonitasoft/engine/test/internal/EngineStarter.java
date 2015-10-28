@@ -7,7 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.naming.Context;
 
@@ -45,6 +47,8 @@ public class EngineStarter {
     private Object h2Server;
     private static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
+    private Map<String,byte[]> overridenConfiguration = new HashMap<>();
+
     public void start() throws Exception {
         LOGGER.info("=====================================================");
         LOGGER.info("============  Starting Bonita BPM Engine  ===========");
@@ -58,7 +62,7 @@ public class EngineStarter {
     //--------------  engine life cycle methods
 
     protected String prepareBonitaHome() throws IOException {
-        final String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
+        String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
         if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
             final InputStream bonitaHomeIS = this.getClass().getResourceAsStream("/bonita-home.zip");
             if (bonitaHomeIS == null) {
@@ -71,9 +75,13 @@ public class EngineStarter {
             }
             outputFolder.mkdir();
             IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
-            System.setProperty(BONITA_HOME_PROPERTY, outputFolder.getAbsolutePath() + "/bonita-home");
+            bonitaHomePath = outputFolder.getAbsolutePath() + "/bonita-home";
+            for (Map.Entry<String, byte[]> customConfig : overridenConfiguration.entrySet()) {
+                IOUtil.write(new File(bonitaHomePath,customConfig.getKey()),customConfig.getValue());
+            }
+            System.setProperty(BONITA_HOME_PROPERTY, bonitaHomePath);
         }
-        return System.getProperty(BONITA_HOME_PROPERTY);
+        return bonitaHomePath;
     }
 
     protected void prepareEnvironment()
@@ -372,5 +380,9 @@ public class EngineStarter {
 
         shutdown();
         checkThreadsAreStopped();
+    }
+
+    public void overrideConfiguration(String path, byte[] file) {
+        overridenConfiguration.put(path,file);
     }
 }

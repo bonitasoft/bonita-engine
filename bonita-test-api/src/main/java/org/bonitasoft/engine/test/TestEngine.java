@@ -12,4 +12,6 @@ public interface TestEngine {
     void stop() throws Exception;
 
     void clearData() throws Exception;
+
+    void overrideConfiguration(String path, byte[] file);
 }

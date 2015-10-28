@@ -1,7 +1,10 @@
 package org.bonitasoft.engine.test.junit;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.test.TestEngine;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.test.annotation.Engine;
@@ -10,31 +13,42 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
- *
- *
- *
  * @author Baptiste Mesta
  */
 public class BonitaEngineRule implements MethodRule {
 
+    public static String CUSTOM_CONFIG_PLATFORM_INIT = "engine-server/conf/platform-init/bonita-platform-init-custom.xml";
+    public static String CUSTOM_CONFIG_PLATFORM = "engine-server/conf/platform/bonita-platform-custom.xml";
+    public static String CUSTOM_CONFIG_TENANT = "engine-server/conf/tenants/template/bonita-tenants-custom.xml";
+
     private TestEngine testEngine;
     private boolean cleanAfterTest;
 
-    protected BonitaEngineRule(TestEngine testEngine){
+    protected BonitaEngineRule(TestEngine testEngine) {
         this.testEngine = testEngine;
     }
 
-    public static BonitaEngineRule create(){
+    public static BonitaEngineRule create() {
         return new BonitaEngineRule(TestEngineImpl.getInstance());
     }
 
-    public static BonitaEngineRule createWith(TestEngine testEngine){
+    public static BonitaEngineRule createWith(TestEngine testEngine) {
         return new BonitaEngineRule(testEngine);
     }
 
 
-    public BonitaEngineRule withCleanAfterTest(){
+    public BonitaEngineRule withCleanAfterTest() {
         cleanAfterTest = true;
+        return this;
+    }
+
+    public BonitaEngineRule addCustomConfig(String path, String file) {
+        try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file)) {
+            final byte[] bytes = IOUtils.toByteArray(resourceAsStream);
+            testEngine.overrideConfiguration(path,bytes);
+        } catch (IOException e) {
+            throw new IllegalStateException("error while fetching the custom configuration", e);
+        }
         return this;
     }
 
@@ -47,7 +61,7 @@ public class BonitaEngineRule implements MethodRule {
             throw new IllegalStateException(e);
         }
         Statement newStatement = new WithTestEngine(statement, getTestEngine());
-        if(cleanAfterTest){
+        if (cleanAfterTest) {
             newStatement = new WithCleanAfterTest(newStatement, getTestEngine());
         }
         return newStatement;
@@ -55,15 +69,16 @@ public class BonitaEngineRule implements MethodRule {
 
     private void handleFieldsAnnotations(Object target) throws IllegalAccessException {
         for (Field field : target.getClass().getFields()) {
-            handleFieldsAnnotation(field,target);
+            handleFieldsAnnotation(field, target);
         }
     }
 
     private void handleFieldsAnnotation(Field field, Object target) throws IllegalAccessException {
-        if(field.getAnnotation(Engine.class) != null){
-            field.set(target,testEngine);
+        if (field.getAnnotation(Engine.class) != null) {
+            field.set(target, testEngine);
         }
     }
+
 
     private static class WithTestEngine extends Statement {
         private Statement statement;
@@ -82,7 +97,7 @@ public class BonitaEngineRule implements MethodRule {
 
         private void startEngine() throws Exception {
             final boolean start = testEngine.start();
-            if(start){
+            if (start) {
                 Runtime.getRuntime().addShutdownHook(new Thread() {
                     public void run() {
                         try {

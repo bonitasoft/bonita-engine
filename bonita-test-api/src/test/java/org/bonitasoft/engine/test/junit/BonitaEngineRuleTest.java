@@ -51,5 +51,10 @@ public class BonitaEngineRuleTest {
         public void clearData() throws Exception {
 
         }
+
+        @Override
+        public void overrideConfiguration(String path, byte[] file) {
+
+        }
     }
 }

@@ -40,7 +40,6 @@ import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,10 +49,6 @@ public class TenantTest extends CommonBPMServicesTest {
     private ReadPersistenceService persistenceService;
     private Recorder recorder;
 
-    public TenantTest() {
-        persistenceService = getTenantAccessor().getReadPersistenceService();
-        recorder = getTenantAccessor().getRecorder();
-    }
 
     @After
     public void after() throws SBonitaException {
@@ -66,7 +61,8 @@ public class TenantTest extends CommonBPMServicesTest {
 
     @Before
     public void before() throws SBonitaException {
-
+        persistenceService = getTenantAccessor().getReadPersistenceService();
+        recorder = getTenantAccessor().getRecorder();
     }
 
     @Test

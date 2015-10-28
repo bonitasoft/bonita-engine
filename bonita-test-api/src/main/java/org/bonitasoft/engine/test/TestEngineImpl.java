@@ -81,5 +81,10 @@ public class TestEngineImpl implements TestEngine {
         engineCommander.clearData();
     }
 
+    @Override
+    public void overrideConfiguration(String path, byte[] file) {
+        engineStarter.overrideConfiguration(path, file);
+    }
+
 
 }
