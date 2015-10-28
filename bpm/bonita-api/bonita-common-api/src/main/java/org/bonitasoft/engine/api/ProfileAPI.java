@@ -25,6 +25,7 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
@@ -99,16 +100,20 @@ public interface ProfileAPI {
     List<Profile> getProfilesForUser(long userId, int startIndex, int maxResults, ProfileCriterion criterion);
 
     /**
-     * Searches profiles according to the criteria containing in the options.
-     *
+     * Searches for {@link Profile}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileSearchDescriptor} to
+     * know the available filters.
+     * 
      * @param options
      *        The search criteria
-     * @return the search result
+     * @return a {@link SearchResult} containing the list of {@code Profile}s matching the search criteria.
      * @throws SearchException
      *         If an exception occurs during the profile searching
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @see Profile
+     * @see org.bonitasoft.engine.profile.ProfileSearchDescriptor
+     * @see SearchResult
      */
     SearchResult<Profile> searchProfiles(SearchOptions options) throws SearchException;
 
@@ -117,6 +122,7 @@ public interface ProfileAPI {
      * <p>
      * If a profile does not exists, no exception is thrown and no value is added in the map.
      * </p>
+     * 
      * @param profileIds
      *        The identifiers of the profiles
      * @return the number of profile members for the profiles
@@ -129,32 +135,40 @@ public interface ProfileAPI {
     Map<Long, Long> getNumberOfProfileMembers(List<Long> profileIds);
 
     /**
-     * Searches profile members according to the criteria containing in the options.
+     * Searches for {@link ProfileMember}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor} to
+     * know the available filters.
      *
      * @param memberType
      *        The member type, it can be: user, role, group, roleAndGroup.
      * @param options
      *        The search criteria
-     * @return the search result
+     * @return a {@link SearchResult} containing the list of {@code ProfileMember}s matching the search criteria.
      * @throws SearchException
      *         If an exception occurs during the profile searching
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @see ProfileMember
+     * @see org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor
+     * @see SearchResult
      */
     SearchResult<ProfileMember> searchProfileMembers(String memberType, SearchOptions options) throws SearchException;
 
     /**
-     * Searches profile entries according to the criteria containing in the options.
+     * Searches for {@link ProfileEntry}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor} to
+     * know the available filters.
      *
      * @param options
-     *        The search criteria
-     * @return the search result
+     *        The search criteria.
+     * @return a {@link SearchResult} containing the list of {@code ProfileEntry}s matching the search criteria.
      * @throws SearchException
      *         If an exception occurs during the profile searching
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
+     * @see ProfileEntry
+     * @see ProfileEntrySearchDescriptor
+     * @see SearchResult
      */
     SearchResult<ProfileEntry> searchProfileEntries(SearchOptions options) throws SearchException;
 
@@ -212,6 +226,7 @@ public interface ProfileAPI {
      * <p>
      * It takes the values of the creator in order to create the profile member.
      * </p>
+     * 
      * @param creator
      *        The profile member to create
      * @return the created profile member

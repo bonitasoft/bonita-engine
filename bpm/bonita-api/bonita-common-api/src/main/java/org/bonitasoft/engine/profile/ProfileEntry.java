@@ -15,6 +15,7 @@ package org.bonitasoft.engine.profile;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.page.Page;
 
 /**
  * A <code>ProfileEntry</code> represents a menu entry (inside the main top menu bar) in the Bonita BPM Portal. It can be a container (that contains other
@@ -27,40 +28,50 @@ import org.bonitasoft.engine.bpm.NamedElement;
 public interface ProfileEntry extends NamedElement, BaseElement {
 
     /**
-     * @return the ID of the parent ProfileEntry.
+     * Retrieves the identifier of the parent {@code ProfileEntry}.
+     * 
+     * @return the identifier of the parent {@code ProfileEntry}.
      */
     long getParentId();
 
     /**
-     * @return the ID of the profile that this profile entry belongs to.
+     * Retrieves the identifier of the related {@link Profile}
+     * 
+     * @return the identifier of the related {@code Profile}
      */
     long getProfileId();
 
     /**
-     * The order of the profile entry in its context (at root level or inside its parent profile entry).
+     * Retrieves the order of the profile entry in its context (at root level or inside its parent profile entry).
      * 
      * @return the index of the profile entry.
      */
     long getIndex();
 
     /**
-     * @return the description of the <code>ProfileEntry</code>, that can be used to describe the link of containing folder it represents, according to its
-     *         type.
+     * Retrieves the {@code ProfileEntry} description, that can be used to describe the link of containing folder it represents, according to its type.
+     * 
+     * @return the {@code ProfileEntry} description
      */
     String getDescription();
 
     /**
-     * @return the type of the profile entry. It can be container (folder), or link to a real page.
+     * Retrieves the {@code ProfileEntry} type. It can be container (folder), or link to a real page.
+     * @return  the {@code ProfileEntry} type
      */
     String getType();
 
     /**
-     * @return a unique reference to a page in the portal.
+     * Retrieves the unique name of the page referenced by this {@code ProfileEntry}. It can be a portal page or a custom {@link org.bonitasoft.engine.page.Page}.
+     * @return the unique name of the page referenced by this {@code ProfileEntry}
+     * @see Page#getName()
      */
     String getPage();
 
     /**
-     * @return true if this entry reference a custom page
+     * Determines if the referenced page is a custom {@link Page}.
+     * @return true if this {@code ProfileEntry} references a custom {@link Page}; false if it references a portal page.
+     * @see Page
      */
     boolean isCustom();
 
