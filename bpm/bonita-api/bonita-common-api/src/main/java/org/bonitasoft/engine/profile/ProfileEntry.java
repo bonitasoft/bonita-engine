@@ -49,7 +49,7 @@ public interface ProfileEntry extends NamedElement, BaseElement {
     long getIndex();
 
     /**
-     * Retrieves the {@code ProfileEntry} description, that can be used to describe the link of containing folder it represents, according to its type.
+     * Retrieves the {@code ProfileEntry} description, that can be used to describe the link of the containing folder it represents, according to its type.
      * 
      * @return the {@code ProfileEntry} description
      */

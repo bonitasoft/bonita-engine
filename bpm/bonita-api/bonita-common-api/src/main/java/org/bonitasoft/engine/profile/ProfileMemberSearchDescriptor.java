@@ -34,7 +34,7 @@ public final class ProfileMemberSearchDescriptor {
     public static final String ID = "id";
 
     /**
-     * Used to filter or order by the identifier of related {@link Profile}
+     * Used to filter or order by the identifier of the related {@link Profile}
      *
      * @see Profile
      * @see ProfileMember

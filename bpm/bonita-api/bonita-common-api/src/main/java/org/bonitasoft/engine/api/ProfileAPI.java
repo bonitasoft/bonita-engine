@@ -120,7 +120,7 @@ public interface ProfileAPI {
     /**
      * Retrieves the number of profile members for the profiles. The map contains the couples profileId/numberOfProfileMembers.
      * <p>
-     * If a profile does not exists, no exception is thrown and no value is added in the map.
+     * If a profile does not exist, no exception is thrown and no value is added in the map.
      * </p>
      * 
      * @param profileIds
