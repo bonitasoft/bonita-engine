@@ -21,27 +21,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecificStatesStrategy;
-import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
-import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
-import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
-import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
-import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
-import com.bonitasoft.engine.bpm.process.Index;
-import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.businessdata.BusinessDataReference;
-import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
-import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
-import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
-import com.bonitasoft.manager.Features;
 import org.bonitasoft.engine.api.impl.DocumentAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
@@ -138,7 +117,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.parameter.ParameterService;
-import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -155,6 +134,28 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
+
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecificStatesStrategy;
+import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
+import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
+import com.bonitasoft.engine.bpm.process.Index;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
@@ -183,27 +184,27 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition;
-            final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-            try {
-                sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
-                throw new ImportParameterException(e);
-            }
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        try {
+            sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
+            throw new ImportParameterException(e);
+        }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final Set<SParameterDefinition> params = sDefinition.getParameters();
         final Map<String, String> defaultParameterValues = new HashMap<String, String>();
 
         if (parameters != null) {
-            final Properties property = new Properties();
+            final Properties properties = new Properties();
             try {
-                property.load(new ByteArrayInputStream(parameters));
+                properties.load(new ByteArrayInputStream(parameters));
             } catch (final IOException e1) {
                 throw new ImportParameterException(e1);
             }
 
-            for (final Map.Entry<Object, Object> entry : property.entrySet()) {
-                defaultParameterValues.put(entry.getKey().toString(), entry.getValue().toString());
+            for (final Map.Entry<Object, Object> property : properties.entrySet()) {
+                defaultParameterValues.put(property.getKey().toString(), property.getValue().toString());
             }
         }
 
@@ -241,7 +242,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
             parameterService.update(processDefinitionId, parameterName, parameterValue);
             tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SParameterProcessNotFoundException e) {
+        } catch (final SParameterNameNotFoundException e) {
             throw new ParameterNotFoundException(processDefinitionId, parameterName);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -508,7 +509,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void replayActivity(final long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException {
-        replayActivity(activityInstanceId, Collections.<Long, ConnectorStateReset>emptyMap());
+        replayActivity(activityInstanceId, Collections.<Long, ConnectorStateReset> emptyMap());
     }
 
     @Override
@@ -535,8 +536,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-
-
     @Override
     public int getNumberOfParameterInstances(final long processDefinitionId) {
         return super.getNumberOfParameterInstances(processDefinitionId);
@@ -545,7 +544,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -602,7 +601,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -662,7 +661,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -720,7 +719,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -775,7 +774,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -1081,7 +1080,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) throws ProcessDefinitionNotFoundException, UpdateException {
+    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content)
+            throws ProcessDefinitionNotFoundException, UpdateException {
         processConfigurationAPIExt.updateExpressionContent(processDefintionId, expressionDefinitionId, content);
     }
 }
