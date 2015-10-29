@@ -31,16 +31,6 @@
 				<artifactId>postgresql</artifactId>
 				<version>9.3-1102-jdbc41</version>
 			</dependency>
-			<dependency>
-				<groupId>com.oracle</groupId>
-				<artifactId>ojdbc</artifactId>
-				<version>6</version>
-			</dependency>
-			<dependency>
-				<groupId>com.microsoft.jdbc</groupId>
-				<artifactId>sqlserver</artifactId>
-				<version>4.0.2206.100</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	

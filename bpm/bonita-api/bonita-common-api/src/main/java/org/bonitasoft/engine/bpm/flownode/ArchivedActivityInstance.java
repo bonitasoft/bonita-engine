@@ -13,17 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-import java.util.Date;
-
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffote
  */
 public interface ArchivedActivityInstance extends ArchivedFlowNodeInstance {
-
-    Date getReachedStateDate();
-
-    Date getLastUpdateDate();
 
 }

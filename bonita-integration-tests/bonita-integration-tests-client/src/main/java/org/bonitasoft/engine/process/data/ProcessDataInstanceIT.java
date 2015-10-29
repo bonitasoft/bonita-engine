@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.process.data;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +29,8 @@ import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -42,6 +46,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
@@ -497,6 +502,35 @@ public class ProcessDataInstanceIT extends TestWithUser {
         assertEquals(0, archivedDataInstances.size());
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+
+    @Test
+    public void getCustomTypeDataInstance() throws Exception {
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithPlopp", "1.0");
+        processDefinitionBuilder.addActor("user").addUserTask("step1", "user").addData("myStepData", "org.bonitasoft.plop.Plopp", new ExpressionBuilder().createGroovyScriptExpression("theScript", "new org.bonitasoft.plop.Plopp()", "org.bonitasoft.plop.Plopp"));;
+        processDefinitionBuilder.addData("myData", "org.bonitasoft.plop.Plopp", new ExpressionBuilder().createGroovyScriptExpression("theScript", "new org.bonitasoft.plop.Plopp()", "org.bonitasoft.plop.Plopp"));
+        final User user = getIdentityAPI().createUser("custDataUser", "bpm");
+        businessArchiveBuilder.setProcessDefinition(processDefinitionBuilder.done());
+        businessArchiveBuilder.addClasspathResource(new BarResource("org.bonitasoft.plop.jar", IOUtil.getAllContentFrom(this.getClass().getResourceAsStream("/org.bonitasoft.plop.bak"))));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), "user", user);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1 = waitForUserTask("step1");
+
+        assertThat(getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10)).extracting("name", "className").containsOnly(tuple("myData","org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getProcessDataInstance("myData",processInstance.getId())).isNotNull();
+        assertThat(getProcessAPI().getActivityDataInstances(step1, 0, 10)).extracting("name", "className").contains(tuple("myStepData", "org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getActivityDataInstance("myStepData",step1)).isNotNull();
+        assertThat(getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10)).extracting("name", "className").containsOnly(tuple("myData","org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getArchivedProcessDataInstance("myData", processInstance.getId())).isNotNull();
+        assertThat(getProcessAPI().getArchivedActivityDataInstances(step1,0,10)).extracting("name", "className").contains(tuple("myStepData","org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getArchivedActivityDataInstance("myStepData",step1)).isNotNull();
+
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(user);
     }
 
 }

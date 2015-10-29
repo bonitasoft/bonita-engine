@@ -471,9 +471,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
             final String alias = getClassAliasMappings().get(entry.getKey().getName());
             for (final String field : entry.getValue()) {
-                final StringBuilder aliasBuilder = new StringBuilder(alias);
-                aliasBuilder.append('.').append(field);
-                fields.add(aliasBuilder.toString());
+                fields.add(alias + '.' + field);
             }
         }
         fields.removeAll(specificFilters);
@@ -556,7 +554,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         Object fieldValue = filterOption.getValue();
         if (fieldValue instanceof String) {
-            fieldValue = "'" + fieldValue + "'";
+            fieldValue = "'" + escapeString((String) fieldValue) + "'";
         } else if (fieldValue instanceof EnumToObjectConvertible) {
             fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
         }
@@ -587,14 +585,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 clause.append(getInClause(completeField, filterOption));
                 break;
             case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
-                final Object to = filterOption.getTo() instanceof String ? "'" + filterOption.getTo() + "'" : filterOption.getTo();
+                final Object from = filterOption.getFrom() instanceof String ? "'" + escapeString((String) filterOption.getFrom()) + "'" : filterOption.getFrom();
+                final Object to = filterOption.getTo() instanceof String ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
                 clause.append("(").append(from).append(" <= ").append(completeField);
                 clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
                 break;
             case LIKE:
                 // TODO:write LIKE
-                clause.append(completeField).append(" LIKE '%").append(filterOption.getValue()).append("%'");
+                clause.append(completeField).append(" LIKE '%").append(escapeTerm((String) filterOption.getValue())).append("%'");
                 break;
             case L_PARENTHESIS:
                 clause.append(" (");

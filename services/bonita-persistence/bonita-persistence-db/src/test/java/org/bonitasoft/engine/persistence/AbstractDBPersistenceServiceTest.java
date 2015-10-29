@@ -16,12 +16,10 @@ package org.bonitasoft.engine.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -280,5 +278,6 @@ public class AbstractDBPersistenceServiceTest {
 
         assertThat(persistenceService.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);
     }
+
 
 }

@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.Date;
-
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 
 /**
@@ -25,95 +23,8 @@ public abstract class ArchivedActivityInstanceImpl extends ArchivedFlowNodeInsta
 
     private static final long serialVersionUID = 2457027970594869050L;
 
-    private Date reachedStateDate;
-
-    private Date lastUpdateDate;
-
     public ArchivedActivityInstanceImpl(final String name) {
         super(name);
-    }
-
-    @Override
-    public Date getReachedStateDate() {
-        return reachedStateDate;
-    }
-
-    public void setReachedStateDate(final Date reachedStateDate) {
-        this.reachedStateDate = reachedStateDate;
-    }
-
-    @Override
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(final Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ArchivedActivityInstanceImpl [reacedStateDate=");
-        builder.append(reachedStateDate);
-        builder.append(", lastUpdateDate=");
-        builder.append(lastUpdateDate);
-        builder.append(", getId()=");
-        builder.append(getId());
-        builder.append(", getArchiveDate()=");
-        builder.append(getArchiveDate());
-        builder.append(", getState()=");
-        builder.append(getState());
-        builder.append(", getParentContainerId()=");
-        builder.append(getParentContainerId());
-        builder.append(", getRootContainerId()=");
-        builder.append(getRootContainerId());
-        builder.append(", getProcessDefinitionId()=");
-        builder.append(getProcessDefinitionId());
-        builder.append(", getProcessInstanceId()=");
-        builder.append(getProcessInstanceId());
-        builder.append(", getName()=");
-        builder.append(getName());
-        builder.append("]");
-        return builder.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
-        result = prime * result + (reachedStateDate == null ? 0 : reachedStateDate.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ArchivedActivityInstanceImpl other = (ArchivedActivityInstanceImpl) obj;
-        if (lastUpdateDate == null) {
-            if (other.lastUpdateDate != null) {
-                return false;
-            }
-        } else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
-            return false;
-        }
-        if (reachedStateDate == null) {
-            if (other.reachedStateDate != null) {
-                return false;
-            }
-        } else if (!reachedStateDate.equals(other.reachedStateDate)) {
-            return false;
-        }
-        return true;
     }
 
 }
