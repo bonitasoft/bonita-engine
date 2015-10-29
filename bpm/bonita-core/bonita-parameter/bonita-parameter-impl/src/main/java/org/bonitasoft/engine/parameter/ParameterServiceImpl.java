@@ -47,7 +47,9 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  */
 public class ParameterServiceImpl implements ParameterService {
 
+    public static final int PAGE_SIZE = 100;
     public final String PARAMETER = "PARAMETER";
+
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
     private final EventService eventService;
@@ -59,11 +61,11 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public void update(long processDefinitionId, String parameterName, String parameterValue) throws SParameterProcessNotFoundException,
-            SParameterNameNotFoundException, SBonitaReadException, SObjectModificationException {
+    public void update(long processDefinitionId, String parameterName, String parameterValue)
+            throws SParameterNameNotFoundException, SBonitaReadException, SObjectModificationException {
         final SParameter sParameter = get(processDefinitionId, parameterName);
         if (sParameter == null) {
-            throw new SParameterProcessNotFoundException("no parameter <" + parameterName + "> found in the process <" + processDefinitionId + ">");
+            throw new SParameterNameNotFoundException("no parameter <" + parameterName + "> found in the process <" + processDefinitionId + ">");
         }
         update(sParameter, parameterValue);
     }
@@ -79,7 +81,8 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public void addAll(long processDefinitionId, Map<String, String> parameters) throws SObjectCreationException, SBonitaReadException, SObjectModificationException {
+    public void addAll(long processDefinitionId, Map<String, String> parameters)
+            throws SObjectCreationException, SBonitaReadException, SObjectModificationException {
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             addOrUpdate(processDefinitionId, entry.getKey(), entry.getValue());
         }
@@ -87,16 +90,15 @@ public class ParameterServiceImpl implements ParameterService {
 
     void addOrUpdate(long processDefinitionId, String name, String value) throws SObjectCreationException, SBonitaReadException, SObjectModificationException {
         final SParameter currentParameter = get(processDefinitionId, name);
-        if(currentParameter != null){
+        if (currentParameter != null) {
             update(currentParameter, value);
-        }else{
+        } else {
             add(processDefinitionId, name, value);
         }
     }
 
     private void add(long processDefinitionId, String name, String value) throws SObjectCreationException {
         final SParameterImpl sParameter = new SParameterImpl(name, value, processDefinitionId);
-
         try {
             recorder.recordInsert(new InsertRecord(sParameter), getInsertEvent(sParameter, PARAMETER));
         } catch (SRecorderException e) {
@@ -106,17 +108,17 @@ public class ParameterServiceImpl implements ParameterService {
 
     @Override
     public Map<String, String> getAll(long processDefinitionId) throws SParameterProcessNotFoundException, SBonitaReadException {
-        Map<String,String> parameters = new HashMap<>();
+        Map<String, String> parameters = new HashMap<>();
         int fromIndex = 0;
         List<SParameter> sParameters;
         do {
-            sParameters = get(processDefinitionId, fromIndex, 100, null);
+            sParameters = get(processDefinitionId, fromIndex, PAGE_SIZE, null);
             for (SParameter sParameter : sParameters) {
-                parameters.put(sParameter.getName(),sParameter.getValue());
+                parameters.put(sParameter.getName(), sParameter.getValue());
             }
-            fromIndex += 100;
+            fromIndex += PAGE_SIZE;
 
-        } while (sParameters.size() == 100);
+        } while (sParameters.size() == PAGE_SIZE);
         return parameters;
     }
 
@@ -124,7 +126,7 @@ public class ParameterServiceImpl implements ParameterService {
     public void deleteAll(long processDefinitionId) throws SParameterProcessNotFoundException, SBonitaReadException, SObjectModificationException {
         List<SParameter> toDelete;
         do {
-            toDelete = get(processDefinitionId, 0, 100, null);
+            toDelete = get(processDefinitionId, 0, PAGE_SIZE, null);
             for (SParameter sParameter : toDelete) {
                 try {
                     recorder.recordDelete(new DeleteRecord(sParameter), getDeleteEvent(sParameter, PARAMETER));
@@ -132,14 +134,14 @@ public class ParameterServiceImpl implements ParameterService {
                     throw new SObjectModificationException(e);
                 }
             }
-        } while (toDelete.size() == 100);
+        } while (toDelete.size() == PAGE_SIZE);
     }
 
     @Override
-    public List<SParameter> get(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order) throws SParameterProcessNotFoundException,
-            SBonitaReadException {
-        return persistenceService.selectList(new SelectListDescriptor<SParameter>("getParameters", Collections.<String, Object> singletonMap(
-                "processDefinitionId", processDefinitionId), SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
+    public List<SParameter> get(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order) throws SBonitaReadException {
+        return persistenceService.selectList(
+                new SelectListDescriptor<SParameter>("getParameters", Collections.<String, Object> singletonMap("processDefinitionId", processDefinitionId),
+                        SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
     }
 
     @Override
@@ -147,14 +149,12 @@ public class ParameterServiceImpl implements ParameterService {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("processDefinitionId", processDefinitionId);
         parameters.put("name", parameterName);
-        return persistenceService.selectOne(new SelectOneDescriptor<SParameter>("getParameterByName", parameters,
-                SParameter.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<SParameter>("getParameterByName", parameters, SParameter.class));
     }
 
     @Override
     public List<SParameter> getNullValues(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order)
             throws SParameterProcessNotFoundException, SBonitaReadException {
-
         return persistenceService.selectList(new SelectListDescriptor<SParameter>("getParametersWithNullValues", Collections.<String, Object> singletonMap(
                 "processDefinitionId", processDefinitionId), SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
     }
@@ -180,7 +180,7 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public boolean containsNullValues(long processDefinitionId) throws SParameterProcessNotFoundException, SBonitaReadException {
+    public boolean containsNullValues(long processDefinitionId) throws SBonitaReadException {
         return !persistenceService.selectList(new SelectListDescriptor<SParameter>("getParametersWithNullValues", Collections.<String, Object> singletonMap(
                 "processDefinitionId", processDefinitionId), SParameter.class, new QueryOptions(0, 1000))).isEmpty();
     }
