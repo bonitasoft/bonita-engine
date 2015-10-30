@@ -59,7 +59,7 @@ public class TenantMaintenanceIT extends CommonAPISPIT {
     }
 
     private void disableAndDeleteProcess(final long tenantId, final long processDefinitionId) throws Exception {
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
         disableAndDeleteProcess(processDefinitionId);
     }
 
@@ -187,12 +187,12 @@ public class TenantMaintenanceIT extends CommonAPISPIT {
     }
 
     private void pauseTenant(final long tenantId) throws BonitaException, UpdateException {
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
         getTenantManagementAPI().pause();
     }
 
     private void resumeTenant(final long tenantId) throws BonitaException, UpdateException {
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
         getTenantManagementAPI().resume();
     }
 }

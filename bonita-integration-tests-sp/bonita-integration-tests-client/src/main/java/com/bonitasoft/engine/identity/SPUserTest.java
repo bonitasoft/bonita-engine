@@ -118,7 +118,7 @@ public class SPUserTest extends CommonAPISPIT {
     @Test
     public void aSameUserNameCanBeUseInTwoTenants() throws BonitaException {
         final long tenantId1 = BPMTestSPUtil.createAndActivateTenantWithDefaultTechnicalLogger("tenant1");
-        final APISession session1 = BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId1);
+        final APISession session1 = BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId1);
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
         final User user1 = identityAPI1.createUser(USERNAME, "bpm");
 
