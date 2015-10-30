@@ -15,10 +15,10 @@ package org.bonitasoft.engine.bpm.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,19 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.operation.model.impl.SOperationImpl;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,14 +69,22 @@ public class BPMInstancesCreatorTest {
     @Mock
     private ConnectorInstanceService connectorInstanceService;
 
+    @Mock
+    private GatewayInstanceService gatewayInstanceService;
+
+    @Mock
+    private ActivityInstanceService activityInstanceService;
+
+    @Mock
+    private FlowNodeStateManager flowNodeStateManager;
+
     @Spy
     @InjectMocks
     private BPMInstancesCreator bpmInstancesCreator;
 
-
     @Before
-    public void setUp() {
-
+    public void setupClass() {
+        bpmInstancesCreator.setStateManager(flowNodeStateManager);
     }
 
     @Test
@@ -74,8 +94,8 @@ public class BPMInstancesCreatorTest {
 
         bpmInstancesCreator.createConnectorInstances(container, connectors, SConnectorInstance.FLOWNODE_TYPE);
 
-        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class),eq(0));
-        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class),eq(1));
+        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class), eq(0));
+        verify(bpmInstancesCreator).createConnectorInstanceObject(any(PersistentObject.class), anyString(), any(SConnectorDefinition.class), eq(1));
     }
 
     @Test
@@ -103,9 +123,34 @@ public class BPMInstancesCreatorTest {
     private List<SConnectorDefinition> getConnectorList() {
         final SConnectorDefinition connector1 = mock(SConnectorDefinition.class);
         final SConnectorDefinition connector2 = mock(SConnectorDefinition.class);
-        final List<SConnectorDefinition> connectors = new ArrayList<SConnectorDefinition>(2);
+        final List<SConnectorDefinition> connectors = new ArrayList<>(2);
         connectors.add(connector1);
         connectors.add(connector2);
         return connectors;
+    }
+
+    @Test
+    public void createManualTaskInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
+        doReturn(mock(SManualTaskInstance.class)).when(activityInstanceService).getFlowNodeInstance(anyLong());
+        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.MANUAL_TASK);
+
+        final SManualTaskInstance manualTaskInstance = bpmInstancesCreator.createManualTaskInstance(2345L, "task", 964854854L, "disp", 78L, "desc",
+                987968744446L, STaskPriority.HIGHEST);
+
+        assertThat(manualTaskInstance.getReachedStateDate()).isNotEqualTo(0L);
+        assertThat(manualTaskInstance.getLastUpdateDate()).isNotEqualTo(0L);
+    }
+
+    @Test
+    public void createFlownodeInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
+        doReturn(mock(SManualTaskInstance.class)).when(activityInstanceService).getFlowNodeInstance(anyLong());
+        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.GATEWAY);
+
+        final SGatewayInstance gatewayInstance = (SGatewayInstance) bpmInstancesCreator.createFlowNodeInstance(2345L, 999L, 888L,
+                SFlowElementsContainerType.FLOWNODE, new SGatewayDefinitionImpl(222L, "myGate", SGatewayType.EXCLUSIVE), 964854854L, 78L, true, 0,
+                SStateCategory.NORMAL, 987968744446L);
+
+        assertThat(gatewayInstance.getReachedStateDate()).isNotEqualTo(0L);
+        assertThat(gatewayInstance.getLastUpdateDate()).isNotEqualTo(0L);
     }
 }
