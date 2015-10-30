@@ -13,16 +13,38 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import org.bonitasoft.engine.search.SearchOptions;
+
 /**
+ * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for {@link Profile}s
+ * 
  * @author Julien Mege
  * @author Celine Souchet
+ * @see SearchOptions
+ * @see Profile
+ * @see org.bonitasoft.engine.api.ProfileAPI#searchProfiles(SearchOptions)
  */
 public final class ProfileSearchDescriptor {
 
+    /**
+     * Used to filter or order by the {@link Profile} identifier
+     * 
+     * @see ProfileEntry
+     */
     public static final String ID = "id";
 
+    /**
+     * Used to filter or order by the {@link Profile} name
+     *
+     * @see ProfileEntry
+     */
     public static final String NAME = "name";
 
+    /**
+     * Used to filter or order by the flag {@link Profile#isDefault()}
+     *
+     * @see ProfileEntry
+     */
     public static final String IS_DEFAULT = "isDefault";
 
 }

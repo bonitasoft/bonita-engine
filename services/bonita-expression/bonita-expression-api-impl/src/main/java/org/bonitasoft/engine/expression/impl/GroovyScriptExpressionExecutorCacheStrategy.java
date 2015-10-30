@@ -142,7 +142,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script : " + expression, e,
                     expressionName);
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
+            //catch throwable because we do not handle contents of scripts
             String message = e.getMessage();
             if (message == null || message.isEmpty()) {
                 message = "No message";

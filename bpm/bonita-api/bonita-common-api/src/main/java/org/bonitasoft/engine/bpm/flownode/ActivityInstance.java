@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-import java.util.Date;
-
 /**
  * Corresponding to a instance of {@link ActivityDefinition}.
  * 
@@ -23,15 +21,5 @@ import java.util.Date;
  * @author Celine Souchet
  */
 public interface ActivityInstance extends FlowNodeInstance {
-
-    /**
-     * @return The date when the activity instance reached its state ({@link ActivityInstance#getState()})
-     */
-    Date getReachedStateDate();
-
-    /**
-     * @return The last date when the activity instance was updated
-     */
-    Date getLastUpdateDate();
 
 }

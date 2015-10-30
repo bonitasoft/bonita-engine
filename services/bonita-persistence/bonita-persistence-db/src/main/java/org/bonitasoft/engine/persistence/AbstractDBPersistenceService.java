@@ -13,18 +13,13 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -224,9 +219,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
                 + getLikeEscapeCharacter() + "'";
     }
 
-    /**
-     * @param term
-     * @return
+    /*
+     *  escape for like
      */
     protected String escapeTerm(final String term) {
         // 1) escape ' character by adding another ' character
@@ -238,6 +232,14 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
                 .replaceAll(getLikeEscapeCharacter(), getLikeEscapeCharacter() + getLikeEscapeCharacter())
                 .replaceAll("%", getLikeEscapeCharacter() + "%")
                 .replaceAll("_", getLikeEscapeCharacter() + "_");
+    }
+    /*
+     *  escape for other things than like
+     */
+    protected String escapeString(final String term) {
+        // 1) escape ' character by adding another ' character
+        return term
+                .replaceAll("'", "''");
     }
 
     protected String getLikeEscapeCharacter() {

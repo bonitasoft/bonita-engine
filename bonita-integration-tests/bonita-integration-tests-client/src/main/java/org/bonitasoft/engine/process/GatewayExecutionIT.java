@@ -74,13 +74,13 @@ public class GatewayExecutionIT extends TestWithUser {
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addUserTask("step3", ACTOR_NAME);
         builder.addUserTask("step4", ACTOR_NAME);
-        builder.addGateway("gatewayOne", GatewayType.INCLUSIVE)
+        builder.addGateway("d'stàp", GatewayType.INCLUSIVE)
                 .addDisplayDescriptionAfterCompletion(new ExpressionBuilder().createConstantStringExpression("description after completion"))
                 .addDisplayName(new ExpressionBuilder().createConstantStringExpression("display name"));
-        builder.addTransition("step1", "gatewayOne");
-        builder.addTransition("gatewayOne", "step2", falseExpression);
-        builder.addTransition("gatewayOne", "step3", falseExpression)
-                .addDefaultTransition("gatewayOne", "step4");
+        builder.addTransition("step1", "d'stàp");
+        builder.addTransition("d'stàp", "step2", falseExpression);
+        builder.addTransition("d'stàp", "step3", falseExpression)
+                .addDefaultTransition("d'stàp", "step4");
         final DesignProcessDefinition designProcessDefinition = builder.getProcess();
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
@@ -96,7 +96,7 @@ public class GatewayExecutionIT extends TestWithUser {
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 10);
         builder0.filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
         builder0.filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
-        builder0.filter(FlowNodeInstanceSearchDescriptor.NAME, "gatewayOne");
+        builder0.filter(FlowNodeInstanceSearchDescriptor.NAME, "d'stàp");
         final SearchResult<FlowNodeInstance> searchResult0 = getProcessAPI().searchFlowNodeInstances(builder0.done());
         assertEquals(0, searchResult0.getCount());
 
@@ -112,7 +112,7 @@ public class GatewayExecutionIT extends TestWithUser {
         builder1 = new SearchOptionsBuilder(0, 10);
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, "gate");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
-        builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "gatewayOne");
+        builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "d'stàp");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
         final ArchivedFlowNodeInstance gatewayOne = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done()).getResult().get(0);
         // we expect all normal gateway states to be archived:

@@ -98,7 +98,6 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedActivityInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedAutomaticTaskInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedCallActivityInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ArchivedFlowNodeInstanceImpl;
@@ -361,6 +360,8 @@ public class ModelConvertor {
         flowNode.setExecutedBy(sflowNode.getExecutedBy());
         flowNode.setExecutedBySubstitute(sflowNode.getExecutedBySubstitute());
         flowNode.setStateCategory(StateCategory.valueOf(sflowNode.getStateCategory().name()));
+        flowNode.setReachedSateDate(new Date(sflowNode.getReachedStateDate()));
+        flowNode.setLastUpdateDate(new Date(sflowNode.getLastUpdateDate()));
     }
 
     public static ActivityInstance toActivityInstance(final SActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager) {
@@ -460,11 +461,11 @@ public class ModelConvertor {
         return gatewayInstance;
     }
 
-    public static ArchivedGatewayInstance toArchivedGatewayInstance(final SAGatewayInstance saGatewayInstance, final FlowNodeStateManager flowNodeStateManager) {
+    public static ArchivedGatewayInstance toArchivedGatewayInstance(final SAGatewayInstance saGatewayInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
         final String name = saGatewayInstance.getName();
         final ArchivedGatewayInstanceImpl aGatewayInstance = new ArchivedGatewayInstanceImpl(name);
-        final String state = flowNodeStateManager.getState(saGatewayInstance.getStateId()).getName();
-        updateArchivedFlowNodeInstance(aGatewayInstance, saGatewayInstance, state);
+        updateArchivedFlowNodeInstance(aGatewayInstance, saGatewayInstance, flowNodeStateManager.getState(saGatewayInstance.getStateId()).getName());
         return aGatewayInstance;
     }
 
@@ -472,8 +473,6 @@ public class ModelConvertor {
             final ActivityInstanceImpl activity) {
         final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
         updateFlowNode(activity, sActivity, state);
-        activity.setReachedSateDate(new Date(sActivity.getReachedStateDate()));
-        activity.setLastUpdateDate(new Date(sActivity.getLastUpdateDate()));
     }
 
     public static List<UserTaskInstance> toUserTaskInstances(final List<SUserTaskInstance> sUserTasks, final FlowNodeStateManager flowNodeStateManager) {
@@ -486,7 +485,8 @@ public class ModelConvertor {
     }
 
     public static UserTaskInstance toUserTaskInstance(final SUserTaskInstance sUserTask, final FlowNodeStateManager flowNodeStateManager) {
-        final UserTaskInstanceImpl userTaskInstance = new UserTaskInstanceImpl(sUserTask.getName(), sUserTask.getFlowNodeDefinitionId(), sUserTask.getActorId());
+        final UserTaskInstanceImpl userTaskInstance = new UserTaskInstanceImpl(sUserTask.getName(), sUserTask.getFlowNodeDefinitionId(),
+                sUserTask.getActorId());
         updateHumanTaskInstance(sUserTask, flowNodeStateManager, userTaskInstance);
         return userTaskInstance;
     }
@@ -628,7 +628,8 @@ public class ModelConvertor {
                 processDefinitionDI.getVersion(), processDefinitionDI.getDescription(), new Date(processDefinitionDI.getDeploymentDate()),
                 processDefinitionDI.getDeployedBy(), ActivationState.valueOf(processDefinitionDI.getActivationState()),
                 ConfigurationState.valueOf(processDefinitionDI.getConfigurationState()), processDefinitionDI.getDisplayName(), new Date(
-                        processDefinitionDI.getLastUpdateDate()), processDefinitionDI.getIconPath(), processDefinitionDI.getDisplayDescription());
+                        processDefinitionDI.getLastUpdateDate()),
+                processDefinitionDI.getIconPath(), processDefinitionDI.getDisplayDescription());
     }
 
     public static Map<Long, ProcessDeploymentInfo> toProcessDeploymentInfos(final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos) {
@@ -645,29 +646,28 @@ public class ModelConvertor {
 
     public static ArchivedUserTaskInstance toArchivedUserTaskInstance(final SAUserTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedUserTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedUserTaskInstanceImpl(sInstance.getName());
-        updateArchivedHumanTaskInstance(archivedUserTaskInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedUserTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        updateArchivedHumanTaskInstance(archivedUserTaskInstanceImpl, sInstance);
         return archivedUserTaskInstanceImpl;
     }
 
     public static ArchivedReceiveTaskInstance toArchivedReceiveTaskInstance(final SAReceiveTaskInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedReceiveTaskInstanceImpl archivedReceiveTaskInstanceImpl = new ArchivedReceiveTaskInstanceImpl(sInstance.getName());
-        updateArchivedReceiveTaskInstance(archivedReceiveTaskInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedReceiveTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedReceiveTaskInstanceImpl;
     }
 
     public static ArchivedSendTaskInstance toArchivedSendTaskInstance(final SASendTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedSendTaskInstanceImpl archivedSendTaskInstanceImpl = new ArchivedSendTaskInstanceImpl(sInstance.getName());
-        updateArchivedSendTaskInstance(archivedSendTaskInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedSendTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedSendTaskInstanceImpl;
     }
 
     /**
      * Update the fields of ArchivedHumanTaskInstance from a SAHumanTaskInstance
      */
-    private static void updateArchivedHumanTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SAHumanTaskInstance saHumanTask) {
-        updateArchivedActivityInstance(activity, flowNodeStateManager, saHumanTask);
+    private static void updateArchivedHumanTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final SAHumanTaskInstance saHumanTask) {
         activity.setAssigneeId(saHumanTask.getAssigneeId());
         activity.setPriority(TaskPriority.valueOf(saHumanTask.getPriority().name()));
         activity.setActorId(saHumanTask.getActorId());
@@ -677,39 +677,6 @@ public class ModelConvertor {
         if (saHumanTask.getClaimedDate() > 0) {
             activity.setClaimedDate(new Date(saHumanTask.getClaimedDate()));
         }
-    }
-
-    /**
-     * Update the fields of ArchivednTaskInstance from a SAActivityInstance
-     */
-    private static void updateArchivedReceiveTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SAReceiveTaskInstance sActivity) {
-        final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
-        updateArchivedFlowNodeInstance(activity, sActivity, state);
-        activity.setReachedStateDate(new Date(sActivity.getReachedStateDate()));
-        activity.setLastUpdateDate(new Date(sActivity.getLastUpdateDate()));
-    }
-
-    /**
-     * Update the fields of ArchivednTaskInstance from a SAActivityInstance
-     */
-    private static void updateArchivedSendTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SASendTaskInstance sActivity) {
-        final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
-        updateArchivedFlowNodeInstance(activity, sActivity, state);
-        activity.setReachedStateDate(new Date(sActivity.getReachedStateDate()));
-        activity.setLastUpdateDate(new Date(sActivity.getLastUpdateDate()));
-    }
-
-    /**
-     * Update the fields of ArchivedActivityInstance from a SAActivityInstance
-     */
-    private static void updateArchivedActivityInstance(final ArchivedActivityInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SAActivityInstance sActivity) {
-        final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
-        updateArchivedFlowNodeInstance(activity, sActivity, state);
-        activity.setReachedStateDate(new Date(sActivity.getReachedStateDate()));
-        activity.setLastUpdateDate(new Date(sActivity.getLastUpdateDate()));
     }
 
     private static void updateArchivedFlowNodeInstance(final ArchivedFlowNodeInstanceImpl aFlowNode, final SAFlowNodeInstance saFlowNode, final String state) {
@@ -731,6 +698,8 @@ public class ModelConvertor {
         aFlowNode.setExecutedBySubstitute(saFlowNode.getExecutedBySubstitute());
         aFlowNode.setFlownodeDefinitionId(saFlowNode.getFlowNodeDefinitionId());
         aFlowNode.setTerminal(saFlowNode.isTerminal());
+        aFlowNode.setReachedStateDate(new Date(saFlowNode.getReachedStateDate()));
+        aFlowNode.setLastUpdateDate(new Date(saFlowNode.getLastUpdateDate()));
     }
 
     public static List<ArchivedUserTaskInstance> toArchivedUserTaskInstances(final List<SAUserTaskInstance> sInstances,
@@ -809,9 +778,9 @@ public class ModelConvertor {
     private static ArchivedLoopActivityInstance toArchivedLoopActivityInstance(final SALoopActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedLoopActivityInstanceImpl archivedloopActivityInstanceImpl = new ArchivedLoopActivityInstanceImpl(sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedloopActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         archivedloopActivityInstanceImpl.setLoopCounter(sInstance.getLoopCounter());
         archivedloopActivityInstanceImpl.setLoopMax(sInstance.getLoopMax());
-        updateArchivedActivityInstance(archivedloopActivityInstanceImpl, flowNodeStateManager, sInstance);
         return archivedloopActivityInstanceImpl;
     }
 
@@ -821,20 +790,22 @@ public class ModelConvertor {
                 sInstance.getName(), sInstance.getFlowNodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
                 sInstance.getLoopDataOutputRef(), sInstance.getDataInputItemRef(), sInstance.getDataOutputItemRef(), sInstance.getNumberOfActiveInstances(),
                 sInstance.getNumberOfCompletedInstances(), sInstance.getNumberOfTerminatedInstances(), sInstance.getLoopCardinality());
-        updateArchivedActivityInstance(archivedMultiInstanceActivityInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedMultiInstanceActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedMultiInstanceActivityInstanceImpl;
     }
 
-    public static ArchivedManualTaskInstance toArchivedManualTaskInstance(final SAManualTaskInstance sInstance, final FlowNodeStateManager flowNodeStateManager) {
-        final ArchivedManualTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedManualTaskInstanceImpl(sInstance.getName());
-        updateArchivedHumanTaskInstance(archivedUserTaskInstanceImpl, flowNodeStateManager, sInstance);
-        return archivedUserTaskInstanceImpl;
+    public static ArchivedManualTaskInstance toArchivedManualTaskInstance(final SAManualTaskInstance sInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final ArchivedManualTaskInstanceImpl archivedManualTaskInstance = new ArchivedManualTaskInstanceImpl(sInstance.getName());
+        updateArchivedFlowNodeInstance(archivedManualTaskInstance, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        updateArchivedHumanTaskInstance(archivedManualTaskInstance, sInstance);
+        return archivedManualTaskInstance;
     }
 
     public static ArchivedCallActivityInstance toArchivedCallActivityInstance(final SACallActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedCallActivityInstanceImpl archivedCallActivityInstanceImpl = new ArchivedCallActivityInstanceImpl(sInstance.getName());
-        updateArchivedActivityInstance(archivedCallActivityInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedCallActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedCallActivityInstanceImpl;
     }
 
@@ -842,15 +813,22 @@ public class ModelConvertor {
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedSubProcessActivityInstanceImpl archivedSubProcActivityInstanceImpl = new ArchivedSubProcessActivityInstanceImpl(sInstance.getName(),
                 sInstance.isTriggeredByEvent());
-        updateArchivedActivityInstance(archivedSubProcActivityInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedSubProcActivityInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedSubProcActivityInstanceImpl;
     }
 
     public static ArchivedAutomaticTaskInstance toArchivedAutomaticTaskInstance(final SAActivityInstance sInstance,
             final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedAutomaticTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedAutomaticTaskInstanceImpl(sInstance.getName());
-        updateArchivedActivityInstance(archivedUserTaskInstanceImpl, flowNodeStateManager, sInstance);
+        updateArchivedFlowNodeInstance(archivedUserTaskInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
         return archivedUserTaskInstanceImpl;
+    }
+
+    public static ArchivedGatewayInstance toArchivedGatewayInstance(final SAActivityInstance sInstance,
+            final FlowNodeStateManager flowNodeStateManager) {
+        final ArchivedGatewayInstanceImpl archGatewayInstanceImpl = new ArchivedGatewayInstanceImpl(sInstance.getName());
+        updateArchivedFlowNodeInstance(archGatewayInstanceImpl, sInstance, flowNodeStateManager.getState(sInstance.getStateId()).getName());
+        return archGatewayInstanceImpl;
     }
 
     public static List<ArchivedActivityInstance> toArchivedActivityInstances(final List<SAActivityInstance> saActivityInstances,
@@ -1778,7 +1756,8 @@ public class ModelConvertor {
                 .setRightOperand(ModelConvertor.constructSExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                                .setType(operation.getLeftOperand().getType()).done()).done();
+                                .setType(operation.getLeftOperand().getType()).done())
+                .done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -1953,7 +1932,8 @@ public class ModelConvertor {
         return connectorInstanceImpl;
     }
 
-    public static ConnectorInstanceWithFailureInfo toConnectorInstanceWithFailureInfo(final SConnectorInstanceWithFailureInfo sConnectorInstanceWithFailureInfo) {
+    public static ConnectorInstanceWithFailureInfo toConnectorInstanceWithFailureInfo(
+            final SConnectorInstanceWithFailureInfo sConnectorInstanceWithFailureInfo) {
         final ConnectorInstanceWithFailureInfoImpl connectorInstanceImpl = new ConnectorInstanceWithFailureInfoImpl(
                 sConnectorInstanceWithFailureInfo.getName(), sConnectorInstanceWithFailureInfo.getContainerId(),
                 sConnectorInstanceWithFailureInfo.getContainerType(), sConnectorInstanceWithFailureInfo.getConnectorId(),
