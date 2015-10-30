@@ -1,0 +1,16 @@
+[
+  {
+    "persistenceId": 3,
+    "persistenceId_string": "3",
+    "persistenceVersion": 0,
+    "persistenceVersion_string": "0",
+    "firstName": "Matthieu",
+    "lastName": "Chaffotte",
+    "links": [
+      {
+        "rel": "addresses",
+        "href": "/businessdata/org.bonita.pojo.BonitaEmployee/3/addresses"
+      }
+    ]
+  }
+]

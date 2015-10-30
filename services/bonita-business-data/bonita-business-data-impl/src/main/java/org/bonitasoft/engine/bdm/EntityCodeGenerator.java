@@ -13,6 +13,22 @@
  **/
 package org.bonitasoft.engine.bdm;
 
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
+
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -29,22 +45,6 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-
-import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
 
 /**
  * @author Colin PUY,
@@ -243,8 +243,7 @@ public class EntityCodeGenerator {
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) {
         if (isCollectionField(field)) {
             codeGenerator.addListSetter(entityClass, fieldVar);
-        }
-        else {
+        } else {
             codeGenerator.addSetter(entityClass, fieldVar);
         }
         final JMethod getter = codeGenerator.addGetter(entityClass, fieldVar);
@@ -261,7 +260,7 @@ public class EntityCodeGenerator {
     }
 
     private boolean isCollectionField(final Field field) {
-        if (field==null){
+        if (field == null) {
             return false;
         }
         final Boolean collection = field.isCollection();

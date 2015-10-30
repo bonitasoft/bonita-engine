@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JDefinedClass;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
 import org.assertj.core.util.FilesException;
@@ -48,9 +50,6 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JDefinedClass;
 
 public class ClientBDMCodeGeneratorTest extends CompilableCode {
 

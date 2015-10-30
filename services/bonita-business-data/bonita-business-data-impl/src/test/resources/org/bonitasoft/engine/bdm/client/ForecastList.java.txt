@@ -19,7 +19,8 @@ import javax.persistence.Version;
 @Table(name = "FORECAST")
 @NamedQueries({
     @NamedQuery(name = "Forecast.findByPersistenceId", query = "SELECT f\nFROM Forecast f\nWHERE f.persistenceId= :persistenceId\n"),
-    @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
+    @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId"),
+    @NamedQuery(name = "Forecast.count", query = "SELECT COUNT(f)\nFROM Forecast f\n")
 })
 public class Forecast implements org.bonitasoft.engine.bdm.Entity
 {
