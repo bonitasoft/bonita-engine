@@ -58,14 +58,6 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.microsoft.jdbc</groupId>
-			<artifactId>sqlserver</artifactId>
-		</dependency>
 
 		<!-- Transaction -->
 		<dependency>

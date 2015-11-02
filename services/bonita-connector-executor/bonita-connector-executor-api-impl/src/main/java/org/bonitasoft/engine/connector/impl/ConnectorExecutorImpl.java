@@ -120,10 +120,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
             return getValue(submit);
-        } catch (final InterruptedException e) {
-            disconnectSilently(sConnector);
-            throw new SConnectorException(e);
-        } catch (final ExecutionException e) {
+        } catch (final InterruptedException | ExecutionException e) {
             disconnectSilently(sConnector);
             throw new SConnectorException(e);
         } catch (final TimeoutException e) {

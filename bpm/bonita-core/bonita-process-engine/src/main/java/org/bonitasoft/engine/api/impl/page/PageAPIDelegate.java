@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl.page;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +51,7 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageNotFoundException;
+import org.bonitasoft.engine.page.PageNotFoundException.PageAttribute;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.page.SInvalidPageTokenException;
@@ -172,7 +172,7 @@ public class PageAPIDelegate {
         try {
             pageService.deletePage(pageId);
             final Set<Long> processDefinitionIds = updatePageMappings(pageId);
-            for (Long processDefinitionId : processDefinitionIds) {
+            for (final Long processDefinitionId : processDefinitionIds) {
                 updateProcessResolution(processDefinitionId);
             }
         } catch (final SBonitaException e) {
@@ -188,7 +188,7 @@ public class PageAPIDelegate {
         final Set<Long> processDefinitionIds = new HashSet<>();
         do {
             formMappings = formMappingService.searchFormMappings(queryOptions);
-            for (SFormMapping formMapping : formMappings) {
+            for (final SFormMapping formMapping : formMappings) {
                 pageMappingService.update(formMapping.getPageMapping(), null);
                 processDefinitionIds.add(formMapping.getProcessDefinitionId());
             }
@@ -212,10 +212,21 @@ public class PageAPIDelegate {
         try {
             final SPage sPage = pageService.getPageByName(name);
             if (sPage == null) {
-                throw new PageNotFoundException(name);
+                throw new PageNotFoundException(name, PageAttribute.NAME);
             }
             return convertToPage(sPage);
         } catch (final SBonitaReadException e) {
+            throw new PageNotFoundException(e);
+        }
+    }
+
+    public Page getPageByMappingKey(String mappingKey) throws PageNotFoundException {
+        try {
+            final SPageMapping sPageMapping = pageMappingService.get(mappingKey);
+            return convertToPage(pageService.getPage(sPageMapping.getId()));
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(String.format("Failed to retrieve a page mapping for %s", mappingKey));
+        } catch (final SObjectNotFoundException e) {
             throw new PageNotFoundException(e);
         }
     }
@@ -362,11 +373,12 @@ public class PageAPIDelegate {
         try {
             final SPage sPage = pageService.getPageByNameAndProcessDefinitionId(name, processDefinitionId);
             if (sPage == null) {
-                throw new PageNotFoundException(name);
+                throw new PageNotFoundException(name, PageAttribute.NAME);
             }
             return convertToPage(sPage);
         } catch (final SBonitaReadException e) {
             throw new PageNotFoundException(e);
         }
     }
+
 }

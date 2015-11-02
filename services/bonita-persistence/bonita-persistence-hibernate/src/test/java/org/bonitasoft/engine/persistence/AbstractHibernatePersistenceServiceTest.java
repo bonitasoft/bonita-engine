@@ -59,4 +59,18 @@ public class AbstractHibernatePersistenceServiceTest {
         assertThat(queryBuilder.toString()).contains("LIKE 'foo%'").doesNotContain("LIKE '% foo%'");
     }
 
+    @Test
+    public void should_escapeString_escape_quote(){
+        doCallRealMethod().when(persistenceService).escapeString(anyString());
+        final String s = persistenceService.escapeString("toto'toto");
+
+        assertThat(s).isEqualTo("toto''toto");
+    }
+    @Test
+    public void should_escapeString_do_not_escape_like_wildcard(){
+        doCallRealMethod().when(persistenceService).escapeString(anyString());
+        final String s = persistenceService.escapeString("%to'to%t_oto%");
+
+        assertThat(s).isEqualTo("%to''to%t_oto%");
+    }
 }

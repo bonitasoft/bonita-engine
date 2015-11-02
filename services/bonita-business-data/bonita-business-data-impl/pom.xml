@@ -149,18 +149,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc</artifactId>
-			<version>6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.microsoft.jdbc</groupId>
-			<artifactId>sqlserver</artifactId>
-			<version>4.0.2206.100</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.5</version>
