@@ -16,7 +16,9 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
@@ -43,14 +45,24 @@ public class VirtualClassLoader extends ClassLoader {
 
     protected final long artifactId;
 
+    private List<ClassLoaderListener> listeners;
+
     protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
         this.artifactType = artifactType;
         this.artifactId = artifactId;
+        listeners = new ArrayList<>();
     }
 
-    void setClassLoader(final BonitaClassLoader classloader) {
+    void replaceClassLoader(final BonitaClassLoader classloader) {
+        BonitaClassLoader oldClassLoader = this.classloader;
         this.classloader = classloader;
+        for (ClassLoaderListener listener : listeners) {
+            listener.onUpdate(this);
+        }
+        if(oldClassLoader != null){
+            destroy(oldClassLoader);
+        }
     }
 
     @Override
@@ -98,6 +110,14 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     public void destroy() {
+        final BonitaClassLoader classloader = this.classloader;
+        destroy(classloader);
+        for (ClassLoaderListener listener : listeners) {
+            listener.onDestroy(this);
+        }
+    }
+
+    private void destroy(BonitaClassLoader classloader) {
         XStreamFactory.remove(this);
         if (classloader != null) {
             classloader.destroy();
@@ -109,4 +129,11 @@ public class VirtualClassLoader extends ClassLoader {
         return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + classloader;
     }
 
+    public boolean addListener(ClassLoaderListener listener) {
+        return !listeners.contains(listener) && listeners.add(listener);
+    }
+
+    public boolean removeListener(ClassLoaderListener classLoaderListener) {
+        return listeners.remove(classLoaderListener);
+    }
 }
