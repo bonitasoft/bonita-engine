@@ -1124,7 +1124,7 @@ CREATE TABLE proc_parameter (
   id NUMERIC(19, 0) NOT NULL,
   process_id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(255) NOT NULL,
-  value NVARCHAR(1024) NULL,
+  value NVARCHAR(MAX) NULL,
   PRIMARY KEY (tenantId, id)
 )
 GO

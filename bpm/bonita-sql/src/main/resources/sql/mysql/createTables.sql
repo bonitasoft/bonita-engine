@@ -1005,6 +1005,6 @@ CREATE TABLE proc_parameter (
   id BIGINT NOT NULL,
   process_id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
-  value VARCHAR(1024) NULL,
+  value MEDIUMTEXT NULL,
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;

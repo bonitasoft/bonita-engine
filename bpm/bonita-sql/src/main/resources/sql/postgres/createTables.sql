@@ -993,6 +993,6 @@ CREATE TABLE proc_parameter (
   id INT8 NOT NULL,
   process_id INT8 NOT NULL,
   name VARCHAR(255) NOT NULL,
-  value VARCHAR(1024) NULL,
+  value TEXT NULL,
   PRIMARY KEY (tenantId, id)
 );
