@@ -14,11 +14,10 @@
 package org.bonitasoft.engine.process;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,26 +113,26 @@ public class ProcessParameterIT extends CommonAPIIT {
     @Test
     public void getParameters() throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key.2", String.class.getCanonicalName())
+        processBuilder.addParameter("key1", String.class.getCanonicalName()).addParameter("key2", String.class.getCanonicalName())
                 .addUserTask("userTask1", null);
 
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("key1", "engine");
-        params.put("key.2", "bos");
+        params.put("key2", "bos");
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
         final List<ParameterInstance> parameters = getProcessAPI().getParameterInstances(definition.getId(), 0, 20, ParameterCriterion.NAME_ASC);
         assertEquals(2, parameters.size());
         final ParameterInstance firstParameter = parameters.get(0);
-        assertEquals("key.2", firstParameter.getName());
-        assertEquals("bos", firstParameter.getValue());
+        assertEquals("key1", firstParameter.getName());
+        assertEquals("engine", firstParameter.getValue());
         final ParameterInstance secondParameter = parameters.get(1);
-        assertEquals("key1", secondParameter.getName());
-        assertEquals("engine", secondParameter.getValue());
+        assertEquals("key2", secondParameter.getName());
+        assertEquals("bos", secondParameter.getValue());
 
         deleteProcess(definition);
     }
@@ -149,9 +148,11 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put(parameterName, parameterValue);
-        params.put("myParam2", "an unused parameter");
+        byte[] theParam2Value = new byte[1150];
+        Arrays.fill(theParam2Value, (byte) 65);
+        params.put("myParam2", new String(theParam2Value));
         businessArchive.setParameters(params);
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
@@ -180,7 +181,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition design = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(design);
-        final Map<String, String> params = new HashMap<String, String>(1);
+        final Map<String, String> params = new HashMap<>(1);
         final String paramValue = "4 is the answer";
         params.put(parameterName, paramValue);
         businessArchive.setParameters(params);
@@ -205,11 +206,12 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put(parameterName, null);
         businessArchive.setParameters(params);
         businessArchive.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().withFormMapping(
-                FormMappingDefinitionBuilder.buildFormMapping("somePage", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("someTask").build()).build());
+                FormMappingDefinitionBuilder.buildFormMapping("somePage", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("someTask").build())
+                .build());
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
@@ -233,7 +235,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put(parameterName, parameterValue);
         params.put("myParam2", "an unused parameter");
         businessArchive.setParameters(params);
@@ -255,7 +257,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("donkey", "engine");
         params.put("bear", "bos");
         params.put("squirrel", "bee");
@@ -282,7 +284,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("donkey", "engine");
         params.put("bear", "bos");
         params.put("squirrel", "bee");
@@ -309,7 +311,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("donkey", "engine");
         params.put("bear", "bos");
         params.put("squirrel", "bee");
@@ -334,7 +336,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("donkey", "engine");
         params.put("bear", "bos");
         params.put("squirrel", "bee");
@@ -359,7 +361,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("donkey", "engine");
         params.put("bear", "bos");
         params.put("squirrel", "bee");
@@ -379,7 +381,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>(1);
+        final Map<String, String> params = new HashMap<>(1);
         params.put("Astronaut", "");
         businessArchive.setParameters(params);
 
@@ -399,7 +401,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("donkey", "engine");
         params.put("bear", "bos");
         params.put("squirrel", "bee");
@@ -421,7 +423,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
-        final Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<>();
         params.put("bee", "busy");
         businessArchive.setParameters(params);
 
@@ -455,7 +457,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         processBuilder.addParameter("doubleValue", String.class.getName());
         processBuilder.addUserTask("humanTask", actor);
 
-        final Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters = new HashMap<>();
         parameters.put("integerValue", "15");
         parameters.put("booleanValue", "true");
         parameters.put("doubleValue", "1.1");
@@ -474,7 +476,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         final Expression isDoubleValueDouble = new ExpressionBuilder().createGroovyScriptExpression("testDoubleValueToBeDouble",
                 "doubleValue instanceof Double", Boolean.class.getName(), doubleParameter);
 
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(0);
+        final Map<String, Serializable> inputValues = new HashMap<>(0);
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isIntegerValueInteger, inputValues, processDefinition.getId()), is(true));
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isBooleanValueBoolean, inputValues, processDefinition.getId()), is(true));
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isDoubleValueDouble, inputValues, processDefinition.getId()), is(true));

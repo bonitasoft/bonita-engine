@@ -13,13 +13,16 @@
  **/
 package org.bonitasoft.engine.parameter;
 
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Matthieu Chaffotte
  */
-public interface SParameter {
+public interface SParameter extends PersistentObject {
 
     String getName();
 
     String getValue();
 
+    long getProcessDefinitionId();
 }
