@@ -55,6 +55,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
+        createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
