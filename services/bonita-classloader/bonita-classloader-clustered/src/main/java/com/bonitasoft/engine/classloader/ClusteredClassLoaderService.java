@@ -15,16 +15,16 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.Member;
+import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-
-import com.bonitasoft.manager.Features;
-import com.bonitasoft.manager.Manager;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.Member;
 
 /**
  * @author Baptiste Mesta
@@ -114,7 +114,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
     private void executeRefreshOnCluster(final String type, final long id,
             final RefreshClassLoaderTask refreshClassLoaderTask)
-            throws SClassLoaderException {
+                    throws SClassLoaderException {
         long before = System.currentTimeMillis();
         Map<Member, Future<TaskStatus>> submitToAllMembers = hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(refreshClassLoaderTask);
         // wait for result;
@@ -137,11 +137,8 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
                     throw new SClassLoaderException(result.getThrowable());
                 }
             }
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | InterruptedException e) {
             // exception in a node
-            throw new SClassLoaderException(e);
-        } catch (InterruptedException e) {
-            // TIMEOUT
             throw new SClassLoaderException(e);
         }
     }
@@ -164,6 +161,16 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     @Override
     public void resume() throws SBonitaException {
         // Nothing to do
+    }
+
+    @Override
+    public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
+        return classLoaderService.addListener(type, id, classLoaderListener);
+    }
+
+    @Override
+    public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
+        return classLoaderService.removeListener(type, id, classLoaderListener);
     }
 
 }
