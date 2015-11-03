@@ -82,4 +82,8 @@ public interface ClassLoaderService extends PlatformLifecycleService {
     void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException;
 
     void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws SClassLoaderException;
+
+    boolean addListener(final String type, final long id, ClassLoaderListener classLoaderListener);
+
+    boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener);
 }

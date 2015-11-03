@@ -14,9 +14,14 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -25,13 +30,42 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.thoughtworks.xstream.XStream;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+@RunWith(MockitoJUnitRunner.class)
 public class VirtualClassLoaderTest {
+
+    private ClassLoader testClassLoader;
+    @Mock
+    private ClassLoaderListener myClassLoaderListener;
+
+    private VirtualClassLoader localClassLoader;
+    private BonitaClassLoader newClassLoader;
+
+    @Before
+    public void before() throws IOException {
+        testClassLoader = Thread.currentThread().getContextClassLoader();
+        localClassLoader = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
+        Thread.currentThread().setContextClassLoader(localClassLoader);
+
+        newClassLoader = new BonitaClassLoader(Collections.<String, byte[]> emptyMap(), "test", 125,
+                File.createTempFile("test", ".tmp").toURI(), testClassLoader);
+    }
+
+    @After
+    public void after() {
+        Thread.currentThread().setContextClassLoader(testClassLoader);
+    }
 
     @Test
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
@@ -41,7 +75,7 @@ public class VirtualClassLoaderTest {
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
-        vcl.setClassLoader(bonitaClassLoader);
+        vcl.replaceClassLoader(bonitaClassLoader);
         URL url = vcl.getResource("au/edu/sydney/faas/applicationstudent/StudentInformation.class");
         assertThat(url).isNotNull();
         assertThat(url.toString())
@@ -65,7 +99,7 @@ public class VirtualClassLoaderTest {
         final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
-        vcl.setClassLoader(bonitaClassLoader);
+        vcl.replaceClassLoader(bonitaClassLoader);
         final Object objectToInvokeJavaMethodOn = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentRequest").getConstructors()[0].newInstance();
         final Object valueToSetObjectWith = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentInformation").getConstructors()[0].newInstance();
 
@@ -122,4 +156,48 @@ public class VirtualClassLoaderTest {
         //clean up
         Thread.currentThread().setContextClassLoader(previousClassLoader);
     }
+
+    @Test
+    public void should_replaceClassLoader_notify_listeners() throws Exception {
+        //given
+        localClassLoader.addListener(myClassLoaderListener);
+        //when
+        localClassLoader.replaceClassLoader(newClassLoader);
+        //then
+        verify(myClassLoaderListener).onUpdate(localClassLoader);
+    }
+
+    @Test
+    public void should_destroy_notify_listeners() throws Exception {
+        //given
+        localClassLoader.addListener(myClassLoaderListener);
+        localClassLoader.replaceClassLoader(newClassLoader);
+        //when
+        localClassLoader.destroy();
+        //then
+        verify(myClassLoaderListener).onDestroy(localClassLoader);
+    }
+
+    @Test
+    public void should_add_same_classloader_do_not_add_it_2_times() throws Exception {
+        //given
+        localClassLoader.addListener(myClassLoaderListener);
+        localClassLoader.addListener(myClassLoaderListener);
+        //when
+        localClassLoader.replaceClassLoader(newClassLoader);
+        //then
+        verify(myClassLoaderListener,times(1)).onUpdate(localClassLoader);
+    }
+
+    @Test
+    public void should_removeListener_remove_listener() throws Exception {
+        //given
+        localClassLoader.addListener(myClassLoaderListener);
+        localClassLoader.removeListener(myClassLoaderListener);
+        //when
+        localClassLoader.replaceClassLoader(newClassLoader);
+        //then
+        verify(myClassLoaderListener,never()).onUpdate(localClassLoader);
+    }
+
 }
