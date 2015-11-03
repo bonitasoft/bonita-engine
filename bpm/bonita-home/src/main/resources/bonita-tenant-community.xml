@@ -1351,6 +1351,7 @@
         <constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
         <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="defaultTenantCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">

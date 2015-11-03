@@ -54,7 +54,7 @@ public class CommonEhCacheCacheServiceTest {
 
     @Before
     public void setup() {
-        cacheService = new EhCacheCacheService(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, null) {
+        cacheService = new EhCacheCacheService(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, null, 1) {
 
             @Override
             public synchronized void start() {

@@ -71,7 +71,7 @@ public class CacheServiceTest {
     }
 
     protected CacheService getCacheService() {
-        final List<CacheConfiguration> configurationsList = new ArrayList<CacheConfiguration>(2);
+        final List<CacheConfiguration> configurationsList = new ArrayList<>(2);
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName(SOME_DEFAULT_CACHE_NAME);
         cacheConfiguration.setTimeToLiveSeconds(1);
@@ -140,7 +140,7 @@ public class CacheServiceTest {
             public long getSessionId() {
                 return 1;
             }
-        }, configurationsList, new CacheConfiguration(), "target");
+        }, configurationsList, new CacheConfiguration(), "target", 1);
     }
 
 	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {
@@ -224,8 +224,8 @@ public class CacheServiceTest {
     @Test
     public void testPutComplexObjectInCache() throws SCacheException {
         final int cacheSize = cacheService.getCacheSize(TEST1);
-        final ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        final HashMap<String, String> map = new HashMap<String, String>();
+        final ArrayList<Map<String, String>> list = new ArrayList<>();
+        final HashMap<String, String> map = new HashMap<>();
         map.put("bpm", "bonita");
         list.add(map);
         cacheService.store(TEST1, "complex", list);
@@ -235,8 +235,8 @@ public class CacheServiceTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testGetComplexObjectInCache() throws SCacheException {
-        final ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        final HashMap<String, String> map = new HashMap<String, String>();
+        final ArrayList<Map<String, String>> list = new ArrayList<>();
+        final HashMap<String, String> map = new HashMap<>();
         map.put("bpm", "bonita");
         list.add(map);
         cacheService.store(TEST1, "complex", list);
@@ -327,7 +327,7 @@ public class CacheServiceTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testChangeCachedElementWithCopy() throws SCacheException {
-        final ArrayList<String> list = new ArrayList<String>();
+        final ArrayList<String> list = new ArrayList<>();
         cacheService.store(TEST1, "mylist", list);
         list.add("kikoo");
         final ArrayList<String> cachedList = (ArrayList<String>) cacheService.get(TEST1, "mylist");
@@ -337,7 +337,7 @@ public class CacheServiceTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testChangeCachedElementWithoutCopy() throws SCacheException {
-        final ArrayList<String> list = new ArrayList<String>();
+        final ArrayList<String> list = new ArrayList<>();
         cacheService.store(TEST2, "mylist", list);
         list.add("kikoo");
         final ArrayList<String> cachedList = (ArrayList<String>) cacheService.get(TEST2, "mylist");
