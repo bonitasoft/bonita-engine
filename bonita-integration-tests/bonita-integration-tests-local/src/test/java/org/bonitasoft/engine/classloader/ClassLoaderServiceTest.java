@@ -370,7 +370,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
         final long dependencyId = createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
         createPlatformDependencyMapping(dependencyId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
-        Thread.sleep(10); // to be sure classlaoder refresh does NOT occur.
+        Thread.sleep(10); // to be sure classloader refresh does NOT occur.
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         final ClassLoader classLoader2 = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader2);
