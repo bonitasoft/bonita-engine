@@ -94,7 +94,7 @@ public class ParameterServiceImplTest {
 
     @Test
     public void addAll_should_call_record_for_all_parameters() throws Exception {
-        HashMap parameters = new HashMap(3);
+        HashMap<String, String> parameters = new HashMap<>(3);
         parameters.put("param1", "value1");
         parameters.put("param2", "value2");
         parameters.put("param3", "value3");
