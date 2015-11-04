@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-theme</artifactId>
 		<groupId>org.bonitasoft.engine.theme</groupId>
-		<version>7.1.3</version>
+		<version>7.1.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-theme-api</artifactId>

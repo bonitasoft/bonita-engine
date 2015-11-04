@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bonita-page</artifactId>
         <groupId>org.bonitasoft.engine.page</groupId>
-        <version>7.1.3</version>
+        <version>7.1.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-page-impl</artifactId>
