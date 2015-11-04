@@ -77,14 +77,9 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     }
 
     @Override
-    public void removeLocalClassLoader(final String type, final long id) {
+    public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
         classLoaderService.removeLocalClassLoader(type, id);
 
-    }
-
-    @Override
-    public void removeAllLocalClassLoaders(final String type) {
-        classLoaderService.removeAllLocalClassLoaders(type);
     }
 
     @Override
