@@ -29,7 +29,7 @@ import org.bonitasoft.engine.work.WorkService;
 /**
  * Transactional work that lock the process instance
  * 
- * This work try to lock a process instance, if it can't be locked before the end of the timeout, we reschedule the fill stack of work on the work service.
+ * This work try to lock a process instance, if it can't be locked before the end of the TIMEOUT, we reschedule the fill stack of work on the work service.
  * 
  * 
  * @author Charles Souillard
@@ -41,7 +41,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     protected final long processInstanceId;
 
-    private final long timeout = 20;
+    private static final long TIMEOUT = 20;
 
     private final TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
@@ -62,7 +62,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " trying to get lock for instance "
                         + processInstanceId + ": " + getWorkStack());
             }
-            lock = lockService.tryLock(processInstanceId, objectType, timeout, timeUnit, getTenantId());
+            lock = lockService.tryLock(processInstanceId, objectType, TIMEOUT, timeUnit, getTenantId());
             if (lock == null) {
                 // lock has not been obtained
                 if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {

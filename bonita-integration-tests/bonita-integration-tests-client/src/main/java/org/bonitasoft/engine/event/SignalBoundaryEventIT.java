@@ -153,7 +153,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     }
 
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
-            "Boundary", "Multi-instance", "Sequential" }, story = "Execute signal boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
+            "Boundary", "Multi-instance",
+            "Sequential" }, story = "Execute signal boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
     @Test
     public void signalBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 3;
@@ -203,7 +204,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
     }
 
     @Cover(classes = { SignalEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal",
-            "Boundary", "Multi-instance", "Sequential" }, story = "Execute signal boundary event not triggered on parallel multi-instance.", jira = "ENGINE-547")
+            "Boundary", "Multi-instance",
+            "Sequential" }, story = "Execute signal boundary event not triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
     public void signalBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 3;

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.lock.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public class MemoryLockService implements LockService {
         // the goal of this map of mutexs is not to solve completely the competition between keys
         // it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
         // this a sharding approach
-        final Map<Integer, Object> tmpMutexs = new HashMap<Integer, Object>();
+        final Map<Integer, Object> tmpMutexs = new HashMap<>();
         for (int i = 0; i < lockPoolSize; i++) {
             tmpMutexs.put(i, new MemoryLockServiceMutex());
         }
@@ -142,6 +143,7 @@ public class MemoryLockService implements LockService {
 
             if (lock.isHeldByCurrentThread()) {
                 // We do not want to support reentrant access
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Trying to acquire the lock another time by the same Thread, this should not happen !");
                 return null;
             }
         }
@@ -159,15 +161,28 @@ public class MemoryLockService implements LockService {
                     if (previousLock == null) {
                         // Someone unlocked the lock while we were tryLocking so it was removed from the Map.
                         // Let's add it again
+                        if (debugEnable) {
+                            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Yes, someone just released the lock, let's take it !");
+                        }
                         locks.put(key, lock);
                     } else if (previousLock != lock) {
+                        if (debugEnable) {
+                            try {
+                                Method getOwnerMethod = previousLock.getClass().getDeclaredMethod("getOwner");
+                                getOwnerMethod.setAccessible(true);
+                                Thread ownerThread = (Thread) getOwnerMethod.invoke(previousLock);
+                                String previousThread = ownerThread.getName();
+                                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                                        "Bad luck, someone (thread " + previousThread + ") was faster that us to take our lock !");
+                            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+                            }
+                        }
                         // Compare the 2 Locks by reference : if they are the same: fine, just continue as we locked on the correct lock.
                         // Otherwise we have to release the lock just acquired : someone was faster than us to lock on the same key.
                         lock.unlock();
                         return null;
-                    } else {
-                        // everything is fine : this is the same lock. Go on !
                     }
+                    // else everything is fine : this is the same lock. Go on !
                 }
 
                 return new BonitaLock(lock, objectType, objectToLockId);
@@ -185,7 +200,7 @@ public class MemoryLockService implements LockService {
     public BonitaLock lock(final long objectToLockId, final String objectType, final long tenantId) throws SLockException {
         BonitaLock lock = tryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS, tenantId);
         if (lock == null) {
-            throw new SLockException("Unable (default timeout) to acquire the lock for " + objectToLockId + ":" + objectType
+            throw new SLockException("Unable to acquire the lock after " + lockTimeout + TimeUnit.SECONDS + " for " + objectToLockId + ":" + objectType
                     + getDetailsOnLock(objectToLockId, objectType, tenantId));
         }
         return lock;
@@ -205,15 +220,18 @@ public class MemoryLockService implements LockService {
                 try {
                     Method getOwnerMethod = reentrantLock.getClass().getDeclaredMethod("getOwner");
                     getOwnerMethod.setAccessible(true);
-                    Thread thread = (Thread) getOwnerMethod.invoke(reentrantLock);
+                    Thread ownerThread = (Thread) getOwnerMethod.invoke(reentrantLock);
                     details.append(", held by thread ");
-                    details.append(thread.getName());
+                    details.append(ownerThread.getName());
                 } catch (Exception e) {
                     logger.log(getClass(), TechnicalLogSeverity.INFO, "Error while fetching exception details on lock.", e);
                 }
             }
         } else {
             details.append("no additional details could be found (lock exists and is not locked, there should be no problem).");
+        }
+        if (debugEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, details.toString());
         }
         return details;
     }
