@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -119,6 +120,10 @@ public class PageServiceImpl implements PageService {
 
     public static final String RESOURCES_INDEX_HTML = "resources/index.html";
 
+    private static final String API_EXTENSIONS = "apiExtensions";
+
+    private static final String CLASS_FILENAME = "classFileName";
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -213,14 +218,41 @@ public class PageServiceImpl implements PageService {
         }
         try {
             final Map<String, byte[]> zipContent = IOUtil.unzip(content);
-            checkZipContainsRequiredEntries(zipContent);
             pageProperties = helper.loadPageProperties(zipContent);
+            if (isAnAPIExtension(pageProperties)) {
+                checkApiControllerExists(zipContent, pageProperties);
+            } else {
+                checkZipContainsRequiredEntries(zipContent);
+            }
             checkPageNameIsValid(pageProperties.getProperty(PageService.PROPERTIES_NAME), provided);
             checkPageDisplayNameIsValid(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME));
         } catch (final IOException e) {
             throw new SInvalidPageZipInconsistentException("Error while reading zip file", e);
         }
         return pageProperties;
+    }
+
+    private void checkApiControllerExists(Map<String, byte[]> zipContent, Properties pageProperties)
+            throws SInvalidPageZipInconsistentException, SInvalidPageZipMissingAPropertyException {
+        final Set<String> entrySet = zipContent.keySet();
+        final String declaredApis = pageProperties.getProperty(API_EXTENSIONS);
+        if (declaredApis == null || declaredApis.isEmpty()) {
+            throw new SInvalidPageZipMissingAPropertyException(API_EXTENSIONS);
+        }
+        final String[] apis = declaredApis.split(",");
+        for (final String api : apis) {
+            final String classFileName = pageProperties.getProperty(api.trim() + "." + CLASS_FILENAME);
+            if (classFileName == null || classFileName.isEmpty()) {
+                throw new SInvalidPageZipMissingAPropertyException(api.trim() + "." + CLASS_FILENAME);
+            }
+            if (!entrySet.contains(classFileName.trim())) {
+                throw new SInvalidPageZipInconsistentException(String.format("RestAPIController %s has not been found in archive.", classFileName.trim()));
+            }
+        }
+    }
+
+    private boolean isAnAPIExtension(Properties pageProperties) {
+        return Objects.equals(SContentType.API_EXTENSION, pageProperties.get(PageService.PROPERTIES_CONTENT_TYPE));
     }
 
     SPage insertPage(final SPage page, final byte[] content) throws SObjectAlreadyExistsException, SObjectCreationException {
@@ -239,6 +271,8 @@ public class PageServiceImpl implements PageService {
             page.setId(pageContent.getId());
             notifyPageInsert(page, content);
             return page;
+        } catch (final SObjectCreationException ce) {
+            throw ce;
         } catch (SRecorderException | SBonitaReadException re) {
             throw new SObjectCreationException(re);
         }
@@ -579,7 +613,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void start() throws SBonitaException {
-        for (String pageName : getProvidedPages()) {
+        for (final String pageName : getProvidedPages()) {
             importProvidedPage(pageName);
         }
     }
@@ -616,7 +650,7 @@ public class PageServiceImpl implements PageService {
 
     private void createPage(final String zipName, final byte[] providedPageContent, final Properties pageProperties) throws SObjectAlreadyExistsException,
             SObjectCreationException {
-        SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
+        final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), zipName, -1, true,
                 pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         insertPage(page, providedPageContent);

@@ -319,7 +319,7 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_create_delete_create_page_with_same_values() throws Exception {
+    public void should_create_a_page_and_delete_it_and_recreate_it_with_same_values() throws Exception {
         // given
         final String pageName = generateUniquePageName(1);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
@@ -407,18 +407,6 @@ public class PageAPIIT extends CommonAPIIT {
                 pageContent);
 
         // when
-
-        // then: expected exception
-    }
-
-    @Test
-    public void should_getPageProperties_throw_alreadyExists() throws Exception {
-        // , "content.zip"given
-        final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
-
-        expectedException.expect(InvalidPageZipMissingIndexException.class);
-        // when
-        getPageAPI().getPageProperties(pageContent, true);
 
         // then: expected exception
     }

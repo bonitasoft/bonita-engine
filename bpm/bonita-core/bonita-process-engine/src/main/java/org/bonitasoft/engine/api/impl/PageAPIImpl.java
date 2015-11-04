@@ -120,11 +120,6 @@ public class PageAPIImpl implements PageAPI {
     }
 
     @Override
-    public Page getPageByMappingKey(String mappingKey) throws PageNotFoundException {
-        return getPageAPIDelegate().getPageByMappingKey(mappingKey);
-    }
-
-    @Override
     public Page getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws PageNotFoundException {
         return getPageAPIDelegate().getPageByNameAndProcessDefinition(name, processDefinitionId);
     }

@@ -27,7 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import java.util.Set;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
@@ -462,39 +460,4 @@ public class PageAPIDelegateTest {
         pageAPIDelegate.getPageProperties(content, false);
     }
 
-    @Test
-    public void should_retrieve_a_page_for_a_given_mapping_key() throws Exception {
-        // given
-        final SPageMapping mapping = mock(SPageMapping.class);
-        final SPage page = mock(SPage.class);
-        when(mapping.getId()).thenReturn(1L);
-        when(pageService.getPage(1L)).thenReturn(page);
-        when(pageMappingService.get("apiExtension|GET|myPathTemplate")).thenReturn(mapping);
-        // when
-        final Page pageByMappingKey = pageAPIDelegate.getPageByMappingKey("apiExtension|GET|myPathTemplate");
-        //then 
-        assertThat(pageByMappingKey).isEqualToComparingFieldByField(pageAPIDelegate.convertToPage(page));
-    }
-
-    @Test
-    public void should_throw_a_RetrieveException_when_SBonitaReadException_is_thrown() throws Exception {
-        // given
-        when(pageMappingService.get("apiExtension|GET|myPathTemplate")).thenThrow(SBonitaReadException.class);
-        // when
-        expectedException.expect(RetrieveException.class);
-        pageAPIDelegate.getPageByMappingKey("apiExtension|GET|myPathTemplate");
-    }
-
-    @Test
-    public void should_throw_a_PageNotFoundException_when_no_page_is_found_for_id_in_mapping() throws Exception {
-        // given
-        final SPageMapping mapping = mock(SPageMapping.class);
-        final SPage page = mock(SPage.class);
-        when(mapping.getId()).thenReturn(1L);
-        when(pageService.getPage(1L)).thenThrow(SObjectNotFoundException.class);
-        when(pageMappingService.get("apiExtension|GET|myPathTemplate")).thenReturn(mapping);
-        // when
-        expectedException.expect(PageNotFoundException.class);
-        pageAPIDelegate.getPageByMappingKey("apiExtension|GET|myPathTemplate");
-    }
 }

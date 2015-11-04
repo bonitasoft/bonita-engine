@@ -18,9 +18,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
 import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SAuthorizationException;
@@ -56,16 +54,6 @@ public class PageAPIImplTest {
         expectedException.expect(UnauthorizedAccessException.class);
 
         processConfigurationAPI.resolvePageOrURL(pageKey, null, true);
-    }
-
-    @Test
-    public void should_delegate_getPageByMappingKey() throws Exception {
-        final PageAPIDelegate pageAPIDelegate = mock(PageAPIDelegate.class);
-        final PageAPIImpl processConfigurationAPI = spy(new PageAPIImpl());
-        doReturn(pageAPIDelegate).when(processConfigurationAPI).getPageAPIDelegate();
-        processConfigurationAPI.getPageByMappingKey("pageKey");
-
-        verify(pageAPIDelegate).getPageByMappingKey("pageKey");
     }
 
 }
