@@ -220,17 +220,6 @@ public class PageAPIDelegate {
         }
     }
 
-    public Page getPageByMappingKey(String mappingKey) throws PageNotFoundException {
-        try {
-            final SPageMapping sPageMapping = pageMappingService.get(mappingKey);
-            return convertToPage(pageService.getPage(sPageMapping.getId()));
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(String.format("Failed to retrieve a page mapping for %s", mappingKey));
-        } catch (final SObjectNotFoundException e) {
-            throw new PageNotFoundException(e);
-        }
-    }
-
     public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException,
             UpdatingWithInvalidPageTokenException, UpdatingWithInvalidPageZipContentException {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {

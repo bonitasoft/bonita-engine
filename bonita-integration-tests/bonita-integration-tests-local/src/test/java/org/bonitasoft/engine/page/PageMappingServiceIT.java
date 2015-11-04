@@ -27,6 +27,7 @@ import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,13 +39,13 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
 
     public static final long PAGE_ID = 12345L;
     public static final long NEW_PAGE_ID = 88854L;
-    private final TransactionService transactionService;
+    private TransactionService transactionService;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     public PageMappingService pageMappingService;
 
-    public PageMappingServiceIT() {
-        super();
+    @Before
+    public void setUp() throws Exception {
         transactionService = getTransactionService();
         pageMappingService = getTenantAccessor().getPageMappingService();
     }
@@ -57,17 +58,17 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void getByKey() throws Exception {
         transactionService.begin();
-        SPageMapping internal = pageMappingService.create("getByKey/process1/12.0", PAGE_ID, Collections.<String> emptyList());
-        SPageMapping external = pageMappingService.create("getByKey/process2/12.0", "http://www.google.com", null, Collections.<String> emptyList());
-        SPageMapping externalWithAdapter = pageMappingService.create("getByKey/process3/12.0", "http://www.google.com", "theAdapter",
+        final SPageMapping internal = pageMappingService.create("getByKey/process1/12.0", PAGE_ID, Collections.<String> emptyList());
+        final SPageMapping external = pageMappingService.create("getByKey/process2/12.0", "http://www.google.com", null, Collections.<String> emptyList());
+        final SPageMapping externalWithAdapter = pageMappingService.create("getByKey/process3/12.0", "http://www.google.com", "theAdapter",
                 Collections.<String> emptyList());
 
         transactionService.complete();
 
         transactionService.begin();
-        SPageMapping internalPersisted = pageMappingService.get("getByKey/process1/12.0");
-        SPageMapping externalPersisted = pageMappingService.get("getByKey/process2/12.0");
-        SPageMapping exterAdaPersisted = pageMappingService.get("getByKey/process3/12.0");
+        final SPageMapping internalPersisted = pageMappingService.get("getByKey/process1/12.0");
+        final SPageMapping externalPersisted = pageMappingService.get("getByKey/process2/12.0");
+        final SPageMapping exterAdaPersisted = pageMappingService.get("getByKey/process3/12.0");
 
         transactionService.complete();
 
@@ -84,7 +85,7 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void delete() throws Exception {
         transactionService.begin();
-        SPageMapping internal = pageMappingService.create("delete/process1/12.0", PAGE_ID, Collections.<String> emptyList());
+        final SPageMapping internal = pageMappingService.create("delete/process1/12.0", PAGE_ID, Collections.<String> emptyList());
         transactionService.complete();
 
         transactionService.begin();
@@ -103,18 +104,18 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void update() throws Exception {
 
-        String key = "theKey/process1/12.0";
+        final String key = "theKey/process1/12.0";
         transactionService.begin();
         pageMappingService.create(key, PAGE_ID, Collections.<String> emptyList());
         transactionService.complete();
 
         transactionService.begin();
-        SPageMapping pageMapping1 = pageMappingService.get(key);
+        final SPageMapping pageMapping1 = pageMappingService.get(key);
         pageMappingService.update(pageMapping1, NEW_PAGE_ID);
         transactionService.complete();
 
         transactionService.begin();
-        SPageMapping updated = pageMappingService.get(key);
+        final SPageMapping updated = pageMappingService.get(key);
         transactionService.complete();
 
         assertThat(updated).isEqualTo(pageMapping1);
@@ -125,7 +126,7 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
         Thread.sleep(10);
 
         transactionService.begin();
-        SPageMapping reUpdated = pageMappingService.get(key);
+        final SPageMapping reUpdated = pageMappingService.get(key);
         pageMappingService.update(reUpdated, "http://www.yahoo.com", "adapterURL");
         transactionService.complete();
 
