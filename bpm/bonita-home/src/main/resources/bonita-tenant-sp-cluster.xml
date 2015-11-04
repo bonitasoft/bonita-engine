@@ -8,7 +8,6 @@
 
 	<bean id="localCacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
         <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
