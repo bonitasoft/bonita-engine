@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-external</artifactId>
 		<groupId>org.bonitasoft.engine.external</groupId>
-		<version>7.1.3-SNAPSHOT</version>
+		<version>7.1.3</version>
 	</parent>
 
 	<artifactId>bonita-web-commands</artifactId>
