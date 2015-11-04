@@ -25,14 +25,11 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -43,8 +40,6 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     protected final TechnicalLoggerService logger;
 
-    protected final ReadSessionAccessor sessionAccessor;
-
     protected final Map<String, CacheConfiguration> cacheConfigurations;
 
     private final CacheConfiguration defaultCacheConfiguration;
@@ -53,15 +48,14 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     private String cacheManagerLastCreation;
 
-    public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final List<org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
+    public CommonEhCacheCacheService(final TechnicalLoggerService logger, final List<org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations,
+            final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
             final String diskStorePath) {
         this.logger = logger;
-        this.sessionAccessor = sessionAccessor;
         this.diskStorePath = diskStorePath;
         this.defaultCacheConfiguration = getEhCacheConfiguration(defaultCacheConfiguration);
         if (cacheConfigurations != null && cacheConfigurations.size() > 0) {
-            this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
+            this.cacheConfigurations = new HashMap<>(cacheConfigurations.size());
             for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : cacheConfigurations) {
                 this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
             }
@@ -99,18 +93,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             cacheManagerLastCreation = getCacheManagerCreationDetails();
         }
-        //System.err.println("\n\nCREATING CACHE MANAGER: " + cacheManager + "\n\n" + getCacheManagerCreationDetails());
     }
 
     private String getCacheManagerCreationDetails() {
         final StringBuilder sb = new StringBuilder();
-        String tenantId = "--UNKNOWN TENANT ID--";
-        try {
-            tenantId = Long.toString(this.sessionAccessor.getTenantId());
-        } catch (STenantIdNotSetException e) {
-            e.printStackTrace();
-        }
-        sb.append("CacheManager (" + cacheManager + ") built for tenant " + tenantId);
+        String identifier = getCacheManagerIdentifier();
+        sb.append("CacheManager (").append(cacheManager).append(") built for ").append(identifier);
         sb.append("\n");
         final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         for (final StackTraceElement stackTraceElement : stackTraceElements) {
@@ -119,6 +107,8 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         }
         return sb.toString();
     }
+
+    protected abstract String getCacheManagerIdentifier();
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws SCacheException {
         if (cacheManager == null) {

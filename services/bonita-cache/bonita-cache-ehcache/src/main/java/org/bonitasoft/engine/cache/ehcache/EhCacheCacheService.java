@@ -22,7 +22,6 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -33,15 +32,15 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     private final long tenantId;
 
-    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final List<CacheConfiguration> cacheConfigurations, final CacheConfiguration defaultCacheConfiguration, final String diskStorePath, long tenantId) {
-        super(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
+    public EhCacheCacheService(final TechnicalLoggerService logger, final List<CacheConfiguration> cacheConfigurations,
+            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath, long tenantId) {
+        super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
         this.tenantId = tenantId;
     }
 
     @Override
     protected String getKeyFromCacheName(final String cacheName) throws SCacheException {
-        return new StringBuilder().append(tenantId).append('_').append(cacheName).toString();
+        return String.valueOf(tenantId) + '_' + cacheName;
     }
 
     @Override
@@ -51,7 +50,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
         }
         final String[] cacheNames = cacheManager.getCacheNames();
         final List<String> cacheNamesList = new ArrayList<>(cacheNames.length);
-        String prefix = new StringBuilder().append(tenantId).append('_').toString();
+        String prefix = String.valueOf(tenantId) + '_';
         for (final String cacheName : cacheNames) {
             if (cacheName.startsWith(prefix)) {
                 cacheNamesList.add(getCacheNameFromKey(cacheName));
@@ -90,4 +89,8 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
         }
     }
 
+    @Override
+    protected String getCacheManagerIdentifier() {
+        return "tenant " + tenantId;
+    }
 }

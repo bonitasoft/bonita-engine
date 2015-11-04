@@ -28,7 +28,6 @@ import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -128,17 +127,6 @@ public class CacheServiceTest {
             @Override
             public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
                 return false;
-            }
-        }, new ReadSessionAccessor() {
-
-            @Override
-            public long getTenantId() {
-                return 1;
-            }
-
-            @Override
-            public long getSessionId() {
-                return 1;
             }
         }, configurationsList, new CacheConfiguration(), "target", 1);
     }

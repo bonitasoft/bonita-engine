@@ -233,7 +233,6 @@
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />
         <constructor-arg name="defaultCacheConfiguration" ref="defaultPlatformCacheConfiguration" />
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/platform.cache" />
