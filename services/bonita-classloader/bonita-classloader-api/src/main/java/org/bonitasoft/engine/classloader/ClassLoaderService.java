@@ -68,16 +68,9 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      *        The classloader's type identifier
      * @param id
      *        The local ClassLoader's id
+     * @throws SClassLoaderException if we can't remove the classloader because it contains children
      */
-    void removeLocalClassLoader(final String type, final long id);
-
-    /**
-     * Remove all local ClassLoaders associated to the given type
-     * 
-     * @param type
-     *        the ClassLoader's type
-     */
-    void removeAllLocalClassLoaders(final String type);
+    void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException;
 
     void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException;
 

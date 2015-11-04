@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -131,6 +132,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
+        } catch (SClassLoaderException e) {
+            throw new UpdateException(e);
         }
     }
 

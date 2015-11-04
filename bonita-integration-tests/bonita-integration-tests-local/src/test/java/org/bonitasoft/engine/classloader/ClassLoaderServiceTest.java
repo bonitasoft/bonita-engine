@@ -66,9 +66,6 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
     @After
     public void tearDown() throws Exception {
-        classLoaderService.removeAllLocalClassLoaders(TYPE1.name());
-        classLoaderService.removeAllLocalClassLoaders(TYPE2.name());
-
         TestUtil.closeTransactionIfOpen(getTransactionService());
 
         getTransactionService().begin();
@@ -342,20 +339,6 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
         classLoaderService.removeLocalClassLoader(TYPE1.name(), ID2);
 
-        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1.name(), ID2));
-        // getTransactionService().complete();
-    }
-
-    @Test
-    public void testRemoveAllLocalClassLoader() throws Exception {
-        initializeClassLoaderService();
-        // getTransactionService().begin();
-        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
-
-        classLoaderService.removeAllLocalClassLoaders(TYPE1.name());
-
-        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
         assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1.name(), ID2));
         // getTransactionService().complete();
     }

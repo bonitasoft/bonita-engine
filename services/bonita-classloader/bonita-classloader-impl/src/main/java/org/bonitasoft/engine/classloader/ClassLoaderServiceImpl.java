@@ -16,7 +16,7 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,8 +36,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
-    private static final String SEPARATOR = ":";
-
     public static final String GLOBAL_TYPE = "GLOBAL";
 
     public static final long GLOBAL_ID = -1;
@@ -48,7 +46,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
-    private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<ClassLoaderIdentifier, VirtualClassLoader>();
+    private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
     private final Object mutex = new ClassLoaderServiceMutex();
 
@@ -123,16 +121,17 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         if (traceEnabled) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "creating classloader with key " + identifier);
         }
-        ClassLoader parent = getParentClassLoader(identifier);
+        VirtualClassLoader parent = getParentClassLoader(identifier);
         final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(), parent);
+        parent.addChild(virtualClassLoader);
         localClassLoaders.put(identifier, virtualClassLoader);
     }
 
-    private ClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
+    private VirtualClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
         final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver.getParentClassLoaderIdentifier(identifier);
-        ClassLoader parent;
+        VirtualClassLoader parent;
         if (parentIdentifier == null) {
-            parent = getGlobalClassLoader();
+            parent = getVirtualGlobalClassLoader();
         } else {
             parent = getLocalClassLoader(parentIdentifier);
         }
@@ -140,7 +139,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public void removeLocalClassLoader(final String type, final long id) {
+    public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
         if (traceEnabled) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Removing local classloader for type " + type + " of id " + id);
         }
@@ -151,26 +150,15 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         destroyLocalClassLoader(key);
     }
 
-    @Override
-    public void removeAllLocalClassLoaders(final String application) {
-        NullCheckingUtil.checkArgsNotNull(application);
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "remove all local classloaders");
-        }
-        final Set<ClassLoaderIdentifier> keySet = new HashSet<>(localClassLoaders.keySet());
-        for (final ClassLoaderIdentifier key : keySet) {
-            if (key.getType().equals(application)) {
-                destroyLocalClassLoader(key);
-            }
-        }
-    }
-
-    private void destroyLocalClassLoader(final ClassLoaderIdentifier key) {
+    private void destroyLocalClassLoader(final ClassLoaderIdentifier key) throws SClassLoaderException {
         if (traceEnabled) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying local classloader with key: " + key);
         }
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
+            if (localClassLoader.hasChildren()) {
+                throw new SClassLoaderException("Unable to delete classloader " + key + " because it has children: " + localClassLoader.getChildren());
+            }
             localClassLoader.destroy();
             localClassLoaders.remove(key);
         }
@@ -225,27 +213,35 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Starting classloader service, creating the platform classloader");
         }
         shuttingDown = false;
-        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+        //we do not create or destroy the global classloader because it does not point to a bonita classloader
     }
 
     @Override
-    public void stop() {
+    public void stop() throws SClassLoaderException {
         if (traceEnabled) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Stopping classloader service, destroying all classloaders");
         }
         shuttingDown = true;
         destroyAllLocalClassLoaders();
-        virtualGlobalClassLoader.destroy();
     }
 
-    private void destroyAllLocalClassLoaders() {
+    private void destroyAllLocalClassLoaders() throws SClassLoaderException {
         if (traceEnabled) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying all classloaders");
         }
-        for (final VirtualClassLoader classLoader : localClassLoaders.values()) {
-            classLoader.destroy();
+        //remove elements only that don't have children
+        //there is no loop in this so the algorithm finishes
+        final Set<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> entries = localClassLoaders.entrySet();
+        while (!entries.isEmpty()) {
+            final Iterator<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<ClassLoaderIdentifier, VirtualClassLoader> next = iterator.next();
+                if (!next.getValue().hasChildren()) {
+                    next.getValue().destroy();
+                    iterator.remove();
+                }
+            }
         }
-        localClassLoaders.clear();
     }
 
     @Override
