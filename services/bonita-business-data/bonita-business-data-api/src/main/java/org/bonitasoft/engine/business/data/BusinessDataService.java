@@ -34,7 +34,7 @@ public interface BusinessDataService {
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 
     Serializable getJsonQueryEntities(String entityClassName, String queryName, Map<String, Serializable> queryParameters, Integer startIndex,
-            Integer maxResults, String businessDataURIPattern) throws SBusinessDataRepositoryException;
+                                                 Integer maxResults, String businessDataURIPattern) throws SBusinessDataRepositoryException;
 
     Serializable getJsonEntities(String entityClassName, List<Long> identifiers, String businessDataURIPattern) throws SBusinessDataRepositoryException;
 
