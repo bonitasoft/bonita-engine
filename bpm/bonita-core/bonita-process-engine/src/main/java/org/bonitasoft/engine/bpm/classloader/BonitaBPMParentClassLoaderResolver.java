@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.classloader;
 
-import org.bonitasoft.engine.classloader.ClassLoaderIdentifier;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.ParentClassLoaderResolver;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -29,19 +30,28 @@ public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderReso
     }
 
     @Override
-    public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
-        if (ScopeType.PROCESS.name().equals(childId.getType())) {
+    public ClassLoader getParent(final ClassLoaderService classLoaderService, final String childClassLoaderType, final long childClassLoaderId)
+            throws SClassLoaderException {
+        ClassLoader parent = null;
+        if (ScopeType.PROCESS.name().equals(childClassLoaderType)) {
             try {
-                return new ClassLoaderIdentifier(ScopeType.TENANT.name(), sessionAccessor.getTenantId());
+                final Long tenantId = sessionAccessor.getTenantId();
+                if (tenantId > 0) {
+                    parent = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId);
+                } else {
+                    // if no tenant is set use global class loader
+                    parent = classLoaderService.getGlobalClassLoader();
+                }
             } catch (final STenantIdNotSetException e) {
-                throw new BonitaRuntimeException("No tenant id set while creating the process classloader: " + childId);
+                parent = classLoaderService.getGlobalClassLoader();
             }
-        } else if (ScopeType.TENANT.name().equals(childId.getType())) {
-            return null;//global
-        } else if ("___datasource___".equals(childId.getType())) {
-            return null;//global
+        } else if (ScopeType.TENANT.name().equals(childClassLoaderType)) {
+            parent = classLoaderService.getGlobalClassLoader();
+        } else if ("___datasource___".equals(childClassLoaderType)) {
+            parent = classLoaderService.getGlobalClassLoader();
         } else {
-            throw new BonitaRuntimeException("unable to find a parent for type: " + childId);
+            throw new BonitaRuntimeException("unable to find a parent for type: " + childClassLoaderType);
         }
+        return parent;
     }
 }
