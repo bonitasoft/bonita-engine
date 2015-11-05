@@ -219,17 +219,4 @@ public interface PageAPI {
      */
     PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
-
-    /**
-     * Retrieves a page from a mapping key.
-     *
-     * @param mappingKey
-     *        the mappingKey of the page to retrieve
-     * @return the found page
-     * @throws PageNotFoundException
-     *         if no page can be found with the provided mappingKey.
-     * @since 7.2.0
-     */
-    Page getPageByMappingKey(String mappingKey) throws PageNotFoundException;
-
 }

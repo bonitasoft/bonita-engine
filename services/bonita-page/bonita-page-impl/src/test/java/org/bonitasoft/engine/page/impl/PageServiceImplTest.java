@@ -343,13 +343,13 @@ public class PageServiceImplTest {
                 BONITA_DEFAULT_LAYOUT_ZIP_NAME,
                 BONITA_DEFAULT_THEME_ZIP_NAME));
 
-        Answer<SPage> answer = new Answer<SPage>() {
+        final Answer<SPage> answer = new Answer<SPage>() {
 
             @Override
             public SPage answer(InvocationOnMock invocation) throws Throwable {
                 final SPage sPage = (SPage) invocation.getArguments()[0];
 
-                Map<String, String> map = new HashMap<>();
+                final Map<String, String> map = new HashMap<>();
                 map.put(DEFAULT_LAYOUT_NAME, "layout");
                 map.put("custompage_htmlexample", "page");
                 map.put("custompage_groovyexample", "page");
@@ -708,7 +708,8 @@ public class PageServiceImplTest {
         exception.expectMessage("Missing Index.groovy or index.html");
 
         // given
-        final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
+        final byte[] content = IOUtil.zip(pair("aFile.txt", "hello".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=page".getBytes()));
 
         // when
         pageServiceImpl.readPageZip(content, false);
@@ -718,9 +719,108 @@ public class PageServiceImplTest {
     }
 
     @Test
+    public void should_throw_an_SInvalidPageZipMissingAPropertyException_for_apiExtension_without_apis() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(pair("MyController.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension".getBytes()));
+
+        exception.expect(SInvalidPageZipMissingAPropertyException.class);
+        exception.expectMessage("Missing fields in the page.properties: apiExtensions");
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+
+    @Test
+    public void should_throw_an_SInvalidPageZipMissingAPropertyException_for_api_extension_without_classFilename() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(pair("MyController.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions=myApi"
+                                .getBytes()));
+
+        exception.expect(SInvalidPageZipMissingAPropertyException.class);
+        exception.expectMessage("Missing fields in the page.properties: myApi.classFileName");
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+
+    @Test
+    public void should_throw_an_SInvalidPageZipInconsistentException_for_api_extension_with_classFilename_not_in_archive() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(Collections.singletonMap(PAGE_PROPERTIES,
+                "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions=myApi\nmyApi.classFileName=MyController.groovy"
+                                .getBytes()));
+
+        exception.expect(SInvalidPageZipInconsistentException.class);
+        exception.expectMessage("RestAPIController MyController.groovy has not been found in archive.");
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+    
+    @Test
+    public void should_throw_an_SInvalidPageZipMissingAPropertyException_for_api_extension_with_empty_classFilename() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(pair("MyController.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions=myApi\nmyApi.classFileName="
+                                .getBytes()));
+
+        exception.expect(SInvalidPageZipMissingAPropertyException.class);
+        exception.expectMessage("Missing fields in the page.properties: myApi.classFileName");
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+
+    @Test
+    public void should_throw_an_SInvalidPageZipMissingAPropertyException_if_apiExtensions_is_empty() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(pair("MyController.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions="
+                                .getBytes()));
+
+        exception.expect(SInvalidPageZipMissingAPropertyException.class);
+        exception.expectMessage("Missing fields in the page.properties: apiExtensions");
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+
+    @Test
+    public void should_read_page_with_an_api_extension() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(pair("MyController.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions=myApi\nmyApi.classFileName=MyController.groovy"
+                                .getBytes()));
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+
+    @Test
+    public void should_read_page_with_many_api_extensions() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(pair("MyController.groovy", "content of the groovy".getBytes()),
+                pair("org/MyOtherController.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions=myApi, myOtherApi\nmyApi.classFileName=MyController.groovy\nmyOtherApi.classFileName=org/MyOtherController.groovy"
+                                .getBytes()));
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+    }
+
+    @Test
     public void zipTest_Throws_exception() throws Exception {
         // given
-        final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
+        final byte[] content = IOUtil.zip(pair("aFile.txt", "hello".getBytes()),pair(PAGE_PROPERTIES,
+                "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=page"
+                        .getBytes()));
         doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMapOf(String.class, byte[].class));
 
         //then
@@ -954,13 +1054,13 @@ public class PageServiceImplTest {
     @Test
     public void should_add_page_return_provided_content_type() throws Exception {
         //given
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
 
         //when
         final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
 
         //then
-        SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
+        SPageAssert.assertThat(insertedPage).hasContentType(SContentType.PAGE);
 
     }
 
@@ -978,9 +1078,10 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void should_rest_api_extsntion_record_page_mapping() throws Exception {
+    public void should_rest_api_extension_record_page_mapping() throws Exception {
         //given
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION, "apiExtensions=myApi", "myApi.classFileName=Index.groovy"));
 
         //when
         final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
@@ -1005,7 +1106,7 @@ public class PageServiceImplTest {
 
     @Test
     public void addPage_should_execute_listener() throws Exception {
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
 
         final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
 
@@ -1030,7 +1131,7 @@ public class PageServiceImplTest {
         final SPageContent pageContent = new SPageContentImpl();
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageContent", SPageContent.class, page.getId()))).thenReturn(pageContent);
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, page.getId()))).thenReturn(page);
-        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.PAGE));
 
         pageServiceImpl.updatePageContent(page.getId(), content, "contentName");
 
@@ -1039,7 +1140,7 @@ public class PageServiceImplTest {
 
     @Test
     public void updatePageContent_should_update_page_content_type() throws Exception {
-        verifyPageUpdateContent(getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION), SContentType.API_EXTENSION);
+        verifyPageUpdateContent(getPagePropertiesContentPair("contentType=" + SContentType.FORM), SContentType.FORM);
     }
 
     @Test
@@ -1062,7 +1163,7 @@ public class PageServiceImplTest {
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
 
-                EntityUpdateDescriptor entityUpdateDescriptor = (EntityUpdateDescriptor) invocation.getArguments()[1];
+                final EntityUpdateDescriptor entityUpdateDescriptor = (EntityUpdateDescriptor) invocation.getArguments()[1];
                 assertThat(entityUpdateDescriptor.getFields()).contains(expectedUpdateFields()).contains(entry("contentType", expectedContentType));
                 return null;
             }
