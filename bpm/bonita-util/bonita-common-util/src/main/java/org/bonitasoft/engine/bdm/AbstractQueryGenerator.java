@@ -154,12 +154,11 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
     }
 
     private Field getField(String fieldName, BusinessObject businessObject) {
-        for (final Field f : businessObject.getFields()) {
-            if (f.getName().equals(fieldName)) {
-                return f;
-            }
+        Field field = businessObject.getField(fieldName);
+        if(field == null) {
+            throw new IllegalArgumentException(fieldName + " doesn't exist in " + businessObject.getQualifiedName());
         }
-        throw new IllegalArgumentException(fieldName + " doesn't exist in " + businessObject.getQualifiedName());
+        return field;
     }
 
     private String createQueryContentForUniqueConstraint(String businessObjectName, UniqueConstraint uniqueConstraint) {
