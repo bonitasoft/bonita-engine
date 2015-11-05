@@ -22,6 +22,10 @@ import java.util.Objects;
  */
 public class ClassLoaderIdentifier implements Serializable {
 
+    public static final String GLOBAL_TYPE = "GLOBAL";
+    public static final long GLOBAL_ID = -1;
+    public static final ClassLoaderIdentifier GLOBAL = new ClassLoaderIdentifier(GLOBAL_TYPE, GLOBAL_ID);
+
     private String type;
     private long id;
 

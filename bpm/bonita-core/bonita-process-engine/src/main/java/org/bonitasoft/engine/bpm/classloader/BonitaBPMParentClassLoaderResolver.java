@@ -37,9 +37,9 @@ public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderReso
                 throw new BonitaRuntimeException("No tenant id set while creating the process classloader: " + childId);
             }
         } else if (ScopeType.TENANT.name().equals(childId.getType())) {
-            return null;//global
+            return ClassLoaderIdentifier.GLOBAL;//global
         } else if ("___datasource___".equals(childId.getType())) {
-            return null;//global
+            return ClassLoaderIdentifier.GLOBAL;
         } else {
             throw new BonitaRuntimeException("unable to find a parent for type: " + childId);
         }

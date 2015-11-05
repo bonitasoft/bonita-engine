@@ -33,6 +33,17 @@ public class ClassLoaderServiceImplTest {
             if (childId.getType().equals(CHILD_TYPE)) {
                 return new ClassLoaderIdentifier(PARENT_TYPE, PARENT_ID);
             } else {
+                return ClassLoaderIdentifier.GLOBAL;
+            }
+        }
+    };
+    private ParentClassLoaderResolver badParentClassLoaderResolver = new ParentClassLoaderResolver() {
+
+        @Override
+        public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
+            if (childId.getType().equals(CHILD_TYPE)) {
+                return new ClassLoaderIdentifier(PARENT_TYPE, PARENT_ID);
+            } else {
                 return null;
             }
         }
@@ -56,7 +67,7 @@ public class ClassLoaderServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        classLoaderService = spy(new ClassLoaderServiceImpl(parentClassLoaderResolver,logger,eventService));
+        classLoaderService = spy(new ClassLoaderServiceImpl(parentClassLoaderResolver, logger, eventService));
         processClassLoader = classLoaderService.getLocalClassLoader(CHILD_TYPE, CHILD_ID);
         tenantClassLoader = classLoaderService.getLocalClassLoader(PARENT_TYPE, PARENT_ID);
         testClassLoader = Thread.currentThread().getContextClassLoader();
@@ -109,7 +120,7 @@ public class ClassLoaderServiceImplTest {
         //given
         classLoaderService.addListener(CHILD_TYPE, CHILD_ID, myClassLoaderListener);
         //when
-        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Collections.<String, byte[]> emptyMap());
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Collections.<String, byte[]>emptyMap());
         //then
         assertThat(myClassLoaderListener.isOnUpdateCalled()).isTrue();
         assertThat(myClassLoaderListener.isOnDestroyCalled()).isFalse();
@@ -154,7 +165,7 @@ public class ClassLoaderServiceImplTest {
     @Test(expected = SClassLoaderException.class)
     public void should_removeLocalClassLoader_throw_exception_if_parent_not_removed() throws Exception {
         //given
-        classLoaderService.getLocalClassLoader(CHILD_TYPE,17);//second classloader
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 17);//second classloader
         //when
         classLoaderService.removeLocalClassLoader(CHILD_TYPE, CHILD_ID);
         classLoaderService.removeLocalClassLoader(PARENT_TYPE, PARENT_ID);
@@ -167,5 +178,35 @@ public class ClassLoaderServiceImplTest {
         classLoaderService.removeLocalClassLoader(CHILD_TYPE, CHILD_ID);
         classLoaderService.removeLocalClassLoader(PARENT_TYPE, PARENT_ID);
     }
+
+
+    @Test
+    public void should_getLocalClassLoader_create_expected_hierarchy() throws Exception {
+        //given
+        VirtualClassLoader localClassLoader = classLoaderService.getLocalClassLoader(CHILD_TYPE, CHILD_ID);
+        //when
+
+        assertThat(localClassLoader.getIdentifier()).isEqualTo(new ClassLoaderIdentifier(CHILD_TYPE, CHILD_ID));
+        ClassLoader parent = localClassLoader.getParent();
+        assertThat(parent).isInstanceOf(VirtualClassLoader.class);
+        assertThat(((VirtualClassLoader) parent).getIdentifier()).isEqualTo(new ClassLoaderIdentifier(PARENT_TYPE, PARENT_ID));
+        ClassLoader global = parent.getParent();
+        assertThat(global).isInstanceOf(VirtualClassLoader.class);
+        assertThat(((VirtualClassLoader) global).getIdentifier()).isEqualTo(ClassLoaderIdentifier.GLOBAL);
+        ClassLoader root = global.getParent();
+        assertThat(root).isNotInstanceOf(VirtualClassLoader.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_create_throw_an_exception_if_bad_resolver() throws Exception {
+        //given
+        classLoaderService = spy(new ClassLoaderServiceImpl(badParentClassLoaderResolver, logger, eventService));
+        //when
+        processClassLoader = classLoaderService.getLocalClassLoader(CHILD_TYPE, CHILD_ID);
+
+        //then exception
+
+    }
+
 
 }

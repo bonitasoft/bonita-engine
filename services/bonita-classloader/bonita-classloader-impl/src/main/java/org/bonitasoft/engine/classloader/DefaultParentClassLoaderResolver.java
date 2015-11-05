@@ -17,7 +17,7 @@ public class DefaultParentClassLoaderResolver implements ParentClassLoaderResolv
 
     @Override
     public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
-        return null;//global
+        return ClassLoaderIdentifier.GLOBAL;//global
     }
 
 }
