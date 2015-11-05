@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,6 +30,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.bonitasoft.engine.bdm.BDMSimpleNameProvider;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
@@ -68,10 +68,10 @@ public class BusinessObject {
     private List<Query> queries;
 
     public BusinessObject() {
-        fields = new ArrayList<Field>();
-        uniqueConstraints = new ArrayList<UniqueConstraint>();
-        queries = new ArrayList<Query>();
-        indexes = new ArrayList<Index>();
+        fields = new ArrayList<>();
+        uniqueConstraints = new ArrayList<>();
+        queries = new ArrayList<>();
+        indexes = new ArrayList<>();
     }
 
     public String getQualifiedName() {
@@ -165,7 +165,7 @@ public class BusinessObject {
     }
 
     public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
-        List<BusinessObject> refs = new ArrayList<BusinessObject>();
+        List<BusinessObject> refs = new ArrayList<>();
         for (Field field : fields) {
             if (isACompositionField(field)) {
                 refs.add(((RelationField) field).getReference());
@@ -195,12 +195,16 @@ public class BusinessObject {
     }
 
     public String getSimpleName() {
-        String simpleName = qualifiedName;
-        if (simpleName != null && simpleName.indexOf(".") != -1) {
-            final String[] split = simpleName.split("\\.");
-            simpleName = split[split.length - 1];
+        return BDMSimpleNameProvider.getSimpleBusinessObjectName(qualifiedName);
+    }
+
+    public Field getField(String fieldName) {
+        for (final Field f : getFields()) {
+            if (f.getName().equals(fieldName)) {
+                return f;
+            }
         }
-        return simpleName;
+        return null;
     }
 
     @Override
