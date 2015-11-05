@@ -21,7 +21,6 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 /**
  * Platform version of the EhCacheCacheService
@@ -30,9 +29,9 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
  */
 public class PlatformEhCacheCacheService extends CommonEhCacheCacheService implements PlatformCacheService {
 
-    public PlatformEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final List<CacheConfiguration> cacheConfigurations, final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
-        super(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
+    public PlatformEhCacheCacheService(final TechnicalLoggerService logger, final List<CacheConfiguration> cacheConfigurations,
+            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
+        super(logger, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     @Override
     public List<String> getCachesNames() {
         final String[] cacheNames = cacheManager.getCacheNames();
-        final List<String> cacheNamesList = new ArrayList<String>(cacheNames.length);
+        final List<String> cacheNamesList = new ArrayList<>(cacheNames.length);
         final String prefix = "P_";
         for (final String cacheName : cacheNames) {
             if (cacheName.startsWith(prefix)) {
@@ -83,4 +82,8 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
         }
     }
 
+    @Override
+    protected String getCacheManagerIdentifier() {
+        return "platform";
+    }
 }
