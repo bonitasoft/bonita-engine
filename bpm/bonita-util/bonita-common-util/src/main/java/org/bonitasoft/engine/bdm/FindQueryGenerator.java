@@ -73,8 +73,8 @@ public class FindQueryGenerator extends AbstractQueryGenerator {
 
     protected String createQueryContentForUniqueConstraint(final String businessObjectName, final UniqueConstraint uniqueConstraint) {
         checkArgumentisNotEmpty(businessObjectName);
-        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char alias = getSimpleNameAlias(simpleName);
+        final String simpleName = BDMSimpleNameProvider.getSimpleBusinessObjectName(businessObjectName);
+        final char alias = BDMSimpleNameProvider.getSimpleNameAlias(simpleName);
         final String selectBlock = buildSelectFrom(simpleName, alias);
         return buildQueryForUniqueConstraint(uniqueConstraint, alias, selectBlock);
     }

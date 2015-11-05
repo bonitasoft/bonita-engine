@@ -129,7 +129,7 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
     private String createQueryContentForLazyField(String businessObjectName, RelationField relationField) {
         checkArgumentisNotEmpty(businessObjectName);
         checkObjectIsNotNull(relationField, "field cannot be null");
-        final String boName = getSimpleBusinessObjectName(businessObjectName);
+        final String boName = BDMSimpleNameProvider.getSimpleBusinessObjectName(businessObjectName);
         final String boAlias = boName.toLowerCase() + "_0";
         final String fieldName = relationField.getName();
         final String fieldAlias = fieldName.toLowerCase() + "_1";
@@ -147,7 +147,7 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
         nameBuilder.append(getQueryPrefix());
         nameBuilder.append(WordUtils.capitalize(relationField.getName()));
         nameBuilder.append("By");
-        nameBuilder.append(getSimpleBusinessObjectName(businessObject.getQualifiedName()));
+        nameBuilder.append(BDMSimpleNameProvider.getSimpleBusinessObjectName(businessObject.getQualifiedName()));
         nameBuilder.append("PersistenceId");
         return nameBuilder.toString();
 
@@ -164,13 +164,9 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
 
     private String createQueryContentForUniqueConstraint(String businessObjectName, UniqueConstraint uniqueConstraint) {
         checkArgumentisNotEmpty(businessObjectName);
-        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char alias = getSimpleNameAlias(simpleName);
+        final String simpleName = BDMSimpleNameProvider.getSimpleBusinessObjectName(businessObjectName);
+        final char alias = BDMSimpleNameProvider.getSimpleNameAlias(simpleName);
         final String selectBlock = buildSelectFrom(simpleName, alias);
-        return buildQueryForUniqueConstraint(uniqueConstraint, alias, selectBlock);
-    }
-
-    private String buildQueryForUniqueConstraint(UniqueConstraint uniqueConstraint, char alias, String selectBlock) {
         final StringBuilder builder = new StringBuilder();
         builder.append(selectBlock);
         builder.append(buildWhereAnd(alias, uniqueConstraint.getFieldNames()));
@@ -199,8 +195,8 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
     protected String createQueryContentForField(String businessObjectName, Field field) {
         checkArgumentisNotEmpty(businessObjectName);
         checkObjectIsNotNull(field, "field cannot be null");
-        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char var = getSimpleNameAlias(simpleName);
+        final String simpleName = BDMSimpleNameProvider.getSimpleBusinessObjectName(businessObjectName);
+        final char var = BDMSimpleNameProvider.getSimpleNameAlias(simpleName);
         final StringBuilder builder = new StringBuilder();
         builder.append(buildSelectFrom(simpleName, var));
         builder.append(buildWhere(var, field.getName()));
@@ -210,8 +206,8 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
 
     protected String createSelectAllQueryContent(String businessObjectName) {
         checkArgumentisNotEmpty(businessObjectName);
-        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char alias = getSimpleNameAlias(simpleName);
+        final String simpleName = BDMSimpleNameProvider.getSimpleBusinessObjectName(businessObjectName);
+        final char alias = BDMSimpleNameProvider.getSimpleNameAlias(simpleName);
         final StringBuilder sb = new StringBuilder();
         sb.append(buildSelectFrom(simpleName, alias));
         sb.append(buildOrderBy(alias));
@@ -236,19 +232,6 @@ public abstract class AbstractQueryGenerator implements QueryGenerator {
         final StringBuilder builder = new StringBuilder();
         builder.append(prefix).append('.').append(paramName).append("= :").append(paramName).append(NEW_LINE);
         return builder.toString();
-    }
-
-    protected char getSimpleNameAlias(String simpleName) {
-        return Character.toLowerCase(simpleName.charAt(0));
-    }
-
-    public String getSimpleBusinessObjectName(final String businessObjectName) {
-        String newBusinessObjectName = businessObjectName;
-        final int lastIndexOf = newBusinessObjectName.lastIndexOf(".");
-        if (lastIndexOf != -1) {
-            newBusinessObjectName = newBusinessObjectName.substring(lastIndexOf + 1, newBusinessObjectName.length());
-        }
-        return newBusinessObjectName;
     }
 
     protected void checkArgumentisNotEmpty(String argument) {
