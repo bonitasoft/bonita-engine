@@ -16,10 +16,11 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -36,6 +37,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
+    private static final String SEPARATOR = ":";
+
     public static final String GLOBAL_TYPE = "GLOBAL";
 
     public static final long GLOBAL_ID = -1;
@@ -46,21 +49,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
-    private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
+    private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
     private final Object mutex = new ClassLoaderServiceMutex();
 
     private boolean shuttingDown = false;
 
     private final EventService eventService;
-    private boolean traceEnabled;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final TechnicalLoggerService logger,
             final EventService eventService) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         this.eventService = eventService;
-        traceEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
     }
 
@@ -68,8 +69,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     }
 
-    private ClassLoaderIdentifier getKey(final String type, final long id) {
-        return new ClassLoaderIdentifier(type, id);
+    private String getKey(final String type, final long id) {
+        final StringBuffer stb = new StringBuffer();
+        stb.append(type);
+        stb.append(SEPARATOR);
+        stb.append(id);
+        return stb.toString();
     }
 
     @Override
@@ -91,7 +96,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return getVirtualGlobalClassLoader();
     }
 
-    private void warnOnShuttingDown(final ClassLoaderIdentifier key) {
+    private void warnOnShuttingDown(final String key) {
         if (shuttingDown && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
             logger.log(getClass(), TechnicalLogSeverity.WARNING, "Using local classloader on after ClassLoaderService shuttingdown: " + key);
         }
@@ -99,66 +104,78 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public VirtualClassLoader getLocalClassLoader(final String type, final long id) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLocalClassLoader"));
+        }
         NullCheckingUtil.checkArgsNotNull(id, type);
-        final ClassLoaderIdentifier key = getKey(type, id);
-        return getLocalClassLoader(key);
-    }
-
-    private VirtualClassLoader getLocalClassLoader(ClassLoaderIdentifier key) {
+        final String key = getKey(type, id);
         warnOnShuttingDown(key);
+        // here we have to manage the case of the "first" get to avoid creating 2 classloaders
+        // we decided to do it in a "double" check manner
+        // as it happens almost "never" (concurrency maybe on 2 or more threads but only on time...
+        // we use the same mutex for all pair type/id
         if (!localClassLoaders.containsKey(key)) {
             synchronized (mutex) {
-                // double check synchronization
+                // here we have to check again the classloader is still not null as it can be not null if the thread executing now is the "second" one
                 if (!localClassLoaders.containsKey(key)) {
-                    createClassLoader(key);
+                    final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(getGlobalClassLoader(),
+                            parentClassLoaderResolver, this, type, id));
+                    localClassLoaders.put(key, virtualClassLoader);
                 }
             }
         }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalClassLoader"));
+        }
+        // final VirtualClassLoader virtualClassLoader = localClassLoaders.get(key);
+        // final String newKey = getKey(virtualClassLoader.getArtifactType(), virtualClassLoader.getArtifactId());
+        // if (!key.equals(newKey)) {
+        // logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "***************** WARNING: getLocalClassLoader() returning wrong Local CL. key: " + newKey
+        // + "  *******************");
+        // }
         return localClassLoaders.get(key);
     }
 
-    private void createClassLoader(ClassLoaderIdentifier identifier) {
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "creating classloader with key " + identifier);
-        }
-        VirtualClassLoader parent = getParentClassLoader(identifier);
-        final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(), parent);
-        parent.addChild(virtualClassLoader);
-        localClassLoaders.put(identifier, virtualClassLoader);
-    }
-
-    private VirtualClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
-        final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver.getParentClassLoaderIdentifier(identifier);
-        VirtualClassLoader parent;
-        if (parentIdentifier == null) {
-            parent = getVirtualGlobalClassLoader();
-        } else {
-            parent = getLocalClassLoader(parentIdentifier);
-        }
-        return parent;
-    }
-
     @Override
-    public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Removing local classloader for type " + type + " of id " + id);
+    public void removeLocalClassLoader(final String type, final long id) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeLocalClassLoader")
+                    + ": Removing local classloader for type " + type + " of id " + id);
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
 
         // Remove the class loader
-        final ClassLoaderIdentifier key = getKey(type, id);
+        final String key = getKey(type, id);
         destroyLocalClassLoader(key);
+
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeLocalClassLoader"));
+        }
     }
 
-    private void destroyLocalClassLoader(final ClassLoaderIdentifier key) throws SClassLoaderException {
-        if (traceEnabled) {
+    @Override
+    public void removeAllLocalClassLoaders(final String application) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeAllLocalClassLoaders"));
+        }
+        NullCheckingUtil.checkArgsNotNull(application);
+        final Set<String> keySet = new HashSet<String>(localClassLoaders.keySet());
+        for (final String key : keySet) {
+            if (key.startsWith(application + SEPARATOR)) {
+                destroyLocalClassLoader(key);
+            }
+        }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllLocalClassLoaders"));
+        }
+    }
+
+    private void destroyLocalClassLoader(final String key) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying local classloader with key: " + key);
         }
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
-            if (localClassLoader.hasChildren()) {
-                throw new SClassLoaderException("Unable to delete classloader " + key + " because it has children: " + localClassLoader.getChildren());
-            }
             localClassLoader.destroy();
             localClassLoaders.remove(key);
         }
@@ -166,7 +183,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException {
-        if (traceEnabled) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Refreshing global classloader");
         }
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
@@ -181,15 +198,17 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws SClassLoaderException {
-        final ClassLoaderIdentifier key = getKey(type, id);
-        if (traceEnabled) {
+        final String key = getKey(type, id);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Refreshing local classloader with key: " + key);
         }
-        final VirtualClassLoader virtualClassloader = getLocalClassLoader(type, id);
+        final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
         try {
             refreshClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id),
-                    getParentClassLoader(key));
-            final SEvent event = new SEventImpl("ClassLoaderRefreshed");
+                    new ParentRedirectClassLoader(
+                            getGlobalClassLoader(), parentClassLoaderResolver, this, type, id));
+            final String eventType = "ClassLoaderRefreshed";
+            final SEvent event = new SEventImpl(eventType);
             event.setObject(key);
             eventService.fireEvent(event);
         } catch (Exception e) {
@@ -209,47 +228,47 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void start() {
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Starting classloader service, creating the platform classloader");
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Starting classloader service");
         }
         shuttingDown = false;
-        //we do not create or destroy the global classloader because it does not point to a bonita classloader
+        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
     }
 
     @Override
-    public void stop() throws SClassLoaderException {
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Stopping classloader service, destroying all classloaders");
+    public void stop() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Stopping classloader service");
         }
         shuttingDown = true;
         destroyAllLocalClassLoaders();
+        virtualGlobalClassLoader.destroy();
     }
 
-    private void destroyAllLocalClassLoaders() throws SClassLoaderException {
-        if (traceEnabled) {
+    private void destroyAllLocalClassLoaders() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying all classloaders");
         }
-        //remove elements only that don't have children
-        //there is no loop in this so the algorithm finishes
-        final Set<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> entries = localClassLoaders.entrySet();
-        while (!entries.isEmpty()) {
-            final Iterator<Map.Entry<ClassLoaderIdentifier, VirtualClassLoader>> iterator = entries.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<ClassLoaderIdentifier, VirtualClassLoader> next = iterator.next();
-                if (!next.getValue().hasChildren()) {
-                    next.getValue().destroy();
-                    iterator.remove();
-                }
-            }
+        for (final VirtualClassLoader classLoader : localClassLoaders.values()) {
+            classLoader.destroy();
         }
+        localClassLoaders.clear();
     }
 
     @Override
     public void pause() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Pausing classloader service");
+        }
+        // Nothing to do
     }
 
     @Override
     public void resume() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Resuming classloader service");
+        }
+        // Nothing to do
     }
 
     @Override

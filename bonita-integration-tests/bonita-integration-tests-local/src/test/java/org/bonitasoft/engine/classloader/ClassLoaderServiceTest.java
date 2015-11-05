@@ -66,6 +66,9 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
     @After
     public void tearDown() throws Exception {
+        classLoaderService.removeAllLocalClassLoaders(TYPE1.name());
+        classLoaderService.removeAllLocalClassLoaders(TYPE2.name());
+
         TestUtil.closeTransactionIfOpen(getTransactionService());
 
         getTransactionService().begin();
@@ -344,6 +347,20 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
+    public void testRemoveAllLocalClassLoader() throws Exception {
+        initializeClassLoaderService();
+        // getTransactionService().begin();
+        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
+
+        classLoaderService.removeAllLocalClassLoaders(TYPE1.name());
+
+        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
+        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1.name(), ID2));
+        // getTransactionService().complete();
+    }
+
+    @Test
     public void testAddResourcesToGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
         getTransactionService().begin();
@@ -353,7 +370,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
         final long dependencyId = createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
         createPlatformDependencyMapping(dependencyId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
-        Thread.sleep(10); // to be sure classloader refresh does NOT occur.
+        Thread.sleep(10); // to be sure classlaoder refresh does NOT occur.
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         final ClassLoader classLoader2 = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader2);
