@@ -18,7 +18,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
@@ -41,11 +43,15 @@ public class VirtualClassLoader extends ClassLoader {
      */
     private BonitaClassLoader classloader;
 
+    private VirtualClassLoader virtualParent;
+
     protected final String artifactType;
 
     protected final long artifactId;
 
     private List<ClassLoaderListener> listeners;
+
+    private Set<VirtualClassLoader> children = new HashSet<>();
 
     protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
@@ -54,14 +60,26 @@ public class VirtualClassLoader extends ClassLoader {
         listeners = new ArrayList<>();
     }
 
+    protected VirtualClassLoader(final String artifactType, final long artifactId, final VirtualClassLoader parent) {
+        this(artifactType, artifactId, (ClassLoader) parent);
+        virtualParent = parent;
+    }
+
     void replaceClassLoader(final BonitaClassLoader classloader) {
         BonitaClassLoader oldClassLoader = this.classloader;
         this.classloader = classloader;
+        notifyUpdate();
+        if (oldClassLoader != null) {
+            destroy(oldClassLoader);
+        }
+    }
+
+    private void notifyUpdate() {
         for (ClassLoaderListener listener : listeners) {
             listener.onUpdate(this);
         }
-        if(oldClassLoader != null){
-            destroy(oldClassLoader);
+        for (VirtualClassLoader child : children) {
+            child.notifyUpdate();
         }
     }
 
@@ -112,9 +130,17 @@ public class VirtualClassLoader extends ClassLoader {
     public void destroy() {
         final BonitaClassLoader classloader = this.classloader;
         destroy(classloader);
+        notifyDestroy();
+        if(virtualParent != null){
+            virtualParent.removeChild(this);
+        }
+    }
+
+    private void notifyDestroy() {
         for (ClassLoaderListener listener : listeners) {
             listener.onDestroy(this);
         }
+        //do not notify children, it should not happen
     }
 
     private void destroy(BonitaClassLoader classloader) {
@@ -135,5 +161,22 @@ public class VirtualClassLoader extends ClassLoader {
 
     public boolean removeListener(ClassLoaderListener classLoaderListener) {
         return listeners.remove(classLoaderListener);
+    }
+
+    public void addChild(VirtualClassLoader virtualClassLoader) {
+        children.add(virtualClassLoader);
+    }
+
+    private void removeChild(VirtualClassLoader child) {
+        children.remove(child);
+
+    }
+
+    public boolean hasChildren() {
+        return !children.isEmpty();
+    }
+
+    public Set<VirtualClassLoader> getChildren() {
+        return children;
     }
 }

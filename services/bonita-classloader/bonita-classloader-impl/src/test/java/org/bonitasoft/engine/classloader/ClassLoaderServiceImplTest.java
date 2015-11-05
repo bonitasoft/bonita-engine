@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.util.Collections;
 
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
@@ -17,9 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -28,14 +26,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ClassLoaderServiceImplTest {
 
-    @Mock
-    private ParentClassLoaderResolver parentClassLoaderResolver;
+    private ParentClassLoaderResolver parentClassLoaderResolver = new ParentClassLoaderResolver() {
+
+        @Override
+        public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
+            if (childId.getType().equals(CHILD_TYPE)) {
+                return new ClassLoaderIdentifier(PARENT_TYPE, PARENT_ID);
+            } else {
+                return null;
+            }
+        }
+    };
     @Mock
     private TechnicalLoggerService logger;
     @Mock
     private EventService eventService;
-    @Spy
-    @InjectMocks
     private ClassLoaderServiceImpl classLoaderService;
     private ClassLoader testClassLoader;
     private VirtualClassLoader processClassLoader;
@@ -44,17 +49,22 @@ public class ClassLoaderServiceImplTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private String CHILD_TYPE = "child";
+    private String PARENT_TYPE = "parent";
+    private long CHILD_ID = 12;
+    private long PARENT_ID = 13;
 
     @Before
     public void before() throws Exception {
-        processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), 12);
-        tenantClassLoader = classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), 13);
+        classLoaderService = spy(new ClassLoaderServiceImpl(parentClassLoaderResolver,logger,eventService));
+        processClassLoader = classLoaderService.getLocalClassLoader(CHILD_TYPE, CHILD_ID);
+        tenantClassLoader = classLoaderService.getLocalClassLoader(PARENT_TYPE, PARENT_ID);
         testClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(processClassLoader);
         myClassLoaderListener = new MyClassLoaderListener();
         temporaryFolder.create();
         final File file = temporaryFolder.newFolder();
-        doReturn(file.toURI()).when(classLoaderService).getLocalTemporaryFolder(anyString(),anyLong());
+        doReturn(file.toURI()).when(classLoaderService).getLocalTemporaryFolder(anyString(), anyLong());
     }
 
     @After
@@ -62,11 +72,10 @@ public class ClassLoaderServiceImplTest {
         Thread.currentThread().setContextClassLoader(testClassLoader);
     }
 
-
     @Test
     public void should_addListener_add_on_specified_classloader_do_not_call_on_others() throws Exception {
         //given
-        classLoaderService.addListener(ScopeType.TENANT.name(), 13, myClassLoaderListener);
+        classLoaderService.addListener(PARENT_TYPE, PARENT_ID, myClassLoaderListener);
         //when
         processClassLoader.destroy();
         //then
@@ -76,7 +85,7 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_addListener_add_on_specified_classloader_call_listener() throws Exception {
         //given
-        classLoaderService.addListener(ScopeType.TENANT.name(), 13, myClassLoaderListener);
+        classLoaderService.addListener(PARENT_TYPE, PARENT_ID, myClassLoaderListener);
         //when
         tenantClassLoader.destroy();
         //then
@@ -86,8 +95,8 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_removeListener_remove_the_listener() throws Exception {
         //given
-        classLoaderService.addListener(ScopeType.TENANT.name(), 13, myClassLoaderListener);
-        classLoaderService.removeListener(ScopeType.TENANT.name(), 13, myClassLoaderListener);
+        classLoaderService.addListener(PARENT_TYPE, PARENT_ID, myClassLoaderListener);
+        classLoaderService.removeListener(PARENT_TYPE, PARENT_ID, myClassLoaderListener);
         //when
         processClassLoader.destroy();
         //then
@@ -98,9 +107,9 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_refreshClassLoader_call_replace_classloader() throws Exception {
         //given
-        classLoaderService.addListener(ScopeType.PROCESS.name(), 12, myClassLoaderListener);
+        classLoaderService.addListener(CHILD_TYPE, CHILD_ID, myClassLoaderListener);
         //when
-        classLoaderService.refreshLocalClassLoader(ScopeType.PROCESS.name(), 12, Collections.<String, byte[]> emptyMap());
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Collections.<String, byte[]> emptyMap());
         //then
         assertThat(myClassLoaderListener.isOnUpdateCalled()).isTrue();
         assertThat(myClassLoaderListener.isOnDestroyCalled()).isFalse();
@@ -109,25 +118,54 @@ public class ClassLoaderServiceImplTest {
     @Test
     public void should_stop_destroy_all_classloaders() throws Exception {
         //given
-        classLoaderService.addListener(ScopeType.PROCESS.name(), 12, myClassLoaderListener);
-        classLoaderService.addListener(ScopeType.TENANT.name(), 13, myClassLoaderListener);
+        classLoaderService.addListener(CHILD_TYPE, CHILD_ID, myClassLoaderListener);
+        classLoaderService.addListener(PARENT_TYPE, PARENT_ID, myClassLoaderListener);
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 125);
+        classLoaderService.addListener(CHILD_TYPE, 125, myClassLoaderListener);
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 126);
+        classLoaderService.addListener(CHILD_TYPE, 126, myClassLoaderListener);
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 127);
+        classLoaderService.addListener(CHILD_TYPE, 127, myClassLoaderListener);
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 128);
+        classLoaderService.addListener(CHILD_TYPE, 128, myClassLoaderListener);
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 129);
+        classLoaderService.addListener(CHILD_TYPE, 129, myClassLoaderListener);
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 130);
+        classLoaderService.addListener(CHILD_TYPE, 130, myClassLoaderListener);
         //when
         classLoaderService.stop();
         //then
         assertThat(myClassLoaderListener.getOnUpdateCalled()).isEqualTo(0);
-        assertThat(myClassLoaderListener.getOnDestroyCalled()).isEqualTo(2);
+        assertThat(myClassLoaderListener.getOnDestroyCalled()).isEqualTo(8);
     }
 
     @Test
     public void should_removeLocalClassLoader_call_destroy() throws Exception {
         //given
-        classLoaderService.addListener(ScopeType.PROCESS.name(), 12, myClassLoaderListener);
-        classLoaderService.addListener(ScopeType.TENANT.name(), 13, myClassLoaderListener);
+        classLoaderService.addListener(CHILD_TYPE, CHILD_ID, myClassLoaderListener);
+        classLoaderService.addListener(PARENT_TYPE, PARENT_ID, myClassLoaderListener);
         //when
-        classLoaderService.removeLocalClassLoader(ScopeType.PROCESS.name(), 12);
+        classLoaderService.removeLocalClassLoader(CHILD_TYPE, CHILD_ID);
 
         //then
         assertThat(myClassLoaderListener.getOnDestroyCalled()).isEqualTo(1);
+    }
+
+    @Test(expected = SClassLoaderException.class)
+    public void should_removeLocalClassLoader_throw_exception_if_parent_not_removed() throws Exception {
+        //given
+        classLoaderService.getLocalClassLoader(CHILD_TYPE,17);//second classloader
+        //when
+        classLoaderService.removeLocalClassLoader(CHILD_TYPE, CHILD_ID);
+        classLoaderService.removeLocalClassLoader(PARENT_TYPE, PARENT_ID);
+    }
+
+    @Test
+    public void should_removeLocalClassLoader_work_if_remove_in_right_order() throws Exception {
+        //given
+        //when
+        classLoaderService.removeLocalClassLoader(CHILD_TYPE, CHILD_ID);
+        classLoaderService.removeLocalClassLoader(PARENT_TYPE, PARENT_ID);
     }
 
 }
