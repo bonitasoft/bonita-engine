@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
@@ -37,11 +36,11 @@ import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.business.data.ClassloaderRefresher;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -56,6 +55,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Romain Bioteau
@@ -244,8 +245,6 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         //when
         final BusinessDataQueryResultImpl businessDataQueryResult = (BusinessDataQueryResultImpl) getCommandAPI().execute(GET_BUSINESS_DATA_BY_QUERY_COMMAND,
                 parameters);
-
-        final ObjectMapper mapper = new ObjectMapper();
 
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
 

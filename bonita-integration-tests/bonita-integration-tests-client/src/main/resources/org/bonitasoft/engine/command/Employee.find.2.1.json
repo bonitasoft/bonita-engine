@@ -1,7 +1,7 @@
 [
   {
-    "persistenceId": 3,
-    "persistenceId_string": "3",
+    "persistenceId": "${json-unit.ignore}",
+    "persistenceId_string": "${json-unit.ignore}",
     "persistenceVersion": 0,
     "persistenceVersion_string": "0",
     "firstName": "Matthieu",
@@ -9,7 +9,7 @@
     "links": [
       {
         "rel": "addresses",
-        "href": "/businessdata/org.bonita.pojo.BonitaEmployee/3/addresses"
+        "href": "${json-unit.ignore}"
       }
     ]
   }
