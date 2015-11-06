@@ -25,6 +25,8 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -38,15 +40,15 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
      * serialized and given to hazelcast
      */
     static HazelcastInstance hazelcastInstance;
-
     static ClassLoaderService classLoaderService;
-
     static TechnicalLoggerService loggerService;
+    static SessionAccessor sessionAccessor;
 
     @SuppressWarnings("static-access")
     public ClusteredClassLoaderService(final HazelcastInstance hazelcastInstance,
-            final ClassLoaderService classLoaderService,
-            final TechnicalLoggerService loggerService) {
+                                       final ClassLoaderService classLoaderService,
+                                       final TechnicalLoggerService loggerService, SessionAccessor sessionAccessor) {
+        this.sessionAccessor = sessionAccessor;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -88,8 +90,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
         // we use the executor service to refresh classloader on all nodes
 
-        RefreshClassLoaderTask refreshClassLoaderTask = new RefreshClassLoaderTask(
-                resources);
+        RefreshClassLoaderTask refreshClassLoaderTask = new RefreshClassLoaderTask(resources);
 
         executeRefreshOnCluster(null, -1, refreshClassLoaderTask);
 
@@ -98,13 +99,14 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     @Override
     public void refreshLocalClassLoader(final String type, final long id,
             final Map<String, byte[]> resources) throws SClassLoaderException {
-
         // we use the executor service to refresh classloader on all nodes
-
-        RefreshClassLoaderTask refreshClassLoaderTask = new RefreshClassLoaderTask(
-                type, id, resources);
-
-        executeRefreshOnCluster(type, id, refreshClassLoaderTask);
+        RefreshClassLoaderTask refreshClassLoaderTask;
+        try {
+            refreshClassLoaderTask = new RefreshClassLoaderTask(sessionAccessor.getTenantId(), type, id, resources);
+            executeRefreshOnCluster(type, id, refreshClassLoaderTask);
+        } catch (STenantIdNotSetException e) {
+            throw new SClassLoaderException(e);
+        }
     }
 
     private void executeRefreshOnCluster(final String type, final long id,
