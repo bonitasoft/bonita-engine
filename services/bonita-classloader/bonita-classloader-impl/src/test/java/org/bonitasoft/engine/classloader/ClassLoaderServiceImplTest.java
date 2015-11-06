@@ -1,10 +1,14 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.util.Collections;
@@ -208,5 +212,33 @@ public class ClassLoaderServiceImplTest {
 
     }
 
+
+    @Test
+    public void should_globalListeners_be_called_on_destroy() throws Exception {
+        //given
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 17);//second classloader
+        ClassLoaderListener listener = mock(ClassLoaderListener.class);
+        classLoaderService.addListener(listener);
+        //when
+        classLoaderService.removeLocalClassLoader(CHILD_TYPE, CHILD_ID);
+        classLoaderService.removeLocalClassLoader(CHILD_TYPE, 17);
+
+        //then
+        verify(listener, times(2)).onDestroy(any(VirtualClassLoader.class));
+    }
+
+    @Test
+    public void should_globalListeners_be_called_on_update() throws Exception {
+        //given
+        classLoaderService.getLocalClassLoader(CHILD_TYPE, 17);//second classloader
+        ClassLoaderListener listener = mock(ClassLoaderListener.class);
+        classLoaderService.addListener(listener);
+        //when
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Collections.<String, byte[]>emptyMap());
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, 17, Collections.<String, byte[]>emptyMap());
+
+        //then
+        verify(listener, times(2)).onUpdate(any(VirtualClassLoader.class));
+    }
 
 }
