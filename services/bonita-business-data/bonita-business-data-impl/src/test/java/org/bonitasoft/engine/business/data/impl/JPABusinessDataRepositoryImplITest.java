@@ -37,6 +37,9 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import org.bonitasoft.engine.business.data.NonUniqueResultException;
+import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -54,8 +57,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import bitronix.tm.TransactionManagerServices;
 
-import org.bonitasoft.engine.business.data.NonUniqueResultException;
-import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.company.pojo.Employee;
 import com.company.pojo.Person;
 
@@ -85,6 +86,10 @@ public class JPABusinessDataRepositoryImplITest {
 
     private UserTransaction ut;
 
+    private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
+
+    private TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
+
     @BeforeClass
     public static void initializeBitronix() {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
@@ -107,7 +112,8 @@ public class JPABusinessDataRepositoryImplITest {
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, 1L));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, configuration));
+        businessDataRepository = spy(
+                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
@@ -206,22 +212,22 @@ public class JPABusinessDataRepositoryImplITest {
         Employee emp1 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
         Employee emp2 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
         Employee emp3 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
-        
+
         List<Employee> emps = businessDataRepository.findByIds(Employee.class, Arrays.asList(emp1.getPersistenceId(), emp2.getPersistenceId()));
-        
+
         assertThat(emps).contains(emp1, emp2);
         assertThat(emps).doesNotContain(emp3);
     }
-    
+
     @Test
     public void should_return_an_empty_list_when_getting_entities_with_empty_ids_list() throws Exception {
-       ArrayList<Long> emptyIdsList = new ArrayList<Long>();
-        
+        ArrayList<Long> emptyIdsList = new ArrayList<Long>();
+
         List<Employee> emps = businessDataRepository.findByIds(Employee.class, emptyIdsList);
-        
+
         assertThat(emps).isEmpty();
     }
-    
+
     @Test
     public void returnNullnWhenFindingAnUnknownEmployee() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) "Unknown_lastName");

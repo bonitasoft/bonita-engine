@@ -20,21 +20,28 @@ import java.util.List;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.impl.utils.JsonNumberSerializerHelper;
+import org.bonitasoft.engine.classloader.ClassLoaderListener;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerializer {
+public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerializer, ClassLoaderListener {
 
-    private final ObjectMapper mapper;
+    private ObjectMapper mapper;
 
-    private final EntitySerializer serializer;
+    private EntitySerializer serializer;
 
-    public JsonBusinessDataSerializerImpl() {
-        mapper = new ObjectMapper();
+    public JsonBusinessDataSerializerImpl(ClassLoaderService classLoaderService) {
+        init();
+        classLoaderService.addListener(this);
+    }
+
+    private void init() {
         serializer = new EntitySerializer(new JsonNumberSerializerHelper());
+        mapper = new ObjectMapper();
         final SimpleModule hbm = new SimpleModule();
         hbm.addSerializer(serializer);
         mapper.registerModule(hbm);
@@ -58,4 +65,13 @@ public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerialize
         return writer.toString();
     }
 
+    @Override
+    public void onUpdate(ClassLoader newClassLoader) {
+        init();
+    }
+
+    @Override
+    public void onDestroy(ClassLoader oldClassLoader) {
+        init();
+    }
 }

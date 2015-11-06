@@ -32,6 +32,7 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -75,6 +76,9 @@ public class ConcurrencyIT {
 
     private UserTransaction ut;
 
+    private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
+    private TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
+
     @BeforeClass
     public static void initializeBitronix() {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
@@ -96,7 +100,7 @@ public class ConcurrencyIT {
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, 1L));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, configuration));
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
 
         ut = TransactionManagerServices.getTransactionManager();

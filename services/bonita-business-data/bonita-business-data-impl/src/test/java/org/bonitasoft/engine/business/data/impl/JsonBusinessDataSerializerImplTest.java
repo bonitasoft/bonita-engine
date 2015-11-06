@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,9 +41,11 @@ public class JsonBusinessDataSerializerImplTest {
 
     List<Entity> personList;
 
+    private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
+
     @Before
     public void setUp() throws Exception {
-        jsonBusinessDataSerializer = new JsonBusinessDataSerializerImpl();
+        jsonBusinessDataSerializer = new JsonBusinessDataSerializerImpl(classLoaderService);
 
     }
 

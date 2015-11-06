@@ -21,9 +21,11 @@ import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 
 /**
  * @author Romain Bioteau
@@ -76,6 +78,7 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     private byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        ((DefaultSerializerProvider) mapper.getSerializerProvider()).flushCachedSerializers();
         try {
             return mapper.writeValueAsBytes(result);
         } catch (final JsonProcessingException jpe) {
