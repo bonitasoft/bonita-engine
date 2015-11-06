@@ -109,6 +109,39 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(shell1).isNotEqualTo(shell2);
     }
 
+
+    @Test
+    public void should_update_on_classloader_listener_clear_shell_cache() throws Exception {
+        // given
+
+        // when
+        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        groovyScriptExpressionExecutorCacheStrategy.onUpdate(null);
+        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+
+        // then
+        assertThat(shell1).isNotNull();
+        assertThat(shell2).isNotNull();
+        assertThat(shell1).isNotEqualTo(shell2);
+    }
+
+
+    @Test
+    public void should_destroy_on_classloader_listener_clear_shell_cache() throws Exception {
+        // given
+
+        // when
+        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        groovyScriptExpressionExecutorCacheStrategy.onDestroy(null);
+        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+
+        // then
+        assertThat(shell1).isNotNull();
+        assertThat(shell2).isNotNull();
+        assertThat(shell1).isNotEqualTo(shell2);
+    }
+
+
     @Test
     public void should_getShell_return_same_shell_for_1_definition() throws Exception {
         // when
