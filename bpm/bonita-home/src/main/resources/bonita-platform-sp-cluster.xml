@@ -22,7 +22,9 @@
 		<constructor-arg name="classLoaderService" ref="normalClassLoader" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 		<constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
+
 	<bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 	</bean>
