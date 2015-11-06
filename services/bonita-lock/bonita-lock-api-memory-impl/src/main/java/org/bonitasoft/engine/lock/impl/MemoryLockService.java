@@ -39,7 +39,7 @@ public class MemoryLockService implements LockService {
 
     protected static final String SEPARATOR = "_";
 
-    private final Map<String, ReentrantLock> locks = Collections.synchronizedMap(new HashMap<String, ReentrantLock>());
+    private final Map<String, ReentrantLock> usedLocks = Collections.synchronizedMap(new HashMap<String, ReentrantLock>());
 
     protected final TechnicalLoggerService logger;
 
@@ -65,9 +65,9 @@ public class MemoryLockService implements LockService {
         traceEnabled = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         this.lockPoolSize = lockPoolSize;
 
-        // the goal of this map of mutexs is not to solve completely the competition between keys,
-        // it is only improving the default "one lock" behaviour by partitioning ids among a chosen pool size
-        // this a sharding approach
+        // The goal of this map of mutexs is not to solve completely the competition between keys,
+        // it is only improving the default "one lock" behaviour by partitioning ids among a chosen pool size.
+        // This a sharding approach.
         final Map<Integer, Object> tmpMutexs = new HashMap<>();
         for (int i = 0; i < lockPoolSize; i++) {
             tmpMutexs.put(i, new MemoryLockServiceMutex());
@@ -88,9 +88,9 @@ public class MemoryLockService implements LockService {
     }
 
     protected ReentrantLock getLockAndPutItInMap(final String key) {
-        if (!locks.containsKey(key)) {
+        if (!usedLocks.containsKey(key)) {
             // use fair mode?
-            locks.put(key, new ReentrantLock());
+            usedLocks.put(key, new ReentrantLock());
         }
         return getLockFromKey(key);
     }
@@ -105,7 +105,7 @@ public class MemoryLockService implements LockService {
                 if (traceEnabled) {
                     logger.log(getClass(), TechnicalLogSeverity.TRACE, "removed from map " + reentrantLock.hashCode() + " id=" + key);
                 }
-                locks.remove(key);
+                usedLocks.remove(key);
             } else {
                 if (debugEnabled) {
                     logger.log(getClass(), TechnicalLogSeverity.DEBUG,
@@ -158,8 +158,9 @@ public class MemoryLockService implements LockService {
 
             if (lock.isHeldByCurrentThread()) {
                 // We do not want to support reentrant access
-                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Trying to acquire the lock another time by the same Thread, this should not happen !");
-                return null;
+                final String message = "Trying to acquire the lock another time by the same Thread, this should not happen !";
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, message);
+                throw new IllegalStateException(message);
             }
         }
         try {
@@ -179,7 +180,7 @@ public class MemoryLockService implements LockService {
                         if (debugEnabled) {
                             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Yes, someone just released the lock, let's take it !");
                         }
-                        locks.put(key, lock);
+                        usedLocks.put(key, lock);
                     } else if (previousLock != lock) {
                         if (debugEnabled) {
                             try {
@@ -255,7 +256,7 @@ public class MemoryLockService implements LockService {
     }
 
     protected ReentrantLock getLockFromKey(final String key) {
-        return locks.get(key);
+        return usedLocks.get(key);
     }
 
 }
