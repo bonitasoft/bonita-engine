@@ -170,4 +170,14 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
         return classLoaderService.removeListener(type, id, classLoaderListener);
     }
 
+    @Override
+    public boolean addListener(ClassLoaderListener classLoaderListener) {
+        return classLoaderService.addListener(classLoaderListener);
+    }
+
+    @Override
+    public boolean removeListener(ClassLoaderListener classLoaderListener) {
+        return classLoaderService.removeListener(classLoaderListener);
+    }
+
 }
