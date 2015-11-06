@@ -23,5 +23,5 @@ public interface BusinessDataQueryMetadata extends Serializable {
 
     Integer getMaxResults();
 
-    Long getCountResults();
+    Long getCount();
 }

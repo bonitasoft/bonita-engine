@@ -39,7 +39,7 @@ public class BusinessDataQueryMetadataImpl implements BusinessDataQueryMetadata 
         return maxResults;
     }
 
-    public Long getCountResults() {
+    public Long getCount() {
         return countResults;
     }
 }
