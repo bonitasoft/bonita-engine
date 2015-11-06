@@ -224,7 +224,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         parameters.put(MAX_RESULTS, 1);
         final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper(); 
         final Long count = mapper.readValue(result, Long.class);
         assertThat(count).isEqualTo(3L);
     }
@@ -248,7 +248,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
 
-        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCountResults()).isEqualTo(3L);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCount()).isEqualTo(3L);
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getStartIndex()).isEqualTo(2);
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getMaxResults()).isEqualTo(1);
 

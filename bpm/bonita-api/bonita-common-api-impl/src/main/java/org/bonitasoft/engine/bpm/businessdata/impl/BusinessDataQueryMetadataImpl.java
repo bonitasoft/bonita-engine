@@ -19,16 +19,16 @@ public class BusinessDataQueryMetadataImpl implements BusinessDataQueryMetadata 
 
     private final Integer startIndex;
     private final Integer maxResults;
-    private final Long countResults;
+    private final Long count;
 
     public BusinessDataQueryMetadataImpl(){
         this(null,null,null);
     };
 
-    public BusinessDataQueryMetadataImpl(Integer startIndex, Integer maxResults, Long countResults) {
+    public BusinessDataQueryMetadataImpl(Integer startIndex, Integer maxResults, Long count) {
         this.startIndex = startIndex;
         this.maxResults = maxResults;
-        this.countResults = countResults;
+        this.count = count;
     }
 
     public Integer getStartIndex() {
@@ -39,7 +39,7 @@ public class BusinessDataQueryMetadataImpl implements BusinessDataQueryMetadata 
         return maxResults;
     }
 
-    public Long getCountResults() {
-        return countResults;
+    public Long getCount() {
+        return count;
     }
 }
