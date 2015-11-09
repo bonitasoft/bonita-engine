@@ -69,7 +69,7 @@ public class PageAPIImpl implements PageAPI {
         }
     }
 
-    private PageAPIDelegate getPageAPIDelegate() {
+    protected PageAPIDelegate getPageAPIDelegate() {
         return new PageAPIDelegate(getTenantAccessor(), SessionInfos.getUserIdFromSession());
     }
 
@@ -143,17 +143,18 @@ public class PageAPIImpl implements PageAPI {
         return getPageAPIDelegate().getPageProperties(content, checkIfItAlreadyExists);
     }
 
+    @Override
     public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
-        PageMappingService pageMappingService = retrievePageMappingService();
+        final PageMappingService pageMappingService = retrievePageMappingService();
         try {
             return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context, executeAuthorizationRules));
-        } catch (SObjectNotFoundException e) {
+        } catch (final SObjectNotFoundException e) {
             throw new NotFoundException(e);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
-        } catch (SExecutionException e) {
+        } catch (final SExecutionException e) {
             throw new ExecutionException(e);
-        } catch (SAuthorizationException e) {
+        } catch (final SAuthorizationException e) {
             throw new UnauthorizedAccessException(e);
         }
     }
@@ -161,5 +162,6 @@ public class PageAPIImpl implements PageAPI {
     PageMappingService retrievePageMappingService() {
         return getTenantAccessor().getPageMappingService();
     }
+
 
 }
