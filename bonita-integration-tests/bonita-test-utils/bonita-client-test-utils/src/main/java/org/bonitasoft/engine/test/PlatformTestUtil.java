@@ -64,6 +64,14 @@ public class PlatformTestUtil {
         logoutOnPlatform(session);
     }
 
+    public void deleteStopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
+        final PlatformSession session = loginOnPlatform();
+        final PlatformAPI platformAPI = getPlatformAPI(session);
+        stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
+        platformAPI.deletePlatform();
+        logoutOnPlatform(session);
+    }
+
     public void createPlatformStructure() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
@@ -81,6 +89,14 @@ public class PlatformTestUtil {
             platformAPI.deletePlatform();
         }
         platformAPI.createPlatform();
+    }
+
+    public void createInitializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
+        final PlatformSession session = loginOnPlatform();
+        final PlatformAPI platformAPI = getPlatformAPI(session);
+        createPlatformStructure(platformAPI, deployCommands);
+        initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
+        logoutOnPlatform(session);
     }
 
     public void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
