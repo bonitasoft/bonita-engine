@@ -29,6 +29,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
@@ -341,11 +342,11 @@ public class PageAPIIT extends CommonAPISPIT {
     }
 
     @Test
-    public void should_getPageProperties_throw_alreadyExists() throws BonitaException, IOException {
+    public void should_throw_a_InvalidPageZipMissingPropertiesException_if_pageProperties_not_exists() throws BonitaException, IOException {
         // , "content.zip"given
         final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
 
-        expectedException.expect(InvalidPageZipMissingIndexException.class);
+        expectedException.expect(InvalidPageZipMissingPropertiesException.class);
         // when
         getSubscriptionPageAPI().getPageProperties(pageContent, true);
 
@@ -571,7 +572,7 @@ public class PageAPIIT extends CommonAPISPIT {
                 .setPage("caselistinguser")
                 .setDescription(DESCRIPTION_PAGE)
                 .setParentId(folderProfileEntry.getId()).setCustom(false));
-        // );
+                // );
 
         // when
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
