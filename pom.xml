@@ -55,7 +55,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<spring.version>3.1.2.RELEASE</spring.version>
-        <jackson.version>2.2.3</jackson.version>
+        <jackson.version>2.4.4</jackson.version>
 		<jaxb.version>2.2.7</jaxb.version>
 
 		<!-- Tests -->
