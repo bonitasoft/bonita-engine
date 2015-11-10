@@ -274,7 +274,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
-            throws SConnectorException {
+                    throws SConnectorException {
         try {
             final SConnectorImplementationDescriptor implementation = getImplementation(processDefinitionId, String.valueOf(sessionAccessor.getTenantId()),
                     connectorDefinitionId, connectorDefinitionVersion);
@@ -330,7 +330,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     public Map<String, Object> evaluateInputParameters(final String connectorId, final Map<String, SExpression> parameters,
             final SExpressionContext sExpressionContext,
             final Map<String, Map<String, Serializable>> inputValues) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
-            SExpressionDependencyMissingException, SInvalidExpressionException {
+                    SExpressionDependencyMissingException, SInvalidExpressionException {
         final long startTime = System.currentTimeMillis();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(parameters.size());
         try {
@@ -427,7 +427,8 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
     }
 
-    private void deployNewDependencies(final long processDefinitionId, final long tenantId) throws SDependencyException, IOException, BonitaHomeNotSetException {
+    private void deployNewDependencies(final long processDefinitionId, final long tenantId)
+            throws SDependencyException, IOException, BonitaHomeNotSetException {
         // deploy new ones from the filesystem (bonita-home):
         final Map<String, byte[]> classpath = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
         final ArrayList<SDependency> dependencies = new ArrayList<SDependency>();
@@ -483,8 +484,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     protected void unzipNewImplementation(final SProcessDefinition sDefinition, final long tenantId, final byte[] connectorImplementationArchive,
             final String connectorId, final String connectorVersion) throws SInvalidConnectorImplementationException {
-        try (ZipInputStream zipInputstream = new ZipInputStream(new ByteArrayInputStream(connectorImplementationArchive)))
-        {
+        try (ZipInputStream zipInputstream = new ZipInputStream(new ByteArrayInputStream(connectorImplementationArchive))) {
             // First delete the old implementation before trying to unzip the new one:
             deleteOldImplementation(tenantId, sDefinition.getId(), connectorId, connectorVersion);
 
@@ -536,9 +536,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                 throw new SInvalidConnectorImplementationException("Can not parse ConnectorImplementation XML.");
             }
             return connectorImplementation;
-        } catch (final IOException e) {
-            throw new SInvalidConnectorImplementationException("Can not load ConnectorImplementation XML.", e);
-        } catch (final SXMLParseException e) {
+        } catch (final IOException | SXMLParseException e) {
             throw new SInvalidConnectorImplementationException("Can not load ConnectorImplementation XML.", e);
         }
     }
@@ -595,7 +593,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                         + ">, but from index is <" + fromIndex + ">");
             }
             // set the comparison field
-            SConnectorImplementationDescriptor.comparedFiled = field;
+            SConnectorImplementationDescriptor.comparedField = field;
             // sorted: sort with ASC order first
             Collections.sort(sConnectorImplementationDescriptors);
             if (order != null && order == OrderByType.DESC) {

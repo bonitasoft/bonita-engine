@@ -111,7 +111,7 @@ public class SBonitaRuntimeException extends RuntimeException {
      * @since 6.3
      */
     public void setConnectorDefinitionImplementationClassNameOnContext(final String name) {
-        context.put(SExceptionContext.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
+        context.put(SExceptionContext.CONNECTOR_IMPLEMENTATION_CLASS_NAME, name);
     }
 
     /**

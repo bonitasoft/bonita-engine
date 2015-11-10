@@ -168,8 +168,8 @@ public abstract class SBonitaException extends Exception {
      *            The class name of the implementation of the connector definition to set
      * @since 6.3
      */
-    public void setConnectorDefinitionImplementationClassNameOnContext(final String name) {
-        context.put(SExceptionContext.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
+    public void setConnectorImplementationClassNameOnContext(final String name) {
+        context.put(SExceptionContext.CONNECTOR_IMPLEMENTATION_CLASS_NAME, name);
     }
 
     /**
