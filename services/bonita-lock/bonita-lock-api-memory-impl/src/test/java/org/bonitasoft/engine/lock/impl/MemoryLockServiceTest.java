@@ -134,8 +134,8 @@ public class MemoryLockServiceTest {
         assertTrue("should not be able to lock", lockThread.isLockObtained());
     }
 
-    @Test(expected = SLockException.class)
-    public void testLockOnSameThread() throws Exception {
+    @Test(expected = IllegalStateException.class)
+    public void lockOnSameThread_should_throw_IllegalStateException() throws Exception {
         memoryLockService.lock(123, "abc", tenantId);
         memoryLockService.lock(123, "abc", tenantId);
     }
@@ -200,7 +200,7 @@ public class MemoryLockServiceTest {
         try {
             t3.waitForLockToBeObtained(500);
             fail();
-        } catch (final InterruptedException e) {
+        } catch (final InterruptedException ignored) {
         }
         s2.release();
         Thread.sleep(20);
@@ -211,7 +211,7 @@ public class MemoryLockServiceTest {
     }
 
     @Test
-    public void getDetailsOnLockShouldReturnLockingTheadOwnerName() {
+    public void getDetailsOnLockShouldReturnLockingThreadOwnerName() {
         // given:
         final MemoryLockService spiedLockService = spy(memoryLockService);
         final long objectToLockId = 151L;
