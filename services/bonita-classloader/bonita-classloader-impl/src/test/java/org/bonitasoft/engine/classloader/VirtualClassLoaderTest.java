@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -167,6 +168,19 @@ public class VirtualClassLoaderTest {
         verify(myClassLoaderListener).onUpdate(localClassLoader);
     }
 
+
+    @Test
+    public void should_replaceClassLoader_call_destroy_on_old_classloader() throws Exception {
+        //given
+        BonitaClassLoader classLoader1 = mock(BonitaClassLoader.class);
+        BonitaClassLoader classLoader2 = mock(BonitaClassLoader.class);
+        //when
+        localClassLoader.replaceClassLoader(classLoader1);
+        localClassLoader.replaceClassLoader(classLoader2);
+        //then
+        verify(classLoader1).destroy();
+    }
+
     @Test
     public void should_destroy_notify_listeners() throws Exception {
         //given
@@ -198,6 +212,19 @@ public class VirtualClassLoaderTest {
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
         verify(myClassLoaderListener,never()).onUpdate(localClassLoader);
+    }
+
+    @Test
+    public void should_notifyUpdate_call_notify_on_children() throws Exception {
+        //given
+        VirtualClassLoader child = new VirtualClassLoader("child", 12, localClassLoader);
+        ClassLoaderListener classLoaderListener = mock(ClassLoaderListener.class);
+        child.addListener(classLoaderListener);
+        //when
+        localClassLoader.replaceClassLoader(newClassLoader);
+        //then
+        verify(classLoaderListener).onUpdate(child);
+
     }
 
 }

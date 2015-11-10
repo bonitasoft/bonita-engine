@@ -45,24 +45,21 @@ public class VirtualClassLoader extends ClassLoader {
 
     private VirtualClassLoader virtualParent;
 
-    protected final String artifactType;
-
-    protected final long artifactId;
-
     private List<ClassLoaderListener> listeners;
 
     private Set<VirtualClassLoader> children = new HashSet<>();
+    private ClassLoaderIdentifier identifier;
 
-    protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
+    VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
-        this.artifactType = artifactType;
-        this.artifactId = artifactId;
+        identifier = new ClassLoaderIdentifier(artifactType, artifactId);
         listeners = new ArrayList<>();
     }
 
-    protected VirtualClassLoader(final String artifactType, final long artifactId, final VirtualClassLoader parent) {
+    VirtualClassLoader(final String artifactType, final long artifactId, final VirtualClassLoader parent) {
         this(artifactType, artifactId, (ClassLoader) parent);
         virtualParent = parent;
+        virtualParent.addChild(this);
     }
 
     void replaceClassLoader(final BonitaClassLoader classloader) {
@@ -152,7 +149,7 @@ public class VirtualClassLoader extends ClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + classloader;
+        return super.toString() + ", type=" + identifier.getType() + ", id=" + identifier.getId() + " delegate: " + classloader;
     }
 
     public boolean addListener(ClassLoaderListener listener) {
@@ -178,5 +175,9 @@ public class VirtualClassLoader extends ClassLoader {
 
     public Set<VirtualClassLoader> getChildren() {
         return children;
+    }
+
+    public ClassLoaderIdentifier getIdentifier() {
+        return identifier;
     }
 }

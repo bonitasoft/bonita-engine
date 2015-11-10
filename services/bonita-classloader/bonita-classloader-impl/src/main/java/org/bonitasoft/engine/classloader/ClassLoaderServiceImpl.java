@@ -36,15 +36,11 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ClassLoaderServiceImpl implements ClassLoaderService {
 
-    public static final String GLOBAL_TYPE = "GLOBAL";
-
-    public static final long GLOBAL_ID = -1;
-
     private final ParentClassLoaderResolver parentClassLoaderResolver;
 
     private final TechnicalLoggerService logger;
 
-    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE, ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
@@ -74,12 +70,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public long getGlobalClassLoaderId() {
-        return GLOBAL_ID;
+        return ClassLoaderIdentifier.GLOBAL_ID;
     }
 
     @Override
     public String getGlobalClassLoaderType() {
-        return GLOBAL_TYPE;
+        return ClassLoaderIdentifier.GLOBAL_TYPE;
     }
 
     private VirtualClassLoader getVirtualGlobalClassLoader() {
@@ -123,14 +119,14 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         VirtualClassLoader parent = getParentClassLoader(identifier);
         final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(identifier.getType(), identifier.getId(), parent);
-        parent.addChild(virtualClassLoader);
         localClassLoaders.put(identifier, virtualClassLoader);
     }
 
     private VirtualClassLoader getParentClassLoader(ClassLoaderIdentifier identifier) {
         final ClassLoaderIdentifier parentIdentifier = parentClassLoaderResolver.getParentClassLoaderIdentifier(identifier);
+        NullCheckingUtil.checkArgsNotNull(parentIdentifier);
         VirtualClassLoader parent;
-        if (parentIdentifier == null) {
+        if (ClassLoaderIdentifier.GLOBAL.equals(parentIdentifier)) {
             parent = getVirtualGlobalClassLoader();
         } else {
             parent = getLocalClassLoader(parentIdentifier);

@@ -530,7 +530,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
     private void checkGlobalClassLoader(final ClassLoader classLoader) {
         final boolean isGlobal = classLoader instanceof BonitaClassLoader
-                && ((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
+                && ((BonitaClassLoader) classLoader).getType().equals(ClassLoaderIdentifier.GLOBAL_TYPE);
         try {
             assertTrue(isGlobal);
         } catch (final AssertionError e) {
@@ -541,7 +541,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
     private void checkLocalClassLoader(final ClassLoader classLoader) {
         final boolean isLocal = classLoader instanceof BonitaClassLoader
-                && !((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
+                && !((BonitaClassLoader) classLoader).getType().equals(ClassLoaderIdentifier.GLOBAL_TYPE);
         try {
             assertTrue(isLocal);
         } catch (final AssertionError e) {
