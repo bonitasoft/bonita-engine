@@ -1443,10 +1443,15 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        Serializable jsonResult = ((BusinessDataQueryResultImpl) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
+        getCommandAPI().addDependency("temporaryDeps", new byte[]{0, 1});
+        //TypeFactory.defaultInstance().clearCache();
+        //new HeapDumper().dumpHeap("target/leak.hprof", true);
+        jsonResult = ((BusinessDataQueryResultImpl) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
+
 
         // then
-        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
+        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
 
     }
 

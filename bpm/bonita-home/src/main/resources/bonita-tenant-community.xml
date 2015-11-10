@@ -1481,6 +1481,9 @@
                 <entry key="javax.persistence.validation.mode" value="${bonita.tenant.bdm.repository.javax.persistence.validation.mode}" />
             </map>
         </constructor-arg>
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="businessDataModelRepository"
@@ -1508,7 +1511,9 @@
     </bean>
 
     <bean id="jsonBusinessDataSerializer"
-          class="org.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl" />
+          class="org.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl" >
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+    </bean>
 
     <bean id="typeConverterUtil" class="org.bonitasoft.engine.commons.TypeConverterUtil">
         <constructor-arg name="datePatterns" type="java.lang.String[]">
