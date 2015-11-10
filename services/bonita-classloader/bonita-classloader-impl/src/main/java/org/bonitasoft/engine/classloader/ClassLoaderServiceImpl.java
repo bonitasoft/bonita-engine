@@ -40,7 +40,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final TechnicalLoggerService logger;
 
-    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE, (long) ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(ClassLoaderIdentifier.GLOBAL_TYPE, ClassLoaderIdentifier.GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
