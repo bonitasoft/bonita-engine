@@ -16,10 +16,12 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -44,6 +46,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final Map<ClassLoaderIdentifier, VirtualClassLoader> localClassLoaders = new HashMap<>();
 
+    private final Set<ClassLoaderListener> globalListeners = new HashSet<>();
+
     private final Object mutex = new ClassLoaderServiceMutex();
 
     private boolean shuttingDown = false;
@@ -52,11 +56,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     private boolean traceEnabled;
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final TechnicalLoggerService logger,
-            final EventService eventService) {
+                                  final EventService eventService) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         this.eventService = eventService;
         traceEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
+        globalListeners.add(new ClassReflectorClearer());
         // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
     }
 
@@ -157,6 +162,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             }
             localClassLoader.destroy();
             localClassLoaders.remove(key);
+            for (ClassLoaderListener globalListener : globalListeners) {
+                globalListener.onDestroy(localClassLoader);
+            }
         }
     }
 
@@ -198,9 +206,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void refreshClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
-            final URI temporaryFolder, final ClassLoader parent) {
+                                    final URI temporaryFolder, final ClassLoader parent) {
         final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
         virtualClassloader.replaceClassLoader(classLoader);
+        for (ClassLoaderListener globalListener : new HashSet<>(globalListeners)) {
+            globalListener.onUpdate(virtualClassloader);
+        }
     }
 
     @Override
@@ -250,13 +261,27 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Added listener " + classLoaderListener + " on " + type + " " + id);
         final VirtualClassLoader localClassLoader = getLocalClassLoader(type, id);
         return localClassLoader.addListener(classLoaderListener);
     }
 
     @Override
     public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Removed listener " + classLoaderListener + " on " + type + " " + id);
         VirtualClassLoader localClassLoader = getLocalClassLoader(type, id);
         return localClassLoader.removeListener(classLoaderListener);
+    }
+
+    @Override
+    public boolean addListener(ClassLoaderListener classLoaderListener) {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Added global listener " + classLoaderListener);
+        return globalListeners.add(classLoaderListener);
+    }
+
+    @Override
+    public boolean removeListener(ClassLoaderListener classLoaderListener) {
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Removed  global listener " + classLoaderListener);
+        return globalListeners.remove(classLoaderListener);
     }
 }
