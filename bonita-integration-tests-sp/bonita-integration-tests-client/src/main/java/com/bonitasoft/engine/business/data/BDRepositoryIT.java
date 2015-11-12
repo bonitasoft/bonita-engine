@@ -137,7 +137,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private File clientFolder;
 
-    private String bdmDeployedVersion="0";
+    private String bdmDeployedVersion = "0";
 
     private BusinessObjectModel buildBOM() {
         final SimpleField name = new SimpleField();
@@ -366,7 +366,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         verifyBdmIsWellDeployed();
     }
 
-    private void verifyBdmIsWellDeployed() throws Exception{
+    private void verifyBdmIsWellDeployed() throws Exception {
         final String businessDataModelVersion = getTenantAdministrationAPI().getBusinessDataModelVersion();
         APITestUtil.LOGGER.warn("previous businessDataModelVersion:" + this.bdmDeployedVersion);
         APITestUtil.LOGGER.warn("new businessDataModelVersion     :" + businessDataModelVersion);
@@ -399,7 +399,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         return model;
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
+    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData",
+            "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
     @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
@@ -557,7 +558,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
     public void createAnEmployeeWithARequiredFieldAtNullThrowsAnException() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; return e;")
-                        .toString(), EMPLOYEE_QUALIFIED_NAME);
+                        .toString(),
+                EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIFIED_NAME, employeeExpression);
@@ -670,7 +672,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
                 new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = "
                         + employeeDAOName + ".findByFirstName('" + firstNameEmployee1 + "', 0, 10).get(0); e.getAddresses().get(0).city",
                         String.class.getName(),
-                        new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")), null);
+                        new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")),
+                null);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_ADDRESS, "Address." + COUNT_ADDRESS, Long.class.getName()), null);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_EMPLOYEE, "Employee." + COUNT_EMPLOYEE, Long.class.getName()), null);
         Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
@@ -868,7 +871,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee, "\"Employee [firstName=\" + " + businessDataName
                         + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
-                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)), null);
+                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)),
+                null);
         try {
             final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
             return (String) evaluatedExpressions.get(expressionEmployee);
@@ -1047,7 +1051,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee, "\"Employee [firstName=\" + " + businessDataName
                         + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
-                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, List.class.getName())), null);
+                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, List.class.getName())),
+                null);
         try {
             final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
             return (String) evaluatedExpressions.get(expressionEmployee);
@@ -1341,8 +1346,9 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step2");
 
-        final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getProcessAPI().getProcessBusinessDataReference(bizDataName,
-                processInstance.getId());
+        final org.bonitasoft.engine.business.data.SimpleBusinessDataReference businessDataReference = (org.bonitasoft.engine.business.data.SimpleBusinessDataReference) getBusinessDataAPI()
+                .getProcessBusinessDataReference(bizDataName,
+                        processInstance.getId());
 
         verifyCommandGetBusinessDataById(businessDataReference);
         verifyCommandGetQuery_findByFirstNameAndLastNameNewOrder();
@@ -1354,7 +1360,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private void verifyCommandGetBusinessDataById(final SimpleBusinessDataReference businessDataReference) throws Exception {
+    private void verifyCommandGetBusinessDataById(final org.bonitasoft.engine.business.data.SimpleBusinessDataReference businessDataReference)
+            throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("businessDataId", businessDataReference.getStorageId());
         parameters.put("entityClassName", EMPLOYEE_QUALIFIED_NAME);
@@ -1498,8 +1505,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, null).setMultiple(true);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().
-                createBusinessDataSetAttributeOperation("myEmployees", "addAll", "java.util.Collection", employeeExpression));
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(
+                new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployees", "addAll", "java.util.Collection", employeeExpression));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -1524,7 +1531,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
     public void should_get_the_lazy_list_in_a_multiple_business_data() throws Exception {
         final Expression initProducts = new ExpressionBuilder().createGroovyScriptExpression("initProducts",
                 new StringBuilder().append("import ").append(PRODUCT_QUALIFIED_NAME).append(";").append(" Product p1 = new Product(); p1.name = 'Rock'; ")
-                        .append(" Product p2 = new Product(); p2.name = 'Paper'; ").append(" return [p1, p2];").toString(), List.class.getName());
+                        .append(" Product p2 = new Product(); p2.name = 'Paper'; ").append(" return [p1, p2];").toString(),
+                List.class.getName());
 
         final Expression productDependency = new ExpressionBuilder().createBusinessDataExpression("products", List.class.getName());
 
@@ -1532,13 +1540,15 @@ public class BDRepositoryIT extends CommonAPISPIT {
                 "initCatalogs",
                 new StringBuilder().append("import ").append(PRODUCT_CATALOG_QUALIFIED_NAME).append(";")
                         .append(" ProductCatalog pc = new ProductCatalog(); pc.name = 'MyFirstCatalog'; pc.setProducts(products);").append(" return [pc];")
-                        .toString(), List.class.getName(), productDependency);
+                        .toString(),
+                List.class.getName(), productDependency);
 
         final Expression catalogDependency = new ExpressionBuilder().createBusinessDataExpression("productCatalogs", List.class.getName());
 
         final Expression nbOfProducts = new ExpressionBuilder().createGroovyScriptExpression("nbOfProducts",
                 new StringBuilder().append("import ").append(PRODUCT_CATALOG_QUALIFIED_NAME).append(";").append(" productCatalogs.get(0).getProducts().size()")
-                        .toString(), Integer.class.getName(), catalogDependency);
+                        .toString(),
+                Integer.class.getName(), catalogDependency);
 
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("def", "6.3-beta");
         builder.addActor(ACTOR_NAME);
@@ -1605,8 +1615,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         uninstallBusinessObjectModel();
 
-        final BusinessObjectModel businessObjectModel = aBOM().
-                withBO(aBO("org.test.Restaurant").withField(aStringField("name").ofType(FieldType.STRING).build())
+        final BusinessObjectModel businessObjectModel = aBOM()
+                .withBO(aBO("org.test.Restaurant").withField(aStringField("name").ofType(FieldType.STRING).build())
                         .build())
                 .build();
         installBusinessDataModel(businessObjectModel);
