@@ -385,8 +385,8 @@ public interface ProcessRuntimeAPI {
     long deleteArchivedProcessInstancesInAllStates(long sourceProcessInstanceId) throws DeletionException;
 
     /**
-     * Start an instance of the process with the specified process definition, using the current session user. <b>Note</b>: if the definition contains a
-     * contract at process level, please use {@link #startProcessWithInputs(long, Map)} instead.
+     * Start an instance of the process with the specified process definition, using the current session user. <b>Note</b>: If the process requires input as
+     * part of its instantiation contract, you must use {@link #startProcessWithInputs(long, Map)} instead.
      *
      * @param processDefinitionId
      *        The identifier of the process definition for which an instance will be started.
@@ -404,7 +404,8 @@ public interface ProcessRuntimeAPI {
     /**
      * Instantiates a process.
      * <br>
-     * The process variables will be initialized by the initialVariables. <b>Note</b>: if the definition contains a contract at process level, please use
+     * The process variables will be initialized by the initialVariables. <b>Note</b>: If the process requires input as part of its instantiation contract, you
+     * must use
      * {@link #startProcessWithInputs(long, Map)} instead, using contract inputs stored in process variables, instead of using directly initialVariables.
      *
      * @param processDefinitionId
@@ -425,7 +426,8 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations. <b>Note</b>:
-     * if the definition contains a contract at process level, please use {@link #startProcessWithInputs(long, Map)} instead. The good practice is to design, in
+     * If the process requires input as part of its instantiation contract, you must use {@link #startProcessWithInputs(long, Map)} instead. The good practice
+     * is to design, in
      * the process definition, contract inputs used in operations, instead of providing operations at start time.
      *
      * @param processDefinitionId
@@ -447,8 +449,8 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user. <b>Note</b>: if the definition contains a
-     * contract at process level, please use {@link #startProcessWithInputs(long, long, Map)} instead.
+     * Start an instance of the process with the specified process definition id on behalf of a given user. <b>Note</b>: If the process requires input as part
+     * of its instantiation contract, you must use {@link #startProcessWithInputs(long, long, Map)} instead.
      *
      * @param userId
      *        The user id of the user.
@@ -470,7 +472,8 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given operations. <b>Note</b>: if the definition contains a contract at process level, please use {@link #startProcessWithInputs(long, long, Map)}
+     * given operations. <b>Note</b>: If the process requires input as part of its instantiation contract, you must use
+     * {@link #startProcessWithInputs(long, long, Map)}
      * instead. The good practice is to design, in the process definition, contract inputs used in operations, instead of providing operations at start time.
      *
      * @param userId
@@ -499,7 +502,8 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given initialVariables. <b>Note</b>: if the definition contains a contract at process level, please use {@link #startProcessWithInputs(long, long, Map)}
+     * given initialVariables. <b>Note</b>: If the process requires input as part of its instantiation contract, you must use
+     * {@link #startProcessWithInputs(long, long, Map)}
      * instead, using contract inputs stored in process variables, instead of using directly initialVariables.
      *
      * @param userId
@@ -1912,7 +1916,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId the ID of the process instance we are interested in.
      * @return true if the specified manager has subordinates involved in the given process instance.
      * @throws ProcessInstanceNotFoundException if the process instance does not exist.
-     * @throws BonitaException if an error occured while searching for users involved.
+     * @throws BonitaException if an error occurred while searching for users involved.
      * @since 6.4.2
      * @see #isInvolvedInProcessInstance(long, long)
      */
