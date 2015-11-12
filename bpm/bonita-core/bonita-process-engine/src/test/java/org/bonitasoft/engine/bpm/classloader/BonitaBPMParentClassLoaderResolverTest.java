@@ -41,23 +41,23 @@ public class BonitaBPMParentClassLoaderResolverTest {
     private BonitaBPMParentClassLoaderResolver bonitaBPMParentClassLoaderResolver;
 
     @Test
-    public void should_getParentClassLoaderIdentifier_return_null_on_tenant_classloader() throws Exception {
+    public void should_getParentClassLoaderIdentifier_return_global_on_tenant_classloader() throws Exception {
         //given
         final ClassLoaderIdentifier childId = new ClassLoaderIdentifier(ScopeType.TENANT.name(), 124);
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isNull();
+        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
     @Test
-    public void should_getParentClassLoaderIdentifier_return_null_on_datasource_classloader() throws Exception {
+    public void should_getParentClassLoaderIdentifier_return_global_on_datasource_classloader() throws Exception {
         //given
         final ClassLoaderIdentifier childId = new ClassLoaderIdentifier("___datasource___", 124);
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isNull();
+        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
     @Test(expected = BonitaRuntimeException.class)
