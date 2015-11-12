@@ -20,6 +20,7 @@ import org.bonitasoft.engine.transaction.JTATransactionServiceImpl;
 /**
  * @author Laurent Vaills
  * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public class JTATransactionServiceExt extends JTATransactionServiceImpl {
 
@@ -41,23 +42,16 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
     public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
         int attempt = 0;
         long sleepTime = delay;
-        T result = null;
+        SRetryableException lastException = null;
         do {
-            // Do not sleep for the 1st attempt.
-            if (attempt != 0) {
-                sleep(sleepTime);
-                sleepTime *= delayFactor;
-            }
-            attempt++;
-
             begin();
             try {
-                result = callable.call();
-                attempt = retries + 1; // To exit the loop :)
-            } catch (final SRetryableException sre) {
+                return callable.call();
+            } catch (final SRetryableException e) {
+                lastException = e;
                 setRollbackOnly();
                 if (logger.isLoggable(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO)) {
-                    logger.log(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO, "Transaction failed", sre);
+                    logger.log(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO, "Transaction failed", e);
                     logger.log(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO, "Retrying (# " + attempt + "/" + retries + ") in " + sleepTime
                             + " ms");
                 }
@@ -67,10 +61,12 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
             } finally {
                 complete();
             }
-
+            sleep(sleepTime);
+            sleepTime *= delayFactor;
+            attempt++;
         } while (attempt <= retries);
-
-        return result;
+        // after all attempts we didn't successfully completed the transaction, we throw the last exception that caused the issue
+        throw lastException.getCause();
     }
 
     private void sleep(final long sleepTime) {
