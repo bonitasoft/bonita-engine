@@ -25,7 +25,7 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 public interface QueryGenerator {
 
     String FIND_PREFIX = "find";
-    String COUNT_PREFIX = "count";
+    String COUNT_PREFIX = "countFor";
 
     char BLANK_SPACE = ' ';
 

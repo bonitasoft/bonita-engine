@@ -39,8 +39,8 @@ public class CountQueryGeneratorTest {
     @Test
     public void should_generate_query_name() {
         //when then
-        assertThat(queryGenerator.getQueryName()).isEqualTo("count");
-        assertThat(queryGenerator.getQueryName("lastName", "firstName")).isEqualTo("countByLastNameAndFirstName");
+        assertThat(queryGenerator.getQueryName()).isEqualTo("countForFind");
+        assertThat(queryGenerator.getQueryName("lastName", "firstName")).isEqualTo("countForFindByLastNameAndFirstName");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class CountQueryGeneratorTest {
         final String countQueryNameForUniqueConstraint = queryGenerator.createQueryNameForUniqueConstraint(uniqueConstraint);
 
         //then
-        assertThat(countQueryNameForUniqueConstraint).isEqualTo("countByName");
+        assertThat(countQueryNameForUniqueConstraint).isEqualTo("countForFindByName");
 
     }
 
@@ -82,7 +82,7 @@ public class CountQueryGeneratorTest {
 
         //then
         QueryAssert.assertThat(query)
-                .hasName("countByName")
+                .hasName("countForFindByName")
                 .hasContent("SELECT COUNT(e)\nFROM Employee e\nWHERE e.name= :name\n")
                 .hasReturnType(Long.class.getName());
         assertThat(query.getQueryParameters()).hasSize(1);
@@ -124,7 +124,7 @@ public class CountQueryGeneratorTest {
 
         //then
         QueryAssert.assertThat(queryForMultipleLazyField)
-                .hasName("countAddressesByEmployeePersistenceId")
+                .hasName("countForFindAddressesByEmployeePersistenceId")
                 .hasReturnType(List.class.getName())
                 .hasContent(
                         "SELECT COUNT(addresses_1) FROM Employee employee_0 JOIN employee_0.addresses as addresses_1 WHERE employee_0.persistenceId= :persistenceId");

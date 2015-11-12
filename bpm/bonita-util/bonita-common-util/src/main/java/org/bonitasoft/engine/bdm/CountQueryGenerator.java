@@ -25,7 +25,7 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 public class CountQueryGenerator extends AbstractQueryGenerator {
 
     public String getQueryPrefix() {
-        return COUNT_PREFIX;
+        return COUNT_PREFIX + "Find";
     }
 
     @Override

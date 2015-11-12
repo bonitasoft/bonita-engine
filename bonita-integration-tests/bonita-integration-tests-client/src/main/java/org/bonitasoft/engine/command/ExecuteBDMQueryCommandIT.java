@@ -217,7 +217,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     @Test
     public void should_have_a_count_query() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<>();
-        parameters.put(QUERY_NAME, "BonitaEmployee.count");
+        parameters.put(QUERY_NAME, "BonitaEmployee.countForFind");
         parameters.put(RETURNS_LIST, false);
         parameters.put(RETURN_TYPE, Long.class.getName());
         parameters.put(START_INDEX, 0);

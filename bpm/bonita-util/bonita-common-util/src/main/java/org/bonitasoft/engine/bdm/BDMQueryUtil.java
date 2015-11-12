@@ -125,10 +125,7 @@ public class BDMQueryUtil {
     }
 
     public static String getCountQueryName(String selectQueryName) {
-        if (selectQueryName.startsWith(QueryGenerator.FIND_PREFIX)) {
-            return selectQueryName.replaceFirst(QueryGenerator.FIND_PREFIX, QueryGenerator.COUNT_PREFIX);
-        }
-        return new StringBuilder(QueryGenerator.COUNT_PREFIX).append(selectQueryName).toString();
+        return new StringBuilder(QueryGenerator.COUNT_PREFIX).append(selectQueryName.substring(0, 1).toUpperCase()).append(selectQueryName.substring(1)).toString();
     }
 
     public static List<Query> createProvidedQueriesForLazyField(final BusinessObjectModel bom, final BusinessObject bo) {

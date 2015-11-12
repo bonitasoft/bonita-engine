@@ -132,11 +132,11 @@ public class PersonneDAOImpl
         }
     }
 
-    public Long countByPrenom(String prenom) {
+    public Long countForFindByPrenom(String prenom) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Personne.countByPrenom");
+            commandParameters.put("queryName", "Personne.countForFindByPrenom");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
@@ -148,11 +148,11 @@ public class PersonneDAOImpl
         }
     }
 
-    public Long countByNom(String nom) {
+    public Long countForFindByNom(String nom) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Personne.countByNom");
+            commandParameters.put("queryName", "Personne.countForFindByNom");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
@@ -164,11 +164,11 @@ public class PersonneDAOImpl
         }
     }
 
-    public Long countByBirthDate(Date birthDate) {
+    public Long countForFindByBirthDate(Date birthDate) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Personne.countByBirthDate");
+            commandParameters.put("queryName", "Personne.countForFindByBirthDate");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
@@ -180,11 +180,11 @@ public class PersonneDAOImpl
         }
     }
 
-    public Long count() {
+    public Long countForFind() {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Personne.count");
+            commandParameters.put("queryName", "Personne.countForFind");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
             return ((Long) commandApi.execute("executeBDMQuery", commandParameters));
