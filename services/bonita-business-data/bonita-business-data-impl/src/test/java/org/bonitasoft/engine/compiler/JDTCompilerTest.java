@@ -25,7 +25,9 @@ import java.net.URLClassLoader;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Colin PUY
@@ -36,11 +38,13 @@ public class JDTCompilerTest {
     private JDTCompiler jdtCompiler;
 
     private File outputDirectory;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
-    public void instanciateCompiler() {
+    public void instanciateCompiler() throws IOException {
         jdtCompiler = new JDTCompiler();
-        outputDirectory = IOUtil.createTempDirectoryInDefaultTempDirectory("testFolder");
+        outputDirectory = temporaryFolder.newFolder();
     }
 
     @After
