@@ -280,7 +280,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session,
-            boolean isInTransaction) {
+            boolean isAlreadyInTransaction) {
         warnIfDeprecated(method, apiInterfaceName);
         if (!isNodeInAValidStateFor(method)) {
             logNodeNotStartedMessage(apiInterfaceName, method);
@@ -291,16 +291,15 @@ public class ServerAPIImpl implements ServerAPI {
         // For tenant level method call:
         if (session instanceof APISession) {
             final long tenantId = ((APISession) session).getTenantId();
-            checkTenantIsInAValidModeFor(apiImpl, method, apiInterfaceName, tenantId, session, isInTransaction);
+            checkTenantIsInAValidModeFor(apiImpl, method, apiInterfaceName, tenantId, session, isAlreadyInTransaction);
         }
     }
 
     protected void checkTenantIsInAValidModeFor(final Object apiImpl, final Method method, final String apiInterfaceName, final long tenantId,
-            final Session session,
-            boolean isInTransaction) {
-        final boolean tenantRunning = isTenantAvailable(tenantId, session, isInTransaction);
+            final Session session, boolean isAlreadyInTransaction) {
+        final boolean tenantRunning = isTenantAvailable(tenantId, session, isAlreadyInTransaction);
         final AvailableWhenTenantIsPaused methodAnnotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
-        AvailableWhenTenantIsPaused annotation = null;
+        AvailableWhenTenantIsPaused annotation;
         if (methodAnnotation != null) {
             annotation = methodAnnotation;
         } else {
@@ -351,17 +350,17 @@ public class ServerAPIImpl implements ServerAPI {
      *        the ID of the tenant to check
      * @param session
      *        the session to user
-     * @param isInTransaction
+     * @param isAlreadyInTransaction
      *        if the request is made in a transaction
      * @return true if the tenant is available, false otherwise (if the tenant is paused)
      */
-    protected boolean isTenantAvailable(final long tenantId, final Session session, boolean isInTransaction) {
+    protected boolean isTenantAvailable(final long tenantId, final Session session, boolean isAlreadyInTransaction) {
         final Object apiImpl;
         try {
             apiImpl = accessResolver.getAPIImplementation(TenantAdministrationAPI.class.getName());
             final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_PAUSED);
             final Boolean paused;
-            if (isInTransaction) {
+            if (isAlreadyInTransaction) {
                 paused = (Boolean) invokeAPI(method, apiImpl);
             } else {
                 final UserTransactionService userTransactionService = selectUserTransactionService(session, getSessionType(session));
@@ -428,7 +427,7 @@ public class ServerAPIImpl implements ServerAPI {
             @Override
             public Object call() throws Exception {
                 try {
-                    checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */true);
+                    checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Already in a transaction */true);
                     return invokeAPI(method, apiImpl, parametersValues);
                 } catch (final Throwable cause) {
                     throw new ServerAPIRuntimeException(cause);

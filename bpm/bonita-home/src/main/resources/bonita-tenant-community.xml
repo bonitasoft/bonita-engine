@@ -815,9 +815,10 @@
         <constructor-arg name="parameterService" ref="parameterService" />
     </bean>
 
-    <bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="cacheService" ref="cacheService" />
+    <bean id="parameterService" class="org.bonitasoft.engine.parameter.ParameterServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
