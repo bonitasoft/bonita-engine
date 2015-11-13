@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationR
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -30,6 +29,7 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -55,7 +55,8 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         super();
     }
 
-    public void generateBom(final BusinessObjectModel bom, final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
+    public void generateBom(final BusinessObjectModel bom, final File destDir)
+            throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
         final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
         final ValidationStatus validationStatus = validator.validate(bom);
         if (!validationStatus.isOk()) {
@@ -166,7 +167,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         for (final QueryParameter param : query.getQueryParameters()) {
             queryMethod.param(getModel().ref(param.getClassName()), param.getName());
         }
-        addOptionalPaginationParameters(queryMethod, query.getReturnType());
+        addOptionalPaginationParameters(queryMethod, query);
         return queryMethod;
     }
 
@@ -188,8 +189,8 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return bo.getQualifiedName() + DAO_SUFFIX;
     }
 
-    private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) {
-        if (List.class.getName().equals(returnType)) {
+    private void addOptionalPaginationParameters(final JMethod queryMethod, final Query query) {
+        if (query.hasMultipleResults()) {
             for (final String param : FORBIDDEN_PARAMETER_NAMES) {
                 queryMethod.param(getModel().ref(int.class.getName()), param);
             }

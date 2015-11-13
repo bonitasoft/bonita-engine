@@ -43,7 +43,7 @@ public class Query {
     private List<QueryParameter> queryParameters;
 
     public Query() {
-        queryParameters = new ArrayList<QueryParameter>();
+        queryParameters = new ArrayList<>();
     }
 
     public Query(final String name, final String content, final String returnType) {
@@ -85,6 +85,10 @@ public class Query {
 
     public String getReturnType() {
         return returnType;
+    }
+
+    public boolean hasMultipleResults() {
+        return List.class.getName().equals(returnType);
     }
 
     public void setReturnType(final String returnType) {

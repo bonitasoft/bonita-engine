@@ -233,7 +233,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Set<Class<? extends Annotation>> getAnnotationKeySet() {
         // FIXME use custom annotation on methods
-        final Set<Class<? extends Annotation>> annotationKeySet = new HashSet<Class<? extends Annotation>>();
+        final Set<Class<? extends Annotation>> annotationKeySet = new HashSet<>();
         annotationKeySet.add(OneToOne.class);
         annotationKeySet.add(OneToMany.class);
         annotationKeySet.add(ManyToMany.class);
@@ -332,8 +332,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName)
             throws SBusinessDataRepositoryException {
-        final String returnType = queryDefinition.getReturnType();
-        if (queryReturnsMultipleResults(returnType)) {
+        if (queryDefinition.hasMultipleResults()) {
             return loadClass(entityClassName);
         }
         try {
@@ -341,10 +340,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         } catch (final ClassNotFoundException e) {
             throw new SBusinessDataRepositoryException("unable to load class " + queryDefinition.getReturnType());
         }
-    }
-
-    private boolean queryReturnsMultipleResults(final String returnType) {
-        return returnType.equals(List.class.getName());
     }
 
     private String getQualifiedQueryName(final Class<? extends Entity> businessDataClass, final String queryName) {
