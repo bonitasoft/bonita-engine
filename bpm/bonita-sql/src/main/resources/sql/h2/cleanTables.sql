@@ -57,6 +57,7 @@ DELETE FROM tenant;
 DELETE FROM platformCommand;
 DELETE FROM form_mapping;
 DELETE FROM page_mapping;
+DELETE FROM proc_parameter;
 
 -- do NOT clear directly PLATFORM table, Hibernate needs to update its cache to know the platform has been deleted
  

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
-import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * Retrieve a String parameter from the ParameterService. The content of the expression must be the parameter name, as a String.
@@ -53,6 +53,9 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
                 if (context.containsKey(PROCESS_DEFINITION_ID)) {
                     final long processDefinitionId = (Long) context.get(PROCESS_DEFINITION_ID);
                     final SParameter parameter = parameterService.get(processDefinitionId, expressionContent);
+                    if(parameter== null){
+                        throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", expression.getName());
+                    }
                     try {
                         final String returnType = expression.getReturnType();
                         if (Boolean.class.getName().equals(returnType)) {
@@ -72,8 +75,8 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
                     throw new SExpressionDependencyMissingException("Mandatory dependency processDefinitionId is missing.");
                 }
             }
-        } catch (final SParameterProcessNotFoundException e) {
-            throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", e, expression.getName());
+        } catch (SBonitaReadException e) {
+            throw new SExpressionEvaluationException("Unable to read references parameter '" + expressionContent + "' ", e, expression.getName());
         }
         return null;
     }
