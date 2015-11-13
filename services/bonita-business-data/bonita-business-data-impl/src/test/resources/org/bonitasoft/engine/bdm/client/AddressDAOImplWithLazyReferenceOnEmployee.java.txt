@@ -90,11 +90,11 @@ public class AddressDAOImpl
         }
     }
 
-    public Long countByStreet(String street) {
+    public Long countForFindByStreet(String street) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Address.countByStreet");
+            commandParameters.put("queryName", "Address.countForFindByStreet");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
@@ -106,11 +106,11 @@ public class AddressDAOImpl
         }
     }
 
-    public Long count() {
+    public Long countForFind() {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-            commandParameters.put("queryName", "Address.count");
+            commandParameters.put("queryName", "Address.countForFind");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
             return ((Long) commandApi.execute("executeBDMQuery", commandParameters));

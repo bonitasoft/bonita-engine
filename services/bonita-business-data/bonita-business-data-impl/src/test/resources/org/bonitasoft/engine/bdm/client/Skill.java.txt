@@ -16,10 +16,10 @@ import javax.persistence.Version;
     @NamedQuery(name = "Skill.findByPersistenceId", query = "SELECT s\nFROM Skill s\nWHERE s.persistenceId= :persistenceId\n"),
     @NamedQuery(name = "Skill.findBySkill", query = "SELECT s\nFROM Skill s\nWHERE s.skill= :skill\nORDER BY s.persistenceId"),
     @NamedQuery(name = "Skill.find", query = "SELECT s\nFROM Skill s\nORDER BY s.persistenceId"),
-    @NamedQuery(name = "Skill.countBySkill", query = "SELECT COUNT(s)\nFROM Skill s\nWHERE s.skill= :skill\n"),
-    @NamedQuery(name = "Skill.count", query = "SELECT COUNT(s)\nFROM Skill s\n"),
+    @NamedQuery(name = "Skill.countForFindBySkill", query = "SELECT COUNT(s)\nFROM Skill s\nWHERE s.skill= :skill\n"),
+    @NamedQuery(name = "Skill.countForFind", query = "SELECT COUNT(s)\nFROM Skill s\n"),
     @NamedQuery(name = "Skill.findSkillsByEmployeePersistenceId", query = "SELECT skills_1 FROM Employee employee_0 JOIN employee_0.skills as skills_1 WHERE employee_0.persistenceId= :persistenceId"),
-    @NamedQuery(name = "Skill.countSkillsByEmployeePersistenceId", query = "SELECT COUNT(skills_1) FROM Employee employee_0 JOIN employee_0.skills as skills_1 WHERE employee_0.persistenceId= :persistenceId")
+    @NamedQuery(name = "Skill.countForFindSkillsByEmployeePersistenceId", query = "SELECT COUNT(skills_1) FROM Employee employee_0 JOIN employee_0.skills as skills_1 WHERE employee_0.persistenceId= :persistenceId")
 })
 public class Skill implements org.bonitasoft.engine.bdm.Entity
 {

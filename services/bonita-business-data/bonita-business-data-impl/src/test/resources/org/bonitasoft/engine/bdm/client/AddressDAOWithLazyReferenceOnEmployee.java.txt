@@ -14,9 +14,9 @@ public interface AddressDAO
 
     public List<Address> find(int startIndex, int maxResults);
 
-    public Long countByStreet(String street);
+    public Long countForFindByStreet(String street);
 
-    public Long count();
+    public Long countForFind();
 
     public Address newInstance();
 

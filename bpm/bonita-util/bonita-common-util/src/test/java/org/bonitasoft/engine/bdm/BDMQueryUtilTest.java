@@ -74,7 +74,7 @@ public class BDMQueryUtilTest {
 
         // then:
         final List<String> extract = extract(queries, on(Query.class).getName());
-        assertThat(extract).containsOnly("find", "count", "findByPersistenceId", "findByUnikAttr", "findByUnconstrainedAttr", "countByUnconstrainedAttr");
+        assertThat(extract).containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr", "findByUnconstrainedAttr", "countForFindByUnconstrainedAttr");
     }
 
     @Test
@@ -90,7 +90,7 @@ public class BDMQueryUtilTest {
 
         // then:
         final List<String> extract = extract(queries, on(Query.class).getName());
-        assertThat(extract).containsOnly("find", "count", "findByPersistenceId", "findByUnikAttr","countByUnikAttr");
+        assertThat(extract).containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr","countForFindByUnikAttr");
     }
 
     protected SimpleField aStringField(final String name) {
@@ -183,9 +183,9 @@ public class BDMQueryUtilTest {
 
     @Test
     public void should_return_related_count_query_name() throws Exception {
-        assertThat(BDMQueryUtil.getCountQueryName("find")).isEqualTo("count");
-        assertThat(BDMQueryUtil.getCountQueryName("findByStreet")).isEqualTo("countByStreet");
-        assertThat(BDMQueryUtil.getCountQueryName("myQuery")).isEqualTo("countmyQuery");
+        assertThat(BDMQueryUtil.getCountQueryName("find")).isEqualTo("countForFind");
+        assertThat(BDMQueryUtil.getCountQueryName("findByStreet")).isEqualTo("countForFindByStreet");
+        assertThat(BDMQueryUtil.getCountQueryName("myQuery")).isEqualTo("countForMyQuery");
     }
 
 
