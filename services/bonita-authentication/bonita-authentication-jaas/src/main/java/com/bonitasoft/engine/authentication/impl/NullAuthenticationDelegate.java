@@ -13,6 +13,8 @@ import java.util.Map;
 
 
 /**
+ * Provides a no op delegate when no authentication delegation is required
+ * 
  * @author Julien Reboul
  *
  */

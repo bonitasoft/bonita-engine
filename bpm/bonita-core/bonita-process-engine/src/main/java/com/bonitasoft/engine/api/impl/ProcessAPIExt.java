@@ -117,7 +117,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.parameter.ParameterService;
-import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -184,15 +184,11 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition;
-        if (processDefinitionId > 0) {
-            final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-            try {
-                sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
-                throw new ImportParameterException(e);
-            }
-        } else {
-            throw new ImportParameterException("The identifier of the process definition have to be a positif number.");
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        try {
+            sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
+            throw new ImportParameterException(e);
         }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
@@ -200,15 +196,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final Map<String, String> defaultParameterValues = new HashMap<String, String>();
 
         if (parameters != null) {
-            final Properties property = new Properties();
+            final Properties properties = new Properties();
             try {
-                property.load(new ByteArrayInputStream(parameters));
+                properties.load(new ByteArrayInputStream(parameters));
             } catch (final IOException e1) {
                 throw new ImportParameterException(e1);
             }
 
-            for (final Map.Entry<Object, Object> entry : property.entrySet()) {
-                defaultParameterValues.put(entry.getKey().toString(), entry.getValue().toString());
+            for (final Map.Entry<Object, Object> property : properties.entrySet()) {
+                defaultParameterValues.put(property.getKey().toString(), property.getValue().toString());
             }
         }
 
@@ -223,7 +219,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         try {
             parameterService.addAll(sDefinition.getId(), storedParameters);
-        } catch (final SParameterProcessNotFoundException e) {
+        } catch (final SBonitaException e) {
             throw new ImportParameterException(e);
         }
 
@@ -246,7 +242,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
             parameterService.update(processDefinitionId, parameterName, parameterValue);
             tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SParameterProcessNotFoundException e) {
+        } catch (final SParameterNameNotFoundException e) {
             throw new ParameterNotFoundException(processDefinitionId, parameterName);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -532,8 +528,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         try {
-            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId,
-                    exportActorMapping(processDefinitionId));
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantAccessor.getTenantId(), processDefinitionId,
+                    exportActorMapping(processDefinitionId), exportParameters(tenantAccessor, processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
@@ -547,7 +544,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -604,7 +601,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -664,7 +661,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -722,7 +719,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -777,7 +774,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException {
+                    throws ConnectorExecutionException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -1083,7 +1080,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) throws ProcessDefinitionNotFoundException, UpdateException {
+    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content)
+            throws ProcessDefinitionNotFoundException, UpdateException {
         processConfigurationAPIExt.updateExpressionContent(processDefintionId, expressionDefinitionId, content);
     }
 }

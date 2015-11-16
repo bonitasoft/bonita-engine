@@ -50,7 +50,7 @@ public class TenantLocalIT extends CommonAPISPIT {
 
     private void checkThatPageServiceExamplesAreDeployedOnTenant(final long tenantId) throws BonitaException, SearchException {
         // given
-        loginOnTenantWithTechnicalLogger(tenantId);
+        loginOnTenantWithTechnicalUser(tenantId);
 
         // when
         final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, EXPECTED_PAGE_SEARCH_RESULT_COUNT).done());
