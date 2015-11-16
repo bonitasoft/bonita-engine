@@ -68,14 +68,17 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private BusinessDataReloader businessDataReloader;
 
+    private final CountQueryProvider countQueryProvider;
+
     public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
             final BusinessDataModelRepository businessDataModelRepository, final TypeConverterUtil typeConverterUtil,
-            BusinessDataReloader businessDataReloader) {
+            BusinessDataReloader businessDataReloader, CountQueryProvider countQueryProvider) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
         this.businessDataModelRepository = businessDataModelRepository;
         this.typeConverterUtil = typeConverterUtil;
         this.businessDataReloader = businessDataReloader;
+        this.countQueryProvider = countQueryProvider;
     }
 
     @Override
@@ -317,7 +320,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 getQueryReturnType(queryDefinition, entityClassName), queryParameters, startIndex, maxResults);
 
         BusinessDataQueryMetadataImpl businessDataQueryMetadata = null;
-        final Query countQueryDefinition = getCountQueryDefinition(businessObject, queryName);
+        final Query countQueryDefinition = countQueryProvider.getCountQueryDefinition(businessObject, queryDefinition);
         if (countQueryDefinition != null) {
             try {
                 businessDataQueryMetadata = new BusinessDataQueryMetadataImpl(startIndex, maxResults,
@@ -394,17 +397,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             }
         }
         return businessObject;
-    }
-
-    private Query getCountQueryDefinition(BusinessObject businessObject, String queryName) throws SBusinessDataRepositoryException {
-        final List<Query> queryList = BDMQueryUtil.createCountProvidedQueriesForBusinessObject(businessObject);
-        for (final Query query : queryList) {
-            if (query.getName().equals(BDMQueryUtil.getCountQueryName(queryName))) {
-                return query;
-
-            }
-        }
-        return null;
     }
 
     @SuppressWarnings("unchecked")
