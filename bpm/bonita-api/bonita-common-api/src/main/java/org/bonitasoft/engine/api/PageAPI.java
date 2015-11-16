@@ -219,6 +219,4 @@ public interface PageAPI {
      */
     PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
-
-
 }

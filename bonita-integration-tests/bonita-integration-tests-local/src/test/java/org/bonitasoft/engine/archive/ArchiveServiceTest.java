@@ -34,9 +34,9 @@ import org.junit.Test;
 
 public class ArchiveServiceTest extends CommonBPMServicesTest {
 
-    private static final long START_OF_2009 = 1230739500052l;
+    private static final long START_OF_2009 = 1230739500052L;
 
-    private static final long BEFORE_2009 = 1130739200052l;
+    private static final long BEFORE_2009 = 1130739200052L;
 
     private static final int ONE_DAY = 86400000;
 

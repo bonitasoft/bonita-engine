@@ -35,7 +35,7 @@ public class BDMQueryCommandParametersTest {
         
         assertThat(commandParameters).contains(
                 entry("queryName", "Employee.findEmployeesByEmployeePersistenceId"),
-                entry("returnType", java.util.List.class.getName()),
+                entry("returnType", Employee.class.getName()),
                 entry("returnsList", Boolean.TRUE),
                 entry("startIndex", 0),
                 entry("maxResults", Integer.MAX_VALUE));

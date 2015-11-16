@@ -14,10 +14,11 @@
 package org.bonitasoft.engine.lock;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * This service allows to synchronize access to a resource using ReadWrite lock pattern
- * Creating a an exclusive lock allows to be the only one at a time accessing the resource
+ * This service allows to synchronize access to a resource using ReadWrite lock pattern.
+ * Creating an exclusive lock allows to be the only one at a time accessing the resource.
  * 
  * @see ReentrantReadWriteLock
  * @author Elias Ricken de Medeiros
@@ -30,13 +31,12 @@ public interface LockService {
 
     /**
      * Acquire the lock for the object having type and id in parameters<br>
-     * 
      * This method wait for the lock to be available
      * 
      * @param objectToLockId
      * @param objectType
      * @param tenantId
-     *            TODO
+     *        TODO
      * @return
      * @throws SLockException
      */
@@ -44,7 +44,6 @@ public interface LockService {
 
     /**
      * Acquire the lock for the object having type and id in parameters waiting maximum timeout<br>
-     * 
      * This method wait for the lock to be available. If it becomes available before the timeout expires the returns the obtained lock, else returns null
      * 
      * @param objectToLockId
@@ -52,7 +51,7 @@ public interface LockService {
      * @param timeout
      * @param timeUnit
      * @param tenantId
-     *            TODO
+     *        TODO
      * @return the obtained lock if it has been acquired before the timeout expires or null if the timeout has expired.
      */
     BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId);

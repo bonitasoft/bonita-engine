@@ -262,6 +262,8 @@ CREATE TABLE arch_flownode_instance (
 GO
 CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(kind, logicalGroup2, executedBy)
 GO
+CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(tenantId, kind, logicalGroup3)
+GO
 CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind)
 GO
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId)
@@ -1116,4 +1118,13 @@ CREATE TABLE page_mapping (
 )
 GO
 ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id)
+GO
+CREATE TABLE proc_parameter (
+  tenantId NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  process_id NUMERIC(19, 0) NOT NULL,
+  name NVARCHAR(255) NOT NULL,
+  value NVARCHAR(MAX) NULL,
+  PRIMARY KEY (tenantId, id)
+)
 GO

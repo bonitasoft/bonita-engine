@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -47,13 +45,11 @@ import org.junit.Test;
 @SuppressWarnings("deprecation")
 public class JobExecutionIT extends CommonAPILocalIT {
 
-    private User john;
-
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
-        john = createUser(USERNAME, PASSWORD);
+        createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
@@ -77,7 +73,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
     public void retryAJob_should_execute_again_a_failed_job_and_clean_related_job_logs_and_jobDescriptor_if_not_recurrent() throws Exception {
         //given
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         try {
             getCommandAPI().execute("except", parameters);
             final FailedJob failedJob = waitForFailedJob("ThrowsExceptionJob", 0);
@@ -119,7 +115,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
         final JobService jobService = tenantAccessor.getJobService();
 
-        final QueryOptions options = new QueryOptions(0, 1, null, Arrays.asList(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId)), null);
+        final QueryOptions options = new QueryOptions(0, 1, null,
+                Collections.singletonList(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId)), null);
 
         final Callable<List<SJobLog>> searchJobLogs = new Callable<List<SJobLog>>() {
 
@@ -138,7 +135,8 @@ public class JobExecutionIT extends CommonAPILocalIT {
         final JobService jobService = tenantAccessor.getJobService();
         final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
 
-        final List<FilterOption> filters = Arrays.asList(new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
+        final List<FilterOption> filters = Collections
+                .singletonList(new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
         final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
 
         final Callable<List<SJobDescriptor>> searchJobLogs = new Callable<List<SJobDescriptor>>() {
@@ -158,7 +156,7 @@ public class JobExecutionIT extends CommonAPILocalIT {
     public void retryAJob_should_update_job_log_when_execution_fails_again() throws Exception {
         //given
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         try {
             getCommandAPI().execute("except", parameters);
             FailedJob failedJob = waitForFailedJob("ThrowsExceptionJob", 0);

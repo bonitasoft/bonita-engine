@@ -15,10 +15,7 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,13 +30,12 @@ import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class LockProcessInstanceWorkTest {
 
     private static final String PROCESS = "PROCESS";
 
-    private final long processInstanceId = 123l;
+    private final long processInstanceId = 123L;
 
     private final BonitaWork wrappedWork = mock(BonitaWork.class);
 
@@ -51,8 +47,6 @@ public class LockProcessInstanceWorkTest {
 
     private WorkService workService;
 
-    private TechnicalLoggerService loggerService;
-
     private static final long TENANT_ID = 1;
 
     @Before
@@ -62,10 +56,9 @@ public class LockProcessInstanceWorkTest {
         tenantAccessor = mock(TenantServiceAccessor.class);
         lockService = mock(LockService.class);
         workService = mock(WorkService.class);
-        loggerService = mock(TechnicalLoggerService.class);
         when(tenantAccessor.getLockService()).thenReturn(lockService);
         when(tenantAccessor.getWorkService()).thenReturn(workService);
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
+        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
     }
 
     @Test
@@ -111,14 +104,14 @@ public class LockProcessInstanceWorkTest {
 
     @Test
     public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12l);
+        when(wrappedWork.getTenantId()).thenReturn(12L);
         assertEquals(12, lockProcessInstanceWork.getTenantId());
     }
 
     @Test
     public void setTenantId() {
-        lockProcessInstanceWork.setTenantId(12l);
-        verify(wrappedWork).setTenantId(12l);
+        lockProcessInstanceWork.setTenantId(12L);
+        verify(wrappedWork).setTenantId(12L);
     }
 
     @Test
@@ -139,7 +132,7 @@ public class LockProcessInstanceWorkTest {
         when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(null);
         Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
 
-        LockProcessInstanceWork spiedWork = Mockito.spy(lockProcessInstanceWork);
+        LockProcessInstanceWork spiedWork = spy(lockProcessInstanceWork);
         spiedWork.work(context);
 
         // in fact we should ensure the rootWork of the lockProcessInstanceWork has been re-executed. We should check the method getRootWork has been called

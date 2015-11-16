@@ -45,12 +45,9 @@ public class TransactionExecutorImpl implements TransactionExecutor {
                 return null;
             }
         };
-
         try {
             transactionService.executeInTransaction(txContentCallable);
-        } catch (SBonitaException e) {
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (SBonitaException | RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new SBonitaRuntimeException(e);

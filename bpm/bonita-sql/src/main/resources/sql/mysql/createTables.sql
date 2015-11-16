@@ -238,6 +238,7 @@ CREATE TABLE arch_flownode_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(kind, logicalGroup2, executedBy);
+CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(tenantId, kind, logicalGroup3);
 CREATE INDEX idx_afi_sourceId_tenantid_kind ON arch_flownode_instance (sourceObjectId, tenantid, kind);
 CREATE INDEX idx1_arch_flownode_instance ON arch_flownode_instance (tenantId, rootContainerId, parentContainerId);
 
@@ -998,3 +999,12 @@ CREATE TABLE page_mapping (
 ) ENGINE = INNODB;
 
 ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);
+
+CREATE TABLE proc_parameter (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  process_id BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  value MEDIUMTEXT NULL,
+  PRIMARY KEY (tenantId, id)
+) ENGINE = INNODB;

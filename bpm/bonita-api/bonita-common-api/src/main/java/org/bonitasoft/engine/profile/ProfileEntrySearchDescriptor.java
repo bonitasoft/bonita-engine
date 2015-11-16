@@ -13,23 +13,58 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import org.bonitasoft.engine.search.SearchOptions;
+
 /**
+ * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for {@link ProfileEntry}s
+ * 
  * @author Celine Souchet
+ * @see org.bonitasoft.engine.search.SearchOptions
+ * @see ProfileEntry
+ * @see org.bonitasoft.engine.api.ProfileAPI#searchProfileEntries(SearchOptions)
  */
 public final class ProfileEntrySearchDescriptor {
 
+    /**
+     * Used to filter or order by the {@link ProfileEntry} identifier
+     * @see ProfileEntry
+     */
     public static final String ID = "id";
 
+    /**
+     * Used to filter or order by the {@link ProfileEntry} index
+     * @see ProfileEntry
+     */
     public static final String INDEX = "index";
 
+    /**
+     * Used to filter or order by the {@link ProfileEntry} name
+     * @see ProfileEntry
+     */
     public static final String NAME = "name";
 
+    /**
+     * Used to filter or order by the identifier of the related {@link Profile}
+     * @see Profile
+     */
     public static final String PROFILE_ID = "profileId";
 
+    /**
+     * Used to filter or order by the identifier of the parent {@link ProfileEntry}
+     * @see ProfileEntry
+     */
     public static final String PARENT_ID = "parentId";
 
+    /**
+     * Used to filter or order by the name of the page referenced by the profile {@link ProfileEntry}.
+     * @see ProfileEntry#getPage()
+     */
     public static final String PAGE = "page";
 
+    /**
+     * Used to filter or order by the flag {@link ProfileEntry#isCustom()}
+     * @see ProfileEntry
+     */
     public static final String CUSTOM = "custom";
 
 }
