@@ -26,6 +26,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -43,6 +44,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SRetryableException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.hibernate.Hibernate;
@@ -178,7 +180,13 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with a null identifier");
         }
         final EntityManager em = getEntityManager();
-        final T entity = em.find(entityClass, primaryKey);
+        final T entity;
+        try {
+            entity = em.find(entityClass, primaryKey);
+        } catch (PersistenceException e) {
+            //wrap in retryable exception because the issue might come from BDR reloading
+            throw new SRetryableException(e);
+        }
         if (entity == null) {
             throw new SBusinessDataNotFoundException("Impossible to get data of type " + entityClass.getName() + " with id: " + primaryKey);
         }
@@ -191,11 +199,16 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             return new ArrayList<>();
         }
         final EntityManager em = getEntityManager();
-        final CriteriaBuilder cb = em.getCriteriaBuilder();
-        final CriteriaQuery<T> criteriaQuery = cb.createQuery(entityClass);
-        final Root<T> row = criteriaQuery.from(entityClass);
-        criteriaQuery.select(row).where(row.get(Field.PERSISTENCE_ID).in(primaryKeys));
-        return em.createQuery(criteriaQuery).getResultList();
+        try {
+            final CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<T> criteriaQuery = cb.createQuery(entityClass);
+            final Root<T> row = criteriaQuery.from(entityClass);
+            criteriaQuery.select(row).where(row.get(Field.PERSISTENCE_ID).in(primaryKeys));
+            return em.createQuery(criteriaQuery).getResultList();
+        } catch (PersistenceException e) {
+            //wrap in retryable exception because the issue might come from BDR reloading
+            throw new SRetryableException(e);
+        }
     }
 
     @Override
@@ -237,30 +250,48 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     public <T extends Serializable> T find(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
-        return find(resultClass, typedQuery, parameters);
+        try {
+            return find(resultClass, typedQuery, parameters);
+        } catch (PersistenceException e) {
+            throw new SRetryableException(e);
+        }
     }
 
     @Override
     public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters,
                                                      final int startIndex, final int maxResults) {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
-        return findList(typedQuery, parameters, startIndex, maxResults);
+        try {
+            return findList(typedQuery, parameters, startIndex, maxResults);
+        } catch (PersistenceException e) {
+            throw new SRetryableException(e);
+        }
     }
 
     @Override
     public <T extends Serializable> T findByNamedQuery(final String queryName, final Class<T> resultClass, final Map<String, Serializable> parameters)
             throws NonUniqueResultException {
         final EntityManager em = getEntityManager();
-        final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
-        return find(resultClass, query, parameters);
+        try {
+            final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
+            return find(resultClass, query, parameters);
+        } catch (PersistenceException e) {
+            //wrap in retryable exception because the issue might come from BDR reloading
+            throw new SRetryableException(e);
+        }
     }
 
     @Override
     public <T extends Serializable> List<T> findListByNamedQuery(final String queryName, final Class<T> resultClass,
                                                                  final Map<String, Serializable> parameters, final int startIndex, final int maxResults) {
         final EntityManager em = getEntityManager();
-        final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
-        return findList(query, parameters, startIndex, maxResults);
+        try {
+            final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
+            return findList(query, parameters, startIndex, maxResults);
+        } catch (PersistenceException e) {
+            //wrap in retryable exception because the issue might come from BDR reloading
+            throw new SRetryableException(e);
+        }
     }
 
     private <T> TypedQuery<T> createTypedQuery(final String jpqlQuery, final Class<T> resultClass) {
@@ -286,21 +317,34 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     public void remove(final Entity entity) {
         if (entity != null && entity.getPersistenceId() != null) {
             final EntityManager em = getEntityManager();
-            em.remove(entity);
+            try {
+                em.remove(entity);
+            } catch (PersistenceException e) {
+                throw new SRetryableException(e);
+            }
         }
     }
 
     @Override
     public void persist(final Entity entity) {
         if (entity != null) {
-            getEntityManager().persist(entity);
+            EntityManager entityManager = getEntityManager();
+            try {
+                entityManager.persist(entity);
+            } catch (PersistenceException e) {
+                throw new SRetryableException(e);
+            }
         }
     }
 
     @Override
     public Entity merge(final Entity entity) {
         if (entity != null) {
-            return getEntityManager().merge(entity);
+            try {
+                return getEntityManager().merge(entity);
+            } catch (PersistenceException e) {
+                throw new SRetryableException(e);
+            }
         }
         return null;
     }
