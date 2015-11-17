@@ -96,7 +96,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee")
                 .withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build())
                 .withField(aSimpleField().withName("lastName").ofType(FieldType.STRING).notNullable().build())
-                .withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build()).withQuery(
+                .withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build())
+                .withQuery(
                         aQuery().withName("getNoEmployees")
                                 .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'")
                                 .withReturnType(List.class.getName()).build())
@@ -106,6 +107,16 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
                                 .withReturnType(EMPLOYEE_QUALIF_CLASSNAME)
                                 .withQueryParameter("firstName", String.class.getName())
                                 .withQueryParameter("lastName", String.class.getName()).build())
+                .withQuery(
+                        aQuery().withName("customQuery")
+                                .withContent("SELECT e FROM BonitaEmployee e")
+                                .withReturnType(List.class.getName())
+                                .build())
+                .withQuery(
+                        aQuery().withName("countForCustomQuery")
+                                .withContent("SELECT COUNT(e) FROM BonitaEmployee e")
+                                .withReturnType(Long.class.getName())
+                                .build())
                 .build();
         return aBOM().withBOs(addressBO, employee).build();
     }
@@ -224,27 +235,15 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         parameters.put(MAX_RESULTS, 1);
         final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
 
-        final ObjectMapper mapper = new ObjectMapper(); 
+        final ObjectMapper mapper = new ObjectMapper();
         final Long count = mapper.readValue(result, Long.class);
         assertThat(count).isEqualTo(3L);
     }
 
     @Test
-    public void should_have_query_metadata() throws Exception {
+    public void should_have_query_metadata_on_auto_generated_queries() throws Exception {
         //given
-        final Map<String, Serializable> parameters = new HashMap<>();
-        HashMap<String, Serializable> queryParameters = new HashMap<>();
-
-        parameters.put(QUERY_NAME, "find");
-        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
-        parameters.put(QUERY_PARAMETERS, queryParameters);
-        parameters.put(START_INDEX, 2);
-        parameters.put(MAX_RESULTS, 1);
-        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
-
-        //when
-        final BusinessDataQueryResultImpl businessDataQueryResult = (BusinessDataQueryResultImpl) getCommandAPI().execute(GET_BUSINESS_DATA_BY_QUERY_COMMAND,
-                parameters);
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("find", 2, 1);
 
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
 
@@ -255,21 +254,42 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_have_results_but_no_query_metadata_when_count_is_not_available() throws Exception {
+    public void should_have_query_metadata_on_custom_queries_with_related_count() throws Exception {
         //given
+        int startIndex = 2;
+        int maxResults = 1;
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("customQuery", startIndex, maxResults);
+
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
+
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata()).isNotNull();
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCount()).isEqualTo(3L);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getStartIndex()).isEqualTo(startIndex);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getMaxResults()).isEqualTo(maxResults);
+
+    }
+
+    private BusinessDataQueryResultImpl executeQuery(String queryName, int startIndex, int maxResults)
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
         final Map<String, Serializable> parameters = new HashMap<>();
         HashMap<String, Serializable> queryParameters = new HashMap<>();
 
-        parameters.put(QUERY_NAME, "getNoEmployees");
+        parameters.put(QUERY_NAME, queryName);
         parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(QUERY_PARAMETERS, queryParameters);
-        parameters.put(START_INDEX, 2);
-        parameters.put(MAX_RESULTS, 1);
+        parameters.put(START_INDEX, startIndex);
+        parameters.put(MAX_RESULTS, maxResults);
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
 
         //when
-        final BusinessDataQueryResultImpl businessDataQueryResult = (BusinessDataQueryResultImpl) getCommandAPI().execute(GET_BUSINESS_DATA_BY_QUERY_COMMAND,
+        return (BusinessDataQueryResultImpl) getCommandAPI().execute(GET_BUSINESS_DATA_BY_QUERY_COMMAND,
                 parameters);
+    }
+
+    @Test
+    public void should_have_results_but_no_query_metadata_when_count_is_not_available() throws Exception {
+        //given
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("getNoEmployees", 2, 1);
 
         //then
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo("[]");
