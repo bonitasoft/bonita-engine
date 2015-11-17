@@ -47,7 +47,7 @@ public class BonitaBPMParentClassLoaderResolverTest {
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isNull();
+        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class BonitaBPMParentClassLoaderResolverTest {
         //when
         final ClassLoaderIdentifier parentClassLoaderIdentifier = bonitaBPMParentClassLoaderResolver.getParentClassLoaderIdentifier(childId);
         //then
-        assertThat(parentClassLoaderIdentifier).isNull();
+        assertThat(parentClassLoaderIdentifier).isEqualTo(ClassLoaderIdentifier.GLOBAL);
     }
 
     @Test(expected = BonitaRuntimeException.class)
