@@ -388,7 +388,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         bo.addField(field);
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         return model;
     }
 
