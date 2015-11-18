@@ -289,8 +289,8 @@ public class EngineStarter {
             createPlatformAndTenant(platformAPI);
         } else {
             LOGGER.info("=========  REUSING EXISTING PLATFORM =======");
+            platformAPI.startNode();
         }
-        platformAPI.startNode();
         platformLoginAPI.logout(session);
 
     }
