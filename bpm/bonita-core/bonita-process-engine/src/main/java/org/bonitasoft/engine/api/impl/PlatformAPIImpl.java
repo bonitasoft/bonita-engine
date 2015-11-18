@@ -210,6 +210,9 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
+        if(isNodeStarted){
+            throw new StartNodeException("Node already started");
+        }
         final PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
         try {
@@ -218,7 +221,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new StartNodeException(e);
         }
-
         try {
             try {
                 checkPlatformVersion(platformAccessor);
