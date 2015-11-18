@@ -47,7 +47,7 @@ public class EngineStarter {
     private Object h2Server;
     private static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
-    private Map<String,byte[]> overridenConfiguration = new HashMap<>();
+    private Map<String, byte[]> overridenConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
 
     public void start() throws Exception {
@@ -78,7 +78,7 @@ public class EngineStarter {
             IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
             bonitaHomePath = outputFolder.getAbsolutePath() + "/bonita-home";
             for (Map.Entry<String, byte[]> customConfig : overridenConfiguration.entrySet()) {
-                IOUtil.write(new File(bonitaHomePath,customConfig.getKey()),customConfig.getValue());
+                IOUtil.write(new File(bonitaHomePath, customConfig.getKey()), customConfig.getValue());
             }
             System.setProperty(BONITA_HOME_PROPERTY, bonitaHomePath);
         }
@@ -137,9 +137,11 @@ public class EngineStarter {
         final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
         final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
         final Method start = server.getClass().getMethod("start");
+        LOGGER.info("Starting h2 on port " + h2Port);
         try {
             start.invoke(server);
         } catch (InvocationTargetException e) {
+            LOGGER.info("Unable to start h2 on port " + h2Port, e);
             return null;
         }
         return server;
@@ -282,10 +284,10 @@ public class EngineStarter {
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        if(!platformAPI.isPlatformCreated() || dropOnStart){
+        if (!platformAPI.isPlatformCreated() || dropOnStart) {
             LOGGER.info("=========  INIT PLATFORM =======");
             createPlatformAndTenant(platformAPI);
-        }else{
+        } else {
             LOGGER.info("=========  REUSING EXISTING PLATFORM =======");
         }
         platformAPI.startNode();
@@ -381,7 +383,7 @@ public class EngineStarter {
     }
 
     public void overrideConfiguration(String path, byte[] file) {
-        overridenConfiguration.put(path,file);
+        overridenConfiguration.put(path, file);
     }
 
     public void setDropOnStart(boolean dropOnStart) {
