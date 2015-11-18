@@ -38,19 +38,18 @@ public class EngineStarterSP extends EngineStarter {
         return defaultTenantId;
     }
 
+
     @Override
-    public void initPlatformAndTenant() throws Exception {
+    protected void createPlatformAndTenant(org.bonitasoft.engine.api.PlatformAPI platformAPI) throws BonitaException {
         try {
-            createPlatformStructure();
+            createPlatformStructure(platformAPI,true);
         } catch (final Exception e) {
             final Logger logger = LoggerFactory.getLogger(TestEngineSP.class);
             logger.error("unable to create platform", e);
-            final PlatformSession session = loginOnPlatform();
-            final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.stopNode();
             platformAPI.cleanPlatform();
             deletePlatformStructure();
-            createPlatformStructure();
+            createPlatformStructure(platformAPI,true);
         }
 
         createEnvironmentWithDefaultTenant();
