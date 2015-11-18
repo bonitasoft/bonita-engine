@@ -86,5 +86,8 @@ public class TestEngineImpl implements TestEngine {
         engineStarter.overrideConfiguration(path, file);
     }
 
-
+    @Override
+    public void setDropOnStart(boolean dropOnStart) {
+        engineStarter.setDropOnStart(dropOnStart);
+    }
 }

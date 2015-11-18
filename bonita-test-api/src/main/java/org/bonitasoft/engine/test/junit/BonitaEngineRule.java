@@ -23,6 +23,7 @@ public class BonitaEngineRule implements MethodRule {
 
     private TestEngine testEngine;
     private boolean cleanAfterTest;
+    private boolean reuseExistingPlatform;
 
     protected BonitaEngineRule(TestEngine testEngine) {
         this.testEngine = testEngine;
@@ -39,6 +40,10 @@ public class BonitaEngineRule implements MethodRule {
 
     public BonitaEngineRule withCleanAfterTest() {
         cleanAfterTest = true;
+        return this;
+    }
+    public BonitaEngineRule reuseExistingPlatform(){
+        testEngine.setDropOnStart(false);
         return this;
     }
 

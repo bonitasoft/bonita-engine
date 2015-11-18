@@ -56,5 +56,10 @@ public class BonitaEngineRuleTest {
         public void overrideConfiguration(String path, byte[] file) {
 
         }
+
+        @Override
+        public void setDropOnStart(boolean dropOnStart) {
+
+        }
     }
 }

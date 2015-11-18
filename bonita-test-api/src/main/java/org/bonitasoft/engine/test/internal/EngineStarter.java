@@ -48,6 +48,7 @@ public class EngineStarter {
     private static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
     private Map<String,byte[]> overridenConfiguration = new HashMap<>();
+    private boolean dropOnStart = true;
 
     public void start() throws Exception {
         LOGGER.info("=====================================================");
@@ -277,9 +278,24 @@ public class EngineStarter {
     }
 
     protected void initPlatformAndTenant() throws Exception {
-        LOGGER.info("=========  INIT PLATFORM =======");
-        createPlatformStructure();
-        initializeAndStartPlatformWithDefaultTenant(true);
+
+        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        if(!platformAPI.isPlatformCreated() || dropOnStart){
+            LOGGER.info("=========  INIT PLATFORM =======");
+            createPlatformAndTenant(platformAPI);
+        }else{
+            LOGGER.info("=========  REUSING EXISTING PLATFORM =======");
+        }
+        platformAPI.startNode();
+        platformLoginAPI.logout(session);
+
+    }
+
+    protected void createPlatformAndTenant(PlatformAPI platformAPI) throws BonitaException {
+        createPlatformStructure(platformAPI, false);
+        initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
     }
 
     protected PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -289,13 +305,6 @@ public class EngineStarter {
     protected PlatformSession loginOnPlatform() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         return platformLoginAPI.login("platformAdmin", "platform");
-    }
-
-    protected void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
-        logoutOnPlatform(session);
     }
 
     protected void deployCommandsOnDefaultTenant() throws BonitaException {
@@ -325,7 +334,6 @@ public class EngineStarter {
     protected void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         platformAPI.initializePlatform();
         platformAPI.startNode();
-
         if (deployCommands) {
             deployCommandsOnDefaultTenant();
         }
@@ -336,16 +344,6 @@ public class EngineStarter {
         System.setProperty(property, finalValue);
         return finalValue;
     }
-
-
-    protected void createPlatformStructure() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        createPlatformStructure(platformAPI, false);
-        platformLoginAPI.logout(session);
-    }
-
 
     protected void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         if (platformAPI.isPlatformCreated()) {
@@ -384,5 +382,13 @@ public class EngineStarter {
 
     public void overrideConfiguration(String path, byte[] file) {
         overridenConfiguration.put(path,file);
+    }
+
+    public void setDropOnStart(boolean dropOnStart) {
+        this.dropOnStart = dropOnStart;
+    }
+
+    public boolean isDropOnStart() {
+        return dropOnStart;
     }
 }
