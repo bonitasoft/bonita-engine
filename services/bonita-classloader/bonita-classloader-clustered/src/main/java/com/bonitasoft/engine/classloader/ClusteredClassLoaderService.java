@@ -15,16 +15,18 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.Member;
+import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-
-import com.bonitasoft.manager.Features;
-import com.bonitasoft.manager.Manager;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.Member;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -38,15 +40,15 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
      * serialized and given to hazelcast
      */
     static HazelcastInstance hazelcastInstance;
-
     static ClassLoaderService classLoaderService;
-
     static TechnicalLoggerService loggerService;
+    static SessionAccessor sessionAccessor;
 
     @SuppressWarnings("static-access")
     public ClusteredClassLoaderService(final HazelcastInstance hazelcastInstance,
-            final ClassLoaderService classLoaderService,
-            final TechnicalLoggerService loggerService) {
+                                       final ClassLoaderService classLoaderService,
+                                       final TechnicalLoggerService loggerService, SessionAccessor sessionAccessor) {
+        this.sessionAccessor = sessionAccessor;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -77,14 +79,9 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     }
 
     @Override
-    public void removeLocalClassLoader(final String type, final long id) {
+    public void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException {
         classLoaderService.removeLocalClassLoader(type, id);
 
-    }
-
-    @Override
-    public void removeAllLocalClassLoaders(final String type) {
-        classLoaderService.removeAllLocalClassLoaders(type);
     }
 
     @Override
@@ -93,8 +90,7 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
 
         // we use the executor service to refresh classloader on all nodes
 
-        RefreshClassLoaderTask refreshClassLoaderTask = new RefreshClassLoaderTask(
-                resources);
+        RefreshClassLoaderTask refreshClassLoaderTask = new RefreshClassLoaderTask(resources);
 
         executeRefreshOnCluster(null, -1, refreshClassLoaderTask);
 
@@ -103,18 +99,19 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     @Override
     public void refreshLocalClassLoader(final String type, final long id,
             final Map<String, byte[]> resources) throws SClassLoaderException {
-
         // we use the executor service to refresh classloader on all nodes
-
-        RefreshClassLoaderTask refreshClassLoaderTask = new RefreshClassLoaderTask(
-                type, id, resources);
-
-        executeRefreshOnCluster(type, id, refreshClassLoaderTask);
+        RefreshClassLoaderTask refreshClassLoaderTask;
+        try {
+            refreshClassLoaderTask = new RefreshClassLoaderTask(sessionAccessor.getTenantId(), type, id, resources);
+            executeRefreshOnCluster(type, id, refreshClassLoaderTask);
+        } catch (STenantIdNotSetException e) {
+            throw new SClassLoaderException(e);
+        }
     }
 
     private void executeRefreshOnCluster(final String type, final long id,
             final RefreshClassLoaderTask refreshClassLoaderTask)
-            throws SClassLoaderException {
+                    throws SClassLoaderException {
         long before = System.currentTimeMillis();
         Map<Member, Future<TaskStatus>> submitToAllMembers = hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(refreshClassLoaderTask);
         // wait for result;
@@ -137,11 +134,8 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
                     throw new SClassLoaderException(result.getThrowable());
                 }
             }
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | InterruptedException e) {
             // exception in a node
-            throw new SClassLoaderException(e);
-        } catch (InterruptedException e) {
-            // TIMEOUT
             throw new SClassLoaderException(e);
         }
     }
@@ -164,6 +158,26 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     @Override
     public void resume() throws SBonitaException {
         // Nothing to do
+    }
+
+    @Override
+    public boolean addListener(String type, long id, ClassLoaderListener classLoaderListener) {
+        return classLoaderService.addListener(type, id, classLoaderListener);
+    }
+
+    @Override
+    public boolean removeListener(String type, long id, ClassLoaderListener classLoaderListener) {
+        return classLoaderService.removeListener(type, id, classLoaderListener);
+    }
+
+    @Override
+    public boolean addListener(ClassLoaderListener classLoaderListener) {
+        return classLoaderService.addListener(classLoaderListener);
+    }
+
+    @Override
+    public boolean removeListener(ClassLoaderListener classLoaderListener) {
+        return classLoaderService.removeListener(classLoaderListener);
     }
 
 }
