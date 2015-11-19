@@ -106,7 +106,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
-    private static boolean isNodeStarted = false;
+    static boolean isNodeStarted = false;
 
     public PlatformAPIImpl() {
         super();

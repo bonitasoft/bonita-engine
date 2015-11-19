@@ -102,6 +102,7 @@ public class PlatformAPIImplTest {
         doReturn(tenantServiceAccessor).when(platformAPI).getTenantServiceAccessor(anyLong());
         doReturn(-1L).when(platformAPI).createSession(anyLong(), any(SessionService.class));
         doReturn(tenants).when(platformAPI).getTenants(platformServiceAccessor);
+        PlatformAPIImpl.isNodeStarted = false;
     }
 
     @Test
