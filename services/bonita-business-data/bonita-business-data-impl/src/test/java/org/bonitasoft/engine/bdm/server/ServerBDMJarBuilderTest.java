@@ -20,16 +20,16 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.compiler.JDTCompiler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.compiler.JDTCompiler;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServerBDMJarBuilderTest {
@@ -37,11 +37,14 @@ public class ServerBDMJarBuilderTest {
     @Mock
     private BusinessObjectModel bom;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     private File directory;
 
     @Before
     public void setUp() throws Exception {
-        directory = IOUtil.createTempDirectoryInDefaultTempDirectory(ServerBDMJarBuilderTest.class.getName());
+        directory = temporaryFolder.newFolder();
     }
 
     @After

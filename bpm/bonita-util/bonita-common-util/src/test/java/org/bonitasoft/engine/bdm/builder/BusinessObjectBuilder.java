@@ -22,6 +22,10 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 
 public class BusinessObjectBuilder {
 
+    public static final String EMPLOYEE_QUALIFIED_CLASS_NAME = "com.company.model.Employee";
+
+    public static final String ADDRESS_QUALIFIED_CLASS_NAME = "com.company.model.Address";
+
     private BusinessObject businessObject = new BusinessObject();
 
     public BusinessObjectBuilder(final String qualifiedName) {

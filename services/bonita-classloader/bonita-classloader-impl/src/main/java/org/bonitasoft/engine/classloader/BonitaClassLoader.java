@@ -16,7 +16,6 @@ package org.bonitasoft.engine.classloader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
@@ -87,8 +86,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
                         final String path = file.getAbsolutePath();
                         final URL url = new File(path).toURI().toURL();
                         urls.add(url);
-                    } catch (final MalformedURLException e) {
-                        e.printStackTrace();
                     } catch (final Exception e) {
                         e.printStackTrace();
                     }

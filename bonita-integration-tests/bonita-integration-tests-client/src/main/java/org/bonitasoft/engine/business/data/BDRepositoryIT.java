@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -49,6 +48,8 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryResult;
+import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -621,7 +622,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().uninstallBusinessDataModel();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
@@ -1442,10 +1443,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
-        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
 
     }
 
@@ -1463,7 +1464,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        BusinessDataQueryResultImpl businessDataQueryResult= (BusinessDataQueryResultImpl) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        final String jsonResult = (String) businessDataQueryResult.getJsonResults();
 
         // then
         assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("getEmployeeByPhoneNumber.json"));
@@ -1484,10 +1486,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
-        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
 
     }
 
@@ -1501,10 +1503,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
 
         // when
-        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
-        assertThatJson(jsonResult).as("should get employee count ").isEqualTo(getJsonContent("countEmployee.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee count ").isEqualTo(getJsonContent("countEmployee.json"));
 
     }
 
@@ -1522,10 +1524,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
-        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByHireDate.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByHireDate.json"));
 
     }
 
