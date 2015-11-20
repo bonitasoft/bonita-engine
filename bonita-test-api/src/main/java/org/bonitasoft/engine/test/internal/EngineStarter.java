@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.naming.Context;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,22 +85,24 @@ public class EngineStarter {
             }
             System.setProperty(BONITA_HOME_PROPERTY, bonitaHomePath);
 
-            // paste the default local server properties
-            File platformInit = new File(bonitaHomePath, "engine-server/conf/platform-init");
-            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"), new File(platformInit, "local-server.xml"));
-            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
         }
         return bonitaHomePath;
     }
 
     protected void prepareEnvironment()
-            throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
+            throws Exception {
 
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        prepareBonitaHome();
+        String bonitaHome = prepareBonitaHome();
         final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
-        setSystemPropertyIfNotSet(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
-        setSystemPropertyIfNotSet(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
+        if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
+            // configure data sources only if we are using a local bonita engine, can do better?
+            File platformInit = new File(bonitaHome, "engine-server/conf/platform-init");
+            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"), new File(platformInit, "local-server.xml"));
+            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
+            setSystemPropertyIfNotSet(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
+            setSystemPropertyIfNotSet(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
+        }
         if ("h2".equals(dbVendor)) {
             LOGGER.info("Using h2, starting H2 server: ");
             this.h2Server = startH2Server();
