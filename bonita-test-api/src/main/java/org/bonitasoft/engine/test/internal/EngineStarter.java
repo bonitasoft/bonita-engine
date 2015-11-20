@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.Context;
 
 import org.apache.commons.io.FileUtils;
@@ -81,6 +82,11 @@ public class EngineStarter {
                 IOUtil.write(new File(bonitaHomePath, customConfig.getKey()), customConfig.getValue());
             }
             System.setProperty(BONITA_HOME_PROPERTY, bonitaHomePath);
+
+            // paste the default local server properties
+            File platformInit = new File(bonitaHomePath, "engine-server/conf/platform-init");
+            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"), new File(platformInit, "local-server.xml"));
+            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
         }
         return bonitaHomePath;
     }
@@ -89,22 +95,10 @@ public class EngineStarter {
             throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
 
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        final String bonitaHome = prepareBonitaHome();
-
-
+        prepareBonitaHome();
         final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
-
-
-        // paste the default local server properties
-        // TODO do not handle the default local server like this
-        File platformInit = new File(bonitaHome, "engine-server/conf/platform-init");
-        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"), new File(platformInit, "local-server.xml"));
-        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
-
-        // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
-
+        setSystemPropertyIfNotSet(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
+        setSystemPropertyIfNotSet(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
         if ("h2".equals(dbVendor)) {
             LOGGER.info("Using h2, starting H2 server: ");
             this.h2Server = startH2Server();
