@@ -62,7 +62,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 /**
  * @author Baptiste Mesta
  */
-public class ClusterTests extends CommonAPISPIT {
+public class ClusterTests extends APITestSPUtil {
 
     static Logger LOGGER = LoggerFactory.getLogger(ClusterTests.class);
 
