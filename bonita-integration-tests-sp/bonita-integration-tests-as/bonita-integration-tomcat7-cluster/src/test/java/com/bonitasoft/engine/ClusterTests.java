@@ -301,10 +301,6 @@ public class ClusterTests extends CommonAPISPIT {
 
     public void waitProcessToFinishAndBeArchived(final ProcessInstance processInstance, ProcessAPI processAPI) throws Exception {
         final boolean waitUntil = new WaitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, processAPI).waitUntil();
-        if (!waitUntil) {
-            printFlowNodes(processInstance);
-            printArchivedFlowNodes(processInstance);
-        }
         assertTrue("Process was not finished", waitUntil);
     }
 
