@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
@@ -42,7 +43,7 @@ import groovy.lang.Script;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyScriptExpressionExecutorStrategy {
+public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyScriptExpressionExecutorStrategy implements ClassLoaderListener {
 
     public static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
 
@@ -116,8 +117,14 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         ClassLoader classLoader;
         if (definitionId == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
+            //do not has listener, should not happen...
+            if (debugEnabled) {
+                IllegalStateException illegalStateException = new IllegalStateException();
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Creating a shell without definition id, might cause issue when reloading classes", illegalStateException);
+            }
         } else {
             classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
+            classLoaderService.addListener(DEFINITION_TYPE, definitionId, this);
         }
         return classLoader;
     }
@@ -134,7 +141,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
             return script.run();
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
-            throw new SExpressionEvaluationException("Expression " + expressionName + " with content = <" + expressionContent + "> depends on " + property + " is neither defined in the script nor in dependencies.", e, expressionName);
+            throw new SExpressionEvaluationException("Expression " + expressionName + " with content = <" + expressionContent + "> depends on " + property
+                    + " is neither defined in the script nor in dependencies.", e, expressionName);
         } catch (final GroovyRuntimeException e) {
             throw new SExpressionEvaluationException(e, expressionName);
         } catch (final SCacheException e) {
@@ -153,4 +161,23 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         }
     }
 
+    @Override
+    public void onUpdate(ClassLoader newClassLoader) {
+        clearCache();
+    }
+
+    private void clearCache() {
+        try {
+            cacheService.clear(GROOVY_SCRIPT_CACHE_NAME);
+        } catch (SCacheException e) {
+            logger.log(getClass(), TechnicalLogSeverity.ERROR,
+                    "error while clearing the cache of the groovy script executor strategy, you might have classloading issue, restart the server if it's the case",
+                    e);
+        }
+    }
+
+    @Override
+    public void onDestroy(ClassLoader oldClassLoader) {
+        clearCache();
+    }
 }

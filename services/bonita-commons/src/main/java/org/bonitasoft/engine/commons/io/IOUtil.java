@@ -30,12 +30,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.math.BigInteger;
-import java.net.URI;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +57,6 @@ import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
 import org.w3c.dom.Document;
-import sun.misc.IOUtils;
-import sun.security.util.ManifestDigester;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -604,40 +600,6 @@ public class IOUtil {
             return file.mkdirs();
         }
         return true;
-    }
-
-    public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + System.currentTimeMillis());
-        createTempDirectory(tmpDir);
-        return tmpDir;
-    }
-
-    public static File createTempDirectory(final URI directoryPath) {
-        final File tmpDir = new File(directoryPath);
-        createTempDirectory(tmpDir);
-        return tmpDir;
-    }
-
-    private static void createTempDirectory(final File tmpDir) {
-        tmpDir.setReadable(true);
-        tmpDir.setWritable(true);
-
-        mkdirs(tmpDir);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    final boolean deleted = deleteDir(tmpDir);
-                    if (!deleted) {
-                        System.err.println("Unable to delete the directory: " + tmpDir);
-                    }
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {

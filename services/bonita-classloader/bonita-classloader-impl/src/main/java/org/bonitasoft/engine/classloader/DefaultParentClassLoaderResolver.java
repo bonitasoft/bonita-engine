@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -16,7 +16,8 @@ package org.bonitasoft.engine.classloader;
 public class DefaultParentClassLoaderResolver implements ParentClassLoaderResolver {
 
     @Override
-    public ClassLoader getParent(ClassLoaderService classLoaderService, String childClassLoaderType, long childClassLoaderId) throws SClassLoaderException {
-        return classLoaderService.getGlobalClassLoader();
+    public ClassLoaderIdentifier getParentClassLoaderIdentifier(ClassLoaderIdentifier childId) {
+        return ClassLoaderIdentifier.GLOBAL;//global
     }
+
 }

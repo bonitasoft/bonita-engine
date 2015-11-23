@@ -1,0 +1,65 @@
+/**
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+
+package org.bonitasoft.engine.classloader;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+/**
+ * @author Baptiste Mesta
+ */
+public class ClassLoaderIdentifier implements Serializable {
+
+    public static final String GLOBAL_TYPE = "GLOBAL";
+    public static final long GLOBAL_ID = -1;
+    public static final ClassLoaderIdentifier GLOBAL = new ClassLoaderIdentifier(GLOBAL_TYPE, GLOBAL_ID);
+
+    private String type;
+    private long id;
+
+    public ClassLoaderIdentifier(String type, long id) {
+        this.type = type;
+        this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ClassLoaderIdentifier that = (ClassLoaderIdentifier) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, id);
+    }
+
+    @Override
+    public String toString() {
+        return type + ':' + id;
+    }
+}

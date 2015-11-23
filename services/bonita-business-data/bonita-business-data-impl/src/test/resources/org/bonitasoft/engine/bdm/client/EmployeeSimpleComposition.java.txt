@@ -19,7 +19,9 @@ import javax.persistence.Version;
 @NamedQueries({
     @NamedQuery(name = "Employee.findByPersistenceId", query = "SELECT e\nFROM Employee e\nWHERE e.persistenceId= :persistenceId\n"),
     @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
-    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
+    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId"),
+    @NamedQuery(name = "Employee.countForFindByFirstName", query = "SELECT COUNT(e)\nFROM Employee e\nWHERE e.firstName= :firstName\n"),
+    @NamedQuery(name = "Employee.countForFind", query = "SELECT COUNT(e)\nFROM Employee e\n")
 })
 public class Employee implements org.bonitasoft.engine.bdm.Entity
 {
