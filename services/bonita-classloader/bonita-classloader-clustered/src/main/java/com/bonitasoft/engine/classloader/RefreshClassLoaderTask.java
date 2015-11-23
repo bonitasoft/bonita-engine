@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.classloader;
 
+import static com.bonitasoft.engine.classloader.ClusteredClassLoaderService.classLoaderService;
+import static com.bonitasoft.engine.classloader.ClusteredClassLoaderService.sessionAccessor;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -15,19 +18,16 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 
 /**
- * 
- * 
  * Refresh the classloader of the current node
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 final class RefreshClassLoaderTask implements Callable<TaskStatus>,
         Serializable {
 
     /**
-	 * 
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
 
     private final Map<String, byte[]> resources;
@@ -39,6 +39,7 @@ final class RefreshClassLoaderTask implements Callable<TaskStatus>,
     private long id;
 
     private final boolean isLocal;
+    private long tenantId;
 
     public RefreshClassLoaderTask(Map<String, byte[]> resources) {
         this.origin = ClusteredClassLoaderService.hazelcastInstance.getCluster().getLocalMember().getUuid();
@@ -46,8 +47,9 @@ final class RefreshClassLoaderTask implements Callable<TaskStatus>,
         isLocal = false;
     }
 
-    public RefreshClassLoaderTask(String type, long id,
-            Map<String, byte[]> resources) {
+    public RefreshClassLoaderTask(long tenantId, String type, long id,
+                                  Map<String, byte[]> resources) {
+        this.tenantId = tenantId;
         this.origin = ClusteredClassLoaderService.hazelcastInstance.getCluster().getLocalMember().getUuid();
         isLocal = true;
         this.type = type;
@@ -63,9 +65,11 @@ final class RefreshClassLoaderTask implements Callable<TaskStatus>,
         try {
             long before = System.currentTimeMillis();
             if (isLocal) {
-                ClusteredClassLoaderService.classLoaderService.refreshLocalClassLoader(type, id, resources);
+                //set the tenant id because the refresh classloader need to know on which tenant it is done
+                sessionAccessor.setTenantId(tenantId);
+                classLoaderService.refreshLocalClassLoader(type, id, resources);
             } else {
-                ClusteredClassLoaderService.classLoaderService.refreshGlobalClassLoader(resources);
+                classLoaderService.refreshGlobalClassLoader(resources);
             }
             long after = System.currentTimeMillis();
             TaskStatus taskStatus = new TaskStatus(origin, localUuid, null, false, after - before, isLocal, type, id);
