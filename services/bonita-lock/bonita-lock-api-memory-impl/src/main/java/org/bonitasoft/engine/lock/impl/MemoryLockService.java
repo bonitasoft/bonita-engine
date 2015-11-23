@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
@@ -31,7 +32,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * This service must be configured as a singleton.
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  */
@@ -54,8 +55,7 @@ public class MemoryLockService implements LockService {
     private final int lockPoolSize;
 
     /**
-     * @param lockTimeout
-     *        timeout to obtain a lock in seconds
+     * @param lockTimeout timeout to obtain a lock (in seconds)
      * @param lockPoolSize the size of the lock pool
      */
     public MemoryLockService(final TechnicalLoggerService logger, final int lockTimeout, final int lockPoolSize) {
@@ -146,7 +146,29 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
+    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) {
+        // Let's try to tryLock() 10 times maximum:
+        for (int i = 0; i < 10; i++) {
+            try {
+                return internalTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS, tenantId);
+            } catch (SBonitaRuntimeException ignored) {
+                if (debugEnabled) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Bad luck concurrency trying to lock. Let's retry to lock...");
+                }
+            } finally {
+                if (i > 0 && debugEnabled) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                            MessageFormat.format("********* YES! retrying solved the problem after {0} retries *********. You can remove those logs, now", i));
+                }
+            }
+        }
+        // Could not retrieve the lock for 10 times: log specific exception and return null:
+        logger.log(getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format("Tried to acquire the lock for 10 times without success for {0}:{1}{3}",
+                objectType, objectToLockId, getDetailsOnLock(objectToLockId, objectType, tenantId)));
+        return null;
+    }
+
+    protected BonitaLock internalTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
         final String key = buildKey(objectToLockId, objectType, tenantId);
         final ReentrantLock lock;
         synchronized (getMutex(objectToLockId)) {
@@ -197,7 +219,7 @@ public class MemoryLockService implements LockService {
                         // Compare the 2 Locks by reference : if they are the same: fine, just continue as we locked on the correct lock.
                         // Otherwise we have to release the lock just acquired : someone was faster than us to lock on the same key.
                         lock.unlock();
-                        return null;
+                        throw new SBonitaRuntimeException("Lock acquire concurrency exception. Should trigger a retry lock.");
                     }
                     // else everything is fine : this is the same lock. Go on !
                 }
