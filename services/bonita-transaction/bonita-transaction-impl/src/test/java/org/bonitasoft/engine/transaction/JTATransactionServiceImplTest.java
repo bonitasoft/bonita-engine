@@ -13,21 +13,12 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
+
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
@@ -55,12 +46,10 @@ public class JTATransactionServiceImplTest {
     @InjectMocks
     private JTATransactionServiceImpl txService;
 
-
     @Test
     public void beginTransaction() throws Exception {
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
-
 
         txService.begin();
         verify(txManager, times(1)).begin();
@@ -124,7 +113,6 @@ public class JTATransactionServiceImplTest {
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
         when(txManager.getTransaction()).thenThrow(new SystemException("Mocked"));
-
 
         try {
             txService.begin();
@@ -333,17 +321,17 @@ public class JTATransactionServiceImplTest {
             return called;
         }
     }
-    
+
     @Test
     public void should_counter_be_reset_if_tx_manager_do_not_call_synchronization() throws Exception {
         //given
         doReturn(Status.STATUS_NO_TRANSACTION).doReturn(Status.STATUS_ACTIVE).doReturn(Status.STATUS_ACTIVE).when(txManager).getStatus();
 
         doThrow(RollbackException.class).doNothing().when(txManager).commit();
-        try{
-
+        try {
             txService.executeInTransaction(new MockCallable());
-        }catch (STransactionCommitException e){
+            fail("executeInTransaction() Should throw STransactionCommitException here");
+        } catch (STransactionCommitException e) {
             //ok
         }
         //when
