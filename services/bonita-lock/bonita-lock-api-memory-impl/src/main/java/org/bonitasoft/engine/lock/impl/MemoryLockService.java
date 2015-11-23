@@ -97,26 +97,12 @@ public class MemoryLockService implements LockService {
 
     protected ReentrantLock removeLockFromMapIfNotUsed(final String key) {
         final ReentrantLock reentrantLock = getLockFromKey(key);
-        /*
-         * The reentrant lock must not have waiting thread that tries to lock it, nor a lockservice.lock that locked it
-         */
-        if (reentrantLock != null) {
-            if (!reentrantLock.hasQueuedThreads()) {
-                if (traceEnabled) {
-                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "removed from map " + reentrantLock.hashCode() + " id=" + key);
-                }
-                usedLocks.remove(key);
-            } else {
-                if (debugEnabled) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                            "NOT removing lock " + reentrantLock.hashCode() + " id=" + key + " from map, as there are " + reentrantLock.getQueueLength()
-                                    + " threads queueing for this lock");
-                }
+        // The reentrant lock must not have any waiting thread that tries to lock it, nor a lockservice.lock() that locked it:
+        if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
+            if (traceEnabled) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "removed from map " + reentrantLock.hashCode() + " id=" + key);
             }
-        } else {
-            if (debugEnabled) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Lock was null, could not removed it from map");
-            }
+            usedLocks.remove(key);
         }
         return reentrantLock;
     }
@@ -174,8 +160,8 @@ public class MemoryLockService implements LockService {
         synchronized (getMutex(objectToLockId)) {
             lock = getLockAndPutItInMap(key);
 
-            if (debugEnabled) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("TryLock {0} with id={1}", String.valueOf(lock.hashCode()), key));
+            if (traceEnabled) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, MessageFormat.format("TryLock {0} with id={1}", String.valueOf(lock.hashCode()), key));
             }
 
             if (lock.isHeldByCurrentThread()) {
@@ -199,18 +185,18 @@ public class MemoryLockService implements LockService {
                     if (previousLock == null) {
                         // Someone unlocked the lock while we were tryLocking so it was removed from the Map.
                         // Let's add it again
-                        if (debugEnabled) {
-                            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Yes, someone just released the lock, let's take it !");
+                        if (traceEnabled) {
+                            logger.log(getClass(), TechnicalLogSeverity.TRACE, "Yes, someone just released the lock, let's take it !");
                         }
                         usedLocks.put(key, lock);
                     } else if (previousLock != lock) {
-                        if (debugEnabled) {
+                        if (traceEnabled) {
                             try {
                                 Method getOwnerMethod = previousLock.getClass().getDeclaredMethod("getOwner");
                                 getOwnerMethod.setAccessible(true);
                                 Thread ownerThread = (Thread) getOwnerMethod.invoke(previousLock);
                                 String previousThread = ownerThread.getName();
-                                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                                logger.log(getClass(), TechnicalLogSeverity.TRACE,
                                         MessageFormat.format("Bad luck, someone (thread {0}) was faster that us to take our lock on {1} {2}", previousThread,
                                                 objectType, objectToLockId));
                             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
@@ -229,8 +215,8 @@ public class MemoryLockService implements LockService {
         } catch (final InterruptedException e) {
             logger.log(getClass(), TechnicalLogSeverity.ERROR, "The trylock was interrupted " + lock.hashCode() + " id=" + key);
         }
-        if (debugEnabled) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+        if (traceEnabled) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE,
                     MessageFormat.format("Could not lock after {0} {1} the lock {2} with id={3}", lockTimeout, TimeUnit.SECONDS,
                             String.valueOf(lock.hashCode()), key));
         }
@@ -270,9 +256,6 @@ public class MemoryLockService implements LockService {
             }
         } else {
             details.append("no additional details could be found (lock exists and is not locked, there should be no problem).");
-        }
-        if (debugEnabled) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, details.toString());
         }
         return details;
     }
