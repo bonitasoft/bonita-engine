@@ -15,11 +15,15 @@ package org.bonitasoft.engine.bdm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
-import static org.bonitasoft.engine.bdm.builder.FieldBuilder.*;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aRelationField;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static org.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.assertThat;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.junit.Test;
 
@@ -158,6 +162,33 @@ public class BusinessObjectTest {
                 .as("should return simple name")
                 .isEqualTo(
                         "BusinessObject[description=description,fields=[SimpleField[name=field1,nullable=true,collection=false,length=<null>,type=BOOLEAN], SimpleField[name=field2,nullable=true,collection=false,length=<null>,type=BOOLEAN]],indexes=[],qualifiedName=com.company.model.Employee,queries=[Query [name=queryName, content=select * from Employee, returnType=java.lang.String, queryParameters=[]]],uniqueConstraints=[org.bonitasoft.engine.bdm.model.UniqueConstraint@d2518f4e, org.bonitasoft.engine.bdm.model.UniqueConstraint@7bea0d39]]");
+    }
+
+    @Test
+    public void getField_should_return_field_matching_the_given_name() throws Exception {
+        //given
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).withField(aBooleanField("field3")).build();
+        businessObject.setQualifiedName("com.company.model.Employee");
+
+        //when
+        Field field = businessObject.getField("field2");
+
+        //then
+        assertThat(field).isNotNull();
+        assertThat(field.getName()).isEqualTo("field2");
+    }
+
+    @Test
+    public void getField_should_return_null_when_no_field_exists_for_the_given_name() throws Exception {
+        //given
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1")).build();
+        businessObject.setQualifiedName("com.company.model.Employee");
+
+        //when
+        Field field = businessObject.getField("thisFieldDoesNotExist");
+
+        //then
+        assertThat(field).isNull();
     }
 
 }

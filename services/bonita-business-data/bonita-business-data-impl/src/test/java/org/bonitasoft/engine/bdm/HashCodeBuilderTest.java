@@ -22,12 +22,14 @@ import java.util.Date;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Romain Bioteau
@@ -40,11 +42,14 @@ public class HashCodeBuilderTest extends CompilableCode {
 
     private File destDir;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         codeGenerator = new CodeGenerator();
         hashCodeBuilder = new HashCodeBuilder();
-        destDir = IOUtil.createTempDirectoryInDefaultTempDirectory("generationDir");
+        destDir = temporaryFolder.newFolder();
     }
 
     @After

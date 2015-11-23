@@ -16,17 +16,20 @@ package org.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Romain Bioteau
@@ -40,11 +43,14 @@ public class EqualsBuilderTest extends CompilableCode {
 
     private File destDir;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         codeGenerator = new CodeGenerator();
         equalsBuilder = new EqualsBuilder();
-        destDir = IOUtil.createTempDirectoryInDefaultTempDirectory("generationDir");
+        destDir = temporaryFolder.newFolder();
     }
 
     @After

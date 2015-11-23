@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -63,6 +65,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     private static final String EXECUTE_BDM_QUERY_COMMAND = "executeBDMQuery";
 
+    public static final String GET_BUSINESS_DATA_BY_QUERY_COMMAND = "getBusinessDataByQueryCommand";
+
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.BonitaEmployee";
 
     private static final String ADDRESS_QUALIF_CLASSNAME = "org.bonita.pojo.BonitaAddress";
@@ -70,6 +74,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     private static final String RETURNS_LIST = "returnsList";
 
     private static final String QUERY_PARAMETERS = "queryParameters";
+
+    public static final String ENTITY_CLASS_NAME = "entityClassName";
 
     private static final String RETURN_TYPE = "returnType";
 
@@ -87,23 +93,32 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     private BusinessObjectModel buildBOM() {
         final BusinessObject addressBO = aBO(ADDRESS_QUALIF_CLASSNAME).withField(aSimpleField().withName("street").ofType(FieldType.STRING).build()).build();
-        final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee").
-                withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build()).
-                withField(aSimpleField().withName("lastName").ofType(FieldType.STRING).notNullable().build()).
-                withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build()).
-                withQuery(
+        final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee")
+                .withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build())
+                .withField(aSimpleField().withName("lastName").ofType(FieldType.STRING).notNullable().build())
+                .withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build())
+                .withQuery(
                         aQuery().withName("getNoEmployees")
                                 .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'")
-                                .withReturnType(List.class.getName()).build()).
-                withQuery(
+                                .withReturnType(List.class.getName()).build())
+                .withQuery(
                         aQuery().withName("getEmployeeByFirstNameAndLastName")
                                 .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName")
                                 .withReturnType(EMPLOYEE_QUALIF_CLASSNAME)
                                 .withQueryParameter("firstName", String.class.getName())
                                 .withQueryParameter("lastName", String.class.getName()).build())
+                .withQuery(
+                        aQuery().withName("customQuery")
+                                .withContent("SELECT e FROM BonitaEmployee e")
+                                .withReturnType(List.class.getName())
+                                .build())
+                .withQuery(
+                        aQuery().withName("countForCustomQuery")
+                                .withContent("SELECT COUNT(e) FROM BonitaEmployee e")
+                                .withReturnType(Long.class.getName())
+                                .build())
                 .build();
-        final BusinessObjectModel model = aBOM().withBOs(addressBO, employee).build();
-        return model;
+        return aBOM().withBOs(addressBO, employee).build();
     }
 
     @BeforeClass
@@ -173,7 +188,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     @Test
     public void should_execute_returns_empty_list() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(QUERY_NAME, "BonitaEmployee.getNoEmployees");
         parameters.put(RETURNS_LIST, true);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
@@ -186,10 +201,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     @Test
     public void should_execute_returns_employee_list() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(QUERY_NAME, "BonitaEmployee.find");
         parameters.put(RETURNS_LIST, true);
-        parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(START_INDEX, 0);
         parameters.put(MAX_RESULTS, 10);
@@ -200,10 +214,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     @Test
     public void getListFromQueryShouldLimitToMaxResults() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(QUERY_NAME, "BonitaEmployee.find");
         parameters.put(RETURNS_LIST, true);
-        parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put(START_INDEX, 0);
         parameters.put(MAX_RESULTS, 2);
@@ -213,11 +226,82 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     }
 
     @Test
+    public void should_have_a_count_query() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<>();
+        parameters.put(QUERY_NAME, "BonitaEmployee.countForFind");
+        parameters.put(RETURNS_LIST, false);
+        parameters.put(RETURN_TYPE, Long.class.getName());
+        parameters.put(START_INDEX, 0);
+        parameters.put(MAX_RESULTS, 1);
+        final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final Long count = mapper.readValue(result, Long.class);
+        assertThat(count).isEqualTo(3L);
+    }
+
+    @Test
+    public void should_have_query_metadata_on_auto_generated_queries() throws Exception {
+        //given
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("find", 2, 1);
+
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
+
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCount()).isEqualTo(3L);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getStartIndex()).isEqualTo(2);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getMaxResults()).isEqualTo(1);
+
+    }
+
+    @Test
+    public void should_have_query_metadata_on_custom_queries_with_related_count() throws Exception {
+        //given
+        int startIndex = 2;
+        int maxResults = 1;
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("customQuery", startIndex, maxResults);
+
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo(getJsonContent("Employee.find.2.1.json"));
+
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata()).isNotNull();
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getCount()).isEqualTo(3L);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getStartIndex()).isEqualTo(startIndex);
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata().getMaxResults()).isEqualTo(maxResults);
+
+    }
+
+    private BusinessDataQueryResultImpl executeQuery(String queryName, int startIndex, int maxResults)
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
+        final Map<String, Serializable> parameters = new HashMap<>();
+        HashMap<String, Serializable> queryParameters = new HashMap<>();
+
+        parameters.put(QUERY_NAME, queryName);
+        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(QUERY_PARAMETERS, queryParameters);
+        parameters.put(START_INDEX, startIndex);
+        parameters.put(MAX_RESULTS, maxResults);
+        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
+
+        //when
+        return (BusinessDataQueryResultImpl) getCommandAPI().execute(GET_BUSINESS_DATA_BY_QUERY_COMMAND,
+                parameters);
+    }
+
+    @Test
+    public void should_have_results_but_no_query_metadata_when_count_is_not_available() throws Exception {
+        //given
+        final BusinessDataQueryResultImpl businessDataQueryResult = executeQuery("getNoEmployees", 2, 1);
+
+        //then
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get json results").isEqualTo("[]");
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata()).isNull();
+    }
+
+    @Test
     public void should_execute_returns_a_single_employee() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(QUERY_NAME, "BonitaEmployee.getEmployeeByFirstNameAndLastName");
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
-        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<>();
         queryParameters.put("firstName", "Romain");
         queryParameters.put("lastName", "Bioteau");
         parameters.put(QUERY_PARAMETERS, (Serializable) queryParameters);
@@ -235,10 +319,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     @Test(expected = CommandExecutionException.class)
     public void should_execute_throw_a_CommandExecutionException_if_result_is_not_single() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(QUERY_NAME, "BonitaEmployee.findByLastName");
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
-        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<>();
         queryParameters.put("lastName", "Bioteau");
         parameters.put(QUERY_PARAMETERS, (Serializable) queryParameters);
         getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
@@ -246,7 +330,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     @Test(expected = BonitaRuntimeException.class)
     public void should_execute_throw_BonitaRuntimeException_if_query_not_exists() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(QUERY_NAME, "unknownQuery");
         parameters.put(RETURN_TYPE, EMPLOYEE_QUALIF_CLASSNAME);
         getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
@@ -314,6 +398,12 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         final Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME);
         final ObjectMapper mapper = new ObjectMapper();
         return (List<?>) mapper.readValue(result, mapper.getTypeFactory().constructCollectionType(List.class, loadClass));
+    }
+
+    private String getJsonContent(final String jsonFileName) throws IOException {
+        final String json;
+        json = new String(org.apache.commons.io.IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
+        return json;
     }
 
 }

@@ -1348,10 +1348,10 @@
 
     <bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
         <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
     <bean id="defaultTenantCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
@@ -1527,12 +1527,15 @@
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
     </bean>
 
+    <bean id="countQueryProvider" class="org.bonitasoft.engine.business.data.impl.CountQueryProvider"/>
+
     <bean id="businessDataService" class="org.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
-        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
-        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
-        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
-        <constructor-arg name="typeConverterUtil" ref="typeConverterUtil" />
-        <constructor-arg name="businessDataReloader" ref="businessDataReloader" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
+        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer"/>
+        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository"/>
+        <constructor-arg name="typeConverterUtil" ref="typeConverterUtil"/>
+        <constructor-arg name="businessDataReloader" ref="businessDataReloader"/>
+        <constructor-arg name="countQueryProvider" ref="countQueryProvider"/>
     </bean>
 
     <bean id="authenticationService" class="org.bonitasoft.engine.authentication.impl.AuthenticationServiceImpl">

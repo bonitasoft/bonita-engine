@@ -16,7 +16,11 @@ package org.bonitasoft.engine.classloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
@@ -39,18 +43,41 @@ public class VirtualClassLoader extends ClassLoader {
      */
     private BonitaClassLoader classloader;
 
-    protected final String artifactType;
+    private VirtualClassLoader virtualParent;
 
-    protected final long artifactId;
+    private List<ClassLoaderListener> listeners;
 
-    protected VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
+    private Set<VirtualClassLoader> children = new HashSet<>();
+    private ClassLoaderIdentifier identifier;
+
+    VirtualClassLoader(final String artifactType, final long artifactId, final ClassLoader parent) {
         super(parent);
-        this.artifactType = artifactType;
-        this.artifactId = artifactId;
+        identifier = new ClassLoaderIdentifier(artifactType, artifactId);
+        listeners = new ArrayList<>();
     }
 
-    void setClassLoader(final BonitaClassLoader classloader) {
+    VirtualClassLoader(final String artifactType, final long artifactId, final VirtualClassLoader parent) {
+        this(artifactType, artifactId, (ClassLoader) parent);
+        virtualParent = parent;
+        virtualParent.addChild(this);
+    }
+
+    void replaceClassLoader(final BonitaClassLoader classloader) {
+        BonitaClassLoader oldClassLoader = this.classloader;
         this.classloader = classloader;
+        notifyUpdate();
+        if (oldClassLoader != null) {
+            destroy(oldClassLoader);
+        }
+    }
+
+    private void notifyUpdate() {
+        for (ClassLoaderListener listener : listeners) {
+            listener.onUpdate(this);
+        }
+        for (VirtualClassLoader child : children) {
+            child.notifyUpdate();
+        }
     }
 
     @Override
@@ -98,6 +125,22 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     public void destroy() {
+        final BonitaClassLoader classloader = this.classloader;
+        destroy(classloader);
+        notifyDestroy();
+        if(virtualParent != null){
+            virtualParent.removeChild(this);
+        }
+    }
+
+    private void notifyDestroy() {
+        for (ClassLoaderListener listener : listeners) {
+            listener.onDestroy(this);
+        }
+        //do not notify children, it should not happen
+    }
+
+    private void destroy(BonitaClassLoader classloader) {
         XStreamFactory.remove(this);
         if (classloader != null) {
             classloader.destroy();
@@ -106,7 +149,35 @@ public class VirtualClassLoader extends ClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + classloader;
+        return super.toString() + ", type=" + identifier.getType() + ", id=" + identifier.getId() + " delegate: " + classloader;
     }
 
+    public boolean addListener(ClassLoaderListener listener) {
+        return !listeners.contains(listener) && listeners.add(listener);
+    }
+
+    public boolean removeListener(ClassLoaderListener classLoaderListener) {
+        return listeners.remove(classLoaderListener);
+    }
+
+    public void addChild(VirtualClassLoader virtualClassLoader) {
+        children.add(virtualClassLoader);
+    }
+
+    private void removeChild(VirtualClassLoader child) {
+        children.remove(child);
+
+    }
+
+    public boolean hasChildren() {
+        return !children.isEmpty();
+    }
+
+    public Set<VirtualClassLoader> getChildren() {
+        return children;
+    }
+
+    public ClassLoaderIdentifier getIdentifier() {
+        return identifier;
+    }
 }

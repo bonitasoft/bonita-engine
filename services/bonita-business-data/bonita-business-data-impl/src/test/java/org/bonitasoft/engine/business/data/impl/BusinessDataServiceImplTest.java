@@ -86,6 +86,9 @@ public class BusinessDataServiceImplTest {
     JsonBusinessDataSerializer jsonEntitySerializer;
 
     @Mock
+    private CountQueryProvider countQueryProvider;
+
+    @Mock
     BusinessDataModelRepository businessDataModelRepository;
 
     private TypeConverterUtil typeConverterUtil;
@@ -94,7 +97,8 @@ public class BusinessDataServiceImplTest {
     public void before() throws Exception {
         final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
         typeConverterUtil = new TypeConverterUtil(datePatterns);
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil, businessDataReloader));
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil,
+                businessDataReloader, countQueryProvider));
     }
 
     @Test
@@ -135,7 +139,7 @@ public class BusinessDataServiceImplTest {
 
     @Test
     public void callJavaOperationShouldInvokeListMethod() throws Exception {
-        final List<Entity> entities = new ArrayList<Entity>();
+        final List<Entity> entities = new ArrayList<>();
         entities.add(new EntityPojo(1L));
         businessDataService.callJavaOperation(entities, entities, "contains", Object.class.getName());
     }
@@ -391,7 +395,8 @@ public class BusinessDataServiceImplTest {
         doReturn(entityPojo).when(businessDataRepository).merge(entityPojo);
 
         //when
-        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(entityPojo, newEntities, "setAggregationEntities", List.class.getName());
+        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(entityPojo, newEntities, "setAggregationEntities",
+                List.class.getName());
 
         assertThat(resultPojo).as("should return object").isNotNull();
         assertThat(resultPojo.getAggregationEntities()).as("should have set entities").containsExactly(entity2);
@@ -495,7 +500,7 @@ public class BusinessDataServiceImplTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        final List<Entity> list = new ArrayList<Entity>();
+        final List<Entity> list = new ArrayList<>();
         list.add(childEntity);
         verify(jsonEntitySerializer).serializeEntity(list, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
@@ -505,14 +510,14 @@ public class BusinessDataServiceImplTest {
     public void getJsonQueryEntities_should_return_json() throws Exception {
         //given
         final EntityPojo entity = new EntityPojo(1562L);
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(PARAMETER_STRING, "a");
         parameters.put(PARAMETER_INTEGER, "12");
         parameters.put(PARAMETER_LONG, "34");
 
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
 
-        final List<Entity> entities = new ArrayList<Entity>();
+        final List<Entity> entities = new ArrayList<>();
         entities.add(entity);
         doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
 
@@ -535,7 +540,7 @@ public class BusinessDataServiceImplTest {
 
         //given
         final EntityPojo entity = new EntityPojo(1562L);
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(PARAMETER_STRING, "a");
         parameters.put(PARAMETER_INTEGER, "12");
         parameters.put(PARAMETER_LONG, "34");
@@ -555,7 +560,7 @@ public class BusinessDataServiceImplTest {
 
         //given
         final EntityPojo entity = new EntityPojo(1562L);
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put(PARAMETER_STRING, "a");
         parameters.put(PARAMETER_INTEGER, "12");
         parameters.put(PARAMETER_LONG, "34");
