@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
@@ -31,7 +32,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * This service must be configured as a singleton.
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  */
@@ -54,8 +55,7 @@ public class MemoryLockService implements LockService {
     private final int lockPoolSize;
 
     /**
-     * @param lockTimeout
-     *        timeout to obtain a lock in seconds
+     * @param lockTimeout timeout to obtain a lock (in seconds)
      * @param lockPoolSize the size of the lock pool
      */
     public MemoryLockService(final TechnicalLoggerService logger, final int lockTimeout, final int lockPoolSize) {
@@ -97,26 +97,12 @@ public class MemoryLockService implements LockService {
 
     protected ReentrantLock removeLockFromMapIfNotUsed(final String key) {
         final ReentrantLock reentrantLock = getLockFromKey(key);
-        /*
-         * The reentrant lock must not have waiting thread that tries to lock it, nor a lockservice.lock that locked it
-         */
-        if (reentrantLock != null) {
-            if (!reentrantLock.hasQueuedThreads()) {
-                if (traceEnabled) {
-                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "removed from map " + reentrantLock.hashCode() + " id=" + key);
-                }
-                usedLocks.remove(key);
-            } else {
-                if (debugEnabled) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                            "NOT removing lock " + reentrantLock.hashCode() + " id=" + key + " from map, as there are " + reentrantLock.getQueueLength()
-                                    + " threads queueing for this lock");
-                }
+        // The reentrant lock must not have any waiting thread that tries to lock it, nor a lockservice.lock() that locked it:
+        if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
+            if (traceEnabled) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "removed from map " + reentrantLock.hashCode() + " id=" + key);
             }
-        } else {
-            if (debugEnabled) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Lock was null, could not removed it from map");
-            }
+            usedLocks.remove(key);
         }
         return reentrantLock;
     }
@@ -146,14 +132,36 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
+    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) {
+        // Let's try to tryLock() 10 times maximum:
+        for (int i = 0; i < 10; i++) {
+            try {
+                return internalTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS, tenantId);
+            } catch (SBonitaRuntimeException ignored) {
+                if (debugEnabled) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Bad luck concurrency trying to lock. Let's retry to lock...");
+                }
+            } finally {
+                if (i > 0 && debugEnabled) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                            MessageFormat.format("********* YES! retrying solved the problem after {0} retries *********. You can remove those logs, now", i));
+                }
+            }
+        }
+        // Could not retrieve the lock for 10 times: log specific exception and return null:
+        logger.log(getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format("Tried to acquire the lock for 10 times without success for {0}:{1}{3}",
+                objectType, objectToLockId, getDetailsOnLock(objectToLockId, objectType, tenantId)));
+        return null;
+    }
+
+    protected BonitaLock internalTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
         final String key = buildKey(objectToLockId, objectType, tenantId);
         final ReentrantLock lock;
         synchronized (getMutex(objectToLockId)) {
             lock = getLockAndPutItInMap(key);
 
-            if (debugEnabled) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("TryLock {0} with id={1}", String.valueOf(lock.hashCode()), key));
+            if (traceEnabled) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, MessageFormat.format("TryLock {0} with id={1}", String.valueOf(lock.hashCode()), key));
             }
 
             if (lock.isHeldByCurrentThread()) {
@@ -177,18 +185,18 @@ public class MemoryLockService implements LockService {
                     if (previousLock == null) {
                         // Someone unlocked the lock while we were tryLocking so it was removed from the Map.
                         // Let's add it again
-                        if (debugEnabled) {
-                            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Yes, someone just released the lock, let's take it !");
+                        if (traceEnabled) {
+                            logger.log(getClass(), TechnicalLogSeverity.TRACE, "Yes, someone just released the lock, let's take it !");
                         }
                         usedLocks.put(key, lock);
                     } else if (previousLock != lock) {
-                        if (debugEnabled) {
+                        if (traceEnabled) {
                             try {
                                 Method getOwnerMethod = previousLock.getClass().getDeclaredMethod("getOwner");
                                 getOwnerMethod.setAccessible(true);
                                 Thread ownerThread = (Thread) getOwnerMethod.invoke(previousLock);
                                 String previousThread = ownerThread.getName();
-                                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                                logger.log(getClass(), TechnicalLogSeverity.TRACE,
                                         MessageFormat.format("Bad luck, someone (thread {0}) was faster that us to take our lock on {1} {2}", previousThread,
                                                 objectType, objectToLockId));
                             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
@@ -197,7 +205,7 @@ public class MemoryLockService implements LockService {
                         // Compare the 2 Locks by reference : if they are the same: fine, just continue as we locked on the correct lock.
                         // Otherwise we have to release the lock just acquired : someone was faster than us to lock on the same key.
                         lock.unlock();
-                        return null;
+                        throw new SBonitaRuntimeException("Lock acquire concurrency exception. Should trigger a retry lock.");
                     }
                     // else everything is fine : this is the same lock. Go on !
                 }
@@ -207,8 +215,8 @@ public class MemoryLockService implements LockService {
         } catch (final InterruptedException e) {
             logger.log(getClass(), TechnicalLogSeverity.ERROR, "The trylock was interrupted " + lock.hashCode() + " id=" + key);
         }
-        if (debugEnabled) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+        if (traceEnabled) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE,
                     MessageFormat.format("Could not lock after {0} {1} the lock {2} with id={3}", lockTimeout, TimeUnit.SECONDS,
                             String.valueOf(lock.hashCode()), key));
         }
@@ -248,9 +256,6 @@ public class MemoryLockService implements LockService {
             }
         } else {
             details.append("no additional details could be found (lock exists and is not locked, there should be no problem).");
-        }
-        if (debugEnabled) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, details.toString());
         }
         return details;
     }
