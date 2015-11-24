@@ -31,6 +31,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         TestShadesSP.class,
+        //start with a sp test in order to have a sp engine running
+        SPIdentityTests.class,
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventIT.class,
         InterruptingTimerBoundaryEventIT.class,
@@ -47,7 +49,6 @@ import org.junit.runners.Suite.SuiteClasses;
         SPPlatformLoginTest.class,
         SPPlatformTest.class,
         SPTimerBoundaryEventTest.class,
-        SPIdentityTests.class,
         TenantMaintenanceIT.class,
         SPProcessManagementTest.class,
         LocalIntegrationTestsSP.class,
