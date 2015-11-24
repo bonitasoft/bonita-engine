@@ -131,9 +131,9 @@ public class SPUserTest extends CommonAPISPIT {
         identityAPI1.deleteUser(user1.getId());
         identityAPI2.deleteUser(user2.getId());
 
-        BPMTestSPUtil.logoutOnTenant(session1);
+        BPMTestSPUtil.logoutOnTenant();
         BPMTestSPUtil.deactivateAndDeleteTenant(tenantId1);
-        BPMTestSPUtil.logoutOnTenant(session2);
+        BPMTestSPUtil.logoutOnTenant();
     }
 
 }

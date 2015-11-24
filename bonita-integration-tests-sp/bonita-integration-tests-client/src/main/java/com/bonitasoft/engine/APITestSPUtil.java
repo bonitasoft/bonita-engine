@@ -11,6 +11,7 @@ package com.bonitasoft.engine;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
@@ -86,6 +88,10 @@ public class APITestSPUtil extends APITestUtil {
     private PageAPI pageAPI;
 
     private ApplicationAPI applicationAPI;
+
+    public APISession getSession() {
+        return BPMTestSPUtil.apiClient.getSession();
+    }
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -168,7 +174,7 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     /**
-     * @param tenantManagementAPI
+     * @param tenantManagementAPI the API so set
      * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantAdministrationAPI)}
      */
     @Deprecated
@@ -177,42 +183,41 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenant(userName, password, tenantId));
+        BPMTestSPUtil.loginOnTenant(userName, password, tenantId);
         setAPIs();
     }
 
     @Override
     public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnDefaultTenant(userName, password));
+        BPMTestSPUtil.loginOnDefaultTenant(userName, password);
         setAPIs();
     }
 
     @Override
     public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser());
+        BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         setAPIs();
     }
 
     protected void loginOnTenantWithTechnicalUser(final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId));
+        BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId);
         setAPIs();
     }
 
     @Override
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setIdentityAPI(BPMTestSPUtil.apiClient.getIdentityAPI());
+        setProcessAPI(BPMTestSPUtil.apiClient.getProcessAPI());
+        setProfileAPI(BPMTestSPUtil.apiClient.getProfileAPI());
+        setThemeAPI(BPMTestSPUtil.apiClient.getThemeAPI());
+        setCommandAPI(BPMTestSPUtil.apiClient.getCommandAPI());
+        setReportingAPI(BPMTestSPUtil.apiClient.getReportingAPI());
         setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
+        setMonitoringAPI(BPMTestSPUtil.apiClient.getMonitoringAPI());
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
-        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
-        setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        setTenantManagementCommunityAPI(BPMTestSPUtil.apiClient.getTenantAdministrationAPI());
+        logAPI = BPMTestSPUtil.apiClient.getLogAPI();
         applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
     }
 
@@ -226,8 +231,7 @@ public class APITestSPUtil extends APITestUtil {
 
     @Override
     public void logoutOnTenant() throws BonitaException {
-        BPMTestSPUtil.logoutOnTenant(getSession());
-        setSession(null);
+        BPMTestSPUtil.apiClient.logout();
         setIdentityAPI(null);
         setProcessAPI(null);
         setProfileAPI(null);
@@ -338,7 +342,7 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector3(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user) throws BonitaException, IOException {
-        final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnector3.impl",
+        final List<BarResource> connectorImplementations = Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource("TestConnector3.impl",
                 TestConnector3.class));
         final List<BarResource> generateConnectorDependencies = Arrays.asList(
                 BuildTestUtil.generateJarAndBuildBarResource(TestConnector3.class, "TestConnector3.jar"),
@@ -354,8 +358,8 @@ public class APITestSPUtil extends APITestUtil {
         final BarResource barResource = new BarResource("connector-with-custom-type.jar", byteArray);
 
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
-                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnectorWithCustomType.impl", TestConnector.class)),
-                Arrays.asList(barResource), null);
+                Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource("TestConnectorWithCustomType.impl", TestConnector.class)),
+                Collections.singletonList(barResource), null);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorLongToExecute(final ProcessDefinitionBuilder processDefinitionBuilder,
@@ -371,7 +375,7 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(
             final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user, final Map<String, String> parameters)
-                    throws BonitaException, IOException {
+            throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters,
                 "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }
@@ -400,8 +404,8 @@ public class APITestSPUtil extends APITestUtil {
 
     private ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user, final Map<String, String> parameters, final String name, final String jarName)
-                    throws IOException, BonitaException {
-        final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, TestConnector.class));
+            throws IOException, BonitaException {
+        final List<BarResource> connectorImplementations = Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(name, TestConnector.class));
         final List<BarResource> generateConnectorDependencies = Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, jarName),
                 BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, connectorImplementations,

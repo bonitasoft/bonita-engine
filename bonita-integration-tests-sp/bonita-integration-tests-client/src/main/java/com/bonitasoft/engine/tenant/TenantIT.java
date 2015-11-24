@@ -234,7 +234,7 @@ public class TenantIT {
             org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
         } finally {
             tenantManagementAPI.resume();
-            BPMTestSPUtil.logoutOnTenant(apiTestSPUtil.getSession());
+            BPMTestSPUtil.logoutOnTenant();
         }
     }
 
