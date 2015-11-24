@@ -371,7 +371,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
-        final long step1Id = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
+        final long step1Id = waitForUserTaskAndAssignIt(processInstance, "step1", user).getId();
 
         // Check that the "input1" variable has no value for "valueOfInput1"
         final WaitUntil waitUntil = waitForVariableStorage(50, 800, TestConnector.INPUT1, valueOfInput1);
@@ -417,7 +417,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
-        final ActivityInstance step1 = waitForUserTaskAndAssigneIt(processInstance, "step1", user);
+        final ActivityInstance step1 = waitForUserTaskAndAssignIt(processInstance, "step1", user);
 
         // Check that the "input1" variable has no value for "valueOfInput1", in Ready state of human task
         final WaitUntil waitUntil = waitForVariableStorage(50, 800, TestConnector.INPUT1, valueOfInput1);

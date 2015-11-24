@@ -720,13 +720,13 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstanceId;
     }
 
-    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final User user) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndAssignIt(final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndAssigneIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndAssignIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;

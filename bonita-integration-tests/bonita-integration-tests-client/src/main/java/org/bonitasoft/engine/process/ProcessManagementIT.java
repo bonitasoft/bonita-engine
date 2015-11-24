@@ -1343,7 +1343,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTaskAndAssigneIt(pi0, "step1", user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssignIt(pi0, "step1", user).getId();
         getProcessAPI().setActivityStateById(activityInstanceId, 3);
 
         final HumanTaskInstance userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);

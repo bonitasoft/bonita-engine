@@ -731,7 +731,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processBuilder.done(), Arrays.asList("myActor", "myActor2"),
                 Arrays.asList(john, jack));
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTaskAndAssigneIt(instance, "Request2", john);
+        waitForUserTaskAndAssignIt(instance, "Request2", john);
 
         List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertThat(pendingHumanTaskInstances).hasSize(1);
