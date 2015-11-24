@@ -1,3 +1,16 @@
+/*
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ */
 package org.bonitasoft.engine.api;
 
 import java.io.IOException;
@@ -52,7 +65,7 @@ public class APIClient {
 
     protected ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ApiAccessType apiType = getApiAccessType();
-        Map<String, String> parameters = null;
+        Map<String, String> parameters;
         switch (apiType) {
             case LOCAL:
                 return LocalServerAPIFactory.getServerAPI();
@@ -68,34 +81,28 @@ public class APIClient {
     }
 
     Map<String, String> getAPITypeParameters() throws BonitaHomeNotSetException, ServerAPIException {
-        Map<String, String> parameters;
         try {
-            parameters = APITypeManager.getAPITypeParameters();
+            return APITypeManager.getAPITypeParameters();
         } catch (IOException e) {
             throw new ServerAPIException(e);
         }
-        return parameters;
     }
 
     ApiAccessType getApiAccessType() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        ApiAccessType apiType;
         try {
-            apiType = APITypeManager.getAPIType();
+            return APITypeManager.getAPIType();
         } catch (IOException e) {
             throw new ServerAPIException(e);
         }
-        return apiType;
     }
 
     protected <T> T getAPI(final Class<T> clazz) {
         if (session == null) {
-            throw new IllegalStateException("You must call login prior to access any API.");
+            throw new IllegalStateException("You must call login() prior to accessing any API.");
         }
-        final ServerAPI serverAPI;
         try {
-            serverAPI = getServerAPI();
-            final ClientInterceptor clientInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
-            return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[]{clazz}, clientInterceptor);
+            final ClientInterceptor clientInterceptor = new ClientInterceptor(clazz.getName(), getServerAPI(), session);
+            return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, clientInterceptor);
         } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -107,10 +114,8 @@ public class APIClient {
 
     protected <T extends LoginAPI> T getLoginAPI(Class<T> apiClass) {
         try {
-            final ServerAPI serverAPI = getServerAPI();
-            final ClientInterceptor interceptor = new ClientInterceptor(LoginAPI.class.getName(), serverAPI);
-            T result = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[]{apiClass}, interceptor);
-            return result;
+            final ClientInterceptor interceptor = new ClientInterceptor(apiClass.getName(), getServerAPI());
+            return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, interceptor);
         } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
