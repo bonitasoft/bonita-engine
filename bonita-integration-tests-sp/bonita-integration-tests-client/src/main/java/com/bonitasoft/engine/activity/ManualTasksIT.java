@@ -93,7 +93,7 @@ public class ManualTasksIT extends CommonAPISPIT {
                 Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, user);
+        final ActivityInstance parentTask = waitForUserTaskAndAssignIt(processInstance, userTaskName, user);
 
         // add sub task
         final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", user.getId(), "add new manual user task 1",
@@ -134,7 +134,7 @@ public class ManualTasksIT extends CommonAPISPIT {
                 Arrays.asList(userTaskName, "step2"), Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, user);
+        final ActivityInstance parentTask = waitForUserTaskAndAssignIt(processInstance, userTaskName, user);
 
         // add sub task
         final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", user.getId(), "add new manual user task 1",
