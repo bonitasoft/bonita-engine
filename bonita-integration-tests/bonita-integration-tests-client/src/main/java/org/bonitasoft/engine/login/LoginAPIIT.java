@@ -13,26 +13,17 @@
  **/
 package org.bonitasoft.engine.login;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -50,7 +41,6 @@ import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -63,7 +53,7 @@ import org.junit.Test;
  */
 public class LoginAPIIT extends CommonAPIIT {
 
-    private static final String COMMAND_NAME = "deleteSessionCommand";
+    private static final String DELETE_SESSION_COMMAND = "deleteSessionCommand";
 
     private static PlatformSession platformSession;
 
@@ -87,16 +77,17 @@ public class LoginAPIIT extends CommonAPIIT {
         deleteSession(sessionId);
 
         // will throw SessionNotFoundException
-        logoutOnTenant();
+        getLoginAPI().logout(getSession());
     }
 
     private void deleteSession(final long sessionId) throws IOException, AlreadyExistsException, CreationException, CreationException,
-            CommandNotFoundException, CommandParameterizationException, CommandExecutionException, DeletionException, DependencyNotFoundException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+            CommandNotFoundException, CommandParameterizationException, CommandExecutionException, DeletionException, DependencyNotFoundException,
+            BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         // execute a command to delete a session
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("sessionId", sessionId);
-        final CommandAPI commandAPI = TenantAPIAccessor.getCommandAPI(getSession());
-        commandAPI.execute(COMMAND_NAME, parameters);
+        final CommandAPI commandAPI = getCommandAPI();
+        commandAPI.execute(DELETE_SESSION_COMMAND, parameters);
     }
 
     @Test(expected = LoginException.class)
@@ -111,14 +102,16 @@ public class LoginAPIIT extends CommonAPIIT {
         loginTenant.login("", null);
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with null password", jira = "ENGINE-622")
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login",
+            "Password" }, story = "Try to login with null password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithNullPassword() throws BonitaException {
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         loginTenant.login("matti", null);
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with wrong password", jira = "ENGINE-622")
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login",
+            "Password" }, story = "Try to login with wrong password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
@@ -134,7 +127,8 @@ public class LoginAPIIT extends CommonAPIIT {
         }
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with empty password", jira = "ENGINE-622")
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login",
+            "Password" }, story = "Try to login with empty password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithEmptyPassword() throws BonitaException {
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();

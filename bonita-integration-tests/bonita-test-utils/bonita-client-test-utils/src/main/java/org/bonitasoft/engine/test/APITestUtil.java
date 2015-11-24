@@ -14,10 +14,7 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,16 +33,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
@@ -168,8 +164,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     public static final String ROLE_NAME = BuildTestUtil.ROLE_NAME;
 
-    private APISession session;
-
     private ProcessAPI processAPI;
 
     private IdentityAPI identityAPI;
@@ -189,6 +183,8 @@ public class APITestUtil extends PlatformTestUtil {
     private TenantAdministrationAPI tenantManagementCommunityAPI;
 
     private BusinessDataAPI businessDataAPI;
+
+    private final APIClient apiClient = new APIClient();
 
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
@@ -211,28 +207,26 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
-        setSession(loginAPI.login(userName, password));
+        apiClient.login(userName, password);
         setAPIs();
     }
 
     public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
-        setSession(loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
+        apiClient.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
         setAPIs();
     }
 
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
-        setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
-        setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
-        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
-        setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
+        setIdentityAPI(apiClient.getIdentityAPI());
+        setProcessAPI(apiClient.getProcessAPI());
+        setCommandAPI(apiClient.getCommandAPI());
+        setProfileAPI(apiClient.getProfileAPI());
+        setThemeAPI(apiClient.getThemeAPI());
+        setPermissionAPI(apiClient.getPermissionAPI());
+        setPageAPI(apiClient.getCustomPageAPI());
+        setApplicationAPI(apiClient.getLivingApplicationAPI());
+        setTenantManagementCommunityAPI(apiClient.getTenantAdministrationAPI());
+        setBusinessDataAPI(apiClient.getBusinessDataAPI());
     }
 
     public BusinessDataAPI getBusinessDataAPI() {
@@ -244,9 +238,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public void logoutOnTenant() throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
-        loginAPI.logout(session);
-        setSession(null);
+        apiClient.logout();
         setIdentityAPI(null);
         setProcessAPI(null);
         setCommandAPI(null);
@@ -444,7 +436,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final List<User> users)
-            throws BonitaException {
+                    throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableProcessWithActor(businessArchive, actorName, users);
     }
@@ -538,7 +530,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final Group... groups)
-            throws BonitaException {
+                    throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         for (final Group group : groups) {
@@ -642,7 +634,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
-            throws BonitaException {
+                    throws BonitaException {
         return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
@@ -711,7 +703,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public APISession getSession() {
-        return session;
+        return apiClient.getSession();
     }
 
     public static boolean containsState(final List<ArchivedProcessInstance> instances, final TestStates state) {
@@ -934,7 +926,8 @@ public class APITestUtil extends PlatformTestUtil {
         System.err.println("Archived flownodes: ");
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
                 new SearchOptionsBuilder(0, 100).filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId())
-                        .done()).getResult();
+                        .done())
+                .getResult();
         System.err.println(archivedFlowNodeInstances);
     }
 
@@ -1205,7 +1198,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
             final boolean isTransient)
-            throws InvalidExpressionException, UpdateException {
+                    throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<>();
         operations.add(stringOperation);
@@ -1479,10 +1472,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void setPermissionAPI(final PermissionAPI permissionAPI) {
         this.permissionAPI = permissionAPI;
-    }
-
-    public void setSession(final APISession session) {
-        this.session = session;
     }
 
     protected void setPageAPI(final PageAPI pageAPI) {
