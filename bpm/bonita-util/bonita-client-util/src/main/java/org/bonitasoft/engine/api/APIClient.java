@@ -30,7 +30,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
- * Bonita BPM <b>Community</b> Edition API's client.<br>
+ * Bonita BPM <b>Community</b> Edition APIs client.<br>
  * <p/>
  * <ul>
  * <li>{@link IdentityAPI},</li>
@@ -80,7 +80,7 @@ public class APIClient {
         }
     }
 
-    Map<String, String> getAPITypeParameters() throws BonitaHomeNotSetException, ServerAPIException {
+    protected Map<String, String> getAPITypeParameters() throws BonitaHomeNotSetException, ServerAPIException {
         try {
             return APITypeManager.getAPITypeParameters();
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class APIClient {
         }
     }
 
-    ApiAccessType getApiAccessType() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    protected ApiAccessType getApiAccessType() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         try {
             return APITypeManager.getAPIType();
         } catch (IOException e) {
@@ -96,13 +96,15 @@ public class APIClient {
         }
     }
 
-    protected <T> T getAPI(final Class<T> clazz) {
+    protected <T> T getAPI(final Class<T> apiClass) {
         if (session == null) {
             throw new IllegalStateException("You must call login() prior to accessing any API.");
         }
         try {
-            final ClientInterceptor clientInterceptor = new ClientInterceptor(clazz.getName(), getServerAPI(), session);
-            return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, clientInterceptor);
+            final ClientInterceptor clientInterceptor = new ClientInterceptor(apiClass.getName(), getServerAPI(), session);
+            @SuppressWarnings("unchecked")
+            final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, clientInterceptor);
+            return api;
         } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -115,7 +117,9 @@ public class APIClient {
     protected <T extends LoginAPI> T getLoginAPI(Class<T> apiClass) {
         try {
             final ClientInterceptor interceptor = new ClientInterceptor(apiClass.getName(), getServerAPI());
-            return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, interceptor);
+            @SuppressWarnings("unchecked")
+            final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, interceptor);
+            return api;
         } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }

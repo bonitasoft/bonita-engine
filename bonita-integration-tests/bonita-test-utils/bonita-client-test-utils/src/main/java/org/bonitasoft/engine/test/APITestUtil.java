@@ -94,13 +94,10 @@ import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.Group;
@@ -164,26 +161,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     public static final String ROLE_NAME = BuildTestUtil.ROLE_NAME;
 
-    private ProcessAPI processAPI;
-
-    private IdentityAPI identityAPI;
-
-    private CommandAPI commandAPI;
-
-    private ProfileAPI profileAPI;
-
-    private ThemeAPI themeAPI;
-
-    private PermissionAPI permissionAPI;
-
-    private PageAPI pageAPI;
-
-    private ApplicationAPI applicationAPI;
-
-    private TenantAdministrationAPI tenantManagementCommunityAPI;
-
-    private BusinessDataAPI businessDataAPI;
-
     private final APIClient apiClient = new APIClient();
 
     static {
@@ -208,47 +185,18 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
         apiClient.login(userName, password);
-        setAPIs();
     }
 
     public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
         apiClient.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
-        setAPIs();
-    }
-
-    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        setIdentityAPI(apiClient.getIdentityAPI());
-        setProcessAPI(apiClient.getProcessAPI());
-        setCommandAPI(apiClient.getCommandAPI());
-        setProfileAPI(apiClient.getProfileAPI());
-        setThemeAPI(apiClient.getThemeAPI());
-        setPermissionAPI(apiClient.getPermissionAPI());
-        setPageAPI(apiClient.getCustomPageAPI());
-        setApplicationAPI(apiClient.getLivingApplicationAPI());
-        setTenantManagementCommunityAPI(apiClient.getTenantAdministrationAPI());
-        setBusinessDataAPI(apiClient.getBusinessDataAPI());
     }
 
     public BusinessDataAPI getBusinessDataAPI() {
-        return businessDataAPI;
-    }
-
-    public void setBusinessDataAPI(final BusinessDataAPI businessDataAPI) {
-        this.businessDataAPI = businessDataAPI;
+        return apiClient.getBusinessDataAPI();
     }
 
     public void logoutOnTenant() throws BonitaException {
         apiClient.logout();
-        setIdentityAPI(null);
-        setProcessAPI(null);
-        setCommandAPI(null);
-        setProfileAPI(null);
-        setThemeAPI(null);
-        setPermissionAPI(null);
-        setApplicationAPI(null);
-        setTenantManagementCommunityAPI(null);
-        setPageAPI(null);
-        setBusinessDataAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -495,14 +443,14 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public ProcessDefinition deployProcess(final BusinessArchive businessArchive) throws BonitaException {
-        return processAPI.deploy(businessArchive);
+        return getProcessAPI().deploy(businessArchive);
     }
 
     private void enableProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
         try {
-            processAPI.enableProcess(processDefinition.getId());
+            getProcessAPI().enableProcess(processDefinition.getId());
         } catch (final ProcessEnablementException e) {
-            final List<Problem> problems = processAPI.getProcessResolutionProblems(processDefinition.getId());
+            final List<Problem> problems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
             throw new ProcessEnablementException("not resolved: " + problems);
         }
     }
@@ -684,10 +632,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
-        while (getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 500) != 0) {
-        }
-        while (getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 500) != 0) {
-        }
+        while (getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 500) != 0);
+        while (getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 500) != 0);
     }
 
     public void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
@@ -774,8 +720,7 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstanceId;
     }
 
-    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final User user) throws Exception,
-            UpdateException {
+    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;
@@ -1427,75 +1372,39 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public ProcessAPI getProcessAPI() {
-        return processAPI;
-    }
-
-    public void setProcessAPI(final ProcessAPI processAPI) {
-        this.processAPI = processAPI;
+        return apiClient.getProcessAPI();
     }
 
     public IdentityAPI getIdentityAPI() {
-        return identityAPI;
-    }
-
-    public void setIdentityAPI(final IdentityAPI identityAPI) {
-        this.identityAPI = identityAPI;
+        return apiClient.getIdentityAPI();
     }
 
     public CommandAPI getCommandAPI() {
-        return commandAPI;
-    }
-
-    public void setCommandAPI(final CommandAPI commandAPI) {
-        this.commandAPI = commandAPI;
+        return apiClient.getCommandAPI();
     }
 
     public ProfileAPI getProfileAPI() {
-        return profileAPI;
-    }
-
-    public void setProfileAPI(final ProfileAPI profileAPI) {
-        this.profileAPI = profileAPI;
+        return apiClient.getProfileAPI();
     }
 
     public ThemeAPI getThemeAPI() {
-        return themeAPI;
-    }
-
-    public void setThemeAPI(final ThemeAPI themeAPI) {
-        this.themeAPI = themeAPI;
+        return apiClient.getThemeAPI();
     }
 
     public PermissionAPI getPermissionAPI() {
-        return permissionAPI;
-    }
-
-    public void setPermissionAPI(final PermissionAPI permissionAPI) {
-        this.permissionAPI = permissionAPI;
-    }
-
-    protected void setPageAPI(final PageAPI pageAPI) {
-        this.pageAPI = pageAPI;
+        return apiClient.getPermissionAPI();
     }
 
     public PageAPI getPageAPI() {
-        return pageAPI;
+        return apiClient.getCustomPageAPI();
     }
 
     public ApplicationAPI getApplicationAPI() {
-        return applicationAPI;
-    }
-
-    public void setApplicationAPI(final ApplicationAPI applicationAPI) {
-        this.applicationAPI = applicationAPI;
+        return apiClient.getLivingApplicationAPI();
     }
 
     public TenantAdministrationAPI getTenantAdministrationAPI() {
-        return tenantManagementCommunityAPI;
-    }
-
-    public void setTenantManagementCommunityAPI(final TenantAdministrationAPI tenantManagementCommunityAPI) {
-        this.tenantManagementCommunityAPI = tenantManagementCommunityAPI;
+        return apiClient.getTenantAdministrationAPI();
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
@@ -1536,14 +1445,14 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     /**
-     * tell the engine to run BPMEventHandlingjob now
+     * tell the engine to run BPMEventHandlingJob now
      *
      * @throws CommandParameterizationException
      * @throws CommandExecutionException
      * @throws CommandNotFoundException
      */
     protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
-        commandAPI.execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
+        getCommandAPI().execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
     }
 
     public ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances, final String dataName) {
