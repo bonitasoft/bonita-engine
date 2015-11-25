@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-monitoring</artifactId>
 		<groupId>com.bonitasoft.engine.monitoring</groupId>
-		<version>7.1.3-SNAPSHOT</version>
+		<version>7.1.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-monitoring-api</artifactId>
