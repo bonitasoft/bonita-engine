@@ -13,6 +13,7 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ApiAccessType;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
@@ -176,6 +177,11 @@ public final class TenantAPIAccessor {
     @Deprecated
     public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ApplicationAPI.class, session);
+    }
+
+    public static BusinessDataAPI getBusinessDataAPI(final APISession session) throws BonitaHomeNotSetException,
+            ServerAPIException, UnknownAPITypeException {
+        return getAPI(org.bonitasoft.engine.api.BusinessDataAPI.class, session);
     }
 
 }

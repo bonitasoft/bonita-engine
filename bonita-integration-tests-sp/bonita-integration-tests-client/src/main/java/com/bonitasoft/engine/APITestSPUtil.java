@@ -211,6 +211,7 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
+        setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
         applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
     }
@@ -370,7 +371,7 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowExceptionAndParameter(
             final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user, final Map<String, String> parameters)
-            throws BonitaException, IOException {
+                    throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, parameters,
                 "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }
@@ -399,7 +400,7 @@ public class APITestSPUtil extends APITestUtil {
 
     private ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user, final Map<String, String> parameters, final String name, final String jarName)
-            throws IOException, BonitaException {
+                    throws IOException, BonitaException {
         final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, TestConnector.class));
         final List<BarResource> generateConnectorDependencies = Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, jarName),
                 BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
