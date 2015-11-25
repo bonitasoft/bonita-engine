@@ -74,7 +74,7 @@ public enum SExceptionContext {
     /**
      * Corresponding to the class name of the implementation of the connector definition
      */
-    CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME,
+    CONNECTOR_IMPLEMENTATION_CLASS_NAME,
     /**
      * Corresponding to the version of the connector definition
      */

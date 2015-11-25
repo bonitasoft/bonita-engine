@@ -17,6 +17,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
 import org.bonitasoft.engine.DeepRegexFileFilter;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
@@ -33,7 +34,7 @@ public class Folder {
         if (folder == null) {
             throw new IOException("Folder is null");
         }
-        this.folder = new File(folder.getAbsolutePath());
+        this.folder = folder;
     }
 
     public Folder(final Folder folder, final String subFolder) throws IOException {
@@ -61,7 +62,7 @@ public class Folder {
         return folder.listFiles();
     }
 
-    public void delete()throws IOException  {
+    public void delete() throws IOException {
         //System.err.println("DELETING FOLDER: " + folder);
         checkFolderExists();
         IOUtil.deleteDir(folder);
@@ -81,7 +82,9 @@ public class Folder {
     public File newFile(final String name) throws IOException {
         checkFolderExists();
         final File newFile = new File(folder, name);
-        newFile.createNewFile();
+        if (!newFile.createNewFile()) {
+            throw new IOException("File " + newFile.getAbsolutePath() + " cannot be created");
+        }
         return newFile;
     }
 
@@ -106,6 +109,7 @@ public class Folder {
         File[] filesArray = folder.listFiles(filter);
         List<File> files = Arrays.asList(filesArray);
         Collections.sort(files, new Comparator<File>() {
+
             @Override
             public int compare(File file, File t1) {
                 return file.getName().compareTo(t1.getName());
@@ -146,12 +150,12 @@ public class Folder {
     public Map<String, byte[]> getResources(String filenamesPattern) throws IOException {
         final Collection<File> files = FileUtils.listFiles(getFile(), new DeepRegexFileFilter(getFile(), filenamesPattern),
                 DirectoryFileFilter.DIRECTORY);
-        final Map<String, byte[]> res = new HashMap<String, byte[]>(files.size());
-            for (final File file : files) {
-                final String key = Util.generateRelativeResourcePath(getFile(), file);
-                final byte[] value = IOUtil.getAllContentFrom(file);
-                res.put(key, value);
-            }
+        final Map<String, byte[]> res = new HashMap<>(files.size());
+        for (final File file : files) {
+            final String key = Util.generateRelativeResourcePath(getFile(), file);
+            final byte[] value = IOUtil.getAllContentFrom(file);
+            res.put(key, value);
+        }
         return res;
     }
 
@@ -161,11 +165,18 @@ public class Folder {
 
     public Map<String, byte[]> listFilesAsResources() throws IOException {
         checkFolderExists();
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
-        for (File file : this.folder.listFiles()) {
-            resources.put(file.getName(), IOUtil.getAllContentFrom(file));
+        final Map<String, byte[]> resources = new HashMap<>();
+        final File[] files = this.folder.listFiles((FileFilter) FileFileFilter.FILE);
+        if (files != null) {
+            for (File file : files) {
+                resources.put(file.getName(), getFileContent(file));
+            }
         }
         return resources;
+    }
+
+    protected byte[] getFileContent(File file) throws IOException {
+        return IOUtil.getAllContentFrom(file);
     }
 
     @Override

@@ -29,9 +29,8 @@ public class SManualTaskInstanceBuilderFactoryImpl extends SHumanTaskInstanceBui
     public SManualTaskInstanceBuilder createNewManualTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
             final long parentContainerId, final long actorId, final long processDefinitionId, final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
-        final SManualTaskInstanceImpl activityInst = new SManualTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, STaskPriority.NORMAL,
-                processDefinitionId,
-                rootProcessInstanceId);
+        final SManualTaskInstanceImpl activityInst = new SManualTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId,
+                STaskPriority.NORMAL, processDefinitionId, rootProcessInstanceId);
         activityInst.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return new SManualTaskInstanceBuilderImpl(activityInst);
     }
