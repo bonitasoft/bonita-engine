@@ -49,6 +49,7 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.APIClient;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
@@ -73,24 +74,20 @@ public class APITestSPUtil extends APITestUtil {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
 
-    private LogAPI logAPI;
-
-    private MonitoringAPI monitoringAPI;
+    private ApplicationAPI applicationAPI;
 
     private PlatformMonitoringAPI platformMonitoringAPI;
-
-    private ReportingAPI reportingAPI;
-
-    private ThemeAPI themeAPI;
 
     private TenantManagementAPI tenantManagementAPI;
 
     private PageAPI pageAPI;
 
-    private ApplicationAPI applicationAPI;
-
     public APISession getSession() {
-        return BPMTestSPUtil.apiClient.getSession();
+        return getApiClient().getSession();
+    }
+
+    protected APIClient getApiClient() {
+        return BPMTestSPUtil.apiClient;
     }
 
     @Override
@@ -112,29 +109,13 @@ public class APITestSPUtil extends APITestUtil {
         return platformMonitoringAPI;
     }
 
-    protected void setReportingAPI(final ReportingAPI reportingAPI) {
-        this.reportingAPI = reportingAPI;
-    }
-
-    protected void setPlatformMonitoringAPI(final PlatformMonitoringAPI platformMonitoringAPI) {
-        this.platformMonitoringAPI = platformMonitoringAPI;
-    }
-
     protected MonitoringAPI getMonitoringAPI() {
-        return monitoringAPI;
-    }
-
-    protected void setMonitoringAPI(final MonitoringAPI monitoringAPI) {
-        this.monitoringAPI = monitoringAPI;
+        return getApiClient().getMonitoringAPI();
     }
 
     @Override
     public ThemeAPI getThemeAPI() {
-        return themeAPI;
-    }
-
-    protected void setThemeAPI(final ThemeAPI themeAPI) {
-        this.themeAPI = themeAPI;
+        return getApiClient().getThemeAPI();
     }
 
     @Override
@@ -153,11 +134,11 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     public ReportingAPI getReportingAPI() {
-        return reportingAPI;
+        return getApiClient().getReportingAPI();
     }
 
     public LogAPI getLogAPI() {
-        return logAPI;
+        return getApiClient().getLogAPI();
     }
 
     /**
@@ -173,76 +154,42 @@ public class APITestSPUtil extends APITestUtil {
         return applicationAPI;
     }
 
-    /**
-     * @param tenantManagementAPI the API so set
-     * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantAdministrationAPI)}
-     */
-    @Deprecated
-    public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
-        this.tenantManagementAPI = tenantManagementAPI;
+    public PageAPI getSubscriptionPageAPI() {
+        return pageAPI;
     }
 
     public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
         BPMTestSPUtil.loginOnTenant(userName, password, tenantId);
-        setAPIs();
+        setOldAPIs();
     }
 
     @Override
     public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
         BPMTestSPUtil.loginOnDefaultTenant(userName, password);
-        setAPIs();
+        setOldAPIs();
     }
 
     @Override
     public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
         BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
-        setAPIs();
+        setOldAPIs();
     }
 
     protected void loginOnTenantWithTechnicalUser(final long tenantId) throws BonitaException {
         BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId);
-        setAPIs();
+        setOldAPIs();
     }
 
-    @Override
-    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        setIdentityAPI(BPMTestSPUtil.apiClient.getIdentityAPI());
-        setProcessAPI(BPMTestSPUtil.apiClient.getProcessAPI());
-        setProfileAPI(BPMTestSPUtil.apiClient.getProfileAPI());
-        setThemeAPI(BPMTestSPUtil.apiClient.getThemeAPI());
-        setCommandAPI(BPMTestSPUtil.apiClient.getCommandAPI());
-        setReportingAPI(BPMTestSPUtil.apiClient.getReportingAPI());
-        setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        setMonitoringAPI(BPMTestSPUtil.apiClient.getMonitoringAPI());
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
-        setTenantManagementCommunityAPI(BPMTestSPUtil.apiClient.getTenantAdministrationAPI());
-        logAPI = BPMTestSPUtil.apiClient.getLogAPI();
+    protected void setOldAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        pageAPI = TenantAPIAccessor.getPageAPI(getSession());
+        platformMonitoringAPI = TenantAPIAccessor.getPlatformMonitoringAPI(getSession());
+        tenantManagementAPI = TenantAPIAccessor.getTenantManagementAPI(getSession());
         applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
-    }
-
-    protected void setPageAPI(final PageAPI pageAPI) {
-        this.pageAPI = pageAPI;
-    }
-
-    public PageAPI getSubscriptionPageAPI() {
-        return pageAPI;
     }
 
     @Override
     public void logoutOnTenant() throws BonitaException {
-        BPMTestSPUtil.apiClient.logout();
-        setIdentityAPI(null);
-        setProcessAPI(null);
-        setProfileAPI(null);
-        setThemeAPI(null);
-        setMonitoringAPI(null);
-        setPlatformMonitoringAPI(null);
-        setReportingAPI(null);
-        setCommandAPI(null);
-        setTenantManagementAPI(null);
-        setTenantManagementCommunityAPI(null);
-        logAPI = null;
+        getApiClient().logout();
     }
 
     public void stopPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
@@ -299,7 +246,7 @@ public class APITestSPUtil extends APITestUtil {
         final List<String> messages = new ArrayList<String>();
         long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
         if (numberOfActiveTransactions != 0) {
-            // retry 50 ms after because the might still be some jobs/works that run
+            // retry 50 ms after because there might still be some jobs/works that run:
             try {
                 LOGGER.warn("There was " + numberOfActiveTransactions + " active transaction, waiting 50ms and checking it again");
                 Thread.sleep(50);
@@ -308,7 +255,7 @@ public class APITestSPUtil extends APITestUtil {
             }
             numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
             if (numberOfActiveTransactions != 0) {
-                // resleep 15 s now
+                // go back to sleep 15s now:
                 LOGGER.warn("There was still " + numberOfActiveTransactions + " active transaction, waiting 15s and checking it again");
                 try {
                     Thread.sleep(15000);
