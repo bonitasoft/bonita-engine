@@ -114,6 +114,15 @@ public class APIClient {
         return getLoginAPI(LoginAPI.class);
     }
 
+    /**
+     * This methods serves the purpose to remove confusion between getAPI() when a session is mandatory, and this one, where no session is needed to access the
+     * API class.
+     * 
+     * @param apiClass the API to retrieve
+     * @param <T> The type of the API, extending {@link org.bonitasoft.engine.api.LoginAPI}
+     * @return the retrieved API
+     * @throws IllegalStateException if the API cannot be retrieved.
+     */
     protected <T extends LoginAPI> T getLoginAPI(Class<T> apiClass) {
         try {
             final ClientInterceptor interceptor = new ClientInterceptor(apiClass.getName(), getServerAPI());

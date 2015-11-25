@@ -184,19 +184,19 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
-        apiClient.login(userName, password);
+        getApiClient().login(userName, password);
     }
 
     public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
-        apiClient.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+        getApiClient().login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
     }
 
     public BusinessDataAPI getBusinessDataAPI() {
-        return apiClient.getBusinessDataAPI();
+        return getApiClient().getBusinessDataAPI();
     }
 
     public void logoutOnTenant() throws BonitaException {
-        apiClient.logout();
+        getApiClient().logout();
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -649,7 +649,11 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public APISession getSession() {
-        return apiClient.getSession();
+        return getApiClient().getSession();
+    }
+
+    protected APIClient getApiClient() {
+        return apiClient;
     }
 
     public static boolean containsState(final List<ArchivedProcessInstance> instances, final TestStates state) {
@@ -1372,39 +1376,39 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public ProcessAPI getProcessAPI() {
-        return apiClient.getProcessAPI();
+        return getApiClient().getProcessAPI();
     }
 
     public IdentityAPI getIdentityAPI() {
-        return apiClient.getIdentityAPI();
+        return getApiClient().getIdentityAPI();
     }
 
     public CommandAPI getCommandAPI() {
-        return apiClient.getCommandAPI();
+        return getApiClient().getCommandAPI();
     }
 
     public ProfileAPI getProfileAPI() {
-        return apiClient.getProfileAPI();
+        return getApiClient().getProfileAPI();
     }
 
     public ThemeAPI getThemeAPI() {
-        return apiClient.getThemeAPI();
+        return getApiClient().getThemeAPI();
     }
 
     public PermissionAPI getPermissionAPI() {
-        return apiClient.getPermissionAPI();
+        return getApiClient().getPermissionAPI();
     }
 
     public PageAPI getPageAPI() {
-        return apiClient.getCustomPageAPI();
+        return getApiClient().getCustomPageAPI();
     }
 
     public ApplicationAPI getApplicationAPI() {
-        return apiClient.getLivingApplicationAPI();
+        return getApiClient().getLivingApplicationAPI();
     }
 
     public TenantAdministrationAPI getTenantAdministrationAPI() {
-        return apiClient.getTenantAdministrationAPI();
+        return getApiClient().getTenantAdministrationAPI();
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
