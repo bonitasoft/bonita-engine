@@ -15,10 +15,10 @@ import java.util.List;
 import com.bonitasoft.engine.api.APIClient;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.test.TestEngineSP;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -157,7 +157,7 @@ public class BPMTestSPUtil {
     }
 
     public static APISession loginOnDefaultTenant(final String userName, final String password) throws BonitaException {
-        apiClient.login(defaultTenantId, userName, password);
+        apiClient.login(getDefaultTenantId(), userName, password);
         return apiClient.getSession();
     }
 
