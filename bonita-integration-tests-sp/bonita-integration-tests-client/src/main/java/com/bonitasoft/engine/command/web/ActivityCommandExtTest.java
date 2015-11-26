@@ -286,7 +286,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         createAndDeployProcess2();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long processInstanceId = processInstance.getId();
-        final ActivityInstance step1 = waitForUserTaskAndAssigneIt(processInstance, "step1", businessUser);
+        final ActivityInstance step1 = waitForUserTaskAndAssignIt(processInstance, "step1", businessUser);
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
@@ -359,7 +359,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         createAndDeployProcess2();
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTaskAndAssigneIt(processInstance, "step1", businessUser);
+        final ActivityInstance userTask = waitForUserTaskAndAssignIt(processInstance, "step1", businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, userTask.getId());
@@ -418,7 +418,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         final String mainInputName1 = "param1";
 
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcessDefinition.getId());
-        final ActivityInstance step2 = waitForUserTaskAndAssigneIt("step2", businessUser);
+        final ActivityInstance step2 = waitForUserTaskAndAssignIt("step2", businessUser);
 
         // Expressions
         final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
@@ -466,7 +466,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the user task and assign it
-        final ActivityInstance userTask = waitForUserTaskAndAssigneIt(processInstance, "step1", businessUser);
+        final ActivityInstance userTask = waitForUserTaskAndAssignIt(processInstance, "step1", businessUser);
 
         // create operation to increment the variable
         final Expression dataExpression = new ExpressionBuilder().createDataExpression(intDataName, Integer.class.getName());
@@ -632,7 +632,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         processDefinition = deployAndEnableProcessWithActor(builder.done(), "myActor", businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final ActivityInstance userTaskInstance = waitForUserTaskAndAssigneIt(processInstance, "Request", businessUser);
+        final ActivityInstance userTaskInstance = waitForUserTaskAndAssignIt(processInstance, "Request", businessUser);
 
         // execute it with operation using the command
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();

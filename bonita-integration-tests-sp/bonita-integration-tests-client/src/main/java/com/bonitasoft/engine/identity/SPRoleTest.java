@@ -33,7 +33,7 @@ public class SPRoleTest extends CommonAPISPIT {
 
     @After
     public void after() throws BonitaException {
-        BPMTestSPUtil.logoutOnTenant(session);
+        BPMTestSPUtil.logoutOnTenant();
     }
 
     @Test
@@ -53,9 +53,9 @@ public class SPRoleTest extends CommonAPISPIT {
         identityAPI1.deleteRole(role1.getId());
         identityAPI2.deleteRole(role2.getId());
 
-        BPMTestSPUtil.logoutOnTenant(session1);
+        BPMTestSPUtil.logoutOnTenant();
         BPMTestSPUtil.deactivateAndDeleteTenant(tenantId1);
-        BPMTestSPUtil.logoutOnTenant(session2);
+        BPMTestSPUtil.logoutOnTenant();
     }
 
 }
