@@ -72,7 +72,7 @@ public class BonitaClientXMLTest {
     @Test
     public void testGetAPITypeParameters() throws Exception {
         Map<String, String> parameters = APITypeManager.getAPITypeParameters();
-        final Map<String, String> expectedParameters = new HashMap<String, String>();
+        final Map<String, String> expectedParameters = new HashMap<>();
         assertEquals(expectedParameters, parameters);
 
         TenantAPIAccessor.refresh();

@@ -14,12 +14,7 @@
 package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +37,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -53,7 +47,8 @@ public class UserIT extends TestWithTechnicalUser {
     /**
      * This test is here for arbitrary reason: it has to be tested on ANY API call.
      */
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "Get exception when calling a platform method on node not started", jira = "ENGINE-1780")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform",
+            "Node" }, story = "Get exception when calling a platform method on node not started", jira = "ENGINE-1780")
     @Test(expected = NodeNotStartedException.class)
     public void unableToCallPlatformMethodOnStoppedNode() throws Exception {
         logoutOnTenant();
@@ -110,7 +105,8 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
+            "Create" }, jira = "ENGINE-577")
     @Test
     public void createEnabledUserByUsernameAndPassword() throws BonitaException {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
@@ -166,7 +162,8 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser(userName);
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
+            "Create" }, jira = "ENGINE-577")
     @Test
     public void createEnabledUserByAUser() throws BonitaException {
         final User user = getIdentityAPI().createUser("bonitasoft", "bpm");
@@ -176,7 +173,8 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Create" }, jira = "ENGINE-577")
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
+            "Create" }, jira = "ENGINE-577")
     @Test
     public void createDisabledUserByAUser() throws BonitaException {
         final UserCreator creator = new UserCreator("bonitasoft", "bpm");
@@ -270,7 +268,7 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void getUsersByIDs() throws BonitaException {
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
-         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
+        final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
         final List<Long> userIds = new ArrayList<Long>();
         userIds.add(userCreated1.getId());
@@ -520,7 +518,8 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals("69000", persoData.getZipCode());
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Enabled", "User", "Update" }, jira = "ENGINE-577")
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Enabled", "User",
+            "Update" }, jira = "ENGINE-577")
     @Test
     public void updateUserToBeEnabled() throws BonitaException {
         // Create user, and updateDescriptor
@@ -539,7 +538,8 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User", "Update" }, jira = "ENGINE-577")
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
+            "Update" }, jira = "ENGINE-577")
     @Test
     public void updateUserToBeDisabled() throws BonitaException {
         // Create user, and updateDescriptor
@@ -734,7 +734,7 @@ public class UserIT extends TestWithTechnicalUser {
 
         deleteUsers(users);
     }
-    
+
     @Test
     public void searchUserSortedById() throws BonitaException {
         final List<User> users = new ArrayList<User>();
@@ -746,7 +746,7 @@ public class UserIT extends TestWithTechnicalUser {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.ID, Order.ASC);
         List<User> usersResult = getIdentityAPI().searchUsers(builder.done()).getResult();
-        
+
         assertEquals(3, usersResult.size());
         assertThat(usersResult.get(0).getId()).isLessThan(usersResult.get(1).getId());
         assertThat(usersResult.get(1).getId()).isLessThan(usersResult.get(2).getId());
@@ -754,7 +754,8 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(users);
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Enabled", "Disabled" }, story = "Search enabled/disabled users", jira = "ENGINE-821")
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Enabled",
+            "Disabled" }, story = "Search enabled/disabled users", jira = "ENGINE-821")
     @Test
     public void searchEnabledDisabledUsers() throws BonitaException {
         // Create users
@@ -807,7 +808,8 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(john1, john2, jack);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchUser", "Apostrophe" }, jira = "ENGINE-366")
+    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchUser",
+            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchUserWithApostrophe() throws BonitaException {
         final User user1 = getIdentityAPI().createUser("'john'002", "bpm", "John", "A");
@@ -1127,13 +1129,11 @@ public class UserIT extends TestWithTechnicalUser {
         updater.setPassword("ñ1234");
         getIdentityAPI().updateUser(jyri.getId(), updater);
 
-        final APISession apiSession = getLoginAPI().login("Jyri", "ñ1234");
-        assertThat(apiSession).isNotNull();
+        loginOnDefaultTenantWith("Jyri", "ñ1234");
+        assertThat(getApiClient().getSession()).isNotNull();
 
         getIdentityAPI().deleteUser(jyri.getId());
     }
-
-
 
     @Test
     public void theTest() throws Exception {
