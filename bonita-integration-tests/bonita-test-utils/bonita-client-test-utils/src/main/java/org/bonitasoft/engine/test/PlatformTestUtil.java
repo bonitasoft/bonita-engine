@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -23,7 +24,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.PlatformState;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 
 /**
@@ -124,10 +124,10 @@ public class PlatformTestUtil {
     }
 
     public void deployCommandsOnDefaultTenant() throws BonitaException {
-        final LoginAPI loginAPI = getLoginAPI();
-        final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
-        ClientEventUtil.deployCommand(session);
-        loginAPI.logout(session);
+        APIClient apiClient = new APIClient();
+        apiClient.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+        ClientEventUtil.deployCommand(apiClient.getSession());
+        apiClient.logout();
     }
 
     public void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
@@ -146,10 +146,10 @@ public class PlatformTestUtil {
 
     public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (undeployCommands) {
-            final LoginAPI loginAPI = getLoginAPI();
-            final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
-            ClientEventUtil.undeployCommand(session);
-            loginAPI.logout(session);
+            APIClient apiClient = new APIClient();
+            apiClient.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+            ClientEventUtil.undeployCommand(apiClient.getSession());
+            apiClient.logout();
         }
 
         platformAPI.stopNode();

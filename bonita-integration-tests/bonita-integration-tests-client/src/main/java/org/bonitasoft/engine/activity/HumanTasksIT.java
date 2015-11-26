@@ -135,7 +135,7 @@ public class HumanTasksIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
-        final ActivityInstance task = waitForUserTaskAndAssigneIt(processInstance, "initTask", user);
+        final ActivityInstance task = waitForUserTaskAndAssignIt(processInstance, "initTask", user);
         try {
             getProcessAPI().executeFlowNode(task.getId());
         } catch (final FlowNodeExecutionException e) {
@@ -234,10 +234,10 @@ public class HumanTasksIT extends TestWithUser {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTaskAndAssigneIt(processInstance, "initTask1", user);
-        waitForUserTaskAndAssigneIt(processInstance, "initTask2", user);
-        waitForUserTaskAndAssigneIt(processInstance, "initTask3", user);
-        waitForUserTaskAndAssigneIt(processInstance, "initTask4", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask1", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask2", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask3", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask4", user);
 
         // The task with the lowest priority is "initTask2"
         HumanTaskInstance humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.PRIORITY_ASC).get(0);
@@ -281,14 +281,14 @@ public class HumanTasksIT extends TestWithUser {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTaskAndAssigneIt(processInstance, "initTask1", user);
-        waitForUserTaskAndAssigneIt(processInstance, "initTask4", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask1", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask4", user);
 
         HumanTaskInstance humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.NAME_DESC).get(0);
         assertEquals("initTask4", humanTask.getName());
 
         assignAndExecuteStep(humanTask, user.getId());
-        waitForUserTaskAndAssigneIt(processInstance, "initTask5", user);
+        waitForUserTaskAndAssignIt(processInstance, "initTask5", user);
 
         humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.REACHED_STATE_DATE_ASC).get(0);
         assertEquals("initTask1", humanTask.getName());

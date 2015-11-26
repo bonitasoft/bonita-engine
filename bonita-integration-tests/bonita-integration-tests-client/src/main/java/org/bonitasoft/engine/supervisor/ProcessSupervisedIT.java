@@ -141,8 +141,8 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
-        waitForUserTaskAndAssigneIt(processInstances.get(0), "step1", john);
-        waitForUserTaskAndAssigneIt(processInstances.get(1), "step1", john);
+        waitForUserTaskAndAssignIt(processInstances.get(0), "step1", john);
+        waitForUserTaskAndAssignIt(processInstances.get(1), "step1", john);
         waitForUserTask(processInstances.get(2), "step1");
     }
 

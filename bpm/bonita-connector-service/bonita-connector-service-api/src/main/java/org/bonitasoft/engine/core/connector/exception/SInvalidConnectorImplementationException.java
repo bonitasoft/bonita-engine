@@ -26,7 +26,7 @@ public class SInvalidConnectorImplementationException extends SBonitaException {
 
     public SInvalidConnectorImplementationException(final String message, final SConnectorImplementationDescriptor connectorImplementationDescriptor) {
         this(message);
-        setConnectorDefinitionImplementationClassNameOnContext(connectorImplementationDescriptor.getImplementationClassName());
+        setConnectorImplementationClassNameOnContext(connectorImplementationDescriptor.getImplementationClassName());
         setConnectorDefinitionIdOnContext(connectorImplementationDescriptor.getDefinitionId());
         setConnectorDefinitionVersionOnContext(connectorImplementationDescriptor.getDefinitionVersion());
     }

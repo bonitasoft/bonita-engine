@@ -1168,9 +1168,9 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefId);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefId);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefId);
-        waitForUserTaskAndAssigneIt(processInstance1, "step1", user);
-        waitForUserTaskAndAssigneIt(processInstance2, "step1", user);
-        waitForUserTaskAndAssigneIt(processInstance3, "step1", otherUser);
+        waitForUserTaskAndAssignIt(processInstance1, "step1", user);
+        waitForUserTaskAndAssignIt(processInstance2, "step1", user);
+        waitForUserTaskAndAssignIt(processInstance3, "step1", otherUser);
 
         final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10)
                 .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefId)

@@ -285,8 +285,8 @@ public class SearchCommentIT extends TestWithUser {
 
         final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance2 = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        waitForUserTaskAndAssigneIt(instance1, "userTask1", jack);
-        waitForUserTaskAndAssigneIt(instance1, "userTask2", jack);
+        waitForUserTaskAndAssignIt(instance1, "userTask1", jack);
+        waitForUserTaskAndAssignIt(instance1, "userTask2", jack);
 
         logoutOnTenant();
         loginOnDefaultTenantWith(jackUserName, PASSWORD);
@@ -342,8 +342,8 @@ public class SearchCommentIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
 
         final ProcessInstance pi1 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
-        waitForUserTaskAndAssigneIt(pi1, "userTask1", john);
-        waitForUserTaskAndAssigneIt(pi1, "userTask2", john);
+        waitForUserTaskAndAssignIt(pi1, "userTask1", john);
+        waitForUserTaskAndAssignIt(pi1, "userTask2", john);
 
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content1");
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content2");
@@ -360,7 +360,7 @@ public class SearchCommentIT extends TestWithUser {
         loginOnDefaultTenantWith(stevenUserName, PASSWORD);
 
         final ProcessInstance pi3 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
-        waitForUserTaskAndAssigneIt(pi3, "userTask1", john);
+        waitForUserTaskAndAssignIt(pi3, "userTask1", john);
         final String commentContent5 = "Steven's comment Content5";
         getProcessAPI().addProcessComment(pi3.getId(), commentContent5);
 

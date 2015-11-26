@@ -78,7 +78,7 @@ public class ActivityCommandIT extends TestWithUser {
         final BusinessArchive businessArchive = buildBusinessArchiveWithDataTransientAndConnector();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssignIt(processInstance, "step1", user).getId();
 
         // Execute it with operation using the command to update data instance
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -101,7 +101,7 @@ public class ActivityCommandIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // process is deployed here with a custom jar
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssignIt(processInstance, "step1", user).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -120,7 +120,7 @@ public class ActivityCommandIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssignIt(processInstance, "step1", user).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -144,7 +144,7 @@ public class ActivityCommandIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", john).getId();
+        final long activityInstanceId = waitForUserTaskAndAssignIt(processInstance, "step1", john).getId();
 
         try {
             // execute it with operation using the command

@@ -48,7 +48,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -345,7 +344,7 @@ public class EvaluateExpressionIT extends TestWithUser {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "taskAssigneeId" }, story = "Evaluate engine constant expression taskAssigneeID.", jira = "ENGINE-1256")
     @Test
     public void evaluateAssigneeId() throws Exception {
-        final ActivityInstance userTaskInstance = waitForUserTaskAndAssigneIt(processInstance, STEP1_NAME, user);
+        final ActivityInstance userTaskInstance = waitForUserTaskAndAssignIt(processInstance, STEP1_NAME, user);
 
         final Expression taskAssigneeExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.TASK_ASSIGNEE_ID);
         final Expression engineExecContextExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.ENGINE_EXECUTION_CONTEXT);

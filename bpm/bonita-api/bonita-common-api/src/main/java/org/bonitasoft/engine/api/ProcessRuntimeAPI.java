@@ -355,7 +355,8 @@ public interface ProcessRuntimeAPI {
     long deleteArchivedProcessInstancesInAllStates(long sourceProcessInstanceId) throws DeletionException;
 
     /**
-     * Start an instance of the process with the specified process definition, using the current session user.
+     * Start an instance of the process with the specified process definition, using the current session user. <b>Note</b>: If the process instantiation
+     * contract requires inputs, you must use {@link #startProcessWithInputs(long, Map)} instead.
      *
      * @param processDefinitionId
      *        The identifier of the process definition for which an instance will be started.
@@ -371,9 +372,10 @@ public interface ProcessRuntimeAPI {
     ProcessInstance startProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Instantiates a process.
-     * <br>
-     * The process variables will be initialized by the initialVariables.
+     * Instantiates a process. <br />
+     * The process variables will be initialized by the <code>initialVariables</code> parameter. <b>Note</b>: If the process instantiation contract requires
+     * inputs, you must use {@link #startProcessWithInputs(long, Map)} instead, transforming <code>initialVariables</code> parameter as follows: in the process,
+     * define process variables initial values (expressions) with contract inputs.
      *
      * @param processDefinitionId
      *        The identifier of the processDefinition
@@ -392,7 +394,9 @@ public interface ProcessRuntimeAPI {
             ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
+     * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations. <b>Note</b>:
+     * If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, Map)} instead. The best practice is to define
+     * contract inputs in the process definition, and use these contract inputs in operations, instead of providing operations at start time.
      *
      * @param processDefinitionId
      *        The identifier of the process definition for which an instance will be started.
@@ -413,7 +417,8 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user.
+     * Start an instance of the process with the specified process definition id on behalf of a given user. <b>Note</b>: If the process instantiation contract
+     * requires inputs, you must use {@link #startProcessWithInputs(long, long, Map)} instead.
      *
      * @param userId
      *        The user id of the user.
@@ -435,7 +440,9 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given operations.
+     * given operations. <b>Note</b>: If the process instantiation contract requires inputs, you must use
+     * {@link #startProcessWithInputs(long, long, Map)} instead. The best practice is to design contract inputs in the process definition, and use these
+     * contract inputs in operations, instead of providing operations at start time.
      *
      * @param userId
      *        The identifier of the user.
@@ -463,7 +470,9 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given initialVariables.
+     * given initialVariables. <b>Note</b>: If the process instantiation contract requires inputs, you must use
+     * {@link #startProcessWithInputs(long, long, Map)}
+     * instead, using contract inputs stored in process variables, instead of using directly initialVariables.
      *
      * @param userId
      *        The identifier of the user.
@@ -486,7 +495,7 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
-     * Start an instance of the process with the specified process definition id, and provides inputs to fullfill Process Contract.
+     * Start an instance of the process with the specified process definition id, and provides inputs to fulfill Process Contract.
      * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
      *
      * @param processDefinitionId
@@ -510,7 +519,7 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
 
     /**
-     * Start an instance of the process with the specified process definition id on behalf of a given user, and provides inputs to fullfill Process Contract.
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and provides inputs to fulfill Process Contract.
      * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
      *
      * @param userId The identifier of the user in the name of whom the process is started.
@@ -1875,7 +1884,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId the ID of the process instance we are interested in.
      * @return true if the specified manager has subordinates involved in the given process instance.
      * @throws ProcessInstanceNotFoundException if the process instance does not exist.
-     * @throws BonitaException if an error occured while searching for users involved.
+     * @throws BonitaException if an error occurred while searching for users involved.
      * @since 6.4.2
      * @see #isInvolvedInProcessInstance(long, long)
      */
@@ -2555,7 +2564,8 @@ public interface ProcessRuntimeAPI {
      * @return a map containing the evaluated context
      * @throws UserTaskNotFoundException if <code>archivedUserTaskInstanceId</code> does not reference any existing archived task.
      */
-    Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+    Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId)
+            throws UserTaskNotFoundException, ExpressionEvaluationException;
 
     /**
      * return the context defined in the process definition for this process instance
@@ -2573,5 +2583,6 @@ public interface ProcessRuntimeAPI {
      * @return a map containing the evaluated context
      * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any existing process.
      */
-    Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
+    Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId)
+            throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 }

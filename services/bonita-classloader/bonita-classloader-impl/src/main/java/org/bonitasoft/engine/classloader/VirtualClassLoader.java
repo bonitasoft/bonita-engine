@@ -72,7 +72,7 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     private void notifyUpdate() {
-        for (ClassLoaderListener listener : listeners) {
+        for (ClassLoaderListener listener : getListeners()) {
             listener.onUpdate(this);
         }
         for (VirtualClassLoader child : children) {
@@ -134,10 +134,14 @@ public class VirtualClassLoader extends ClassLoader {
     }
 
     private void notifyDestroy() {
-        for (ClassLoaderListener listener : listeners) {
+        for (ClassLoaderListener listener : getListeners()) {
             listener.onDestroy(this);
         }
         //do not notify children, it should not happen
+    }
+
+    private synchronized List<ClassLoaderListener> getListeners() {
+        return new ArrayList<>(listeners);
     }
 
     private void destroy(BonitaClassLoader classloader) {
@@ -152,11 +156,11 @@ public class VirtualClassLoader extends ClassLoader {
         return super.toString() + ", type=" + identifier.getType() + ", id=" + identifier.getId() + " delegate: " + classloader;
     }
 
-    public boolean addListener(ClassLoaderListener listener) {
+    public synchronized boolean addListener(ClassLoaderListener listener) {
         return !listeners.contains(listener) && listeners.add(listener);
     }
 
-    public boolean removeListener(ClassLoaderListener classLoaderListener) {
+    public synchronized boolean removeListener(ClassLoaderListener classLoaderListener) {
         return listeners.remove(classLoaderListener);
     }
 
