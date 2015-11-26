@@ -11,6 +11,7 @@ package com.bonitasoft.engine;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -41,12 +42,14 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.APIClient;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
@@ -71,21 +74,21 @@ public class APITestSPUtil extends APITestUtil {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
 
-    private LogAPI logAPI;
-
-    private MonitoringAPI monitoringAPI;
+    private ApplicationAPI applicationAPI;
 
     private PlatformMonitoringAPI platformMonitoringAPI;
-
-    private ReportingAPI reportingAPI;
-
-    private ThemeAPI themeAPI;
 
     private TenantManagementAPI tenantManagementAPI;
 
     private PageAPI pageAPI;
 
-    private ApplicationAPI applicationAPI;
+    public APISession getSession() {
+        return getApiClient().getSession();
+    }
+
+    protected APIClient getApiClient() {
+        return BPMTestSPUtil.apiClient;
+    }
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -106,29 +109,13 @@ public class APITestSPUtil extends APITestUtil {
         return platformMonitoringAPI;
     }
 
-    protected void setReportingAPI(final ReportingAPI reportingAPI) {
-        this.reportingAPI = reportingAPI;
-    }
-
-    protected void setPlatformMonitoringAPI(final PlatformMonitoringAPI platformMonitoringAPI) {
-        this.platformMonitoringAPI = platformMonitoringAPI;
-    }
-
     protected MonitoringAPI getMonitoringAPI() {
-        return monitoringAPI;
-    }
-
-    protected void setMonitoringAPI(final MonitoringAPI monitoringAPI) {
-        this.monitoringAPI = monitoringAPI;
+        return getApiClient().getMonitoringAPI();
     }
 
     @Override
     public ThemeAPI getThemeAPI() {
-        return themeAPI;
-    }
-
-    protected void setThemeAPI(final ThemeAPI themeAPI) {
-        this.themeAPI = themeAPI;
+        return getApiClient().getThemeAPI();
     }
 
     @Override
@@ -147,11 +134,11 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     public ReportingAPI getReportingAPI() {
-        return reportingAPI;
+        return getApiClient().getReportingAPI();
     }
 
     public LogAPI getLogAPI() {
-        return logAPI;
+        return getApiClient().getLogAPI();
     }
 
     /**
@@ -167,77 +154,42 @@ public class APITestSPUtil extends APITestUtil {
         return applicationAPI;
     }
 
-    /**
-     * @param tenantManagementAPI
-     * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantAdministrationAPI)}
-     */
-    @Deprecated
-    public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
-        this.tenantManagementAPI = tenantManagementAPI;
-    }
-
-    public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenant(userName, password, tenantId));
-        setAPIs();
-    }
-
-    @Override
-    public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnDefaultTenant(userName, password));
-        setAPIs();
-    }
-
-    @Override
-    public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser());
-        setAPIs();
-    }
-
-    protected void loginOnTenantWithTechnicalUser(final long tenantId) throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId));
-        setAPIs();
-    }
-
-    @Override
-    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
-        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
-        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
-    }
-
-    protected void setPageAPI(final PageAPI pageAPI) {
-        this.pageAPI = pageAPI;
-    }
-
     public PageAPI getSubscriptionPageAPI() {
         return pageAPI;
     }
 
+    public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
+        BPMTestSPUtil.loginOnTenant(userName, password, tenantId);
+        setOldAPIs();
+    }
+
+    @Override
+    public void loginOnDefaultTenantWith(final String userName, final String password) throws BonitaException {
+        BPMTestSPUtil.loginOnDefaultTenant(userName, password);
+        setOldAPIs();
+    }
+
+    @Override
+    public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
+        BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
+        setOldAPIs();
+    }
+
+    protected void loginOnTenantWithTechnicalUser(final long tenantId) throws BonitaException {
+        BPMTestSPUtil.loginOnTenantWithDefaultTechnicalUser(tenantId);
+        setOldAPIs();
+    }
+
+    protected void setOldAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        pageAPI = TenantAPIAccessor.getPageAPI(getSession());
+        platformMonitoringAPI = TenantAPIAccessor.getPlatformMonitoringAPI(getSession());
+        tenantManagementAPI = TenantAPIAccessor.getTenantManagementAPI(getSession());
+        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
+    }
+
     @Override
     public void logoutOnTenant() throws BonitaException {
-        BPMTestSPUtil.logoutOnTenant(getSession());
-        setSession(null);
-        setIdentityAPI(null);
-        setProcessAPI(null);
-        setProfileAPI(null);
-        setThemeAPI(null);
-        setMonitoringAPI(null);
-        setPlatformMonitoringAPI(null);
-        setReportingAPI(null);
-        setCommandAPI(null);
-        setTenantManagementAPI(null);
-        setTenantManagementCommunityAPI(null);
-        logAPI = null;
+        getApiClient().logout();
     }
 
     public void stopPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
@@ -294,7 +246,7 @@ public class APITestSPUtil extends APITestUtil {
         final List<String> messages = new ArrayList<String>();
         long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
         if (numberOfActiveTransactions != 0) {
-            // retry 50 ms after because the might still be some jobs/works that run
+            // retry 50 ms after because there might still be some jobs/works that run:
             try {
                 LOGGER.warn("There was " + numberOfActiveTransactions + " active transaction, waiting 50ms and checking it again");
                 Thread.sleep(50);
@@ -303,7 +255,7 @@ public class APITestSPUtil extends APITestUtil {
             }
             numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
             if (numberOfActiveTransactions != 0) {
-                // resleep 15 s now
+                // go back to sleep 15s now:
                 LOGGER.warn("There was still " + numberOfActiveTransactions + " active transaction, waiting 15s and checking it again");
                 try {
                     Thread.sleep(15000);
@@ -337,7 +289,7 @@ public class APITestSPUtil extends APITestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector3(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user) throws BonitaException, IOException {
-        final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnector3.impl",
+        final List<BarResource> connectorImplementations = Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource("TestConnector3.impl",
                 TestConnector3.class));
         final List<BarResource> generateConnectorDependencies = Arrays.asList(
                 BuildTestUtil.generateJarAndBuildBarResource(TestConnector3.class, "TestConnector3.jar"),
@@ -353,8 +305,8 @@ public class APITestSPUtil extends APITestUtil {
         final BarResource barResource = new BarResource("connector-with-custom-type.jar", byteArray);
 
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
-                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource("TestConnectorWithCustomType.impl", TestConnector.class)),
-                Arrays.asList(barResource), null);
+                Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource("TestConnectorWithCustomType.impl", TestConnector.class)),
+                Collections.singletonList(barResource), null);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorLongToExecute(final ProcessDefinitionBuilder processDefinitionBuilder,
@@ -400,7 +352,7 @@ public class APITestSPUtil extends APITestUtil {
     private ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actorName, final User user, final Map<String, String> parameters, final String name, final String jarName)
             throws IOException, BonitaException {
-        final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, TestConnector.class));
+        final List<BarResource> connectorImplementations = Collections.singletonList(BuildTestUtil.getContentAndBuildBarResource(name, TestConnector.class));
         final List<BarResource> generateConnectorDependencies = Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(TestConnector.class, jarName),
                 BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, connectorImplementations,

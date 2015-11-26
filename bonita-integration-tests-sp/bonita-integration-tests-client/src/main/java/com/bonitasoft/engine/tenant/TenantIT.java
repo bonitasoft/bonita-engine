@@ -54,7 +54,6 @@ import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
@@ -70,6 +69,8 @@ import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.APIClient;
+import com.bonitasoft.engine.api.IdentityAPI;
 /**
  * @author Yanyan Liu
  * @author Celine Souchet
@@ -87,13 +88,13 @@ public class TenantIT {
 
     private static final Object LOCK = new Object();
 
-    private APISession apiSession;
-
     private static PlatformAPI platformAPI;
 
     private static PlatformLoginAPI platformLoginAPI;
 
     private static PlatformSession session;
+
+    private APIClient apiClient = new APIClient();
 
     private final Logger LOGGER = LoggerFactory.getLogger(TenantIT.class);
 
@@ -137,22 +138,24 @@ public class TenantIT {
 
     @Test
     public void singleThreadTenant() throws Exception {
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        final APISession apiSession = loginAPI.login(tenantId, userName, password);
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
+        APIClient apiClient = new APIClient();
+        apiClient.login(tenantId, userName, password);
 
+        final IdentityAPI identityAPI = apiClient.getIdentityAPI();
         identityAPI.createUser("auser1", "bpm");
         final List<User> users = identityAPI.getUsers(0, 5, UserCriterion.USER_NAME_ASC);
         assertEquals(1, users.size());
 
         identityAPI.deleteUser("auser1");
+        apiClient.logout();
     }
 
     @Test
     public void deactivateTenantDeleteSession() throws Exception {
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        final APISession apiSession = loginAPI.login(tenantId, userName, password);
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
+        APIClient apiClient = new APIClient();
+        apiClient.login(tenantId, userName, password);
+
+        final IdentityAPI identityAPI = apiClient.getIdentityAPI();
         // will work
         identityAPI.getNumberOfUsers();
         platformAPI.deactiveTenant(tenantId);
@@ -162,6 +165,7 @@ public class TenantIT {
         } catch (final InvalidSessionException e) {
             // Oracle deadlock can occur here, but does not appear to have functional issue:
             platformAPI.activateTenant(tenantId);
+            apiClient.logout();
         }
 
     }
@@ -169,83 +173,83 @@ public class TenantIT {
     @Test(expected = TenantStatusException.class)
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
     public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
-        final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
-        apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
-        final TenantAdministrationAPI tenantManagementAPI = apiTestSPUtil.getTenantAdministrationAPI();
+        APIClient apiClient = new APIClient();
+        apiClient.login(tenantId, userName, password);
+
+        final TenantAdministrationAPI tenantManagementAPI = apiClient.getTenantAdministrationAPI();
         tenantManagementAPI.pause();
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        apiSession = loginAPI.login(tenantId, userName, password);
+        // Here session has been cleaned, so need to login again:
+        apiClient.login(tenantId, userName, password);
         try {
-            apiTestSPUtil.getProcessAPI().getNumberOfProcessInstances();
+            apiClient.getProcessAPI().getNumberOfProcessInstances();
         } finally {
             tenantManagementAPI.resume();
-            loginAPI.logout(apiSession);
+            apiClient.logout();
         }
     }
 
     @Test
     @Cover(classes = { ServerAPI.class }, jira = "BS-7101", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
     public void should_be_able_to_login_only_with_technical_user_on_paused_tenant() throws Exception {
-        final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
-        final IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
+        APIClient apiClient = new APIClient();
+        apiClient.login(tenantId, userName, password);
+        final IdentityAPI identityAPI = apiClient.getIdentityAPI();
         final User john = identityAPI.createUser("john", "bpm");
-        final TenantAdministrationAPI tenantManagementAPI = apiTestSPUtil.getTenantAdministrationAPI();
+        final TenantAdministrationAPI tenantManagementAPI = apiClient.getTenantAdministrationAPI();
         tenantManagementAPI.pause();
-        loginAPI.logout(apiTestSPUtil.getSession());
+        apiClient.logout();
         // login with normal user: not working
         try {
-            loginAPI.login(tenantId, "john", "bpm");
+            apiClient.login(tenantId, "john", "bpm");
             fail("Should not be able to login using other user than technical");
         } catch (final TenantStatusException e) {
             // ok, can't login with user that is not technical
         }
         // login with normal user: not working
-        APISession loginOnDefaultTenantWithTechnical = loginAPI.login(tenantId, userName, password);
+        apiClient.login(tenantId, userName, password);
         // ok to login with technical user
-        TenantAPIAccessor.getTenantAdministrationAPI(loginOnDefaultTenantWithTechnical).resume();
-        loginAPI.logout(loginOnDefaultTenantWithTechnical);
+        apiClient.getTenantAdministrationAPI().resume();
+        apiClient.logout();
         // can now login with normal user
-        final APISession login = loginAPI.login(tenantId, "john", "bpm");
-        loginAPI.logout(login);
+        apiClient.login(tenantId, "john", "bpm");
+        apiClient.logout();
 
         // delete the user
-        loginOnDefaultTenantWithTechnical = loginAPI.login(tenantId, userName, password);
-        TenantAPIAccessor.getIdentityAPI(loginOnDefaultTenantWithTechnical).deleteUser(john.getId());
-        loginAPI.logout(loginOnDefaultTenantWithTechnical);
+        apiClient.login(tenantId, userName, password);
+        apiClient.getIdentityAPI().deleteUser(john.getId());
+        apiClient.logout();
     }
 
     @Test
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant pause" }, concept = BPMNConcept.NONE)
     public void pauseAnnotatedAPIMethodShouldBePossibleOnPausedTenant() throws Exception {
-        final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
-        apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
-        apiTestSPUtil.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);
-        final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        APIClient apiClient = new APIClient();
+        apiClient.login(tenantId, userName, password);
+        apiClient.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);
+        final TenantManagementAPI tenantManagementAPI = TenantAPIAccessor.getTenantManagementAPI(apiClient.getSession());
         tenantManagementAPI.pause();
         try {
             tenantManagementAPI.isPaused();
             // test with sp accessor
-            apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
-            apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
-            apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
-            apiTestSPUtil.getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, 1).done());
+            apiClient.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
+            apiClient.getIdentityAPI().getNumberOfUsers();
+            apiClient.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
+            apiClient.getCustomPageAPI().searchPages(new SearchOptionsBuilder(0, 1).done());
             // test with bos accessor
-            org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
-            org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
-            org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
+            org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiClient.getSession()).getLastUpdateDate(ThemeType.PORTAL);
+            org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiClient.getSession()).getNumberOfUsers();
+            org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiClient.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
         } finally {
             tenantManagementAPI.resume();
-            BPMTestSPUtil.logoutOnTenant(apiTestSPUtil.getSession());
+            apiClient.logout();
         }
     }
 
     @Test
     public void timerNotDeletedWhenTenantIsDeactivated() throws Exception {
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        APISession apiSession = loginAPI.login(tenantId, userName, password);
-        ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
+        APIClient apiClient = new APIClient();
+        apiClient.login(tenantId, userName, password);
+        ProcessAPI processAPI = apiClient.getProcessAPI();
         final ProcessDefinitionBuilderExt processDefinitionBuilderExt = new ProcessDefinitionBuilderExt();
         processDefinitionBuilderExt.createNewInstance("aProcess", "1.0");
 
@@ -257,12 +261,12 @@ public class TenantIT {
         final ProcessDefinition process = processAPI.deploy(new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(processDefinitionBuilderExt.done()).done());
         processAPI.enableProcess(process.getId());
-        loginAPI.logout(apiSession);
+        apiClient.logout();
         logAsPlatformAdmin();
         platformAPI.deactiveTenant(tenantId); // Oracle deadlock can occur here, but does not appear to have functional issue
         platformAPI.activateTenant(tenantId);
-        apiSession = loginAPI.login(tenantId, userName, password);
-        processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
+        apiClient.login(tenantId, userName, password);
+        processAPI = apiClient.getProcessAPI();
         final ProcessAPI fprocessAPI = processAPI;
         // the timer should have created at least 1 instance after the activate
         new WaitUntil(30, 20000) {
@@ -277,7 +281,7 @@ public class TenantIT {
             }
         }.waitUntil();
         waitForInstancesToFinishAndRemoveProcess(process, fprocessAPI);
-
+        apiClient.logout();
     }
 
     protected void waitForInstancesToFinishAndRemoveProcess(final ProcessDefinition process, final ProcessAPI processAPI) throws Exception {
@@ -326,8 +330,9 @@ public class TenantIT {
         final List<User> users = getUser.getUsers();
         assertNotNull(users);
         assertEquals(1, users.size());
-        final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(TenantIT.this.apiSession);
+        final IdentityAPI identityAPI = apiClient.getIdentityAPI();
         identityAPI.deleteUser("auser1");
+        apiClient.logout();
     }
 
     class LoginThread implements Runnable {
@@ -336,11 +341,9 @@ public class TenantIT {
 
         @Override
         public void run() {
-            LoginAPI loginAPI;
             synchronized (LOCK) {
                 try {
-                    loginAPI = TenantAPIAccessor.getLoginAPI();
-                    apiSession = loginAPI.login(tenantId, userName, password);
+                    apiClient.login(tenantId, userName, password);
                 } catch (final Exception e) {
                     failed = true;
                     throw new RuntimeException(e);
@@ -375,14 +378,14 @@ public class TenantIT {
             IdentityAPI identityAPI;
             synchronized (LOCK) {
                 try {
-                    while (apiSession == null && !loginThread.isFailed()) {
+                    while (apiClient.getSession() == null && !loginThread.isFailed()) {
                         LOCK.wait();
                     }
                     if (loginThread.isFailed()) {
                         failed = true;
                         throw new RuntimeException("login failed");
                     }
-                    identityAPI = TenantAPIAccessor.getIdentityAPI(apiSession);
+                    identityAPI = apiClient.getIdentityAPI();
                     identityAPI.createUser("auser1", "bpm");
                     users = identityAPI.getUsers(0, 5, UserCriterion.USER_NAME_ASC);
                 } catch (final Exception e) {
