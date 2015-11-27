@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.data</groupId>
 		<artifactId>bonita-business-data</artifactId>
-        <version>7.1.4.RC1</version>
+        <version>7.1.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-business-data-client-resources</artifactId>
