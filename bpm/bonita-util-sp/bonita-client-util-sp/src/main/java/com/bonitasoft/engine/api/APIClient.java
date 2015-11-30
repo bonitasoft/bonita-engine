@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.platform.LoginException;
+import org.bonitasoft.engine.session.APISession;
 
 /**
  * Bonita BPM <b>Subscription</b> Edition API's client.<br>
@@ -22,6 +23,14 @@ import org.bonitasoft.engine.platform.LoginException;
  * @author Nicolas Chabanoles
  */
 public class APIClient extends org.bonitasoft.engine.api.APIClient {
+
+    public APIClient() {
+        super();
+    }
+
+    public APIClient(APISession session) {
+        super(session);
+    }
 
     protected LoginAPI getLoginAPI() {
         return getLoginAPI(LoginAPI.class);
