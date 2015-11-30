@@ -25,6 +25,8 @@
                 <prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
                 <prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
                 <prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
+                <prop key="org.quartz.plugin.shutdownhook.class">org.quartz.plugins.management.ShutdownHookPlugin</prop>
+                <prop key="org.quartz.plugin.shutdownhook.cleanShutdown">false</prop>
             </props>
         </property>
     </bean>
