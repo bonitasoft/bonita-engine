@@ -34,4 +34,13 @@ public class BusinessObjectDaoCreationException extends CreationException {
         super(cause);
     }
 
+    /**
+     * Constructs a BusinessObjectDaoCreationException with the specified message.
+     *
+     * @param message the explanations of the exception
+     */
+    public BusinessObjectDaoCreationException(final String message) {
+        super(message);
+    }
+
 }
