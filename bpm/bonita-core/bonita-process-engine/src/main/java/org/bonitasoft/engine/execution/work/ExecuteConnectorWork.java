@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
@@ -154,15 +155,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
         final ProcessDefinitionService processDefinitionService = getTenantAccessor(context).getProcessDefinitionService();
-        if (handleError(context, userTransactionService, processDefinitionService, e)) {
+
+        final HandleConnectorOnFailEventTxContent callable = new HandleConnectorOnFailEventTxContent(e, processDefinitionService, context);
+        final SConnectorDefinition sConnectorDefinition = userTransactionService.executeInTransaction(callable);
+
+        if (shouldContinueFlow(sConnectorDefinition)) {
             userTransactionService.executeInTransaction(new ContinueFlowTxContent(context));
         }
     }
 
-    private boolean handleError(final Map<String, Object> context, final UserTransactionService userTransactionService,
-            final ProcessDefinitionService processDefinitionService, final Exception e) throws Exception {
-        final HandleConnectorOnFailEventTxContent handleError = new HandleConnectorOnFailEventTxContent(e, processDefinitionService, context);
-        return userTransactionService.executeInTransaction(handleError);
+    private boolean shouldContinueFlow(SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+        return sConnectorDefinition.getFailAction() == FailAction.IGNORE;
     }
 
     private final class EvaluateParameterAndGetConnectorInstance implements Callable<Void> {
@@ -209,9 +212,11 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     /**
+     * Handle the error according to failure policy.
+     * 
      * @author Emmanuel Duchastenier
      */
-    private final class HandleConnectorOnFailEventTxContent implements Callable<Boolean> {
+    private final class HandleConnectorOnFailEventTxContent implements Callable<SConnectorDefinition> {
 
         private final Exception e;
 
@@ -228,21 +233,22 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         }
 
         @Override
-        public Boolean call() throws Exception {
+        public SConnectorDefinition call() throws Exception {
             final SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(processDefinitionService);
             switch (sConnectorDefinition.getFailAction()) {
                 case ERROR_EVENT:
                     errorEventOnFail(context, sConnectorDefinition, e);
-                    return false;
+                    break;
                 case FAIL:
                     setConnectorAndContainerToFailed(context, e);
-                    return false;
+                    break;
                 case IGNORE:
                     setConnectorOnlyToFailed(context, e);
-                    return true;
+                    break;
                 default:
                     throw new Exception("No action defined for " + sConnectorDefinition.getFailAction());
             }
+            return sConnectorDefinition;
         }
     }
 

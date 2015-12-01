@@ -59,7 +59,6 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final long flowNodeDefinitionId;
 
-
     ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId, final long connectorInstanceId,
             final String connectorDefinitionName) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
@@ -117,12 +116,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     @Override
     protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Exception exception)
             throws SBonitaException {
-        setConnectorOnlyToFailed(context, exception);
-        handleErrorEventOnFail(context, sConnectorDefinition, exception);
-    }
-
-    private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Exception exception)
-            throws SBonitaException {
+        setConnectorAndContainerToFailed(context, exception);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -143,7 +137,6 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition, throwEventInstance,
                 errorEventTriggerDefinition, sFlowNodeInstance);
         tenantAccessor.getFlowNodeExecutor().archiveFlowNodeInstance(throwEventInstance, true, sProcessDefinition.getId());
-        setConnectorAndContainerToFailed(context, exception);
     }
 
     @Override

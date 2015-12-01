@@ -20,10 +20,14 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescript
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -77,6 +81,18 @@ public abstract class AbstractArchiveActivityInstanceSearchEntity extends Abstra
                         break;
                     case SEND_TASK:
                         entityClass = SASendTaskInstance.class;
+                        break;
+                    case CALL_ACTIVITY:
+                        entityClass = SACallActivityInstance.class;
+                        break;
+                    case LOOP_ACTIVITY:
+                        entityClass = SALoopActivityInstance.class;
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY:
+                        entityClass = SAMultiInstanceActivityInstance.class;
+                        break;
+                    case SUB_PROCESS:
+                        entityClass = SASubProcessActivityInstance.class;
                         break;
                     default:
                         entityClass = SAActivityInstance.class;
