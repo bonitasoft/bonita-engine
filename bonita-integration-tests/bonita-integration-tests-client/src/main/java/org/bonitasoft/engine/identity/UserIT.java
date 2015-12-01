@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -136,10 +137,6 @@ public class UserIT extends TestWithTechnicalUser {
         }
     }
 
-    public void getFirstPageWithNoResult() {
-        getIdentityAPI().getUsers(0, 10, UserCriterion.USER_NAME_ASC);
-    }
-
     @Test(expected = CreationException.class)
     public void createUserFailed() throws BonitaException {
         getIdentityAPI().createUser(null, null);
@@ -251,8 +248,8 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void cannotGetTechUserInList() {
-        final Map<Long, User> users = getIdentityAPI().getUsers(Arrays.asList(-1L));
-        assertNull(users.get(-1));
+        final Map<Long, User> users = getIdentityAPI().getUsers(Collections.singletonList(-1L));
+        assertNull(users.get(-1L));
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -270,7 +267,7 @@ public class UserIT extends TestWithTechnicalUser {
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(userCreated1.getId());
         userIds.add(userCreated2.getId());
 
@@ -287,11 +284,12 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(userCreated1, userCreated2);
     }
 
+    @Test
     public void getUsersByIDsWithoutUserNotFoundException() throws BonitaException {
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>(2);
         userIds.add(userCreated1.getId());
         userIds.add(userCreated2.getId() + 100);
 
@@ -300,7 +298,6 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals(1, users.size());
 
         assertEquals("zhang", users.get(userCreated1.getId()).getUserName());
-        assertEquals("engine", users.get(userCreated1.getId()).getPassword());
 
         deleteUsers(userCreated1, userCreated2);
     }
@@ -365,7 +362,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void deleteUsers() throws BonitaException {
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(getIdentityAPI().createUser("user1", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user2", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user3", "engine").getId());
@@ -383,7 +380,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void deleteUsersDeleteAllExistingOnesAndIgnoresOthers() throws BonitaException {
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(getIdentityAPI().createUser("user1", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user2", "engine").getId());
         userIds.add(152458L);
@@ -690,7 +687,7 @@ public class UserIT extends TestWithTechnicalUser {
             "Column not unique" }, jira = "ENGINE-1557")
     @Test
     public void searchUser() throws BonitaException {
-        final List<User> users = new ArrayList<User>();
+        final List<User> users = new ArrayList<>();
         users.add(getIdentityAPI().createUser("jgrGF[|00", "bpm", "John", "Taylor"));
         users.add(getIdentityAPI().createUser("45èDG'fgb", "bpm", "Jack", "Jack"));
         users.add(getIdentityAPI().createUser("à\"(èg", "bpm", "John", "Smith"));
@@ -737,7 +734,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void searchUserSortedById() throws BonitaException {
-        final List<User> users = new ArrayList<User>();
+        final List<User> users = new ArrayList<>();
         users.add(getIdentityAPI().createUser("jgrGF[|00", "bpm", "John", "Taylor"));
         users.add(getIdentityAPI().createUser("user02", "bpm", "Pierre", "Smith"));
         users.add(getIdentityAPI().createUser("User00", "bpm", "Marie", "Taylor"));
@@ -860,7 +857,7 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().addUserMemberships(Arrays.asList(john1.getId(), jack.getId()), group.getId(), role.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(UserSearchDescriptor.GROUP_ID, (Long) group.getId());
+        builder.filter(UserSearchDescriptor.GROUP_ID, group.getId());
         builder.sort(UserSearchDescriptor.USER_NAME, Order.DESC);
         final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
@@ -886,7 +883,7 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().addUserMemberships(Arrays.asList(john1.getId(), jack.getId()), group.getId(), role.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(UserSearchDescriptor.ROLE_ID, (Long) role.getId());
+        builder.filter(UserSearchDescriptor.ROLE_ID, role.getId());
         builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
         final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
@@ -912,7 +909,7 @@ public class UserIT extends TestWithTechnicalUser {
         final Role role2 = createRole("delivery");
 
         getIdentityAPI().addUserMemberships(Arrays.asList(john1.getId(), jack.getId()), group1.getId(), role1.getId());
-        getIdentityAPI().addUserMemberships(Arrays.asList(john2.getId()), group2.getId(), role1.getId());
+        getIdentityAPI().addUserMemberships(Collections.singletonList(john2.getId()), group2.getId(), role1.getId());
         getIdentityAPI().addUserMemberships(Arrays.asList(john2.getId(), jack.getId()), group1.getId(), role2.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -939,7 +936,7 @@ public class UserIT extends TestWithTechnicalUser {
         final User john = getIdentityAPI().createUser("john001", "bpm", "John", "Smith");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(UserSearchDescriptor.MANAGER_USER_ID, (Long) manager.getId());
+        builder.filter(UserSearchDescriptor.MANAGER_USER_ID, manager.getId());
         final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
         assertEquals(1, searchUsers.getCount());
@@ -977,13 +974,13 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void getUsersFromIdsShouldReturnUsersInTheRightOrder() throws BonitaException {
-        final List<User> expectedUsers = new ArrayList<User>();
+        final List<User> expectedUsers = new ArrayList<>();
         expectedUsers.add(getIdentityAPI().createUser("zhao", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("qian", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("sun", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("li", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("zhou", "engine"));
-        final List<Long> userIds = new ArrayList<Long>(5);
+        final List<Long> userIds = new ArrayList<>(5);
         userIds.add(expectedUsers.get(4).getId());
         userIds.add(expectedUsers.get(0).getId());
         userIds.add(expectedUsers.get(2).getId());
@@ -1021,7 +1018,7 @@ public class UserIT extends TestWithTechnicalUser {
         final User matti = getIdentityAPI().createUser("matti", "bpm");
         final User jani = getIdentityAPI().createUser("jani", "bpm");
 
-        final List<String> userNames = new ArrayList<String>(3);
+        final List<String> userNames = new ArrayList<>(3);
         userNames.add("jani");
         userNames.add("liisa");
         userNames.add("matti");
