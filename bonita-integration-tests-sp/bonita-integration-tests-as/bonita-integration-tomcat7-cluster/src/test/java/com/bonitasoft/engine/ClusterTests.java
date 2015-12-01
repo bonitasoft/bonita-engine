@@ -9,9 +9,7 @@
 package com.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -36,9 +34,6 @@ import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.connectors.TestExternalConnector;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -56,7 +51,6 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
@@ -93,12 +87,10 @@ public class ClusterTests extends CommonAPISPIT {
 
     protected void changeToNode1() throws Exception {
         setConnectionPort("8186");
-        changeApis();
     }
 
     protected void changeToNode2() throws Exception {
         setConnectionPort("8187");
-        changeApis();
     }
 
     private void setConnectionPort(final String port) {
@@ -108,16 +100,6 @@ public class ClusterTests extends CommonAPISPIT {
         APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);
 
         LOGGER.info("changed to " + port);
-    }
-
-    private void changeApis() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
     }
 
     @Test
@@ -143,7 +125,8 @@ public class ClusterTests extends CommonAPISPIT {
                 .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
                 .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
                 .addOutput(
-                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+                        new OperationBuilder().createSetDataOperation("text",
+                                new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -317,27 +300,23 @@ public class ClusterTests extends CommonAPISPIT {
         final ProcessDefinition humanDef1 = deployAndEnableProcessWithActor(new ProcessDefinitionBuilder().createNewInstance("processDef2", "1.0")
                 .addActor("actor").addUserTask("step1", "actor").getProcess(), "actor", user);
 
-
         final ProcessInstance human1 = getProcessAPI().startProcess(humanDef1.getId());
-
 
         changeToNode2();
 
-
-
         Thread.sleep(2000);
-
 
         List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 4, ActivityInstanceCriterion.DEFAULT);
         assertThat(pendingHumanTaskInstances).hasSize(1);
         for (HumanTaskInstance pendingHumanTaskInstance : pendingHumanTaskInstances) {
             getProcessAPI().assignUserTask(pendingHumanTaskInstance.getId(), user.getId());
-            getProcessAPI().executeUserTask(pendingHumanTaskInstance.getId(), Collections.<String, Serializable>emptyMap());
+            getProcessAPI().executeUserTask(pendingHumanTaskInstance.getId(), Collections.<String, Serializable> emptyMap());
         }
 
         Thread.sleep(2000);
 
-        assertThat(getProcessAPI().searchArchivedProcessInstances(new SearchOptionsBuilder(0,10).filter("sourceObjectId", human1.getId()).done()).getResult()).hasSize(1);
+        assertThat(getProcessAPI().searchArchivedProcessInstances(new SearchOptionsBuilder(0, 10).filter("sourceObjectId", human1.getId()).done()).getResult())
+                .hasSize(1);
 
         disableAndDeleteProcess(autoDef1);
         disableAndDeleteProcess(humanDef1);

@@ -76,7 +76,7 @@ public abstract class ExecutionInSession {
         }
         setSession(session);
         run();
-        BPMTestSPUtil.logoutOnTenant(session);
+        BPMTestSPUtil.logoutOnTenant();
     }
 
 }

@@ -40,7 +40,7 @@ public class ClusteredTestSuiteIT {
         platformLoginAPI.logout(platformSession);
         final APISession loginDefaultTenant = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         ClientEventUtil.deployCommand(loginDefaultTenant);
-        BPMTestSPUtil.logoutOnTenant(loginDefaultTenant);
+        BPMTestSPUtil.logoutOnTenant();
         changeToNode1();
     }
 
@@ -48,7 +48,7 @@ public class ClusteredTestSuiteIT {
         changeToNode2();
         final APISession loginDefaultTenant = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         ClientEventUtil.undeployCommand(loginDefaultTenant);
-        BPMTestSPUtil.logoutOnTenant(loginDefaultTenant);
+        BPMTestSPUtil.logoutOnTenant();
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
