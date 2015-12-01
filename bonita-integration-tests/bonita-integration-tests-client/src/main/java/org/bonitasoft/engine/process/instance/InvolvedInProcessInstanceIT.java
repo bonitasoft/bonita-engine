@@ -145,7 +145,7 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
 
         getProcessAPI().removeActorMember(johnActorMember.getId());
         logoutThenloginAs(john.getUserName(), "bpm");
-        final HumanTaskInstance step1Instance = waitForUserTaskAndAssigneIt(processInstance, "step1", john);
+        final HumanTaskInstance step1Instance = waitForUserTaskAndAssignIt(processInstance, "step1", john);
 
         assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstanceId)).as("assigned user should be involved").isTrue();
 
@@ -156,7 +156,7 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
 
         getProcessAPI().removeActorMember(jamesActorMember.getId());
         logoutThenloginAs(james.getUserName(), "bpm");
-        final HumanTaskInstance step2Instance = waitForUserTaskAndAssigneIt(processInstance, "step2", james);
+        final HumanTaskInstance step2Instance = waitForUserTaskAndAssignIt(processInstance, "step2", james);
         assertThat(getProcessAPI().isManagerOfUserInvolvedInProcessInstance(managerOfJames.getId(), processInstanceId)).as(
                 "the manager of a user assigned to a task should be involved").isTrue();
 

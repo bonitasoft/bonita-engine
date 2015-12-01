@@ -190,7 +190,7 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait and execute the step1 with a timer boundary event
-        waitForUserTaskAndAssigneIt(processInstance, "step1", user);
+        waitForUserTaskAndAssignIt(processInstance, "step1", user);
 
         // wait timer trigger
         waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);

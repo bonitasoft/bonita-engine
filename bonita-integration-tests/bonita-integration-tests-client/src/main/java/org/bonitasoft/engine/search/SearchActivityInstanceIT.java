@@ -145,11 +145,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .addUserTask("userTask6", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final long stepId1 = waitForUserTaskAndAssigneIt(pi0, "userTask1", john).getId();
-        final long stepId2 = waitForUserTaskAndAssigneIt(pi0, "userTask2", john).getId();
-        final long stepId3 = waitForUserTaskAndAssigneIt(pi0, "userTask3", jack).getId();
-        final long stepId4 = waitForUserTaskAndAssigneIt(pi0, "task4", john).getId();
-        final long stepId5 = waitForUserTaskAndAssigneIt(pi0, "userTask5", jules).getId();
+        final long stepId1 = waitForUserTaskAndAssignIt(pi0, "userTask1", john).getId();
+        final long stepId2 = waitForUserTaskAndAssignIt(pi0, "userTask2", john).getId();
+        final long stepId3 = waitForUserTaskAndAssignIt(pi0, "userTask3", jack).getId();
+        final long stepId4 = waitForUserTaskAndAssignIt(pi0, "task4", john).getId();
+        final long stepId5 = waitForUserTaskAndAssignIt(pi0, "userTask5", jules).getId();
         final long stepId6 = waitForUserTask(pi0, "userTask6");
         // don't assign userTask6 to anyone.
         skipTask(stepId1);
@@ -224,10 +224,10 @@ public class SearchActivityInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndAssigneIt(processInstance, "userTask1", john).getId();
-        waitForUserTaskAndAssigneIt(processInstance, "userTask2", john).getId();
-        waitForUserTaskAndAssigneIt(processInstance, "userTask3", jack).getId();
-        waitForUserTaskAndAssigneIt(processInstance, "task4", john).getId();
+        waitForUserTaskAndAssignIt(processInstance, "userTask1", john).getId();
+        waitForUserTaskAndAssignIt(processInstance, "userTask2", john).getId();
+        waitForUserTaskAndAssignIt(processInstance, "userTask3", jack).getId();
+        waitForUserTaskAndAssignIt(processInstance, "task4", john).getId();
 
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(HumanTaskInstanceSearchDescriptor.NAME, "userTask1");
@@ -586,7 +586,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(pi1, "userTask1");
-        waitForUserTaskAndAssigneIt(pi1, "userTask2", user);
+        waitForUserTaskAndAssignIt(pi1, "userTask2", user);
         waitForUserTask(pi1, "manualTask");
 
         waitForUserTask(pi2, "userTask1");
@@ -704,7 +704,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask(pi0, "userTask1");
-        final long step2Id = waitForUserTaskAndAssigneIt(pi0, "userTask2", user).getId();
+        final long step2Id = waitForUserTaskAndAssignIt(pi0, "userTask2", user).getId();
 
         getProcessAPI().setActivityStateById(step1Id, 12);
         getProcessAPI().setActivityStateById(step2Id, 12);
@@ -754,7 +754,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .addUserTask("userTask3", ACTOR_NAME).addTransition("userTask2", "userTask3").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndAssigneIt(pi0, "userTask1", user);
+        waitForUserTaskAndAssignIt(pi0, "userTask1", user);
         waitForUserTaskAndExecuteIt(pi0, "userTask2", user);
         waitForUserTask(pi0, "userTask3");
 
@@ -886,8 +886,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(pi0, "userTask1");
-        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
-        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssignIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssignIt(pi0, "userTask3", user);
         waitForUserTask(pi0, "task4");
         waitForUserTask(pi0, "userTask5");
 
@@ -932,9 +932,9 @@ public class SearchActivityInstanceIT extends TestWithUser {
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(pi0, "userTask1");
-        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
-        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
-        waitForUserTaskAndAssigneIt(pi0, "task4", john);
+        waitForUserTaskAndAssignIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssignIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssignIt(pi0, "task4", john);
         waitForUserTask(pi0, "userTask5");
 
         // -------- test assigned & pending task search methods
@@ -974,9 +974,9 @@ public class SearchActivityInstanceIT extends TestWithUser {
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(pi0, "userTask1");
-        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
-        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
-        waitForUserTaskAndAssigneIt(pi0, "task4", john);
+        waitForUserTaskAndAssignIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssignIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssignIt(pi0, "task4", john);
         waitForUserTask(pi0, "userTask5");
 
         // -------- test pending task search methods

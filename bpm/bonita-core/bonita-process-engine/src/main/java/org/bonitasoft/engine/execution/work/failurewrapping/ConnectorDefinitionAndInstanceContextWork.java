@@ -68,7 +68,7 @@ public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailure
 
     @Override
     protected void setExceptionContext(final SBonitaException e, final Map<String, Object> context) {
-        e.setConnectorDefinitionImplementationClassNameOnContext(connectorDefinitionName);
+        e.setConnectorImplementationClassNameOnContext(connectorDefinitionName);
         e.setConnectorInstanceIdOnContext(connectorInstanceId);
         if (activationEvent != null) {
             e.setConnectorActivationEventOnContext(activationEvent.name());

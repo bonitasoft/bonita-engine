@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainer;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -65,6 +67,9 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
             final long logicalGroup1, final long logicalGroup2) {
         super(name, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
         this.flowNodeDefinitionId = flowNodeDefinitionId;
+        long now = new Date().getTime();
+        lastUpdateDate = now;
+        reachedStateDate = now;
     }
 
     @Override
