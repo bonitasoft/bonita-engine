@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-xml</artifactId>
 		<groupId>org.bonitasoft.engine.xml</groupId>
-		<version>7.1.4-SNAPSHOT</version>
+		<version>7.1.4</version>
 	</parent>
 
 	<artifactId>bonita-xml-impl</artifactId>
