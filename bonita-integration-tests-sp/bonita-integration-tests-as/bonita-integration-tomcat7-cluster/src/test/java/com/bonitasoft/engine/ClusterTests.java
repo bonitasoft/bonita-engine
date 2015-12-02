@@ -56,7 +56,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 /**
  * @author Baptiste Mesta
  */
-public class ClusterTests extends CommonAPISPIT {
+public class ClusterTests extends APITestSPUtil {
 
     static Logger LOGGER = LoggerFactory.getLogger(ClusterTests.class);
 
@@ -284,10 +284,6 @@ public class ClusterTests extends CommonAPISPIT {
 
     public void waitProcessToFinishAndBeArchived(final ProcessInstance processInstance, ProcessAPI processAPI) throws Exception {
         final boolean waitUntil = new WaitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, processAPI).waitUntil();
-        if (!waitUntil) {
-            printFlowNodes(processInstance);
-            printArchivedFlowNodes(processInstance);
-        }
         assertTrue("Process was not finished", waitUntil);
     }
 

@@ -8,11 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.supervisor;
 
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({ ProcessSupervisedTest.class, SupervisorTest.class })
 public class SupervisedTests {
 

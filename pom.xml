@@ -81,6 +81,7 @@
             <modules>
                 <module>services</module>
                 <module>bpm</module>
+                <module>bonita-test-api-sp</module>
             </modules>
         </profile>
 
@@ -118,6 +119,7 @@
             <modules>
                 <module>services</module>
                 <module>bpm</module>
+                <module>bonita-test-api-sp</module>
                 <module>bonita-integration-tests-sp</module>
             </modules>
             <properties>
@@ -156,6 +158,7 @@
             <modules>
                 <module>services</module>
                 <module>bpm</module>
+                <module>bonita-test-api-sp</module>
                 <module>bonita-integration-tests-sp</module>
             </modules>
             <build>

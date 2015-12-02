@@ -11,25 +11,25 @@ package com.bonitasoft.engine;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.ClientEventUtil;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.util.APITypeManager;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({ ClusterTests.class })
-@Initializer(ClusteredTestSuiteIT.class)
 public class ClusteredTestSuiteIT {
 
+    @BeforeClass
     public static void beforeAll() throws Exception {
         System.err.println("=================== ClusteredTestSuiteIT.beforeClass()");
         changeToNode2();
@@ -42,8 +42,10 @@ public class ClusteredTestSuiteIT {
         ClientEventUtil.deployCommand(loginDefaultTenant);
         BPMTestSPUtil.logoutOnTenant();
         changeToNode1();
+
     }
 
+    @AfterClass
     public static void afterAll() throws Exception {
         changeToNode2();
         final APISession loginDefaultTenant = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();

@@ -8,13 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.activity.PendingTasksIT;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite.SuiteClasses;
-
 import com.bonitasoft.engine.activity.TaskOnDemandIT;
 import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import com.bonitasoft.engine.business.application.ApplicationAPIITs;
@@ -32,8 +25,14 @@ import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
 import com.bonitasoft.engine.search.SearchProcessInstanceTest;
 import com.bonitasoft.engine.supervisor.ProcessSupervisedTest;
 import com.bonitasoft.engine.tenant.TenantIT;
+import org.bonitasoft.engine.activity.PendingTasksIT;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({
         PageAPIIT.class,
         ApplicationAPIITs.class,
@@ -55,22 +54,11 @@ import com.bonitasoft.engine.tenant.TenantIT;
         org.bonitasoft.engine.business.data.BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
-@Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {
 
-    private static APITestSPUtil apiTestUtil = new APITestSPUtil();
-
+    @BeforeClass
     public static void beforeAll() throws BonitaException {
-        System.err.println("=================== BPMSPTestsForServers.beforeClass()");
-        apiTestUtil.createPlatformStructure();
-        BPMTestSPUtil.createEnvironmentWithDefaultTenant();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
-    }
-
-    public static void afterAll() throws BonitaException {
-        System.err.println("=================== BPMSPTestsForServers.afterClass()");
-        BPMTestSPUtil.destroyPlatformAndTenants();
-        apiTestUtil.deletePlatformStructure();
     }
 
 }
