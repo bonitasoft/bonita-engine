@@ -14,12 +14,16 @@
 package org.bonitasoft.engine.api;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
+import org.bonitasoft.engine.bdm.BusinessObjectDaoCreationException;
+import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -48,6 +52,8 @@ import org.bonitasoft.engine.util.APITypeManager;
  * @author Nicolas Chabanoles
  */
 public class APIClient {
+
+    private static final String IMPL_SUFFIX = "Impl";
 
     protected APISession session;
 
@@ -97,9 +103,7 @@ public class APIClient {
     }
 
     protected <T> T getAPI(final Class<T> apiClass) {
-        if (session == null) {
-            throw new IllegalStateException("You must call login() prior to accessing any API.");
-        }
+        ensureSessionExists();
         try {
             final ClientInterceptor clientInterceptor = new ClientInterceptor(apiClass.getName(), getServerAPI(), session);
             @SuppressWarnings("unchecked")
@@ -107,6 +111,12 @@ public class APIClient {
             return api;
         } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
+
+    private void ensureSessionExists() {
+        if (session == null) {
+            throw new IllegalStateException("You must call login() prior to accessing any API.");
         }
     }
 
@@ -164,6 +174,51 @@ public class APIClient {
             // If the session is not found on server, then the client is already logged out.
             // Do nothing
         }
+    }
+
+    /**
+     * Get an implementation instance of the DAO Interface.
+     *
+     * @param daoInterface the interface of the DAO
+     * @return the implementation of the DAO
+     * @throws BusinessObjectDaoCreationException if the factory is not able to instantiate the DAO
+     */
+    public <T extends BusinessObjectDAO> T getDAO(final Class<T> daoInterface) throws BusinessObjectDaoCreationException {
+        ensureSessionExists();
+        if (daoInterface == null) {
+            throw new IllegalArgumentException("daoInterface is null");
+        }
+        if (!daoInterface.isInterface()) {
+            throw new IllegalArgumentException(daoInterface.getName() + " is not an interface");
+        }
+
+        Class<T> daoImplClass = null;
+        try {
+            daoImplClass = loadClass(daoInterface);
+
+            if (daoImplClass != null) {
+                final Constructor<T> constructor = daoImplClass.getConstructor(APISession.class);
+                return constructor.newInstance(session);
+            }
+        } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new BusinessObjectDaoCreationException(e);
+        }
+        throw new BusinessObjectDaoCreationException("No Implementation of the DAO available.");
+    }
+
+    /**
+     * Loads the class of the {@link BusinessObjectDAO} according to its class name.
+     * <p>
+     * The loading is done in the current Thread ClassLoader.
+     *
+     * @param daoInterface the DAO's interface
+     * @return the Implementation class of the BusinessObjectDAO
+     * @throws ClassNotFoundException if the implementation class name is unknown by the current Thread ClassLoader
+     */
+    @SuppressWarnings("unchecked")
+    protected <T extends BusinessObjectDAO> Class<T> loadClass(final Class<T> daoInterface) throws ClassNotFoundException {
+        final String implementationClassName = daoInterface.getName() + IMPL_SUFFIX;
+        return (Class<T>) Class.forName(implementationClassName, true, Thread.currentThread().getContextClassLoader());
     }
 
     /**
