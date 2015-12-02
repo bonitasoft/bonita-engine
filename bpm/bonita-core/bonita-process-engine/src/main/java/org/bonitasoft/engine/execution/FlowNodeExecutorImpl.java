@@ -166,8 +166,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 registerWork(state, processDefinitionId, processInstanceId, sFlowNodeInstance);
             }
             return state;
-        } catch (final SActivityStateExecutionException e) {
-            throw e;
         } catch (final SFlowNodeExecutionException e) {
             throw e;
         } catch (final SBonitaException e) {

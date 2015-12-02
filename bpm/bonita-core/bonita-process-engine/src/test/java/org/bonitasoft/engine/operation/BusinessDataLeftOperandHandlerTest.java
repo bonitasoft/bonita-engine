@@ -21,11 +21,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,7 +88,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final BusinessDataLeftOperandHandler spy = spy(leftOperandHandler);
         doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong(), anyString());
         final Map<String, Object> inputValues = new HashMap<>(1);
-        final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
+        final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", 987L, inputValues);
         final SLeftOperand leftOperand = createLeftOperand(bizDataName);
         Map<String, Object> contextToSet = new HashMap<>();
         // when:

@@ -21,11 +21,7 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -200,7 +196,7 @@ public class OperationServiceImplTest {
         final Map<String, Object> inputValues = new HashMap<>();
         inputValues.put("data1", "value1");
         inputValues.put("data2", "value2");
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, inputValues);
         final Map<SLeftOperand, LeftOperandUpdateStatus> updates = new HashMap<>();
         updates.put(buildLeftOperand(TYPE_1, "data1"), new LeftOperandUpdateStatus(SOperatorType.ASSIGNMENT));
         updates.put(buildLeftOperand(TYPE_2, "data2"), new LeftOperandUpdateStatus(SOperatorType.DELETION));
@@ -222,7 +218,7 @@ public class OperationServiceImplTest {
         final SOperation op2 = buildOperation(TYPE_2, "data2", SOperatorType.XPATH_UPDATE_QUERY, sExpression);
         final SOperation op3 = buildOperation(TYPE_2, "data2", SOperatorType.JAVA_METHOD, sExpression);
         final Map<String, Object> inputValues = new HashMap<>();
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, inputValues);
 
         final List<SOperation> operations = Arrays.asList(op1, op2, op3);
         given(persistRightOperandResolver.shouldPersistByPosition(0, operations)).willReturn(true);
@@ -248,7 +244,7 @@ public class OperationServiceImplTest {
     public void should_retrieveLeftOperandsAndPutItInExpressionContextIfNotIn_do_not_override_value_in_map() throws Exception {
         // given
         final SOperation op1 = buildOperation(TYPE_2, "data1", SOperatorType.XPATH_UPDATE_QUERY);
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object> singletonMap("data1",
                 "originalValue"));
 
         // when
@@ -266,7 +262,7 @@ public class OperationServiceImplTest {
         final SOperation operation1 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
         final SOperation operation2 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
         final List<SOperation> operations = Arrays.asList(operation1, operation2);
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object> singletonMap("data1",
                 "givenValue"));
 
         // when
@@ -285,13 +281,12 @@ public class OperationServiceImplTest {
         final List<SOperation> operations = new ArrayList<>();
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object> singletonMap("data1",
                 "givenValue"));
         final OperationServiceImpl spy = spy(operationServiceImpl);
 
         // when
-        final Map<SLeftOperand, LeftOperandUpdateStatus> updates = spy.executeOperators(operations, expressionContext
-                );
+        final Map<SLeftOperand, LeftOperandUpdateStatus> updates = spy.executeOperators(operations, expressionContext);
 
         // then
         assertThat(updates).hasSize(2);
@@ -312,7 +307,7 @@ public class OperationServiceImplTest {
         operations.add(buildOperation(TYPE_2, "data4", SOperatorType.ASSIGNMENT));
         operations.add(buildOperation(TYPE_2, "data5", SOperatorType.ASSIGNMENT));
         final HashMap<String, Object> inputValues = new HashMap<>();
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, inputValues);
 
         //when
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, 123l/* data container */, "containerType", expressionContext);
@@ -333,7 +328,7 @@ public class OperationServiceImplTest {
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.ASSIGNMENT));
         final HashMap<String, Object> inputValues = new HashMap<>();
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, inputValues);
 
         //when
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, 124l/* an other data container */, "containerType",

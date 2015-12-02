@@ -93,8 +93,7 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
                     final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
                     final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
                     bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(), flowNodeInstance.getId(),
-                            SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, 1, SStateCategory.NORMAL, -1
-                    );
+                            SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, 1, SStateCategory.NORMAL, -1);
                     activityInstanceService.incrementLoopCounter(loopActivity);
                     activityInstanceService.setTokenCount(loopActivity, loopActivity.getTokenCount() + 1);
                 }
@@ -107,9 +106,10 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
 
     private boolean evaluateLoop(final SStandardLoopCharacteristics standardLoop, final SLoopActivityInstance loopActivity)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        final Map<String, Object> input = new HashMap<String, Object>(1);
+        final Map<String, Object> input = new HashMap<>(1);
         input.put(ExpressionConstants.LOOP_COUNTER.getEngineConstantName(), loopActivity.getLoopCounter());
-        final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), input);
+        final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                loopActivity.getProcessDefinitionId(), input);
         return ((Boolean) expressionResolverService.evaluate(standardLoop.getLoopCondition(), sExpressionContext)).booleanValue();
     }
 

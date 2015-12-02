@@ -20,9 +20,14 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -74,6 +79,21 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
                         break;
                     case RECEIVE_TASK:
                         entityClass = SReceiveTaskInstance.class;
+                        break;
+                    case SEND_TASK:
+                        entityClass = SSendTaskInstance.class;
+                        break;
+                    case CALL_ACTIVITY:
+                        entityClass = SCallActivityInstance.class;
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY:
+                        entityClass = SMultiInstanceActivityInstance.class;
+                        break;
+                    case SUB_PROCESS:
+                        entityClass = SSubProcessActivityInstance.class;
+                        break;
+                    case LOOP_ACTIVITY:
+                        entityClass = SLoopActivityInstance.class;
                         break;
                     default:
                         entityClass = SActivityInstance.class;
