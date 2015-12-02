@@ -23,14 +23,12 @@ import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import org.bonitasoft.engine.test.APIMethodLocalIT;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         BPMLocalSuiteTests.class,
         BPMRemoteTestsLocal.class,
@@ -46,7 +44,7 @@ import org.junit.runners.Suite.SuiteClasses;
         //last test suite because it breaks the platform
         AllBPMTests.class,
 })
-@Initializer(LocalServerTestsInitializer.class)
+@RunWith(Suite.class)
 public class LocalIntegrationTests {
 
     @BeforeClass

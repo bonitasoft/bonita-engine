@@ -55,7 +55,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<spring.version>3.1.2.RELEASE</spring.version>
-        <jackson.version>2.2.3</jackson.version>
+		<jackson.version>2.2.3</jackson.version>
 		<jaxb.version>2.2.7</jaxb.version>
 
 		<!-- Tests -->
@@ -64,7 +64,7 @@
 		<!-- ************************ -->
 		<!-- Sonar/Reporting settings -->
 		<!-- ************************ -->
-        <!-- Sonar/Jacoco integration. Note that these properties need to be defined outside the "coverage" profile because we want to be to able to execute mvn 
+		<!-- Sonar/Jacoco integration. Note that these properties need to be defined outside the "coverage" profile because we want to be to able to execute mvn
             sonar:sonar without passing a profile -->
 		<!-- Tells Sonar to use jacoco for coverage results -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -84,7 +84,7 @@
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
 		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
-        <sonar.exclusions>**/*Test.java,**/*Tests.java,**/*IT.java</sonar.exclusions>
+		<sonar.exclusions>**/*Test.java,**/*Tests.java,**/*IT.java</sonar.exclusions>
 	</properties>
 
 	<dependencyManagement>
@@ -472,6 +472,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
@@ -500,6 +501,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
@@ -515,6 +517,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
@@ -539,6 +542,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
@@ -569,6 +573,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-test-api</module>
 				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
@@ -685,10 +690,11 @@
             </build>
         </profile>
         <profile>
-            <id>proprietary_db_vendors</id>
+            <id>oracle_drivers</id>
             <activation>
                 <property>
-                    <name>!skipTests</name>
+                    <name>sysprop.bonita.db.vendor</name>
+                    <value>oracle</value>
                 </property>
             </activation>
             <dependencies>
@@ -698,6 +704,17 @@
                     <version>6</version>
                     <scope>test</scope>
                 </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>sqlserver_drivers</id>
+            <activation>
+                <property>
+                    <name>sysprop.bonita.db.vendor</name>
+                    <value>sqlserver</value>
+                </property>
+            </activation>
+            <dependencies>
                 <dependency>
                     <groupId>com.microsoft.jdbc</groupId>
                     <artifactId>sqlserver</artifactId>

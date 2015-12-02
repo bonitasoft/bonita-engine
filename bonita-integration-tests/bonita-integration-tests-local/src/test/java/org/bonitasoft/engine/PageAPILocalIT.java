@@ -19,17 +19,10 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@SuppressWarnings("javadoc")
-@RunWith(BonitaTestRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class PageAPILocalIT extends CommonAPIIT {
 
     @Before

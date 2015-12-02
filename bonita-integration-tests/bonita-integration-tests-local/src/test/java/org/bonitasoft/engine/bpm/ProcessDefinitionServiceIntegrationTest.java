@@ -41,6 +41,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -48,11 +49,13 @@ import org.junit.Test;
  */
 public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTest {
 
-    private final ProcessDefinitionService processDefinitionService;
+    private ProcessDefinitionService processDefinitionService;
 
-    private final ActorMappingService actorMappingService;
+    private ActorMappingService actorMappingService;
 
-    public ProcessDefinitionServiceIntegrationTest() {
+
+    @Before
+    public void before(){
         processDefinitionService = getTenantAccessor().getProcessDefinitionService();
         actorMappingService = getTenantAccessor().getActorMappingService();
     }

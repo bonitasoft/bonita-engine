@@ -35,8 +35,6 @@ public class PlatformTestUtil {
 
     public static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
 
-    public static final String DEFAULT_TENANT = "default";
-
     public PlatformSession loginOnPlatform() throws BonitaException {
         final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         return platformLoginAPI.login("platformAdmin", "platform");
@@ -159,22 +157,6 @@ public class PlatformTestUtil {
 
     public static void cleanPlatform(final PlatformAPI platformAPI) throws BonitaException {
         platformAPI.cleanPlatform();
-    }
-
-    public void createEnvironmentWithoutTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        platformAPI.createAndInitializePlatform();
-        platformAPI.startNode();
-        logoutOnPlatform(session);
-    }
-
-    public void destroyEnvironmentWithoutTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = getPlatformAPI(session);
-        platformAPI.stopNode();
-        platformAPI.deletePlatform();
-        logoutOnPlatform(session);
     }
 
 }

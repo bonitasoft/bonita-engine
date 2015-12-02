@@ -23,16 +23,16 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
+import org.junit.Before;
 import org.junit.Test;
 
 public class MultiTenancyTest extends CommonBPMServicesTest {
 
-    public static final String DEFAULT_TENANT_STATUS = "DEACTIVATED";
-
     private ReadPersistenceService persistenceService;
     private Recorder recorder;
 
-    public MultiTenancyTest() {
+    @Before
+    public void before() {
         persistenceService = getTenantAccessor().getReadPersistenceService();
         recorder = getTenantAccessor().getRecorder();
     }

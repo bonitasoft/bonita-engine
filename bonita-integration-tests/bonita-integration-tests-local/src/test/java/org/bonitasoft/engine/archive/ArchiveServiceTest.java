@@ -29,6 +29,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ArchiveServiceTest extends CommonBPMServicesTest {
@@ -39,9 +40,10 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
 
     private static final int ONE_DAY = 86400000;
 
-    private final ArchiveService archiveService;
+    private ArchiveService archiveService;
 
-    public ArchiveServiceTest() throws NoSuchFieldException, IllegalAccessException {
+    @Before
+    public void before(){
         this.archiveService = getTenantAccessor().getArchiveService();
     }
 

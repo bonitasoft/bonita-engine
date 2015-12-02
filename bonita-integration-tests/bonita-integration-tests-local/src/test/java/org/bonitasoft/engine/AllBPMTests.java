@@ -48,12 +48,10 @@ import org.bonitasoft.engine.recorder.RecorderTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorITest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
 import org.bonitasoft.engine.session.SessionServiceTest;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 @SuiteClasses({
         CacheServiceTest.class,
         PersistenceTests.class,
@@ -95,5 +93,6 @@ import org.junit.runners.Suite.SuiteClasses;
         FormMappingServiceIT.class,
         PageMappingServiceIT.class
 })
+@RunWith(Suite.class)
 public class AllBPMTests {
 }
