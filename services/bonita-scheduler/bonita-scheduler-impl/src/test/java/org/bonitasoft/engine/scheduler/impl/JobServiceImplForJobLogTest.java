@@ -13,11 +13,14 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -35,6 +38,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -49,6 +53,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
@@ -56,6 +61,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -79,6 +85,8 @@ public class JobServiceImplForJobLogTest {
 
     @Mock
     private Recorder recorder;
+    @Mock
+    private TechnicalLoggerService technicalLoggerService;
 
     @Spy
     @InjectMocks
@@ -363,4 +371,68 @@ public class JobServiceImplForJobLogTest {
         // When
         jobServiceImpl.updateJobLog(jobLog, descriptor);
     }
+
+    @Test
+    public void jobWasExecuted_should_update_jobLog_on_exception_if_previous_joblog() throws Exception {
+        // Given
+        final SJobLogImpl jobLog = mock(SJobLogImpl.class);
+        doReturn(1L).when(jobLog).getRetryNumber();
+        final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
+
+        doReturn(jobLogs).when(jobServiceImpl).getJobLogs(5L, 0, 1);
+
+        long before = System.currentTimeMillis();
+
+        // When
+        Exception jobException = new Exception("theException");
+        jobServiceImpl.logJobError(jobException,5L);
+
+        // Then
+        ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
+        verify(jobServiceImpl).updateJobLog(eq(jobLogs.get(0)),captor.capture());
+
+        EntityUpdateDescriptor updateDescriptor = captor.getValue();
+        assertThat((String) updateDescriptor.getFields().get("lastMessage")).contains(jobException.getMessage());
+        assertThat((Long) updateDescriptor.getFields().get("lastUpdateDate")).isGreaterThanOrEqualTo(before);
+        assertThat(updateDescriptor.getFields().get("retryNumber")).isEqualTo(2L);
+    }
+
+
+    @Test
+    public void createJobLog_should_call_job_service_createJobLog_when_related_job_descriptor_exists() throws Exception {
+        //given
+        Exception exception = new Exception("Missing mandatory parameter");
+        long jobDescriptorId = 4L;
+        long before = System.currentTimeMillis();
+        given(jobServiceImpl.getJobDescriptor(jobDescriptorId)).willReturn(mock(SJobDescriptor.class));
+
+        //when
+        jobServiceImpl.createJobLog(exception, jobDescriptorId);
+
+        //then
+        ArgumentCaptor<SJobLog> captor = ArgumentCaptor.forClass(SJobLog.class);
+        verify(jobServiceImpl).createJobLog(captor.capture());
+        SJobLog jobLog = captor.getValue();
+        assertThat(jobLog.getRetryNumber()).isEqualTo(0);
+        assertThat(jobLog.getJobDescriptorId()).isEqualTo(jobDescriptorId);
+        assertThat(jobLog.getLastMessage()).contains(exception.getMessage());
+        assertThat(jobLog.getLastUpdateDate()).isGreaterThanOrEqualTo(before);
+    }
+
+    @Test
+    public void createJobLog_should_not_create_job_log_when_related_job_descriptor_does_not_exist() throws Exception {
+        //given
+        Exception exception = new Exception("Missing mandatory parameter");
+        long jobDescriptorId = 4L;
+        given(jobServiceImpl.getJobDescriptor(jobDescriptorId)).willReturn(null);
+
+        //when
+        jobServiceImpl.createJobLog(exception, jobDescriptorId);
+
+        //then
+        verify(jobServiceImpl, never()).createJobLog(any(SJobLog.class));
+    }
+
+
+
 }

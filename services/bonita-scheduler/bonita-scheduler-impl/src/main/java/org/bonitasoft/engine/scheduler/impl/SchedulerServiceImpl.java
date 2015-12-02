@@ -54,6 +54,7 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -87,6 +88,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final TransactionService transactionService;
 
     private final ServicesResolver servicesResolver;
+    private PersistenceService persistenceService;
 
     private final int batchSize;
 
@@ -95,17 +97,18 @@ public class SchedulerServiceImpl implements SchedulerService {
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
             final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-            final ServicesResolver servicesResolver) {
-        this(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver, 1000);
+            final ServicesResolver servicesResolver, PersistenceService persistenceService) {
+        this(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver, persistenceService, 1000);
     }
 
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
             final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
-            final ServicesResolver servicesResolver, final int batchSize) {
+            final ServicesResolver servicesResolver, PersistenceService persistenceService, final int batchSize) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
         this.servicesResolver = servicesResolver;
+        this.persistenceService = persistenceService;
         schedulStarted = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STARTED).done();
         schedulStopped = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STOPPED).done();
         jobFailed = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(JOB_FAILED).done();
@@ -359,8 +362,8 @@ public class SchedulerServiceImpl implements SchedulerService {
             if (servicesResolver != null) {
                 injectServices(statelessJob);
             }
-            return new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
-                    sessionAccessor, transactionService);
+            return new JobWrapper(jobIdentifier, statelessJob, logger, jobIdentifier.getTenantId(), eventService,
+                    sessionAccessor, transactionService, persistenceService, jobService);
         }
     }
 

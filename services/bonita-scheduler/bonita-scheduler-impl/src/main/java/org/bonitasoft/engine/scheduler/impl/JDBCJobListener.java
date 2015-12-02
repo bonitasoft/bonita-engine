@@ -13,30 +13,18 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.incident.Incident;
-import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -52,11 +40,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     private final JobService jobService;
 
-    private final IncidentService incidentService;
-
     private final TechnicalLoggerService logger;
-
-    private final JobLogCreator jobLogCreator;
 
     private final SchedulerService schedulerService;
 
@@ -67,17 +51,15 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
     private final TransactionService transactionService;
 
     public JDBCJobListener(final SchedulerService schedulerService, final JobService jobService, final SchedulerExecutor schedulerExecutor,
-            final SessionAccessor sessionAccessor, final TransactionService transactionService, final IncidentService incidentService,
-            final TechnicalLoggerService logger, final JobLogCreator jobLogCreator) {
+                           final SessionAccessor sessionAccessor, final TransactionService transactionService,
+                           final TechnicalLoggerService logger) {
         super();
         this.schedulerService = schedulerService;
         this.jobService = jobService;
         this.schedulerExecutor = schedulerExecutor;
         this.sessionAccessor = sessionAccessor;
         this.transactionService = transactionService;
-        this.incidentService = incidentService;
         this.logger = logger;
-        this.jobLogCreator = jobLogCreator;
     }
 
     @Override
@@ -102,7 +84,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
             if (sJobDescriptor == null) {
                 deleteJob(context, jobDescriptorId, tenantId);
             }
-        } catch (final SBonitaException e) {
+        } catch (final Exception e) {
             logWarningWhenExceptionOccurs("check of the existence of the job descriptor '" + jobDescriptorId + "'.", e);
         } finally {
             cleanSession();
@@ -154,28 +136,14 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
         // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
         sessionAccessor.setTenantId(tenantId);
         try {
-            if (jobException != null) {
-                setJobLog(jobException, jobDescriptorId);
-            } else {
+            if (jobException == null) {
                 jobService.deleteJobLogs(jobDescriptorId);
                 deleteJobIfNotScheduledAnyMore(jobDescriptorId);
             }
-        } catch (final SBonitaException sbe) {
-            final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor " + jobDescriptorId, "",
-                    jobException, sbe);
-            incidentService.report(tenantId, incident);
+        } catch (final Exception e) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Unable to delete the job logs for job " + jobDescriptorId, e);
         } finally {
             cleanSession();
-        }
-    }
-
-    private void setJobLog(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
-            SJobLogCreationException, SJobDescriptorReadException {
-        final List<SJobLog> jobLogs = jobService.getJobLogs(jobDescriptorId, 0, 1);
-        if (!jobLogs.isEmpty()) {
-            updateJobLog(jobException, jobLogs);
-        } else {
-            jobLogCreator.createJobLog(jobException, jobDescriptorId);
         }
     }
 
@@ -193,32 +161,13 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
         }
     }
 
-    private void updateJobLog(final Exception jobException, final List<SJobLog> jobLogs) throws SJobLogUpdatingException {
-        final SJobLog jobLog = jobLogs.get(0);
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField("lastMessage", getStackTrace(jobException));
-        descriptor.addField("lastUpdateDate", System.currentTimeMillis());
-        descriptor.addField("retryNumber", jobLog.getRetryNumber() + 1);
-        jobService.updateJobLog(jobLog, descriptor);
-    }
-
     private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         if (jobDescriptor != null && !schedulerService.isStillScheduled(jobDescriptor)) {
             schedulerService.delete(jobDescriptor.getJobName());
         } else if (jobDescriptor == null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("jobDescriptor with id");
-            stringBuilder.append(jobDescriptorId);
-            stringBuilder.append(" already deleted, ignore it");
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "jobDescriptor with id " + jobDescriptorId + " already deleted, ignore it");
         }
-    }
-
-    private String getStackTrace(final Exception jobException) {
-        final StringWriter exceptionWriter = new StringWriter();
-        jobException.printStackTrace(new PrintWriter(exceptionWriter));
-        return exceptionWriter.toString();
     }
 
 }

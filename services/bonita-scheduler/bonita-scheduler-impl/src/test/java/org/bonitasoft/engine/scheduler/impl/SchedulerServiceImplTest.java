@@ -55,6 +55,7 @@ import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCre
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -86,6 +87,8 @@ public class SchedulerServiceImplTest {
 
     @Mock
     private SessionAccessor sessionAccessor;
+    @Mock
+    private PersistenceService persistenceService;
 
     ServicesResolver servicesResolver;
 
@@ -108,7 +111,7 @@ public class SchedulerServiceImplTest {
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 
         servicesResolver = mock(ServicesResolver.class);
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver);
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver, persistenceService);
     }
 
     @Test
@@ -276,7 +279,7 @@ public class SchedulerServiceImplTest {
 
         // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
-        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
+        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>>any(), eq(TENANT_ID), anyLong());
         verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), anyString(), anyBoolean());
     }
 

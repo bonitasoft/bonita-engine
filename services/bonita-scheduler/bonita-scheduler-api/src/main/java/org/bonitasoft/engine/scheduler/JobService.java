@@ -50,10 +50,8 @@ public interface JobService {
     /**
      * Create a new job descriptor for a specific tenant
      *
-     * @param sJobDescriptor
-     *        JobDescriptor to create
-     * @param tenantId
-     *        Identifier of tenant
+     * @param sJobDescriptor JobDescriptor to create
+     * @param tenantId       Identifier of tenant
      * @return The created jobDescriptor
      * @throws SJobDescriptorCreationException
      * @since 6.1
@@ -63,8 +61,7 @@ public interface JobService {
     /**
      * Delete the specified job descriptor
      *
-     * @param id
-     *        Identifier of job descriptor to delete
+     * @param id Identifier of job descriptor to delete
      * @throws SJobDescriptorReadException
      * @throws SJobDescriptorNotFoundException
      * @throws SJobDescriptorDeletionException
@@ -75,8 +72,7 @@ public interface JobService {
     /**
      * Delete the specified job descriptor
      *
-     * @param sJobDescriptor
-     *        JobDescriptor to delete
+     * @param sJobDescriptor JobDescriptor to delete
      * @throws SJobDescriptorDeletionException
      * @since 6.1
      */
@@ -101,8 +97,7 @@ public interface JobService {
     /**
      * Get a specific job descriptor
      *
-     * @param id
-     *        Identifier of job descriptor
+     * @param id Identifier of job descriptor
      * @return Null if the job descriptor doesn't exist, else the {@link SJobDescriptor} corresponding to the identifier
      * @throws SJobDescriptorReadException
      * @since 6.1
@@ -112,8 +107,7 @@ public interface JobService {
     /**
      * Get total number of job descriptors
      *
-     * @param queryOptions
-     *        a map of specific parameters of a query
+     * @param queryOptions a map of specific parameters of a query
      * @return total number of job logs
      * @throws SBonitaReadException
      */
@@ -122,8 +116,7 @@ public interface JobService {
     /**
      * Search all job descriptors according to specific criteria
      *
-     * @param queryOptions
-     *        a map of specific parameters of a query
+     * @param queryOptions a map of specific parameters of a query
      * @return A list of SJobParameter objects
      * @throws SBonitaReadException
      * @since 6.1
@@ -133,12 +126,9 @@ public interface JobService {
     /**
      * Create new job parameters for a specific tenant
      *
-     * @param parameters
-     *        JobParameters to create
-     * @param tenantId
-     *        Identifier of tenant
-     * @param jobDescriptorId
-     *        Identifier of job descriptor
+     * @param parameters      JobParameters to create
+     * @param tenantId        Identifier of tenant
+     * @param jobDescriptorId Identifier of job descriptor
      * @return
      * @throws SJobParameterCreationException
      * @since 6.2
@@ -160,12 +150,9 @@ public interface JobService {
     /**
      * Create a new job parameter for a specific tenant
      *
-     * @param sJobParameter
-     *        JobParameter to create
-     * @param tenantId
-     *        Identifier of tenant
-     * @param jobDescriptorId
-     *        Identifier of job descriptor
+     * @param sJobParameter   JobParameter to create
+     * @param tenantId        Identifier of tenant
+     * @param jobDescriptorId Identifier of job descriptor
      * @return
      * @throws SJobParameterCreationException
      * @since 6.2
@@ -175,8 +162,7 @@ public interface JobService {
     /**
      * Delete the specified job parameter
      *
-     * @param id
-     *        Identifier of job parameter to delete
+     * @param id Identifier of job parameter to delete
      * @throws SJobParameterReadException
      * @throws SJobParameterNotFoundException
      * @throws SJobParameterDeletionException
@@ -187,8 +173,7 @@ public interface JobService {
     /**
      * Delete the specified job parameter
      *
-     * @param sJobParameter
-     *        JobParameter to delete
+     * @param sJobParameter JobParameter to delete
      * @throws SJobParameterDeletionException
      * @since 6.1
      */
@@ -197,8 +182,7 @@ public interface JobService {
     /**
      * Get a specific job parameter
      *
-     * @param id
-     *        Identifier of job parameter
+     * @param id Identifier of job parameter
      * @return
      * @throws SJobParameterReadException
      * @throws SJobParameterNotFoundException
@@ -209,8 +193,7 @@ public interface JobService {
     /**
      * Search all job parameters according to specific criteria
      *
-     * @param queryOptions
-     *        a map of specific parameters of a query
+     * @param queryOptions a map of specific parameters of a query
      * @return A list of SJobParameter objects
      * @throws SBonitaReadException
      * @since 6.1
@@ -220,8 +203,7 @@ public interface JobService {
     /**
      * Create a new job log for a specific tenant
      *
-     * @param sJobLog
-     *        JobLog to create
+     * @param sJobLog JobLog to create
      * @return
      * @throws SJobLogCreationException
      * @since 6.2
@@ -231,8 +213,7 @@ public interface JobService {
     /**
      * Delete the specified job log
      *
-     * @param id
-     *        Identifier of job log to delete
+     * @param id Identifier of job log to delete
      * @throws SBonitaReadException
      * @throws SJobLogDeletionException
      * @since 6.1
@@ -242,8 +223,7 @@ public interface JobService {
     /**
      * Delete the specified job log
      *
-     * @param sJobLog
-     *        JobLog to delete
+     * @param sJobLog JobLog to delete
      * @throws SJobLogDeletionException
      * @since 6.1
      */
@@ -252,8 +232,7 @@ public interface JobService {
     /**
      * Get a specific job log
      *
-     * @param id
-     *        Identifier of job log
+     * @param id Identifier of job log
      * @return
      * @throws SBonitaReadException
      * @since 6.1
@@ -263,8 +242,7 @@ public interface JobService {
     /**
      * Get total number of job logs
      *
-     * @param queryOptions
-     *        a map of specific parameters of a query
+     * @param queryOptions a map of specific parameters of a query
      * @return total number of job logs
      * @throws SBonitaReadException
      */
@@ -273,8 +251,7 @@ public interface JobService {
     /**
      * Search all job logs according to specific criteria
      *
-     * @param queryOptions
-     *        a map of specific parameters of a query
+     * @param queryOptions a map of specific parameters of a query
      * @return A list of SJobLog objects
      * @throws SBonitaReadException
      * @since 6.1
@@ -295,8 +272,7 @@ public interface JobService {
     /**
      * Update a {@link SJobLog}
      *
-     * @param jobLog
-     *        The log to update
+     * @param jobLog     The log to update
      * @param descriptor
      * @since 6.4.0
      */
@@ -305,8 +281,7 @@ public interface JobService {
     /**
      * Delete all {@link SJobLog} of a specific {@link SJobDescriptor}
      *
-     * @param jobDescriptorId
-     *        The identifier of the {@link SJobDescriptor}
+     * @param jobDescriptorId The identifier of the {@link SJobDescriptor}
      * @throws SBonitaReadException
      * @throws SJobLogDeletionException
      * @since 6.4.0
@@ -316,16 +291,26 @@ public interface JobService {
     /**
      * Get all {@link SJobLog} of a specific {@link SJobDescriptor}
      *
-     * @param jobDescriptorId
-     *        The identifier of the {@link SJobDescriptor}
-     * @param fromIndex
-     *        The index of the first element of the list
-     * @param maxResults
-     *        The nulber max of elements of the list
+     * @param jobDescriptorId The identifier of the {@link SJobDescriptor}
+     * @param fromIndex       The index of the first element of the list
+     * @param maxResults      The nulber max of elements of the list
      * @return A list of {@link SJobLog}
      * @throws SBonitaReadException
      * @since 6.4.0
      */
     List<SJobLog> getJobLogs(long jobDescriptorId, int fromIndex, int maxResults) throws SBonitaReadException;
 
+    /**
+     * log an error on a job
+     *
+     * @param jobException    the exception
+     * @param jobDescriptorId the id of the job
+     * @throws SBonitaReadException
+     * @throws SJobLogUpdatingException
+     * @throws SJobLogCreationException
+     * @throws SJobDescriptorReadException
+     * @since 7.2.0
+     */
+    void logJobError(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+            SJobLogCreationException, SJobDescriptorReadException;
 }
