@@ -731,6 +731,22 @@
                 	<artifactId>bonita-common-api-impl</artifactId>
                 	<groupId>org.bonitasoft.engine.api</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-api-sp</artifactId>
+                    <groupId>com.bonitasoft.engine.api</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-api-impl-sp</artifactId>
+                    <groupId>com.bonitasoft.engine.api</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-util</artifactId>
+                    <groupId>org.bonitasoft.engine.util</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-util-sp</artifactId>
+                    <groupId>com.bonitasoft.engine.util</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
