@@ -146,6 +146,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         addressBO.addField(city);
         addressBO.addField(country);
         addressBO.addQuery(COUNT_ADDRESS, "SELECT count(a) FROM Address a", Long.class.getName());
+        addressBO.addUniqueConstraint("addressUK_with_relation","city","country");
 
         final RelationField addresses = new RelationField();
         addresses.setType(RelationField.Type.AGGREGATION);
