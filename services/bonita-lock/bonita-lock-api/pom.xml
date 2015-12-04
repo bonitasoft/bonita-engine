@@ -6,7 +6,7 @@
   <parent>
     <artifactId>bonita-lock</artifactId>
     <groupId>org.bonitasoft.engine.lock</groupId>
-    <version>7.1.4-SNAPSHOT</version>
+    <version>7.1.5-SNAPSHOT</version>
   </parent>
   
   <artifactId>bonita-lock-api</artifactId>
