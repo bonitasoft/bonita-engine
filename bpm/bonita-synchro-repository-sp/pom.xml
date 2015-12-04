@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
 		<artifactId>bpm</artifactId>
-		<version>7.1.4-SNAPSHOT</version>
+		<version>7.1.5-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.bonitasoft.engine.synchro</groupId>
