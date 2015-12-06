@@ -114,7 +114,7 @@ public class RoleIT extends TestWithTechnicalUser {
 
     @Test
     public void roleNameAndDisplayNameShouldAccept255Chars() throws BonitaException {
-        final String stringIndex_255_chars = "a\uD83C\uDC40\uD83C\uDCBDツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッ";
+        final String stringIndex_255_chars = "ईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईईऑऑऑऑऑ";
         final Role role = getIdentityAPI().createRole(new RoleCreator(stringIndex_255_chars).setDisplayName(stringIndex_255_chars));
 
         // Should be no exception:
