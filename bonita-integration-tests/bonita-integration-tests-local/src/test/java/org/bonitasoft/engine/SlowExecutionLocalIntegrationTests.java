@@ -24,14 +24,8 @@ import org.bonitasoft.engine.event.TimerEventIT;
 import org.bonitasoft.engine.platform.PlatformLoginIT;
 import org.bonitasoft.engine.platform.PlatformIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceIT;
-import org.bonitasoft.engine.test.APIMethodLocalIT;
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         TestShades.class,
         // Specific slow test suites below:
@@ -51,7 +45,6 @@ import org.junit.runners.Suite.SuiteClasses;
         LocalIntegrationTests.class,
 
 })
-@Initializer(LocalServerTestsInitializer.class)
 public class SlowExecutionLocalIntegrationTests extends LocalIntegrationTests {
 
 }

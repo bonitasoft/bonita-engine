@@ -19,8 +19,9 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,24 +37,24 @@ public class ProcessManagerTest {
     @Mock
     private BonitaHomeServer bonitaHomeServer;
 
-
     @InjectMocks
     @Spy
     private ProcessManager processManager;
 
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
 
     @Test
     public void storeConnectorFileShouldEnsureParentFoldersExist() throws Exception {
-        final String home = System.getProperty("java.io.tmpdir") + File.separator + "home-test";
-        final File homeFile = new File(home);
+        final File homeFile = temp.newFolder("home-test");
         doReturn(homeFile).when(bonitaHomeServer).getBonitaHomeFolder();
-        final String oldBonitaHome = System.setProperty(BonitaHome.BONITA_HOME, home);
+        final String oldBonitaHome = System.setProperty(BonitaHome.BONITA_HOME, homeFile.getAbsolutePath());
         final long tenantId = 44L;
         final long processId = 5421L;
         final File connectorFolder = FolderMgr.getTenantWorkProcessConnectorsFolder(BonitaHomeServer.getInstance().getBonitaHomeFolder(), tenantId, processId)
                 .getFile();
 
-        connectorFolder.mkdirs();
+        assert connectorFolder.mkdirs();
 
         try {
             final String resourceName = "src/net/dummy/MyConnectorImpl.java";
@@ -65,7 +66,6 @@ public class ProcessManagerTest {
             if (oldBonitaHome != null) {
                 System.setProperty(BonitaHome.BONITA_HOME, oldBonitaHome);
             }
-            IOUtil.deleteDir(homeFile);
         }
     }
 

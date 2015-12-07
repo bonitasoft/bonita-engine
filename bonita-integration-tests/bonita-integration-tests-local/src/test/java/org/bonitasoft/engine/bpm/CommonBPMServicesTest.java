@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm;
 
-import static org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -82,7 +79,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
@@ -92,10 +89,8 @@ import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,9 +99,12 @@ import org.slf4j.LoggerFactory;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-@RunWith(BonitaTestRunner.class)
-@Initializer(LocalServerTestsInitializer.class)
 public class CommonBPMServicesTest {
+
+    @Rule
+    public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.create()
+            .addCustomConfig(BonitaEngineRule.CUSTOM_CONFIG_PLATFORM, "bonita-platform-custom.xml")
+            .addCustomConfig(BonitaEngineRule.CUSTOM_CONFIG_TENANT, "bonita-tenants-custom.xml");
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
     protected static SessionAccessor sessionAccessor;
@@ -123,12 +121,6 @@ public class CommonBPMServicesTest {
     };
     private APISession apiSession = null;
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        tenantServiceAccessors = new HashMap<>();
-        APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
-        tenantId = apiSession.getTenantId();
-    }
 
     protected ServiceAccessorFactory getServiceAccessorFactory() {
         return ServiceAccessorFactory.getInstance();
@@ -171,6 +163,9 @@ public class CommonBPMServicesTest {
 
     @Before
     public void doNotOverrideBefore() throws Exception {
+        tenantServiceAccessors = new HashMap<>();
+        apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+        tenantId = apiSession.getTenantId();
         if (sessionAccessor == null) {
             sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
         }

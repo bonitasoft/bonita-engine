@@ -13,17 +13,14 @@
  **/
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.event.LocalInterruptingTimerBoundaryEventIT;
 import org.bonitasoft.engine.event.LocalTimerEventIT;
 import org.bonitasoft.engine.job.JobExecutionIT;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.theme.ThemeIT;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         JobExecutionIT.class,
         BPMLocalIT.class,
@@ -37,7 +34,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ThemeIT.class,
         PermissionAPIIT.class
 })
-@Initializer(LocalServerTestsInitializer.class)
+@RunWith(Suite.class)
 public class BPMLocalSuiteTests {
 
 }

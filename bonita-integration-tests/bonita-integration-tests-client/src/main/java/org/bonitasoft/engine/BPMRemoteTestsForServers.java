@@ -35,12 +35,11 @@ import org.bonitasoft.engine.profile.ProfileIT;
 import org.bonitasoft.engine.search.SearchProcessInstanceIT;
 import org.bonitasoft.engine.supervisor.ProcessSupervisedIT;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({
         RemoteEngineIT.class, // this class is only in remote (we test that server stack trace are reported in client side)
         ImportActorMappingIT.class,
@@ -66,20 +65,6 @@ import org.junit.runners.Suite.SuiteClasses;
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
-@Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 
-    private static APITestUtil apiTestUtil = new APITestUtil();
-
-    public static void beforeAll() throws Exception {
-        System.err.println("=================== BPMRemoteTestsForServers.beforeClass()");
-        apiTestUtil.createPlatformStructure();
-        apiTestUtil.initializeAndStartPlatformWithDefaultTenant(true);
-    }
-
-    public static void afterAll() throws Exception {
-        System.err.println("=================== BPMRemoteTestsForServers.afterClass()");
-        apiTestUtil.stopAndCleanPlatformAndTenant(true);
-        apiTestUtil.deletePlatformStructure();
-    }
 }

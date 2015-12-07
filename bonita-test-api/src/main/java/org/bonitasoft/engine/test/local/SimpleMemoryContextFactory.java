@@ -11,22 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.runner;
+package org.bonitasoft.engine.test.local;
 
-import org.junit.runner.Runner;
-import org.junit.runners.model.Statement;
+import java.util.Hashtable;
 
-final class WithGlobalBefore extends Statement {
+import javax.naming.Context;
+import javax.naming.spi.InitialContextFactory;
 
-    private final Statement classBlock;
+/**
+ * A factory of a naming context that uses the memory as dictionary of objects. Useful to tests
+ * objects using JNDI to get dependencies.
+ */
+public class SimpleMemoryContextFactory implements InitialContextFactory {
 
-    WithGlobalBefore(final Statement classBlock, final Runner testRunner) {
-        this.classBlock = classBlock;
-    }
+    private static final SimpleMemoryContext context = new SimpleMemoryContext();
 
     @Override
-    public void evaluate() throws Throwable {
-        BonitaTestContext.initializeEngine();
-        classBlock.evaluate();
+    public Context getInitialContext(final Hashtable<?, ?> environment) {
+        return context;
     }
 }

@@ -67,7 +67,6 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescript
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
@@ -123,7 +122,6 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.check.CheckProcessInstanceIsArchived;
 import org.bonitasoft.engine.test.wait.WaitForArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
-import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
@@ -384,7 +382,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final List<User> users)
-                    throws BonitaException {
+            throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableProcessWithActor(businessArchive, actorName, users);
     }
@@ -478,7 +476,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final Group... groups)
-                    throws BonitaException {
+            throws BonitaException {
         final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         for (final Group group : groups) {
@@ -582,7 +580,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
-                    throws BonitaException {
+            throws BonitaException {
         return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
@@ -871,23 +869,6 @@ public class APITestUtil extends PlatformTestUtil {
                 DEFAULT_TIMEOUT);
     }
 
-    protected void printArchivedFlowNodes(final ProcessInstance processInstance) throws SearchException {
-        System.err.println("Archived flownodes: ");
-        final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
-                new SearchOptionsBuilder(0, 100).filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId())
-                        .done())
-                .getResult();
-        System.err.println(archivedFlowNodeInstances);
-    }
-
-    protected void printFlowNodes(final ProcessInstance processInstance) throws SearchException {
-        System.err.println("Active flownodes: ");
-        final List<FlowNodeInstance> flownodes = getProcessAPI().searchFlowNodeInstances(
-                new SearchOptionsBuilder(0, 100).filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId()).done())
-                .getResult();
-        System.err.println(flownodes);
-    }
-
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,
             final int timeout) throws Exception {
         Map<String, Serializable> params;
@@ -935,13 +916,6 @@ public class APITestUtil extends PlatformTestUtil {
     public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName, final TestStates state) throws Exception {
         final Long activityId = waitForFlowNode(processInstance.getId(), state, flowNodeName, true, DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
-    }
-
-    public FlowNodeInstance waitForFlowNodeInInterruptingState(final ProcessInstance processInstance, final String flowNodeName,
-            final boolean useRootProcessInstance) throws Exception {
-        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.INTERRUPTED, flowNodeName, useRootProcessInstance,
-                DEFAULT_TIMEOUT);
-        return getFlowNode(flowNodeInstanceId);
     }
 
     private FlowNodeInstance getFlowNode(final Long flowNodeInstanceId) throws FlowNodeInstanceNotFoundException {
@@ -993,13 +967,6 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public void waitForDataValue(final ProcessInstance processInstance, final String dataName, final String expectedValue) throws Exception {
-        final WaitForDataValue waitForConnector = new WaitForDataValue(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), dataName, expectedValue,
-                getProcessAPI());
-        assertTrue("Can't find data <" + dataName + "> with value <" + expectedValue + ">", waitForConnector.waitUntil());
-    }
-
-    @Deprecated
     public WaitForEvent waitForEventInWaitingState(final ProcessInstance processInstance, final String eventName) throws Exception {
         return waitForEvent(processInstance, eventName, TestStates.WAITING);
     }
@@ -1023,11 +990,6 @@ public class APITestUtil extends PlatformTestUtil {
                 expectedNbOfOpenActivities, getProcessAPI());
         checkNbOfOpenActivities.waitUntil();
         assertEquals(message, expectedNbOfOpenActivities, checkNbOfOpenActivities.getNumberOfOpenActivities());
-    }
-
-    @Deprecated
-    public CheckNbPendingTaskOf checkNbPendingTaskOf(final User user) throws Exception {
-        return checkNbPendingTaskOf(1, user);
     }
 
     @Deprecated
@@ -1147,7 +1109,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
             final boolean isTransient)
-                    throws InvalidExpressionException, UpdateException {
+            throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<>();
         operations.add(stringOperation);

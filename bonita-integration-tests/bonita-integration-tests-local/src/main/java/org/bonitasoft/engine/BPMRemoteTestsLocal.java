@@ -14,8 +14,8 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
-import org.bonitasoft.engine.activity.TaskTests;
 import org.bonitasoft.engine.activity.ContractIT;
+import org.bonitasoft.engine.activity.TaskTests;
 import org.bonitasoft.engine.business.data.BDRepositoryIT;
 import org.bonitasoft.engine.command.CommandsTests;
 import org.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
@@ -30,8 +30,8 @@ import org.bonitasoft.engine.process.ProcessTests;
 import org.bonitasoft.engine.profile.ProfileAllTest;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
 import org.bonitasoft.engine.supervisor.SupervisorTests;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
@@ -54,8 +54,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
-@RunWith(BonitaSuiteRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
+@RunWith(Suite.class)
 public class BPMRemoteTestsLocal {
 
 }

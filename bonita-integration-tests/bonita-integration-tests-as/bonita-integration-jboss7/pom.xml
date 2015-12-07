@@ -41,7 +41,7 @@
 	<dependencies>
         <dependency>
             <groupId>org.bonitasoft.engine.test</groupId>
-            <artifactId>bonita-deploy-ear3</artifactId>                        
+            <artifactId>bonita-deploy-ear3</artifactId>
             <version>${project.version}</version>
             <type>ear</type>
         </dependency>
@@ -242,7 +242,7 @@
                                                  value="h2"/>
                                             </else>
                                         </if>
-                                        
+
 										<!-- Create default bonita.home folder -->
                                         <copy todir="${bonita.home}" verbose="true">
                                             <fileset dir="${distrib.dir}/resources/bonita-home/" />
@@ -284,7 +284,7 @@
 											</fileset>
 										</path>
 
-									    <!-- 
+									    <!--
                                             in jboss 7, all port are available even when everything is not deployed...
                                             Thus, we have to force a sleep task and not only wait for a port to be ready
                                         -->
@@ -301,7 +301,7 @@
 											<sysproperty key="bonita.home" value="${bonita.home}" />
 											<formatter type="xml" />
 											<test todir="${report.xml}" name="${test.class}" />
-                                           <!--  <jvmarg value="-Xdebug"/> 
+                                           <!--  <jvmarg value="-Xdebug"/>
                                             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/> -->
 										</junit>
 										<junitreport todir="${report.xml}">
@@ -384,7 +384,7 @@
 				</plugins>
 			</build>
 		</profile>
-        
+
 		<!-- the profile package-all is declared here only to deactivate the profile tests (active by default) -->
 		<profile>
 	      <id>package-all</id>

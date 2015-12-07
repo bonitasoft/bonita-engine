@@ -11,23 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.local;
+package org.bonitasoft.engine.test.local;
 
-import java.util.Hashtable;
+import javax.naming.CompositeName;
+import javax.naming.Name;
+import javax.naming.NameParser;
+import javax.naming.NamingException;
 
-import javax.naming.Context;
-import javax.naming.spi.InitialContextFactory;
+public class SimpleNameParser implements NameParser {
 
-/**
- * A factory of a naming context that uses the memory as dictionary of objects. Useful to tests
- * objects using JNDI to get dependencies.
- */
-public class SimpleMemoryContextFactory implements InitialContextFactory {
-
-    private static final SimpleMemoryContext context = new SimpleMemoryContext();
+    public SimpleNameParser(final String name) {
+        // TODO Auto-generated constructor stub
+    }
 
     @Override
-    public Context getInitialContext(final Hashtable<?, ?> environment) {
-        return context;
+    public Name parse(final String name) throws NamingException {
+        return new CompositeName(name);
     }
+
 }
