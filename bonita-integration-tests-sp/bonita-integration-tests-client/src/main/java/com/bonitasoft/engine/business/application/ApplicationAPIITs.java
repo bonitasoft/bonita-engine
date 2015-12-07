@@ -8,14 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({
         ApplicationAPIApplicationIT.class,
         ApplicationAPIApplicationPageIT.class,

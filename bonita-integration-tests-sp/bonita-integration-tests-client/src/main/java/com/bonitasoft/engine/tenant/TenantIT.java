@@ -8,11 +8,31 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.List;
 
+import com.bonitasoft.engine.APITestSPUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.api.IdentityAPI;
+import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.TenantStatusException;
+import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceSearchDescriptor;
+import com.bonitasoft.engine.platform.TenantActivationException;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
+import com.bonitasoft.engine.test.junit.BonitaEngineSPRule;
 import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
@@ -39,39 +59,26 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
+import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.bonitasoft.engine.theme.ThemeType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.APIClient;
 import com.bonitasoft.engine.api.IdentityAPI;
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.TenantStatusException;
-import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceSearchDescriptor;
-import com.bonitasoft.engine.platform.TenantActivationException;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
-
 /**
  * @author Yanyan Liu
  * @author Celine Souchet
  */
-@RunWith(BonitaTestRunner.class)
 public class TenantIT {
+
+    @Rule
+    public BonitaEngineRule bonitaEngineSPRule = BonitaEngineSPRule.create();
 
     private final static String userName = "tenant_name";
 

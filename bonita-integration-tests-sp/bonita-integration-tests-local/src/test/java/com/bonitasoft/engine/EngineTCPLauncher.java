@@ -8,18 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite.SuiteClasses;
-
 import com.bonitasoft.engine.connector.ConnectorExecutionTimeOutTest;
 import com.bonitasoft.engine.connector.ConnectorImplementationLocalSPTest;
 import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
+import org.bonitasoft.engine.test.BPMLocalSuiteTests;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({ BPMSPTests.class,
         BPMLocalSuiteTests.class,
         LocalLogTest.class,
@@ -29,7 +27,6 @@ import com.bonitasoft.engine.theme.ThemeTest;
         ThemeTest.class,
         PageAPILocalIT.class,
         TenantMaintenanceLocalIT.class })
-@Initializer(LocalServerTestsInitializerSP.class)
 public class EngineTCPLauncher {
 
 }

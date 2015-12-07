@@ -16,12 +16,11 @@ import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
 import org.bonitasoft.engine.BPMRemoteTestsLocal;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({BPMSPTests.class,
         BPMLocalSuiteTests.class,
         BPMRemoteTestsLocal.class,
@@ -37,7 +36,6 @@ import org.junit.runners.Suite.SuiteClasses;
         BDRepositoryLocalIT.class,
         AllBPMSPTests.class
 })
-@Initializer(LocalServerTestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
 
 }
