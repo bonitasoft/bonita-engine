@@ -31,32 +31,32 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 public class SelectBusinessDataDescriptorBuilder {
 
     public static SelectOneDescriptor<SRefBusinessDataInstance> getSRefBusinessDataInstance(final String name, final long processInstanceId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", name);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectOneDescriptor<SRefBusinessDataInstance>("getSRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
+        return new SelectOneDescriptor<>("getSRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
     }
 
     public static SelectListDescriptor<SRefBusinessDataInstance> getSRefBusinessDataInstances(final long processInstanceId, final int startIndex,
             final int maxResults) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put("processInstanceId", processInstanceId);
         final QueryOptions options = new QueryOptions(startIndex, maxResults);
-        return new SelectListDescriptor<SRefBusinessDataInstance>("getSRefBusinessDataInstancesOfProcess", parameters, SRefBusinessDataInstance.class,
+        return new SelectListDescriptor<>("getSRefBusinessDataInstancesOfProcess", parameters, SRefBusinessDataInstance.class,
                 options);
     }
 
     public static SelectOneDescriptor<SRefBusinessDataInstance> getSFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", name);
         parameters.put("flowNodeInstanceId", flowNodeInstanceId);
-        return new SelectOneDescriptor<SRefBusinessDataInstance>("getSFlowNodeRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
+        return new SelectOneDescriptor<>("getSFlowNodeRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
     }
 
     public static SelectOneDescriptor<Integer> getNumberOfDataOfMultiRefBusinessData(final String name, final long processInstanceId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", name);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectOneDescriptor<Integer>("getNumberOfDataOfMultiRefBusinessData", parameters, SMultiRefBusinessDataInstance.class);
+        return new SelectOneDescriptor<>("getNumberOfDataOfMultiRefBusinessData", parameters, SMultiRefBusinessDataInstance.class);
     }
 }

@@ -20,13 +20,11 @@ import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import groovy.lang.GroovyShell;
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
@@ -48,6 +46,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import groovy.lang.GroovyShell;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GroovyScriptExpressionExecutorCacheStrategyTest {
@@ -76,13 +76,13 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     public void setup() throws Exception {
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
-        final List<CacheConfiguration> cacheConfigurations = Arrays.asList(cacheConfiguration);
+        final List<CacheConfiguration> cacheConfigurations = Collections.singletonList(cacheConfiguration);
         cacheService = new EhCacheCacheService(logger,  cacheConfigurations, defaultCacheConfiguration, diskStorePath, 1);
         cacheService.start();
         groovyScriptExpressionExecutorCacheStrategy = new GroovyScriptExpressionExecutorCacheStrategy(cacheService, classLoaderService, logger);
         doReturn(GroovyScriptExpressionExecutorCacheStrategyTest.class.getClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
         context = new HashMap<>();
-        context.put(ExpressionExecutorStrategy.DEFINITION_ID,123456789l);
+        context.put(ExpressionExecutorStrategy.DEFINITION_ID, 123456789L);
     }
 
     @After
@@ -100,8 +100,8 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         // given
 
         // when
-        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
-        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(13l);
+        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
+        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(13L);
 
         // then
         assertThat(shell1).isNotNull();
@@ -145,20 +145,19 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test
     public void should_getShell_return_same_shell_for_1_definition() throws Exception {
         // when
-        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
-        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12l);
+        final GroovyShell shell1 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
+        final GroovyShell shell2 = groovyScriptExpressionExecutorCacheStrategy.getShell(12L);
 
         // then
         assertThat(shell1).isNotNull();
         assertThat(shell1).isEqualTo(shell2);
     }
 
-
     @Test
     public void should_getScriptFromCache_return_a_the_same_script_class_if_in_same_definition() throws Exception {
         // when
-        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
-        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12L);
+        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12L);
 
         // then
         assertThat(script1).isNotNull();
@@ -169,14 +168,14 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test
     public void should_getScriptFromCache_should_cache_only_once_when_on_different_threads() throws Exception {
         // when
-        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12L);
 
         Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
-                    script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+                    script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12L);
                 } catch (SCacheException | SClassLoaderException e) {
                     e.printStackTrace();
                 }
@@ -195,8 +194,8 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test
     public void should_getScriptFromCache_return_different_script_if_different_definition() throws Exception {
         // when
-        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
-        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 13l);
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12L);
+        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 13L);
 
         // then
         assertThat(script1).isNotNull();
@@ -207,8 +206,8 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test
     public void should_getScriptFromCache_return_different_script_if_content_is_different_definition() throws Exception {
         // when
-        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent1", 12l);
-        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent2", 12l);
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent1", 12L);
+        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent2", 12L);
 
         // then
         assertThat(script1).isNotNull();
@@ -229,9 +228,10 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test
     public void should_evaluate_return_the_evaluation() throws Exception {
         //given
-        final SExpressionImpl expression = new SExpressionImpl("myExpr", "'toto'", null, "java.lang.String", null, Collections.<SExpression>emptyList());
+        final SExpressionImpl expression = new SExpressionImpl("myExpr", "'toto'", null, "java.lang.String", null, Collections.<SExpression> emptyList());
         // when
-        final Object evaluate = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+        final Object evaluate = groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, Collections.<Integer, Object> emptyMap(),
+                ContainerState.ACTIVE);
 
         // then
         assertThat(evaluate).isEqualTo("toto");
@@ -240,9 +240,10 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test(expected = SExpressionEvaluationException.class)
     public void should_evaluate_throw_SExpressionEvaluationException_when_script_throws_Error() throws Exception {
         //given
-        final SExpressionImpl expression = new SExpressionImpl("myExpr", "throw new java.lang.NoClassDefFoundError()", null, "java.lang.String", null, Collections.<SExpression>emptyList());
+        final SExpressionImpl expression = new SExpressionImpl("myExpr", "throw new java.lang.NoClassDefFoundError()", null, "java.lang.String", null,
+                Collections.<SExpression> emptyList());
         // when
-        groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+        groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
 
         // then
         //exception
@@ -251,9 +252,10 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test(expected = SExpressionEvaluationException.class)
     public void should_evaluate_throw_SExpressionEvaluationException_when_script_throws_Throwable() throws Exception {
         //given
-        final SExpressionImpl expression = new SExpressionImpl("myExpr", "throw new java.lang.Throwable()", null, "java.lang.String", null, Collections.<SExpression>emptyList());
+        final SExpressionImpl expression = new SExpressionImpl("myExpr", "throw new java.lang.Throwable()", null, "java.lang.String", null,
+                Collections.<SExpression> emptyList());
         // when
-        groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, Collections.<Integer, Object>emptyMap(), ContainerState.ACTIVE);
+        groovyScriptExpressionExecutorCacheStrategy.evaluate(expression, context, Collections.<Integer, Object> emptyMap(), ContainerState.ACTIVE);
         // then
         //exception
     }

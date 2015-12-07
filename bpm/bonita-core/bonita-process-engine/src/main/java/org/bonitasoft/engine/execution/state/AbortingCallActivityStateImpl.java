@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.ContainerRegistry;
@@ -34,10 +35,10 @@ public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionSt
 
     public AbortingCallActivityStateImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final ContainerRegistry containerRegistry, final ArchiveService archiveService, final SCommentService commentService,
-            final DocumentService documentService, final TechnicalLoggerService logger,
-                                         final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
+            final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
         super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService, documentService,
-                logger, processDefinitionService, connectorInstanceService, classLoaderService);
+                logger, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
     }
 
     @Override

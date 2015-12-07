@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
@@ -47,7 +48,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     private final String identifier;
 
     public ArchiveProcessInstancesHandler(final long tenantId) {
-        this(tenantId,  UUID.randomUUID().toString());
+        this(tenantId, UUID.randomUUID().toString());
     }
 
     public ArchiveProcessInstancesHandler(final long tenantId, final String identifier) {
@@ -69,9 +70,10 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
             final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
             ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
+            RefBusinessDataService refBusinessDataService = tenantServiceAccessor.getRefBusinessDataService();
 
-            ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService,
-                    logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService);
+            new ProcessArchiver().archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService,
+                    logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
         } catch (SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }

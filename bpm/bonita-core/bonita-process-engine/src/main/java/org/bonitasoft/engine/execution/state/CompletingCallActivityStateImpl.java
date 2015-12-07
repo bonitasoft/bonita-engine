@@ -26,6 +26,7 @@ import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefiniti
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -55,15 +56,19 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
+
     private final ClassLoaderService classLoaderService;
 
     private final DocumentService documentService;
+
+    private final RefBusinessDataService refBusinessDataService;
 
     public CompletingCallActivityStateImpl(final StateBehaviors stateBehaviors, final OperationService operationService,
             final ProcessInstanceService processInstanceService,
             final DocumentService documentService, final TechnicalLoggerService logger,
             final ArchiveService archiveService, final SCommentService commentService,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
+            ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
         super(stateBehaviors);
         this.operationService = operationService;
         this.processInstanceService = processInstanceService;
@@ -74,6 +79,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
+        this.refBusinessDataService = refBusinessDataService;
     }
 
     @Override
@@ -92,10 +98,11 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             final SExpressionContext expressionContext = new SExpressionContext(childProcInst.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                     childProcInst.getProcessDefinitionId());
             expressionContext.setParentProcessDefinitionId(instance.getProcessDefinitionId());
-            operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
+            operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    expressionContext);
             // archive child process instance
-            ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
-                    commentService, processDefinitionService, connectorInstanceService, classLoaderService);
+            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
+                    commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

@@ -74,7 +74,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     @Override
     public SRefBusinessDataInstance getRefBusinessDataInstance(final String name, final long processInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
-        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstance(name, processInstanceId);
+        final SelectOneDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstance(name,
+                processInstanceId);
         final SRefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
         if (ref == null) {
             throw new SRefBusinessDataInstanceNotFoundException(processInstanceId, name);
@@ -97,7 +98,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
 
     @Override
     public SRefBusinessDataInstance addRefBusinessDataInstance(final SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException {
-        final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUISNESS_DATA_INSTANCE_ADDED);
+        final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUSINESS_DATA_INSTANCE_ADDED);
         final InsertRecord insertRecord = new InsertRecord(instance);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(REF_BUSINESS_DATA_INSTANCE, EventActionType.CREATED)) {
@@ -129,7 +130,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         logBuilder.setActionType(actionType);
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder,
+            final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -142,7 +144,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     @Override
     public void updateRefBusinessDataInstance(final SSimpleRefBusinessDataInstance refBusinessDataInstance, final Long dataId)
             throws SRefBusinessDataInstanceModificationException {
-        final Map<String, Object> fields = new HashMap<String, Object>();
+        final Map<String, Object> fields = new HashMap<>();
         fields.put("dataId", dataId);
         updateRefBusinessDataInstance(refBusinessDataInstance, fields);
     }
@@ -150,7 +152,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     @Override
     public void updateRefBusinessDataInstance(final SMultiRefBusinessDataInstance refBusinessDataInstance, final List<Long> dataIds)
             throws SRefBusinessDataInstanceModificationException {
-        final Map<String, Object> fields = new HashMap<String, Object>();
+        final Map<String, Object> fields = new HashMap<>();
         fields.put("dataIds", dataIds);
         updateRefBusinessDataInstance(refBusinessDataInstance, fields);
     }
@@ -175,6 +177,11 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         final SelectOneDescriptor<Integer> descriptor = SelectBusinessDataDescriptorBuilder.getNumberOfDataOfMultiRefBusinessData(name,
                 processInstanceId);
         return persistenceRead.selectOne(descriptor);
+    }
+
+    @Override
+    public void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SRefBusinessDataInstanceModificationException {
+        throw new RuntimeException("not yet implemented");
     }
 
     @Override

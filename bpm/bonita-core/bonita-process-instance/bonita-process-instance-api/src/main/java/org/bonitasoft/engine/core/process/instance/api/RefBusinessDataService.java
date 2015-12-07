@@ -28,15 +28,14 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public interface RefBusinessDataService {
 
-    String NEW_REF_BUISNESS_DATA_INSTANCE_ADDED = "New reference to a business data added";
+    String NEW_REF_BUSINESS_DATA_INSTANCE_ADDED = "New reference to a business data added";
 
     String REF_BUSINESS_DATA_INSTANCE = "REF_BUSINESS_DATA_INSTANCE";
 
     SRefBusinessDataInstance getRefBusinessDataInstance(String name, long processInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
-    List<SRefBusinessDataInstance> getRefBusinessDataInstances(long processInstanceId, int startIndex, int maxResults)
-            throws SBonitaReadException;
+    List<SRefBusinessDataInstance> getRefBusinessDataInstances(long processInstanceId, int startIndex, int maxResults) throws SBonitaReadException;
 
     SRefBusinessDataInstance getFlowNodeRefBusinessDataInstance(String name, long flowNodeInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
@@ -50,5 +49,7 @@ public interface RefBusinessDataService {
             throws SRefBusinessDataInstanceModificationException;
 
     int getNumberOfDataOfMultiRefBusinessData(String name, long processInstanceId) throws SBonitaReadException;
+
+    void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SRefBusinessDataInstanceModificationException; // TODO; specific exception
 
 }
