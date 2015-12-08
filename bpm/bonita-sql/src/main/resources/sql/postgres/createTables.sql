@@ -81,7 +81,7 @@ CREATE TABLE arch_process_comment(
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid);
+CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceobjectid, tenantid);
 CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid);
 CREATE TABLE process_comment (
   tenantid INT8 NOT NULL,
