@@ -30,7 +30,7 @@ public class SDependencyBuilderFactoryImpl implements SDependencyBuilderFactory 
         final SDependencyImpl object;
         switch (artifactType) {
             case PROCESS:
-                object = new SDependencyImpl(artifactId + "_" + name, artifactId + "_" + fileName, value);
+                object = new SDependencyImpl(artifactId + "_" + name,fileName, value);
                 break;
             default:
                 object = new SDependencyImpl(name, fileName, value);

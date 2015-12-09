@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -116,14 +116,14 @@ public class PageAPIDelegateTest {
     @Mock
     private FormMappingService formMappingService;
     @Mock
-    private DependencyResolver dependencyResolver;
+    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
     @Before
     public void before() {
         doReturn(pageService).when(serviceAccessor).getPageService();
         doReturn(pageMappingService).when(serviceAccessor).getPageMappingService();
         doReturn(formMappingService).when(serviceAccessor).getFormMappingService();
-        doReturn(dependencyResolver).when(serviceAccessor).getDependencyResolver();
+        doReturn(businessArchiveArtifactsManager).when(serviceAccessor).getBusinessArchiveArtifactsManager();
         doReturn(mock(SearchEntitiesDescriptor.class)).when(serviceAccessor).getSearchEntitiesDescriptor();
         pageAPIDelegate = spy(new PageAPIDelegate(serviceAccessor, userId));
     }
@@ -204,8 +204,8 @@ public class PageAPIDelegateTest {
 
         pageAPIDelegate.deletePage(PAGE_ID);
 
-        verify(dependencyResolver).resolveDependencies(PROCESS_ID_1, serviceAccessor);
-        verify(dependencyResolver).resolveDependencies(PROCESS_ID_2, serviceAccessor);
+        verify(businessArchiveArtifactsManager).resolveDependencies(PROCESS_ID_1, serviceAccessor);
+        verify(businessArchiveArtifactsManager).resolveDependencies(PROCESS_ID_2, serviceAccessor);
     }
 
     private SFormMapping formMapping(Long processId) {

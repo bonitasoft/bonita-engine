@@ -41,6 +41,10 @@ public class SConnectorAdapter implements SConnector {
         this.connector = connector;
     }
 
+    public Connector getConnector() {
+        return connector;
+    }
+
     @Override
     public void setInputParameters(final Map<String, Object> parameters) {
         final APIAccessor apiAccessor = (APIAccessor) parameters.remove("connectorApiAccessor");

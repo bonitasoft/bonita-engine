@@ -23,8 +23,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.command.DeleteSCommand;
 import org.bonitasoft.engine.api.impl.transaction.command.GetCommands;
-import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
-import org.bonitasoft.engine.api.impl.transaction.dependency.DeleteSDependency;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.command.CommandDescriptor;
@@ -49,6 +47,7 @@ import org.bonitasoft.engine.command.model.SCommandUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
+import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -93,12 +92,11 @@ public class CommandAPIImpl implements CommandAPI {
         // FIXME method in dependency service which get a dependency using its name
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jar, tenantAccessor.getTenantId(), ScopeType.TENANT);
         try {
-            addSDependency.execute();
+            dependencyService.createMappedDependency(name, jar, name + ".jar", tenantAccessor.getTenantId(), ScopeType.TENANT);
         } catch (final SDependencyAlreadyExistsException e) {
             throw new AlreadyExistsException(e);
-        } catch (final SBonitaException sbe) {
+        } catch (final SDependencyException sbe) {
             throw new CreationException(sbe);
         }
     }
@@ -108,9 +106,8 @@ public class CommandAPIImpl implements CommandAPI {
         // FIXME it is maybe too much to delete dependency mappings with the dependency -> better if there are mappings of this dependency throws an exception.
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DeleteSDependency deleteSDependency = new DeleteSDependency(dependencyService, name);
         try {
-            deleteSDependency.execute();
+            dependencyService.deleteDependency(name);
         } catch (final SDependencyNotFoundException sdnfe) {
             throw new DependencyNotFoundException(sdnfe);
         } catch (final SBonitaException sbe) {
@@ -126,10 +123,9 @@ public class CommandAPIImpl implements CommandAPI {
             existingCommandDescriptor = getCommand(name);
         } catch (final CommandNotFoundException notFoundE) {
             // Nothing to do : no command with that name exists.
-        } finally {
-            if (existingCommandDescriptor != null) {
-                throw new AlreadyExistsException("A command with name \"" + name + "\" already exists");
-            }
+        }
+        if (existingCommandDescriptor != null) {
+            throw new AlreadyExistsException("A command with name \"" + name + "\" already exists");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CommandService commandService = tenantAccessor.getCommandService();
@@ -158,12 +154,8 @@ public class CommandAPIImpl implements CommandAPI {
             final String tenantCommandClassName = sCommand.getImplementation();
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             return (TenantCommand) contextClassLoader.loadClass(tenantCommandClassName).newInstance();
-        } catch (final ClassNotFoundException cnfe) {
-            throw new SCommandParameterizationException(cnfe);
-        } catch (final InstantiationException ie) {
-            throw new SCommandParameterizationException(ie);
-        } catch (final IllegalAccessException iae) {
-            throw new SCommandParameterizationException(iae);
+        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new SCommandParameterizationException(e);
         }
     }
 
@@ -317,9 +309,7 @@ public class CommandAPIImpl implements CommandAPI {
             final EntityUpdateDescriptor changeDescriptor = getCommandUpdateDescriptor(updateDescriptor, commandUpdateBuilder);
             final SCommand sCommand = commandFetcher.fetch(commandService);
             commandService.update(sCommand, changeDescriptor);
-        } catch (final SCommandNotFoundException scnfe) {
-            throw new UpdateException(scnfe);
-        } catch (final SCommandUpdateException e) {
+        } catch (final SCommandNotFoundException | SCommandUpdateException e) {
             throw new UpdateException(e);
         }
     }

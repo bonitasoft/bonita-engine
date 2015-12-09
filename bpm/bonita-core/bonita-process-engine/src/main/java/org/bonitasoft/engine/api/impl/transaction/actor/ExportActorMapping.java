@@ -69,7 +69,7 @@ public class ExportActorMapping implements TransactionContentWithResult<String> 
         }
     }
 
-    private ActorMapping getActorMapping() throws SBonitaException {
+    public ActorMapping getActorMapping() throws SBonitaException {
         final ActorMapping actorMapping = new ActorMapping();
         QueryOptions queryOptions = new QueryOptions(0, 100, SActor.class, "id", OrderByType.ASC);
         List<SActor> actors = actorMappingService.getActors(processDefinitionId, queryOptions);

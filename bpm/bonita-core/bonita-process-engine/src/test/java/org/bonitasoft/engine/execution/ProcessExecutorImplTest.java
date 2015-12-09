@@ -80,6 +80,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.work.WorkService;
@@ -316,7 +317,7 @@ public class ProcessExecutorImplTest {
 
     @Test
     public void should_getInitialDocumentValue_return_the_document_value_from_expression() throws BonitaHomeNotSetException, STenantIdNotSetException,
-            IOException {
+            IOException, SBonitaReadException {
         //given
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SExpression initialValueExpression = new SExpressionImpl();
@@ -332,7 +333,7 @@ public class ProcessExecutorImplTest {
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_url() throws BonitaHomeNotSetException, STenantIdNotSetException, IOException {
+    public void should_getInitialDocumentValue_return_the_document_value_from_url() throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
         //given
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         SDocumentDefinitionImpl documentDefinition = new SDocumentDefinitionImpl("myDoc");
@@ -345,7 +346,7 @@ public class ProcessExecutorImplTest {
     }
 
     @Test
-    public void should_getInitialDocumentValue_return_the_document_value_from_file() throws BonitaHomeNotSetException, STenantIdNotSetException, IOException {
+    public void should_getInitialDocumentValue_return_the_document_value_from_file() throws BonitaHomeNotSetException, STenantIdNotSetException, IOException, SBonitaReadException {
         //given
         ProcessExecutorImpl processExecutor = spy(processExecutorImpl);
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);

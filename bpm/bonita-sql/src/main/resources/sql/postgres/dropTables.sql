@@ -62,3 +62,4 @@ DROP TABLE form_mapping;
 DROP TABLE page_mapping;
 DROP TABLE process_content;
 DROP TABLE proc_parameter;
+DROP TABLE bar_resource;

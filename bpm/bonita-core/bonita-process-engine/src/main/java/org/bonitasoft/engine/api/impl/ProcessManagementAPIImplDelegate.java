@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
@@ -39,12 +38,12 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -85,11 +84,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     public void deleteProcessDefinition(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
-        final DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processDefinitionId);
-        deleteProcess.execute();
-
-        BonitaHomeServer.getInstance().getProcessManager().deleteProcess(tenantAccessor.getTenantId(), processDefinitionId);
+        deleteArchivedProcessInstances(processDefinitionId, processInstanceService);
+        tenantAccessor.getBusinessArchiveService().delete(processDefinitionId);
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
@@ -97,9 +95,19 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-    protected DeleteProcess instantiateDeleteProcessTransactionContent(final long processId) {
-        return new DeleteProcess(getTenantAccessor(), processId);
+    void deleteArchivedProcessInstances(long processDefinitionId, ProcessInstanceService processInstanceService) throws SBonitaException {
+        List<Long> sourceProcessInstanceIds;
+        do {
+            sourceProcessInstanceIds = processInstanceService.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
+                    100, OrderByType.DESC);
+            for (final Long orgProcessId : sourceProcessInstanceIds) {
+                processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);
+                processInstanceService.deleteArchivedProcessInstancesOfProcessInstance(orgProcessId);
+            }
+
+        } while (!sourceProcessInstanceIds.isEmpty());
     }
+
 
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();

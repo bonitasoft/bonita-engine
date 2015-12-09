@@ -47,7 +47,6 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtils;
@@ -148,13 +147,10 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
-        final SDependency sDependency = createSDependency(tenantId, serverBdmJar);
         try {
-            dependencyService.createDependency(sDependency);
-            final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
-            dependencyService.createDependencyMapping(sDependencyMapping);
+            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_NAME + ".jar", tenantId, ScopeType.TENANT);
             update(model.getBusinessObjectsClassNames());
-            return sDependency.getId();
+            return mappedDependency.getId();
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
@@ -225,11 +221,6 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
 
         return IOUtil.generateZip(resources);
-    }
-
-    protected SDependency createSDependency(final long tenantId, final byte[] transformedBdrArchive) {
-        return BuilderFactory.get(SDependencyBuilderFactory.class)
-                .createNewInstance(BDR_DEPENDENCY_NAME, tenantId, ScopeType.TENANT, BDR_DEPENDENCY_NAME + ".jar", transformedBdrArchive).done();
     }
 
     protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {

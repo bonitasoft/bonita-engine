@@ -50,7 +50,7 @@ public class AddSPlatformCommandDependency implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, name + ".jar", jar).done();
+        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, name, jar).done();
         this.dependencyService.createDependency(sDependency);
         final SDependencyMapping sDependencyMapping = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class)
                 .createNewInstance(sDependency.getId(), artifactId, artifactType).done();
