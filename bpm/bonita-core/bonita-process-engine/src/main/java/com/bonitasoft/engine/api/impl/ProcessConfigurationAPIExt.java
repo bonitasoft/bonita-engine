@@ -58,7 +58,7 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl {
         try {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
             formMappingService.update(sFormMapping, url, pageId);
-            tenantAccessor.getDependencyResolver().resolveDependencies(sFormMapping.getProcessDefinitionId(), tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(sFormMapping.getProcessDefinitionId(), tenantAccessor);
             return ModelConvertor.toFormMapping(sFormMapping, new FormRequiredAnalyzer(tenantAccessor.getProcessDefinitionService()));
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);

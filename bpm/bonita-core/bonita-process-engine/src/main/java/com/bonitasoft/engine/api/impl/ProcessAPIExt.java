@@ -52,7 +52,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
-import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -112,7 +111,6 @@ import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -184,12 +182,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition;
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
-            throw new ImportParameterException(e);
-        }
+            final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+            try {
+                sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
+                throw new ImportParameterException(e);
+            }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final Set<SParameterDefinition> params = sDefinition.getParameters();
@@ -224,7 +222,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
 
         // update process resolution:
-        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+        tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
     }
 
     @Override
@@ -241,7 +239,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new ParameterNotFoundException(processDefinitionId, parameterName);
             }
             parameterService.update(processDefinitionId, parameterName, parameterValue);
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SParameterNameNotFoundException e) {
             throw new ParameterNotFoundException(processDefinitionId, parameterName);
         } catch (final SBonitaException e) {
@@ -489,10 +487,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final long tenantId = tenantAccessor.getTenantId();
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
+            connectorService.setConnectorImplementation(sProcessDefinition, connectorId, connectorVersion, connectorImplementationArchive);
         } catch (final SInvalidConnectorImplementationException e) {
             throw new InvalidConnectorImplementationException(e);
         } catch (final SBonitaException e) {
@@ -524,17 +521,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         flowNodeRetrier.retry(activityInstanceId);
     }
 
-    @Override
-    // TODO delete files after use/if an exception occurs
-    public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
-        try {
-            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantAccessor.getTenantId(), processDefinitionId,
-                    exportActorMapping(processDefinitionId), exportParameters(tenantAccessor, processDefinitionId));
-        } catch (Exception e) {
-            throw new ProcessExportException(e);
-        }
-    }
 
     @Override
     public int getNumberOfParameterInstances(final long processDefinitionId) {
@@ -544,7 +530,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -583,7 +569,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(saprocessInstance.getArchiveDate().getTime());
 
-            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+            final ConnectorResult connectorResult = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
 
             if (operations != null) {
@@ -601,7 +587,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -644,7 +630,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             expcontext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
-            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+            final ConnectorResult connectorResult = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
             if (operations != null) {
                 // execute operations
@@ -661,7 +647,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -702,7 +688,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             expcontext.setContainerState(ContainerState.ARCHIVED);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(aactivityInstance.getArchiveDate() + 500);
-            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+            final ConnectorResult connectorResult = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
             if (operations != null) {
                 // execute operations
@@ -719,7 +705,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -757,7 +743,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             expcontext.setContainerState(ContainerState.ARCHIVED);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(saprocessInstance.getArchiveDate().getTime() + 500);
-            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+            final ConnectorResult connectorResult = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
             if (operations != null) {
                 // execute operations
@@ -774,7 +760,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -814,7 +800,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             expcontext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
-            final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
+            final ConnectorResult connectorResult = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinitionVersion, connectorsExps, inputValues, classLoader, expcontext);
             if (operations != null) {
                 // execute operations
