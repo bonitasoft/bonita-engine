@@ -13,7 +13,7 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="resourcesService" ref="resourcesService" />
         <constructor-arg name="connectorService" ref="connectorService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
@@ -33,7 +33,6 @@
             </map>
         </constructor-arg>
         <constructor-arg name="documentService" ref="documentService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
         <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
         <constructor-arg name="eventsHandler" ref="eventsHandler" />
