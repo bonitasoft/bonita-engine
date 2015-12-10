@@ -13,21 +13,14 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.*;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -36,9 +29,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bar.BARResourceType;
+import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.bar.SBARResource;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
+import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.connector.parser.JarDependencies;
@@ -46,13 +46,17 @@ import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescr
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.home.ProcessManager;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -60,64 +64,55 @@ import org.bonitasoft.engine.xml.SXMLParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
  */
 @SuppressWarnings("javadoc")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BonitaHomeServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ConnectorServiceImplTest {
 
-    /**
-     * @author Emmanuel Duchastenier
-     */
-    protected FilenameFilter jarFilenameFilter = new FilenameFilter() {
-
-        @Override
-        public boolean accept(final File dir, final String name) {
-            return name.endsWith(".jar");
-        }
-    };
-
+    private static final long PROCESS_DEFINITION_ID = 123153L;
     @Mock
     private BonitaHomeServer bonitaHomeServer;
     @Mock
-    private ProcessManager processManager;
-
-    private ConnectorServiceImpl connectorService;
-
-    @Mock
     private Parser parser;
-
     @Mock
     private CacheService cacheService;
-
     @Mock
     private ParserFactory parserFactory;
-
     @Mock
     private DependencyService dependencyService;
-
+    @Mock
+    private ResourcesService resourcesService;
     @Mock
     private SConnectorImplementationDescriptor connectorImplDescriptorInCache;
+    @Mock
+    private ConnectorExecutor connectorExecutor;
+    @Mock
+    private ExpressionResolverService expressionResolverService;
+    @Mock
+    private OperationService operationService;
+    @Mock
+    private TimeTracker timeTracker;
+    @Mock
+    private TechnicalLoggerService technicalLoggerService;
+    @Captor
+    private ArgumentCaptor<SConnector> connectorArgumentCaptor;
+
+    private ConnectorServiceImpl connectorService;
 
     @SuppressWarnings("unchecked")
     @Before
     public void setup() {
-        mockStatic(BonitaHomeServer.class);
-
-        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
-        when(bonitaHomeServer.getProcessManager()).thenReturn(processManager);
-
         doReturn(parser).when(parserFactory).createParser(anyList());
-
-        connectorService = new ConnectorServiceImpl(/* cacheService */mock(CacheService.class), mock(ConnectorExecutor.class), parserFactory,
-                mock(ReadSessionAccessor.class),
-                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null, mock(TimeTracker.class));
+        connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, parserFactory, expressionResolverService,
+                operationService, dependencyService,
+                technicalLoggerService, timeTracker, resourcesService);
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)
@@ -151,11 +146,10 @@ public class ConnectorServiceImplTest {
 
     @Test
     public void setNewConnectorImplemCleansOldDependencies() throws Exception {
-        final long tenantId = 98774L;
         final long processDefId = 17L;
 
-        final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
-        when(sProcessDef.getId()).thenReturn(processDefId);
+        final SProcessDefinitionImpl sProcessDef = new SProcessDefinitionImpl("MyProcess", "1.0");
+        sProcessDef.setId(processDefId);
         final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
         final String connectorDefVersion = "1.0.0";
         final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
@@ -165,49 +159,45 @@ public class ConnectorServiceImplTest {
                 connectorImplId,
                 connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
         final SConnectorImplementationDescriptor oldConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("file.jar")));
+                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Collections.singletonList("file.jar")));
 
         Map<String, byte[]> zipFileMap = new HashMap<>(3);
         final byte[] implBytes = "tototo".getBytes();
         zipFileMap.put("HoogardenBeerConnector.impl", implBytes);
-        final byte[] dep1Bytes = {12, 94, 14, 12};
+        final byte[] dep1Bytes = { 12, 94, 14, 12 };
         zipFileMap.put("some1.jar", dep1Bytes);
-        final byte[] hoogardenConnectorBytes = {12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65};
+        final byte[] hoogardenConnectorBytes = { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 };
         zipFileMap.put("HoogardenConnector.jar", hoogardenConnectorBytes);
         final byte[] zip1 = IOUtil.zip(zipFileMap);
-        final Map<String, byte[]> returnedMap = new HashMap<>();
-        returnedMap.put("file.jar", new byte[]{1});
-        returnedMap.put("file.impl", new byte[]{2});
-        when(parser.getObjectFromXML(eq(new byte[]{2}))).thenReturn(oldConnectorDescriptor);
+        when(parser.getObjectFromXML(eq(new byte[] { 2 }))).thenReturn(oldConnectorDescriptor);
         when(parser.getObjectFromXML(eq(implBytes))).thenReturn(hoogardenConnectorDescriptor);
 
-        doReturn(returnedMap).when(processManager).getConnectorFiles(tenantId, processDefId);
-        connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
-        verify(processManager, times(1)).storeClasspathFile(tenantId, processDefId, "HoogardenConnector.jar", hoogardenConnectorBytes);
-        verify(processManager, times(1)).storeClasspathFile(tenantId, processDefId, "some1.jar", dep1Bytes);
-        verify(processManager, times(1)).storeConnectorFile(tenantId, processDefId, "HoogardenBeerConnector.impl", implBytes);
-        verify(processManager, times(1)).deleteClasspathFiles(tenantId, processDefId, "file.jar");
-        verify(processManager, times(1)).deleteConnectorFile(tenantId, processDefId, "file.impl");
+        final SBARResource originalConnector = new SBARResource("file.impl", BARResourceType.CONNECTOR, processDefId, new byte[] { 2 });
+        doReturn(Collections.singletonList(originalConnector)).when(resourcesService)
+                .get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
+        SDependency dependency = mock(SDependency.class);
+        doReturn(dependency).when(dependencyService).getDependencyOfArtifact(processDefId, ScopeType.PROCESS, "file.jar");
+
+        connectorService.setConnectorImplementation(sProcessDef, connectorDefId, connectorDefVersion, zip1);
+        verify(dependencyService).createMappedDependency("HoogardenConnector.jar", hoogardenConnectorBytes, "HoogardenConnector.jar", processDefId,
+                ScopeType.PROCESS);
+        verify(dependencyService).createMappedDependency("some1.jar", dep1Bytes, "some1.jar", processDefId, ScopeType.PROCESS);
+        verify(resourcesService).add(processDefId, "HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, implBytes);
+        verify(dependencyService).deleteDependency(dependency);
+        verify(resourcesService).remove(originalConnector);
     }
 
     @Test
     public void setNewConnectorImplemShouldIgnoreSourceFiles() throws Exception {
-        final long tenantId = 24L;
         final long processDefId = 1324565477444L;
 
-        final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
-        final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
-        final String connectorDefVersion = "1.0.0";
         Map<String, byte[]> zipFileMap = new HashMap<>(1);
         zipFileMap.put("src/net/company/MyImplem.java", "some Java source file content".getBytes());
         final byte[] zip = IOUtil.zip(zipFileMap);
 
-        final ConnectorServiceImpl spy = spy(connectorService);
-        doNothing().when(spy).deleteOldImplementation(tenantId, processDefId, connectorDefId, connectorDefVersion);
+        connectorService.extractConnectorImplementation(zip);
 
-        spy.unzipNewImplementation(sProcessDef, tenantId, zip, connectorDefId, connectorDefVersion);
-
-        verify(processManager, times(0)).storeConnectorFile(eq(tenantId), eq(processDefId), anyString(), any(byte[].class));
+        verify(resourcesService, times(0)).add(eq(processDefId), anyString(), any(BARResourceType.class), any(byte[].class));
     }
 
     @Test
@@ -230,15 +220,29 @@ public class ConnectorServiceImplTest {
         checkGetConnectorImplementationUsesCache(1, 0, true);
     }
 
+    @Test
+    public void should_executeConnector_call_connector_executor() throws Exception {
+        //given
+        SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
+                "impplVersion", "defId", "defVersion", new JarDependencies(Collections.<String> emptyList()));
+        SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
+
+        //when
+        Map<String, Object> inputParameters = Collections.<String, Object> singletonMap("key", "value");
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
+        //then
+        verify(connectorExecutor).execute(connectorArgumentCaptor.capture(), eq(inputParameters), eq(contextClassLoader));
+        SConnector sConnector = connectorArgumentCaptor.getValue();
+        assertThat(sConnector).isInstanceOf(SConnectorAdapter.class);
+        assertThat(((SConnectorAdapter) sConnector).getConnector()).isInstanceOf(MyTestConnector.class);
+    }
+
     private void checkGetConnectorImplementationUsesCache(final int givenCacheSizeToBeReturned, final int expectedNumberOfCacheStoreInvocations,
             final boolean shouldCacheContainsConnectorImplementation)
-            throws BonitaHomeNotSetException, SXMLParseException,
-            IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException {
-        connectorService = new ConnectorServiceImpl(cacheService, mock(ConnectorExecutor.class), parserFactory,
-                mock(ReadSessionAccessor.class),
-                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null, mock(TimeTracker.class));
+                    throws BonitaHomeNotSetException, SXMLParseException,
+                    IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException, SBonitaReadException {
 
-        final long tenantId = 98774L;
         final long processDefId = 17L;
         final SProcessDefinition sProcessDef;
         sProcessDef = mock(SProcessDefinition.class);
@@ -254,15 +258,17 @@ public class ConnectorServiceImplTest {
         when(parser.getObjectFromXML(eq("tototo".getBytes()))).thenReturn(connectorImplDescriptor);
 
         final Map<String, byte[]> zipFileMap = new HashMap<>(3);
+
         zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
         zipFileMap.put("some1.jar", new byte[] { 12, 94, 14, 12 });
         zipFileMap.put("HoogardenConnector.jar", new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
         final byte[] zip1 = IOUtil.zip(zipFileMap);
 
-        doReturn(zipFileMap).when(processManager).getConnectorFiles(tenantId, processDefId);
+        doReturn(Collections.singletonList(new SBARResource("HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, processDefId, "tototo".getBytes())))
+                .when(resourcesService).get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
 
         //setConnectorImplementation store to cache
-        connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
+        connectorService.setConnectorImplementation(sProcessDef, connectorDefId, connectorDefVersion, zip1);
 
         //given
         doReturn(givenCacheSizeToBeReturned).when(cacheService).getCacheSize(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
@@ -271,13 +277,13 @@ public class ConnectorServiceImplTest {
         final String buildConnectorImplementationKey = connectorService
                 .buildConnectorImplementationKey(processDefId, connectorImplId, connectorImplVersion);
         if (shouldCacheContainsConnectorImplementation) {
-            cacheContentKeys = Arrays.asList(buildConnectorImplementationKey);
+            cacheContentKeys = Collections.singletonList(buildConnectorImplementationKey);
         }
         doReturn(cacheContentKeys).when(cacheService).getKeys(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
         doReturn(connectorImplDescriptor).when(cacheService).get(ConnectorServiceImpl.CONNECTOR_CACHE_NAME, buildConnectorImplementationKey);
 
         //when
-        connectorService.getConnectorImplementations(processDefId, tenantId, 0,
+        connectorService.getConnectorImplementations(processDefId, 0,
                 10, "", OrderByType.ASC);
 
         //then
@@ -285,4 +291,27 @@ public class ConnectorServiceImplTest {
 
     }
 
+    public static class MyTestConnector extends AbstractConnector {
+
+        @Override
+        public void validateInputParameters() throws ConnectorValidationException {
+
+        }
+
+        @Override
+        protected void executeBusinessLogic() throws ConnectorException {
+
+        }
+    }
+
+    @Test
+    public void getNumberOfConnectorImplementations_should_call_count_on_resource_service() throws Exception {
+        final long processDefinitionId = 451L;
+        final long expectedCount = 11L;
+        doReturn(expectedCount).when(resourcesService).count(processDefinitionId, BARResourceType.CONNECTOR);
+
+        final Long numberOfConnectorImplementations = connectorService.getNumberOfConnectorImplementations(processDefinitionId);
+
+        assertThat(numberOfConnectorImplementations).isEqualTo(expectedCount);
+    }
 }

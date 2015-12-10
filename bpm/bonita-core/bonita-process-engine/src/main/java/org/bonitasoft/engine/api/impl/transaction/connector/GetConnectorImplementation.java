@@ -46,7 +46,7 @@ public class GetConnectorImplementation implements TransactionContentWithResult<
 
     @Override
     public void execute() throws SBonitaException {
-        connectorImplementation = connectorService.getConnectorImplementation(processDefinitionId, connectorId, connectorVersion, tenantId);
+        connectorImplementation = connectorService.getConnectorImplementation(processDefinitionId, connectorId, connectorVersion);
     }
 
     @Override

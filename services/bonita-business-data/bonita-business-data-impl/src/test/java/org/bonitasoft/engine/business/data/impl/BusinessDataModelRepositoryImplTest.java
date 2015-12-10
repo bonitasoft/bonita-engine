@@ -15,7 +15,6 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -34,7 +33,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.home.TenantStorage;
 import org.bonitasoft.engine.io.IOUtil;
@@ -71,18 +70,14 @@ public class BusinessDataModelRepositoryImplTest {
 
     @Test
     public void deployABOMShouldCreatetheBOMJARAndAddANewTenantDependency() throws Exception {
-        final SDependency sDependency = mock(SDependency.class);
-        final SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
-        doReturn(sDependency).when(businessDataModelRepository).createSDependency(anyLong(), any(byte[].class));
-        doReturn(dependencyMapping).when(businessDataModelRepository).createDependencyMapping(1, sDependency);
-
         BusinessObjectModel bom = BOMBuilder.aBOM().build();
         doReturn("some bytes".getBytes()).when(businessDataModelRepository).generateServerBDMJar(bom);
 
+        doReturn(mock(SDependency.class)).when(dependencyService).createMappedDependency("BDR", "some bytes".getBytes(), "BDR.jar", 1, ScopeType.TENANT);
+
         businessDataModelRepository.createAndDeployServerBDMJar(1, bom);
 
-        verify(dependencyService).createDependency(sDependency);
-        verify(dependencyService).createDependencyMapping(dependencyMapping);
+        verify(dependencyService).createMappedDependency("BDR", "some bytes".getBytes(), "BDR.jar", 1, ScopeType.TENANT);
     }
 
     @Test

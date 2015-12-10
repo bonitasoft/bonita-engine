@@ -20,6 +20,8 @@ import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException
 import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
  * @author Baptiste Mesta
@@ -32,6 +34,8 @@ public interface UserFilterService {
     FilterResult executeFilter(long processDefinitionId, SUserFilterDefinition sUserFilterDefinition, Map<String, SExpression> inputs, ClassLoader classLoader,
             SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException;
 
-    boolean loadUserFilters(long processDefinitionId, long tenantId) throws SUserFilterLoadingException;
+    void removeUserFilters(long processDefinitionId) throws SBonitaReadException, SRecorderException;
+
+    boolean loadUserFilters(long processDefinitionId) throws SUserFilterLoadingException;
 
 }

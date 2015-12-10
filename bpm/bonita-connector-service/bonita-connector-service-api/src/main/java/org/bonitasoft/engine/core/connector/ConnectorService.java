@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bar.SBARResource;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
@@ -30,6 +31,8 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
  * @author Baptiste Mesta
@@ -53,24 +56,24 @@ public interface ConnectorService {
      * Execute a connector instance by given connectorDefinitionId and connectorDefinitionVersion
      * 
      * @param processDefinitionId
-     *            The identifier of process definition
+     *        The identifier of process definition
      * @param connectorDefinitionId
-     *            The identifier of connector definition
+     *        The identifier of connector definition
      * @param connectorDefinitionVersion
-     *            The version of connector definition
+     *        The version of connector definition
      * @param connectorInputParameters
-     *            The input of connector
+     *        The input of connector
      * @param inputValues
-     *            The input values of connector
+     *        The input values of connector
      * @param classLoader
-     *            The class loader used to load and run connector
+     *        The class loader used to load and run connector
      * @param sexpContext
-     *            The expression context
+     *        The expression context
      * @return The output after connector executing
      * @throws SConnectorException
-     *             Error thrown if has exceptions during the connector executing
+     *         Error thrown if has exceptions during the connector executing
      */
-    ConnectorResult executeMutipleEvaluation(long processDefinitionId, String connectorDefinitionId, String connectorDefinitionVersion,
+    ConnectorResult executeMultipleEvaluation(long processDefinitionId, String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, SExpression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, ClassLoader classLoader,
             SExpressionContext sexpContext) throws SConnectorException;
 
@@ -78,14 +81,12 @@ public interface ConnectorService {
      * Load connectors for given process definition and tenant, connectors will be stored in cache after loading
      * 
      * @param sDefinition
-     *            The process definition
-     * @param tenantId
-     *            Identifier of tenant
+     *        The process definition
      * @return true if all connectors found have all them dependencies resolved and are correctly loaded
      * @throws SConnectorException
-     *             Error thrown if has exceptions during the connector loading
+     *         Error thrown if has exceptions during the connector loading
      */
-    boolean loadConnectors(SProcessDefinition sDefinition, long tenantId) throws SConnectorException;
+    boolean loadConnectors(SProcessDefinition sDefinition) throws SConnectorException;
 
     /**
      * Set connector implementation for id and version specified connector.
@@ -93,65 +94,57 @@ public interface ConnectorService {
      * Delete former and load current connectors in cache.
      * 
      * @param sProcessDefinition
-     *            The process definition which the connector belongs to
-     * @param tenantId
-     *            The identifier of tenant
+     *        The process definition which the connector belongs to
      * @param connectorId
-     *            Id of connector definition.
+     *        Id of connector definition.
      * @param connectorVersion
-     *            Version of connector definition
+     *        Version of connector definition
      * @param connectorImplementationArchive
-     *            zip byte array containing the connector implementation information
+     *        zip byte array containing the connector implementation information
      * @throws SConnectorException
-     *             Error thrown if has exceptions during the connector implementation setting
-     * @author Yanyan Liu
+     *         Error thrown if has exceptions during the connector implementation setting
      * @throws SInvalidConnectorImplementationException
      */
-    void setConnectorImplementation(SProcessDefinition sProcessDefinition, long tenantId, String connectorId, String connectorVersion,
+    void setConnectorImplementation(SProcessDefinition sProcessDefinition, String connectorId, String connectorVersion,
             byte[] connectorImplementationArchive) throws SConnectorException, SInvalidConnectorImplementationException;
 
     /**
      * Get a list of connector implementation descriptors for id specified process definition, the returned list is paginated
      * 
      * @param processDefinitionId
-     *            Identifier of process definition
+     *        Identifier of process definition
      * @param fromIndex
-     *            Start index of connector record
+     *        Start index of connector record
      * @param numberPerPage
-     *            Number of connectors we want to get. Maximum number of connectors returned.
+     *        Number of connectors we want to get. Maximum number of connectors returned.
      * @param field
-     *            The field that the result ordered by
+     *        The field that the result ordered by
      * @param order
-     *            The order, ACS or DESC
+     *        The order, ACS or DESC
      * @return A list of all satisfied connector implementation descriptor objects
      * @throws SConnectorException
-     *             Error thrown if has exceptions during the connector implementations retrieve
-     * @author Yanyan Liu
+     *         Error thrown if has exceptions during the connector implementations retrieve
      */
-    List<SConnectorImplementationDescriptor> getConnectorImplementations(long processDefinitionId, long tenantId, int fromIndex, int numberPerPage,
+    List<SConnectorImplementationDescriptor> getConnectorImplementations(long processDefinitionId, int fromIndex, int numberPerPage,
             String field, OrderByType order) throws SConnectorException;
 
     /**
      * Get connector implementation descriptor for specified connector in a process definition.
      * 
      * @param processDefinitionId
-     *            Identifier of process definition
+     *        Identifier of process definition
      * @param connectorId
-     *            id of connector definition
+     *        id of connector definition
      * @param connectorVersion
-     *            version of connector definition
-     * @param tenantId
-     *            Identifier of tenant
+     *        version of connector definition
      * @return connector implementation descriptor object
      * @throws SConnectorException
-     *             Error thrown if has exceptions during the connector implementation get
-     * @author Yanyan Liu
+     *         Error thrown if has exceptions during the connector implementation get
      */
-    SConnectorImplementationDescriptor getConnectorImplementation(long processDefinitionId, String connectorId, String connectorVersion, long tenantId)
+    SConnectorImplementationDescriptor getConnectorImplementation(long processDefinitionId, String connectorId, String connectorVersion)
             throws SConnectorException;
 
     /**
-     * @param @param parameters
      * @param parameters
      * @param sExpressionContext
      * @param inputValues
@@ -163,7 +156,10 @@ public interface ConnectorService {
      */
     Map<String, Object> evaluateInputParameters(String connectorId, Map<String, SExpression> parameters, SExpressionContext sExpressionContext,
             Map<String, Map<String, Serializable>> inputValues) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
-            SExpressionDependencyMissingException, SInvalidExpressionException;
+                    SExpressionDependencyMissingException, SInvalidExpressionException;
+
+    SConnectorImplementationDescriptor getConnectorImplementationDescriptor(long processDefinitionId, String connectorId, String version)
+            throws SConnectorException;
 
     /**
      * @param outputs
@@ -174,15 +170,17 @@ public interface ConnectorService {
     void executeOutputOperation(List<SOperation> outputs, SExpressionContext expressionContext, ConnectorResult result) throws SConnectorException;
 
     /**
-     * @param rootDefinitionId
+     * @param processDefinitionId
      * @param sConnectorInstance
+     * @param connectorImplementationDescriptor
      * @param classLoader
      * @param inputParameters
-     * @return
+     * @return the result of the connector execution
      * @throws SConnectorException
      */
-    ConnectorResult executeConnector(long rootDefinitionId, SConnectorInstance sConnectorInstance, ClassLoader classLoader, Map<String, Object> inputParameters)
-            throws SConnectorException;
+    ConnectorResult executeConnector(long processDefinitionId, SConnectorInstance sConnectorInstance,
+            SConnectorImplementationDescriptor connectorImplementationDescriptor, ClassLoader classLoader, Map<String, Object> inputParameters)
+                    throws SConnectorException;
 
     /**
      * @param result
@@ -192,10 +190,16 @@ public interface ConnectorService {
 
     /**
      * @param processDefinitionId
-     * @param tenantId
+     *        the id of the process definition
      * @return
+     *         the number of connector implementation for this process definition
      * @throws SConnectorException
      */
-    Long getNumberOfConnectorImplementations(long processDefinitionId, long tenantId) throws SConnectorException;
+    Long getNumberOfConnectorImplementations(long processDefinitionId) throws SConnectorException;
 
+    List<SBARResource> getConnectorImplementations(long processDefinitionId, int from, int numberOfElements) throws SBonitaReadException;
+
+    void addConnectorImplementation(Long processDefinitionId, String name, byte[] content) throws SRecorderException;
+
+    void removeConnectorImplementations(long processDefinitionId) throws SBonitaReadException, SRecorderException;
 }

@@ -1125,7 +1125,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             final Long processDefId = actor.getScopeId();
             if (!processDefinitionIds.contains(processDefId)) {
                 processDefinitionIds.add(processDefId);
-                tenantAccessor.getDependencyResolver().resolveDependencies(actor.getScopeId(), tenantAccessor);
+                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(actor.getScopeId(), tenantAccessor);
             }
         }
     }

@@ -17,6 +17,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
+import org.bonitasoft.engine.bar.SBARResource;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -246,6 +247,12 @@ public class TestRepository {
         getSession().save(profile);
         return (SProfile) getSession().get(profile.getClass(),
                 new PersistentObjectId(profile.getId(), profile.getTenantId()));
+    }
+
+    public SBARResource add(final SBARResource sbarResource) {
+        getSession().save(sbarResource);
+        return (SBARResource) getSession().get(sbarResource.getClass(),
+                new PersistentObjectId(sbarResource.getId(), sbarResource.getTenantId()));
     }
 
     public void update(final SApplicationImpl application) {

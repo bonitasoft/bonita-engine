@@ -22,6 +22,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -129,7 +130,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             userTransactionService.executeInTransaction(callable);
             final SConnectorDefinition sConnectorDefinition = callable.getsConnectorDefinition();
             final SConnectorInstance connectorInstance = callable.getConnectorInstance();
-            final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
+            SConnectorImplementationDescriptor connectorImplementationDescriptor = callable.getConnectorImplementationDescriptor();
+            final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, connectorImplementationDescriptor, processClassloader,
                     callable.getInputParameters());
             // evaluate output and trigger the execution of the flow node
             userTransactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, context));
@@ -181,6 +183,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         private final ProcessDefinitionService processDefinitionService;
 
         private SConnectorDefinition sConnectorDefinition;
+        private SConnectorImplementationDescriptor connectorImplementationDescriptor;
 
         private EvaluateParameterAndGetConnectorInstance(final ConnectorService connectorService, final ProcessDefinitionService processDefinitionService,
                 final ConnectorInstanceService connectorInstanceService) {
@@ -201,12 +204,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             return sConnectorDefinition;
         }
 
+        public SConnectorImplementationDescriptor getConnectorImplementationDescriptor() {
+            return connectorImplementationDescriptor;
+        }
+
         @Override
         public Void call() throws Exception {
             sConnectorDefinition = getSConnectorDefinition(processDefinitionService);
             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getConnectorId(), sConnectorDefinition.getInputs(),
                     inputParametersContext, null);
             connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
+            connectorImplementationDescriptor = connectorService.getConnectorImplementationDescriptor(processDefinitionId, sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion());
             return null;
         }
     }

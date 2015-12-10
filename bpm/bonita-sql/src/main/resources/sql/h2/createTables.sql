@@ -933,6 +933,7 @@ CREATE TABLE job_param (
   value_ MEDIUMBLOB NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE job_log (
   tenantid BIGINT NOT NULL,
@@ -945,7 +946,6 @@ CREATE TABLE job_log (
   PRIMARY KEY (tenantid, id)
 );
 
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 CREATE TABLE theme (
   tenantId BIGINT NOT NULL,
@@ -997,3 +997,15 @@ CREATE TABLE proc_parameter (
   value CLOB NULL,
   PRIMARY KEY (tenantId, id)
 );
+CREATE TABLE bar_resource (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  process_id BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  type VARCHAR(16) NOT NULL,
+  content LONGBLOB NOT NULL,
+  UNIQUE (tenantId, process_id, name, type),
+  PRIMARY KEY (tenantId, id)
+);
+CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name);
+
