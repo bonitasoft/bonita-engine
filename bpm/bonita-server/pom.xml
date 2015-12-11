@@ -567,6 +567,10 @@
                     <artifactId>bonita-common-api-impl</artifactId>
                     <groupId>org.bonitasoft.engine.api</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-util</artifactId>
+                    <groupId>org.bonitasoft.engine.util</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
