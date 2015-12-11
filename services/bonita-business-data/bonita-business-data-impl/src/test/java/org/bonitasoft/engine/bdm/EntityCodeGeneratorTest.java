@@ -16,12 +16,12 @@ package org.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,16 +32,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
 
-import org.bonitasoft.engine.bdm.CodeGenerator;
-import org.bonitasoft.engine.bdm.EntityCodeGenerator;
-import org.junit.Before;
-import org.junit.Test;
-
-import org.bonitasoft.engine.bdm.model.BusinessObject;
-import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.model.field.Field;
-import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
@@ -50,10 +40,19 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.model.field.Field;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
+import org.junit.Before;
+import org.junit.Test;
 
 public class EntityCodeGeneratorTest {
 
     private static final String EMPLOYEE_QUALIFIED_NAME = "org.bonitasoft.hr.Employee";
+    private static final String UNIQUE_RELATION_QUALIFIED_NAME = "org.bonitasoft.hr.Unique";
 
     private EntityCodeGenerator entityCodeGenerator;
 
@@ -288,5 +287,36 @@ public class EntityCodeGeneratorTest {
             }
         }
         return annotation;
+    }
+
+    @Test
+    public void should_add_real_columnName_in_unique_key() throws Exception {
+        //given
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+
+        final BusinessObject uniqueRelationBO = new BusinessObject();
+        uniqueRelationBO.setQualifiedName(UNIQUE_RELATION_QUALIFIED_NAME);
+
+        final RelationField relationField = new RelationField();
+        relationField.setName("uniqueRelation");
+        relationField.setReference(uniqueRelationBO);
+        employeeBO.addField(relationField);
+        employeeBO.addUniqueConstraint("unique_constraint", "uniqueRelation");
+
+        //when
+        final JDefinedClass jDefinedClass = entityCodeGenerator.addEntity(employeeBO);
+
+        //then
+        final Writer writer = new StringWriter();
+        final JAnnotationUse tableAnnotation = getAnnotation(jDefinedClass, Table.class.getCanonicalName());
+        assertThat(tableAnnotation).as("should have Table Annotation").isNotNull();
+        tableAnnotation.generate(new JFormatter(writer));
+        assertThat(writer.toString()).as("should rename relation field to real column name")
+                .isEqualTo("@javax.persistence.Table(name = \"EMPLOYEE\", uniqueConstraints = {\n" +
+                        "    @javax.persistence.UniqueConstraint(name = \"UNIQUE_CONSTRAINT\", columnNames = {\n" +
+                        "        \"UNIQUERELATION_PID\"\n" +
+                        "    })\n" +
+                        "})");
     }
 }
