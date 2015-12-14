@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.recorder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -37,6 +38,13 @@ public class SelectBusinessDataDescriptorBuilder {
         return new SelectOneDescriptor<>("getSRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
     }
 
+    public static SelectOneDescriptor<SARefBusinessDataInstance> getSARefBusinessDataInstance(final String name, final long processInstanceId) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", name);
+        parameters.put("processInstanceId", processInstanceId);
+        return new SelectOneDescriptor<>("getSARefBusinessDataInstance", parameters, SARefBusinessDataInstance.class);
+    }
+
     public static SelectListDescriptor<SRefBusinessDataInstance> getSRefBusinessDataInstances(final long processInstanceId, final int startIndex,
             final int maxResults) {
         final Map<String, Object> parameters = new HashMap<>();
@@ -51,6 +59,13 @@ public class SelectBusinessDataDescriptorBuilder {
         parameters.put("name", name);
         parameters.put("flowNodeInstanceId", flowNodeInstanceId);
         return new SelectOneDescriptor<>("getSFlowNodeRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
+    }
+
+    public static SelectOneDescriptor<SARefBusinessDataInstance> getSAFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", name);
+        parameters.put("flowNodeInstanceId", flowNodeInstanceId);
+        return new SelectOneDescriptor<>("getSAFlowNodeRefBusinessDataInstance", parameters, SARefBusinessDataInstance.class);
     }
 
     public static SelectOneDescriptor<Integer> getNumberOfDataOfMultiRefBusinessData(final String name, final long processInstanceId) {

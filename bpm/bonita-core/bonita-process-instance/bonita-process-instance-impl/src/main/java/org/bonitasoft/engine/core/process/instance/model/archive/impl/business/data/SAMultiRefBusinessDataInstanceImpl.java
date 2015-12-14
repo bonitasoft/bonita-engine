@@ -11,39 +11,32 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
-package org.bonitasoft.engine.operation;
+import java.util.List;
 
-import org.bonitasoft.engine.commons.Container;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAMultiRefBusinessDataInstance;
 
 /**
- * Represents a Evaluation Context to reference / retrieve Business Data.
- * 
- * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
-public class BusinessDataContext {
+public abstract class SAMultiRefBusinessDataInstanceImpl extends SARefBusinessDataInstanceImpl implements SAMultiRefBusinessDataInstance {
 
-    /**
-     * name of the business data to retrieve
-     */
-    private String name;
+    private static final long serialVersionUID = -7182225911903915352L;
 
-    /**
-     * Container on which to look for the business data (PROCESS of FLOWNODE)
-     */
-    private Container container;
+    private List<Long> dataIds;
 
-    public BusinessDataContext(final String name, final Container container) {
-        this.name = name;
-        this.container = container;
+    public SAMultiRefBusinessDataInstanceImpl() {
+        super();
     }
 
-    public String getName() {
-        return name;
+    public void setDataIds(final List<Long> dataIds) {
+        this.dataIds = dataIds;
     }
 
-    public Container getContainer() {
-        return container;
+    @Override
+    public List<Long> getDataIds() {
+        return dataIds;
     }
 
 }

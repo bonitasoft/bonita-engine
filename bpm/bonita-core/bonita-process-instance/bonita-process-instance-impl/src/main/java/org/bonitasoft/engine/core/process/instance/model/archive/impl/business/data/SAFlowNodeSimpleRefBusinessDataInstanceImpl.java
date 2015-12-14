@@ -11,39 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
-package org.bonitasoft.engine.operation;
-
-import org.bonitasoft.engine.commons.Container;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance;
 
 /**
- * Represents a Evaluation Context to reference / retrieve Business Data.
- * 
- * @author Elias Ricken de Medeiros
+ * @author Emmanuel Duchastenier
  */
-public class BusinessDataContext {
+public class SAFlowNodeSimpleRefBusinessDataInstanceImpl extends SASimpleRefBusinessDataInstanceImpl implements SAFlowNodeSimpleRefBusinessDataInstance {
 
-    /**
-     * name of the business data to retrieve
-     */
-    private String name;
+    private static final long serialVersionUID = 5486560338692349006L;
 
-    /**
-     * Container on which to look for the business data (PROCESS of FLOWNODE)
-     */
-    private Container container;
+    private long flowNodeInstanceId;
 
-    public BusinessDataContext(final String name, final Container container) {
-        this.name = name;
-        this.container = container;
+    @Override
+    public long getFlowNodeInstanceId() {
+        return flowNodeInstanceId;
     }
 
-    public String getName() {
-        return name;
+    public void setFlowNodeInstanceId(final long flowNodeInstanceId) {
+        this.flowNodeInstanceId = flowNodeInstanceId;
     }
-
-    public Container getContainer() {
-        return container;
-    }
-
 }

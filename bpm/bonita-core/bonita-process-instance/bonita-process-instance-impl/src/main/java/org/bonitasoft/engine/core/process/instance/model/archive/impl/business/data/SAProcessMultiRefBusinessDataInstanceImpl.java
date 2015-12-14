@@ -11,39 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
-package org.bonitasoft.engine.operation;
-
-import org.bonitasoft.engine.commons.Container;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessMultiRefBusinessDataInstance;
 
 /**
- * Represents a Evaluation Context to reference / retrieve Business Data.
- * 
- * @author Elias Ricken de Medeiros
+ * @author Emmanuel Duchastenier
  */
-public class BusinessDataContext {
+public class SAProcessMultiRefBusinessDataInstanceImpl extends SAMultiRefBusinessDataInstanceImpl implements SAProcessMultiRefBusinessDataInstance {
 
-    /**
-     * name of the business data to retrieve
-     */
-    private String name;
+    private static final long serialVersionUID = -8285156092879797973L;
 
-    /**
-     * Container on which to look for the business data (PROCESS of FLOWNODE)
-     */
-    private Container container;
+    private long processInstanceId;
 
-    public BusinessDataContext(final String name, final Container container) {
-        this.name = name;
-        this.container = container;
+    @Override
+    public long getProcessInstanceId() {
+        return processInstanceId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Container getContainer() {
-        return container;
+    public void setProcessInstanceId(final long processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
 }

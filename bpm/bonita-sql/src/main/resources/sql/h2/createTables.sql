@@ -464,17 +464,17 @@ CREATE TABLE arch_ref_biz_data_inst (
   	id BIGINT NOT NULL,
   	kind VARCHAR(15) NOT NULL,
   	name VARCHAR(255) NOT NULL,
-  	proc_inst_id BIGINT,
-  	fn_inst_id BIGINT,
+  	orig_proc_inst_id BIGINT,
+  	orig_fn_inst_id BIGINT,
   	data_id BIGINT,
   	data_classname VARCHAR(255) NOT NULL
 );
-CREATE INDEX idx_arch_biz_data_inst1 ON arch_ref_biz_data_inst (tenantid, proc_inst_id);
-CREATE INDEX idx_arch_biz_data_inst2 ON arch_ref_biz_data_inst (tenantid, fn_inst_id);
+CREATE INDEX idx_arch_biz_data_inst1 ON arch_ref_biz_data_inst (tenantid, orig_proc_inst_id);
+CREATE INDEX idx_arch_biz_data_inst2 ON arch_ref_biz_data_inst (tenantid, orig_fn_inst_id);
 ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT pk_arch_ref_biz_data_inst PRIMARY KEY (tenantid, id);
-ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT uk_arch_ref_biz_data_inst UNIQUE (name, proc_inst_id, fn_inst_id, tenantid);
-ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT fk_arch_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES arch_process_instance(tenantid, id) ON DELETE CASCADE;
-ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT fk_arch_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES arch_flownode_instance(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT uk_arch_ref_biz_data_inst UNIQUE (name, orig_proc_inst_id, orig_fn_inst_id, tenantid);
+--ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT fk_arch_ref_biz_data_proc FOREIGN KEY (tenantid, orig_proc_inst_id) REFERENCES arch_process_instance(tenantid, sourceObjectId) ON DELETE CASCADE;
+--ALTER TABLE arch_ref_biz_data_inst ADD CONSTRAINT fk_arch_ref_biz_data_fn FOREIGN KEY (tenantid, orig_fn_inst_id) REFERENCES arch_flownode_instance(tenantid, sourceObjectId) ON DELETE CASCADE;
 
 CREATE TABLE arch_multi_biz_data (
 	tenantid BIGINT NOT NULL,

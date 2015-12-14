@@ -16,6 +16,9 @@ package org.bonitasoft.engine.business.data;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SAProcessSimpleRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data.SASimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
@@ -50,6 +53,12 @@ public class DummyBusinessDataRefBuilder {
         final SProcessMultiRefBusinessDataInstanceImpl reference = new SProcessMultiRefBusinessDataInstanceImpl();
         reference.setDataClassName(dataClassName);
         return reference;
+    }
+
+    public static SASimpleRefBusinessDataInstance buildArchivedSimpleRefBusinessData(final Long dataId) {
+        final SASimpleRefBusinessDataInstanceImpl saProcessSimpleRefBusinessDataInstance = new SAProcessSimpleRefBusinessDataInstanceImpl();
+        saProcessSimpleRefBusinessDataInstance.setDataId(dataId);
+        return saProcessSimpleRefBusinessDataInstance;
     }
 
 }

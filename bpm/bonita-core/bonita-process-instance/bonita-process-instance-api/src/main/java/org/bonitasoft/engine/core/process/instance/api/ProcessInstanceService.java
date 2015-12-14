@@ -527,7 +527,7 @@ public interface ProcessInstanceService {
      * @return
      * @throws SProcessInstanceReadException
      */
-    List<Long> getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(long processDefinitionId, int fromIndex, int maxResults, OrderByType sortingOrder)
+    List<Long> getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(long processDefinitionId, int fromIndex, int maxResults, OrderByType sortingOrder)
             throws SProcessInstanceReadException;
 
     /**

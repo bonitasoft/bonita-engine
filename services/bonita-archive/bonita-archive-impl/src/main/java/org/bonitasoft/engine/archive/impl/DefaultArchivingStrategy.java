@@ -13,7 +13,6 @@
  */
 package org.bonitasoft.engine.archive.impl;
 
-
 import java.util.Map;
 
 /**
@@ -40,6 +39,7 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
+        archives.put("org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance", true);
         for (Map.Entry<String, Boolean> entry : additionalConfiguration.entrySet()) {
             if (!archives.containsKey(entry.getKey())) {
                 archives.put(entry.getKey(), entry.getValue());

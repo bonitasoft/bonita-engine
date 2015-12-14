@@ -15,9 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -28,14 +26,7 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -168,6 +158,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.google.common.collect.Lists;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
 
@@ -239,14 +231,11 @@ public class ProcessAPIImplTest {
 
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID,
-                ACTOR_ID, STaskPriority.ABOVE_NORMAL,
-                PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID);
-        when(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).thenReturn(
-                sUserTaskInstance);
+                ACTOR_ID, STaskPriority.ABOVE_NORMAL, PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID);
+        when(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).thenReturn(sUserTaskInstance);
         SAUserTaskInstanceImpl value = new SAUserTaskInstanceImpl(sUserTaskInstance);
         value.setId(ARCHIVED_FLOW_NODE_INSTANCE_ID);
-        when(activityInstanceService.getArchivedFlowNodeInstance(ARCHIVED_FLOW_NODE_INSTANCE_ID)).thenReturn(
-                value);
+        when(activityInstanceService.getArchivedFlowNodeInstance(ARCHIVED_FLOW_NODE_INSTANCE_ID)).thenReturn(value);
         processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
         SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
         processDefinition.setProcessContainer(processContainer);

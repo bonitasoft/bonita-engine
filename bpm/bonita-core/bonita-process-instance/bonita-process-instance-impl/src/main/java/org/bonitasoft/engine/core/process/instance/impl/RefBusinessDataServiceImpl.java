@@ -13,16 +13,22 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.archive.ArchiveInsertRecord;
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.business.data.SARefBusinessDataInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
@@ -63,12 +69,15 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final ArchiveService archiveService;
+
     public RefBusinessDataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final QueriableLoggerService queriableLoggerService) {
+            final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
+        this.archiveService = archiveService;
     }
 
     @Override
@@ -180,16 +189,59 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     }
 
     @Override
-    public void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SRefBusinessDataInstanceModificationException {
-        throw new RuntimeException("not yet implemented");
-    }
-
-    @Override
     public List<SRefBusinessDataInstance> getRefBusinessDataInstances(final long processInstanceId, final int startIndex, final int maxResults)
             throws SBonitaReadException {
         final SelectListDescriptor<SRefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSRefBusinessDataInstances(processInstanceId,
                 startIndex, maxResults);
         return persistenceRead.selectList(descriptor);
+    }
+
+    @Override
+    public SARefBusinessDataInstance getSARefBusinessDataInstance(final String name, final long processInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
+        final SelectOneDescriptor<SARefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSARefBusinessDataInstance(name,
+                processInstanceId);
+        final SARefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
+        if (ref == null) {
+            throw new SRefBusinessDataInstanceNotFoundException(processInstanceId, name);
+        }
+        return ref;
+    }
+
+    @Override
+    public SARefBusinessDataInstance getSAFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
+        final SelectOneDescriptor<SARefBusinessDataInstance> descriptor = SelectBusinessDataDescriptorBuilder.getSAFlowNodeRefBusinessDataInstance(name,
+                flowNodeInstanceId);
+        final SARefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
+        if (ref == null) {
+            throw new SRefBusinessDataInstanceNotFoundException(flowNodeInstanceId, name);
+        }
+        return ref;
+    }
+
+    @Override
+    public void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SObjectModificationException {
+        try {
+            final SARefBusinessDataInstance saRefBusinessDataInstance = BuilderFactory.get(SARefBusinessDataInstanceBuilderFactory.class)
+                    .createNewInstance(businessDataInstance).done();
+            final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saRefBusinessDataInstance);
+            archiveService.recordInsert(0L, archiveInsertRecord); // no archived date (nor sourceObjectId) in this table, as it is not necessary (archived only once at end of process execution)
+        } catch (final SRecorderException e) {
+            throw new SObjectModificationException("Unable to archive RefBusinessDataInstance", e);
+        }
+    }
+
+    @Override
+    public void deleteArchivedRefBusinessDataInstance(long processInstanceId) throws SObjectModificationException {
+        try {
+            archiveService.deleteFromQuery("deleteArchivedRefBizDataForProcessInstance",
+                    Collections.<String, Object> singletonMap("processInstanceId", processInstanceId));
+            //            archiveService.deleteFromQuery("deleteArchivedMultiRefBizDataForProcessInstance",
+            //                    Collections.<String, Object> singletonMap("processInstanceId", processInstanceId));
+        } catch (SRecorderException e) {
+            throw new SObjectModificationException("Unable to delete SARefBusinessDataInstance's for processInstanceId: " + processInstanceId, e);
+        }
     }
 
 }

@@ -1160,6 +1160,7 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="documentService" ref="documentService" />
         <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
     </bean>
 
     <bean id="gatewayInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
@@ -1177,11 +1178,13 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
+
     <bean id="refBusinessDataService" class="org.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
     <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">

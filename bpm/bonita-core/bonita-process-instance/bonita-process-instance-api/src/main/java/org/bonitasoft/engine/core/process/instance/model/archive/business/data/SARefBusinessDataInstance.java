@@ -11,39 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.core.process.instance.model.archive.business.data;
 
-package org.bonitasoft.engine.operation;
-
-import org.bonitasoft.engine.commons.Container;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 
 /**
- * Represents a Evaluation Context to reference / retrieve Business Data.
- * 
- * @author Elias Ricken de Medeiros
+ * @author Emmanuel Duchastenier
  */
-public class BusinessDataContext {
+public interface SARefBusinessDataInstance extends ArchivedPersistentObject, SRefBusinessDataInstance {
 
-    /**
-     * name of the business data to retrieve
-     */
-    private String name;
+    String getName();
 
-    /**
-     * Container on which to look for the business data (PROCESS of FLOWNODE)
-     */
-    private Container container;
-
-    public BusinessDataContext(final String name, final Container container) {
-        this.name = name;
-        this.container = container;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Container getContainer() {
-        return container;
-    }
+    String getDataClassName();
 
 }

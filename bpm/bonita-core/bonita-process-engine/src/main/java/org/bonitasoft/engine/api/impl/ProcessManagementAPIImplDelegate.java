@@ -98,7 +98,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     void deleteArchivedProcessInstances(long processDefinitionId, ProcessInstanceService processInstanceService) throws SBonitaException {
         List<Long> sourceProcessInstanceIds;
         do {
-            sourceProcessInstanceIds = processInstanceService.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
+            sourceProcessInstanceIds = processInstanceService.getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
                     100, OrderByType.DESC);
             for (final Long orgProcessId : sourceProcessInstanceIds) {
                 processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);

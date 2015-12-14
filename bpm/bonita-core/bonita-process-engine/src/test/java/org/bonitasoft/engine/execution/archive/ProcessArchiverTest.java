@@ -23,17 +23,22 @@ import java.util.List;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,6 +70,13 @@ public class ProcessArchiverTest {
     ClassLoaderService classLoaderService;
     @Mock
     RefBusinessDataService refBusinessDataService;
+    @Mock
+    DataInstanceService dataInstanceService;
+    @Mock
+    private ActivityInstanceService activityInstanceService;
+    @Mock
+    private ContractDataService contractDataInstanceService;
+
     @Spy
     private ProcessArchiver processArchiver;
 
@@ -74,8 +86,8 @@ public class ProcessArchiverTest {
         ref1.setId(1L); // so that those 3 objects are not considered the same (in the verify)
         final SProcessSimpleRefBusinessDataInstanceImpl ref2 = new SProcessSimpleRefBusinessDataInstanceImpl();
         ref2.setId(2L);
-        final SProcessSimpleRefBusinessDataInstanceImpl ref3 = new SProcessSimpleRefBusinessDataInstanceImpl();
-        List<SProcessSimpleRefBusinessDataInstanceImpl> sRefBusinessDataInstances = Arrays.asList(ref1, ref2, ref3);
+        final SProcessMultiRefBusinessDataInstanceImpl ref3 = new SProcessMultiRefBusinessDataInstanceImpl();
+        List<SRefBusinessDataInstanceImpl> sRefBusinessDataInstances = Arrays.asList(ref1, ref2, ref3);
         SProcessInstance processInstance = new SProcessInstanceImpl();
         processInstance.setId(451L);
 
@@ -94,4 +106,16 @@ public class ProcessArchiverTest {
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref3);
     }
 
+    //    @Test
+    //    public void archiveFlownodeInstance_should_() throws Exception {
+    //        long processDefinitionId = 214L;
+    //        final SUserTaskInstanceImpl intTxflowNodeInstance = new SUserTaskInstanceImpl();
+    //        final SFlowNodeSimpleRefBusinessDataInstanceImpl refBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstanceImpl();
+    //        doReturn(refBusinessDataInstance).when(refBusinessDataService).getRefBusinessDataInstances(eq(processInstance.getId()), eq(0), anyInt());
+    //
+    //        processArchiver.archiveFlowNodeInstance(intTxflowNodeInstance, true, processDefinitionId, processInstanceService, processDefinitionService,
+    //                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataInstanceService);
+    //
+    //        verify(refBusinessDataService).archiveRefBusinessDataInstance(refBusinessDataInstance);
+    //    }
 }

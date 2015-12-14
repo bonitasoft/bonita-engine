@@ -15,9 +15,11 @@ package org.bonitasoft.engine.core.process.instance.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
@@ -25,6 +27,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public interface RefBusinessDataService {
 
@@ -50,6 +53,13 @@ public interface RefBusinessDataService {
 
     int getNumberOfDataOfMultiRefBusinessData(String name, long processInstanceId) throws SBonitaReadException;
 
-    void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SRefBusinessDataInstanceModificationException; // TODO; specific exception
+    SARefBusinessDataInstance getSARefBusinessDataInstance(String name, long processInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
+    SARefBusinessDataInstance getSAFlowNodeRefBusinessDataInstance(String name, long flowNodeInstanceId)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
+
+    void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SObjectModificationException; // TODO; specific exception
+
+    void deleteArchivedRefBusinessDataInstance(long processInstanceId) throws SObjectModificationException;
 }

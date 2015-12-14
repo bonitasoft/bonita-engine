@@ -5888,11 +5888,11 @@ public class ProcessAPIImpl implements ProcessAPI {
             ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            SAFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
-            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(activityInstance.getSourceObjectId(), processDefinition,
-                    CONTAINER_TYPE_ACTIVITY_INSTANCE, activityInstance.getArchiveDate());
-            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
+            SAFlowNodeInstance archivedActivityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(archivedActivityInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(archivedActivityInstance.getSourceObjectId(), processDefinition,
+                    CONTAINER_TYPE_ACTIVITY_INSTANCE, archivedActivityInstance.getArchiveDate());
+            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(archivedActivityInstance.getFlowNodeDefinitionId());
             return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
         } catch (SFlowNodeNotFoundException | SBonitaReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
             throw new UserTaskNotFoundException(e);
@@ -5918,11 +5918,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException,
+    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId) throws ProcessInstanceNotFoundException,
             ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            SAProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getArchivedProcessInstance(processInstanceId);
+            SAProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getArchivedProcessInstance(archivedProcessInstanceId);
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
             final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition,
                     CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());

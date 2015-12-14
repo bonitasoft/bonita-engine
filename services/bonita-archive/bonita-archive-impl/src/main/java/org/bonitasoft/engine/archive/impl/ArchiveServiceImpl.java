@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
@@ -73,8 +75,8 @@ public class ArchiveServiceImpl implements ArchiveService {
                 transactionService.registerBeforeCommitCallable(callable);
             } catch (final STransactionNotFoundException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register the beforeCommitCallable to log queriable logs: transaction not found",
-                            e);
+                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                            "Unable to register the beforeCommitCallable to log queriable logs: transaction not found", e);
                 }
             }
         }
@@ -104,7 +106,6 @@ public class ArchiveServiceImpl implements ArchiveService {
             }
         }
     }
-
 
     @Override
     public void recordDelete(final DeleteRecord record) throws SRecorderException {
@@ -145,6 +146,15 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Override
     public ReadPersistenceService getDefinitiveArchiveReadPersistenceService() {
         return definitiveArchivePersistenceService;
+    }
+
+    @Override
+    public void deleteFromQuery(String queryName, Map<String, Object> parameters) throws SRecorderException {
+        try {
+            definitiveArchivePersistenceService.update(queryName, parameters);
+        } catch (SPersistenceException e) {
+            throw new SRecorderException(e);
+        }
     }
 
 }
