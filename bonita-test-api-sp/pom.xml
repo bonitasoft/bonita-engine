@@ -22,6 +22,12 @@
             <artifactId>bonita-client-sp</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-common-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.bonitasoft.engine</groupId>
