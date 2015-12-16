@@ -48,6 +48,7 @@ import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryMetadata;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryResult;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -94,6 +95,8 @@ public class BDRepositoryIT extends CommonAPIIT {
     public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
     public static final String ENTITY_CLASS_NAME = "entityClassName";
     public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
+    public static final String COUNT_FOR_FIND_BY_HIRE_DATE_RANGE = "countForFindByHireDateRange";
+
     private static final String BDM_PACKAGE_PREFIX = "com.company.model";
     private static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
     private static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
@@ -221,6 +224,11 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "SELECT e FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", List.class.getName());
         findByHireDate.addQueryParameter("date1", Date.class.getName());
         findByHireDate.addQueryParameter("date2", Date.class.getName());
+
+        final Query countForFindByHireDate = employee.addQuery(COUNT_FOR_FIND_BY_HIRE_DATE_RANGE,
+                "SELECT count(e) FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", Long.class.getName());
+        countForFindByHireDate.addQueryParameter("date1", Date.class.getName());
+        countForFindByHireDate.addQueryParameter("date2", Date.class.getName());
 
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
@@ -1385,6 +1393,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         verifyCommandGetQuery_countEmployee();
         verifyCommandGetQuery_findByHireDate();
 
+
         disableAndDeleteProcess(processDefinition.getId());
     }
 
@@ -1489,6 +1498,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
+        assertThat(businessDataQueryResult.getBusinessDataQueryMetadata()).as("should have no metadata when custom countFor is not here").isNull();
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
 
     }
@@ -1528,6 +1538,11 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByHireDate.json"));
+        final BusinessDataQueryMetadata businessDataQueryMetadata = businessDataQueryResult.getBusinessDataQueryMetadata();
+        assertThat(businessDataQueryMetadata).as ("should have metadata").isNotNull();
+        assertThat(businessDataQueryMetadata.getCount()).isEqualTo(1L);
+        assertThat(businessDataQueryMetadata.getStartIndex()).isEqualTo(0);
+        assertThat(businessDataQueryMetadata.getMaxResults()).isEqualTo(10);
 
     }
 

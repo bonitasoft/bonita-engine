@@ -25,10 +25,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -320,7 +321,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 getQueryReturnType(queryDefinition, entityClassName), queryParameters, startIndex, maxResults);
 
         BusinessDataQueryMetadataImpl businessDataQueryMetadata = null;
-        final Query countQueryDefinition = countQueryProvider.getCountQueryDefinition(businessObject, queryDefinition);
+        final Query countQueryDefinition = getCountQueryDefinition(businessDataClass, businessObject, queryDefinition);
         if (countQueryDefinition != null) {
             try {
                 businessDataQueryMetadata = new BusinessDataQueryMetadataImpl(startIndex, maxResults,
@@ -331,6 +332,27 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             }
         }
         return new BusinessDataQueryResultImpl(buildJsonRepresentation((List<Entity>) list, businessDataURIPattern), businessDataQueryMetadata);
+    }
+
+    private Query getCountQueryDefinition(Class<? extends Entity> businessDataClass, BusinessObject businessObject, Query queryDefinition) {
+        final Query countQueryDefinition = countQueryProvider.getCountQueryDefinition(businessObject, queryDefinition);
+        if (ensureQueryIsDefinedInEntity(businessDataClass, countQueryDefinition)) {
+            return countQueryDefinition;
+        }
+        return null;
+    }
+
+    private boolean ensureQueryIsDefinedInEntity(Class<? extends Entity> businessDataClass, Query countQueryDefinition) {
+        final NamedQueries namedQueries = businessDataClass.getAnnotation(NamedQueries.class);
+        if (namedQueries == null || countQueryDefinition == null) {
+            return false;
+        }
+        for (NamedQuery namedQuery : namedQueries.value()) {
+            if (namedQuery.name().equals(getQualifiedQueryName(businessDataClass, countQueryDefinition.getName()))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName)
