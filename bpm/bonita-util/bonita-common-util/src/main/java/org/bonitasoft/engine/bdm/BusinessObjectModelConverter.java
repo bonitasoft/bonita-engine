@@ -19,10 +19,9 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import org.xml.sax.SAXException;
-
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.io.IOUtils;
+import org.xml.sax.SAXException;
 
 /**
  * @author Matthieu Chaffotte
@@ -44,6 +43,14 @@ public class BusinessObjectModelConverter {
     }
 
     public byte[] marshall(final BusinessObjectModel bom) throws JAXBException, IOException, SAXException {
+        final String modelVersion = bom.getModelVersion();
+        if (modelVersion == null || modelVersion.isEmpty()) {
+            bom.setModelVersion(BusinessObjectModel.CURRENT_MODEL_VERSION);
+        }
+        final String productVersion = bom.getProductVersion();
+        if (productVersion == null || productVersion.isEmpty()) {
+            bom.setProductVersion(BusinessObjectModel.CURRENT_PRODUCT_VERSION);
+        }
         return IOUtils.marshallObjectToXML(bom, xsdUrl);
     }
 
