@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
+import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -56,7 +57,7 @@ public class DocumentHelper {
     private final ProcessInstanceService processInstanceService;
 
     public DocumentHelper(final DocumentService documentService, final ProcessDefinitionService processDefinitionService,
-            final ProcessInstanceService processInstanceService) {
+                          final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
@@ -133,17 +134,17 @@ public class DocumentHelper {
     }
 
     /**
-     * @param newValue the new value
-     * @param documentName the name of the document
+     * @param newValue          the new value
+     * @param documentName      the name of the document
      * @param processInstanceId the id of the process instance
-     * @param authorId the author id
-     * @param description used only when creating a document
+     * @param authorId          the author id
+     * @param description       used only when creating a document
      * @throws SBonitaReadException
      * @throws SObjectCreationException
      * @throws SObjectModificationException
      */
     public void createOrUpdateDocument(final DocumentValue newValue, final String documentName, final long processInstanceId, final long authorId,
-            String description)
+                                       String description)
             throws SBonitaReadException, SObjectCreationException, SObjectModificationException {
         final SDocument document = createDocumentObject(newValue, authorId);
         try {
@@ -183,7 +184,7 @@ public class DocumentHelper {
     }
 
     SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<SMappedDocument> currentList, final Long documentId, final String documentName,
-            final Long processInstanceId) throws SObjectNotFoundException {
+                                                                 final Long processInstanceId) throws SObjectNotFoundException {
         final Iterator<SMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
             final SMappedDocument next = iterator.next();
@@ -216,7 +217,7 @@ public class DocumentHelper {
     }
 
     void processDocumentOnIndex(final DocumentValue documentValue, final String documentName, final long processInstanceId,
-            final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
+                                final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException, SObjectModificationException {
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update
@@ -249,6 +250,21 @@ public class DocumentHelper {
         return new DocumentValue(fileInput.getContent(), null, fileInput.getFileName());
     }
 
+    public DocumentValue toDocumentValue(Document document) throws SOperationExecutionException {
+        DocumentValue documentValue;
+        if (document.hasContent()) {
+            try {
+                byte[] documentContent = documentService.getDocumentContent(document.getContentStorageId());
+                documentValue = new DocumentValue(documentContent, document.getContentMimeType(), document.getContentFileName());
+            } catch (SObjectNotFoundException e) {
+                throw new SOperationExecutionException("Unable to execute set document operation because the content of the document to use is not found", e);
+            }
+        } else {
+            documentValue = new DocumentValue(document.getUrl());
+        }
+        return documentValue;
+    }
+
     public List<DocumentValue> toCheckedList(final Object newValue) throws SOperationExecutionException {
         if (!(newValue instanceof List)) {
             throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
@@ -257,6 +273,10 @@ public class DocumentHelper {
         for (final Object item : (List<?>) newValue) {
             if (item instanceof FileInputValue) {
                 newList.add(toDocumentValue((FileInputValue) item));
+                continue;
+            }
+            if (item instanceof Document) {
+                newList.add(toDocumentValue((Document) item));
                 continue;
             }
             if (item instanceof DocumentValue) {
