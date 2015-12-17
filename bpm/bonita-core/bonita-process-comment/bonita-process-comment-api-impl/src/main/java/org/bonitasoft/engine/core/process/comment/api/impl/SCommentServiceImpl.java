@@ -264,7 +264,7 @@ public class SCommentServiceImpl implements SCommentService {
     @Override
     public SAComment getArchivedComment(final long archivedCommentId) throws SCommentNotFoundException, SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final SAComment selectById = persistenceService.selectById(new SelectByIdDescriptor<SAComment>("getArchivedCommentById", SAComment.class,
+        final SAComment selectById = persistenceService.selectById(new SelectByIdDescriptor<SAComment>(SAComment.class,
                 archivedCommentId));
         if (selectById == null) {
             throw new SCommentNotFoundException("Archived comment not found with id=" + archivedCommentId);

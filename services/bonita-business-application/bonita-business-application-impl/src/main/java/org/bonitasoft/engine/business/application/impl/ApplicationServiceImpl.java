@@ -205,7 +205,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplication getApplication(final long applicationId) throws SBonitaReadException, SObjectNotFoundException {
         final SApplication application = persistenceService
-                .selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId));
+                .selectById(new SelectByIdDescriptor<SApplication>(SApplication.class, applicationId));
         if (application == null) {
             throw new SObjectNotFoundException("No application found with id '" + applicationId + "'.");
         }
@@ -392,7 +392,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private SApplicationPage executeGetApplicationPageById(final long applicationPageId) throws SBonitaReadException {
         return persistenceService
-                .selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId));
+                .selectById(new SelectByIdDescriptor<SApplicationPage>(SApplicationPage.class, applicationPageId));
     }
 
     @Override
@@ -539,7 +539,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplicationMenu getApplicationMenu(final long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException {
         final SApplicationMenu applicationMenu = persistenceService
-                .selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId));
+                .selectById(new SelectByIdDescriptor<SApplicationMenu>(SApplicationMenu.class, applicationMenuId));
         if (applicationMenu == null) {
             throw new SObjectNotFoundException("No application found with id '" + applicationMenuId + "'.");
         }

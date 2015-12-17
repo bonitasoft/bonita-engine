@@ -313,7 +313,7 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public SFormMapping get(long formMappingId) throws SBonitaReadException, SObjectNotFoundException {
-        SFormMapping getFormMappingById = persistenceService.selectById(new SelectByIdDescriptor<>("getFormMappingById", SFormMapping.class,
+        SFormMapping getFormMappingById = persistenceService.selectById(new SelectByIdDescriptor<>(SFormMapping.class,
                 formMappingId));
         if (getFormMappingById == null) {
             throw new SObjectNotFoundException(formMappingId);

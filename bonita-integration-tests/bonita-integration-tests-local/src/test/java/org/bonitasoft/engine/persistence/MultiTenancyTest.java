@@ -53,7 +53,7 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         try {
-            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>(Human.class, human1.getId())));
             fail("human1 must not be found in tenant2");
         } catch (final AssertionError e) {
             // OK
@@ -66,7 +66,7 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
                                 new QueryOptions(0, 20, Human.class, "id", OrderByType.ASC))).size());
 
         recorder.recordInsert(new InsertRecord(human1), null);
-        PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+        PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>(Human.class, human1.getId())));
 
         assertEquals(
                 1,
@@ -123,14 +123,14 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
             final Human human2 = PersistenceTestUtil.buildHuman(firstName, lastName, age);
             getTransactionService().begin();
             recorder.recordInsert(new InsertRecord(human1), null);
-            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human1.getId())));
+            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<>(Human.class, human1.getId())));
             getTransactionService().complete();
 
             changeTenant(tenant2Id);
             getTransactionService().begin();
             try {
                 PersistenceTestUtil.checkHuman(human1,
-                        persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human1.getId())));
+                        persistenceService.selectById(new SelectByIdDescriptor<>(Human.class, human1.getId())));
                 fail("human1 must not be found in tenant1");
             } catch (final AssertionError e) {
                 // OK
@@ -140,10 +140,10 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
 
             changeTenant(tenant1Id);
             getTransactionService().begin();
-            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human1.getId())));
+            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<>(Human.class, human1.getId())));
             try {
                 PersistenceTestUtil.checkHuman(human2,
-                        persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human2.getId())));
+                        persistenceService.selectById(new SelectByIdDescriptor<>(Human.class, human2.getId())));
                 fail("human1 must not be found in default");
             } catch (final AssertionError e) {
                 // OK

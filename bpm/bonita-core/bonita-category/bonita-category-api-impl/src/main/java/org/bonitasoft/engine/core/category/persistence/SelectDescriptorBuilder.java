@@ -37,7 +37,7 @@ public class SelectDescriptorBuilder {
     private static final String PROCESS_ID = "processId";
 
     public static SelectByIdDescriptor<SCategory> getCategory(final long categoryId) {
-        return new SelectByIdDescriptor<SCategory>("getCategoryById", SCategory.class, categoryId);
+        return new SelectByIdDescriptor<SCategory>(SCategory.class, categoryId);
     }
 
     public static SelectOneDescriptor<SCategory> getCategory(final String categoryName) {

@@ -546,7 +546,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstanceId);
         try {
-            final SelectByIdDescriptor<SDataInstance> selectDescriptor = new SelectByIdDescriptor<SDataInstance>("getDataInstanceById", SDataInstance.class,
+            final SelectByIdDescriptor<SDataInstance> selectDescriptor = new SelectByIdDescriptor<SDataInstance>(SDataInstance.class,
                     dataInstanceId);
             final SDataInstance dataInstance = persistenceService.selectById(selectDescriptor);
             if (dataInstance == null) {

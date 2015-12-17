@@ -16,19 +16,14 @@ package org.bonitasoft.engine.services.impl;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.mockito.ArgumentMatcher;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class SelectByIdMatcher extends ArgumentMatcher<SelectByIdDescriptor<?>>{
-    
-    
-    private String queryName;
+public class SelectByIdMatcher extends ArgumentMatcher<SelectByIdDescriptor<?>> {
+
     private long id;
 
-    public SelectByIdMatcher(String queryName, long id) {
-        this.queryName = queryName;
+    public SelectByIdMatcher(long id) {
         this.id = id;
     }
 
@@ -37,9 +32,8 @@ public class SelectByIdMatcher extends ArgumentMatcher<SelectByIdDescriptor<?>>{
         if (!(argument instanceof SelectByIdDescriptor)) {
             return false;
         }
-        SelectByIdDescriptor<?> selectDescriptor = (SelectByIdDescriptor<?>)argument;
-        return queryName.equals(selectDescriptor.getQueryName())
-                && id == selectDescriptor.getId();
+        SelectByIdDescriptor<?> selectDescriptor = (SelectByIdDescriptor<?>) argument;
+        return id == selectDescriptor.getId();
     }
 
 }
