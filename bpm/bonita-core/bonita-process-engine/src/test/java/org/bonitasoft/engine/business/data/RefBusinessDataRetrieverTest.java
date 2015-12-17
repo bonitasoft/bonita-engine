@@ -23,7 +23,9 @@ import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -142,6 +144,9 @@ public class RefBusinessDataRetrieverTest {
                 .willReturn(PROCESS_INSTANCE_ID);
         given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willThrow(notFoundException);
         given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willThrow(notFoundException);
+        final SAUserTaskInstanceImpl saTask = new SAUserTaskInstanceImpl();
+        saTask.setLogicalGroup(3, PROCESS_INSTANCE_ID);
+        given(flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, FLOW_NODE_INSTANCE_ID)).willReturn(saTask);
         given(refBusinessDataService.getSARefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(archRefBusinessDataInstance);
 
         //when

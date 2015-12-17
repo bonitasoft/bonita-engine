@@ -13,6 +13,8 @@ DELETE FROM document_mapping;
 DELETE FROM arch_flownode_instance;
 DELETE FROM arch_process_instance;
 DELETE FROM arch_connector_instance;
+DELETE FROM arch_multi_biz_data;
+DELETE FROM arch_ref_biz_data_inst;
 DELETE FROM multi_biz_data;
 DELETE FROM ref_biz_data_inst;
 DELETE FROM pending_mapping;

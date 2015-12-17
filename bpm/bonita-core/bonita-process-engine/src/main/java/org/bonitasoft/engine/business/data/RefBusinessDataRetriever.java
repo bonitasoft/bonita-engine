@@ -17,7 +17,9 @@ package org.bonitasoft.engine.business.data;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.BusinessDataContext;
@@ -50,13 +52,13 @@ public class RefBusinessDataRetriever {
             try {
                 final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(context.getContainer().getId(), context.getContainer().getType());
                 return refBusinessDataService.getRefBusinessDataInstance(context.getName(), processInstanceId);
-            } catch (SRefBusinessDataInstanceNotFoundException e) {
+            } catch (SFlowNodeNotFoundException | SRefBusinessDataInstanceNotFoundException e) {
                 try {
-                    //                    final long processInstanceId = flowNodeInstanceService.getLastArchivedFlowNodeInstance(context.getContainer().getId(), context.getContainer().getType());
                     return refBusinessDataService.getSAFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
                 } catch (SRefBusinessDataInstanceNotFoundException ee) {
-                    //                    return refBusinessDataService.getSARefBusinessDataInstance(context.getName(), processInstanceId);
-                    return null; // FIXME: Change this
+                    final long processInstanceId = flowNodeInstanceService
+                            .getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, context.getContainer().getId()).getParentProcessInstanceId();
+                    return refBusinessDataService.getSARefBusinessDataInstance(context.getName(), processInstanceId);
                 }
             }
         }
