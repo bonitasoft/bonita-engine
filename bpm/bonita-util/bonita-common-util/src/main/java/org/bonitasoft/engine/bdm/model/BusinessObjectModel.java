@@ -15,20 +15,26 @@ package org.bonitasoft.engine.bdm.model;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -37,19 +43,58 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessObjectModel {
 
+    public static final String CURRENT_MODEL_VERSION = "1.0";
+
+    public static final String CURRENT_PRODUCT_VERSION;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessObjectModel.class);
+
+    static {
+        final Properties info = new Properties();
+        try {
+            info.load(BusinessObjectModel.class.getResourceAsStream("/info.properties"));
+        } catch (final IOException e) {
+            LOGGER.error("Failed to retrieve product version", e);
+        }
+        final String version = info.getProperty("version");
+        CURRENT_PRODUCT_VERSION = !StringUtils.isBlank(version) ? version : null;
+    }
+
     @XmlElementWrapper(name = "businessObjects", required = true)
     @XmlElement(name = "businessObject", required = true)
     private List<BusinessObject> businessObjects;
 
+    @XmlAttribute(name = "modelVersion", required = false)
+    private String modelVersion;
+
+    @XmlAttribute(name = "productVersion", required = false)
+    private String productVersion;
+
     public BusinessObjectModel() {
         businessObjects = new ArrayList<BusinessObject>();
+    }
+
+    public void setModelVersion(final String modelVersion) {
+        this.modelVersion = modelVersion;
+    }
+
+    public String getModelVersion() {
+        return modelVersion;
+    }
+
+    public void setProductVersion(final String productVersion) {
+        this.productVersion = productVersion;
+    }
+
+    public String getProductVersion() {
+        return productVersion;
     }
 
     public List<BusinessObject> getBusinessObjects() {
         return businessObjects;
     }
 
-    public void setBusinessObjects(List<BusinessObject> businessObjects) {
+    public void setBusinessObjects(final List<BusinessObject> businessObjects) {
         this.businessObjects = businessObjects;
     }
 
@@ -58,32 +103,32 @@ public class BusinessObjectModel {
     }
 
     public Set<String> getBusinessObjectsClassNames() {
-        HashSet<String> set = new HashSet<String>();
-        for (BusinessObject o : businessObjects) {
+        final HashSet<String> set = new HashSet<String>();
+        for (final BusinessObject o : businessObjects) {
             set.add(o.getQualifiedName());
         }
         return set;
     }
 
     public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
-        List<BusinessObject> refs = new ArrayList<BusinessObject>();
-        for (BusinessObject bo : businessObjects) {
+        final List<BusinessObject> refs = new ArrayList<BusinessObject>();
+        for (final BusinessObject bo : businessObjects) {
             refs.addAll(bo.getReferencedBusinessObjectsByComposition());
         }
         return refs;
     }
 
     public List<UniqueConstraint> getUniqueConstraints() {
-        List<UniqueConstraint> constraints = new ArrayList<UniqueConstraint>();
-        for (BusinessObject bo : businessObjects) {
+        final List<UniqueConstraint> constraints = new ArrayList<UniqueConstraint>();
+        for (final BusinessObject bo : businessObjects) {
             constraints.addAll(bo.getUniqueConstraints());
         }
         return constraints;
     }
 
     public List<Index> getIndexes() {
-        List<Index> indexes = new ArrayList<Index>();
-        for (BusinessObject bo : businessObjects) {
+        final List<Index> indexes = new ArrayList<Index>();
+        for (final BusinessObject bo : businessObjects) {
             indexes.addAll(bo.getIndexes());
         }
         return indexes;
@@ -91,7 +136,7 @@ public class BusinessObjectModel {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(businessObjects).toHashCode();
+        return new HashCodeBuilder().append(businessObjects).append(modelVersion).append(productVersion).toHashCode();
     }
 
     @Override
@@ -100,6 +145,8 @@ public class BusinessObjectModel {
             final BusinessObjectModel other = (BusinessObjectModel) obj;
             return new EqualsBuilder()
                     .append(businessObjects, other.businessObjects)
+                    .append(modelVersion, other.modelVersion)
+                    .append(productVersion, other.productVersion)
                     .isEquals();
         }
         return false;
