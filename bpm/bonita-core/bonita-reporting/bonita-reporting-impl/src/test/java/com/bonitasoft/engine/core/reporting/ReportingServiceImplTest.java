@@ -214,7 +214,7 @@ public class ReportingServiceImplTest {
     public void getReport() throws SBonitaException {
         final long reportId = 15;
         final SReport expected = aReport(reportId);
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>(SReport.class, reportId))).thenReturn(expected);
 
         final SReport report = reportingService.getReport(reportId);
 
@@ -224,7 +224,7 @@ public class ReportingServiceImplTest {
     @Test(expected = SReportNotFoundException.class)
     public void getReportThrowsReportNotFoundException() throws SBonitaException {
         final long reportId = 15;
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(null);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>(SReport.class, reportId))).thenReturn(null);
 
         reportingService.getReport(reportId);
     }
@@ -232,7 +232,7 @@ public class ReportingServiceImplTest {
     @Test(expected = SBonitaReadException.class)
     public void getReportThrowsException() throws SBonitaException {
         final long reportId = 15;
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenThrow(new SBonitaReadException("ouch!"));
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>(SReport.class, reportId))).thenThrow(new SBonitaReadException("ouch!"));
 
         reportingService.getReport(reportId);
     }
@@ -242,7 +242,7 @@ public class ReportingServiceImplTest {
         final long reportId = 15;
         final SReport expected = aReport(reportId);
         doThrow(new SRecorderException("ouch !")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(persistence.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId))).thenReturn(expected);
+        when(persistence.selectById(new SelectByIdDescriptor<SReport>(SReport.class, reportId))).thenReturn(expected);
 
         reportingService.deleteReport(reportId);
     }

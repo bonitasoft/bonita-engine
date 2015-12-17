@@ -238,7 +238,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getReport"));
         }
         try {
-            final SReport report = persistenceService.selectById(new SelectByIdDescriptor<SReport>("getReportById", SReport.class, reportId));
+            final SReport report = persistenceService.selectById(new SelectByIdDescriptor<SReport>(SReport.class, reportId));
             if (report == null) {
                 throw new SReportNotFoundException(reportId);
             }
@@ -389,7 +389,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getReportContent"));
         }
         try {
-            final SReportContent getReportContent = persistenceService.selectById(new SelectByIdDescriptor<SReportContent>("getReportContent",
+            final SReportContent getReportContent = persistenceService.selectById(new SelectByIdDescriptor<SReportContent>(
                     SReportContent.class, reportId));
             if (getReportContent == null) {
                 throw new SReportNotFoundException(reportId);
@@ -411,7 +411,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
         final SReportLogBuilder logBuilder = getReportLog(ActionType.UPDATED, "Updating report with id " + report.getId());
         try {
             entityUpdateDescriptor.addField("lastModificationDate", System.currentTimeMillis());
-            SSaveReportWithContent reportWithContent = persistenceService.selectById(new SelectByIdDescriptor<SSaveReportWithContent>("getReportById", SSaveReportWithContent.class, report.getId()));
+            SSaveReportWithContent reportWithContent = persistenceService.selectById(new SelectByIdDescriptor<SSaveReportWithContent>(SSaveReportWithContent.class, report.getId()));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(reportWithContent,
                     entityUpdateDescriptor);
             final SUpdateEvent updatePageEvent = getUpdateEvent(reportWithContent, REPORT);

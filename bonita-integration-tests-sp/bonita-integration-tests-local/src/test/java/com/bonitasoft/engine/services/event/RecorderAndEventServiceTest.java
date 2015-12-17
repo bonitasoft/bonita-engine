@@ -54,7 +54,7 @@ public class RecorderAndEventServiceTest extends CommonBPMServicesSPTest {
 
         // Update an Employee using recorder
         getTransactionService().begin();
-        final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>("getEmployeeById", Employee.class, employee.getId());
+        final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>(Employee.class, employee.getId());
         employee = persistenceService.selectById(selectByIdDescriptor);
         // Make UpdateRecord parameter
         final Map<String, Object> fields = new HashMap<String, Object>();
@@ -88,7 +88,7 @@ public class RecorderAndEventServiceTest extends CommonBPMServicesSPTest {
         // Update an Employee using recorder
         getTransactionService().begin();
 
-        final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>("getEmployeeById", Employee.class, employee.getId());
+        final SelectByIdDescriptor<Employee> selectByIdDescriptor = new SelectByIdDescriptor<Employee>(Employee.class, employee.getId());
         employee = persistenceService.selectById(selectByIdDescriptor);
         // Make UpdateRecord parameter
         final Map<String, Object> fields = new HashMap<String, Object>();
