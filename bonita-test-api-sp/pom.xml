@@ -24,14 +24,12 @@
         </dependency>
         <dependency>
             <groupId>com.bonitasoft.engine</groupId>
-            <artifactId>bonita-common-sp</artifactId>
+            <artifactId>bonita-server-sp</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>com.bonitasoft.engine</groupId>
-            <artifactId>bonita-server-sp</artifactId>
+            <artifactId>bonita-common-sp</artifactId>
             <version>${project.version}</version>
         </dependency>
 
