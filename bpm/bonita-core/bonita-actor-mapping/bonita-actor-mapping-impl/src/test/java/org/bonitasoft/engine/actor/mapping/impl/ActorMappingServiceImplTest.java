@@ -14,7 +14,6 @@ package org.bonitasoft.engine.actor.mapping.impl;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.engine.actor.mapping.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -77,6 +76,7 @@ import org.mockito.Matchers;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 
 /**
  * @author Celine Souchet
@@ -265,7 +265,7 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long)}.
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long, int, int)} .
      *
      * @throws SBonitaReadException
      */
@@ -278,7 +278,7 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long)}.
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long, int, int)} .
      *
      * @throws SBonitaReadException
      */
@@ -365,7 +365,7 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorsOfUserCanStartProcessDefinition(long, long)}.
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long, int, int)} .
      *
      * @throws SBonitaReadException
      */

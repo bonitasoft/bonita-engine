@@ -28,8 +28,6 @@ import java.util.Map;
 
 import org.assertj.core.util.Lists;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.bpm.actor.ActorCriterion;
-import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
@@ -48,10 +46,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.Order;
@@ -523,104 +518,6 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
                 // Second creation date must be after third creation date:
                 assertTrue(returnedPI1.getStartDate().after(returnedPI2.getStartDate()));
                 break;
-        }
-
-    }
-
-    @Test
-    public void isInvolvedInProcessInstance() throws Exception {
-
-        //given
-
-        //user and manager
-
-        final User managerOfJohn = createUser(new UserCreator("managerOfJohn", "bpm"));
-        final User john = createUser(new UserCreator("john", "bpm").setManagerUserId(managerOfJohn.getId()));
-
-        final User managerOfJack = createUser(new UserCreator("managerOfJack", "bpm"));
-        final User jack = createUser(new UserCreator("jack", "bpm").setManagerUserId(managerOfJack.getId()));
-        final Group jackGroup = createGroup("jackGroup", null);
-        final Role jackRole = createRole("jackRole");
-        getIdentityAPI().addUserMembership(jack.getId(), jackGroup.getId(), jackRole.getId());
-
-        final User managerOfJames = createUser(new UserCreator("managerOfJames", "bpm"));
-        final User james = createUser(new UserCreator("james", "bpm").setManagerUserId(managerOfJames.getId()));
-        final Group jamesGroup = createGroup("jamesGroup", null);
-        final Role jamesRole = createRole("jamesRole");
-        getIdentityAPI().addUserMembership(james.getId(), jamesGroup.getId(), jamesRole.getId());
-
-        final User managerOfToto = createUser(new UserCreator("managerOfToto", "bpm"));
-        final User toto = createUser(new UserCreator("toto", "bpm").setManagerUserId(managerOfToto.getId()));
-        final Group totoGroup = createGroup("totoGroup", null);
-        final Role totoRole = createRole("totoRole");
-        getIdentityAPI().addUserMembership(toto.getId(), totoGroup.getId(), totoRole.getId());
-
-        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder1.addActor(ACTOR_NAME);
-
-        // 1 instance of process def:
-        final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME)
-                .addUserTask("step3", ACTOR_NAME).addUserTask("step4", ACTOR_NAME).addTransition("step1", "step2").addTransition("step1", "step3")
-                .addTransition("step1", "step4").getProcess();
-        final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
-
-        //map user, group, role, and membership to that actor
-        final ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
-        getProcessAPI().addUserToActor(actor.getId(), john.getId());
-        getProcessAPI().addGroupToActor(actor.getId(), jackGroup.getId());
-        getProcessAPI().addRoleToActor(actor.getId(), jamesRole.getId());
-        getProcessAPI().addRoleAndGroupToActor(actor.getId(), totoRole.getId(), totoGroup.getId());
-
-        getProcessAPI().enableProcess(processDefinition.getId());
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        //then
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstance.getId())).as("directly mapped user should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJohn.getId(), processInstance.getId())).as(
-                "manager of directly mapped user should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(jack.getId(), processInstance.getId())).as("user mapped using group should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJack.getId(), processInstance.getId())).as(
-                "manager of user mapped using group should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(james.getId(), processInstance.getId())).as("user mapped using role should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJames.getId(), processInstance.getId())).as(
-                "manger of user mapped using role should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(toto.getId(), processInstance.getId())).as("user mapped using membership should be involed")
-                .isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfToto.getId(), processInstance.getId())).as(
-                "manager of user mapped using membership should be involed").isTrue();
-        assertThat(getProcessAPI().isInvolvedInProcessInstance(pedro.getId(), processInstance.getId())).as("not mapped user should not be involved").isFalse();
-
-        //clean
-        deleteUsers(john, jack, james, toto, managerOfJohn, managerOfJames, managerOfJack, managerOfToto);
-        deleteGroups(jackGroup, jamesGroup, totoGroup);
-        deleteRoles(jackRole, jamesRole, totoRole);
-
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    @Test(expected = ProcessInstanceNotFoundException.class)
-    public void isInvolvedInProcessInstanceWithProcessInstanceNotFoundException() throws Exception {
-        getProcessAPI().isInvolvedInProcessInstance(pedro.getId(), 0);
-    }
-
-    @Test
-    public void isInvolvedInProcessInstanceWithInvalidUser() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
-        final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
-
-        addUserToFirstActorOfProcess(pedro.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance);
-        try {
-            final long beinglessUserId = pedro.getId() + 1;
-            getProcessAPI().isInvolvedInProcessInstance(beinglessUserId, processInstance.getId());
-        } finally {
-            disableAndDeleteProcess(processDefinition);
         }
     }
 

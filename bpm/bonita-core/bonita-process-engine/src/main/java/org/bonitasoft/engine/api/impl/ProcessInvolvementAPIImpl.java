@@ -40,6 +40,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -194,13 +195,13 @@ public class ProcessInvolvementAPIImpl {
                 .getManagerUserIdKey(), managerUserId));
         try {
             return identityService.searchUsers(new QueryOptions(0, Integer.MAX_VALUE, userOrderBys, userFilters, null));
-        } catch (final SBonitaReadException e) {
-            return Collections.emptyList();
+        } catch (SBonitaSearchException e) {
+           return Collections.EMPTY_LIST;
         }
     }
 
     private boolean isArchivedTaskDoneByOneOfTheSubordinates(final long processInstanceId, final ActivityInstanceService activityInstanceService,
-            final List<SUser> subordinates) throws SBonitaReadException {
+            final List<SUser> subordinates) throws SBonitaReadException, SBonitaSearchException {
         QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(processInstanceId);
 
         List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);

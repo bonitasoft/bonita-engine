@@ -5629,7 +5629,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     }
 
-    private ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
+    ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
