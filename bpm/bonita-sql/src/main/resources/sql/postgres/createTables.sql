@@ -477,9 +477,9 @@ CREATE TABLE arch_multi_biz_data (
 	tenantid BIGINT NOT NULL,
   	id BIGINT NOT NULL,
   	idx BIGINT NOT NULL,
-  	data_id BIGINT NOT NULL,
-  	PRIMARY KEY (tenantid, id, data_id)
+  	data_id BIGINT NOT NULL
 );
+ALTER TABLE arch_multi_biz_data ADD CONSTRAINT pk_arch_rbdi_mbd PRIMARY KEY (tenantid, id, data_id);
 ALTER TABLE arch_multi_biz_data ADD CONSTRAINT fk_arch_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES arch_ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE report (
