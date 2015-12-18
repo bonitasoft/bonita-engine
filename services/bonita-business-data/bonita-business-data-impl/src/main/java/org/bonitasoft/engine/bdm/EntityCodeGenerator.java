@@ -120,11 +120,11 @@ public class EntityCodeGenerator {
         }
     }
 
-    private void addUniqueConstraintAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
+    private void addUniqueConstraintAnnotations(final BusinessObject businessObject, final JDefinedClass entityClass) {
         final JAnnotationUse tableAnnotation = codeGenerator.addAnnotation(entityClass, Table.class);
         tableAnnotation.param("name", entityClass.name().toUpperCase());
 
-        final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
+        final List<UniqueConstraint> uniqueConstraints = businessObject.getUniqueConstraints();
         if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
@@ -132,14 +132,14 @@ public class EntityCodeGenerator {
                 uniqueConstraintAnnotation.param("name", uniqueConstraint.getName().toUpperCase());
                 final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotation.paramArray("columnNames");
                 for (final String fieldName : uniqueConstraint.getFieldNames()) {
-                    columnNamesParamArray.param(fieldName.toUpperCase());
+                    columnNamesParamArray.param(getFieldRealColumnName(businessObject, fieldName));
                 }
             }
         }
     }
 
-    private void addIndexAnnotations(final BusinessObject bo, final JDefinedClass entityClass) {
-        final List<Index> indexes = bo.getIndexes();
+    private void addIndexAnnotations(final BusinessObject businessObject, final JDefinedClass entityClass) {
+        final List<Index> indexes = businessObject.getIndexes();
         if (indexes != null && !indexes.isEmpty()) {
             final JAnnotationUse hibTabAnnotation = codeGenerator.addAnnotation(entityClass, org.hibernate.annotations.Table.class);
             hibTabAnnotation.param("appliesTo", entityClass.name().toUpperCase());
@@ -149,16 +149,26 @@ public class EntityCodeGenerator {
                 indexAnnotation.param("name", index.getName().toUpperCase());
                 final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
                 for (final String fieldName : index.getFieldNames()) {
-                    String columnName;
-                    if (bo.isARelationField(fieldName)) {
-                        columnName = relationFieldAnnotator.getJoinColumnName(fieldName);
-                    } else {
-                        columnName = fieldName;
-                    }
-                    columnParamArray.param(columnName.toUpperCase());
+                    columnParamArray.param(getFieldRealColumnName(businessObject, fieldName).toUpperCase());
                 }
             }
         }
+    }
+
+    /**
+     * get real column name used in database
+     * @param businessObject
+     * @param fieldName
+     * @return fieldName for simple fields or reduced name suffix by "_PID" when we have an entity relationship
+     */
+    private String getFieldRealColumnName(BusinessObject businessObject, String fieldName) {
+        String columnName;
+        if (businessObject.isARelationField(fieldName)) {
+            columnName = relationFieldAnnotator.getJoinColumnName(fieldName);
+        } else {
+            columnName = fieldName;
+        }
+        return columnName;
     }
 
     private void addNamedQuery(final JDefinedClass entityClass, final JAnnotationArrayMember valueArray, final String name, final String content) {

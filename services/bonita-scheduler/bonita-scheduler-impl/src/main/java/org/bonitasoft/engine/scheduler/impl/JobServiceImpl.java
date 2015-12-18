@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,6 +60,7 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
+import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
 
@@ -396,4 +399,44 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    @Override
+    public void logJobError(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+            SJobLogCreationException, SJobDescriptorReadException {
+        final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId, 0, 1);
+        if (!jobLogs.isEmpty()) {
+            final SJobLog jobLog = jobLogs.get(0);
+            final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+            final StringWriter exceptionWriter = new StringWriter();
+            jobException.printStackTrace(new PrintWriter(exceptionWriter));
+            descriptor.addField("lastMessage", exceptionWriter.toString());
+            descriptor.addField("lastUpdateDate", System.currentTimeMillis());
+            descriptor.addField("retryNumber", jobLog.getRetryNumber() + 1);
+            updateJobLog(jobLog, descriptor);
+        } else {
+            createJobLog(jobException, jobDescriptorId);
+        }
+    }
+
+
+    public void createJobLog(final Exception jobException, final Long jobDescriptorId) throws SJobLogCreationException, SJobDescriptorReadException {
+        SJobDescriptor jobDescriptor = getJobDescriptor(jobDescriptorId);
+        if (jobDescriptor != null) {
+            final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
+            jobLog.setLastMessage(getStackTrace(jobException));
+            jobLog.setRetryNumber(0L);
+            jobLog.setLastUpdateDate(System.currentTimeMillis());
+            createJobLog(jobLog);
+        } else {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Impossible to mark the job with id '" + jobDescriptorId
+                        + "' as failed because no job was found for this identifier. It was probably removed just after its failure and before this action.");
+            }
+        }
+    }
+
+    private String getStackTrace(final Exception jobException) {
+        final StringWriter exceptionWriter = new StringWriter();
+        jobException.printStackTrace(new PrintWriter(exceptionWriter));
+        return exceptionWriter.toString();
+    }
 }

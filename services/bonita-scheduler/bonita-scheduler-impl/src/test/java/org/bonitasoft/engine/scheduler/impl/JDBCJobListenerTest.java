@@ -27,16 +27,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -48,14 +44,12 @@ import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNot
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -98,8 +92,6 @@ public class JDBCJobListenerTest {
     @Mock
     private IncidentService incidentService;
 
-    @Mock
-    private JobLogCreator jobLogCreator;
 
     @InjectMocks
     private JDBCJobListener jdbcJobListener;
@@ -114,57 +106,6 @@ public class JDBCJobListenerTest {
         context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
     }
 
-    @Test
-    public void jobWasExecuted_should_call_incidentServiceIfExceptionOccurs() throws Exception {
-        // Given
-        doThrow(SBonitaReadException.class).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
-
-        // When
-        jdbcJobListener.jobWasExecuted(context, exeption1);
-
-        // Then
-        verify(incidentService).report(anyLong(), any(Incident.class));
-        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
-    }
-
-    @Test
-    public void jobWasExecuted_should_create_jobLog_on_exception_if_no_previous_joblog() throws Exception {
-        // Given
-        final List<SJobLog> jobLogs = Collections.emptyList();
-        doReturn(jobLogs).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
-
-        // When
-        jdbcJobListener.jobWasExecuted(context, exeption1);
-
-        // Then
-        verify(jobLogCreator).createJobLog(exeption1, JOB_DESCRIPTOR_ID);
-        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
-    }
-
-    @Test
-    public void jobWasExecuted_should_update_jobLog_on_exception_if_previous_joblog() throws Exception {
-        // Given
-        final SJobLogImpl jobLog = mock(SJobLogImpl.class);
-        doReturn(1L).when(jobLog).getRetryNumber();
-        final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
-
-        doReturn(jobLogs).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
-
-        long before = System.currentTimeMillis();
-
-        // When
-        jdbcJobListener.jobWasExecuted(context, exeption1);
-
-        // Then
-        ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
-        verify(jobService).updateJobLog(eq(jobLog), captor.capture());
-        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
-
-        EntityUpdateDescriptor updateDescriptor = captor.getValue();
-        assertThat((String) updateDescriptor.getFields().get("lastMessage")).contains(exeption1.getMessage());
-        assertThat((Long) updateDescriptor.getFields().get("lastUpdateDate")).isGreaterThanOrEqualTo(before);
-        assertThat(updateDescriptor.getFields().get("retryNumber")).isEqualTo(2L);
-    }
 
     @Test
     public void jobWasExecuted_should_log_if_can_log_when_no_job_descriptor_id() throws Exception {
