@@ -260,7 +260,7 @@ CREATE TABLE arch_flownode_instance (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(kind, logicalGroup2, executedBy)
+CREATE INDEX idx_afi_kind_lg2_executedBy ON arch_flownode_instance(logicalGroup2, tenantId, kind, executedBy);
 GO
 CREATE INDEX idx_afi_kind_lg3 ON arch_flownode_instance(tenantId, kind, logicalGroup3)
 GO
