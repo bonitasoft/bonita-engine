@@ -340,6 +340,14 @@
         <property name="dataId" column="data_id" />
     </subclass>
 
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="proc_simple_ref">
+        <property name="processInstanceId" column="proc_inst_id" />
+    </subclass>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="fn_simple_ref">
+        <property name="flowNodeInstanceId" column="fn_inst_id" />
+    </subclass>
+
     <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true">
         <list name="dataIds" table="multi_biz_data">
             <key>
@@ -351,16 +359,8 @@
         </list>
     </subclass>
 
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="proc_simple_ref">
-        <property name="processInstanceId" column="proc_inst_id" />
-    </subclass>
-
     <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" discriminator-value="proc_multi_ref">
         <property name="processInstanceId" column="proc_inst_id" />
-    </subclass>
-
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="fn_simple_ref">
-        <property name="flowNodeInstanceId" column="fn_inst_id" />
     </subclass>
 
 </hibernate-mapping>

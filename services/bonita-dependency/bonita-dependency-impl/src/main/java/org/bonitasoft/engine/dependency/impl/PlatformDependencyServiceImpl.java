@@ -140,7 +140,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public SDependency getDependency(final long id) throws SDependencyNotFoundException {
-        final SelectByIdDescriptor<SPlatformDependency> selectByIdDescriptor = new SelectByIdDescriptor<SPlatformDependency>("getPlatformDependencyById",
+        final SelectByIdDescriptor<SPlatformDependency> selectByIdDescriptor = new SelectByIdDescriptor<SPlatformDependency>(
                 SPlatformDependency.class, id);
         try {
             final SPlatformDependency sDependency = platformPersistenceService.selectById(selectByIdDescriptor);
@@ -246,7 +246,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     @Override
     public SDependencyMapping getDependencyMapping(final long id) throws SDependencyMappingNotFoundException {
         final SelectByIdDescriptor<SPlatformDependencyMapping> selectByIdDescriptor = new SelectByIdDescriptor<SPlatformDependencyMapping>(
-                "getPlatformDependencyMappingById", SPlatformDependencyMapping.class, id);
+                SPlatformDependencyMapping.class, id);
         try {
             final SDependencyMapping sDependency = platformPersistenceService.selectById(selectByIdDescriptor);
             if (sDependency == null) {

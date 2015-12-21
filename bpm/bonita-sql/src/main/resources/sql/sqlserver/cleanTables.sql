@@ -28,6 +28,10 @@ DELETE FROM arch_process_instance
 GO
 DELETE FROM arch_connector_instance
 GO
+DELETE FROM arch_multi_biz_data
+GO
+DELETE FROM arch_ref_biz_data_inst
+GO
 DELETE FROM multi_biz_data
 GO
 DELETE FROM ref_biz_data_inst

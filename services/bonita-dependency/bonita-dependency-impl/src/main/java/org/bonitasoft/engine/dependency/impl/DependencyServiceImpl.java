@@ -386,7 +386,7 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(id);
         try {
-            final SelectByIdDescriptor<SDependency> desc = new SelectByIdDescriptor<SDependency>("getDependencyById", SDependency.class, id);
+            final SelectByIdDescriptor<SDependency> desc = new SelectByIdDescriptor<SDependency>(SDependency.class, id);
             final SDependency sDependency = persistenceService.selectById(desc);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependency"));
@@ -437,7 +437,7 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(id);
         try {
-            final SelectByIdDescriptor<SDependencyMapping> desc = new SelectByIdDescriptor<SDependencyMapping>("getDependencyMapping",
+            final SelectByIdDescriptor<SDependencyMapping> desc = new SelectByIdDescriptor<SDependencyMapping>(
                     SDependencyMapping.class, id);
             final SDependencyMapping sDependencyMapping = persistenceService.selectById(desc);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {

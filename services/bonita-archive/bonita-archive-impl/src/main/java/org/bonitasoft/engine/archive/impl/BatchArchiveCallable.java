@@ -32,20 +32,18 @@ public class BatchArchiveCallable implements Callable<Void> {
     public BatchArchiveCallable(final PersistenceService persistenceService, final ArchiveInsertRecord... records) {
         this.persistenceService = persistenceService;
         if (records == null) {
-            archivedObjects = new ArrayList<ArchivedPersistentObject>();
+            archivedObjects = new ArrayList<>();
         } else {
             archivedObjects = createArchivedObjectsList(records);
         }
     }
 
     /**
-     * @param time
      * @param records
      * @return
-     * @throws SRecorderException
      */
     protected List<ArchivedPersistentObject> createArchivedObjectsList(final ArchiveInsertRecord... records) {
-        final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();
+        final List<ArchivedPersistentObject> archivedObjects = new ArrayList<>();
         for (final ArchiveInsertRecord record : records) {
             if (record != null) {
                 archivedObjects.add(record.getEntity());

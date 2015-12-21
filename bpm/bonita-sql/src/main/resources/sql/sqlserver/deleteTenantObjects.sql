@@ -28,6 +28,10 @@ DELETE FROM arch_process_instance WHERE tenantid = ${tenantid}
 GO
 DELETE FROM arch_connector_instance  WHERE tenantid = ${tenantid}
 GO
+DELETE FROM arch_multi_biz_data WHERE tenantid = ${tenantid}
+GO
+DELETE FROM arch_ref_biz_data_inst WHERE tenantid = ${tenantid}
+GO
 DELETE FROM multi_biz_data WHERE tenantid = ${tenantid}
 GO
 DELETE FROM ref_biz_data_inst WHERE tenantid = ${tenantid}

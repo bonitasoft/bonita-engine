@@ -215,7 +215,7 @@ public class SyncQueriableLoggerServiceImplTest {
     @Test
     public void getLog_should_return_log_from_persistence_service() throws Exception {
         // given
-        doReturn(log1).when(persistenceService).selectById(argThat(new SelectByIdMatcher("getQueriableLogById", 100L)));
+        doReturn(log1).when(persistenceService).selectById(argThat(new SelectByIdMatcher(100L)));
 
         // when
         SQueriableLog log = logService.getLog(100L);

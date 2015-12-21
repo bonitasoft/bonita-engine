@@ -17,12 +17,20 @@ package org.bonitasoft.engine.operation;
 import org.bonitasoft.engine.commons.Container;
 
 /**
+ * Represents a Evaluation Context to reference / retrieve Business Data.
+ * 
  * @author Elias Ricken de Medeiros
  */
 public class BusinessDataContext {
 
+    /**
+     * name of the business data to retrieve
+     */
     private String name;
 
+    /**
+     * Container on which to look for the business data (PROCESS of FLOWNODE)
+     */
     private Container container;
 
     public BusinessDataContext(final String name, final Container container) {

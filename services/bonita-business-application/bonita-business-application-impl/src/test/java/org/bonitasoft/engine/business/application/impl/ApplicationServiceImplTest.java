@@ -192,7 +192,7 @@ public class ApplicationServiceImplTest {
     @Test
     public void getApplication_should_return_result_of_persistence_service_selectById() throws Exception {
         //given
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, 10L))).willReturn(application);
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, 10L))).willReturn(application);
 
         //when
         final SApplication retrievedApp = applicationServiceImpl.getApplication(10L);
@@ -205,7 +205,7 @@ public class ApplicationServiceImplTest {
     public void getApplication_should_throw_SObjectNotFoundException_when_persitence_service_returns_null() throws Exception {
         //given
         final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, applicationId))).willReturn(null);
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(null);
 
         //when
         try {
@@ -236,7 +236,7 @@ public class ApplicationServiceImplTest {
     public void deleteApplication_should_call_record_delete() throws Exception {
         //given
         final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, applicationId))).willReturn(
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
                 application);
 
         //when
@@ -269,7 +269,7 @@ public class ApplicationServiceImplTest {
     public void deleteApplication_should_throw_SObjectNotFoundException_when_no_application_with_the_given_id_is_found() throws Exception {
         //given
         final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, applicationId))).willReturn(null);
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(null);
 
         //when
         applicationServiceImpl.deleteApplication(applicationId);
@@ -281,7 +281,7 @@ public class ApplicationServiceImplTest {
     public void deleteApplication_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
         //given
         final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, applicationId))).willReturn(
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
                 application);
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
@@ -393,7 +393,7 @@ public class ApplicationServiceImplTest {
     public void getApplicationPage_should_return_result_of_persitence_service_selectById() throws Exception {
         //given
         final SApplicationPage applicationPage = buildApplicationPage(10, 20, "myPage");
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationPageById", SApplicationPage.class, 10L))).willReturn(
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, 10L))).willReturn(
                 applicationPage);
 
         //when
@@ -495,7 +495,7 @@ public class ApplicationServiceImplTest {
     public void deleteApplicationPage_should_throw_SObjectNotFound_when_there_is_no_applicationPage_for_the_given_id() throws Exception {
         //given
         final long applicationPageId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, applicationPageId)))
                 .willReturn(null);
 
         //when
@@ -509,7 +509,7 @@ public class ApplicationServiceImplTest {
         //given
         final long applicationPageId = 10L;
         final SApplicationPage applicationPage = buildApplicationPage(27, 20, 30, "myPage");
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, applicationPageId)))
                 .willReturn(applicationPage);
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
@@ -527,7 +527,7 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, applicationId))).willReturn(
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
                 application);
 
         //when
@@ -551,10 +551,10 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationById", SApplication.class, applicationId))).willReturn(
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
                 application);
 
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationPageById", SApplicationPage.class, homePageId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, homePageId)))
                 .willReturn(
                         null);
 
@@ -717,7 +717,7 @@ public class ApplicationServiceImplTest {
         appMenu.setId(17);
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationMenu.class, applicationMenuId)))
                 .willReturn(
                         appMenu);
 
@@ -803,7 +803,7 @@ public class ApplicationServiceImplTest {
         appMenu.setId(17);
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationMenu.class, applicationMenuId)))
                 .willReturn(
                         appMenu);
 
@@ -822,7 +822,7 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationMenu.class, applicationMenuId)))
                 .willReturn(
                         null);
 
@@ -843,7 +843,7 @@ public class ApplicationServiceImplTest {
         appMenu.setId(17);
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationMenu.class, applicationMenuId)))
                 .willReturn(
                         appMenu);
         doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
@@ -858,7 +858,7 @@ public class ApplicationServiceImplTest {
     public void getApplicationMenu_by_id_should_return_result_of_persitence_service() throws Exception {
         //given
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1, 12);
-        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>("getApplicationMenuById",
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>(
                 SApplicationMenu.class, 3);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
 
@@ -872,7 +872,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void getApplicationMenu_by_id_should_throw_SObjectNotFoundException_when_persistence_service_returns_null() throws Exception {
         //given
-        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>("getApplicationMenuById",
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>(
                 SApplicationMenu.class, 3);
         given(persistenceService.selectById(selectDescriptor)).willReturn(null);
 
@@ -888,7 +888,7 @@ public class ApplicationServiceImplTest {
         final int applicationMenuId = 3;
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1, 12);
         applicationMenu.setId(applicationMenuId);
-        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>("getApplicationMenuById",
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>(
                 SApplicationMenu.class, applicationMenuId);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
         final SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
@@ -931,7 +931,7 @@ public class ApplicationServiceImplTest {
         final int applicationId = 3;
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, indexValue, 12);
         applicationMenu.setId(applicationId);
-        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>("getApplicationMenuById",
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<>(
                 SApplicationMenu.class, applicationId);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
 
