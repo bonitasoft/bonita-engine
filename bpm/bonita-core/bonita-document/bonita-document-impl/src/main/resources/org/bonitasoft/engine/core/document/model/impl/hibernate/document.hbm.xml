@@ -46,7 +46,7 @@
         <property name="fileName" type="string" column="filename"/>
         <property name="mimeType" type="string" column="mimetype"/>
         <property name="url" type="string" column="url"/>
-        <property name="content" column="content"/>
+        <property name="content" type="materialized_blob" column="content"/>
         <filter name="tenantFilter"/>
     </class>
 
