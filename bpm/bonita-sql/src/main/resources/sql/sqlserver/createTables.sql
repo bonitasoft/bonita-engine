@@ -929,7 +929,7 @@ GO
 CREATE TABLE page (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
+  name NVARCHAR(255) NOT NULL,
   displayName NVARCHAR(255) NOT NULL,
   description NVARCHAR(MAX),
   installationDate NUMERIC(19, 0) NOT NULL,
@@ -1021,7 +1021,7 @@ CREATE TABLE profileentry (
   parentId NUMERIC(19, 0),
   index_ NUMERIC(19, 0),
   type NVARCHAR(50),
-  page NVARCHAR(50),
+  page NVARCHAR(255),
   custom BIT DEFAULT 0,
   PRIMARY KEY (tenantId, id)
 )
