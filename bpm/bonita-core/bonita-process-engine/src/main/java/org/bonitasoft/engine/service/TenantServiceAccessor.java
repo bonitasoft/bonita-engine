@@ -16,9 +16,10 @@ package org.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
-import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
+import org.bonitasoft.engine.bar.ResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
+import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -190,7 +192,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     CacheService getCacheService();
 
-    DependencyResolver getDependencyResolver();
+    BusinessArchiveArtifactsManager getBusinessArchiveArtifactsManager();
 
     WorkService getWorkService();
 
@@ -245,4 +247,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     ReadPersistenceService getReadPersistenceService();
 
     Recorder getRecorder();
+
+    BusinessArchiveService getBusinessArchiveService();
+
+    ResourcesService getResourcesService();
 }

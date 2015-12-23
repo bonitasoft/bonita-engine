@@ -62,3 +62,4 @@ DROP TABLE form_mapping cascade constraints purge;
 DROP TABLE page_mapping cascade constraints purge;
 DROP TABLE process_content cascade constraints purge;
 DROP TABLE proc_parameter cascade constraints purge;
+DROP TABLE bar_resource cascade constraints purge;

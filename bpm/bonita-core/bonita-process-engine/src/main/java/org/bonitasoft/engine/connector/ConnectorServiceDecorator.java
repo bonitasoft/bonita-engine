@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bar.SBARResource;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
@@ -34,6 +35,8 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
  * This service wraps the connector service and add engine variables like apiAccessor, engineExecutionContext.
@@ -52,38 +55,38 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
-            final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
-            final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
+    public ConnectorResult executeMultipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
+                                                     final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
+                                                     final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
             throws SConnectorException {
         final Map<String, SExpression> parameters = new HashMap<String, SExpression>(connectorInputParameters);
         parameters.put("connectorApiAccessor", EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression());
         parameters.put("engineExecutionContext", EngineConstantExpressionBuilder.getEngineExecutionContext());
-        return connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, parameters, inputValues,
+        return connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, parameters, inputValues,
                 classLoader, sexpContext);
     }
 
     @Override
-    public boolean loadConnectors(final SProcessDefinition sDefinition, final long tenantId) throws SConnectorException {
-        return connectorService.loadConnectors(sDefinition, tenantId);
+    public boolean loadConnectors(final SProcessDefinition sDefinition) throws SConnectorException {
+        return connectorService.loadConnectors(sDefinition);
     }
 
     @Override
-    public void setConnectorImplementation(final SProcessDefinition sProcessDefinition, final long tenantId, final String connectorId,
+    public void setConnectorImplementation(final SProcessDefinition sProcessDefinition, final String connectorId,
             final String connectorVersion, final byte[] connectorImplementationArchive) throws SConnectorException, SInvalidConnectorImplementationException {
-        connectorService.setConnectorImplementation(sProcessDefinition, tenantId, connectorId, connectorVersion, connectorImplementationArchive);
+        connectorService.setConnectorImplementation(sProcessDefinition, connectorId, connectorVersion, connectorImplementationArchive);
     }
 
     @Override
-    public List<SConnectorImplementationDescriptor> getConnectorImplementations(final long processDefinitionId, final long tenantId, final int fromIndex,
+    public List<SConnectorImplementationDescriptor> getConnectorImplementations(final long processDefinitionId, final int fromIndex,
             final int numberPerPage, final String field, final OrderByType order) throws SConnectorException {
-        return connectorService.getConnectorImplementations(processDefinitionId, tenantId, fromIndex, numberPerPage, field, order);
+        return connectorService.getConnectorImplementations(processDefinitionId, fromIndex, numberPerPage, field, order);
     }
 
     @Override
     public SConnectorImplementationDescriptor getConnectorImplementation(final long processDefinitionId, final String connectorId,
-            final String connectorVersion, final long tenantId) throws SConnectorException {
-        return connectorService.getConnectorImplementation(processDefinitionId, connectorId, connectorVersion, tenantId);
+            final String connectorVersion) throws SConnectorException {
+        return connectorService.getConnectorImplementation(processDefinitionId, connectorId, connectorVersion);
     }
 
     @Override
@@ -106,9 +109,9 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public ConnectorResult executeConnector(final long rootDefinitionId, final SConnectorInstance sConnectorInstance, final ClassLoader classLoader,
-            final Map<String, Object> inputParameters) throws SConnectorException {
-        return connectorService.executeConnector(rootDefinitionId, sConnectorInstance, classLoader, inputParameters);
+    public ConnectorResult executeConnector(final long processDefinitionId, final SConnectorInstance sConnectorInstance, SConnectorImplementationDescriptor connectorImplementationDescriptor, final ClassLoader classLoader,
+                                            final Map<String, Object> inputParameters) throws SConnectorException {
+        return connectorService.executeConnector(processDefinitionId, sConnectorInstance, connectorImplementationDescriptor, classLoader, inputParameters);
     }
 
     @Override
@@ -117,7 +120,27 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public Long getNumberOfConnectorImplementations(final long processDefinitionId, final long tenantId) throws SConnectorException {
-        return connectorService.getNumberOfConnectorImplementations(processDefinitionId, tenantId);
+    public Long getNumberOfConnectorImplementations(final long processDefinitionId) throws SConnectorException {
+        return connectorService.getNumberOfConnectorImplementations(processDefinitionId);
+    }
+
+    @Override
+    public List<SBARResource> getConnectorImplementations(long processDefinitionId, int from, int numberOfElements) throws SBonitaReadException {
+        return connectorService.getConnectorImplementations(processDefinitionId, from, numberOfElements);
+    }
+
+    @Override
+    public void addConnectorImplementation(Long processDefinitionId, String name, byte[] content) throws SRecorderException {
+        connectorService.addConnectorImplementation(processDefinitionId, name, content);
+    }
+
+    @Override
+    public void removeConnectorImplementations(long processDefinitionId) throws SBonitaReadException, SRecorderException {
+        connectorService.removeConnectorImplementations(processDefinitionId);
+    }
+
+    @Override
+    public SConnectorImplementationDescriptor getConnectorImplementationDescriptor(long processDefinitionId, String connectorId, String version) throws SConnectorException {
+        return connectorService.getConnectorImplementation(processDefinitionId, connectorId, version);
     }
 }

@@ -45,7 +45,6 @@ public class BonitaHomeServer extends BonitaHome {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
-    private final ProcessManager processManager;
     private final TenantManager tenantManager;
     private final TenantStorage tenantStorage;
     private Properties platformProperties = null;
@@ -53,7 +52,6 @@ public class BonitaHomeServer extends BonitaHome {
 
     private BonitaHomeServer() {
         platformProperties = null;
-        processManager = new ProcessManager(this);
         tenantManager = new TenantManager(this);
         tenantStorage = new TenantStorage(this);
     }
@@ -68,9 +66,6 @@ public class BonitaHomeServer extends BonitaHome {
      * =================================================
      */
 
-    public ProcessManager getProcessManager() {
-        return processManager;
-    }
 
     public TenantManager getTenantManager() {
         return tenantManager;

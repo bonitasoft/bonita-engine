@@ -769,4 +769,24 @@ public class DependencyServiceImpl implements DependencyService {
         return hashMap;
     }
 
+    @Override
+    public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
+            throws SDependencyException {
+        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId, scopeType, fileName, jarContent)
+                .done();
+        createDependency(sDependency);
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
+                .createNewInstance(sDependency.getId(), artifactId, scopeType).done();
+        createDependencyMapping(sDependencyMapping);
+        return sDependency;
+    }
+
+    @Override
+    public SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<>(3);
+        inputParameters.put("artifactId", artifactId);
+        inputParameters.put("artifactType", artifactType);
+        inputParameters.put("fileName", fileName);
+        return persistenceService.selectOne(new SelectOneDescriptor<SDependency>("getDependencyOfArtifact", inputParameters, SDependency.class));
+    }
 }

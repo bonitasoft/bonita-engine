@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyDeployer;
+import org.bonitasoft.engine.api.impl.resolver.ActorBusinessArchiveArtifactManager;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -89,9 +89,9 @@ public class OrganizationAPIImpl {
 
     private void deleteCustomUserInfo(IdentityService identityService) throws SIdentityException {
         // only definitions will be deleted because values are deleted on cascade from DB
-        List<SCustomUserInfoDefinition> customUserInfoDefinitions = null;
+        List<SCustomUserInfoDefinition> customUserInfoDefinitions;
         do {
-            // the start index is always zero because the curent page will be deleted
+            // the start index is always zero because the current page will be deleted
             customUserInfoDefinitions = identityService.getCustomUserInfoDefinitions(0, pageSize);
             deleteCustomUserInfo(customUserInfoDefinitions, identityService);
         } while (customUserInfoDefinitions.size() == pageSize);
@@ -110,11 +110,11 @@ public class OrganizationAPIImpl {
     private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
-        final ActorProcessDependencyDeployer dependencyResolver = new ActorProcessDependencyDeployer();
+        final ActorBusinessArchiveArtifactManager dependencyResolver = new ActorBusinessArchiveArtifactManager(tenantAccessor.getActorMappingService(),tenantAccessor.getIdentityService(), tenantAccessor.getTechnicalLoggerService());
         do {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, 100);
             for (final Long processDefinitionId : processDefinitionIds) {
-                tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor, dependencyResolver);
+                tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependencies(processDefinitionId, tenantAccessor, dependencyResolver);
             }
         } while (processDefinitionIds.size() == 100);
     }

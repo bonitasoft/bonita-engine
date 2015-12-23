@@ -80,7 +80,7 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
         final String triggerName = (String) context.get(TRIGGER_NAME);
         try {
             deleteTimerEventTrigger(triggerName);
-        } catch (final SBonitaException e) {
+        } catch (final Exception e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
                         "An exception occurs during the deleting of the timer event trigger '" + triggerName + "'.", e);

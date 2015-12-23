@@ -26,6 +26,8 @@ import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition
 import org.bonitasoft.engine.expression.EngineConstantExpressionBuilder;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
  * This {@link UserFilterService} implementation injects, in method {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to
@@ -42,8 +44,6 @@ public class UserFilterServiceDecorator implements UserFilterService {
     /**
      * @param userFilterService
      *            the UserFilterService class that this class is decorating.
-     * @param expressionbuilder
-     *            the {@link SExpressionBuilder} used to decorate.
      */
     public UserFilterServiceDecorator(final UserFilterService userFilterService) {
         super();
@@ -54,7 +54,6 @@ public class UserFilterServiceDecorator implements UserFilterService {
      * {@inheritDoc}. This implementation injects a new expression to access the {@link APIAccessor} for User filters.
      * This new expression is referenced under the name 'apiAccessor'.
      * 
-     * @param actors
      */
     @Override
     public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition, final Map<String, SExpression> inputs,
@@ -70,8 +69,12 @@ public class UserFilterServiceDecorator implements UserFilterService {
     }
 
     @Override
-    public boolean loadUserFilters(final long processDefinitionId, final long tenantId) throws SUserFilterLoadingException {
-        return userFilterService.loadUserFilters(processDefinitionId, tenantId);
+    public boolean loadUserFilters(final long processDefinitionId) throws SUserFilterLoadingException {
+        return userFilterService.loadUserFilters(processDefinitionId);
     }
 
+    @Override
+    public void removeUserFilters(long processDefinitionId) throws SBonitaReadException, SRecorderException {
+        userFilterService.removeUserFilters(processDefinitionId);
+    }
 }

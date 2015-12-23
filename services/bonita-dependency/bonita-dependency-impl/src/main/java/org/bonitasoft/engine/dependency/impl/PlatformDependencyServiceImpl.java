@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -35,6 +36,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -415,4 +418,20 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         throw new UnsupportedOperationException("Only one artifact at platform level. No need to update in batch all dependencies.");
     }
 
+    @Override
+    public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException {
+        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
+                .createNewInstance(name, fileName, jarContent)
+                .done();
+        createDependency(sDependency);
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class)
+                .createNewInstance(sDependency.getId(), artifactId, scopeType).done();
+        createDependencyMapping(sDependencyMapping);
+        return sDependency;
+    }
+
+    @Override
+    public SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) {
+        return null;
+    }
 }

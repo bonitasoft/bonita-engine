@@ -16,6 +16,7 @@
 
     <modules>
         <module>bonita-commons</module>
+        <module>bonita-resources</module>
         <module>bonita-log</module>
         <module>bonita-recorder</module>
         <module>bonita-identity</module>

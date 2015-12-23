@@ -126,3 +126,5 @@ DROP TABLE process_content
 GO
 DROP TABLE proc_parameter
 GO
+DROP TABLE bar_resource
+GO

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -77,7 +77,7 @@ public class OrganizationAPIImplTest {
     private ProcessDefinitionService processDefinitionService;
 
     @Mock
-    private DependencyResolver dependencyResolver;
+    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
     @Mock
     private SCustomUserInfoDefinition userInfoDef1;
@@ -100,7 +100,7 @@ public class OrganizationAPIImplTest {
         given(serviceAccessor.getSupervisorService()).willReturn(supervisorService);
         given(serviceAccessor.getExternalIdentityMappingService()).willReturn(externalIdentityMappingService);
         given(serviceAccessor.getProcessDefinitionService()).willReturn(processDefinitionService);
-        given(serviceAccessor.getDependencyResolver()).willReturn(dependencyResolver);
+        given(serviceAccessor.getBusinessArchiveArtifactsManager()).willReturn(businessArchiveArtifactsManager);
 
         given(userInfoDef1.getId()).willReturn(CUSTOM_USER_INFO_DEF_ID1);
         given(userInfoDef2.getId()).willReturn(CUSTOM_USER_INFO_DEF_ID2);

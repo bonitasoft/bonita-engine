@@ -54,6 +54,7 @@
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="servicesResolver" ref="servicesResolver" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="batchSize" value="${bonita.platform.scheduler.batchsize}" />
     </bean>
 
@@ -172,20 +173,13 @@
         </property>
     </bean>
 
-    <bean id="jobLogCreator" class="org.bonitasoft.engine.scheduler.impl.JobLogCreator">
-        <constructor-arg name="jobService" ref="jobService" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-    </bean>
-
     <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
         <constructor-arg name="schedulerService" ref="scheduler" />
         <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
         <constructor-arg name="jobService" ref="jobService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="incidentService" ref="incidentService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="jobLogCreator" ref="jobLogCreator" />
     </bean>
 
     <bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
@@ -627,6 +621,15 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10400:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.bar.SBARResource</value>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10500" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10500:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
         <constructor-arg name="sequenceId" value="10121" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10121:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -771,6 +774,9 @@
                 <!-- actor -->
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
+                <!-- bar resources -->
+                <value>org/bonitasoft/engine/bar/hibernate/bar.hbm.xml</value>
+                <value>org/bonitasoft/engine/bar/hibernate/bar.queries.hbm.xml</value>
                 <!-- theme -->
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.hbm.xml</value>
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>

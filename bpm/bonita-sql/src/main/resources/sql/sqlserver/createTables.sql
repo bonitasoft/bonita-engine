@@ -94,7 +94,7 @@ CREATE TABLE arch_process_comment(
 )
 GO
 
-CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid)
+CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceobjectid, tenantid)
 GO
 CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid)
 GO
@@ -1127,4 +1127,17 @@ CREATE TABLE proc_parameter (
   value NVARCHAR(MAX) NULL,
   PRIMARY KEY (tenantId, id)
 )
+GO
+CREATE TABLE bar_resource (
+  tenantId NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  process_id NUMERIC(19, 0) NOT NULL,
+  name NVARCHAR(255) NOT NULL,
+  type NVARCHAR(16) NOT NULL,
+  content VARBINARY(MAX) NOT NULL,
+  UNIQUE (tenantId, process_id, name, type),
+  PRIMARY KEY (tenantId, id)
+)
+GO
+CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name)
 GO

@@ -27,8 +27,11 @@ import java.util.List;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
+import org.bonitasoft.engine.scheduler.JobIdentifier;
+import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
@@ -122,8 +125,8 @@ public class PlatformQuartzJobListenerTest {
         final TriggerFiredBundle firedBundle = new TriggerFiredBundle(jobDetail, trigger, new WeeklyCalendar(), true, new Date(), new Date(),
                 new Date(), new Date());
         final ConcurrentQuartzJob job = new ConcurrentQuartzJob();
-        job.setBosJob(new JobWrapper("name", mock(StatelessJob.class), mock(TechnicalLoggerService.class), 9, mock(EventService.class),
-                mock(SessionAccessor.class), mock(TransactionService.class)));
+        job.setBosJob(new JobWrapper(new JobIdentifier(1, 1, "name"), mock(StatelessJob.class), mock(TechnicalLoggerService.class), 9, mock(EventService.class),
+                mock(SessionAccessor.class), mock(TransactionService.class), mock(PersistenceService.class), mock(JobService.class)));
         final JobExecutionContext context = new JobExecutionContextImpl(scheduler, firedBundle, job);
 
         // When

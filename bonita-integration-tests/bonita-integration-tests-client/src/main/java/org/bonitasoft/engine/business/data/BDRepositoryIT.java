@@ -37,6 +37,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.api.APIClient;
 import org.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
@@ -150,6 +151,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         addressBO.addField(city);
         addressBO.addField(country);
         addressBO.addQuery(COUNT_ADDRESS, "SELECT count(a) FROM Address a", Long.class.getName());
+        addressBO.addUniqueConstraint("addressUK_with_relation","city","country");
 
         final RelationField addresses = new RelationField();
         addresses.setType(RelationField.Type.AGGREGATION);
@@ -712,7 +714,11 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+    /**
+     * {@link BDRepositoryIT#should_use_apiClient_to_instantiate_dao_on_client_side}
+     * @throws Exception
+     */
+    @Test @Deprecated
     public void should_use_factory_to_instantiate_dao_on_client_side() throws Exception {
         final AddressRef ref1 = new AddressRef("newYorkAddr", "33, corner street", "NY");
         final AddressRef ref2 = new AddressRef("romeAddr", "2, plaza del popolo", "Roma");
@@ -733,6 +739,50 @@ public class BDRepositoryIT extends CommonAPIIT {
                     classLoaderWithBDM);
             final BusinessObjectDAOFactory businessObjectDAOFactory = new BusinessObjectDAOFactory();
             final BusinessObjectDAO daoImpl = businessObjectDAOFactory.createDAO(apiSession, daoInterface);
+            assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIFIED_NAME + "DAOImpl");
+
+            Method daoMethod = daoImpl.getClass().getMethod("findByLastName", String.class, int.class, int.class);
+            assertThat(daoMethod).isNotNull();
+            assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
+            List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol", 0, 10);
+            assertThat(result).isNotEmpty().hasSize(1);
+
+            result = (List<?>) daoMethod.invoke(daoImpl, "Hanin", 0, 10);
+            assertThat(result).isEmpty();
+
+            daoMethod = daoImpl.getClass().getMethod("findByFirstNameAndLastName", String.class, String.class);
+            assertThat(daoMethod).isNotNull();
+            assertThat(daoMethod.getReturnType().getName()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
+            final Object employee = daoMethod.invoke(daoImpl, "Marcel", "Pagnol");
+            assertThat(employee).isNotNull();
+            final List<?> lazyAddresses = (List<?>) employee.getClass().getMethod("getAddresses", new Class[0]).invoke(employee);
+            assertThat(lazyAddresses).hasSize(2);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    @Test
+    public void should_use_apiClient_to_instantiate_dao_on_client_side() throws Exception {
+        final AddressRef ref1 = new AddressRef("newYorkAddr", "33, corner street", "NY");
+        final AddressRef ref2 = new AddressRef("romeAddr", "2, plaza del popolo", "Roma");
+        addEmployee("Marcel", "Pagnol", ref1, ref2);
+        final APISession apiSession = getSession();
+        final byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
+
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+
+        final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader,
+                EMPLOYEE_QUALIFIED_NAME, clientFolder);
+
+        try {
+            Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
+
+            @SuppressWarnings("unchecked")
+            final Class<? extends BusinessObjectDAO> daoInterface = (Class<? extends BusinessObjectDAO>) Class.forName(EMPLOYEE_QUALIFIED_NAME + "DAO", true,
+                    classLoaderWithBDM);
+            final APIClient client = new APIClient(apiSession);
+            final BusinessObjectDAO daoImpl = client.getDAO(daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIFIED_NAME + "DAOImpl");
 
             Method daoMethod = daoImpl.getClass().getMethod("findByLastName", String.class, int.class, int.class);
