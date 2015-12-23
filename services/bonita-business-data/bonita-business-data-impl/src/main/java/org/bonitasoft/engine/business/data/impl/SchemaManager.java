@@ -40,7 +40,7 @@ public class SchemaManager {
 
     public SchemaManager(final Map<String, Object> configuration, final TechnicalLoggerService loggerService) throws HibernateException {
         this.loggerService = loggerService;
-        this.configuration = new HashMap<String, Object>(configuration);
+        this.configuration = new HashMap<>(configuration);
         final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
         if (remove != null && loggerService.isLoggable(SchemaManager.class, TechnicalLogSeverity.INFO)) {
             this.loggerService.log(SchemaManager.class, TechnicalLogSeverity.INFO, "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
