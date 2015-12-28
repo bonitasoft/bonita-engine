@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bdm;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -48,7 +47,7 @@ public class BDMQueryUtil {
 
     protected static void createProvidedQueriesForBusinessObject(BusinessObject businessObject, List<Query> queries, QueryGenerator queryGenerator) {
         final Set<String> queryNames = new HashSet<>();
-        if (!containsQueryWithName(businessObject, queryGenerator.getQueryName(Field.PERSISTENCE_ID))) {
+        if (!businessObject.containsQuery(queryGenerator.getQueryName(Field.PERSISTENCE_ID))) {
             addQueryAndNameIfNotNull(queries, queryNames, queryGenerator.createQueryForPersistenceId(businessObject));
         }
 
@@ -92,7 +91,7 @@ public class BDMQueryUtil {
     public static Set<String> getAllProvidedQueriesNameForBusinessObject(final BusinessObject businessObject) {
         final Set<String> queryNames = new HashSet<>();
         for (QueryGenerator queryGenerator : getQueryGenerators()) {
-            if (!containsQueryWithName(businessObject, queryGenerator.getQueryName(Field.PERSISTENCE_ID))) {
+            if (!businessObject.containsQuery(queryGenerator.getQueryName(Field.PERSISTENCE_ID))) {
                 final SimpleField persistenceIdField = new SimpleField();
                 persistenceIdField.setName(Field.PERSISTENCE_ID);
                 persistenceIdField.setType(FieldType.LONG);
@@ -113,15 +112,6 @@ public class BDMQueryUtil {
         }
 
         return queryNames;
-    }
-
-    private static boolean containsQueryWithName(final BusinessObject businessObject, final String queryName) {
-        for (final Query q : businessObject.getQueries()) {
-            if (Objects.equals(queryName, q.getName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static String getCountQueryName(String selectQueryName) {

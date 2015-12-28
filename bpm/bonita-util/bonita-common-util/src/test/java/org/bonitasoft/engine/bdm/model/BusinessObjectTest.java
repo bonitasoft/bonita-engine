@@ -191,4 +191,35 @@ public class BusinessObjectTest {
         assertThat(field).isNull();
     }
 
+    @Test
+    public void containsQuery_should_return_true_when_query_exists() throws Exception {
+        //given
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1"))
+                .withQuery(new Query("query1", null, null))
+                .withQuery(new Query("query2", null, null))
+                .build();
+        businessObject.setQualifiedName("com.company.model.Employee");
+
+        //when
+        boolean containsQuery = businessObject.containsQuery("query2");
+
+        //then
+        assertThat(containsQuery).isTrue();
+    }
+
+    @Test
+    public void containsQuery_should_return_false_when_query_does_not_exist() throws Exception {
+        //given
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1"))
+                .withQuery(new Query("query1", null, null))
+                .build();
+        businessObject.setQualifiedName("com.company.model.Employee");
+
+        //when
+        boolean containsQuery = businessObject.containsQuery("anyAbsentQuery");
+
+        //then
+        assertThat(containsQuery).isFalse();
+    }
+
 }
