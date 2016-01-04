@@ -114,7 +114,7 @@ public class FormMappingServiceImpl implements FormMappingService {
     public SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form)
             throws SBonitaReadException, SObjectCreationException {
         if (target == null) {
-            throw new IllegalArgumentException("Illegal form target " + target);
+            throw new IllegalArgumentException("Form target is null");
         }
         SPageMapping sPageMapping;
         String key = formMappingKeyGenerator.generateKey(processDefinitionId, task, type);
@@ -133,7 +133,7 @@ public class FormMappingServiceImpl implements FormMappingService {
                 sPageMapping = null;
                 break;
             case SFormMapping.TARGET_NONE:
-                sPageMapping = null;
+                sPageMapping = pageMappingService.create(key, null, authorizationRules);
                 break;
             default:
                 throw new IllegalArgumentException("Illegal form target " + target);
