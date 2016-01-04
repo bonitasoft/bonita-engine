@@ -68,7 +68,7 @@ public class EngineStarter {
     protected String prepareBonitaHome() throws IOException {
         String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
         if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
-            final InputStream bonitaHomeIS = this.getClass().getResourceAsStream("/bonita-home.zip");
+            final InputStream bonitaHomeIS = getBonitaHomeInputStream();
             if (bonitaHomeIS == null) {
                 throw new IllegalStateException("No bonita home found in the class path");
             }
@@ -87,6 +87,10 @@ public class EngineStarter {
 
         }
         return bonitaHomePath;
+    }
+
+    protected InputStream getBonitaHomeInputStream() {
+        return this.getClass().getResourceAsStream("/bonita-home.zip");
     }
 
     protected void prepareEnvironment()
