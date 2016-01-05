@@ -19,11 +19,18 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.bonitasoft.engine.bdm.Entity;
 
+@NamedQueries({
+        @NamedQuery(name = "EntityPojo.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
+        @NamedQuery(name = "EntityPojo.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId"),
+        @NamedQuery(name = "EntityPojo.countForFind", query = "SELECT count(e)\nFROM Employee e\n")
+})
 public class EntityPojo implements Entity {
 
     private static final long serialVersionUID = 1L;

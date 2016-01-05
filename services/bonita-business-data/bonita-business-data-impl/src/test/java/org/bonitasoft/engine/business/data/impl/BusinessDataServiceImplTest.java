@@ -17,7 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -34,11 +36,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
 import org.bonitasoft.engine.bdm.model.QueryParameter;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryMetadata;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryResult;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
@@ -55,8 +60,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataServiceImplTest {
@@ -568,10 +571,30 @@ public class BusinessDataServiceImplTest {
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
         final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+        //        Query findQuery=new Query("find","query");
+        Query countQuery = new Query("countForFind", "query", Long.class.getName());
+        doReturn(countQuery).when(countQueryProvider).getCountQueryDefinition(any(BusinessObject.class), any(Query.class));
+        final long count = 5L;
+        doReturn(count).when(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class), anyMapOf(String.class, Serializable.class));
 
-        //when then no exception
-        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "find", parameters, 0, 10,
+        //when
+        final int startIndex = 3;
+        final int maxResults = 10;
+        final BusinessDataQueryResult queryResult = businessDataService.getJsonQueryEntities(entity.getClass().getName(), "find", parameters, startIndex,
+                maxResults,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //then
+        verify(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class), anyMapOf(String.class, Serializable.class));
+        final BusinessDataQueryMetadata businessDataQueryMetadata = queryResult.getBusinessDataQueryMetadata();
+        assertThat(businessDataQueryMetadata)
+                .as("should retrieve metadata")
+                .isNotNull();
+
+        assertThat(businessDataQueryMetadata.getStartIndex()).isEqualTo(startIndex);
+        assertThat(businessDataQueryMetadata.getMaxResults()).isEqualTo(maxResults);
+        assertThat(businessDataQueryMetadata.getCount()).isEqualTo(count);
+
     }
 
     @Test

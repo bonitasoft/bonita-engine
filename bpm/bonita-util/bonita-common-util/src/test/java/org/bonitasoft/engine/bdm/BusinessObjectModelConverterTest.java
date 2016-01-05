@@ -19,11 +19,10 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.io.IOUtils;
+import org.junit.Test;
 
 public class BusinessObjectModelConverterTest {
 
@@ -80,10 +79,41 @@ public class BusinessObjectModelConverterTest {
 
     @Test
     public void should_be_backward_compatible() throws Exception {
-        byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
-        BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
-        convertor.unmarshall(xml);
+        final byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_6.3.0.xml"));
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = convertor.unmarshall(xml);
         // expect no unmarshalling exception
+
+        assertThat(bom.getModelVersion()).isNullOrEmpty();
+        assertThat(bom.getProductVersion()).isNullOrEmpty();
+    }
+
+    @Test
+    public void should_be_backward_compatible_with_version() throws Exception {
+        final byte[] xml = org.apache.commons.io.IOUtils.toByteArray(BusinessObjectModelConverterTest.class.getResourceAsStream("/bom_7.2.0.xml"));
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = convertor.unmarshall(xml);
+        // expect no unmarshalling exception
+
+        assertThat(bom.getModelVersion()).isEqualTo("1.0");
+        assertThat(bom.getProductVersion()).isEqualTo("7.2.0");
+
+        final BusinessObjectModel unmarshallBom = convertor.unmarshall(convertor.marshall(bom));
+
+        assertThat(unmarshallBom.getModelVersion()).isEqualTo("1.0");
+        assertThat(unmarshallBom.getProductVersion()).isEqualTo("7.2.0");
+    }
+
+    @Test
+    public void should_set_current_model_version_when_marshalling() throws Exception {
+        final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
+        final BusinessObjectModel bom = new BusinessObjectModelBuilder().buildBOMWithQuery();
+        assertThat(bom.getModelVersion()).isNullOrEmpty();
+        assertThat(bom.getProductVersion()).isNullOrEmpty();
+        final BusinessObjectModel unmarshalledBom = convertor.unmarshall(convertor.marshall(bom));
+
+        assertThat(unmarshalledBom.getModelVersion()).isEqualTo(BusinessObjectModel.CURRENT_MODEL_VERSION);
+        assertThat(bom.getProductVersion()).isNotNull().isNotEmpty();
     }
 
     public void zipThenUnzipBOMShouldReturnTheOriginalBOMWithIndex() throws Exception {

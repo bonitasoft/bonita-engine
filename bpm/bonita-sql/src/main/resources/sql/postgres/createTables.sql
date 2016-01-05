@@ -818,7 +818,7 @@ ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenanti
 CREATE TABLE page (
   tenantId INT8 NOT NULL,
   id INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   displayName VARCHAR(255) NOT NULL,
   description TEXT,
   installationDate INT8 NOT NULL,
@@ -901,7 +901,7 @@ CREATE TABLE profileentry (
   parentId INT8,
   index_ INT8,
   type VARCHAR(50),
-  page VARCHAR(50),
+  page VARCHAR(255),
   custom BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (tenantId, id)
 );
