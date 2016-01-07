@@ -416,7 +416,7 @@ public interface DocumentAPI {
     /**
      * Get an ArchivedDocument based on it's id.
      *
-     * @param archivedDocumentId
+     * @param archivedProcessDocumentId
      *        The identifier of the document
      * @return an archived document
      * @throws org.bonitasoft.engine.session.InvalidSessionException
