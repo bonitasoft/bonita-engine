@@ -100,6 +100,14 @@ public class FormMappingServiceImplTest {
 
         verifyZeroInteractions(pageMappingService);
     }
+    @Test
+    public void createFormMapping_with_none_should_create_empty_form_mapping() throws Exception {
+        doReturn("mockedKey").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "someHumanTask", 84);
+
+        formMappingService.create(PROCESS_DEFINITION_ID, "someHumanTask", 84, SFormMapping.TARGET_NONE, null);
+
+        verify(pageMappingService).create(eq("mockedKey"), (Long) eq(null), anyList());
+    }
 
     @Test
     public void createWithInternalPageShouldCallPageMapping_create() throws Exception {

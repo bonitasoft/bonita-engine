@@ -58,7 +58,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FormMappingAndPageDependencyManagerTest {
+public class FormMappingAndPageArtifactManagerTest {
 
     public static final String PAGE = "myPage";
     public static final byte[] CONTENT1 = "content1".getBytes();
