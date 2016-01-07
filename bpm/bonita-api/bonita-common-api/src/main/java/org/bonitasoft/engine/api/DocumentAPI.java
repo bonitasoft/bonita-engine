@@ -416,7 +416,7 @@ public interface DocumentAPI {
     /**
      * Get an ArchivedDocument based on it's id.
      *
-     * @param sourceObjectId
+     * @param archivedDocumentId
      *        The identifier of the document
      * @return an archived document
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -425,10 +425,10 @@ public interface DocumentAPI {
      *         when the specified identifier does not refer to an archived document
      * @since 6.0
      */
-    ArchivedDocument getArchivedProcessDocument(final long sourceObjectId) throws ArchivedDocumentNotFoundException;
+    ArchivedDocument getArchivedProcessDocument(final long archivedProcessDocumentId) throws ArchivedDocumentNotFoundException;
 
     /**
-     * Get the original version of the document with the specified identifier.
+     * Get the latest version of the document with the specified identifier.
      *
      * @param sourceObjectId
      *        The identifier of the document
