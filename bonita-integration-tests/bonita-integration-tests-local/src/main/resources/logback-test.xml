@@ -7,7 +7,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.bonitasoft" level="WARN" />
+    <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="WARN" />
 
     <root level="WARN">
@@ -31,8 +31,9 @@
     <!--<logger name="org.bonitasoft.engine.execution.work.TxBonitaWork" level="DEBUG" />-->
     <!--<logger name="org.bonitasoft.engine.execution.work.LockProcessInstanceWork" level="DEBUG" />-->
     <!--<logger name="org.bonitasoft.engine.work.ExecutorWorkService" level="DEBUG" />-->
-    <!--<logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR"/>-->
-    <!--<logger name="org.hibernate.type" level="DEBUG"/>-->
+    <logger name="org.bonitasoft.engine.tracking.TimeTracker" level="WARN" />
+    <!--<logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR" />-->
+    <!--<logger name="org.hibernate.hql.internal.ast.QueryTranslatorImpl" level="DEBUG" />-->
 
 
     <!-- Quartz log for job lifecycle -->

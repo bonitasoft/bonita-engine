@@ -28,6 +28,10 @@ DROP TABLE arch_process_instance
 GO
 DROP TABLE arch_connector_instance
 GO
+DROP TABLE arch_multi_biz_data
+GO
+DROP TABLE arch_ref_biz_data_inst
+GO
 DROP TABLE multi_biz_data
 GO
 DROP TABLE ref_biz_data_inst

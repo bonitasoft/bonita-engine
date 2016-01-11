@@ -26,15 +26,15 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 public class SelectDescriptorBuilder {
 
     public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingWithoutDisplayNameById(final long mappingId) {
-        return new SelectByIdDescriptor<SExternalIdentityMapping>("getExternalIdentityMappingWithoutDisplayNameById", SExternalIdentityMapping.class, mappingId);
+        return new SelectByIdDescriptor<SExternalIdentityMapping>(SExternalIdentityMapping.class, mappingId);
     }
 
     public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingById(final long mappingId) {
-        return new SelectByIdDescriptor<SExternalIdentityMapping>("getExternalIdentityMappingById", SExternalIdentityMapping.class, mappingId);
+        return new SelectByIdDescriptor<SExternalIdentityMapping>(SExternalIdentityMapping.class, mappingId);
     }
 
     public static SelectByIdDescriptor<SExternalIdentityMapping> getExternalIdentityMappingById(final long mappingId, final String suffix) {
-        return new SelectByIdDescriptor<SExternalIdentityMapping>("getExternalIdentityMappingById" + suffix, SExternalIdentityMapping.class, mappingId);
+        return new SelectByIdDescriptor<SExternalIdentityMapping>(SExternalIdentityMapping.class, mappingId);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfExternalIdentityMappings(final String externalId, final String kind) {

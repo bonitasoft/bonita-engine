@@ -35,7 +35,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderF
 public class SelectDescriptorBuilder {
 
     public static SelectByIdDescriptor<SProcessSupervisor> getSupervisor(final long supervisorId) {
-        return new SelectByIdDescriptor<SProcessSupervisor>("getSupervisorById", SProcessSupervisor.class, supervisorId);
+        return new SelectByIdDescriptor<SProcessSupervisor>(SProcessSupervisor.class, supervisorId);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfSupervisors(final long processDefId) {

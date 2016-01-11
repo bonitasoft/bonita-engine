@@ -71,7 +71,7 @@ public class SelectDescriptorBuilder {
     }
 
     public static SelectByIdDescriptor<SAMappedDocument> getArchivedDocumentById(final long documentId) {
-        return new SelectByIdDescriptor<>("getArchivedDocumentById", SAMappedDocument.class, documentId);
+        return new SelectByIdDescriptor<>(SAMappedDocument.class, documentId);
     }
 
     public static SelectOneDescriptor<SAMappedDocument> getArchivedVersionOfDocument(final long documentId) {

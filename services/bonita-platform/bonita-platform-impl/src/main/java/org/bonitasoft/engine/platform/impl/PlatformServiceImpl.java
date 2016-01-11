@@ -553,7 +553,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         STenant tenant;
         try {
-            tenant = platformPersistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_TENANT_BY_ID, STenant.class, id));
+            tenant = platformPersistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, id));
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with id: " + id);
             }

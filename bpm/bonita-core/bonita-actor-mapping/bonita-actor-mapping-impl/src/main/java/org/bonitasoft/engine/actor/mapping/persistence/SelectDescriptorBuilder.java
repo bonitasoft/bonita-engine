@@ -37,7 +37,7 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 public class SelectDescriptorBuilder {
 
     public static SelectByIdDescriptor<SActor> getActor(final long actorId) {
-        return new SelectByIdDescriptor<SActor>("getActorById", SActor.class, actorId);
+        return new SelectByIdDescriptor<SActor>(SActor.class, actorId);
     }
 
     public static SelectOneDescriptor<SActor> getActor(final String actorName, final long scopeId) {
@@ -48,7 +48,7 @@ public class SelectDescriptorBuilder {
     }
 
     public static SelectByIdDescriptor<SActorMember> getActorMember(final long actorMemberId) {
-        return new SelectByIdDescriptor<SActorMember>("getActorMemberById", SActorMember.class, actorMemberId);
+        return new SelectByIdDescriptor<SActorMember>(SActorMember.class, actorMemberId);
     }
 
     public static SelectOneDescriptor<SActorMember> getActorMember(final long actorId, final long userId, final long groupId, final long roleId) {

@@ -41,7 +41,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Baptiste Mesta
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DocumentInitialValueDependencyManagerTest {
+public class DocumentInitialValueArtifactManagerTest {
 
     public static final long PROCESS_ID = 456L;
     @Mock

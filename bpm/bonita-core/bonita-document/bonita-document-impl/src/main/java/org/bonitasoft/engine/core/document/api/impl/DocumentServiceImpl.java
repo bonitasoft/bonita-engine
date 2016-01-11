@@ -216,7 +216,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public SLightDocument getDocument(final long documentId) throws SObjectNotFoundException, SBonitaReadException {
-        final SLightDocument document = persistenceService.selectById(new SelectByIdDescriptor<SLightDocument>("getLightDocumentById", SLightDocument.class,
+        final SLightDocument document = persistenceService.selectById(new SelectByIdDescriptor<SLightDocument>(SLightDocument.class,
                 documentId));
         if (document == null) {
             throw new SObjectNotFoundException("Document with id " + documentId + " not found");
@@ -270,7 +270,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private SDocument getDocumentWithContent(final Long id) throws SBonitaReadException, SObjectNotFoundException {
-        final SDocument document = persistenceService.selectById(new SelectByIdDescriptor<SDocument>("geDocumentById", SDocument.class, id));
+        final SDocument document = persistenceService.selectById(new SelectByIdDescriptor<SDocument>(SDocument.class, id));
         if (document == null) {
             throw new SObjectNotFoundException("Document with id " + id + " not found");
         }
@@ -279,7 +279,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public SMappedDocument getMappedDocument(final long mappingId) throws SObjectNotFoundException, SBonitaReadException {
-        final SMappedDocument document = persistenceService.selectById(new SelectByIdDescriptor<SMappedDocument>("getSMappedDocumentById",
+        final SMappedDocument document = persistenceService.selectById(new SelectByIdDescriptor<SMappedDocument>(
                 SMappedDocument.class,
                 mappingId));
         if (document == null) {
