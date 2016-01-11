@@ -826,7 +826,7 @@ CREATE TABLE page (
   provided BOOLEAN,
   lastModificationDate INT8 NOT NULL,
   lastUpdatedBy INT8 NOT NULL,
-  contentName VARCHAR(50) NOT NULL,
+  contentName VARCHAR(280) NOT NULL,
   content BYTEA,
   contentType VARCHAR(50) NOT NULL,
   processDefinitionId INT8
