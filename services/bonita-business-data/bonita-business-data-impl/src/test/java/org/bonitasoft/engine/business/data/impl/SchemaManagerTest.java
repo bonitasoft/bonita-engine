@@ -66,7 +66,7 @@ public class SchemaManagerTest {
         updateAndDropSchema(bom);
     }
 
-    protected void updateAndDropSchema(final BusinessObjectModel bom) {
+       protected void updateAndDropSchema(final BusinessObjectModel bom) {
         final List<Exception> updateExceptions = schemaManager.update(bom.getBusinessObjectsClassNames());
         if (!updateExceptions.isEmpty()) {
             fail("Updating schema fails due to: " + updateExceptions);
