@@ -853,7 +853,7 @@ CREATE TABLE page (
   provided BOOLEAN,
   lastModificationDate BIGINT NOT NULL,
   lastUpdatedBy BIGINT NOT NULL,
-  contentName VARCHAR(50) NOT NULL,
+  contentName VARCHAR(280) NOT NULL,
   content LONGBLOB,
   contentType VARCHAR(50) NOT NULL,
   processDefinitionId BIGINT

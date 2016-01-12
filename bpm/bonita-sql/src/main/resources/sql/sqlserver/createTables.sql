@@ -967,7 +967,7 @@ CREATE TABLE page (
   provided BIT,
   lastModificationDate NUMERIC(19, 0) NOT NULL,
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,
-  contentName NVARCHAR(50) NOT NULL,
+  contentName NVARCHAR(280) NOT NULL,
   content VARBINARY(MAX),
   contentType NVARCHAR(50) NOT NULL,
   processDefinitionId NUMERIC(19,0)
