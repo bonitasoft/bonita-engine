@@ -55,7 +55,9 @@ public class ServerProxyfier {
         if (entity == null) {
             return null;
         }
+
         final ProxyFactory factory = new ProxyFactory();
+        factory.setUseCache(false);
         Class<?> classForProxy = entity.getClass();
 
         //It's not possible to create a Proxy on a Proxy

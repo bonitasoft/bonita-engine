@@ -77,8 +77,6 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
             final String dataInstanceName = operation.getLeftOperand().getName();
             // should be a String because the data is an xml expression
             final String dataValue = (String) expressionContext.getInputValues().get(dataInstanceName);
-            final SExpressionContext sExpressionContext = new SExpressionContext();
-            sExpressionContext.setInputValues(expressionContext.getInputValues());
             final Object variableValue = value;
 
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

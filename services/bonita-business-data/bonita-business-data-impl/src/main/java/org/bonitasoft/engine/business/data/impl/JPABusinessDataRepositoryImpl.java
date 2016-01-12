@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -39,6 +39,11 @@ import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.classloader.ClassLoaderListener;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.hibernate.Hibernate;
@@ -48,7 +53,7 @@ import org.hibernate.proxy.HibernateProxy;
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
-public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
+public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, ClassLoaderListener {
 
     private static final String BDR_PERSISTENCE_UNIT = "BDR";
 
@@ -56,33 +61,77 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private EntityManagerFactory entityManagerFactory;
 
-    private final ThreadLocal<EntityManager> managers = new ThreadLocal<EntityManager>();
+    private final ThreadLocal<EntityManager> managers = new ThreadLocal<>();
 
     private final BusinessDataModelRepository businessDataModelRepository;
+    private final TechnicalLoggerService loggerService;
+    private ClassLoaderService classLoaderService;
+    private final long tenantId;
 
     private final TransactionService transactionService;
 
     public JPABusinessDataRepositoryImpl(final TransactionService transactionService, final BusinessDataModelRepository businessDataModelRepository,
-            final Map<String, Object> configuration) {
+            TechnicalLoggerService loggerService,
+            final Map<String, Object> configuration, ClassLoaderService classLoaderService, long tenantId) {
         this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
-        this.configuration = new HashMap<String, Object>(configuration);
+        this.loggerService = loggerService;
+        this.classLoaderService = classLoaderService;
+        this.tenantId = tenantId;
+        this.configuration = new HashMap<>(configuration);
         this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
     }
 
     @Override
     public void start() {
         if (businessDataModelRepository.isDBMDeployed()) {
-            entityManagerFactory = Persistence.createEntityManagerFactory(BDR_PERSISTENCE_UNIT, configuration);
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Create entity factory on tenant " + tenantId);
+            entityManagerFactory = createEntityManagerFactory();
         }
+        classLoaderService.addListener(ScopeType.TENANT.name(), tenantId, this);
+    }
+
+    EntityManagerFactory createEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(BDR_PERSISTENCE_UNIT, configuration);
     }
 
     @Override
     public void stop() {
-        if (entityManagerFactory != null) {
-            entityManagerFactory.close();
+        if (getEntityManagerFactory() != null) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Close entity factory because service is stopping on tenant " + tenantId);
+            getEntityManagerFactory().close();
             entityManagerFactory = null;
         }
+        classLoaderService.removeListener(ScopeType.TENANT.name(), tenantId, this);
+    }
+
+    private synchronized void recreateEntityManagerFactory(ClassLoader newClassLoader) {
+        if (businessDataModelRepository.isDBMDeployed()) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Recreate entity factory for classloader " + newClassLoader + " on tenant " + tenantId);
+            ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(newClassLoader);
+                entityManagerFactory.close();
+                entityManagerFactory = createEntityManagerFactory();
+            } finally {
+                Thread.currentThread().setContextClassLoader(currentClassLoader);
+            }
+        }
+    }
+
+    public EntityManagerFactory getEntityManagerFactory() {
+        if (entityManagerFactory == null) {
+            /*
+             * in case the entity manager factory is reloading inside #recreateEntityManagerFactory
+             * we get it inside a method synchronized with #recreateEntityManagerFactory
+             */
+            return synchronizedGetEntityManagerFactory();
+        }
+        return entityManagerFactory;
+    }
+
+    private synchronized EntityManagerFactory synchronizedGetEntityManagerFactory() {
+        return entityManagerFactory;
     }
 
     @Override
@@ -97,7 +146,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public Set<String> getEntityClassNames() {
-        if (entityManagerFactory == null) {
+        if (getEntityManagerFactory() == null) {
             return Collections.emptySet();
         }
         final EntityManager em = getEntityManager();
@@ -110,13 +159,13 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected EntityManager getEntityManager() {
-        if (entityManagerFactory == null) {
+        if (getEntityManagerFactory() == null) {
             throw new IllegalStateException("The BDR is not started");
         }
 
         EntityManager manager = managers.get();
         if (manager == null || !manager.isOpen()) {
-            manager = entityManagerFactory.createEntityManager();
+            manager = getEntityManagerFactory().createEntityManager();
             try {
                 transactionService.registerBonitaSynchronization(new RemoveEntityManagerSynchronization(managers));
             } catch (final STransactionNotFoundException stnfe) {
@@ -271,4 +320,13 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return entity;
     }
 
+    @Override
+    public void onUpdate(ClassLoader newClassLoader) {
+        recreateEntityManagerFactory(newClassLoader);
+    }
+
+    @Override
+    public void onDestroy(ClassLoader oldClassLoader) {
+
+    }
 }

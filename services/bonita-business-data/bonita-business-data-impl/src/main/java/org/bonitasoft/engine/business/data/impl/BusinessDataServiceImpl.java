@@ -263,10 +263,14 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Serializable buildJsonRepresentation(final Entity entity, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
         try {
-            return jsonBusinessDataSerializer.serializeEntity(entity, businessDataURIPattern);
+            return serializeJson(entity, businessDataURIPattern);
         } catch (final IOException e) {
             throw new SBusinessDataRepositoryException(e);
         }
+    }
+
+    private String serializeJson(Entity entity, String businessDataURIPattern) throws IOException {
+        return jsonBusinessDataSerializer.serializeEntity(entity, businessDataURIPattern);
     }
 
     private Serializable buildJsonRepresentation(final List<Entity> entities, final String businessDataURIPattern) throws SBusinessDataRepositoryException {

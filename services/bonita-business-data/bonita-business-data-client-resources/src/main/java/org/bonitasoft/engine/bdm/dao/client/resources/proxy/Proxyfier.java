@@ -46,6 +46,7 @@ public class Proxyfier {
             return null;
         }
         final ProxyFactory factory = new ProxyFactory();
+        factory.setUseCache(false);
         factory.setSuperclass(entity.getClass());
         factory.setFilter(new AllMethodFilter());
         try {
