@@ -75,7 +75,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
     @Test
     public void deployProcessesWithFormMappingAndUpdateThem() throws Exception {
         ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithUpdatedFormMappings", "1.0");
-        p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
+        p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor").addUserTask("step3", "actor");
         p1Builder.addActor("actor");
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
@@ -84,6 +84,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
                         FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
                                 .addTaskForm("task1Form", FormMappingTarget.UNDEFINED, "step2")
+                                .addTaskForm("task1Form", FormMappingTarget.NONE, "step3")
                                 .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.URL).build());
 
         ProcessDefinition p = getProcessAPI().deploy(bar.done());
@@ -99,6 +100,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
         //get
         FormMapping step1Form = getFormMapping(p, processConfigurationAPI, "step1");
         FormMapping step2Form = getFormMapping(p, processConfigurationAPI, "step2");
+        FormMapping step3Form = getFormMapping(p, processConfigurationAPI, "step3");
 
         //update
         processConfigurationAPI.updateFormMapping(step2Form.getId(), "http://newFormUrlForStep2", null);
@@ -118,6 +120,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
         PageURL pOverview = getCustomPageAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
         PageURL pStep1Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
         PageURL pStep2Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
+        PageURL pStep3Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step3", context, true);
         assertThat(pInstantiation.getUrl()).isEqualTo("processStartForm?tenant=" + getSession().getTenantId());
         assertThat(pInstantiation.getPageId()).isNull();
         assertThat(pOverview.getPageId()).isNull();
@@ -126,6 +129,20 @@ public class LiveUpdateIT extends CommonAPISPIT {
         assertThat(pStep1Execution.getPageId()).isNull(); // referenced page does not exist
         assertThat(pStep2Execution.getPageId()).isNull();
         assertThat(pStep2Execution.getUrl()).isEqualTo("http://newFormUrlForStep2?tenant=" + getSession().getTenantId());
+        assertThat(pStep3Execution.getPageId()).isNull();
+        assertThat(pStep3Execution.getUrl()).isNull();
+
+        //update step 3 form none to url and vice versa
+
+        processConfigurationAPI.updateFormMapping(step3Form.getId(), "http://newFormUrlForStep3", null);
+        pStep3Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step3", context, true);
+        assertThat(pStep3Execution.getPageId()).isNull();
+        assertThat(pStep3Execution.getUrl()).isEqualTo("http://newFormUrlForStep3?tenant=" + getSession().getTenantId());
+        processConfigurationAPI.updateFormMapping(step3Form.getId(), null, null);
+        pStep3Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step3", context, true);
+        assertThat(pStep3Execution.getPageId()).isNull();
+        assertThat(pStep3Execution.getUrl()).isNull();
+
 
         // deploy 2 pages
 
@@ -163,7 +180,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
                 new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_UPDATED")
                         .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done());
         assertThat(logSearchResult.getResult())
-                .hasSize(6)
+                .hasSize(8)
                 .extracting("message")
                 .contains(
                         "Previous: pageId=<null> urlAdapter=<external> url=<a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very ve",
@@ -172,13 +189,13 @@ public class LiveUpdateIT extends CommonAPISPIT {
         assertThat(
                 getLogAPI().searchLogs(
                         new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_CREATED")
-                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
+                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(5);
 
         getProcessAPI().deleteProcessDefinition(p.getId());
         assertThat(
                 getLogAPI().searchLogs(
                         new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_DELETED")
-                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
+                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(5);
 
     }
 

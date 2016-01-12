@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import com.bonitasoft.engine.api.PlatformAPI;
@@ -110,5 +111,10 @@ public class EngineStarterSP extends EngineStarter {
             }
         }
         return bonitaHome;
+    }
+
+    @Override
+    protected InputStream getBonitaHomeInputStream() {
+        return this.getClass().getResourceAsStream("/bonita-home-sp.zip");
     }
 }

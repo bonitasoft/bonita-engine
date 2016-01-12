@@ -81,7 +81,7 @@
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${basedir}/src/main/resources</outputDirectory>
-                                    <destFileName>bonita-home.zip</destFileName>
+                                    <destFileName>bonita-home-sp.zip</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
