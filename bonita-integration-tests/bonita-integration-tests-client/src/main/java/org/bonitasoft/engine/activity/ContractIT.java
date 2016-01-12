@@ -115,6 +115,14 @@ public class ContractIT extends CommonAPIIT {
         final HashMap<Object, Object> map = new HashMap<>();
         map.put("text", "textValue");
         inputs.put("complex", map);
+        //check exception on contract violation
+        try {
+            getProcessAPI().startProcessWithInputs(processDefinition.getId(), Collections.<String, Serializable> emptyMap());
+            fail("Should throw a contract violation exception");
+        } catch (ContractViolationException e) {
+            assertThat(e.getMessage()).contains("multipleText", "complex");
+        }
+        //start with right inputs
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
         final DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
@@ -144,8 +152,10 @@ public class ContractIT extends CommonAPIIT {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
 
-        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), Collections.<String, Serializable>singletonMap("nameInput", "john"));
-        assertThat(getProcessAPI().getProcessDataInstance("name", processInstance.getId()).getValue()).as("value of the data 'name' of the process").isEqualTo("john");
+        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
+                Collections.<String, Serializable> singletonMap("nameInput", "john"));
+        assertThat(getProcessAPI().getProcessDataInstance("name", processInstance.getId()).getValue()).as("value of the data 'name' of the process")
+                .isEqualTo("john");
         waitForUserTask(TASK1);
 
         getProcessAPI().sendSignal("*Bip Bip*");
@@ -207,7 +217,7 @@ public class ContractIT extends CommonAPIIT {
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable>singletonMap("reportInit", new FileInputValue("theFile", "", "theContent".getBytes())));
+                Collections.<String, Serializable> singletonMap("reportInit", new FileInputValue("theFile", "", "theContent".getBytes())));
         final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
 
         //then
@@ -395,7 +405,8 @@ public class ContractIT extends CommonAPIIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private Map<String, Serializable> createExpenseLine(final String expenseType, final float expenseAmount, final Date expenseDate, final byte[] expenseProof) {
+    private Map<String, Serializable> createExpenseLine(final String expenseType, final float expenseAmount, final Date expenseDate,
+            final byte[] expenseProof) {
         final Map<String, Serializable> expenseLine = new HashMap<>();
         expenseLine.put("expenseType", expenseType);
         expenseLine.put("expenseAmount", expenseAmount);
