@@ -842,7 +842,7 @@ CREATE TABLE page (
   provided NUMBER(1),
   lastModificationDate NUMBER(19, 0) NOT NULL,
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
-  contentName VARCHAR2(50 CHAR) NOT NULL,
+  contentName VARCHAR2(280 CHAR) NOT NULL,
   content BLOB,
   contentType VARCHAR2(50 CHAR),
   processDefinitionId NUMBER(19, 0)

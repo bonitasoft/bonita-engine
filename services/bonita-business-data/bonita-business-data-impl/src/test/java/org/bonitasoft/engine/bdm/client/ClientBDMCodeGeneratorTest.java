@@ -209,7 +209,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     private String readGeneratedDAOInterface() throws IOException {
-        final File daoInterface = new File(destDir, EMPLOYEE_QUALIFIED_NAME.replace(".", File.separator) + "DAO.java");
+        final File daoInterface = getGeneratedFile(EMPLOYEE_QUALIFIED_NAME.replace(".", File.separator) + "DAO.java");
         return FileUtils.readFileToString(daoInterface);
     }
 
@@ -361,11 +361,19 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         return aBO("Address").withField(aStringField("street").build()).withField(aStringField("city").build()).build();
     }
 
-    private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws URISyntaxException, IOException {
-        final File file = new File(destDir, qualifiedName);
+    private void assertFilesAreEqual(final String qualifiedName, final String resourceName) throws Exception {
+        assertThat(getGeneratedFile(qualifiedName)).hasContentEqualTo(getExpectedFile(resourceName));
+    }
+
+    private File getExpectedFile(String resourceName) throws URISyntaxException {
+        File expected;
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
-        final File expected = new File(resource.toURI());
-        assertThat(file).hasContentEqualTo(expected);
+        expected = new File(resource.toURI());
+        return expected;
+    }
+
+    private File getGeneratedFile(String qualifiedName) {
+        return new File(destDir, qualifiedName);
     }
 
 }

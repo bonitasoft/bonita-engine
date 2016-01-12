@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm;
 
+import static org.apache.commons.lang3.StringUtils.left;
+
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -23,15 +25,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 
-import org.bonitasoft.engine.bdm.model.field.RelationField;
-import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
-
-import static org.apache.commons.lang3.StringUtils.left;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
 
 /**
  * @author Colin PUY
@@ -40,8 +40,11 @@ public class RelationFieldAnnotator {
 
     private final CodeGenerator codeGenerator;
 
+    private final ForeignKeyAnnotator foreignKeyAnnotator;
+
     public RelationFieldAnnotator(final CodeGenerator codeGenerator) {
         this.codeGenerator = codeGenerator;
+        this.foreignKeyAnnotator = new ForeignKeyAnnotator(codeGenerator);
     }
 
     public void annotateRelationField(final JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
@@ -49,7 +52,7 @@ public class RelationFieldAnnotator {
         if (field.isCollection()) {
             relation = annotateMultipleReference(entityClass, field, fieldVar);
         } else {
-            relation = annotateSingleReference(field, fieldVar);
+            relation = annotateSingleReference(entityClass,field, fieldVar);
         }
 
         if (field.isLazy()) {
@@ -61,13 +64,13 @@ public class RelationFieldAnnotator {
 
         if (field.getType() == Type.COMPOSITION) {
             relation.param("cascade", CascadeType.ALL);
-        }
-        else if (field.getType() == Type.AGGREGATION) {
+        } else if (field.getType() == Type.AGGREGATION) {
             relation.param("cascade", CascadeType.MERGE);
         }
+
     }
 
-    private JAnnotationUse annotateSingleReference(final RelationField field, final JFieldVar fieldVar) {
+    private JAnnotationUse annotateSingleReference(JDefinedClass entityClass, final RelationField field, final JFieldVar fieldVar) {
         JAnnotationUse relation;
         if (field.getType() == Type.AGGREGATION) {
             relation = codeGenerator.addAnnotation(fieldVar, ManyToOne.class);
@@ -77,6 +80,7 @@ public class RelationFieldAnnotator {
         }
         addJoinColumn(fieldVar, field.getName());
         relation.param("optional", field.isNullable());
+        foreignKeyAnnotator.annotateForeignKeyName(entityClass, fieldVar, field);
         return relation;
     }
 
