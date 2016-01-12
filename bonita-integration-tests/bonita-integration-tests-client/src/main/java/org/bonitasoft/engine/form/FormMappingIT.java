@@ -192,6 +192,27 @@ public class FormMappingIT extends TestWithUser {
     }
 
     @Test
+    public void resolvePageOrURL_should_return_null_mapping_for_NONE() throws Exception {
+        ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.0");
+        p1Builder.addActor("actor").addUserTask("step", "actor");
+        BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
+                .createNewBusinessArchive().setProcessDefinition(p1Builder.done())
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm(null, FormMappingTarget.NONE, "step").build());
+
+        ProcessDefinition processDefinition = deployProcess(bar.done());
+
+
+        // try to resolve url:
+        PageURL pageURL = getPageAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", context, true);
+
+        assertThat(pageURL.getPageId()).isNull();
+        assertThat(pageURL.getUrl()).isNull();
+
+
+        deleteProcess(processDefinition);
+    }
+
+    @Test
     public void deployProcessWithInternalPagesIncludedShouldBeResolved() throws Exception {
         Page custompage_globalpage = getPageAPI().createPage("globalPage.zip", createTestPageContent("custompage_globalpage", "Global page", "a global page"));
         ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.12");
@@ -237,7 +258,7 @@ public class FormMappingIT extends TestWithUser {
         final SubProcessDefinitionBuilder eventSubProc = p1Builder.addSubProcess("eventSubProc", true).getSubProcessBuilder();
         eventSubProc.addUserTask("subTask", "actor");
         eventSubProc.addStartEvent("start").addSignalEventTrigger("theSignal");
-        eventSubProc.addTransition("start","subTask");
+        eventSubProc.addTransition("start", "subTask");
 
         BusinessArchiveBuilder bar1 = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
@@ -247,7 +268,6 @@ public class FormMappingIT extends TestWithUser {
                                 .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
                                 .addTaskForm("urlForThesubTask", FormMappingTarget.URL, "subTask")
                                 .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.INTERNAL).build());
-
 
 
         ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());

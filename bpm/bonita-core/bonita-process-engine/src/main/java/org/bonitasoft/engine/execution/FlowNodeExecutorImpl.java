@@ -318,8 +318,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     @Override
     public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId)
             throws SArchivingException {
-        ProcessArchiver.archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService, processDefinitionService,
-                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataService);
+        new ProcessArchiver().archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService,
+                processDefinitionService, archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataService);
     }
 
 }

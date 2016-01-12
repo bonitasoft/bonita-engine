@@ -73,7 +73,7 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
-        List<Object> daos = new ArrayList<Object>(expressions.size());
+        List<Object> daos = new ArrayList<>(expressions.size());
         for (SExpression expression : expressions) {
             daos.add(evaluate(expression, context, resolvedExpressions, containerState));
         }

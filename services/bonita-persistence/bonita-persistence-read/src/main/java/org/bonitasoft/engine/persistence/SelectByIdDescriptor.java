@@ -21,8 +21,8 @@ public final class SelectByIdDescriptor<T extends PersistentObject> extends Abst
 
     private final long id;
 
-    public SelectByIdDescriptor(final String queryName, final Class<T> entityType, final long id) {
-        super(queryName, entityType, entityType);
+    public SelectByIdDescriptor(final Class<T> entityType, final long id) {
+        super(null, entityType, entityType);
         this.id = id;
     }
 

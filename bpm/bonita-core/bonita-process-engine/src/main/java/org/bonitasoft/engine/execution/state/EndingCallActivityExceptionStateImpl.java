@@ -24,6 +24,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -60,13 +61,14 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
-    private ClassLoaderService classLoaderService;
 
-    public EndingCallActivityExceptionStateImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final SCommentService commentService,
+    private ClassLoaderService classLoaderService;
+    private RefBusinessDataService refBusinessDataService;
+
+    public EndingCallActivityExceptionStateImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
+            final ContainerRegistry containerRegistry, final ArchiveService archiveService, final SCommentService commentService,
             final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-                                                final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
+            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -78,6 +80,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
+        this.refBusinessDataService = refBusinessDataService;
     }
 
     @Override
@@ -113,8 +116,8 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     protected void archiveChildProcessInstance(final SFlowNodeInstance instance) throws SProcessInstanceNotFoundException, SArchivingException,
             SBonitaReadException {
         final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
-        ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
-                commentService, processDefinitionService, connectorInstanceService, classLoaderService);
+        new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
+                commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
     }
 
     @Override

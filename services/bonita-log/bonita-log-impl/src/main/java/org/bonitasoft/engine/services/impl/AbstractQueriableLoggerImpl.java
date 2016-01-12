@@ -131,7 +131,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     @Override
     public SQueriableLog getLog(final long logId) throws SQueriableLogNotFoundException, SQueriableLogException {
         try {
-            final SQueriableLog selectOne = persistenceService.selectById(new SelectByIdDescriptor<SQueriableLog>("getQueriableLogById", SQueriableLog.class,
+            final SQueriableLog selectOne = persistenceService.selectById(new SelectByIdDescriptor<SQueriableLog>(SQueriableLog.class,
                     logId));
             if (selectOne == null) {
                 throw new SQueriableLogNotFoundException(logId);

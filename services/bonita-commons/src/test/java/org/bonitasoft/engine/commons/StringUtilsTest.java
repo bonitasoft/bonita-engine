@@ -20,17 +20,15 @@ import org.junit.Test;
 public class StringUtilsTest {
 
     @Test
-    public void uniformizePathPatternShouldChangeAllSlashesToSystemDependentSeparator() {
+    public void uniformizePathPatternShouldChangeAllBackslashesToForwardSlashes() {
         final String uniformized = StringUtils.uniformizePathPattern("C:\\toto\\my path\\my\\/file.bak.txt");
-        assertThat(uniformized)
-                .isEqualTo("C:/toto/my path/my/file.bak.txt");
+        assertThat(uniformized).isEqualTo("C:/toto/my path/my/file.bak.txt");
     }
 
     @Test
     public void uniformizePathPatternShouldLeaveNoDoubleSeparator() {
         final String uniformized = StringUtils.uniformizePathPattern("C:///toto//my path/////full_slashes/my file.bak.txt");
-        assertThat(uniformized).isEqualTo(
-                "C:/toto/my path/full_slashes/my file.bak.txt");
+        assertThat(uniformized).isEqualTo("C:/toto/my path/full_slashes/my file.bak.txt");
     }
 
 }

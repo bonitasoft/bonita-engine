@@ -333,7 +333,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPage(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId));
         if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
@@ -461,7 +461,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         final SPage page = getPage(pageId);
-        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
+        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
                 SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
@@ -493,7 +493,7 @@ public class PageServiceImpl implements PageService {
         final String logMethodName = METHOD_UPDATE_PAGE;
         try {
 
-            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId));
             checkPageDuplicate(sPage, entityUpdateDescriptor, logBuilder, logMethodName);
             final String oldPageName = sPage.getName();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage, entityUpdateDescriptor);
@@ -580,7 +580,7 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
         final Properties pageProperties = readPageZip(content, false);
         try {
-            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
+            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
                     SPageContent.class, pageId));
             final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
                     .createNewInstance(new EntityUpdateDescriptor());

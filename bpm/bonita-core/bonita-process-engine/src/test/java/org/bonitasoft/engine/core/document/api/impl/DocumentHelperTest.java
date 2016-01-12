@@ -375,7 +375,7 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt).isIn("text/plain",null);
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("text/plain")).as("mimetype should be text/plain or null on mac").isTrue();
     }
 
     @Test
@@ -385,7 +385,7 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt).isIn("text/plain", null);
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("text/plain")).as("mimetype should be text/plain or null on mac").isTrue();
     }
 
     @Test
@@ -402,7 +402,7 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt).isIn("application/xml", null);
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("application/xml")).as("mimetype should be application/xml or null on mac").isTrue();
     }
 
     @Test
@@ -412,7 +412,7 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt).isIn("application/octet-stream", null);
+        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("application/octet-stream")).as("mimetype should be application/octet-stream or null on mac").isTrue();
     }
 
     @Test

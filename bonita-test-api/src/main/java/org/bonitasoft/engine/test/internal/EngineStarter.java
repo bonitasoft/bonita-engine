@@ -68,7 +68,7 @@ public class EngineStarter {
     protected String prepareBonitaHome() throws IOException {
         String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
         if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
-            final InputStream bonitaHomeIS = this.getClass().getResourceAsStream("/bonita-home.zip");
+            final InputStream bonitaHomeIS = getBonitaHomeInputStream();
             if (bonitaHomeIS == null) {
                 throw new IllegalStateException("No bonita home found in the class path");
             }
@@ -87,6 +87,10 @@ public class EngineStarter {
 
         }
         return bonitaHomePath;
+    }
+
+    protected InputStream getBonitaHomeInputStream() {
+        return this.getClass().getResourceAsStream("/bonita-home.zip");
     }
 
     protected void prepareEnvironment()
@@ -132,8 +136,8 @@ public class EngineStarter {
     }
 
     private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
+        final String[] args = new String[] { "-tcp", "-tcpAllowOthers", "-tcpPort", h2Port };
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[] { args });
         final Method start = server.getClass().getMethod("start");
         LOGGER.info("Starting h2 on port " + h2Port);
         try {
@@ -199,7 +203,6 @@ public class EngineStarter {
         }
     }
 
-
     private void checkThreadsAreStopped() throws InterruptedException {
         LOGGER.info("=========  CHECK ENGINE IS SHUTDOWN =======");
         final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
@@ -225,7 +228,7 @@ public class EngineStarter {
         int nbOfThreads = keySet.size();
         int nbOfExpectedThreads = expectedThreads.size() + 2;
         boolean fail = nbOfThreads > nbOfExpectedThreads;
-        LOGGER.info(nbOfThreads + " are alive. " + nbOfExpectedThreads + " are expected.");
+        LOGGER.info(nbOfThreads + " threads are alive. " + nbOfExpectedThreads + " are expected.");
         if (cacheManagerThreads.size() > 2) {
             LOGGER.info("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but "
                     + cacheManagerThreads.size() + " are found:");
@@ -266,7 +269,8 @@ public class EngineStarter {
         }
         final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown", "surefire-forkedjvm",
+                "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown",
+                "surefire-forkedjvm",
                 "Restlet");
         for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {

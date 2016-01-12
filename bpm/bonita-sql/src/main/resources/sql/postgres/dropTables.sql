@@ -13,6 +13,8 @@ DROP TABLE document;
 DROP TABLE arch_flownode_instance;
 DROP TABLE arch_process_instance;
 DROP TABLE arch_connector_instance;
+DROP TABLE arch_multi_biz_data;
+DROP TABLE arch_ref_biz_data_inst;
 DROP TABLE multi_biz_data;
 DROP TABLE ref_biz_data_inst;
 DROP TABLE pending_mapping;

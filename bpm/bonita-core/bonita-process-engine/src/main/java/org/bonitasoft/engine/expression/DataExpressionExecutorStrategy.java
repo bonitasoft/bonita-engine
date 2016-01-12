@@ -74,8 +74,8 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         final int maxExpressionSize = expressions.size();
-        final List<String> dataNames = new ArrayList<String>(maxExpressionSize);
-        final Map<String, Serializable> results = new HashMap<String, Serializable>(maxExpressionSize);
+        final List<String> dataNames = new ArrayList<>(maxExpressionSize);
+        final Map<String, Serializable> results = new HashMap<>(maxExpressionSize);
         for (final SExpression sExpression : expressions) {
             final String dataName = sExpression.getContent();
             if (context.containsKey(dataName)) {
@@ -118,7 +118,7 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     }
 
     private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {
-        final List<Object> list = new ArrayList<Object>(expressions.size());
+        final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(results.get(expression.getContent()));
         }

@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -423,7 +422,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter, final boolean enableWordSearch) {
+    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter,
+            final boolean enableWordSearch) {
         final StringBuilder builder = new StringBuilder(query);
         final Set<String> specificFilters = new HashSet<String>(filters.size());
         if (!filters.isEmpty()) {
@@ -585,7 +585,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 clause.append(getInClause(completeField, filterOption));
                 break;
             case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String ? "'" + escapeString((String) filterOption.getFrom()) + "'" : filterOption.getFrom();
+                final Object from = filterOption.getFrom() instanceof String ? "'" + escapeString((String) filterOption.getFrom()) + "'"
+                        : filterOption.getFrom();
                 final Object to = filterOption.getTo() instanceof String ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
                 clause.append("(").append(from).append(" <= ").append(completeField);
                 clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");

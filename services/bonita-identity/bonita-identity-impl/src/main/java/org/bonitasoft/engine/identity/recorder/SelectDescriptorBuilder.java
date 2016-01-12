@@ -56,7 +56,7 @@ public class SelectDescriptorBuilder {
     }
 
     public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final String elementName, final long id) {
-        return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
+        return new SelectByIdDescriptor<T>(clazz, id);
     }
 
     public static <T extends PersistentObject> SelectListDescriptor<T> getElements(final Class<T> clazz, final String elementName, final int fromIndex,
@@ -97,7 +97,7 @@ public class SelectDescriptorBuilder {
     }
 
     public static <T extends PersistentObject> SelectByIdDescriptor<T> getLightElementById(final Class<T> clazz, final String elementName, final long id) {
-        return new SelectByIdDescriptor<T>("getLight" + elementName + "ById", clazz, id);
+        return new SelectByIdDescriptor<T>(clazz, id);
     }
 
     public static SelectOneDescriptor<SUserMembership> getLightUserMembership(final long userId, final long groupId, final long roleId) {

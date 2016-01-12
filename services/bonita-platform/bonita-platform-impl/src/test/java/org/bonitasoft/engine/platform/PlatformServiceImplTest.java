@@ -198,21 +198,21 @@ public class PlatformServiceImplTest {
     @Test
     public final void getTenantById() throws SBonitaException {
         final STenant sTenant = buildTenant(15l, "tenant1");
-        when(persistenceService.selectById(new SelectByIdDescriptor<>("getTenantById", STenant.class, 15l))).thenReturn(sTenant);
+        when(persistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, 15l))).thenReturn(sTenant);
 
         assertEquals(sTenant, platformServiceImpl.getTenant(15L));
     }
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByIdNotExists() throws SBonitaException {
-        when(persistenceService.selectById(new SelectByIdDescriptor<>("getTenantById", STenant.class, 15l))).thenReturn(null);
+        when(persistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, 15l))).thenReturn(null);
 
         platformServiceImpl.getTenant(15L);
     }
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByIdThrowException() throws SBonitaException {
-        when(persistenceService.selectById(new SelectByIdDescriptor<>("getTenantById", STenant.class, 15l))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(new SelectByIdDescriptor<>(STenant.class, 15l))).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.getTenant(15L);
     }

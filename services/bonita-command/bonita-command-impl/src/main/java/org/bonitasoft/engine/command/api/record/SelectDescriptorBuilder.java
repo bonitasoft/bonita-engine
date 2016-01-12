@@ -48,6 +48,6 @@ public class SelectDescriptorBuilder {
     }
 
     public static SelectByIdDescriptor<SCommand> getCommandById(final long commandId) {
-        return new SelectByIdDescriptor<SCommand>("getCommandById", SCommand.class, commandId);
+        return new SelectByIdDescriptor<SCommand>(SCommand.class, commandId);
     }
 }

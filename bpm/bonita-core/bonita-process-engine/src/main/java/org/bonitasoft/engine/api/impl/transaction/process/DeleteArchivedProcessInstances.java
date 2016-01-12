@@ -49,7 +49,7 @@ public class DeleteArchivedProcessInstances implements TransactionContent {
         List<Long> sourceProcessInstanceIds;
         do {
             // from index always will be zero because elements will be deleted
-            sourceProcessInstanceIds = processInstanceService.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
+            sourceProcessInstanceIds = processInstanceService.getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
                     BATCH_SIZE, OrderByType.DESC);
             for (final Long orgProcessId : sourceProcessInstanceIds) {
                 processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);

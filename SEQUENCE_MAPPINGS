@@ -108,6 +108,10 @@ SBusinessApplicationMenu -> 10202
 SUSerTaskContractData -> 10210
 SProcessContractData --> 10220
 
+SFormMappingImpl --> 10300
+
+SProcessDefinitionDesignContentImpl --> 10310
+
 =Archived objects==
 
 ProcessInstance -> 20010
@@ -128,8 +132,8 @@ SABlobDataInstance --> 20050
 
 SAUSerTaskContractData -> 20210
 SAProcessContractData --> 20220
-SFormMappingImpl --> 10300
-SProcessDefinitionDesignContentImpl --> 10300
+
+SARefBusinessDataInstance -> 20096
 
 =TESTS=
 HUMAN -> 1000
