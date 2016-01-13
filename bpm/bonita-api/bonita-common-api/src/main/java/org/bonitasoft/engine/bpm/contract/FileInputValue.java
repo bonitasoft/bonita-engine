@@ -32,9 +32,15 @@ public class FileInputValue implements Serializable {
 
     private String fileName;
     private byte[] content;
+    private String contentType;
 
     public FileInputValue(String fileName, byte[] content) {
+        this(fileName, null, content);
+    }
+
+    public FileInputValue(String fileName, String contentType, byte[] content) {
         this.fileName = fileName;
+        this.contentType = contentType;
         this.content = content;
     }
 
@@ -44,6 +50,14 @@ public class FileInputValue implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public byte[] getContent() {
@@ -60,7 +74,6 @@ public class FileInputValue implements Serializable {
                 "fileName='" + fileName + '\'' +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {

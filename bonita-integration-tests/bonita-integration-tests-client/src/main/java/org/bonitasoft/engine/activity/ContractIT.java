@@ -207,7 +207,7 @@ public class ContractIT extends CommonAPIIT {
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable>singletonMap("reportInit", new FileInputValue("theFile", "theContent".getBytes())));
+                Collections.<String, Serializable>singletonMap("reportInit", new FileInputValue("theFile", "", "theContent".getBytes())));
         final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
 
         //then
@@ -365,10 +365,10 @@ public class ContractIT extends CommonAPIIT {
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
-        final FileInputValue reportFile = new FileInputValue("report.pdf", new byte[] { 0, 1, 2, 3 });
+        final FileInputValue reportFile = new FileInputValue("report.pdf", "", new byte[] { 0, 1, 2, 3 });
         taskInput.put("report", reportFile);
-        final FileInputValue receipt1 = new FileInputValue("receipt1.pdf", new byte[] { 0, 1, 2, 4 });
-        final FileInputValue receipt2 = new FileInputValue("receipt2.pdf", new byte[] { 0, 1, 2, 5 });
+        final FileInputValue receipt1 = new FileInputValue("receipt1.pdf", "", new byte[] { 0, 1, 2, 4 });
+        final FileInputValue receipt2 = new FileInputValue("receipt2.pdf", "", new byte[] { 0, 1, 2, 5 });
         taskInput.put("receipts", (Serializable) Arrays.asList(receipt1, receipt2));
 
         getProcessAPI().executeUserTask(userTask.getId(), taskInput);
