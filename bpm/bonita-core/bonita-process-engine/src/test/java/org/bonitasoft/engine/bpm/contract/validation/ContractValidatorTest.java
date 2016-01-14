@@ -42,7 +42,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ContractValidatorTest {
 
-    private static final long PROCESS_DEFINITION_ID = 1245l;
+    private static final long PROCESS_DEFINITION_ID = 1245L;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     @Mock
