@@ -88,9 +88,10 @@ public class ContractTypeValidator {
             @SuppressWarnings("unchecked")
             final Map<String, Object> map = (Map<String, Object>) object;
             for (final SInputDefinition sInputDefinition : definition.getInputDefinitions()) {
-                validate(sInputDefinition, map.get(sInputDefinition.getName()), errorReporter);
+                Object value = (map == null) ? null : map.get(sInputDefinition.getName());
+                validate(sInputDefinition, value, errorReporter);
             }
-            return map != null;
+            return !errorReporter.hasError();
         } catch (final ClassCastException e) {
             return false;
         }
