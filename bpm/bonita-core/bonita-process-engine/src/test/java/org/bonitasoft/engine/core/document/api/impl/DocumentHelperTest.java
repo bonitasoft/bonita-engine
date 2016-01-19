@@ -428,11 +428,11 @@ public class DocumentHelperTest {
 
     @Test
     public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
-        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "It's my file".getBytes());
+        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "contentType", "It's my file".getBytes());
 
         final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(fileInputValue);
 
-        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, null, "theFile.txt"), "content");
+        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, "contentType", "theFile.txt"), "content");
         assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
     }
 
@@ -459,10 +459,11 @@ public class DocumentHelperTest {
 
     @Test
     public void should_toCheckedList_returns_the_list_if_contains_FileInputValue() throws Exception {
-        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "The report content".getBytes()));
+        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "contentType", "The report content".getBytes()));
         final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
         assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
         assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
+        assertThat(result.get(0).getMimeType()).isEqualTo("contentType");
     }
 
     @Test

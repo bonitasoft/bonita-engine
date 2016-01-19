@@ -146,7 +146,7 @@ public class ContractTypeValidatorTest {
         final SInputDefinitionImpl definition = new SInputDefinitionImpl("theFile", SType.FILE, "description", false, Arrays.<SInputDefinition>asList(new SInputDefinitionImpl("","")));
 
         //when
-        contractTypeValidator.validate(definition, new FileInputValue("theFile",new byte[]{0,1}), errorReporter);
+        contractTypeValidator.validate(definition, new FileInputValue("theFile", "", new byte[]{0,1}), errorReporter);
 
         // then
         assertThat(errorReporter.hasError()).isFalse();
