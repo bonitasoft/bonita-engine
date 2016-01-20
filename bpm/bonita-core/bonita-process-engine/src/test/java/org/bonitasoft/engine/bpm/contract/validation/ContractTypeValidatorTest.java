@@ -69,7 +69,7 @@ public class ContractTypeValidatorTest {
 
     @Test
     public void should_not_validate_null_for_a_complex_type() throws Exception {
-        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition","");
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition", "");
 
         contractTypeValidator.validate(definition, null, errorReporter);
 
@@ -78,7 +78,7 @@ public class ContractTypeValidatorTest {
 
     @Test
     public void should_not_validate_non_map_object_for_complex_type() throws Exception {
-        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition","");
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition", "");
 
         contractTypeValidator.validate(definition, "this is not a map", errorReporter);
 
@@ -89,7 +89,7 @@ public class ContractTypeValidatorTest {
     public void should_validate_map_object_for_complex_type() throws Exception {
         //given
         final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition", "description", true,
-                Arrays.<SInputDefinition>asList(new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description")));
+                Collections.<SInputDefinition> singletonList(new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description")));
 
         definition.getInputDefinitions().add(
                 new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description"));
@@ -143,7 +143,8 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_file_input() throws Exception {
         //given
-        final SInputDefinitionImpl definition = new SInputDefinitionImpl("theFile", SType.FILE, "description", false, Arrays.<SInputDefinition>asList(new SInputDefinitionImpl("","")));
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("theFile", SType.FILE, "description", false,
+                Collections.<SInputDefinition> singletonList(new SInputDefinitionImpl("", "")));
 
         //when
         contractTypeValidator.validate(definition, new FileInputValue("theFile", "", new byte[]{0,1}), errorReporter);
@@ -234,10 +235,6 @@ public class ContractTypeValidatorTest {
         final Map<String, Object> taskInput = new HashMap<>();
         taskInput.put("complexInComplex", complexList);
 
-        final List<Map<String, Object>> taskInputList = new ArrayList<>();
-        taskInputList.add(taskInput);
-        taskInputList.add(taskInput);
-        taskInputList.add(taskInput);
         contractTypeValidator.validate(complexDefinition, taskInput, errorReporter);
 
         // then
@@ -270,7 +267,8 @@ public class ContractTypeValidatorTest {
 
         // then
         assertThat(errorReporter.hasError()).isTrue();
-        assertThat(errorReporter.getErrors()).containsExactly("{complexInComplex=[{simpleInput=not a date}, {simpleInput=not a date}, {simpleInput=not a date}]} cannot be assigned to COMPLEX type");
+        assertThat(errorReporter.getErrors()).containsExactly(
+                "{complexInComplex=[{simpleInput=not a date}, {simpleInput=not a date}, {simpleInput=not a date}]} cannot be assigned to COMPLEX type");
 
     }
 
@@ -299,16 +297,49 @@ public class ContractTypeValidatorTest {
 
         //when
         final List<Map<String, Object>> complexList = new ArrayList<>();
-        complexList.add(Collections.<String, Object>singletonMap("simpleInput","aa"));
-        complexList.add(Collections.<String, Object>singletonMap("simpleInput","bb"));
-        complexList.add(Collections.<String, Object>singletonMap("simpleInput","cc"));
+        complexList.add(Collections.<String, Object> singletonMap("simpleInput", "aa"));
+        complexList.add(Collections.<String, Object> singletonMap("simpleInput", "bb"));
+        complexList.add(Collections.<String, Object> singletonMap("simpleInput", "cc"));
 
         contractTypeValidator.validate(complexDefinition, complexList, errorReporter);
 
         // then
         assertThat(errorReporter.hasError()).isTrue();
-        assertThat(errorReporter.getErrors()).containsExactly("aa cannot be assigned to INTEGER", "bb cannot be assigned to INTEGER", "cc cannot be assigned to INTEGER");
+        assertThat(errorReporter.getErrors()).containsExactly("aa cannot be assigned to INTEGER", "bb cannot be assigned to INTEGER",
+                "cc cannot be assigned to INTEGER");
 
+    }
+
+    @Test
+    public void should_validate_for_multiple_complex_type_with_missing_value_for_subType() throws Exception {
+        //given
+        final SInputDefinition complexDefinition = aComplexInput().withName("invoice").withDescription("complex multiple input")
+                .withInput(aComplexInput().withName("lines").withDescription("my lines").withMultiple(true)
+                        .withInput(aSimpleInput().withName("productName").build()).build())
+                .build();
+
+        final List<Map<String, Object>> lines = new ArrayList<>();
+        lines.add(Collections.<String, Object> singletonMap("productName", "product value"));
+        lines.add(null);
+        // JSON equivalent:
+        // {
+        //        "invoice": {
+        //            "lines": [
+        //            {
+        //                "productName": "product value"
+        //            },
+        //            null
+        //            ]
+        //        }
+        //    }
+
+        final Map<String, Object> inputs = Collections.<String, Object> singletonMap("lines", lines);
+
+        //when
+        contractTypeValidator.validate(complexDefinition, inputs, errorReporter);
+
+        // then
+        assertThat(errorReporter.hasError()).isFalse();
     }
 
 }

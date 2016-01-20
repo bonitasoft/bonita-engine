@@ -48,7 +48,7 @@ public class ContractConstraintsValidator {
 
     public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables)
             throws SContractViolationException {
-        final Map<String, Serializable> vars = (variables == null ? Collections.EMPTY_MAP : variables);
+        final Map<String, Serializable> vars = (variables == null ? Collections.<String, Serializable> emptyMap() : variables);
         final List<String> comments = new ArrayList<>();
         Map<String, Object> context = new HashMap<>(vars.size());
         context.putAll(vars);

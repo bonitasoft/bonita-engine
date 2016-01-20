@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
@@ -42,9 +43,7 @@ public class SComplexInputDefinitionBuilder {
     }
 
     public SComplexInputDefinitionBuilder withInput(final SInputDefinition... definitions) {
-        for (final SInputDefinition definition : definitions) {
-            inputDefinitions.add(definition);
-        }
+        Collections.addAll(inputDefinitions, definitions);
         return this;
     }
 
