@@ -388,7 +388,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         bo.addField(field);
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         return model;
     }
 
@@ -1510,11 +1509,13 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        final BusinessDataQueryResult businessDataQueryResult = (BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+        ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
+        getCommandAPI().addDependency("temporaryDeps", new byte[] {0, 1});
+        Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
+
 
         // then
-        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee")
-                .hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
+        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
 
     }
 

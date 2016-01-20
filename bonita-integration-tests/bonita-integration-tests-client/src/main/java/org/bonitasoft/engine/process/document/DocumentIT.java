@@ -1345,6 +1345,7 @@ public class DocumentIT extends TestWithUser {
                         List.class.getName(),
                         new ExpressionBuilder().createDataExpression("doc2Id", Long.class.getName()));
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask("updateStep", "john");
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("invoicesCopy", new ExpressionBuilder().createDocumentListExpression("invoices")));
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("invoices", scriptExpression1));
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("emptyList", scriptExpression2));
         //        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("unknown", scriptExpression2));
@@ -1366,6 +1367,8 @@ public class DocumentIT extends TestWithUser {
         invoices.addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("initialDocs",
                 script,
                 List.class.getName()));
+        final DocumentListDefinitionBuilder invoicesCopy = builder.addDocumentListDefinition("invoicesCopy");
+        invoicesCopy.addDescription("My invoices copy");
         builder.addDocumentListDefinition("emptyList");
         final User john = createUser("john", "bpm");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "john", john);
@@ -1383,6 +1386,9 @@ public class DocumentIT extends TestWithUser {
         assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello1".getBytes());
         final Document fileFromFileInput = invoices1.get(4);
         assertThat(getProcessAPI().getDocumentContent(fileFromFileInput.getContentStorageId())).isEqualTo("hello4".getBytes());
+        List<Document> invoicesCopyList = getProcessAPI().getDocumentList(processInstance.getId(), "invoicesCopy", 0, 100);
+        assertThat(invoicesCopyList).as("initial value of the list that will copy invoices").isEmpty();
+
         List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList", 0, 100);
         assertThat(emptyList).isEmpty();
         try {
@@ -1428,6 +1434,17 @@ public class DocumentIT extends TestWithUser {
         assertThat(emptyListDoc.hasContent()).isTrue();
         assertThat(emptyListDoc.getContentFileName()).isEqualTo("file.txt");
         assertThat(getProcessAPI().getDocumentContent(emptyListDoc.getContentStorageId())).isEqualTo("updatedDoc".getBytes());
+
+        invoicesCopyList = getProcessAPI().getDocumentList(processInstance.getId(), "invoicesCopy", 0, 100);
+        assertThat(invoicesCopyList).hasSize(5);
+        final Document urlDocumentCopy = invoicesCopyList.get(0);
+        assertThat(urlDocumentCopy.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
+        final Document fileDocumentCopy = invoicesCopyList.get(1);
+        assertThat(getProcessAPI().getDocumentContent(fileDocumentCopy.getContentStorageId())).isEqualTo("hello1".getBytes());
+        final Document fileFromFileInputCopy = invoicesCopyList.get(4);
+        assertThat(getProcessAPI().getDocumentContent(fileFromFileInputCopy.getContentStorageId())).isEqualTo("hello4".getBytes());
+
+
 
         //        List<Document> unknown = getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
         //        assertThat(unknown).hasSize(1);

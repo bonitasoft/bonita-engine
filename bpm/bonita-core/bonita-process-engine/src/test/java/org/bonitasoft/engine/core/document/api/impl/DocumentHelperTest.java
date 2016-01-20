@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
+import org.bonitasoft.engine.bpm.document.impl.DocumentImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -59,8 +60,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentHelperTest {
 
-    public static final long AUTHOR_ID = 12l;
-    public static final long PROCESS_INSTANCE_ID = 45l;
+    public static final long AUTHOR_ID = 12L;
+    public static final long PROCESS_INSTANCE_ID = 45L;
     @Rule
     public ExpectedException exception = ExpectedException.none();
     @Mock
@@ -239,7 +240,7 @@ public class DocumentHelperTest {
     @Test
     public void should_setDocumentList_set_the_list() throws Exception {
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> existingList = Arrays.<SMappedDocument> asList(new SMappedDocumentImpl());
+        List<SMappedDocument> existingList = Arrays.<SMappedDocument>asList(new SMappedDocumentImpl());
         doReturn(existingList).when(documentHelperSpy).getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
 
         DocumentValue docValue1 = new DocumentValue("url1");
@@ -360,7 +361,7 @@ public class DocumentHelperTest {
     @Test
     public void should_getMimeTypeOrGuessIt_return_the_original_mime_type_if_not_null() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, "myMimeType", "theFile.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, "myMimeType", "theFile.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
@@ -408,7 +409,7 @@ public class DocumentHelperTest {
     @Test
     public void should_getMimeTypeOrGuessIt_guess_application_octet_stream_if_byte_array() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, null, "theFile.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "theFile.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
@@ -418,7 +419,7 @@ public class DocumentHelperTest {
     @Test
     public void should_getMimeTypeOrGuessIt_do_not_fail_with_bad_filename() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, null, "the\0File.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "the\0File.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
@@ -463,4 +464,53 @@ public class DocumentHelperTest {
         assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
         assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
     }
+
+    @Test
+    public void should_toCheckedList_returns_the_list_if_contains_DocumentImpl() throws Exception {
+        DocumentImpl documentWithContent = new DocumentImpl();
+        documentWithContent.setHasContent(true);
+        documentWithContent.setContentMimeType("application/pdf");
+        documentWithContent.setContentStorageId("the storage ID");
+        documentWithContent.setFileName("myPdf.pdf");
+        final List<DocumentImpl> inputList = Collections.singletonList(documentWithContent);
+        doReturn("the pdf content".getBytes()).when(documentService).getDocumentContent("the storage ID");
+
+        final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
+
+
+        assertThat(result.get(0).getContent()).isEqualTo("the pdf content".getBytes());
+        assertThat(result.get(0).getFileName()).isEqualTo("myPdf.pdf");
+        assertThat(result.get(0).getMimeType()).isEqualTo("application/pdf");
+    }
+
+    @Test
+    public void should_toCheckedList_returns_the_list_if_contains_external_DocumentImpl() throws Exception {
+        DocumentImpl documentWithContent = new DocumentImpl();
+        documentWithContent.setHasContent(false);
+        documentWithContent.setUrl("the url");
+        final List<DocumentImpl> inputList = Collections.singletonList(documentWithContent);
+
+        final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
+
+        assertThat(result.get(0).getUrl()).isEqualTo("the url");
+    }
+
+    @Test
+    public void should_toCheckedList_throw_exception_with_document_having_content_not_found() throws Exception {
+        DocumentImpl documentWithContent = new DocumentImpl();
+        documentWithContent.setHasContent(true);
+        documentWithContent.setContentMimeType("application/pdf");
+        documentWithContent.setContentStorageId("the storage ID");
+        documentWithContent.setFileName("myPdf.pdf");
+        final List<DocumentImpl> inputList = Collections.singletonList(documentWithContent);
+        doThrow(SObjectNotFoundException.class).when(documentService).getDocumentContent("the storage ID");
+
+
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Unable to execute set document operation because the content of the document to use is not found");
+
+        documentHelper.toCheckedList(inputList);
+    }
+
+
 }
