@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -51,7 +52,6 @@ import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
@@ -191,7 +191,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return new ArrayList<Entity>();
         }
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findByIds(ServerProxyfier.getRealClass(entities.get(0)), getPrimaryKeys(entities));
+            return businessDataRepository.findByIds(businessDataReloader.getEntityRealClass(entities.get(0)), getPrimaryKeys(entities));
         } else {
             return entities;
         }

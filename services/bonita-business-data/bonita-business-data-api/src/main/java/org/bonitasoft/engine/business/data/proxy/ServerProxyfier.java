@@ -201,14 +201,4 @@ public class ServerProxyfier {
         return realEntity;
     }
 
-    /**
-     * Retrieves the real class for the given entity. This result will be same as {@code entity.getClass()} if the entity is not a proxy.
-     * 
-     * @param entity
-     * @return
-     */
-    public static Class<? extends Entity> getRealClass(final Entity entity) {
-        return unProxyfyIfNeeded(entity).getClass();
-    }
-
 }
