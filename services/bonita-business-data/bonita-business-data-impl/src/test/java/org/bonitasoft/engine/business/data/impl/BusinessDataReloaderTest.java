@@ -101,7 +101,6 @@ public class BusinessDataReloaderTest {
 
         given(repository.findById(EntityPojo.class, id)).willReturn(entityUpdated);
 
-
         //when
         Entity reloadedEntity = reloader.reloadEntitySoftly(entity);
 
@@ -119,7 +118,6 @@ public class BusinessDataReloaderTest {
         //use real class
         given(repository.findById(EntityPojo.class, id)).willReturn(entityUpdated);
 
-
         //when
         Entity reloadedEntity = reloader.reloadEntitySoftly(proxyfiedEntity);
 
@@ -127,4 +125,24 @@ public class BusinessDataReloaderTest {
         assertThat(reloadedEntity).isEqualTo(entityUpdated);
     }
 
+    @Test
+    public void getEntityRealClass_should_handle_Bonita_proxy() throws Exception {
+        final Class entityRealClass = reloader.getEntityRealClass(proxyfier.proxify(new EntityPojo(451L)));
+
+        assertThat(entityRealClass).isEqualTo(EntityPojo.class);
+    }
+
+    @Test
+    public void getEntityRealClass_should_handle_Hibernate_proxy() throws Exception {
+        final Class entityRealClass = reloader.getEntityRealClass(new FakeHibernateProxyEntity());
+
+        assertThat(entityRealClass).isEqualTo(EntityPojo.class);
+    }
+
+    @Test
+    public void getEntityRealClass_should_handle_Hibernate_proxy_inside_Bonita_proxy() throws Exception {
+        final Class entityRealClass = reloader.getEntityRealClass(proxyfier.proxify(new FakeHibernateProxyEntity()));
+
+        assertThat(entityRealClass).isEqualTo(EntityPojo.class);
+    }
 }

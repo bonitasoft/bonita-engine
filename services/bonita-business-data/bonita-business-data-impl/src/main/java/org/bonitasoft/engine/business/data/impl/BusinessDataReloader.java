@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
+import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -38,7 +39,12 @@ public class BusinessDataReloader {
      * @throws SBusinessDataNotFoundException
      */
     public Entity reloadEntity(Entity entityToReload) throws SBusinessDataNotFoundException {
-        return businessDataRepository.findById(ServerProxyfier.getRealClass(entityToReload), entityToReload.getPersistenceId());
+        final Class realClass = getEntityRealClass(entityToReload);
+        return businessDataRepository.findById(realClass, entityToReload.getPersistenceId());
+    }
+
+    public Class getEntityRealClass(Entity entity) {
+        return HibernateProxyHelper.getClassWithoutInitializingProxy(ServerProxyfier.unProxyfyIfNeeded(entity));
     }
 
     /**

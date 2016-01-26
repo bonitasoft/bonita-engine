@@ -17,9 +17,7 @@ package org.bonitasoft.engine.business.data.proxy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -165,18 +163,6 @@ public class ServerProxyfierTest {
         for (final Address address : entity.getAddresses()) {
             assertThat(ServerProxyfier.isLazyMethodProxyfied(address)).isFalse();
         }
-    }
-
-    @Test
-    public void should_retrieve_real_class() throws Exception {
-        //given
-        final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
-
-        //when
-        final Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
-
-        //then
-        assertThat(realClass.getName()).isEqualTo(PersonEntity.class.getName());
     }
 
     @Test
