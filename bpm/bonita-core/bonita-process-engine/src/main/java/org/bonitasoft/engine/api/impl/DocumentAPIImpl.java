@@ -203,9 +203,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
             return ModelConvertor.toDocument(documentService.getMappedDocument(documentId), documentService);
-        } catch (final SObjectNotFoundException e) {
-            throw new DocumentNotFoundException(e);
-        } catch (final SBonitaReadException e) {
+        } catch (final SObjectNotFoundException | SBonitaReadException e) {
             throw new DocumentNotFoundException(e);
         }
     }
@@ -250,10 +248,8 @@ public class DocumentAPIImpl implements DocumentAPI {
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
             return ModelConvertor.toDocument(documentService.getMappedDocument(processInstanceId, documentName), documentService);
-        } catch (final SObjectNotFoundException sbe) {
+        } catch (final SObjectNotFoundException | SBonitaReadException sbe) {
             throw new DocumentNotFoundException(sbe);
-        } catch (final SBonitaReadException e) {
-            throw new DocumentNotFoundException(e);
         }
     }
 

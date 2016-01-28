@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 public class MapBuilder {
 
     public static Builder<String, Serializable> aMap() {
-        return ImmutableMap.<String, Serializable> builder();
+        return ImmutableMap.builder();
     }
 
     public static Map<String, Serializable> contractInputMap(final MapEntry... entries) {

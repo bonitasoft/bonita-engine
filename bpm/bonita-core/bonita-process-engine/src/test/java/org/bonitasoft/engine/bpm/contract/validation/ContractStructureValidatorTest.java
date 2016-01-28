@@ -39,7 +39,9 @@ import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -54,6 +56,9 @@ public class ContractStructureValidatorTest {
     private TechnicalLoggerService logger;
     @InjectMocks
     private ContractStructureValidator validator;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
@@ -114,7 +119,8 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(
                         aComplexInput().withName("complex").withMultiple(true)
-                                .withInput(aSimpleInput(TEXT).withName("name").build(), aSimpleInput(SType.INTEGER).withName("value").build())).build();
+                                .withInput(aSimpleInput(TEXT).withName("name").build(), aSimpleInput(SType.INTEGER).withName("value").build()))
+                .build();
 
         final List<Map<String, Serializable>> complexList = new ArrayList<>();
         complexList.add(aMap().put("name", "value1").put("value", 5).build());
@@ -249,6 +255,53 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract().withInput(aComplexInput().withName("employee")).build();
 
         validator.validate(contract, contractInputMap(entry("employee", null)));
+    }
+
+    @Test
+    public void should_not_throw_exception_for_present_multiple_complex_input_with_empty_list() throws Exception {
+        final SContractDefinition contract = aContract()
+                .withInput(aComplexInput().withName("complex").withMultiple(true).withInput(aSimpleInput(TEXT).withName("name").build())).build();
+
+        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) Collections.emptyList()).build();
+
+        validator.validate(contract, taskInputs);
+    }
+
+    @Test
+    public void should_ignore_null_values_for_multiple_complex_input() throws Exception {
+        final SContractDefinition contract = aContract()
+                .withInput(aComplexInput().withName("complex").withMultiple(true).withInput(
+                        aSimpleInput(TEXT).withName("plic").build()))
+                .build();
+
+        final List<Map<String, Serializable>> complexList = new ArrayList<>();
+        complexList.add(null);
+
+        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) complexList).build();
+
+        validator.validate(contract, taskInputs);
+    }
+
+    @Test
+    public void should_ignore_null_values_for_multiple_complex_input_and_validate_next_element() throws Exception {
+        final SContractDefinition contract = aContract()
+                .withInput(aComplexInput().withName("complex").withMultiple(true).withInput(
+                        aSimpleInput(TEXT).withName("plic").build(),
+                        aSimpleInput(INTEGER).withName("plac").build()))
+                .build();
+
+        final List<Map<String, Serializable>> complexList = new ArrayList<>();
+        complexList.add(null);
+        complexList.add(aMap().put("plic", "value2").build());
+
+        final Map<String, Serializable> taskInputs = aMap().put("complex", (Serializable) complexList).build();
+
+        try {
+            validator.validate(contract, taskInputs);
+            fail("Should throw validation exception");
+        } catch (final SContractViolationException e) {
+            assertThat(e.getExplanations()).containsOnly("Expected input [plac] is missing");
+        }
     }
 
 }
