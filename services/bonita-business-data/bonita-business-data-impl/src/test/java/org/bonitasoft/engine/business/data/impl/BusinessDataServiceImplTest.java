@@ -20,12 +20,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -36,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -60,6 +54,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataServiceImplTest {
@@ -253,18 +249,19 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldWithListOfProxyfiedEntitiesShouldUsedRealEntityClass() throws Exception {
+    public void callJavaOperationWithListOfProxyfiedEntitiesShouldUsedRealEntityClass() throws Exception {
         //given
         final EntityPojo entity = new EntityPojo(2L);
         ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
         EntityPojo proxyfiedEntity = proxyfier.proxify(entity);
 
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
+        // Cannot specify the real instance (instead of any()) because of proxy object that does not match (Mockito):
+        doReturn(pojo.getClass()).when(businessDataReloader).getEntityRealClass(any(Entity.class));
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
-        businessDataService.callJavaOperation(pojo, Collections.singletonList(proxyfiedEntity), "setAggregationEntities",
-                List.class.getName());
+        businessDataService.callJavaOperation(pojo, Collections.singletonList(proxyfiedEntity), "setAggregationEntities", List.class.getName());
 
         verify(businessDataRepository).findByIds(entity.getClass(), Collections.singletonList(2L));
     }
@@ -280,6 +277,8 @@ public class BusinessDataServiceImplTest {
         final List<Long> keys = Arrays.asList(persistenceId1, persistenceId2);
 
         doReturn(pojo).when(businessDataReloader).reloadEntitySoftly(pojo);
+        // Cannot specify the real instance (instead of any()) because of proxy object that does not match (Mockito):
+        doReturn(pojo.getClass()).when(businessDataReloader).getEntityRealClass(any(Entity.class));
         doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
@@ -394,6 +393,8 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> newEntities = Arrays.asList(entity2);
         final List<Long> keys2 = Arrays.asList(persistenceId2);
         doReturn(entityPojo).when(businessDataReloader).reloadEntitySoftly(entityPojo);
+        // Cannot specify the real instance (instead of any()) because of proxy object that does not match (Mockito):
+        doReturn(pojo.getClass()).when(businessDataReloader).getEntityRealClass(any(Entity.class));
         doReturn(newEntities).when(businessDataRepository).findByIds(entity2.getClass(), keys2);
         doReturn(entityPojo).when(businessDataRepository).merge(entityPojo);
 
@@ -575,7 +576,8 @@ public class BusinessDataServiceImplTest {
         Query countQuery = new Query("countForFind", "query", Long.class.getName());
         doReturn(countQuery).when(countQueryProvider).getCountQueryDefinition(any(BusinessObject.class), any(Query.class));
         final long count = 5L;
-        doReturn(count).when(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class), anyMapOf(String.class, Serializable.class));
+        doReturn(count).when(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class),
+                anyMapOf(String.class, Serializable.class));
 
         //when
         final int startIndex = 3;
