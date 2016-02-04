@@ -31,12 +31,12 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 /**
  * @author Baptiste Mesta
  */
-public class ResourcesServiceImpl implements ResourcesService {
+public class ProcessResourcesServiceImpl implements ProcessResourcesService {
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
 
-    public ResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
+    public ProcessResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
     }

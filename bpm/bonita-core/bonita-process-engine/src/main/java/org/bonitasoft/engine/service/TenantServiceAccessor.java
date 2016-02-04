@@ -19,7 +19,7 @@ import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
-import org.bonitasoft.engine.resources.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -250,5 +250,5 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     BusinessArchiveService getBusinessArchiveService();
 
-    ResourcesService getResourcesService();
+    ProcessResourcesService getProcessResourcesService();
 }

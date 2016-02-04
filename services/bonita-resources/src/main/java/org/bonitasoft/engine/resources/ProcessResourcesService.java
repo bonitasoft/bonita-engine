@@ -22,7 +22,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 /**
  * @author Baptiste Mesta
  */
-public interface ResourcesService {
+public interface ProcessResourcesService {
 
     void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException;
 

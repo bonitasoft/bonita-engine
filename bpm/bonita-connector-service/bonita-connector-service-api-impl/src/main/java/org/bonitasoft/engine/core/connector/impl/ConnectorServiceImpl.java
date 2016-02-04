@@ -28,7 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
@@ -92,15 +92,15 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final DependencyService dependencyService;
     private final TechnicalLoggerService logger;
     private final TimeTracker timeTracker;
-    private final ResourcesService resourcesService;
+    private final ProcessResourcesService processResourcesService;
 
     public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor, final ParserFactory parserFactory,
                                 final ExpressionResolverService expressionResolverService, final OperationService operationService,
-                                final DependencyService dependencyService, final TechnicalLoggerService logger, final TimeTracker timeTracker, ResourcesService resourcesService) {
+                                final DependencyService dependencyService, final TechnicalLoggerService logger, final TimeTracker timeTracker, ProcessResourcesService processResourcesService) {
         this.cacheService = cacheService;
         this.connectorExecutor = connectorExecutor;
         this.expressionResolverService = expressionResolverService;
-        this.resourcesService = resourcesService;
+        this.processResourcesService = processResourcesService;
         final List<Class<? extends ElementBinding>> bindings = new ArrayList<>();
         bindings.add(ConnectorImplementationBinding.class);
         bindings.add(JarDependenciesBinding.class);
@@ -368,7 +368,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         for (final Map.Entry<String, byte[]> file : connectorArchive.getDependencies().entrySet()) {
             dependencyService.createMappedDependency(file.getKey(), file.getValue(), file.getKey(), processDefinitionId, ScopeType.PROCESS);
         }
-        resourcesService.add(processDefinitionId, connectorArchive.getConnectorImplName(), BARResourceType.CONNECTOR,
+        processResourcesService.add(processDefinitionId, connectorArchive.getConnectorImplName(), BARResourceType.CONNECTOR,
                 connectorArchive.getConnectorImplContent());
 
     }
@@ -455,7 +455,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     protected void deleteOldImplementation(final long processId, final String connectorId, final String connectorVersion)
             throws SInvalidConnectorImplementationException, IOException, SDependencyException, SBonitaReadException, SRecorderException {
-        final List<SBARResource> listFiles = resourcesService.get(processId, BARResourceType.CONNECTOR, 0, 1000);//FIXME
+        final List<SBARResource> listFiles = processResourcesService.get(processId, BARResourceType.CONNECTOR, 0, 1000);//FIXME
         final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
         List<String> jarFileNames = null;
         // delete .impl file for the specified connector
@@ -464,7 +464,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             if (pattern.matcher(name).matches()) {
                 final SConnectorImplementationDescriptor connectorImplementation = getConnectorImplementationDescriptor(resource.getContent());
                 if (connectorId.equals(connectorImplementation.getDefinitionId()) && connectorVersion.equals(connectorImplementation.getDefinitionVersion())) {
-                    resourcesService.remove(resource);
+                    processResourcesService.remove(resource);
                     jarFileNames = connectorImplementation.getJarDependencies().getDependencies();
                     break;
                 }
@@ -496,7 +496,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     public Long getNumberOfConnectorImplementations(final long processDefinitionId) throws SConnectorException {
         try {
-            return resourcesService.count(processDefinitionId, BARResourceType.CONNECTOR);
+            return processResourcesService.count(processDefinitionId, BARResourceType.CONNECTOR);
         } catch (SBonitaReadException e) {
             throw new SConnectorException(e);
     }
@@ -615,16 +615,16 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public List<SBARResource> getConnectorImplementations(long processDefinitionId, int from, int numberOfElements) throws SBonitaReadException {
-        return resourcesService.get(processDefinitionId, BARResourceType.CONNECTOR, from, numberOfElements);
+        return processResourcesService.get(processDefinitionId, BARResourceType.CONNECTOR, from, numberOfElements);
     }
 
     @Override
     public void addConnectorImplementation(Long processDefinitionId, String name, byte[] content) throws SRecorderException {
-        resourcesService.add(processDefinitionId, name, BARResourceType.CONNECTOR, content);
+        processResourcesService.add(processDefinitionId, name, BARResourceType.CONNECTOR, content);
     }
 
     @Override
     public void removeConnectorImplementations(long processDefinitionId) throws SBonitaReadException, SRecorderException {
-        resourcesService.removeAll(processDefinitionId, BARResourceType.CONNECTOR);
+        processResourcesService.removeAll(processDefinitionId, BARResourceType.CONNECTOR);
     }
 }

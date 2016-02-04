@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
@@ -88,7 +88,7 @@ public class ConnectorServiceImplTest {
     @Mock
     private DependencyService dependencyService;
     @Mock
-    private ResourcesService resourcesService;
+    private ProcessResourcesService processResourcesService;
     @Mock
     private SConnectorImplementationDescriptor connectorImplDescriptorInCache;
     @Mock
@@ -112,7 +112,7 @@ public class ConnectorServiceImplTest {
         doReturn(parser).when(parserFactory).createParser(anyList());
         connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, parserFactory, expressionResolverService,
                 operationService, dependencyService,
-                technicalLoggerService, timeTracker, resourcesService);
+                technicalLoggerService, timeTracker, processResourcesService);
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)
@@ -173,7 +173,7 @@ public class ConnectorServiceImplTest {
         when(parser.getObjectFromXML(eq(implBytes))).thenReturn(hoogardenConnectorDescriptor);
 
         final SBARResource originalConnector = new SBARResource("file.impl", BARResourceType.CONNECTOR, processDefId, new byte[] { 2 });
-        doReturn(Collections.singletonList(originalConnector)).when(resourcesService)
+        doReturn(Collections.singletonList(originalConnector)).when(processResourcesService)
                 .get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
         SDependency dependency = mock(SDependency.class);
         doReturn(dependency).when(dependencyService).getDependencyOfArtifact(processDefId, ScopeType.PROCESS, "file.jar");
@@ -182,9 +182,9 @@ public class ConnectorServiceImplTest {
         verify(dependencyService).createMappedDependency("HoogardenConnector.jar", hoogardenConnectorBytes, "HoogardenConnector.jar", processDefId,
                 ScopeType.PROCESS);
         verify(dependencyService).createMappedDependency("some1.jar", dep1Bytes, "some1.jar", processDefId, ScopeType.PROCESS);
-        verify(resourcesService).add(processDefId, "HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, implBytes);
+        verify(processResourcesService).add(processDefId, "HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, implBytes);
         verify(dependencyService).deleteDependency(dependency);
-        verify(resourcesService).remove(originalConnector);
+        verify(processResourcesService).remove(originalConnector);
     }
 
     @Test
@@ -197,7 +197,7 @@ public class ConnectorServiceImplTest {
 
         connectorService.extractConnectorImplementation(zip);
 
-        verify(resourcesService, times(0)).add(eq(processDefId), anyString(), any(BARResourceType.class), any(byte[].class));
+        verify(processResourcesService, times(0)).add(eq(processDefId), anyString(), any(BARResourceType.class), any(byte[].class));
     }
 
     @Test
@@ -265,7 +265,7 @@ public class ConnectorServiceImplTest {
         final byte[] zip1 = IOUtil.zip(zipFileMap);
 
         doReturn(Collections.singletonList(new SBARResource("HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, processDefId, "tototo".getBytes())))
-                .when(resourcesService).get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
+                .when(processResourcesService).get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
 
         //setConnectorImplementation store to cache
         connectorService.setConnectorImplementation(sProcessDef, connectorDefId, connectorDefVersion, zip1);
@@ -308,7 +308,7 @@ public class ConnectorServiceImplTest {
     public void getNumberOfConnectorImplementations_should_call_count_on_resource_service() throws Exception {
         final long processDefinitionId = 451L;
         final long expectedCount = 11L;
-        doReturn(expectedCount).when(resourcesService).count(processDefinitionId, BARResourceType.CONNECTOR);
+        doReturn(expectedCount).when(processResourcesService).count(processDefinitionId, BARResourceType.CONNECTOR);
 
         final Long numberOfConnectorImplementations = connectorService.getNumberOfConnectorImplementations(processDefinitionId);
 

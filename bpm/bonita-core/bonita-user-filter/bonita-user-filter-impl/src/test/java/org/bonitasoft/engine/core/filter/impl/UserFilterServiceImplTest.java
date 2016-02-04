@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
@@ -55,7 +55,7 @@ public class UserFilterServiceImplTest {
     @Mock
     private ExpressionResolverService expressionResolverService;
     @Mock
-    private ResourcesService resourceService;
+    private ProcessResourcesService resourceService;
     private SUserFilterDefinitionImpl sUserFilterDefinition;
     private UserFilterImplementationDescriptor userFilterImplementationDescriptor;
 

@@ -26,7 +26,7 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.resources.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -234,7 +234,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ReadPersistenceService readPersistenceService;
     private Recorder recorder;
     private BusinessArchiveService businessArchiveService;
-    private ResourcesService resourcesService;
+    private ProcessResourcesService processResourcesService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
@@ -856,11 +856,10 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return pageMappingService;
     }
 
-    @Override
-    public ResourcesService getResourcesService() {
-        if (resourcesService == null) {
-            resourcesService = beanAccessor.getService(ResourcesService.class);
+    public ProcessResourcesService getProcessResourcesService() {
+        if (processResourcesService == null) {
+            processResourcesService = beanAccessor.getService(ProcessResourcesService.class);
         }
-        return resourcesService;
+        return processResourcesService;
     }
 }
