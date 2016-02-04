@@ -16,7 +16,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 import com.bonitasoft.engine.service.platform.PlatformInformationManager;
 import com.bonitasoft.engine.service.platform.SynchronizationPlatformInfoManager;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.ResourcesService;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
