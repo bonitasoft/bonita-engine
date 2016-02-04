@@ -29,4 +29,29 @@
         AND bar.name = :name
     </query>
 
+
+
+    <query name="getTenantResourcesLightOfType">
+        SELECT r
+        FROM org.bonitasoft.engine.resources.STenantResourceLight AS r
+        WHERE r.type = :type
+    </query>
+    <query name="getTenantResourcesOfType">
+        SELECT r
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+    </query>
+    <query name="getNumberOfTenantResourcesOfType">
+        SELECT count(r)
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+    </query>
+
+    <query name="getTenantResource">
+        SELECT r
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+        AND r.name = :name
+    </query>
+
 </hibernate-mapping>

@@ -115,8 +115,11 @@
    <bean id="applicationRepository" class="org.bonitasoft.engine.test.persistence.repository.ApplicationRepository">
         <constructor-arg ref="sessionFactory" />
    </bean>
-   <bean id="barResourceRepository" class="org.bonitasoft.engine.test.persistence.repository.BARResourceRepository">
+    <bean id="barResourceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessResourceRepository">
         <constructor-arg ref="sessionFactory" />
-   </bean>
+    </bean>
+    <bean id="tenantResourceRepository" class="org.bonitasoft.engine.test.persistence.repository.TenantResourceRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
 
 </beans>

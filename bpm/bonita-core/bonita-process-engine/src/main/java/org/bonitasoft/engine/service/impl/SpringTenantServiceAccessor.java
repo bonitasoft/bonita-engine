@@ -90,6 +90,7 @@ import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.profile.xml.RoleNamesBinding;
 import org.bonitasoft.engine.profile.xml.UserNamesBinding;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -235,6 +236,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private Recorder recorder;
     private BusinessArchiveService businessArchiveService;
     private ProcessResourcesService processResourcesService;
+    private TenantResourcesService tenantResourceService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
@@ -861,5 +863,12 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             processResourcesService = beanAccessor.getService(ProcessResourcesService.class);
         }
         return processResourcesService;
+    }
+
+    public TenantResourcesService getTenantResourcesService() {
+        if (tenantResourceService == null) {
+            tenantResourceService = beanAccessor.getService(TenantResourcesService.class);
+        }
+        return tenantResourceService;
     }
 }

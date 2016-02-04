@@ -71,6 +71,7 @@ import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -251,4 +252,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     BusinessArchiveService getBusinessArchiveService();
 
     ProcessResourcesService getProcessResourcesService();
+
+    TenantResourcesService getTenantResourcesService();
 }

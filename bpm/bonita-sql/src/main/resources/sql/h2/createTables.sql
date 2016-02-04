@@ -1034,3 +1034,14 @@ CREATE TABLE bar_resource (
 );
 CREATE INDEX idx_bar_resource ON bar_resource (tenantId, process_id, type, name);
 
+CREATE TABLE tenant_resource (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  type VARCHAR(16) NOT NULL,
+  content LONGBLOB NOT NULL,
+  UNIQUE (tenantId, name, type),
+  PRIMARY KEY (tenantId, id)
+);
+CREATE INDEX idx_tenant_resource ON tenant_resource (tenantId, type, name);
+

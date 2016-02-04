@@ -276,6 +276,11 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
     </bean>
 
+    <bean id="tenantResourcesService" class="org.bonitasoft.engine.resources.TenantResourcesServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+    </bean>
+
     <bean id="businessArchiveService" class="org.bonitasoft.engine.bar.BusinessArchiveServiceImpl">
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />

@@ -630,6 +630,15 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10500:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.resources.STenantResource</value>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10501" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10501:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
         <constructor-arg name="sequenceId" value="10121" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10121:${bonita.platform.sequence.defaultRangeSize}}" />
