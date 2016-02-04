@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -206,6 +208,16 @@ public class BusinessObject {
         }
         return null;
     }
+
+    public boolean containsQuery(final String queryName) {
+        for (final Query q : getQueries()) {
+            if (Objects.equals(queryName, q.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public int hashCode() {
