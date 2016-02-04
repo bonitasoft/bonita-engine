@@ -623,7 +623,7 @@
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="classNames">
             <set>
-                <value>org.bonitasoft.engine.bar.SBARResource</value>
+                <value>org.bonitasoft.engine.resources.SBARResource</value>
             </set>
         </constructor-arg>
         <constructor-arg name="sequenceId" value="10500" />
@@ -786,8 +786,8 @@
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
                 <!-- bar resources -->
-                <value>org/bonitasoft/engine/bar/hibernate/bar.hbm.xml</value>
-                <value>org/bonitasoft/engine/bar/hibernate/bar.queries.hbm.xml</value>
+                <value>org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
+                <value>org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
                 <!-- theme -->
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.hbm.xml</value>
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>

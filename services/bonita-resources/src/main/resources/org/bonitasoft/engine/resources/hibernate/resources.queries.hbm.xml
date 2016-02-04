@@ -4,26 +4,26 @@
 
     <query name="getBARResourcesLightOfType">
         SELECT bar
-        FROM org.bonitasoft.engine.bar.SBARResourceLight AS bar
+        FROM org.bonitasoft.engine.resources.SBARResourceLight AS bar
         WHERE bar.processDefinitionId= :processDefinitionId
         AND bar.type = :type
     </query>
     <query name="getBARResourcesOfType">
         SELECT bar
-        FROM org.bonitasoft.engine.bar.SBARResource AS bar
+        FROM org.bonitasoft.engine.resources.SBARResource AS bar
         WHERE bar.processDefinitionId= :processDefinitionId
         AND bar.type = :type
     </query>
     <query name="getNumberOfBARResourcesOfType">
         SELECT count(bar)
-        FROM org.bonitasoft.engine.bar.SBARResource AS bar
+        FROM org.bonitasoft.engine.resources.SBARResource AS bar
         WHERE bar.processDefinitionId= :processDefinitionId
         AND bar.type = :type
     </query>
 
     <query name="getBARResource">
         SELECT bar
-        FROM org.bonitasoft.engine.bar.SBARResource AS bar
+        FROM org.bonitasoft.engine.resources.SBARResource AS bar
         WHERE bar.processDefinitionId= :processDefinitionId
         AND bar.type = :type
         AND bar.name = :name

@@ -106,10 +106,10 @@ import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfAssignedUserTa
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
 import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.bar.BARResourceType;
+import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.bar.ResourcesService;
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.ResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;

@@ -271,7 +271,7 @@
         <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
-    <bean id="resourcesService" class="org.bonitasoft.engine.bar.ResourcesServiceImpl">
+    <bean id="resourcesService" class="org.bonitasoft.engine.resources.ResourcesServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
     </bean>

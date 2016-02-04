@@ -12,7 +12,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.bar;
+package org.bonitasoft.engine.resources;
 
 import java.util.List;
 

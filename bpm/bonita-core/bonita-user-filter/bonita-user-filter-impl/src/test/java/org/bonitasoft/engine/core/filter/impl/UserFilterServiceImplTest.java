@@ -9,8 +9,8 @@ import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ResourcesService;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.connector.ConnectorExecutor;

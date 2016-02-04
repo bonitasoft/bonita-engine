@@ -49,8 +49,8 @@
                 <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
                 <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
 
-                <value>/org/bonitasoft/engine/bar/hibernate/bar.hbm.xml</value>
-                <value>/org/bonitasoft/engine/bar/hibernate/bar.queries.hbm.xml</value>
+                <value>/org/bonitasoft/engine/resources/hibernate/resources.hbm.xml</value>
+                <value>/org/bonitasoft/engine/resources/hibernate/resources.queries.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">

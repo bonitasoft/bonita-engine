@@ -12,30 +12,11 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.bar;
+package org.bonitasoft.engine.resources;
 
 /**
  * @author Baptiste Mesta
  */
-public class SBARResource extends SBARResourceLight {
-
-    private byte[] content;
-
-    public SBARResource() {
-    }
-
-    public SBARResource(String name, BARResourceType type, long processDefinitionId, byte[] content) {
-        this.name = name;
-        this.type = type;
-        this.processDefinitionId = processDefinitionId;
-        this.content = content;
-    }
-
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
+public enum BARResourceType {
+    DOCUMENT, EXTERNAL, CONNECTOR, USER_FILTER
 }

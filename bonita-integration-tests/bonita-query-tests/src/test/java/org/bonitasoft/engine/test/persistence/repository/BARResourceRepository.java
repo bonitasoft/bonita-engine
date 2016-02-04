@@ -15,9 +15,9 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.SBARResource;
-import org.bonitasoft.engine.bar.SBARResourceLight;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.SBARResource;
+import org.bonitasoft.engine.resources.SBARResourceLight;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
