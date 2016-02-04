@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.io.IOUtil;
 
 /**
  *
@@ -35,32 +34,6 @@ public class TenantStorage {
 
         this.bonitaHomeServer = bonitaHomeServer;
     }
-
-    private File getBDMFile(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final Folder bdmFolder = FolderMgr.getTenantWorkBDMFolder(getBonitaHomeFolder(), tenantId);
-        return bdmFolder.getFile("client-bdm.zip");
-    }
-
-    public byte[] getClientBDMZip(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final File bdmFile = getBDMFile(tenantId);
-        return IOUtil.getAllContentFrom(bdmFile);
-    }
-
-    public void writeClientBDMZip(final long tenantId, byte[] clientBdmJar) throws BonitaHomeNotSetException, IOException {
-        final File bdmFile = getBDMFile(tenantId);
-        if (bdmFile.exists()) {
-            bdmFile.delete();
-        }
-        IOUtil.write(bdmFile, clientBdmJar);
-    }
-
-    public void removeBDMZip(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final File bdmFile = getBDMFile(tenantId);
-        if (bdmFile.exists()) {
-            bdmFile.delete();
-        }
-    }
-
 
     public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
         Folder current = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);

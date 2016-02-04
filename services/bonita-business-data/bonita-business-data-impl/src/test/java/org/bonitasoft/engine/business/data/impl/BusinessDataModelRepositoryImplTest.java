@@ -20,8 +20,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,42 +32,32 @@ import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.home.TenantStorage;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.resources.TenantResourceType;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BonitaHomeServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class BusinessDataModelRepositoryImplTest {
 
     @Mock
     private DependencyService dependencyService;
 
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
-
     @Mock
-    private TenantStorage tenantStorage;
-    @Mock
-    private BonitaHomeServer bonitaHomeServer;
+    private TenantResourcesService tenantResourcesService;
 
     @Before
     public void setUp() {
-        mockStatic(BonitaHomeServer.class);
-        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
-        when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
-
-        dependencyService = mock(DependencyService.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), 1L));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), tenantResourcesService));
     }
 
     @Test
-    public void deployABOMShouldCreatetheBOMJARAndAddANewTenantDependency() throws Exception {
+    public void should_createAndDeployServerBDMJar_add_dependency_on_bdm_server_jar() throws Exception {
         BusinessObjectModel bom = BOMBuilder.aBOM().build();
         doReturn("some bytes".getBytes()).when(businessDataModelRepository).generateServerBDMJar(bom);
 
@@ -78,6 +66,16 @@ public class BusinessDataModelRepositoryImplTest {
         businessDataModelRepository.createAndDeployServerBDMJar(1, bom);
 
         verify(dependencyService).createMappedDependency("BDR", "some bytes".getBytes(), "BDR.jar", 1, ScopeType.TENANT);
+    }
+
+    @Test
+    public void should_createAndDeployClientBDMZip_add_resource_on_tenantResourcesService() throws Exception {
+        BusinessObjectModel bom = BOMBuilder.aBOM().build();
+        doReturn("some bytes".getBytes()).when(businessDataModelRepository).generateClientBDMZip(bom);
+
+        businessDataModelRepository.createAndDeployClientBDMZip(bom);
+
+        verify(tenantResourcesService).add("client-bdm.zip", TenantResourceType.BDM ,"some bytes".getBytes());
     }
 
     @Test
@@ -138,7 +136,7 @@ public class BusinessDataModelRepositoryImplTest {
         doThrow(IOException.class).when(businessDataModelRepository).getBusinessObjectModel(any(clientBDMZip.getClass()));
 
         //when then exception
-         businessDataModelRepository.getBusinessObjectModel();
+        businessDataModelRepository.getBusinessObjectModel();
     }
 
 }

@@ -33,7 +33,6 @@ import org.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
 import org.bonitasoft.engine.bdm.client.ResourcesLoader;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -45,15 +44,17 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.TenantResourceType;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.xml.sax.SAXException;
 
 /**
@@ -62,6 +63,7 @@ import org.xml.sax.SAXException;
 public class BusinessDataModelRepositoryImpl implements BusinessDataModelRepository {
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
+    private static final String CLIENT_BDM_ZIP = "client-bdm.zip";
 
     private static final String MODEL_JAR_NAME = "bdm-model.jar";
 
@@ -72,22 +74,27 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private final DependencyService dependencyService;
 
     private final SchemaManager schemaManager;
+    private TenantResourcesService tenantResourcesService;
 
-    private final long tenantId;
-
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager, final long tenantId) {
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager,
+            TenantResourcesService tenantResourcesService) {
         this.dependencyService = dependencyService;
         this.schemaManager = schemaManager;
-        this.tenantId = tenantId;
+        this.tenantResourcesService = tenantResourcesService;
     }
 
     @Override
     public byte[] getClientBDMZip() throws SBusinessDataRepositoryException {
+        STenantResource sTenantResource;
         try {
-            return BonitaHomeServer.getInstance().getTenantStorage().getClientBDMZip(tenantId);
-        } catch (final Exception e) {
+            sTenantResource = tenantResourcesService.get(TenantResourceType.BDM, CLIENT_BDM_ZIP);
+        } catch (SBonitaReadException e) {
             throw new SBusinessDataRepositoryException(e);
         }
+        if (sTenantResource == null) {
+            throw new SBusinessDataRepositoryException("no client-bdm.zip found in tenant resources");
+        }
+        return sTenantResource.getContent();
     }
 
     @Override
@@ -140,7 +147,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public String install(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
-        createClientBDMZip(tenantId, model);
+        createAndDeployClientBDMZip(model);
         final long bdmVersion = createAndDeployServerBDMJar(tenantId, model);
         return String.valueOf(bdmVersion);
     }
@@ -148,7 +155,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
-            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_NAME + ".jar", tenantId, ScopeType.TENANT);
+            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_NAME + ".jar",
+                    tenantId, ScopeType.TENANT);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException e) {
@@ -163,11 +171,10 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    private void createClientBDMZip(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+    void createAndDeployClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         try {
-            final byte[] clientBdmJar = generateClientBDMZip(model);
-            BonitaHomeServer.getInstance().getTenantStorage().writeClientBDMZip(tenantId, clientBdmJar);
-        } catch (final Exception e) {
+            tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model));
+        } catch (IOException | SRecorderException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
     }
@@ -192,7 +199,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final JDTCompiler compiler = new JDTCompiler();
         AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader());
 
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Map<String, byte[]> resources = new HashMap<>();
         // Build jar with Model
         final byte[] modelJarContent = builder.build(model, new WithoutDAOImplementationFileFilter());
         resources.put(MODEL_JAR_NAME, modelJarContent);
@@ -223,10 +230,6 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         return IOUtil.generateZip(resources);
     }
 
-    protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {
-        return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, ScopeType.TENANT).done();
-    }
-
     @Override
     public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
         try {
@@ -237,8 +240,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throw new SBusinessDataRepositoryException(sde);
         }
         try {
-            BonitaHomeServer.getInstance().getTenantStorage().removeBDMZip(tenantId);
-        } catch (Exception e) {
+            STenantResource clientBDMZip = tenantResourcesService.get(TenantResourceType.BDM, CLIENT_BDM_ZIP);
+            if (clientBDMZip != null) {
+                tenantResourcesService.remove(clientBDMZip);
+            }
+        } catch (SBonitaReadException | SRecorderException e) {
             throw new SBusinessDataRepositoryException(e);
         }
     }
