@@ -201,10 +201,11 @@ public class Folder {
         return this.folder.toURI();
     }
 
-    public void createIfNotExists() throws IOException {
+    public Folder createIfNotExists() throws IOException {
         if (!this.folder.exists()) {
             create();
         }
+        return this;
     }
 
     public void createAsTemporaryFolder() {
