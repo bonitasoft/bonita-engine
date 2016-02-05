@@ -233,7 +233,7 @@ public class BonitaHomeServer extends BonitaHome {
      */
 
     public File getPlatformTempFile(final String fileName) throws BonitaHomeNotSetException, IOException {
-        final Folder tempFolder = FolderMgr.getPlatformTempFolder(getBonitaHomeFolder());
+        final Folder tempFolder = FolderMgr.getPlatformTempFolder();
         final File file = tempFolder.getFile(fileName);
         file.delete();
         file.createNewFile();
@@ -241,11 +241,11 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public URI getGlobalTemporaryFolder() throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getPlatformGobalClassLoaderFolder(getBonitaHomeFolder()).toURI();
+        return FolderMgr.getPlatformGlobalClassLoaderFolder().toURI();
     }
 
     public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getPlatformLocalClassLoaderFolder(getBonitaHomeFolder(), artifactType, artifactId).toURI();
+        return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
     private static class XmlFilesFilter implements FileFilter {
