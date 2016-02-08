@@ -46,6 +46,10 @@ public class BonitaEngineRule implements MethodRule {
         testEngine.setDropOnStart(false);
         return this;
     }
+    public BonitaEngineRule keepPlatformOnShutdown(){
+        testEngine.setDropOnStop(false);
+        return this;
+    }
 
     public BonitaEngineRule addCustomConfig(String path, String file) {
         try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file)) {
