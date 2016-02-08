@@ -63,7 +63,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
         final String documentName = sLeftOperand.getName();
         try {
             final long processInstanceId = getProcessInstanceId(containerId, containerType);
-            documentHelper.setDocumentList(documentList, documentName, processInstanceId, getAuthorId());
+            documentHelper.setDocumentList(documentList, documentName, processInstanceId, getAuthorId(containerId, containerType));
             return documentList;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e.getMessage(), e);
