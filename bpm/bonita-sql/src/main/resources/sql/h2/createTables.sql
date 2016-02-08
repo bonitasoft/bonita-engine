@@ -1040,7 +1040,7 @@ CREATE TABLE tenant_resource (
   name VARCHAR(255) NOT NULL,
   type VARCHAR(16) NOT NULL,
   content LONGBLOB NOT NULL,
-  UNIQUE (tenantId, name, type),
+  CONSTRAINT UK_tenant_resource UNIQUE (tenantId, name, type),
   PRIMARY KEY (tenantId, id)
 );
 CREATE INDEX idx_tenant_resource ON tenant_resource (tenantId, type, name);

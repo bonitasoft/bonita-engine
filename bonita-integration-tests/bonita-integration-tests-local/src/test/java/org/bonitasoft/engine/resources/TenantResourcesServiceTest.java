@@ -24,8 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Nicolas Chabanoles
- * @author Celine Souchet
+ * @author Baptiste Mesta
  */
 public class TenantResourcesServiceTest extends CommonBPMServicesTest {
 
@@ -33,9 +32,8 @@ public class TenantResourcesServiceTest extends CommonBPMServicesTest {
 
     private static TransactionService transactionService;
 
-
     @Before
-    public void before(){
+    public void before() {
         tenantResourcesService = getTenantAccessor().getTenantResourcesService();
         transactionService = getTransactionService();
     }
@@ -43,6 +41,7 @@ public class TenantResourcesServiceTest extends CommonBPMServicesTest {
     @After
     public void after() throws Exception {
         transactionService.executeInTransaction(new Callable<Object>() {
+
             @Override
             public Object call() throws Exception {
                 tenantResourcesService.removeAll(TenantResourceType.BDM);
@@ -55,7 +54,7 @@ public class TenantResourcesServiceTest extends CommonBPMServicesTest {
     public void should_create_and_get_resource_work() throws Exception {
         transactionService.begin();
         //given
-        tenantResourcesService.add("myResource",TenantResourceType.BDM,"theResourceContent".getBytes());
+        tenantResourcesService.add("myResource", TenantResourceType.BDM, "theResourceContent".getBytes());
         //when
         transactionService.complete();
         transactionService.begin();

@@ -1177,7 +1177,7 @@ CREATE TABLE tenant_resource (
   name NVARCHAR(255) NOT NULL,
   type NVARCHAR(16) NOT NULL,
   content VARBINARY(MAX) NOT NULL,
-  UNIQUE (tenantId, name, type),
+  CONSTRAINT UK_tenant_resource UNIQUE (tenantId, name, type),
   PRIMARY KEY (tenantId, id)
 )
 GO
