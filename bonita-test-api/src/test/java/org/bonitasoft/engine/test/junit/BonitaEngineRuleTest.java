@@ -61,5 +61,10 @@ public class BonitaEngineRuleTest {
         public void setDropOnStart(boolean dropOnStart) {
 
         }
+
+        @Override
+        public void setDropOnStop(boolean dropOnStop) {
+
+        }
     }
 }

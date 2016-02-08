@@ -16,4 +16,6 @@ public interface TestEngine {
     void overrideConfiguration(String path, byte[] file);
 
     void setDropOnStart(boolean dropOnStart);
+
+    void setDropOnStop(boolean dropOnStop);
 }
