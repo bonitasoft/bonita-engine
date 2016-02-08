@@ -48,7 +48,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -88,6 +87,10 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         if (expressionConstant == null) {
             throw new SExpressionEvaluationException(expression.getContent() + " is not a valid Engine-provided variable", expressionName);
         }
+        return evaluate(context, containerState, expressionConstant, expressionName);
+    }
+
+    public Serializable evaluate(Map<String, Object> context, ContainerState containerState, ExpressionConstants expressionConstant, String expressionName) throws SExpressionEvaluationException {
         try {
             switch (expressionConstant) {
                 case API_ACCESSOR:
@@ -102,7 +105,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                 case TASK_ASSIGNEE_ID:
                     return getFromContextOrEngineExecutionContext(expressionConstant, context, containerState);
                 case LOGGED_USER_ID:
-                    return getLoggedUserFromSession();
+                    return getLoggedUserFromSession(context, containerState);
                 case LOOP_COUNTER:
                     return getLoopCounter(context);
                 default:
@@ -113,20 +116,10 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                     }
                     return (Serializable) object;
             }
-        } catch (final STenantIdNotSetException e) {
-            throw new SExpressionEvaluationException(e, expressionName);
-        } catch (final SSessionNotFoundException e) {
-            throw new SExpressionEvaluationException(e, expressionName);
-        } catch (final SProcessInstanceNotFoundException e) {
+        } catch (final SProcessInstanceNotFoundException | SProcessInstanceReadException e) {
             throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e,
                     expressionName);
-        } catch (final SProcessInstanceReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e,
-                    expressionName);
-        } catch (final SFlowNodeReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineExecutionContext as EngineConstantExpression",
-                    e, expressionName);
-        } catch (final SFlowNodeNotFoundException e) {
+        } catch (final SFlowNodeReadException | SFlowNodeNotFoundException e) {
             throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineExecutionContext as EngineConstantExpression",
                     e, expressionName);
         } catch (final SActivityInstanceNotFoundException e) {
@@ -141,16 +134,17 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private Serializable getLoopCounter(Map<String, Object> context) throws SExpressionEvaluationException, SFlowNodeReadException, SFlowNodeNotFoundException {
         final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
-            final long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
-        if( DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)){
+        final long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
+        if (DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)) {
             SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
-            if(flowNodeInstance instanceof SLoopActivityInstance){
+            if (flowNodeInstance instanceof SLoopActivityInstance) {
                 return flowNodeInstance.getLoopCounter();
             }
-            SLoopActivityInstance loopActivityInstance = (SLoopActivityInstance) activityInstanceService.getFlowNodeInstance(flowNodeInstance.getParentActivityInstanceId());
+            SLoopActivityInstance loopActivityInstance = (SLoopActivityInstance) activityInstanceService
+                    .getFlowNodeInstance(flowNodeInstance.getParentActivityInstanceId());
             return loopActivityInstance.getLoopCounter();
         }
-        throw new SExpressionEvaluationException("loopCounter is not available in this context","loopCounter");
+        throw new SExpressionEvaluationException("loopCounter is not available in this context", "loopCounter");
     }
 
     protected APIAccessor getApiAccessor() {
@@ -162,11 +156,20 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         return new ConnectorAPIAccessorImpl(tenantId);
     }
 
-    private long getLoggedUserFromSession() throws SSessionNotFoundException {
-        return sessionService.getLoggedUserFromSession(sessionAccessor);
+    long getLoggedUserFromSession(Map<String, Object> context, ContainerState containerState) {
+        long loggedUserFromSession = sessionService.getLoggedUserFromSession(sessionAccessor);
+        if (loggedUserFromSession <= 0) {
+            //try to get it from the user task assignee if applicable
+            try {
+                return (long) getFromContextOrEngineExecutionContext(ExpressionConstants.TASK_ASSIGNEE_ID, context, containerState);
+            } catch (SBonitaException e) {
+                return -1L;
+            }
+        }
+        return loggedUserFromSession;
     }
 
-    private Serializable getFromContextOrEngineExecutionContext(final ExpressionConstants expressionConstant, final Map<String, Object> context,
+    public Serializable getFromContextOrEngineExecutionContext(final ExpressionConstants expressionConstant, final Map<String, Object> context,
             final ContainerState containerState) throws SBonitaException {
         final Object object = context.get(expressionConstant.getEngineConstantName());
         if (object == null) {
@@ -198,7 +201,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                 return evaluateUsingProcessInstanceContainer(expressionConstant, context, containerId);
             }
         } else {
-            return -1;// no container id and not processDefinition
+            return -1L;// no container id and not processDefinition
         }
     }
 
@@ -207,7 +210,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         if (ExpressionConstants.PROCESS_INSTANCE_ID.equals(expressionConstant)) {
             return containerId;
         } else if (ExpressionConstants.TASK_ASSIGNEE_ID.equals(expressionConstant)) {
-            return -1; // the assignee is related to an user task
+            return -1L; // the assignee is related to an user task
         } else {
             // get the process and fill the others elements
             fillDependenciesFromProcessInstance(context, containerId);

@@ -15,9 +15,13 @@ package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -32,7 +36,7 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     private final SessionService sessionService;
 
     public AbstractDocumentLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService) {
+                                              final SessionService sessionService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -49,8 +53,19 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
         return processInstanceId;
     }
 
-    protected long getAuthorId() {
-        return sessionService.getLoggedUserFromSession(sessionAccessor);
+    protected long getAuthorId(long containerId, String containerType) {
+        long loggedUserFromSession = sessionService.getLoggedUserFromSession(sessionAccessor);
+        try {
+            if (loggedUserFromSession <= 0 && DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
+                SActivityInstance activityInstance = activityInstanceService.getActivityInstance(containerId);
+                if (activityInstance instanceof SHumanTaskInstance) {
+                    SHumanTaskInstance instance = (SHumanTaskInstance) activityInstance;
+                    return instance.getAssigneeId();
+                }
+            }
+        } catch (SActivityInstanceNotFoundException | SActivityReadException ignored) {
+        }
+        return loggedUserFromSession;
     }
 
 }
