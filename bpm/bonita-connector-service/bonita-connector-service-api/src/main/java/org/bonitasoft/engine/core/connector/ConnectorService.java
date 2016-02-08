@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;

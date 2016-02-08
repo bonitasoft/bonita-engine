@@ -26,7 +26,7 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -90,6 +90,7 @@ import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.profile.xml.RoleNamesBinding;
 import org.bonitasoft.engine.profile.xml.UserNamesBinding;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -234,7 +235,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ReadPersistenceService readPersistenceService;
     private Recorder recorder;
     private BusinessArchiveService businessArchiveService;
-    private ResourcesService resourcesService;
+    private ProcessResourcesService processResourcesService;
+    private TenantResourcesService tenantResourceService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
@@ -856,11 +858,17 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return pageMappingService;
     }
 
-    @Override
-    public ResourcesService getResourcesService() {
-        if (resourcesService == null) {
-            resourcesService = beanAccessor.getService(ResourcesService.class);
+    public ProcessResourcesService getProcessResourcesService() {
+        if (processResourcesService == null) {
+            processResourcesService = beanAccessor.getService(ProcessResourcesService.class);
         }
-        return resourcesService;
+        return processResourcesService;
+    }
+
+    public TenantResourcesService getTenantResourcesService() {
+        if (tenantResourceService == null) {
+            tenantResourceService = beanAccessor.getService(TenantResourcesService.class);
+        }
+        return tenantResourceService;
     }
 }

@@ -17,7 +17,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -59,6 +59,7 @@ import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
+import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
@@ -253,6 +254,12 @@ public class TestRepository {
         getSession().save(sbarResource);
         return (SBARResource) getSession().get(sbarResource.getClass(),
                 new PersistentObjectId(sbarResource.getId(), sbarResource.getTenantId()));
+    }
+
+    public STenantResource add(final STenantResource sTenantResource) {
+        getSession().save(sTenantResource);
+        return (STenantResource) getSession().get(sTenantResource.getClass(),
+                new PersistentObjectId(sTenantResource.getId(), sTenantResource.getTenantId()));
     }
 
     public void update(final SApplicationImpl application) {

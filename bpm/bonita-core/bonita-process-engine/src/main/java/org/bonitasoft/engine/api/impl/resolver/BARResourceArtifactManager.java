@@ -17,9 +17,9 @@ package org.bonitasoft.engine.api.impl.resolver;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.ResourcesService;
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -31,16 +31,16 @@ import org.bonitasoft.engine.recorder.SRecorderException;
  * @author Baptiste Mesta
  */
 public abstract class BARResourceArtifactManager implements BusinessArchiveArtifactManager {
-    protected final ResourcesService resourcesService;
+    protected final ProcessResourcesService processResourcesService;
 
-    public BARResourceArtifactManager(ResourcesService resourcesService) {
-        this.resourcesService = resourcesService;
+    public BARResourceArtifactManager(ProcessResourcesService processResourcesService) {
+        this.processResourcesService = processResourcesService;
     }
 
     void saveResources(BusinessArchive businessArchive, SProcessDefinition processDefinition, String folder, BARResourceType type) throws SRecorderException {
         final Map<String, byte[]> resources = businessArchive.getResources("^" + folder + "/.*$");
         for (Map.Entry<String, byte[]> entry : resources.entrySet()) {
-            resourcesService.add(processDefinition.getId(), entry.getKey().substring((folder + "/").length()),
+            processResourcesService.add(processDefinition.getId(), entry.getKey().substring((folder + "/").length()),
                     type, entry.getValue());
         }
     }
@@ -50,7 +50,7 @@ public abstract class BARResourceArtifactManager implements BusinessArchiveArtif
         int from = 0;
         final int pageSize = 10;
         do {
-            resources = resourcesService.get(processDefinitionId, type, from, pageSize);
+            resources = processResourcesService.get(processDefinitionId, type, from, pageSize);
             addToBusinessArchive(businessArchiveBuilder, resources);
             from += pageSize;
         } while (resources.size() == pageSize);

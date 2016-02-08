@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.ResourcesService;
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
@@ -70,16 +70,16 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     private final TechnicalLoggerService logger;
 
-    private final ResourcesService resourcesService;
+    private final ProcessResourcesService processResourcesService;
 
     public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService,
-                                 final ExpressionResolverService expressionResolverService, final ParserFactory parserFactory, final TechnicalLoggerService logger, ResourcesService resourcesService) {
+                                 final ExpressionResolverService expressionResolverService, final ParserFactory parserFactory, final TechnicalLoggerService logger, ProcessResourcesService processResourcesService) {
         super();
         this.connectorExecutor = connectorExecutor;
         this.cacheService = cacheService;
         this.expressionResolverService = expressionResolverService;
         this.logger = logger;
-        this.resourcesService = resourcesService;
+        this.processResourcesService = processResourcesService;
         final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>(2);
         bindings.add(JarDependenciesBinding.class);
         bindings.add(UserFilterImplementationBinding.class);
@@ -165,14 +165,14 @@ public class UserFilterServiceImpl implements UserFilterService {
 
     @Override
     public void removeUserFilters(final long processDefinitionId) throws SBonitaReadException, SRecorderException {
-        resourcesService.removeAll(processDefinitionId, BARResourceType.USER_FILTER);
+        processResourcesService.removeAll(processDefinitionId, BARResourceType.USER_FILTER);
     }
 
     @Override
     public boolean loadUserFilters(final long processDefinitionId) throws SUserFilterLoadingException {
         String name = null;
         try {
-            final List<SBARResource> listFiles = resourcesService.get(processDefinitionId, BARResourceType.USER_FILTER, 0, 1000);//FIXME
+            final List<SBARResource> listFiles = processResourcesService.get(processDefinitionId, BARResourceType.USER_FILTER, 0, 1000);//FIXME
             final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
             for (final SBARResource file : listFiles) {
                 name = file.getName();

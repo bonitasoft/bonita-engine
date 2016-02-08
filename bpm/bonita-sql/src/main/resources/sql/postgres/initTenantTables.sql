@@ -51,6 +51,7 @@ INSERT INTO sequence VALUES(${tenantid}, 10300, 1);
 INSERT INTO sequence VALUES(${tenantid}, 10310, 1);
 INSERT INTO sequence VALUES(${tenantid}, 10400, 1);
 INSERT INTO sequence VALUES(${tenantid}, 10500, 1);
+INSERT INTO sequence VALUES(${tenantid}, 10501, 1);
 INSERT INTO sequence VALUES(${tenantid}, 20010, 1);
 INSERT INTO sequence VALUES(${tenantid}, 20011, 1);
 INSERT INTO sequence VALUES(${tenantid}, 20013, 1);

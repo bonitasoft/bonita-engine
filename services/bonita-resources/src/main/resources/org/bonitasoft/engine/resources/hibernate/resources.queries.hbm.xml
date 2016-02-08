@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getBARResourcesLightOfType">
+        SELECT bar
+        FROM org.bonitasoft.engine.resources.SBARResourceLight AS bar
+        WHERE bar.processDefinitionId= :processDefinitionId
+        AND bar.type = :type
+    </query>
+    <query name="getBARResourcesOfType">
+        SELECT bar
+        FROM org.bonitasoft.engine.resources.SBARResource AS bar
+        WHERE bar.processDefinitionId= :processDefinitionId
+        AND bar.type = :type
+    </query>
+    <query name="getNumberOfBARResourcesOfType">
+        SELECT count(bar)
+        FROM org.bonitasoft.engine.resources.SBARResource AS bar
+        WHERE bar.processDefinitionId= :processDefinitionId
+        AND bar.type = :type
+    </query>
+
+    <query name="getBARResource">
+        SELECT bar
+        FROM org.bonitasoft.engine.resources.SBARResource AS bar
+        WHERE bar.processDefinitionId= :processDefinitionId
+        AND bar.type = :type
+        AND bar.name = :name
+    </query>
+
+
+
+    <query name="getTenantResourcesLightOfType">
+        SELECT r
+        FROM org.bonitasoft.engine.resources.STenantResourceLight AS r
+        WHERE r.type = :type
+    </query>
+    <query name="getTenantResourcesOfType">
+        SELECT r
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+    </query>
+    <query name="getNumberOfTenantResourcesOfType">
+        SELECT count(r)
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+    </query>
+
+    <query name="getTenantResource">
+        SELECT r
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+        AND r.name = :name
+    </query>
+
+</hibernate-mapping>

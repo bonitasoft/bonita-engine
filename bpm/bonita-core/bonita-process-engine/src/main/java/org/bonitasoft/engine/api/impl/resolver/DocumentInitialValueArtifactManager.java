@@ -17,8 +17,8 @@ package org.bonitasoft.engine.api.impl.resolver;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -37,8 +37,8 @@ public class DocumentInitialValueArtifactManager extends BARResourceArtifactMana
 
     public static final String FOLDER = "documents";
 
-    public DocumentInitialValueArtifactManager(ResourcesService resourcesService) {
-        super(resourcesService);
+    public DocumentInitialValueArtifactManager(ProcessResourcesService processResourcesService) {
+        super(processResourcesService);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DocumentInitialValueArtifactManager extends BARResourceArtifactMana
 
     @Override
     public void delete(SProcessDefinition processDefinition) throws SObjectModificationException, SBonitaReadException, SRecorderException {
-        resourcesService.removeAll(processDefinition.getId(),BARResourceType.DOCUMENT);
+        processResourcesService.removeAll(processDefinition.getId(),BARResourceType.DOCUMENT);
     }
 
     @Override
