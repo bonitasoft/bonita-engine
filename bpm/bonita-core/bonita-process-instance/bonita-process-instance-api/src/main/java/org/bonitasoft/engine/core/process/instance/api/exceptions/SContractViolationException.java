@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Thrown when the {@link org.bonitasoft.engine.core.process.definition.model.SContractDefinition} is not fulfilled.
@@ -25,7 +25,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  * @author Emmanuel Duchastenier
  * @since 7.0
  */
-public class SContractViolationException extends SBonitaReadException {
+public class SContractViolationException extends SBonitaException {
 
     private final List<String> explanations;
     private final String simpleMessage;
