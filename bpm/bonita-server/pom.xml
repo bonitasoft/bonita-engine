@@ -88,6 +88,12 @@
             <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-impl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.data</groupId>
