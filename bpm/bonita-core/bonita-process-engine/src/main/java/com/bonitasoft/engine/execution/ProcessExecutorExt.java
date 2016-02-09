@@ -16,7 +16,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 import com.bonitasoft.engine.service.platform.PlatformInformationManager;
 import com.bonitasoft.engine.service.platform.SynchronizationPlatformInfoManager;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -79,7 +79,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     public ProcessExecutorExt(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
                               final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
                               final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
-                              final ResourcesService resourcesService, final ConnectorService connectorService,
+                              final ProcessResourcesService processResourcesService, final ConnectorService connectorService,
                               final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
                               final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
                               final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
@@ -88,7 +88,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                               final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator,
                               final ContractDataService contractDataService, SynchronizationPlatformInfoManager platformInformationManager, PlatformVerifier platformVerifier) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
-                resourcesService, connectorService, connectorInstanceService, classLoaderService, operationService,
+                processResourcesService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, expressionService, eventService, handlers, documentService, containerRegistry, bpmInstancesCreator,
                 eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator, contractDataService);
         this.platformInformationManager = platformInformationManager;

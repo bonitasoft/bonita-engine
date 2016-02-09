@@ -28,10 +28,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.APIClient;
+import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +75,6 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
@@ -76,24 +90,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
-import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Query;
-import com.bonitasoft.engine.bdm.model.field.FieldType;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.businessdata.BusinessDataReference;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 /**
  * @deprecated From 7.0.0 on, please report changes to this class in org.bonitasoft.engine.business.data.BDRepositoryIT
@@ -609,27 +605,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         assertCount(instance.getId());
         disableAndDeleteProcess(definition);
-    }
-
-    @Test
-    public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
-        final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
-
-        assertThat(getTenantManagementAPI().getClientBDMZip()).isNotEmpty();
-    }
-
-    @Test(expected = BusinessDataRepositoryException.class)
-    public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        getTenantManagementAPI().pause();
-        getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
-        getTenantManagementAPI().resume();
-
-        final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
-
-        getTenantManagementAPI().getClientBDMZip();
     }
 
     @Test
