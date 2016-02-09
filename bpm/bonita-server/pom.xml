@@ -99,6 +99,10 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.bonitasoft.engine.core</groupId>
                     <artifactId>bonita-home-server</artifactId>
                 </exclusion>
