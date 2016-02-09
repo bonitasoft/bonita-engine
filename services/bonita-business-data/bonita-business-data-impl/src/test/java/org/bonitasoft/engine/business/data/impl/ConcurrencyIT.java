@@ -35,6 +35,7 @@ import javax.transaction.UserTransaction;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -99,8 +100,9 @@ public class ConcurrencyIT {
         final TransactionService transactionService = mock(TransactionService.class);
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaManager, 1L));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
+                schemaManager, mock(TenantResourcesService.class)));
+        businessDataRepository = spy(
+                new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
 
         ut = TransactionManagerServices.getTransactionManager();

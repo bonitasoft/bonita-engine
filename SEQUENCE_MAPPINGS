@@ -112,6 +112,10 @@ SFormMappingImpl --> 10300
 
 SProcessDefinitionDesignContentImpl --> 10310
 
+
+SBARResource --> 10500
+STenantResource --> 10501
+
 =Archived objects==
 
 ProcessInstance -> 20010

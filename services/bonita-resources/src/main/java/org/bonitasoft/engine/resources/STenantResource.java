@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2016 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,22 +11,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.home;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Test;
+package org.bonitasoft.engine.resources;
 
 /**
  * @author Baptiste Mesta
- * @author Emmanuel Duchastenier
  */
-public class FolderMgrTest {
+public class STenantResource extends STenantResourceLight {
 
-    @Test
-    public void getPlatformGlobalClassLoaderFolder_should_create_all_parents() throws Exception {
-        final Folder platformGlobalClassLoaderFolder = FolderMgr.getPlatformGlobalClassLoaderFolder();
-        assertThat(platformGlobalClassLoaderFolder.getFile()).exists().isDirectory();
+    private byte[] content;
+
+    public STenantResource() {
     }
 
+    public STenantResource(String name, TenantResourceType type, byte[] content) {
+        this.name = name;
+        this.type = type;
+        this.content = content;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
 }

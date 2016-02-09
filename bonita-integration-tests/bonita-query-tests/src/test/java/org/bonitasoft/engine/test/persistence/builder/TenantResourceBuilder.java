@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Bonitasoft S.A.
+ * Copyright (C) 2016 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,49 +13,42 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.SBARResource;
+import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.TenantResourceType;
 
-public class BARResourceBuilder extends PersistentObjectBuilder<SBARResource, BARResourceBuilder> {
+public class TenantResourceBuilder extends PersistentObjectBuilder<STenantResource, TenantResourceBuilder> {
 
     private String name;
 
-    private Long processDefinitionId;
-
     private byte[] content;
-    private BARResourceType type;
+    private TenantResourceType type;
 
-    public static BARResourceBuilder aBARResource() {
-        return new BARResourceBuilder();
+    public static TenantResourceBuilder aTenantResource() {
+        return new TenantResourceBuilder();
     }
 
     @Override
-    public SBARResource _build() {
-        return new SBARResource(name, type, processDefinitionId, content);
+    public STenantResource _build() {
+        return new STenantResource(name, type, content);
     }
 
-    public BARResourceBuilder withName(final String name) {
+    public TenantResourceBuilder withName(final String name) {
         this.name = name;
         return this;
     }
 
-    public BARResourceBuilder withType(final BARResourceType type) {
+    public TenantResourceBuilder withType(final TenantResourceType type) {
         this.type = type;
         return this;
     }
 
-    public BARResourceBuilder withContent(final byte[] content) {
+    public TenantResourceBuilder withContent(final byte[] content) {
         this.content = content;
         return this;
     }
 
-    public BARResourceBuilder withProcessDefinitionId(final Long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-        return this;
-    }
-
     @Override
-    BARResourceBuilder getThisBuilder() {
+    TenantResourceBuilder getThisBuilder() {
         return this;
     }
 
