@@ -52,6 +52,7 @@ public class EngineStarter {
 
     private Map<String, byte[]> overridenConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
+    private boolean dropOnStop = true;
 
     public void start() throws Exception {
         LOGGER.info("=====================================================");
@@ -175,7 +176,9 @@ public class EngineStarter {
         LOGGER.info("=========  CLEAN PLATFORM =======");
 
         stopAndCleanPlatformAndTenant(true);
-        deletePlatformStructure();
+        if (dropOnStop) {
+            deletePlatformStructure();
+        }
     }
 
     protected void deletePlatformStructure() throws BonitaException {
@@ -199,7 +202,9 @@ public class EngineStarter {
     protected void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (platformAPI.isNodeStarted()) {
             stopPlatformAndTenant(platformAPI, undeployCommands);
-            cleanPlatform(platformAPI);
+            if (dropOnStop) {
+                cleanPlatform(platformAPI);
+            }
         }
     }
 
@@ -394,5 +399,9 @@ public class EngineStarter {
 
     public boolean isDropOnStart() {
         return dropOnStart;
+    }
+
+    public void setDropOnStop(boolean dropOnStop) {
+        this.dropOnStop = dropOnStop;
     }
 }

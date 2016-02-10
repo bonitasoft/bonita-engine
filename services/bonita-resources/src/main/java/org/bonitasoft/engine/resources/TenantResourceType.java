@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Bonitasoft S.A.
+ * Copyright (C) 2016 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -12,30 +12,11 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.bar;
+package org.bonitasoft.engine.resources;
 
 /**
  * @author Baptiste Mesta
  */
-public class SBARResource extends SBARResourceLight {
-
-    private byte[] content;
-
-    public SBARResource() {
-    }
-
-    public SBARResource(String name, BARResourceType type, long processDefinitionId, byte[] content) {
-        this.name = name;
-        this.type = type;
-        this.processDefinitionId = processDefinitionId;
-        this.content = content;
-    }
-
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
+public enum TenantResourceType {
+    BDM
 }

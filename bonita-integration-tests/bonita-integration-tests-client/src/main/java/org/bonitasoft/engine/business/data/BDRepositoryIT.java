@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -77,7 +76,6 @@ import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
-import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
@@ -91,7 +89,9 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.xml.sax.SAXException;
 
 public class BDRepositoryIT extends CommonAPIIT {
@@ -114,13 +114,15 @@ public class BDRepositoryIT extends CommonAPIIT {
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
     private static final String COUNT_EMPLOYEE = "countEmployee";
     private static final String COUNT_ADDRESS = "countAddress";
-    private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
     private User matti;
 
     private File clientFolder;
     private Long tenantId;
 
     private static String bdmDeployedVersion = "0";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private BusinessObjectModel buildBOM() {
         final SimpleField name = new SimpleField();
@@ -626,23 +628,17 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
-        final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
-
+    public void should_deploy_generate_client_bdm_zip() throws Exception {
         assertThat(getTenantAdministrationAPI().getClientBDMZip()).isNotEmpty();
     }
 
-    @Test(expected = BusinessDataRepositoryException.class)
-    public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
+    @Test
+    public void should_undeploy_delete_generate_client_bdm_zip() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().resume();
-
-        final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
-
+        expectedException.expect(BusinessDataRepositoryException.class);
         getTenantAdministrationAPI().getClientBDMZip();
     }
 

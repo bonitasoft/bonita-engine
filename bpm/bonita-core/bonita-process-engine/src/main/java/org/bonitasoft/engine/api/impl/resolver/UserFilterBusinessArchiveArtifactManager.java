@@ -16,8 +16,8 @@ package org.bonitasoft.engine.api.impl.resolver;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -40,8 +40,8 @@ public class UserFilterBusinessArchiveArtifactManager extends BARResourceArtifac
 
     private final UserFilterService userFilterService;
 
-    public UserFilterBusinessArchiveArtifactManager(UserFilterService userFilterService, ResourcesService resourcesService) {
-        super(resourcesService);
+    public UserFilterBusinessArchiveArtifactManager(UserFilterService userFilterService, ProcessResourcesService processResourcesService) {
+        super(processResourcesService);
         this.userFilterService = userFilterService;
     }
 

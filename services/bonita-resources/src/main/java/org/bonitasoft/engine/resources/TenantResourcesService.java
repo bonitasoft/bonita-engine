@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Bonitasoft S.A.
+ * Copyright (C) 2016 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -12,7 +12,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.bar;
+package org.bonitasoft.engine.resources;
 
 import java.util.List;
 
@@ -22,17 +22,17 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 /**
  * @author Baptiste Mesta
  */
-public interface ResourcesService {
+public interface TenantResourcesService {
 
-    void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException;
+    void add(String name, TenantResourceType type, byte[] content) throws SRecorderException;
 
-    void removeAll(long processDefinitionId, BARResourceType external) throws SBonitaReadException, SRecorderException;
+    void removeAll(TenantResourceType external) throws SBonitaReadException, SRecorderException;
 
-    List<SBARResource> get(long processDefinitionId, BARResourceType type, int from, int numberOfElements) throws SBonitaReadException;
+    List<STenantResource> get(TenantResourceType type, int from, int numberOfElements) throws SBonitaReadException;
 
-    long count(long processDefinitionId, BARResourceType type) throws SBonitaReadException;
+    long count(TenantResourceType type) throws SBonitaReadException;
 
-    SBARResource get(long processDefinitionId, BARResourceType type, String name) throws SBonitaReadException;
+    STenantResource get(TenantResourceType type, String name) throws SBonitaReadException;
 
-    void remove(SBARResourceLight resource) throws SRecorderException;
+    void remove(STenantResourceLight resource) throws SRecorderException;
 }
