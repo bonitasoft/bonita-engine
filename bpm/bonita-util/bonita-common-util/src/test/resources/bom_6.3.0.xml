@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<businessObjectModel>
+    <businessObjects>
+        <businessObject qualifiedName="com.company.model.SecondBusinessObject">
+            <fields>
+                <field name="aMandatory" type="STRING" nullable="false" length="255" collection="false"/>
+                <field name="aMultiple" type="STRING" nullable="true" length="255" collection="true"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="aConstraint">
+                    <fieldNames>
+                        <fieldName>aMandatory</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries/>
+        </businessObject>
+        <businessObject qualifiedName="com.company.model.FirstBusinessObject">
+            <fields>
+                <field name="aString" type="STRING" nullable="true" collection="false"/>
+                <field name="aText" type="TEXT" nullable="true" length="255" />
+                <field name="aBoolean" type="BOOLEAN" nullable="true"  />
+                <field name="anInteger" type="INTEGER" nullable="true" />
+                <field name="aLong" type="LONG" nullable="true" length="255" collection="false"/>
+                <field name="aFloat" type="FLOAT" nullable="true" length="255" collection="false"/>
+                <field name="aDouble" type="DOUBLE" nullable="true" length="255" collection="false"/>
+                <field name="aDate" type="DATE" nullable="true" length="255" collection="false"/>
+            </fields>
+            <uniqueConstraints>
+                <uniqueConstraint name="otherConstraint">
+                    <fieldNames>
+                        <fieldName>aBoolean</fieldName>
+                        <fieldName>aDate</fieldName>
+                        <fieldName>anInteger</fieldName>
+                    </fieldNames>
+                </uniqueConstraint>
+            </uniqueConstraints>
+            <queries>
+                <query name="aQuery" content="SELECT f &#xA;FROM FirstBusinessObject f &#xA;WHERE f.aString = :aString&#xA;AND f.aText = :aText&#xA;AND f.aBoolean = :aBoolean&#xA;AND f.anInteger = :anInteger&#xA;AND f.aLong = :aLong&#xA;AND f.aFloat = :aFloat&#xA;AND f.aDouble = :aDouble&#xA;AND f.aDate = :aDate&#xA;ORDER BY f.persistenceId ASC" returnType="java.util.List">
+                    <queryParameters>
+                        <queryParameter name="aString" className="java.lang.String"/>
+                        <queryParameter name="aText" className="java.lang.String"/>
+                        <queryParameter name="aBoolean" className="java.lang.Boolean"/>
+                        <queryParameter name="anInteger" className="java.lang.Integer"/>
+                        <queryParameter name="aLong" className="java.lang.Long"/>
+                        <queryParameter name="aFloat" className="java.lang.Float"/>
+                        <queryParameter name="aDouble" className="java.lang.Double"/>
+                        <queryParameter name="aDate" className="java.util.Date"/>
+                    </queryParameters>
+                </query>
+            </queries>
+        </businessObject>
+    </businessObjects>
+</businessObjectModel>

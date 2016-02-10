@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.actor.mapping.model.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SActorImpl" table="actor">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="scopeId" type="long" column="scopeid" />
+		<property name="name" type="java.lang.String" column="name" />
+		<property name="displayName" type="java.lang.String" column="displayname" />
+		<property name="description" type="java.lang.String" column="description" />
+		<property name="initiator" type="boolean" column="initiator" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SActorMemberImpl" table="actormember">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="actorId" type="long" column="actorid" />
+		<property name="userId" type="long" column="userId" />
+		<property name="groupId" type="long" column="groupId" />
+		<property name="roleId" type="long" column="roleId" />
+		<filter name="tenantFilter" />
+	</class>
+
+</hibernate-mapping>

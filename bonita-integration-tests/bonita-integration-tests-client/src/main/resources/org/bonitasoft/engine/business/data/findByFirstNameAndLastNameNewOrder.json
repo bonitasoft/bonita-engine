@@ -1,0 +1,20 @@
+[
+  {
+    "persistenceId": 1,
+    "persistenceVersion": 0,
+    "persistenceId_string": "1",
+    "persistenceVersion_string": "0",
+    "firstName": "Alphonse",
+    "lastName": "Dupond",
+    "hireDate":"123456789",
+    "phoneNumbers": ["123456789"],
+    "addresses": [{}],
+    "booleanField":null,
+    "links": [
+      {
+        "rel": "address",
+        "href": "/businessdata/org.bonita.pojo.Employee/1/address"
+      }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!-- ADD ANY BEAN DEFINITION YOU WANT TO BE AVAILABLE TO THE TENANT ACCESSOR -->
+
+    <!--
+    <bean id="flushEventListeners" parent="defaultFlushEventListeners" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+    -->
+
+    <!--
+    <bean id="activatedRecords" parent="defaultActivatedRecords" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+    -->
+
+</beans>

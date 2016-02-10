@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+    <query name="getDependencyByName">
+        SELECT dependency
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
+        WHERE dependency.name = :name
+    </query>
+
+    <query name="getDependenciesByIds">
+        SELECT dependency
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
+        WHERE dependency.id IN (:ids)
+        ORDER BY dependency.id ASC
+    </query>
+
+    <query name="getDependencies">
+        SELECT dependency
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
+    </query>
+
+    <query name="getDependencyMapping">
+        SELECT dependencymapping
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+        WHERE dependencymapping.id = :id
+    </query>
+
+    <query name="getDependencyMappings">
+        SELECT dependencymapping
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+    </query>
+
+    <query name="getDependencyMappingsByArtifact">
+        SELECT dependencymapping
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+        WHERE dependencymapping.artifactId = :artifactId
+        AND dependencymapping.artifactType = :artifactType
+    </query>
+
+    <query name="getDependencyMappingsByDependency">
+        SELECT dependencymapping
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+        WHERE dependencymapping.dependencyId = :dependencyId
+    </query>
+
+    <query name="getDependencyIds">
+        SELECT dependencymapping.dependencyId
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+        WHERE dependencymapping.artifactId = :artifactId
+        AND dependencymapping.artifactType = :artifactType
+        ORDER BY dependencymapping.dependencyId
+    </query>
+
+    <query name="getDependencyOfArtifact">
+        SELECT dependency
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency,
+        org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+        WHERE dependencymapping.artifactId = :artifactId
+        AND dependencymapping.artifactType = :artifactType
+        AND dependencymapping.dependencyId = dependency.id
+        AND dependency.fileName = :fileName
+    </query>
+
+</hibernate-mapping>

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getDataInstanceByIds">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE dataInstance.id IN (:ids)
+        ORDER BY dataInstance.id
+    </query>
+
+    <query name="getDataInstancesByNameAndContainer">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE dataInstance.name = :name
+        AND dataInstance.containerId = :containerId
+        AND dataInstance.containerType = :containerType
+    </query>
+
+    <query name="getDataInstancesByContainer">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE dataInstance.containerId = :containerId
+        AND dataInstance.containerType = :containerType
+    </query>
+
+
+    <query name="getNumberOfDataInstancesForContainer">
+        SELECT count(dataInstance)
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE dataInstance.containerId = :containerId
+        AND dataInstance.containerType = :containerType
+    </query>
+
+    <query name="getDataInstancesOf1Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+    </query>
+
+    <query name="getDataInstancesOf2Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        OR
+        dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+    </query>
+
+    <query name="getDataInstancesOf3Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        OR
+        dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+        OR
+        dataInstance.containerType = :containerType3 AND dataInstance.containerId in(:containerType3Ids)
+    </query>
+
+    <query name="getDataInstancesWithNamesOf1Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.name in (:dataNames)
+        AND
+        (
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        )
+    </query>
+
+    <query name="getDataInstancesWithNamesOf2Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.name in (:dataNames)
+        AND
+        (
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        OR
+        dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+        )
+    </query>
+
+    <query name="getDataInstancesWithNamesOf3Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.name in (:dataNames)
+        AND
+        (
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        OR
+        dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+        OR
+        dataInstance.containerType = :containerType3 AND dataInstance.containerId in(:containerType3Ids)
+        )
+    </query>
+
+
+</hibernate-mapping>

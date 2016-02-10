@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field"
+                   package="org.bonitasoft.engine.core.document.model.archive.impl">
+
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantId" type="long"/>
+    </filter-def>
+
+    <import class="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl"/>
+
+    <class name="SADocumentMappingImpl" table="arch_document_mapping">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="ID" type="long"/>
+        </composite-id>
+        <property name="sourceObjectId" type="long" column="sourceObjectId"/>
+        <property name="processInstanceId" type="long" column="processinstanceid"/>
+        <property name="documentId" type="long" column="documentid"/>
+        <property name="name" type="string" column="name"/>
+        <property name="description" type="string" column="description"/>
+        <property name="version" type="string" column="version"/>
+        <property name="index" type="int" column="index_"/>
+        <property name="archiveDate" type="long" column="archiveDate"/>
+        <filter name="tenantFilter"/>
+    </class>
+
+
+    <class name="SAMappedDocumentImpl" table="arch_document_mapping" polymorphism="explicit">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
+        </composite-id>
+        <property name="sourceObjectId" type="long" column="sourceObjectId"/>
+        <property name="processInstanceId" type="long" column="processinstanceid"/>
+        <property name="name" type="string" column="name"/>
+        <property name="description" type="string" column="description"/>
+        <property name="version" type="string" column="version"/>
+        <property name="index" type="int" column="index_"/>
+        <property name="archiveDate" type="long" column="archiveDate"/>
+        <property name="documentId" type="long" column="documentid"/>
+        <many-to-one name="document" class="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" insert="false" update="false" lazy="false">
+            <column name="tenantid"/>
+            <column name="documentid"/>
+        </many-to-one>
+        <filter name="tenantFilter"/>
+    </class>
+
+
+</hibernate-mapping>

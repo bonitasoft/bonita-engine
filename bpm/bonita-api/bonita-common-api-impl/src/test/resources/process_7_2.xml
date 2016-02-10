@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<def:processDefinition xmlns:def="http://www.bonitasoft.org/ns/process/client/7.2" version="1.0" displayName="Q8LV__u4bM4yfDoRDUZjJ6IVa0NdFj" stringIndexLabel1="wBdc26kRTUzsuLYJktlHPS8KY8" stringIndexLabel2="A7zoGOS0" stringIndexLabel3="wTODbcp-KZPIOi4FA1fBq.6zvtF9" stringIndexLabel4="jJTKHaBBM6cUw43oP" stringIndexLabel5="M" name="Unzo32.l0SkbcVmzErJBlK" id="-1019635836">
+    <description>zs</description>
+    <displayDescription>cTns8ztMcXG3</displayDescription>
+    <stringIndexes>
+        <stringIndex index="1" label="dCRAsx2Fk">
+            <expression name="Dy6-R" expressionType="x.chCSJM-GU9j" returnType="java.lang.String" interpreter="cK4CjUclAG-t-l6Ypi7c45_l6" id="-2046534041">
+                <content>Fkmmul_MBBkCMLUtrp9H3bIYkJLYu</content>
+            </expression>
+        </stringIndex>
+    </stringIndexes>
+    <flowElements>
+        <receiveTask name="JIXdDTG" id="38102801">
+            <description>yYGYgSgO.5YP49</description>
+            <displayName name="zUim3_mQxEWWObuMTrwN" expressionType="Kqc8" returnType="java.lang.String" interpreter="dNqXXcNTPELqm" id="-1996992514">
+                <content>wDv5MXgnau1klqnNdq7Kx.I</content>
+            </displayName>
+            <displayDescription name="Ok" expressionType="vAg-uj.d0S" returnType="java.lang.String" interpreter="bcL.M1CMIamDLSiUgetIt9UvuuLl" id="344472116">
+                <content>p</content>
+            </displayDescription>
+            <displayDescriptionAfterCompletion name="zbCOeSQ04mW" expressionType="bQ6_IXIWG" returnType="java.lang.String" interpreter="yw" id="-1363467136">
+                <content>JzDQJCn5</content>
+            </displayDescriptionAfterCompletion>
+            <incomingTransition>2026358303</incomingTransition>
+            <outgoingTransition>1213001692</outgoingTransition>
+            <defaultTransition>-697993750</defaultTransition>
+            <connector connectorId="bh8l-L" version="kcW2P8yU7KuT" activationEvent="ON_ENTER" failAction="FAIL" errorCode="R" name="c" id="-785005706">
+                <description>lqRTrFysj4bUStrIq</description>
+                <inputs />
+                <outputs />
+            </connector>
+            <dataDefinitions>
+                <textDataDefinition transient="0" className="ao" longText="true" name="yL0Bm6" id="2082294838">
+                    <description>GBOke5aXygyA</description>
+                </textDataDefinition>
+            </dataDefinitions>
+            <businessDataDefinitions>
+                <businessDataDefinition className="GuwFW9-stFNjYPFGxIT7IlrQ51z" multiple="false" name="sYoBsH.X35J7Y68Ml" id="-1866070880">
+                    <description>vqBN4q</description>
+                </businessDataDefinition>
+            </businessDataDefinitions>
+            <operations>
+                <operation operator="b8hcUy1gPUnWvnJNPI2xWwcKXQ4IbM" operatorType="ASSIGNMENT">
+                    <leftOperand name="wzjZfhNO-T4vQ_AzA96Zc803ne5" type="_GWlxk" />
+                </operation>
+            </operations>
+            <standardLoopCharacteristics testBefore="true">
+                <loopCondition name="fh2RKGc3qH" expressionType="asa4H-dRYsIX78gJbDt9m5usL5" returnType="java.lang.Boolean" interpreter="na" id="-314251109">
+                    <content>PiouSTk9DQ8PRPRQ</content>
+                </loopCondition>
+                <loopMax name="VNM3JIxnyA7iSD" expressionType="tEz" returnType="java.lang.Integer" interpreter="QlqoPUEOe" id="1497733707">
+                    <content>sKR.7lbUD9vSK96MsqhGddB</content>
+                </loopMax>
+            </standardLoopCharacteristics>
+            <boundaryEvents>
+                <boundaryEvent interrupting="0" name="v_YhbfTaiDv.y" id="932919329">
+                    <description>d6MJpNkx8cO</description>
+                </boundaryEvent>
+            </boundaryEvents>
+            <catchMessageEventTrigger name="IsNAnjiy6-b33K42FFPLEjfI7XCNcX">
+                <correlation>
+                    <key name="ZnY8ZlI7RjB.ir59nnR77wlhD" expressionType="SteOHQgpe3WWMzfbjkTOxr.-K4" returnType="java.lang.String" interpreter="Z_0sez4PVWGdo_EMt0yk08" id="-1603392084">
+                        <content>yF6xuPlu5zz6oUA.M2y_wMt0D9A</content>
+                    </key>
+                    <value name="IH" expressionType="p9Tl75mVa3cakH8rp" returnType="java.lang.String" interpreter="zCF-umYa2BBmkUM" id="326394974">
+                        <content>OuhefKmRrQToRbxRftVdPSc</content>
+                    </value>
+                </correlation>
+                <operation operator="uVB" operatorType="ASSIGNMENT">
+                    <leftOperand name="NsCnTo5icA.YvRVrgd" type="u4z.jxX" />
+                </operation>
+            </catchMessageEventTrigger>
+        </receiveTask>
+        <businessDataDefinitions>
+            <businessDataDefinition className="fGX2mQuwNBqi-EWFSR" multiple="false" name="eKZSR947WQh.9awNxGw8Mzv" id="-381123242">
+                <description>adT8JasXJsWP</description>
+                <description>JT4INX5uamIXMQmJ</description>
+                <defaultValue name="g" expressionType="FQ-j" returnType="java.lang.String" interpreter="ZTIDTpUtspMBkWHF2mwMgQHfHf9e" id="-2066790859">
+                    <content>d5GZ7cAsDE9Of96KV</content>
+                </defaultValue>
+            </businessDataDefinition>
+        </businessDataDefinitions>
+        <transitions>
+            <transition source="-610622361" target="1618206496" name="Tx0qYIu.02qPjYVPWs" id="73800789">
+                <description>Lwce2xg3</description>
+                <condition name="ZnE3lhhI" expressionType="xqZ6Kxtlk1YBjVBzqNvCzHdRWQ6xHC" returnType="java.lang.Boolean" interpreter="lEF7hDog5MF4T0N09sm3NvBvl" id="-2113513283">
+                    <content>false</content>
+                </condition>
+            </transition>
+        </transitions>
+        <connectors>
+            <connector connectorId="IVgzAGxXTs3eplV1oE11bCbBT" version="kP.6" activationEvent="ON_ENTER" failAction="ERROR_EVENT" errorCode="Pm5SypIgkqYSfz4XRKSkvLNPfpEqE3" name="kNZ5Jg5On" id="-1379396699">
+                <description>mjA</description>
+                <inputs>
+                    <input name="eCAbOEBETNKSHn1VLNjc5fdDkdxH0i" id="-458659955">
+                        <description>KwQv-UbF8QfcD4Iupf6CpKaI</description>
+                        <expression name="VGi_4zbQLgPH2uquhAP" expressionType="ugOV" returnType="java.lang.String" interpreter="IZrSizj1kohr6L9UP7-T7uF-qGG" id="728775400">
+                            <content>bPkfU</content>
+                        </expression>
+                    </input>
+                </inputs>
+                <outputs>
+                    <operation operator="yMHn" operatorType="ASSIGNMENT">
+                        <leftOperand name="LJDbWEEsw7POun9AzwEhmMnM9H" type="BKKmihcToCUa9aS0jnz1hl" />
+                    </operation>
+                </outputs>
+            </connector>
+        </connectors>
+        <dataDefinitions>
+            <textDataDefinition transient="1" className="jRTSz-nzONN7" longText="true" name="_O0G5-1" id="-1672012584">
+                <description>BlNFRHSeHm4nS7Sn2</description>
+                <description>paKdDhTdnMV7j2-HVrKVfOJkPt3q</description>
+                <defaultValue name="VKxZBDsZAJWjmPGqPN" expressionType="p8rIC" returnType="java.lang.String" interpreter="MKzIJ" id="-1836840782">
+                    <content>Pld.9TrLsKm</content>
+                </defaultValue>
+            </textDataDefinition>
+        </dataDefinitions>
+        <documentDefinitions>
+            <documentDefinition mimeType="RkDRpH9OZ1kEdEypPoTEoTUkWQ" name="iEjrvBHiurn-" id="-1897688617">
+                <description>y</description>
+                <description>xSEjDxLfMUluojYlRgTY8Pfo.</description>
+                <url>pTmk</url>
+                <file>someDoc.txt</file>
+                <fileName>SaCPXdYyzpDMyCnZ6K8BiuW2Nb</fileName>
+                <expression name="m6O560kmlYm_2R4" expressionType="kI.8GUxVPwh_be" returnType="java.lang.String" interpreter="t4JfEgycmD8-" id="758052897">
+                    <content>LPo</content>
+                </expression>
+            </documentDefinition>
+        </documentDefinitions>
+        <documentListDefinitions>
+            <documentListDefinition name="NvLozf5Gw5.FNV3-Vph51sYhY" id="-931524663">
+                <description>aNCVFyif5</description>
+                <description>nYda</description>
+                <expression name="EjkQ4LO7UmqEuzC.5nJ_" expressionType="y-HT" returnType="java.util.List" interpreter="fFy-8uUSuJbwm" id="-1813308285">
+                    <content>new java.util.ArrayList()</content>
+                </expression>
+            </documentListDefinition>
+        </documentListDefinitions>
+    </flowElements>
+    <actors>
+        <actor name="Customer" id="142086412">
+            <description>O4Dk_x7pJ5</description>
+            <description>d2Virx</description>
+        </actor>
+    </actors>
+    <parameters>
+        <parameter type="GvMvUw8FklMqFk5bhnVNvi9K8YmeI" name="in" id="-96659522">
+            <description>GagCjDBiYrnzWrczIXHhxdrU9gP</description>
+            <description>Q8G35</description>
+        </parameter>
+    </parameters>
+    <actorInitiator>CustomerInitiator</actorInitiator>
+    <contract>
+        <inputDefinitions>
+            <inputDefinition multiple="true" type="BYTE_ARRAY" name="ma6SXw0tqbCA.l" id="-853884021">
+                <description>mhhmtCq8td1likP1xX1ZmQkRY4</description>
+                <inputDefinition multiple="0" type="TEXT" name="ow2CMQ0kkZ-c1FaM7W3YuO" id="379932271">
+                    <description>ndpldEFfi8AU0IiDZpQeMrYV3d7</description>
+                </inputDefinition>
+            </inputDefinition>
+        </inputDefinitions>
+        <constraintDefinitions>
+            <constraintDefinition name="Gh" id="1602216497">
+                <description>wyATkhI</description>
+                <conditionalExpression>O6iZmgzshtJr2CrTJ</conditionalExpression>
+                <explanation>vl0OayaQBYbOMn1YueK9oLN0W</explanation>
+                <inputDefinitionNames>
+                    <inputDefinitionName>H.J7f1R._CHEj0NuB0EqVwZCs0</inputDefinitionName>
+                </inputDefinitionNames>
+            </constraintDefinition>
+        </constraintDefinitions>
+    </contract>
+    <context>
+        <contextEntry key="z3">
+            <expression name="ex8UbtmGH3ZiWEcVaM3ut87L" expressionType="o2u4W0WIyFUWaWECzktrq" returnType="java.lang.String" interpreter="ofmADD3UaLrhb1ixHvNk17Lo" id="1182744920">
+                <content>YvHHK</content>
+            </expression>
+        </contextEntry>
+    </context>
+</def:processDefinition>

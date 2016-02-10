@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>bonita-core</artifactId>
+		<groupId>org.bonitasoft.engine.core</groupId>
+		<version>7.2.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.core.operation</groupId>
+	<artifactId>bonita-operation</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Operation</name>
+
+	<modules>
+		<module>bonita-operation-api</module>
+		<module>bonita-operation-api-impl</module>
+		<module>bonita-operation-model</module>
+		<module>bonita-operation-model-impl</module>
+	</modules>
+</project>  

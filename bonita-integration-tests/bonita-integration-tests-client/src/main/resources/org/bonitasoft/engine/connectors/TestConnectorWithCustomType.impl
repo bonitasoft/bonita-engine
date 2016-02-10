@@ -1,0 +1,9 @@
+<connectorImplementation>
+	
+	<definitionId>connectorWithCustomType</definitionId>
+	<definitionVersion>1.0.0</definitionVersion>
+	<implementationClassname>org.connector.custom.ConnectorWithCustomType</implementationClassname>
+	<implementationId>connectorWithCustomTypeImpl</implementationId>
+	<implementationVersion>1.0.0</implementationVersion>
+	
+</connectorImplementation>

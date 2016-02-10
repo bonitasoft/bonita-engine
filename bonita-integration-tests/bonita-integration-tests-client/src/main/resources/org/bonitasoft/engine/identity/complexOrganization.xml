@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+	<users>
+		<user userName="john">
+			<password encrypted="false">bpm</password>
+			<firstName>John</firstName>
+			<lastName>Doe</lastName>
+			<iconName>john.png</iconName>
+			<iconPath>/icons/</iconPath>
+			<title>M</title>
+			<manager>jack</manager>
+			<jobTitle>Web Team Manager</jobTitle>
+			<personalData>
+				<email>emailValue</email>
+				<phoneNumber>phoneNumberValue</phoneNumber>
+				<mobileNumber>mobileNumberValue</mobileNumber>
+				<faxNumber>faxNumberValue</faxNumber>
+				<building>buildingValue</building>
+				<room>roomValue</room>
+				<address>addressValue</address>
+				<zipCode>zipCodeValue</zipCode>
+				<city>cityValue</city>
+				<state>stateValue</state>
+				<country>countryValue</country>
+				<website>websiteValue</website>
+			</personalData>
+			<professionalData>
+				<email>emailProfessionalValue</email>
+				<phoneNumber>phoneNumberProfessionalValue</phoneNumber>
+				<mobileNumber>mobileNumberProfessionalValue</mobileNumber>
+				<faxNumber>faxNumberProfessionalValue</faxNumber>
+				<building>buildingProfessionalValue</building>
+				<room>roomProfessionalValue</room>
+				<address>addressProfessionalValue</address>
+				<zipCode>zipCodeProfessionalValue</zipCode>
+				<city>cityProfessionalValue</city>
+				<state>stateProfessionalValue</state>
+				<country>countryProfessionalValue</country>
+				<website>websiteProfessionalValue</website>
+			</professionalData>
+		</user>
+		<user userName="jack">
+			<password encrypted="false">bpm</password>
+			<jobTitle>Web Team Manager</jobTitle>
+			<personalData />
+			<professionalData />
+		</user>
+		<user userName="james">
+			<password encrypted="false">bpm</password>
+			<personalData />
+			<professionalData />
+		</user>
+	</users>
+	<roles>
+		<role name="Developer">
+			<displayName>Bonita developer</displayName>
+		</role>
+		<role name="Manager">
+			<displayName>Bonita Manager</displayName>
+		</role>
+	</roles>
+	<groups>
+		<group name="BonitaSoft">
+			<displayName>Bonitasoft S.A.</displayName>
+			<description>The best BPM compagny</description>
+		</group>
+		<group name="RD" parentPath="/BonitaSoft">
+			<displayName>R&amp;D team</displayName>
+			<description>All Rd of BonitaSoft</description>
+		</group>
+		<group name="RD">
+			<displayName>R&amp;D team</displayName>
+			<description>All Rd of all compagnies</description>
+		</group>
+		<group name="Support" parentPath="/BonitaSoft">
+			<displayName>Support team</displayName>
+		</group>
+	</groups>
+	<memberships>
+		<membership>
+			<userName>john</userName>
+			<roleName>Developer</roleName>
+			<groupName>RD</groupName>
+			<groupParentPath>/BonitaSoft</groupParentPath>
+			<assignedBy>jack</assignedBy>
+			<assignedDate>1331142448365</assignedDate>
+		</membership>
+		<membership>
+			<userName>jack</userName>
+			<roleName>Developer</roleName>
+			<groupName>RD</groupName>
+		</membership>
+	</memberships>
+</organization:Organization>

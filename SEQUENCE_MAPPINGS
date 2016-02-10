@@ -1,0 +1,140 @@
+=SERVICES=
+
+PLATFORM
+platform -> 0
+tenant -> 1
+
+DEPENDENCY
+dependency -> 10
+dependencyMapping -> 11
+
+PLATFORM DEPENDENCY
+platform-dependency -> 2
+platform-dependencyMapping -> 3
+
+IDENTITY
+user -> 20
+group -> 21
+role -> 22
+user_membership -> 23
+P-metadata_def -> 24
+P-metadata_val -> 25
+user_contactinfo -> 26
+
+LOG
+queriable_log -> 30
+queriable_log_parameter -> 31 
+
+Archive
+employee -> 60
+laptop -> 61
+address -> 62
+project -> 63
+employeeprojectmapping -> 64
+saemployee -> 65
+
+SCHEDULER
+jobDescriptor -> 70
+jobParameter -> 71
+
+COMMAND
+command -> 90
+
+PLATFORMCOMMAND
+platformCommand -> 4
+
+=CORE=
+
+BPM
+process -> 100
+activity -> 101
+
+Report
+report -> 500
+
+
+Actor
+actor -> 10000
+actorMapping -> 10001
+
+ProcessInstance -> 10010
+ActivityInstance -> 10011
+ProcessDefinition -> 10012
+TransitoinInstance -> 10013
+ConnectorInstance -> 10014
+EventTriggerInstance -> 10015
+WaitingEvent -> 10016
+MessageInstance -> 10017
+PendingActivityMapping -> 10018
+RefBusinessDataInstance -> 10096
+
+Datainstance
+IntegerDataInstance -> 10020
+BooleanDataInstance -> 10020
+DoubleDataInstance -> 10020
+ShortTextDataInstance -> 10020
+LongDataInstance -> 10020
+BlobDataInstance -> 10020
+DATEDataInstance -> 10020
+LongTextDataInstance -> 10020
+XMLDataInstance -> 10020
+
+Category
+category -> 10030
+
+Document
+SDocumentMapping -> 10040
+
+document_content -> 10090
+
+Supervisor
+supervisor -> 10050
+
+Comment
+comment -> 10060
+SAComment -> 10080
+
+ExternalIdentityMapping
+ExternalIdentityMapping -> 10070
+
+Token -> 10110
+
+Page -> 10120
+
+SBusinessApplication -> 10200
+SBusinessApplicationPage -> 10201
+SBusinessApplicationMenu -> 10202
+
+SUSerTaskContractData -> 10210
+SProcessContractData --> 10220
+
+SFormMappingImpl --> 10300
+
+SProcessDefinitionDesignContentImpl --> 10310
+
+=Archived objects==
+
+ProcessInstance -> 20010
+ActivityInstance -> 20011
+
+SADocumentMapping -> 20040
+
+SADataInstance
+SABooleanDataInstance --> 20050
+SAIntegerDataInstance --> 20050
+SADoubleDataInstance --> 20050
+SAShortTextDataInstance --> 20050
+SALongDataInstance --> 20050
+SADateDataInstance --> 20050
+SALongTextDataInstance --> 20050
+SAXMLDataInstance --> 20050
+SABlobDataInstance --> 20050
+
+SAUSerTaskContractData -> 20210
+SAProcessContractData --> 20220
+
+SARefBusinessDataInstance -> 20096
+
+=TESTS=
+HUMAN -> 1000
+CAR -> 1001

@@ -1,0 +1,43 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans   
+	   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	   http://www.springframework.org/schema/context 
+	   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	   http://www.springframework.org/schema/util 
+	   http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+    
+    <import resource="classpath:/datasource/datasource-dependency-${sysprop.bonita.db.vendor:h2}.xml" /> 
+
+	<bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
+		<property name="uniqueName" value="java:/comp/env/jdbc/PGDS1" />
+		<property name="className" value="${db.datasource.classname}" />
+		<property name="maxPoolSize" value="10" />
+		<property name="allowLocalTransactions" value="true" />
+		<property name="driverProperties" ref="driverProperties" />
+	</bean>
+    
+    <util:map id="jpa-configuration" scope="prototype" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object">
+	    <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
+	    <entry key="hibernate.connection.datasource" value-ref="businessDataDataSource" />
+	</util:map>
+
+  <bean id="notManagedBizDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+		<property name="driverClass" value="${db.datasource.classname}" />
+		<property name="jdbcUrl" value="${db.url}" />
+		<property name="username" value="${db.user}" />
+		<property name="password" value="${db.password}" />
+		<property name="maxConnectionsPerPartition" value="3"/>
+		<property name="minConnectionsPerPartition" value="1"/>
+		<property name="partitionCount" value="1"/>
+	</bean>
+    
+    <util:map id="jpa-model-configuration" scope="prototype" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object">
+	    <entry key="hibernate.dialect" value="${db.hibernate.dialect}" />
+		<entry key="hibernate.show_sql" value="false" />
+		<entry key="hibernate.format_sql" value="true" />
+	    <entry key="hibernate.connection.datasource" value-ref="notManagedBizDataSource" />
+	</util:map>
+    
+</beans>

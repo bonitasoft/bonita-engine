@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+	<profile name="User" isDefault="true">
+		<description>The user can view and perform tasks and can start a new case of a process.</description>
+		<profileEntries>
+			<parentProfileEntry name="Tasks" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>Manage tasks</description>
+				<type>link</type>
+				<page>tasklistinguser</page>
+			</parentProfileEntry>
+			<parentProfileEntry name="Cases" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>2</index>
+				<description>Manage cases</description>
+				<type>link</type>
+				<page>caselistinguser</page>
+			</parentProfileEntry>
+			<parentProfileEntry name="Processes" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>Manage processes</description>
+				<type>link</type>
+				<page>processlistinguser</page>
+			</parentProfileEntry>
+		</profileEntries>
+	</profile>
+	<profile name="Administrator" isDefault="true">
+		<description>The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task).</description>
+		<profileEntries>
+			<parentProfileEntry name="BPM"
+				isCustom="false">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>BPM</description>
+				<type>folder</type>
+				<childrenEntries>
+					<profileEntry name="Tasks" isCustom="false">
+						<parentName>BPM</parentName>
+						<index>0</index>
+						<description>All tasks</description>
+						<type>link</type>
+						<page>tasklistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Cases" isCustom="false">
+						<parentName>BPM</parentName>
+						<index>2</index>
+						<description>All cases</description>
+						<type>link</type>
+						<page>caselistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Processes" isCustom="false">
+						<parentName>BPM</parentName>
+						<index>4</index>
+						<description>All processes</description>
+						<type>link</type>
+						<page>processlistingadmin</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry name="Organization" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>2</index>
+				<description>Organization</description>
+				<type>folder</type>
+				<childrenEntries>
+					<profileEntry name="Users" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>0</index>
+						<description>All users</description>
+						<type>link</type>
+						<page>userlistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Groups" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>2</index>
+						<description>All groups</description>
+						<type>link</type>
+						<page>grouplistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Roles" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>4</index>
+						<description>All roles</description>
+						<type>link</type>
+						<page>rolelistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Import / Export" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>6</index>
+						<description>Import / Export an final organization</description>
+						<type>link</type>
+						<page>importexportorganization</page>
+					</profileEntry>
+					<profileEntry name="Profiles" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>8</index>
+						<description>All profiles</description>
+						<type>link</type>
+						<page>profilelisting</page>
+					</profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+			<parentProfileEntry name="Resources" isCustom="false">
+                <parentName>NULL</parentName>
+                <index>4</index>
+                <description>Resources</description>
+                <type>link</type>
+				<page>pagelisting</page>
+            </parentProfileEntry>
+			<parentProfileEntry name="Applications" isCustom="false">
+                <parentName>NULL</parentName>
+                <index>6</index>
+                <description>Applications</description>
+                <type>link</type>
+                <page>applicationslistingadmin</page>
+            </parentProfileEntry>
+
+		</profileEntries>
+	</profile>
+</profiles:profiles>

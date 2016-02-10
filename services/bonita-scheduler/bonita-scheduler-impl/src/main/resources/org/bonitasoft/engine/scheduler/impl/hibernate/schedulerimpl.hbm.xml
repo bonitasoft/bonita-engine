@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.scheduler.model.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SJobDescriptorImpl" table="job_desc">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="jobClassName" type="java.lang.String" column="jobClassName" />
+		<property name="jobName" type="java.lang.String" column="jobName" />
+		<property name="description" type="java.lang.String" column="description" />
+		<filter name="tenantFilter"></filter>
+	</class>
+	
+	<class name="SJobParameterImpl" table="job_param">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="jobDescriptorId" type="long" column="jobDescriptorId" />
+		<property name="key" type="java.lang.String" column="key_" />
+		<property name="value" type="serializable" column="value_" />
+		<filter name="tenantFilter"></filter>
+	</class>
+	
+	<class name="SJobLogImpl" table="job_log">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="jobDescriptorId" type="long" column="jobDescriptorId" />
+		<property name="retryNumber" type="long" column="retryNumber" />
+		<property name="lastUpdateDate" type="long" column="lastUpdateDate" />
+		<property name="lastMessage" type="java.lang.String" column="lastMessage" />
+		<filter name="tenantFilter"></filter>
+	</class>
+	
+</hibernate-mapping>
