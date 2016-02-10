@@ -1,0 +1,9 @@
+<connectorImplementation>
+	
+	<definitionId>connectorInJar</definitionId>
+	<definitionVersion>1.0.0</definitionVersion>
+	<implementationClassname>ConnectorInJar</implementationClassname>
+	<implementationId>connectorInJarImpl</implementationId>
+	<implementationVersion>1.0.0</implementationVersion>
+	
+</connectorImplementation>

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.profile.model.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantId">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SProfileImpl" table="profile">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="isDefault" column="isDefault" />
+		<property name="name" column="name" />
+		<property name="description" column="description" />
+		<property name="creationDate" column="creationDate" />
+		<property name="createdBy" column="createdBy" />
+		<property name="lastUpdateDate" column="lastUpdateDate" />
+		<property name="lastUpdatedBy" column="lastUpdatedBy" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SProfileEntryImpl" table="profileentry">
+		<composite-id  class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+        <property name="profileId" column="profileId"/>
+		<property name="name" column="name" />
+		<property name="description" column="description" />
+		<property name="parentId" column="parentId"/>
+		<property name="index" column="index_"/>
+		<property name="type" column="type"/>
+		<property name="page" column="page"/>
+		<property name="custom" column="custom"/>
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SProfileMemberImpl" table="profilemember">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="profileId" column="profileId" />
+		<property name="userId" column="userId" />
+		<property name="groupId" column="groupId" />
+		<property name="roleId" column="roleId" />
+		<filter name="tenantFilter" />
+	</class>
+
+</hibernate-mapping>

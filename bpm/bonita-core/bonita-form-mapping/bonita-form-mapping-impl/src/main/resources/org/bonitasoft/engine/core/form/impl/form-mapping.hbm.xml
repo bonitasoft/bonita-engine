@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--~
+  ~ Copyright (C) 2015 BonitaSoft S.A.
+  ~ BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 2.0 of the License, or
+  ~ (at your option) any later version.
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  ~-->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.form.impl">
+
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantid" type="long" />
+    </filter-def>
+
+    <class name="SFormMappingImpl" table="form_mapping">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="processDefinitionId" type="long" column="process" />
+        <property name="type" type="integer" column="type" />
+        <property name="task" type="java.lang.String" column="task" />
+        <property name="lastUpdateDate" type="long" column="lastupdatedate" />
+        <property name="lastUpdatedBy" type="long" column="lastupdatedby" />
+        <property name="target" type="string" column="target" />
+
+        <many-to-one name="pageMapping" class="org.bonitasoft.engine.page.impl.SPageMappingImpl" update="true" fetch="join" lazy="false">
+            <column name="page_mapping_tenant_id" />
+            <column name="page_mapping_id" />
+        </many-to-one>
+
+        <filter name="tenantFilter" />
+    </class>
+
+</hibernate-mapping>

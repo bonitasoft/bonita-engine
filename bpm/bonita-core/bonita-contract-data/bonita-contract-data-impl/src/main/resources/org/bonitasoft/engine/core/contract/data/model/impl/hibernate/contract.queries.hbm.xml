@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getContractDataByUserTaskId">
+        SELECT tcd
+        FROM org.bonitasoft.engine.core.contract.data.STaskContractData AS tcd
+        WHERE tcd.scopeId = :scopeId
+    </query>
+
+    <query name="getContractDataByUserTaskIdAndDataName">
+        SELECT tcd
+        FROM org.bonitasoft.engine.core.contract.data.STaskContractData AS tcd
+        WHERE tcd.scopeId = :scopeId
+        AND name = :name
+    </query>
+
+    <query name="getArchivedContractDataByUserTaskIdAndDataName">
+        SELECT atcd
+        FROM org.bonitasoft.engine.core.contract.data.SATaskContractData AS atcd
+        WHERE atcd.scopeId = :scopeId
+        AND atcd.name = :name
+    </query>
+
+    <query name="getContractDataByProcessInstanceId">
+        SELECT p
+        FROM org.bonitasoft.engine.core.contract.data.SProcessContractData AS p
+        WHERE p.scopeId = :scopeId
+    </query>
+
+    <query name="getContractDataByProcessInstanceIdAndDataName">
+        SELECT p
+        FROM org.bonitasoft.engine.core.contract.data.SProcessContractData AS p
+        WHERE p.scopeId = :scopeId
+        AND name = :name
+    </query>
+
+    <query name="getArchivedContractDataByProcessInstanceIdAndDataName">
+        SELECT ap
+        FROM org.bonitasoft.engine.core.contract.data.SAProcessContractData AS ap
+        WHERE ap.scopeId = :scopeId
+        AND ap.name = :name
+    </query>
+
+</hibernate-mapping>

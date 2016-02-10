@@ -1,0 +1,28 @@
+<project name="bonita-integration-tests-local" default="build-home-tests">
+
+	<property name="target.dir" value="${basedir}/target"/>
+	<property name="resources.dir" value="${basedir}/src/test/resources"/>
+	<property name="bh.source.dir" value="${target.dir}/bonita-home-community/bonita-home"/>
+	<property name="local.server.resources.dir" value="${target.dir}/local-server"/>
+	<property name="bh.target.dir" value="${target.dir}/bonita-home"/>
+	<property name="bh.target.conf.platform.dir" value="${bh.target.dir}/engine-server/conf/platform"/>
+	<property name="bh.target.conf.tenant.dir" value="${bh.target.dir}/engine-server/conf/tenants/template"/>
+	<property name="bh.target.conf.platforminit.dir" value="${bh.target.dir}/engine-server/conf/platform-init"/>
+	
+	<target name="build-home-tests">
+		<delete dir="${bh.target.dir}" />
+		<copy todir="${bh.target.dir}">
+			<fileset dir="${bh.source.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy file="${resources.dir}/bonita-platform-custom.xml" todir="${bh.target.conf.platform.dir}" overwrite="true"/>
+		<copy file="${resources.dir}/bonita-tenants-custom.xml" todir="${bh.target.conf.tenant.dir}" overwrite="true"/>
+		<copy todir="${bh.target.conf.platforminit.dir}">
+			<fileset dir="${local.server.resources.dir}">
+				<include name="*"/>
+			</fileset>
+		</copy>
+	</target>
+
+</project>

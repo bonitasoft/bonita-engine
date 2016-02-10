@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.process.definition.model.impl">
+
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantId" type="long" />
+    </filter-def>
+
+    <class name="SProcessDefinitionDeployInfoImpl" table="process_definition">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="name" column="name" />
+        <property name="processId" column="processId" />
+        <property name="version" column="version" />
+        <property name="description" column="description" />
+        <property name="deploymentDate" column="deploymentDate" type="long" />
+        <property name="deployedBy" column="deployedBy" />
+        <property name="activationState" column="activationState" />
+        <property name="configurationState" column="configurationState" />
+        <property name="displayName" column="displayName" />
+        <property name="displayDescription" column="displayDescription" />
+        <property name="lastUpdateDate" column="lastUpdateDate" />
+        <property name="iconPath" column="iconPath" />
+        <many-to-one name="designContent" class="SProcessDefinitionDesignContentImpl" update="true" cascade="all" fetch="join" lazy="proxy">
+            <column name="content_tenantid" />
+            <column name="content_id" />
+        </many-to-one>
+        <filter name="tenantFilter" />
+    </class>
+
+    <class name="SProcessDefinitionDesignContentImpl" table="process_content">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="content" column="content" />
+    </class>
+
+</hibernate-mapping>

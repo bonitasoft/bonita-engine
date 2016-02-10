@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.persistence.model">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="Human" discriminator-value="human" abstract="false" table="human">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<discriminator column="DISCRIMINANT" type="string" />
+		<property name="firstName" column="FIRSTNAME" />
+		<property name="lastName" column="LASTNAME" />
+		<property name="age" column="AGE" />
+		<property name="carId" column="CAR_ID" type="long" />
+		<filter name="tenantFilter"></filter>
+	</class>
+
+	<subclass name="Child" discriminator-value="child" extends="Human">
+		<property name="parentId" column="PARENT_ID" type="long" />
+	</subclass>
+
+	<subclass name="Parent" discriminator-value="parent" extends="Child" />
+	
+</hibernate-mapping>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="searchQueriableLog">
+		SELECT log
+		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+	</query>
+
+	<query name="deleteAllSQueriableLogImpl">
+		DELETE FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl
+	</query>
+
+	<query name="getNumberOfLogs">
+		SELECT COUNT(log)
+		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+	</query>
+
+	<query name="getLogs">
+		SELECT log
+		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+	</query>
+
+	<query name="searchSQueriableLog">
+		SELECT log
+		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+	</query>
+
+	<query name="getNumberOfSQueriableLog">
+		SELECT COUNT(log)
+		FROM org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl AS log
+	</query>
+
+</hibernate-mapping>

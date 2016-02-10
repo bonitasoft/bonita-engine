@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<!-- Job Descriptor -->
+	<query name="getNumberOfSJobDescriptor">
+		SELECT COUNT(jd)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
+	</query>
+
+	<query name="searchSJobDescriptor">
+		SELECT jd
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
+	</query>
+
+	<!-- Job Parameter -->
+	<query name="getNumberOfSJobParameter">
+		SELECT COUNT(jp)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
+	</query>
+
+	<query name="searchSJobParameter">
+		SELECT jp
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
+	</query>
+
+	<!-- Job Log -->
+	<query name="getNumberOfSJobLog">
+		SELECT COUNT(jl)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
+	</query>
+
+	<query name="searchSJobLog">
+		SELECT jl
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
+	</query>
+
+	<!-- Failed Job -->
+	<query name="getFailedJobs">
+		SELECT new org.bonitasoft.engine.scheduler.model.impl.SFailedJobImpl(jd.id, jd.jobName, jd.description, jl.retryNumber, jl.lastUpdateDate, jl.lastMessage)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl,
+		     org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
+		WHERE jd.id = jl.jobDescriptorId
+		ORDER BY jl.lastUpdateDate ASC
+	</query>
+
+</hibernate-mapping>

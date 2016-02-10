@@ -1,0 +1,5 @@
+<connectorImplementation id="org.bonitasoft.engine.filter.user.testFilterWithClassNotFound" version="1.0"
+	definitionId="org.bonitasoft.engine.filter.user.testFilterWithClassNotFound" definitionVersion="1.0" implementationClassname="org.bonitasoft.engine.filter.user.Unknown">
+	<jarDependencies>
+	</jarDependencies>
+</connectorImplementation>

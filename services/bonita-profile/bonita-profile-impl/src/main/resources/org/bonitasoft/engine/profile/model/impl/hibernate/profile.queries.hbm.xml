@@ -1,0 +1,280 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+   <query name="getProfileByName">
+		SELECT profile
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile
+		WHERE profile.name = :name
+	</query>
+
+	<query name="getNumberOfSProfile">
+		SELECT COUNT(profile)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile
+	</query>
+
+	<query name="searchSProfile">
+		SELECT profile
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile
+	</query>
+
+	<query name="getNumberOfSProfileEntry">
+		SELECT COUNT(profileentry)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+	</query>
+
+	<query name="searchSProfileEntry">
+		SELECT profileentry
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+	</query>
+	
+	<query name="getEntriesOfProfile">
+		SELECT profileentry
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+		WHERE profileentry.profileId = :profileId
+	</query>
+	
+	<query name="getEntriesOfProfileByParentId">
+		SELECT profileentry
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+		WHERE profileentry.profileId = :profileId
+		AND profileentry.parentId = :parentId
+	</query>
+
+	<query name="getDirectProfileMembersOfUser">
+		SELECT pm
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.userId = :userId
+	</query>
+
+	<query name="getDirectProfileMembersOfGroup">
+		SELECT pm
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.groupId = :groupId
+	</query>
+
+	<query name="getDirectProfileMembersOfRole">
+		SELECT pm
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.roleId = :roleId
+	</query>
+
+	<query name="getProfileMembers">
+		SELECT pm
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+	</query>
+
+
+	<query name="getSProfileMembersWithoutDisplayName">
+		SELECT pm 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm 
+		WHERE pm.profileId = :profileId
+	</query>
+
+	<query name="searchSProfileMemberwithSUserForUser">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, user.firstName AS displayNamePart1, user.lastName AS displayNamePart2, user.userName AS displayNamePart3)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+		WHERE pm.userId = user.id
+	</query>
+
+	<query name="searchSProfileMemberForUser">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, user.firstName AS displayNamePart1, user.lastName AS displayNamePart2, user.userName AS displayNamePart3)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user 
+		WHERE pm.userId = user.id
+	</query>
+
+	<query name="getNumberOfSProfileMemberwithSUserForUser">
+		SELECT COUNT(*)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user 
+		WHERE pm.userId = user.id
+	</query>
+
+	<query name="getNumberOfSProfileMemberForUser">
+		SELECT COUNT(*)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user 
+		WHERE pm.userId = user.id
+		AND pm.userId &gt;0
+	</query>
+
+	<query name="searchSProfileMemberwithSGroupForGroup">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, group_.name AS displayNamePart1, group_.parentPath AS displayNamePart2, ''  AS displayNamePart3) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE pm.groupId = group_.id
+		AND pm.roleId = -1
+	</query>
+
+	<query name="searchSProfileMemberForGroup">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, group_.name AS displayNamePart1, group_.parentPath AS displayNamePart2, ''  AS displayNamePart3) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_ 
+		WHERE pm.groupId = group_.id
+		AND pm.roleId = -1
+	</query>
+
+	<query name="getNumberOfSProfileMemberwithSGroupForGroup">
+		SELECT COUNT(pm.id) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE pm.groupId = group_.id
+		AND pm.roleId = -1
+	</query>
+
+	<query name="getNumberOfSProfileMemberForGroup">
+		SELECT COUNT(pm.id) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE pm.groupId = group_.id
+		AND pm.roleId = -1
+	</query>
+
+	<query name="searchSProfileMemberwithSRoleForRole">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE pm.roleId = role.id
+		AND pm.groupId = -1
+	</query>
+
+	<query name="searchSProfileMemberForRole">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, '' AS displayNamePart2, '' AS displayNamePart3)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role 
+		WHERE pm.roleId = role.id
+		AND pm.groupId = -1
+	</query>
+
+	<query name="getNumberOfSProfileMemberwithSRoleForRole">
+		SELECT  COUNT(pm.id)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
+		WHERE  pm.roleId = role.id
+		AND pm.groupId = -1
+	</query>
+
+	<query name="getNumberOfSProfileMemberForRole">
+		SELECT  COUNT(pm.id)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role 
+		WHERE  pm.roleId = role.id 
+		AND pm.groupId = -1
+	</query>
+
+	<query name="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE  pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="searchSProfileMemberwithSGroupForRoleAndGroup">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE  pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="searchSProfileMemberwithSRoleForRoleAndGroup">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE  pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="searchSProfileMemberForRoleAndGroup">
+		SELECT new org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl(pm.id, pm.tenantId, pm.profileId, pm.userId, pm.groupId, pm.roleId, role.name AS displayNamePart1, group_.name AS displayNamePart2, group_.parentPath AS displayNamePart3) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_ 
+		WHERE  pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="getNumberOfSProfileMemberwithSGroupwithSRoleForRoleAndGroup">
+		SELECT  COUNT(pm.id) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="getNumberOfSProfileMemberwithSRoleForRoleAndGroup">
+		SELECT  COUNT(pm.id) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="getNumberOfSProfileMemberwithSGroupForRoleAndGroup">
+		SELECT  COUNT(pm.id) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
+		WHERE pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="getNumberOfSProfileMemberForRoleAndGroup">
+		SELECT  COUNT(pm.id) 
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm, 
+			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
+			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_ 
+		WHERE pm.roleId = role.id
+		AND pm.groupId = group_.id
+	</query>
+
+	<query name="getProfilesOfUser">
+		SELECT DISTINCT profile
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile,
+		     org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.profileId = profile.id
+		AND (
+			pm.userId = :userId
+			OR pm.id IN (
+				SELECT pm.id
+				FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm,
+				     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+				WHERE um.userId = :userId 
+				AND (
+					(pm.groupId = um.groupId AND pm.roleId &lt;= 0)
+					OR (pm.roleId = um.roleId AND pm.groupId &lt;= 0)
+					OR (pm.groupId = um.groupId AND pm.roleId = um.roleId)
+				)
+			)
+		)
+	</query>
+
+	<query name="getNumberOfProfileMemberOfProfile">
+		SELECT COUNT(pm)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.profileId = :profileId
+	</query>
+
+	<query name="getProfileMembersFromProfileIds">
+		SELECT pm
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.profileId IN (:profileIds)
+	</query>
+
+    <query name="updateLastupdatePtofile">
+        UPDATE org.bonitasoft.engine.profile.model.impl.SProfileImpl AS p
+        SET p.lastUpdateDate = :lastUpdateDate,
+        p.lastUpdatedBy = :lastUpdatedBy
+        WHERE p.id = :id
+    </query>
+
+</hibernate-mapping>

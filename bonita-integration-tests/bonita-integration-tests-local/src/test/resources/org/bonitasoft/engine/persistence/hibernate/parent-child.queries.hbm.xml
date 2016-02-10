@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getHumanById">
+		SELECT human
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.id = :id
+	</query>
+
+	<query name="getHumansById">
+		SELECT human
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.id IN (:ids)
+	</query>
+
+	<query name="getParentById">
+		SELECT parent
+		FROM org.bonitasoft.engine.persistence.model.Parent AS parent
+		WHERE parent.id = :id
+	</query>
+
+	<query name="getChildById">
+		SELECT child
+		FROM org.bonitasoft.engine.persistence.model.Child AS child
+		WHERE child.id = :id
+	</query>
+
+	<query name="getHumanByIds">
+		SELECT human
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.id IN (:ids)
+	</query>
+
+	<query name="getAllHumans">
+		SELECT human
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+	</query>
+
+	<query name="getParentsHavingAChildWithFirstName">
+		SELECT distinct parent
+		FROM org.bonitasoft.engine.persistence.model.Parent AS parent,
+		org.bonitasoft.engine.persistence.model.Child AS child
+		WHERE parent.id = child.parentId
+		AND child.firstName = :firstName
+	</query>
+
+	<query name="getAllChildren">
+		SELECT child
+		FROM org.bonitasoft.engine.persistence.model.Child AS child
+		WHERE child.parentId != 0
+	</query>
+
+	<query name="deleteHuman">
+		DELETE
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.id = :id
+	</query>
+
+	<query name="deleteAllHuman">
+		DELETE
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+	</query>
+
+	<query name="deleteByIdsHuman">
+		DELETE
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.id in (:ids)
+	</query>
+
+	<query name="getNumberOfParents">
+		SELECT count(*)
+		FROM org.bonitasoft.engine.persistence.model.Parent AS parent
+	</query>
+
+	<query name="getNumberOfHumans">
+		SELECT count(*)
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+	</query>
+
+	<query name="getNumberOfChildren">
+		SELECT count(*)
+		FROM org.bonitasoft.engine.persistence.model.Child AS child
+		WHERE child.parentId != 0
+	</query>
+
+	<query name="getChildParent">
+		SELECT parent
+		FROM org.bonitasoft.engine.persistence.model.Parent AS parent
+		WHERE parent.id = (
+			SELECT child.parentId
+			FROM org.bonitasoft.engine.persistence.model.Child AS child
+			WHERE child.id = :id
+		)
+	</query>
+
+	<query name="getParentChildren">
+		SELECT child
+		FROM org.bonitasoft.engine.persistence.model.Child AS child
+		WHERE child.parentId = :id
+	</query>
+
+	<query name="getHumanByFirstName">
+		SELECT human
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.firstName = :firstName
+	</query>
+
+	<query name="getHumanFirstName">
+		SELECT human.firstName
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+		WHERE human.id = :id
+	</query>
+
+	<query name="searchHumans">
+		SELECT human
+		FROM org.bonitasoft.engine.persistence.model.Human AS human
+	</query>
+
+</hibernate-mapping>

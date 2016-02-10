@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
+	<profile name="Team Manager" isDefault="true">
+		<description>TM profile</description>
+		<profileEntries>
+			<parentProfileEntry name="Home" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>0</index>
+				<description>My team activitys dashboard</description>
+				<type>CurrentUserTeamTasksDashboard</type>
+				<page>6</page>
+			</parentProfileEntry>
+		</profileEntries>
+		<profileMapping>
+			<users>
+				<user>userName1</user>
+				<user>userName2</user>
+			</users>
+		</profileMapping>
+	</profile>
+</profiles:profiles>

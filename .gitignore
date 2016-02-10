@@ -1,0 +1,13 @@
+.project
+.settings
+target
+.classpath
+.metadata
+FILEPATH.*.db
+dependency-reduced-pom.xml
+Temporary*.java
+*.iml
+.idea
+*.orig
+engine-it.exec
+bonita-test-api/src/main/resources/bonita-home.zip

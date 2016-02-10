@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.contract.data">
+
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantId" type="long"/>
+    </filter-def>
+
+    <class name="SContractData" abstract="true" table="contract_data">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
+        </composite-id>
+        <discriminator column="kind" type="string"/>
+        <property name="scopeId" type="long" column="scopeId"/>
+        <property name="name" type="java.lang.String" column="name"/>
+        <property name="value" column="val"/>
+        <filter name="tenantFilter"/>
+    </class>
+
+    <subclass name="STaskContractData" discriminator-value="TASK" extends="SContractData"/>
+
+    <subclass name="SProcessContractData" discriminator-value="PROCESS" extends="SContractData"/>
+
+
+    <class name="SAContractData" abstract="true" table="arch_contract_data">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
+        </composite-id>
+        <discriminator column="kind" type="string"/>
+        <property name="scopeId" type="long" column="scopeId"/>
+        <property name="name" type="java.lang.String" column="name"/>
+        <property name="value" column="val"/>
+        <property name="archiveDate" column="archiveDate" type="long"/>
+        <property name="sourceObjectId" column="sourceObjectId" type="long"/>
+        <filter name="tenantFilter"/>
+    </class>
+
+    <subclass name="SATaskContractData" discriminator-value="TASK" extends="SAContractData"/>
+
+    <subclass name="SAProcessContractData" discriminator-value="PROCESS" extends="SAContractData"/>
+
+</hibernate-mapping>

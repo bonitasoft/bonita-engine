@@ -1,0 +1,34 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+        <property name="properties">
+            <props>
+                <prop key="db.hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+                <prop key="db.datasource.classname">org.postgresql.xa.PGXADataSource</prop>
+                <prop key="db.server.name">localhost</prop>
+                <prop key="db.server.port">5432</prop>
+                <prop key="db.database.name">bonita</prop>
+                <prop key="db.user">bonita</prop>
+                <prop key="db.password">bonita</prop>
+                <prop key="db.url">jdbc:postgresql://${db.server.name}:${db.server.port}/${db.database.name}</prop>
+            </props>
+        </property>
+    </bean>
+
+	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="user">${db.user}</prop>
+				<prop key="password">${db.password}</prop>
+				<prop key="serverName">${db.server.name}</prop>
+				<prop key="portNumber">${db.server.port}</prop>
+				<prop key="databaseName">${db.database.name}</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>
