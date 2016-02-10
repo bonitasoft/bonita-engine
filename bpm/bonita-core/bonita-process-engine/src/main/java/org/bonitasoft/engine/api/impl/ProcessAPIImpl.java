@@ -3047,11 +3047,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
-        try {
             return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
-        } catch (SContractViolationException e) {
-            throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
-        }
     }
 
     @Override
@@ -3104,9 +3100,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
         try {
             return starter.start();
-        } catch (SContractViolationException e) {
+        } catch (ContractViolationException e) {
             // To not have an API break, we need to wrapped this new Exception:
-            throw new ProcessExecutionException(new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause()));
+            throw new ProcessExecutionException(e);
         }
     }
 

@@ -40,7 +40,7 @@ public class ContractStructureValidator {
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws SContractViolationException {
         final ErrorReporter errorReporter = new ErrorReporter();
-        validateInputContainer(contract, inputs != null ? inputs : Collections.<String, Serializable> emptyMap(), errorReporter);
+        validateInputContainer(contract, inputs, errorReporter);
         if (errorReporter.hasError()) {
             throw new SContractViolationException("Error while validating expected inputs", errorReporter.getErrors());
         }
@@ -50,7 +50,7 @@ public class ContractStructureValidator {
         logInputsWhichAreNotInContract(DEBUG, inputContainer.getInputDefinitions(), inputs);
         for (final SInputDefinition inputDefinition : inputContainer.getInputDefinitions()) {
             // For each input, fills the errorReporter if some rule is not valid:
-            validateInput(inputs, errorReporter, inputDefinition);
+            validateInput(inputs != null ? inputs : Collections.<String, Serializable> emptyMap(), errorReporter, inputDefinition);
         }
     }
 
@@ -68,7 +68,10 @@ public class ContractStructureValidator {
         if (inputDefinition.hasChildren() && inputDefinition.getType() == null) {
             if (inputDefinition.isMultiple()) {
                 for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(inputDefinition.getName())) {
-                    validateInputContainer(inputDefinition, complexItem, errorReporter);
+                    // we tolerate (and ignore) null values in lists:
+                    if (complexItem != null) {
+                        validateInputContainer(inputDefinition, complexItem, errorReporter);
+                    }
                 }
             } else {
                 validateInputContainer(inputDefinition, (Map<String, Serializable>) inputs.get(inputDefinition.getName()), errorReporter);
