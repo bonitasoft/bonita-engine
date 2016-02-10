@@ -737,9 +737,8 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
-        final BonitaHomeServer home = BonitaHomeServer.getInstance();
         try {
-            home.getTenantManager().createTenant(tenantId);
+            BonitaHomeServer.getInstance().getTenantManager().createTenant(tenantId);
         } catch (Exception e) {
             throw new STenantCreationException("Exception while creating tenant folder");
         }

@@ -25,7 +25,8 @@ import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.bar.BusinessArchiveService;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -36,7 +37,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
-import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -90,6 +90,7 @@ import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.profile.xml.RoleNamesBinding;
 import org.bonitasoft.engine.profile.xml.UserNamesBinding;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -97,7 +98,6 @@ import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
@@ -187,8 +187,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private SessionService sessionService;
 
-    private ReadSessionAccessor readSessionAccessor;
-
     private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
 
     private SessionAccessor sessionAccessor;
@@ -237,7 +235,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ReadPersistenceService readPersistenceService;
     private Recorder recorder;
     private BusinessArchiveService businessArchiveService;
-    private ResourcesService resourcesService;
+    private ProcessResourcesService processResourcesService;
+    private TenantResourcesService tenantResourceService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
@@ -596,7 +595,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public Parser getProfileParser() {
-        final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>();
+        final List<Class<? extends ElementBinding>> bindings = new ArrayList<>();
         bindings.add(ProfileBinding.class);
         bindings.add(ProfilesBinding.class);
         bindings.add(ProfileEntryBinding.class);
@@ -610,20 +609,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         bindings.add(RoleNamesBinding.class);
         bindings.add(GroupPathsBinding.class);
         final Parser parser = getParserFactgory().createParser(bindings);
-        final InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd");
-        try {
+        try (InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd")) {
             parser.setSchema(resource);
             return parser;
-        } catch (final SInvalidSchemaException ise) {
-            throw new BonitaRuntimeException(ise);
-        } finally {
-            try {
-                if (resource != null) {
-                    resource.close();
-                }
-            } catch (final IOException ioe) {
-                throw new BonitaRuntimeException(ioe);
-            }
+        } catch (final SInvalidSchemaException | IOException e) {
+            throw new BonitaRuntimeException(e);
         }
     }
 
@@ -844,7 +834,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return businessArchiveService;
     }
 
-
     @Override
     public BusinessDataService getBusinessDataService() {
         if (businessDataService == null) {
@@ -869,11 +858,17 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return pageMappingService;
     }
 
-    @Override
-    public ResourcesService getResourcesService() {
-        if (resourcesService == null) {
-            resourcesService = beanAccessor.getService(ResourcesService.class);
+    public ProcessResourcesService getProcessResourcesService() {
+        if (processResourcesService == null) {
+            processResourcesService = beanAccessor.getService(ProcessResourcesService.class);
         }
-        return resourcesService;
+        return processResourcesService;
+    }
+
+    public TenantResourcesService getTenantResourcesService() {
+        if (tenantResourceService == null) {
+            tenantResourceService = beanAccessor.getService(TenantResourcesService.class);
+        }
+        return tenantResourceService;
     }
 }

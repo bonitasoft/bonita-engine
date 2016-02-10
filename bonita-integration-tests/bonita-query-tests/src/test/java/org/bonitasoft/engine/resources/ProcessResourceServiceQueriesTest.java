@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bar;
+package org.bonitasoft.engine.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -20,7 +20,7 @@ import static org.bonitasoft.engine.test.persistence.builder.BARResourceBuilder.
 import java.util.List;
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.test.persistence.repository.BARResourceRepository;
+import org.bonitasoft.engine.test.persistence.repository.ProcessResourceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testContext.xml"})
 @Transactional
-public class ResourceServiceQueriesTest {
+public class ProcessResourceServiceQueriesTest {
 
     @Inject
-    private BARResourceRepository repository;
+    private ProcessResourceRepository repository;
 
     @Test
     public void getBarResource_should_get_one_resource() {

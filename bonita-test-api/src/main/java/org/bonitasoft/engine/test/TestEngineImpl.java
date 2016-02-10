@@ -90,4 +90,9 @@ public class TestEngineImpl implements TestEngine {
     public void setDropOnStart(boolean dropOnStart) {
         engineStarter.setDropOnStart(dropOnStart);
     }
+
+    @Override
+    public void setDropOnStop(boolean dropOnStop) {
+        engineStarter.setDropOnStop(dropOnStop);
+    }
 }

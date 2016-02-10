@@ -106,10 +106,10 @@ import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfAssignedUserTa
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfOpenTasksForUsers;
 import org.bonitasoft.engine.api.impl.transaction.task.SetTaskPriority;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.bar.BARResourceType;
+import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.bar.ResourcesService;
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
@@ -2242,12 +2242,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
         final Map<String, byte[]> processResources = new HashMap<>();
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ResourcesService resourcesService = tenantAccessor.getResourcesService();
+        ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
         List<SBARResource> sbarResources;
         Pattern pattern = Pattern.compile(filenamesPattern);
         int from = 0;
         try {
-            sbarResources = resourcesService.get(processDefinitionId, BARResourceType.EXTERNAL, from, BATCH_SIZE);
+            sbarResources = processResourcesService.get(processDefinitionId, BARResourceType.EXTERNAL, from, BATCH_SIZE);
             do {
                 from += BATCH_SIZE;
                 for (SBARResource sbarResource : sbarResources) {

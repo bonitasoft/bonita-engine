@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.SBARResource;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.SBARResource;
 
 public class BARResourceBuilder extends PersistentObjectBuilder<SBARResource, BARResourceBuilder> {
 

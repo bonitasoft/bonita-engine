@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.SArchivingException;
-import org.bonitasoft.engine.bar.BARResourceType;
-import org.bonitasoft.engine.bar.ResourcesService;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
@@ -148,7 +148,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final ProcessDefinitionService processDefinitionService;
     private final GatewayInstanceService gatewayInstanceService;
     private final OperationService operationService;
-    private ResourcesService resourcesService;
+    private ProcessResourcesService processResourcesService;
     private final ConnectorInstanceService connectorInstanceService;
     private final TransitionEvaluator transitionEvaluator;
     private final ContractDataService contractDataService;
@@ -159,7 +159,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
                                final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
                                final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
-                               final ResourcesService resourcesService, final ConnectorService connectorService,
+                               final ProcessResourcesService processResourcesService, final ConnectorService connectorService,
                                final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
                                final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
                                final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
@@ -169,7 +169,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
-        this.resourcesService = resourcesService;
+        this.processResourcesService = processResourcesService;
         this.connectorInstanceService = connectorInstanceService;
         this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
@@ -499,7 +499,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     byte[] getProcessDocumentContent(final SProcessDefinition sDefinition, final SDocumentDefinition document) throws BonitaHomeNotSetException, IOException,
             STenantIdNotSetException, SBonitaReadException {
         final String file = document.getFile();// should always exists...validation on BusinessArchive
-        return resourcesService.get(sDefinition.getId(), BARResourceType.DOCUMENT, file).getContent();
+        return processResourcesService.get(sDefinition.getId(), BARResourceType.DOCUMENT, file).getContent();
     }
 
     private Map<SExpression, DocumentValue> evaluateInitialExpressionsOfDocument(final SProcessInstance processInstance,
