@@ -25,6 +25,7 @@ import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
+import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.bar.ResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
@@ -36,7 +37,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
-import org.bonitasoft.engine.bar.BusinessArchiveService;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -60,6 +60,7 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -111,6 +112,7 @@ import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -503,6 +505,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public DataInstanceService getDataInstanceService() {
+
         if (dataInstanceService == null) {
             dataInstanceService = beanAccessor.getService(DataInstanceService.class);
         }
@@ -741,8 +744,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public <T> T lookup(final String serviceName) {
-        return beanAccessor.getService(serviceName);
+    public <T> T lookup(final String serviceName) throws NotFoundException {
+        try{
+
+            return beanAccessor.getService(serviceName);
+        }catch (NoSuchBeanDefinitionException e){
+            throw new NotFoundException(e);
+        }
     }
 
     @Override
@@ -843,7 +851,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         }
         return businessArchiveService;
     }
-
 
     @Override
     public BusinessDataService getBusinessDataService() {

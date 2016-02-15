@@ -69,7 +69,13 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.TransactionState;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -80,21 +86,20 @@ public class DependencyServiceImpl implements DependencyService {
     private static final int BATCH_SIZE = 100;
 
     private final ReadPersistenceService persistenceService;
-
     private final Recorder recorder;
-
     private final EventService eventService;
-
     private final TechnicalLoggerService logger;
-
     private final QueriableLoggerService queriableLoggerService;
-
     private final ClassLoaderService classLoaderService;
+    private BroadcastService broadcastService;
+    private ReadSessionAccessor readSessionAccessor;
+    private UserTransactionService userTransactionService;
 
     private final Map<String, Long> lastUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
 
     public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService) {
+                                 final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
+                                 BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -102,6 +107,9 @@ public class DependencyServiceImpl implements DependencyService {
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.classLoaderService = classLoaderService;
+        this.broadcastService = broadcastService;
+        this.readSessionAccessor = readSessionAccessor;
+        this.userTransactionService = userTransactionService;
     }
 
     private String getKey(final ScopeType artifactType, final long artifactId) {
@@ -680,7 +688,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     private void refreshLocalClassLoader(final SDependencyMapping dependencyMapping) throws SDependencyException {
-        refreshClassLoader(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
+        registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
     }
 
     private Map<String, byte[]> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
@@ -707,6 +715,43 @@ public class DependencyServiceImpl implements DependencyService {
             classLoaderService.refreshLocalClassLoader(type.name(), id, resources);
         } catch (final SClassLoaderException e) {
             throw new SDependencyException("Cannot refresh classLoader with type'" + type + "' and id " + id, e);
+        }
+    }
+
+    /**
+     * register a synchronization that will refresh the classloader everywhere
+     * is called when a dependency change is triggered
+     *
+     * @param type
+     * @param id
+     * @throws SDependencyException
+     */
+        void registerRefreshOnAllNodes(final ScopeType type, final long id) throws SDependencyException {
+        try {
+            final long tenantId = readSessionAccessor.getTenantId();
+            final RefreshClassLoaderTask callable = new RefreshClassLoaderTask(type, id);
+            callable.setDependencyService(this);
+            callable.call();
+            userTransactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
+
+                @Override
+                public void beforeCommit() {
+
+                }
+
+                @Override
+                public void afterCompletion(TransactionState txState) {
+                    Map<String, TaskResult<Void>> execute = broadcastService.executeOnOthers(callable, tenantId);
+                    for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
+                        if (resultEntry.getValue().isError()) {
+                            throw new IllegalStateException(resultEntry.getValue().getThrowable());
+                        }
+
+                    }
+                }
+            });
+        } catch (Exception e) {
+            throw new SDependencyException(e);
         }
     }
 

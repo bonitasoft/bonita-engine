@@ -1334,6 +1334,9 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="broadcastService" ref="broadcastService" />
+        <constructor-arg name="readSessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">

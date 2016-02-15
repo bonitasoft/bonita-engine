@@ -19,6 +19,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
@@ -27,9 +28,11 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -65,6 +68,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private PlatformCacheService platformCacheService;
     private BroadcastService broadcastService;
     private PlatformAuthenticationService platformAuthenticationService;
+    private ServicesResolver servicesResolver;
 
     public SpringPlatformServiceAccessor() {
         beanAccessor = SpringFileSystemBeanAccessorFactory.getPlatformAccessor();
@@ -190,5 +194,24 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             platformAuthenticationService = beanAccessor.getService(PlatformAuthenticationService.class);
         }
         return platformAuthenticationService;
+    }
+
+    @Override
+    public <T> T lookup(String serviceName) throws NotFoundException {
+        try{
+
+            return beanAccessor.getService(serviceName);
+        }catch (NoSuchBeanDefinitionException e) {
+            throw new NotFoundException(e);
+        }
+
+    }
+
+    @Override
+    public ServicesResolver getServicesResolver() {
+        if (servicesResolver == null) {
+            servicesResolver = beanAccessor.getService(ServicesResolver.class);
+        }
+        return servicesResolver;
     }
 }
