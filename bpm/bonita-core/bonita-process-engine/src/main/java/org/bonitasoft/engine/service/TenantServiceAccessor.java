@@ -53,6 +53,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -212,7 +213,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     TenantConfiguration getTenantConfiguration();
 
-    <T> T lookup(String serviceName);
+    <T> T lookup(String serviceName) throws NotFoundException;
 
     GatewayInstanceService getGatewayInstanceService();
 

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -42,18 +41,17 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobParameter;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -360,22 +358,10 @@ public class SchedulerServiceImpl implements SchedulerService {
             parameterMap.put(JobParameter.BATCH_SIZE.name(), batchSize);
             statelessJob.setAttributes(parameterMap);
             if (servicesResolver != null) {
-                injectServices(statelessJob);
+                servicesResolver.injectServices(jobIdentifier.getTenantId(), statelessJob);
             }
             return new JobWrapper(jobIdentifier, statelessJob, logger, jobIdentifier.getTenantId(), eventService,
                     sessionAccessor, transactionService, persistenceService, jobService);
-        }
-    }
-
-    protected void injectServices(final StatelessJob statelessJob) throws Exception {
-        final Method[] methods = statelessJob.getClass().getMethods();
-        for (final Method method : methods) {
-            if (method.getAnnotation(InjectedService.class) != null) {
-                String serviceName = method.getName().substring(3);
-                serviceName = serviceName.substring(0, 1).toLowerCase() + serviceName.substring(1);
-                final Object lookup = servicesResolver.lookup(serviceName);
-                method.invoke(statelessJob, lookup);
-            }
         }
     }
 

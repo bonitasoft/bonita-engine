@@ -58,7 +58,11 @@
         <constructor-arg name="batchSize" value="${bonita.platform.scheduler.batchsize}" />
     </bean>
 
-    <bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
+    <bean id="servicesResolver" class="org.bonitasoft.engine.service.ServicesResolver">
+        <constructor-arg name="servicesLookup" ref="servicesLookup"/>
+    </bean>
+
+    <bean id="servicesLookup" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver"/>
 
     <bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
         <constructor-arg name="props" ref="quartzProperties" />
@@ -215,6 +219,8 @@
     <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyServiceImpl">
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="broadcastService" ref="broadcastService" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
     <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
@@ -289,7 +295,9 @@
         <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
     </bean>
 
-    <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal" />
+    <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal">
+        <constructor-arg name="servicesResolver" ref="servicesResolver" />
+    </bean>
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
