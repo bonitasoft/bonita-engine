@@ -44,18 +44,13 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     protected Set<URL> urls;
 
-    private final File temporaryDirectory;
+    private File temporaryDirectory;
 
     private boolean isActive = true;
 
     private final long creationTime;
 
-    private final String uuid;
-
-    /**
-     * Logger
-     */
-    // TODO logger
+    private String uuid;
 
     BonitaClassLoader(final Map<String, byte[]> resources, final String type, final long id, final URI temporaryDirectoryUri, final ClassLoader parent) {
         super(type + "__" + id, new URL[] {}, parent);
@@ -63,16 +58,36 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         NullCheckingUtil.checkArgsNotNull(resources, type, id, temporaryDirectoryUri, parent);
         this.type = type;
         this.id = id;
-        this.uuid = UUID.randomUUID().toString();
+        this.uuid = generateUUID();
 
-        nonJarResources = new HashMap<String, byte[]>();
-        urls = new HashSet<URL>();
-        temporaryDirectory = new File(temporaryDirectoryUri);
+        nonJarResources = new HashMap<>();
+        urls = new HashSet<>();
+        this.temporaryDirectory = createTemporaryDirectory(temporaryDirectoryUri);
+        addResources(resources);
+        addURLs(urls.toArray(new URL[urls.size()]));
+    }
+
+    File createTemporaryDirectory(URI temporaryDirectoryUri) {
+        File temporaryDirectory = new File(temporaryDirectoryUri);
         if (!temporaryDirectory.exists()) {
             temporaryDirectory.mkdirs();
         }
-        addResources(resources);
-        addURLs(urls.toArray(new URL[urls.size()]));
+        temporaryDirectory = createFolderFromUUID(temporaryDirectory, uuid);
+        if (temporaryDirectory.exists()) {
+            uuid = generateUUID();
+            //retry
+            return createTemporaryDirectory(temporaryDirectoryUri);
+        }
+        temporaryDirectory.mkdir();
+        return temporaryDirectory;
+    }
+
+    private File createFolderFromUUID(File temporaryDirectory, String uuid) {
+        return new File(temporaryDirectory, uuid.substring(0, 5));
+    }
+
+    String generateUUID() {
+        return UUID.randomUUID().toString();
     }
 
     protected void addResources(final Map<String, byte[]> resources) {
@@ -174,6 +189,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", uuid=" + uuid + ", creationTime=" + creationTime + ", type=" + type + ", id=" + id + ", isActive: " + isActive + ", parent= " + getParent();
+        return super.toString() + ", uuid=" + uuid + ", creationTime=" + creationTime + ", type=" + type + ", id=" + id + ", isActive: " + isActive
+                + ", parent= " + getParent();
     }
 }
