@@ -39,13 +39,14 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class BDRepositoryLocalIT extends CommonAPIIT {
 
@@ -101,9 +102,12 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
     private ClassLoader contextClassLoaderBeforeAddingBPMClientZip;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Before
     public void setUp() throws Exception {
-        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
+        clientFolder = temporaryFolder.newFolder();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         matti = createUser("matti", "bpm");
 

@@ -9,7 +9,6 @@ import java.lang.management.ManagementFactory;
  */
 class FolderMgr {
 
-
     private static Folder getFolder(final File baseFolder, final String subFolder) throws IOException {
         return new Folder(new Folder(baseFolder), subFolder);
     }
@@ -79,6 +78,7 @@ class FolderMgr {
     public static Folder getTenantConfFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
         return getFolder(getTenantsConfFolder(bonitaHomeFolder), Long.toString(tenantId));
     }
+
     public static Folder getTenantTempFolder(File bonitaHomeFolder, long tenantId) throws IOException {
         Folder tenantsTempFolder = getTenantsTempFolder(bonitaHomeFolder);
         tenantsTempFolder.createIfNotExists();
@@ -124,7 +124,6 @@ class FolderMgr {
         getTenantConfFolder(bonitaHomeFolder, tenantId).delete();
         getTenantTempFolder(bonitaHomeFolder, tenantId).delete();
     }
-
 
     public static void createTenant(File bonitaHomeFolder, long tenantId) throws IOException {
         final Folder tenantWorkFolder = getTenantWorkFolder(bonitaHomeFolder, tenantId);
@@ -191,10 +190,12 @@ class FolderMgr {
 
     public static Folder getPlatformClassLoaderFolder(File bonitaHomeFolder) throws IOException {
         final Folder classloadersFolder = getFolder(getPlatformTempFolder(bonitaHomeFolder), "classloaders");
-        classloadersFolder.createIfNotExists();
+        if(!classloadersFolder.exists()){
+            classloadersFolder.createAsTemporaryFolder();
+        }
         final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
         final String subFolderName = "bonita_engine_" + jvmName;
-        final Folder jvmFolder = getFolder(getPlatformTempFolder(bonitaHomeFolder), subFolderName);
+        final Folder jvmFolder = getFolder(classloadersFolder, subFolderName);
         jvmFolder.createIfNotExists();
         return jvmFolder;
     }

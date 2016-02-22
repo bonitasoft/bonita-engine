@@ -113,7 +113,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     File writeResource(Map.Entry<String, byte[]> resource, byte[] data) throws IOException {
-        final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryDirectory);
+        final File file = File.createTempFile(resource.getKey(), ".jar", temporaryDirectory);
         IOUtil.write(file, data);
         return file;
     }
