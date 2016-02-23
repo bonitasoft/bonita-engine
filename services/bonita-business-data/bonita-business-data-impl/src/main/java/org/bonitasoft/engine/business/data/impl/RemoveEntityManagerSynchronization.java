@@ -32,12 +32,13 @@ public class RemoveEntityManagerSynchronization implements BonitaTransactionSync
 
     @Override
     public void beforeCommit() {
-        localManager.remove();
+        // Nothing to do
     }
 
     @Override
     public void afterCompletion(final TransactionState txState) {
-        // Nothing to do
+        localManager.get().close();
+        localManager.remove();
     }
 
 }
