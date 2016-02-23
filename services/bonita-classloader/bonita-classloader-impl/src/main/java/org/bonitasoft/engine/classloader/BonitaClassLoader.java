@@ -15,6 +15,7 @@ package org.bonitasoft.engine.classloader;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -27,6 +28,7 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -96,19 +98,24 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
                 if (resource.getKey().matches(".*\\.jar")) {
                     final byte[] data = resource.getValue();
                     try {
-                        final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryDirectory);
-                        IOUtil.write(file, data);
+                        final File file = writeResource(resource, data);
                         final String path = file.getAbsolutePath();
                         final URL url = new File(path).toURI().toURL();
                         urls.add(url);
-                    } catch (final Exception e) {
-                        e.printStackTrace();
+                    } catch (final IOException e) {
+                        throw new BonitaRuntimeException(e);
                     }
                 } else {
                     nonJarResources.put(resource.getKey(), resource.getValue());
                 }
             }
         }
+    }
+
+    File writeResource(Map.Entry<String, byte[]> resource, byte[] data) throws IOException {
+        final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryDirectory);
+        IOUtil.write(file, data);
+        return file;
     }
 
     @Override
