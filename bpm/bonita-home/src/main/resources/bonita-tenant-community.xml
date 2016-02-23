@@ -1480,6 +1480,7 @@
                 <entry key="hibernate.validator.autoregister_listeners" value="${bonita.tenant.bdm.repository.validator.autoregister_listeners}" />
                 <entry key="hibernate.validator.apply_to_ddl" value="${bonita.tenant.bdm.repository.validator.apply_to_ddl}" />
                 <entry key="javax.persistence.validation.mode" value="${bonita.tenant.bdm.repository.javax.persistence.validation.mode}" />
+                <entry key="hibernate.current_session_context_class" value="thread" />
             </map>
         </constructor-arg>
     </bean>
