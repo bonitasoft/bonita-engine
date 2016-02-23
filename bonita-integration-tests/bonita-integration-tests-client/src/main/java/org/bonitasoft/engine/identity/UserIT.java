@@ -913,8 +913,8 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().addUserMemberships(Arrays.asList(john2.getId(), jack.getId()), group1.getId(), role2.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(UserSearchDescriptor.GROUP_ID, String.valueOf(group2.getId()));
-        builder.filter(UserSearchDescriptor.ROLE_ID, String.valueOf(role1.getId()));
+        builder.filter(UserSearchDescriptor.GROUP_ID, group2.getId());
+        builder.filter(UserSearchDescriptor.ROLE_ID, role1.getId());
         builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
         final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
         assertNotNull(searchUsers);
