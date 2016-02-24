@@ -1103,7 +1103,7 @@
         <property name="map">
             <map>
                 <entry key="hibernate.connection.datasource" value="${database.journal.datasource.name}" />
-                <entry key="hibernate.current_session_context_class" value="jta" />
+                <entry key="hibernate.current_session_context_class" value="thread" />
                 <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
                 <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
                 <entry key="hibernate.dialect" value="${${db.vendor}.hibernate.dialect}" />
