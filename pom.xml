@@ -58,6 +58,9 @@
         <spring.version>3.1.2.RELEASE</spring.version>
         <jackson.version>2.4.4</jackson.version>
         <jaxb.version>2.2.7</jaxb.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <jaxen.version>1.1.4</jaxen.version>
+
 
         <!-- Tests -->
         <powermock.version>1.5.1</powermock.version>
