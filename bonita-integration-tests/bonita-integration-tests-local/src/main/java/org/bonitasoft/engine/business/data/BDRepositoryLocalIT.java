@@ -112,7 +112,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         matti = createUser("matti", "bpm");
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(buildBOM());
+        final byte[] zip = converter.zip(buildCustomBOM());
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().installBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
@@ -142,7 +142,6 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
     private void resumeClassloader() {
         Thread.currentThread().setContextClassLoader(contextClassLoaderBeforeAddingBPMClientZip);
-
     }
 
     @Test
@@ -359,7 +358,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         return addressExpression;
     }
 
-    private BusinessObjectModel buildBOM() {
+    private BusinessObjectModel buildCustomBOM() {
         final SimpleField name = new SimpleField();
         name.setName("name");
         name.setType(FieldType.STRING);
