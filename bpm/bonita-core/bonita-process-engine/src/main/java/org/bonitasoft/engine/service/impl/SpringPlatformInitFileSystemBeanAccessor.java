@@ -23,9 +23,9 @@
      * @author Matthieu Chaffotte
      * @author Charles Souillard
      */
-    public class SpringPlatformInitFileSystemBeanAcessor extends SpringFileSystemBeanAccessor {
+    public class SpringPlatformInitFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
 
-        public SpringPlatformInitFileSystemBeanAcessor(SpringFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
+        public SpringPlatformInitFileSystemBeanAccessor(SpringFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
             super(parent);
         }
 
