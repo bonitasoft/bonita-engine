@@ -112,11 +112,6 @@
     <bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
         <constructor-arg ref="platformPersistenceService" />
         <constructor-arg name="platformRetriever" ref="platformRetriever" />
-        <constructor-arg name="tenantPersistenceServices">
-            <list>
-                <ref bean="persistenceService" />
-            </list>
-        </constructor-arg>
         <constructor-arg ref="platformTechnicalLoggerService" />
         <constructor-arg ref="platformCacheService" />
         <constructor-arg ref="platformProperties" />

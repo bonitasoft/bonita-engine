@@ -16,26 +16,22 @@
     import java.io.IOException;
     import java.util.HashMap;
     import java.util.Map;
-    import java.util.Properties;
 
     import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-    import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-    import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-    import org.springframework.context.support.FileSystemXmlApplicationContext;
 
     /**
      * @author Charles Souillard
      */
     public class SpringFileSystemBeanAccessorFactory {
 
-        private static SpringPlatformInitFileSystemBeanAcessor platformInit;
+        private static SpringPlatformInitFileSystemBeanAccessor platformInit;
         private static SpringPlatformFileSystemBeanAccessor platform;
         private static Map<Long, SpringTenantFileSystemBeanAccessor> tenants = new HashMap<>();
 
-        public static SpringPlatformInitFileSystemBeanAcessor getPlatformInitAccessor() {
+        public static SpringPlatformInitFileSystemBeanAccessor getPlatformInitAccessor() {
             if (platformInit == null) {
                 try {
-                    platformInit = new SpringPlatformInitFileSystemBeanAcessor(null);
+                    platformInit = new SpringPlatformInitFileSystemBeanAccessor(null);
                 } catch (IOException | BonitaHomeNotSetException e) {
                     throw new RuntimeException(e);
                 }

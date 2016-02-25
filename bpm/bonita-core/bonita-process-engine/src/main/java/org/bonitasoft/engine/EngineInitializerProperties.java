@@ -15,7 +15,6 @@ package org.bonitasoft.engine;
 
 import java.util.Properties;
 
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 
@@ -23,8 +22,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
  * @author Baptiste Mesta
  */
 public class EngineInitializerProperties {
-
-    protected static final String PROPERTIES_FILENAME = "platform-tenant-config.properties";
 
     /**
      * Configurations of platform
@@ -39,20 +36,13 @@ public class EngineInitializerProperties {
 
     protected static final String TENANT_ADMIN_USERNAME = "userName";
 
-    // /**
-    // * Configurations of tenant
-    // */
-    // public static final String PLATFORM_DEFAULT_TENANT_ID = "platform.tenant.default.id";
-
     /**
      * properties of the platform
      */
     private Properties platformProperties;
 
     /**
-     * Private contructor to prevent instantiation
-     * 
-     * @throws BonitaHomeNotSetException
+     * Private constructor to prevent instantiation
      */
     public EngineInitializerProperties() {
         try {
