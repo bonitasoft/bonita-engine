@@ -148,12 +148,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             try {
                 final Interceptor interceptor = (Interceptor) Class.forName(className).newInstance();
                 configuration.setInterceptor(interceptor);
-            } catch (final ClassNotFoundException cnfe) {
+            } catch (final ClassNotFoundException | IllegalAccessException | InstantiationException cnfe) {
                 throw new SPersistenceException(cnfe);
-            } catch (final InstantiationException e) {
-                throw new SPersistenceException(e);
-            } catch (final IllegalAccessException e) {
-                throw new SPersistenceException(e);
             }
 
         }
@@ -162,7 +158,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         statistics = sessionFactory.getStatistics();
 
         final Iterator<PersistentClass> classMappingsIterator = configuration.getClassMappings();
-        classMapping = new ArrayList<Class<? extends PersistentObject>>();
+        classMapping = new ArrayList<>();
         while (classMappingsIterator.hasNext()) {
             classMapping.add(classMappingsIterator.next().getMappedClass());
         }
@@ -425,7 +421,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter,
             final boolean enableWordSearch) {
         final StringBuilder builder = new StringBuilder(query);
-        final Set<String> specificFilters = new HashSet<String>(filters.size());
+        final Set<String> specificFilters = new HashSet<>(filters.size());
         if (!filters.isEmpty()) {
             FilterOption previousFilter = null;
             if (!query.contains("WHERE")) {
@@ -467,7 +463,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters,
             final boolean enableWordSearch) {
         final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
-        final Set<String> fields = new HashSet<String>();
+        final Set<String> fields = new HashSet<>();
         for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
             final String alias = getClassAliasMappings().get(entry.getKey().getName());
             for (final String field : entry.getValue()) {
