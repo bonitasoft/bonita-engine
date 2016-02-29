@@ -72,7 +72,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
             final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
             final FlowNodeSelector flowNodeSelector) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(processInstanceId,
-                DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId));
+                DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId), processInstanceId);
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;

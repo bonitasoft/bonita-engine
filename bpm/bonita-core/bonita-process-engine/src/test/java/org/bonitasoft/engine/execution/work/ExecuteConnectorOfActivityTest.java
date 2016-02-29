@@ -58,7 +58,7 @@ public class ExecuteConnectorOfActivityTest {
 
     @Test
     public void createThrowErrorEventInstance_should_return_a_well_formed_instance() throws Exception {
-        final ExecuteConnectorOfActivity work = new ExecuteConnectorOfActivity(4L, 45L, 687L, 5357L, "myConnector");
+        final ExecuteConnectorOfActivity work = new ExecuteConnectorOfActivity(4L, 123L, 45L, 687L, 5357L, "myConnector");
         final SEndEventDefinition eventDefinition = new SEndEventDefinitionImpl(8687L, "end");
         final SUserTaskInstanceImpl instanceImpl = new SUserTaskInstanceImpl("userTask1", 1L, 2L, 3L, 4L, STaskPriority.NORMAL, 5L, 6L);
         instanceImpl.setLogicalGroup(3, 4L);
