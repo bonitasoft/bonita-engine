@@ -809,7 +809,7 @@ public class TenantTest extends CommonBPMServicesTest {
         orderByOptions.add(new OrderByOption(Human.class, "lastName", OrderByType.DESC));
 
         final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(Human.class, "age", "27"));
+        filters.add(new FilterOption(Human.class, "age", 27));
 
         final QueryOptions queryOptions = new QueryOptions(0, 2, orderByOptions, filters, null);
         final SelectListDescriptor<Human> selectDescriptor = new SelectListDescriptor<Human>("getAllHumans", null, Human.class, queryOptions);
@@ -843,7 +843,7 @@ public class TenantTest extends CommonBPMServicesTest {
         orderByOptions.add(new OrderByOption(Human.class, "lastName", OrderByType.DESC));
 
         final List<FilterOption> filters = new ArrayList<FilterOption>(1);
-        filters.add(new FilterOption(Human.class, "age", "27"));
+        filters.add(new FilterOption(Human.class, "age", 27));
         final Map<Class<? extends PersistentObject>, Set<String>> fields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> set = new HashSet<String>(2);
         set.add("firstName");
