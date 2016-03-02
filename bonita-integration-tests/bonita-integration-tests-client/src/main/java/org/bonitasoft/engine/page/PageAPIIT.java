@@ -176,9 +176,11 @@ public class PageAPIIT extends CommonAPIIT {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
@@ -190,13 +192,13 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
-
     @Test(expected = AlreadyExistsException.class)
     public void updateForm_with_existing_process_definitionId_should_fail() throws Exception {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
         final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
@@ -299,12 +301,12 @@ public class PageAPIIT extends CommonAPIIT {
         final String pageName1 = generateUniquePageName(0);
         final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName1, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION,
                 "contentType=WillBeIgnored", "apiExtensions=myGetResource", "myGetResource.method=POST", "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy","myGetResource.permissions=newPermission");
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission");
 
         final String pageName2 = generateUniquePageName(1);
         final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
                 + ContentType.API_EXTENSION, "apiExtensions=myGetResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
-                "myGetResource.classFileName=Index.groovy","myGetResource.permissions=newPermission");
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission");
 
         // when
         final Page pageWithCreator = getPageAPI().createPage(
@@ -324,8 +326,9 @@ public class PageAPIIT extends CommonAPIIT {
         final String pageName = generateUniquePageName(1);
         final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
                 + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
-                "myGetResource.pathTemplate=helloWorld", "myGetResource.classFileName=Index.groovy","myGetResource.permissions=newPermission", "myPostResource.method=POST",
-                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy","myPostResource.permissions=newPermission");
+                "myGetResource.pathTemplate=helloWorld", "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission",
+                "myPostResource.method=POST",
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy", "myPostResource.permissions=newPermission");
 
         // when
         Page pageWithContent = getPageAPI().createPage(pageName, pageContent);
@@ -402,11 +405,12 @@ public class PageAPIIT extends CommonAPIIT {
         // , "content.zip"given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
+
         expectedException.expect(InvalidPageZipMissingIndexException.class);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
 
         // when
+        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                pageContent);
 
         // then: expected exception
     }
@@ -433,9 +437,8 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     private void checkPageContentContainsProperties(final byte[] content, final String displayName, final String description) throws Exception {
-        Map<String, String> contentAsMap = null;
         try {
-            contentAsMap = unzip(content);
+            Map<String, String> contentAsMap = unzip(content);
             assertThat(contentAsMap.keySet()).as("should contains page.properties").contains("page.properties");
             final String string = contentAsMap.get("page.properties");
             final Properties props = new Properties();
@@ -448,12 +451,11 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
-    private final Map<String, String> unzip(final byte[] zipFile) throws Exception {
+    private Map<String, String> unzip(final byte[] zipFile) throws Exception {
         final ByteArrayInputStream bais = new ByteArrayInputStream(zipFile);
-        final ZipInputStream zipInputstream = new ZipInputStream(bais);
-        ZipEntry zipEntry = null;
-        final Map<String, String> zipMap = new HashMap<String, String>();
-        try {
+        ZipEntry zipEntry;
+        final Map<String, String> zipMap = new HashMap<>();
+        try (ZipInputStream zipInputstream = new ZipInputStream(bais)) {
             while ((zipEntry = zipInputstream.getNextEntry()) != null) {
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 int bytesRead;
@@ -463,8 +465,6 @@ public class PageAPIIT extends CommonAPIIT {
                 }
                 zipMap.put(zipEntry.getName(), new String(byteArrayOutputStream.toByteArray(), UTF8));
             }
-        } finally {
-            zipInputstream.close();
         }
         return zipMap;
     }
@@ -506,10 +506,7 @@ public class PageAPIIT extends CommonAPIIT {
         final String description = "description";
         final String noneMatchingdisplayName = DISPLAY_NAME;
         final String matchingValue = "Cool";
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(matchingValue);
-        stringBuilder.append(" page!");
-        final String matchingDisplayName = stringBuilder.toString();
+        final String matchingDisplayName = matchingValue + " page!";
 
         // given
         final int noneMatchingCount = 8;
@@ -534,10 +531,7 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     private String generateUniquePageName(final int i) {
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("custompage_unique" + i);
-        stringBuilder.append(System.currentTimeMillis());
-        return stringBuilder.toString();
+        return ("custompage_unique" + i) + System.currentTimeMillis();
     }
 
     @Test
@@ -556,11 +550,8 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         final List<Page> results = searchPages.getResult();
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("should have only ");
-        stringBuilder.append(expectedResultSize);
-        stringBuilder.append(" results");
-        assertThat(results.size()).as(stringBuilder.toString()).isEqualTo(expectedResultSize);
+        String stringBuilder = "should have only " + expectedResultSize + " results";
+        assertThat(results.size()).as(stringBuilder).isEqualTo(expectedResultSize);
 
     }
 
