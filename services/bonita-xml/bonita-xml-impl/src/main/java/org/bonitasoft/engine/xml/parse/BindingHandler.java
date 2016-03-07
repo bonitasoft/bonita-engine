@@ -98,11 +98,7 @@ public class BindingHandler extends DefaultHandler {
         if (tempVal == null) {
             tempVal = new StringBuilder();
         }
-        String tempString = new String(ch, start, length);
-        if ("".equals(tempString.trim())) {
-            tempString = "";
-        }
-        tempVal.append(tempString);
+        tempVal.append(new String(ch, start, length));
     }
 
     @Override
@@ -167,7 +163,7 @@ public class BindingHandler extends DefaultHandler {
             final ElementBinding binder = model.peek();
             try {
                 if (tempVal != null) {
-                    binder.setChildElement(localName, tempVal.toString(), tempAttributes);
+                    binder.setChildElement(localName, tempVal.toString().trim(), tempAttributes);
                 } else {
                     binder.setChildElement(localName, "", tempAttributes);
                 }
