@@ -23,7 +23,6 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -53,7 +52,6 @@ import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionIm
 import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -178,7 +176,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         return marshaller;
     }
 
-    public DesignProcessDefinition convertXmlToProcess(String content) throws IOException, XMLParseException {
+    public DesignProcessDefinition convertXmlToProcess(String content) throws IOException {
         try (InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
 
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
