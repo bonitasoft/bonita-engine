@@ -38,7 +38,6 @@ import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -305,7 +304,7 @@ public class ProcessManagementIT extends TestWithUser {
     }
 
     private void getArchivedActivityInstancesOrderByPagingCriterion(final ActivityInstanceCriterion criterionAsc, final int asc1, final int asc2,
-            final int asc3, final ActivityInstanceCriterion criterionDsc, final int desc1, final int desc2, final int desc3) throws Exception {
+                                                                    final int asc3, final ActivityInstanceCriterion criterionDsc, final int desc1, final int desc2, final int desc3) throws Exception {
 
         final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME
                 + criterionAsc, PROCESS_VERSION, Arrays.asList("task1", "task2", "task3"), Arrays.asList(false, false, false));
@@ -529,25 +528,32 @@ public class ProcessManagementIT extends TestWithUser {
                 processDefinitionBuilder.done());
 
         // Add a resource to the biz archive:
-        final String dummyText = "DUMMY";
-        final String dummyFile = "dummy.txt";
-        final String documentText = "SOME DOCUMENT TEXT";
-        final String documentFile = "folder/document.txt";
-        businessArchiveBuilder.addExternalResource(new BarResource(dummyFile, dummyText.getBytes()));
-        businessArchiveBuilder.addExternalResource(new BarResource(documentFile, documentText.getBytes()));
+        businessArchiveBuilder.addExternalResource(new BarResource("dummy.txt", "DUMMY".getBytes()));
+        businessArchiveBuilder.addExternalResource(new BarResource("folder/document.txt", "SOME DOCUMENT TEXT".getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource("folder/image.jpg", "UNUSED".getBytes()));
+        businessArchiveBuilder.addExternalResource(new BarResource("someFolder/bin.sh", "some script".getBytes()));
+        businessArchiveBuilder.addExternalResource(new BarResource("ajar.jar", "a jar in resources".getBytes()));
+        businessArchiveBuilder.addClasspathResource(new BarResource("xsds/general-xsd-jar.jar", "a jar in a subfolder".getBytes()));
+        businessArchiveBuilder.addClasspathResource(new BarResource("acme-lib-001.jar", "a jar at the root".getBytes()));
 
         // deploy the process to unzip the .bar in BONITA_HOME:
         final ProcessDefinition processDefinition = deployProcess(businessArchiveBuilder.done());
-        final Map<String, byte[]> resources = getProcessAPI().getProcessResources(processDefinition.getId(), ".*/.*\\.txt");
-        assertThat(resources).hasSize(2);
-        assertTrue("Searched resource not returned", resources.containsKey(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + dummyFile));
-        assertTrue("Searched resource not returned", resources.containsKey(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + documentFile));
-        final byte[] dum = resources.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + dummyFile);
-        assertTrue("File content not the expected", Arrays.equals(dummyText.getBytes(), dum));
-        final byte[] doc = resources.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + documentFile);
-        assertTrue("File content not the expected", Arrays.equals(documentText.getBytes(), doc));
-
+        //check resources
+        assertThat(getProcessAPI().getProcessResources(processDefinition.getId(), ".*/.*\\.txt"))
+                .hasSize(2)
+                .containsEntry("resources/dummy.txt", "DUMMY".getBytes())
+                .containsEntry("resources/folder/document.txt", "SOME DOCUMENT TEXT".getBytes());
+        //check jars
+        assertThat(getProcessAPI().getProcessResources(processDefinition.getId(), "^classpath/.*\\.jar$"))
+                .hasSize(2)
+                .containsEntry("classpath/xsds/general-xsd-jar.jar", "a jar in a subfolder".getBytes())
+                .containsEntry("classpath/acme-lib-001.jar", "a jar at the root".getBytes());
+        //check both
+        assertThat(getProcessAPI().getProcessResources(processDefinition.getId(), "^.*/.*\\.jar$"))
+                .hasSize(3)
+                .containsEntry("classpath/xsds/general-xsd-jar.jar", "a jar in a subfolder".getBytes())
+                .containsEntry("classpath/acme-lib-001.jar", "a jar at the root".getBytes())
+                .containsEntry("resources/ajar.jar", "a jar in resources".getBytes());
         deleteProcess(processDefinition);
     }
 
