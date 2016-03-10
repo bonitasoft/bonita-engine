@@ -1,1 +1,0 @@
-ALTER TABLE human DROP FOREIGN KEY fk_car;

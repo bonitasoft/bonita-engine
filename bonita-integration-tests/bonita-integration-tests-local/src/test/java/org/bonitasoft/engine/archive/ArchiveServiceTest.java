@@ -16,12 +16,8 @@ package org.bonitasoft.engine.archive;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.bonitasoft.engine.archive.model.Address;
-import org.bonitasoft.engine.archive.model.Employee;
-import org.bonitasoft.engine.archive.model.EmployeeProjectMapping;
-import org.bonitasoft.engine.archive.model.Laptop;
-import org.bonitasoft.engine.archive.model.Project;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
+import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -51,42 +47,25 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     public void testRecordInsert() throws Exception {
         getTransactionService().begin();
 
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
-        assertNotNull(laptop);
-
-        final Employee employee = insertEmployeeWithYesterdayDate(laptop);
-        assertNotNull(employee);
-
-        final Address address = insertAddressRecordIntoArchiveWithYesterdayDate(employee);
-        assertNotNull(address);
-
-        final Project project = insertProjectRecordIntoArchiveWithYesterdayDate();
-        assertNotNull(project);
-
-        final EmployeeProjectMapping epMapping = insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(employee, project);
-        assertNotNull(epMapping);
+        final SAShortTextDataInstanceImpl dataInstance = insertDataWithYesterdayDate();
+        assertNotNull(dataInstance);
 
         getTransactionService().complete();
     }
 
     @Test
     public void archiveInSlidingArchiveNotDone() throws Exception {
-        getTransactionService().begin();
-
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
-        getTransactionService().complete();
 
         getTransactionService().begin();
-        final Employee employee = insertEmployeeWithFirstJanuary2009Date(laptop);
+        final SAShortTextDataInstanceImpl dataInstance = insertDataWithFirstJanuary2009Date();
         getTransactionService().complete();
 
         getTransactionService().begin();
 
-        final Employee employeeArchiveRecord = selectEmployeeByIdFromDefinitiveArchive(employee);
-        assertNotNull("should be in definitive archive", employeeArchiveRecord);
-        assertEquals(employee.getName(), employeeArchiveRecord.getName());
-        assertEquals(employee.getAge(), employeeArchiveRecord.getAge());
-        assertEquals(laptop.getId(), employeeArchiveRecord.getLaptopId());
+        final SAShortTextDataInstanceImpl dataInstanceFromArchive = selectDataByIdFromDefinitiveArchive(dataInstance);
+        assertNotNull("should be in definitive archive", dataInstanceFromArchive);
+        assertEquals(dataInstance.getName(), dataInstanceFromArchive.getName());
+        assertEquals(dataInstance.getValue(), dataInstanceFromArchive.getValue());
 
         getTransactionService().complete();
     }
@@ -94,63 +73,37 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     @Test
     public void insertWithNoDefinitiveArchiveForThatDate() throws Exception {
         getTransactionService().begin();
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
         try {
-            insertEmployeeWithBefore2009Date(laptop);
+            insertDataWithBefore2009Date();
         } finally {
             getTransactionService().complete();
         }
     }
 
-    private Laptop insertLaptopRecordIntoArchiveWithYesterdayDate() throws SRecorderException {
-        final Laptop laptop = new Laptop("Dell", "1800");
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(laptop));
-        return laptop;
+
+    private SAShortTextDataInstanceImpl insertDataWithYesterdayDate() throws SRecorderException {
+        return insertData(System.currentTimeMillis() - ONE_DAY);
     }
 
-    private Employee insertEmployeeWithYesterdayDate(final Laptop laptop) throws SRecorderException {
-        final Employee employee = new Employee("ZhaoDa", 20);
-        employee.setLaptopId(laptop.getId());
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(employee));
-        return employee;
+    private SAShortTextDataInstanceImpl insertDataWithFirstJanuary2009Date() throws SRecorderException {
+        return insertData(START_OF_2009);
     }
 
-    private Employee insertEmployeeWithFirstJanuary2009Date(final Laptop laptop) throws SRecorderException {
-        final Employee employee = new Employee("ZhaoDa", 20);
-        employee.setLaptopId(laptop.getId());
-        archiveService.recordInsert(START_OF_2009, new ArchiveInsertRecord(employee));
-        return employee;
+    private SAShortTextDataInstanceImpl insertDataWithBefore2009Date() throws SRecorderException {
+        return insertData(BEFORE_2009);
     }
 
-    private Employee insertEmployeeWithBefore2009Date(final Laptop laptop) throws SRecorderException {
-        final Employee employee = new Employee("ZhaoDa", 20);
-        employee.setLaptopId(laptop.getId());
-        archiveService.recordInsert(BEFORE_2009, new ArchiveInsertRecord(employee));
-        return employee;
+    private SAShortTextDataInstanceImpl insertData(long before2009) throws SRecorderException {
+        final SAShortTextDataInstanceImpl data = new SAShortTextDataInstanceImpl();
+        data.setName("archiveTestEmployee");
+        data.setValue("password");
+        archiveService.recordInsert(before2009, new ArchiveInsertRecord(data));
+        return data;
     }
 
-    private Address insertAddressRecordIntoArchiveWithYesterdayDate(final Employee employee) throws SRecorderException {
-        final Address address = new Address("China");
-        address.setEmployeeId(employee.getId());
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(address));
-        return address;
-    }
 
-    private Project insertProjectRecordIntoArchiveWithYesterdayDate() throws SRecorderException {
-        final Project project = new Project("BOS6");
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(project));
-        return project;
-    }
-
-    private EmployeeProjectMapping insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(final Employee employee, final Project project)
-            throws SRecorderException {
-        final EmployeeProjectMapping epMapping = new EmployeeProjectMapping(employee, project);
-        archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(epMapping));
-        return epMapping;
-    }
-
-    private Employee selectEmployeeByIdFromDefinitiveArchive(final Employee employee) throws SBonitaReadException {
-        final SelectByIdDescriptor<Employee> selectByIdDescriptor1 = new SelectByIdDescriptor<Employee>(Employee.class, employee.getId());
+    private SAShortTextDataInstanceImpl selectDataByIdFromDefinitiveArchive(final SAShortTextDataInstanceImpl dataInstance) throws SBonitaReadException {
+        final SelectByIdDescriptor<SAShortTextDataInstanceImpl> selectByIdDescriptor1 = new SelectByIdDescriptor<>(SAShortTextDataInstanceImpl.class, dataInstance.getId());
         return archiveService.getDefinitiveArchiveReadPersistenceService().selectById(selectByIdDescriptor1);
     }
 
@@ -158,29 +111,15 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     public void testRecordDelete() throws Exception {
         getTransactionService().begin();
 
-        final Laptop laptop = insertLaptopRecordIntoArchiveWithYesterdayDate();
 
-        final Employee employee = insertEmployeeWithYesterdayDate(laptop);
+        final SAShortTextDataInstanceImpl dataInstance = insertDataWithYesterdayDate();
 
-        final Address address = insertAddressRecordIntoArchiveWithYesterdayDate(employee);
-
-        final Project project = insertProjectRecordIntoArchiveWithYesterdayDate();
-
-        final EmployeeProjectMapping employeeProjectMapping = insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(employee, project);
 
         getTransactionService().complete();
 
         getTransactionService().begin();
 
-        archiveService.recordDelete(new DeleteRecord(employeeProjectMapping));
-
-        archiveService.recordDelete(new DeleteRecord(project));
-
-        archiveService.recordDelete(new DeleteRecord(address));
-
-        archiveService.recordDelete(new DeleteRecord(laptop));
-
-        archiveService.recordDelete(new DeleteRecord(employee));
+        archiveService.recordDelete(new DeleteRecord(dataInstance));
 
         getTransactionService().complete();
     }
