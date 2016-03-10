@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -224,8 +223,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test
     public void shouldBeAbleToRetrieveTenantByName() throws Exception {
-        final String name = "tenant1";
-        final String createdBy = "mycreatedBy";
+        final String name = "tenantByName";
+        final String createdBy = "myCreatedBy";
         final long created = System.currentTimeMillis();
 
         final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
@@ -247,7 +246,7 @@ public class TenantManagementTest extends CommonBPMServicesTest {
     public void getTenantsShouldFilterOnSearchCriteria() throws Exception {
         final String tenant1Name = "tTenantsShouldFilter1";
         final String tenant2Name = "tTenantsShouldFilter2";
-        final String createdBy = "mycreatedBy";
+        final String createdBy = "myCreatedBy";
         final long created = System.currentTimeMillis();
 
         final STenant tenant1 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false)
