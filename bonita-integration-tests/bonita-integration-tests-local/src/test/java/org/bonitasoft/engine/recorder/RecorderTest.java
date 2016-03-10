@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.recorder;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +30,7 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -39,21 +38,15 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.persistence.model.Human;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionRollbackException;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -69,7 +62,7 @@ public class RecorderTest extends CommonBPMServicesTest {
 
     private final static int SLEEP_TIME = 200;
 
-    private final static String HUMAN = "HUMAN";
+    private final static String SUSER_IMPL = "SUSER_IMPL";
 
     protected ReadPersistenceService persitenceService;
 
@@ -83,16 +76,13 @@ public class RecorderTest extends CommonBPMServicesTest {
 
     private TestLogBuilderFactory logModelBuilderFactory;
 
-    public RecorderTest() {
+    @Before
+    public void setUp() throws Exception {
         persitenceService = getTenantAccessor().getReadPersistenceService();
         recorder = getTenantAccessor().getRecorder();
         scheduler = getTenantAccessor().getSchedulerService();
         eventService = getTenantAccessor().getEventService();
         loggerService = getTenantAccessor().getQueriableLoggerService();
-    }
-
-    @Before
-    public void setUp() throws Exception {
         TestUtil.startScheduler(scheduler);
     }
 
@@ -102,23 +92,18 @@ public class RecorderTest extends CommonBPMServicesTest {
         TestUtil.stopScheduler(scheduler, getTransactionService());
     }
 
-    private Human buildHuman(final String firstName, final String lastName, final int age) {
-        final Human human = new Human();
-        human.setFirstName(firstName);
-        human.setLastName(lastName);
-        human.setAge(age);
-        return human;
-    }
-
-    private Map<String, Object> getMap(final String key, final Object value) {
-        return Collections.singletonMap(key, value);
+    private SUserImpl buildSUserImpl(final String firstName, final String lastName) {
+        final SUserImpl sUserImpl = new SUserImpl();
+        sUserImpl.setUserName(firstName);
+        sUserImpl.setPassword(lastName);
+        return sUserImpl;
     }
 
     private List<SQueriableLog> getLogs(final long indexValue, final String actionType) throws SBonitaReadException {
-        final List<FilterOption> filters = new ArrayList<FilterOption>(2);
+        final List<FilterOption> filters = new ArrayList<>(2);
         filters.add(getActionTypeFilterOption(actionType));
         filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getObjectIdKey(), indexValue));
-        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
+        final List<OrderByOption> orders = Collections.singletonList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
         final QueryOptions opts = new QueryOptions(0, 10, orders, filters, null);
         return loggerService.searchLogs(opts);
     }
@@ -128,32 +113,32 @@ public class RecorderTest extends CommonBPMServicesTest {
     }
 
     private List<SQueriableLog> getLogs(final String actionType) throws SBonitaReadException {
-        final List<FilterOption> filters = Arrays.asList(getActionTypeFilterOption(actionType));
-        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(getActionTypeFilterOption(actionType));
+        final List<OrderByOption> orders = Collections.singletonList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
         return loggerService.searchLogs(new QueryOptions(0, 10, orders, filters, null));
     }
 
-    private void checkHuman(final Human expectedHuman, final Human retrievedHuman) {
-        assertNotNull(retrievedHuman);
-        assertEquals(expectedHuman, retrievedHuman);
+    private void checkSUserImpl(final SUserImpl expectedSUserImpl, final SUserImpl retrievedSUserImpl) {
+        assertNotNull(retrievedSUserImpl);
+        assertEquals(expectedSUserImpl, retrievedSUserImpl);
     }
 
-    private Human getHumanByFirstName(final String firstName) throws SBonitaReadException {
-        return getPersistenceService().selectOne(new SelectOneDescriptor<Human>("getHumanByFirstName", getMap("firstName", firstName), Human.class));
+    private SUserImpl getUserByUsername(final String firstName) throws SBonitaReadException {
+        return getPersistenceService().selectOne(new SelectOneDescriptor<SUserImpl>("getUserByUserName", Collections.singletonMap("userName", (Object) firstName), SUserImpl.class));
     }
 
     @Test
     public void testNotLogOnInsertRecordWhenBTXRolledBack() throws Exception {
         System.out.println(getTransactionService());
         getTransactionService().begin();
-        final SelectOneDescriptor<Human> selectDescriptor = new SelectOneDescriptor<Human>("getHumanByFirstName", getMap("firstName", "firstName"), Human.class);
-        Human retrievedHuman = getPersistenceService().selectOne(selectDescriptor);
-        assertNull("Should not have any Human in DB before test", retrievedHuman);
+        final SelectOneDescriptor<SUserImpl> selectDescriptor = new SelectOneDescriptor<>("getUserByUserName", (Map<String, Object>) Collections.singletonMap("userName", (Object) "firstName"), SUserImpl.class);
+        SUserImpl retrievedSUserImpl = getPersistenceService().selectOne(selectDescriptor);
+        assertNull("Should not have any SUSER_IMPL in DB before test", retrievedSUserImpl);
 
         final String firstName = "Laurent";
-        final Human human = buildHuman(firstName, "Vaills", 20);
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human).done();
-        recorder.recordInsert(new InsertRecord(human), insertEvent);
+        final SUserImpl sUserImpl = buildSUserImpl(firstName, "Vaills");
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUSER_IMPL).setObject(sUserImpl).done();
+        recorder.recordInsert(new InsertRecord(sUserImpl), insertEvent);
 
         // set rollback
         getTransactionService().setRollbackOnly();
@@ -161,11 +146,11 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         Thread.sleep(SLEEP_TIME);
 
-        // The transaction has been rolled back no Human nor log should have been inserted.
+        // The transaction has been rolled back no SUserImpl nor log should have been inserted.
         getTransactionService().begin();
 
-        retrievedHuman = getPersistenceService().selectOne(selectDescriptor);
-        assertNull(retrievedHuman);
+        retrievedSUserImpl = getPersistenceService().selectOne(selectDescriptor);
+        assertNull(retrievedSUserImpl);
 
         final List<SQueriableLog> retrievedLogs = getLogs(TEST_CREATED);
         assertEquals(0, retrievedLogs.size());
@@ -175,21 +160,21 @@ public class RecorderTest extends CommonBPMServicesTest {
 
     @Test
     public void testNotLogOnUpdateRecordWhenBTXRolledBack() throws Exception {
-        // add human using persistence service
+        // add sUserImpl using persistence service
         getTransactionService().begin();
 
-        final Human human = buildHuman("firstName", "lastName", 20);
-        recorder.recordInsert(new InsertRecord(human), null);
+        final SUserImpl sUserImpl = buildSUserImpl("firstName", "lastName");
+        recorder.recordInsert(new InsertRecord(sUserImpl), null);
         getTransactionService().complete();
 
-        // update human (fail)
+        // update sUserImpl (fail)
         getTransactionService().begin();
 
-        final Human humanToUpdate = getHumanByFirstName("firstName");
-        assertNotNull(humanToUpdate);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN).setObject(human).done();
-        final Map<String, Object> stringObjectMap = Collections.<String, Object> singletonMap("firstName", "firstName");
-        recorder.recordUpdate(UpdateRecord.buildSetFields(humanToUpdate, stringObjectMap), updateEvent);
+        final SUserImpl sUserImplToUpdate = getUserByUsername("firstName");
+        assertNotNull(sUserImplToUpdate);
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(SUSER_IMPL).setObject(sUserImpl).done();
+        final Map<String, Object> stringObjectMap = Collections.<String, Object>singletonMap("userName", "firstName");
+        recorder.recordUpdate(UpdateRecord.buildSetFields(sUserImplToUpdate, stringObjectMap), updateEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 
@@ -198,34 +183,34 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         // query
         getTransactionService().begin();
-        final Human retrivedHuman = getPersistenceService().selectOne(
-                new SelectOneDescriptor<Human>("getHumanByFirstName", getMap("firstName", "firstNameUpdate"), Human.class));
-        assertNull(retrivedHuman);
+        final SUserImpl retrivedSUserImpl = getPersistenceService().selectOne(
+                new SelectOneDescriptor<SUserImpl>("getUserByUserName", Collections.singletonMap("userName", (Object) "firstNameUpdate"), SUserImpl.class));
+        assertNull(retrivedSUserImpl);
 
         final List<SQueriableLog> retrievedLogs = getLogs(TEST_UPDATE);
         assertEquals(0, retrievedLogs.size());
 
-        final Human addedHuman = getHumanByFirstName("firstName");
-        recorder.recordDelete(new DeleteRecord(addedHuman), null);
+        final SUserImpl addedSUserImpl = getUserByUsername("firstName");
+        recorder.recordDelete(new DeleteRecord(addedSUserImpl), null);
 
         getTransactionService().complete();
     }
 
     @Test
     public void testNotLogOnDeleteRecordIfBTXRolledBack() throws Exception {
-        // add human using persistence service
+        // add sUserImpl using persistence service
         getTransactionService().begin();
-        final Human human = buildHuman("firstName", "lastName", 20);
-        recorder.recordInsert(new InsertRecord(human), null);
+        final SUserImpl sUserImpl = buildSUserImpl("firstName", "lastName");
+        recorder.recordInsert(new InsertRecord(sUserImpl), null);
         getTransactionService().complete();
 
-        // delete human using recorder
+        // delete sUserImpl using recorder
         getTransactionService().begin();
 
-        final Human humanToDelete = getHumanByFirstName("firstName");
-        assertNotNull(humanToDelete);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(HUMAN).setObject(human).done();
-        recorder.recordDelete(new DeleteRecord(humanToDelete), deleteEvent);
+        final SUserImpl sUserImplToDelete = getUserByUsername("firstName");
+        assertNotNull(sUserImplToDelete);
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUSER_IMPL).setObject(sUserImpl).done();
+        recorder.recordDelete(new DeleteRecord(sUserImplToDelete), deleteEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 
@@ -234,17 +219,17 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         // query
         getTransactionService().begin();
-        final Human retrievedHuman = getHumanByFirstName("firstName");
-        checkHuman(human, retrievedHuman);
+        final SUserImpl retrievedSUserImpl = getUserByUsername("firstName");
+        checkSUserImpl(sUserImpl, retrievedSUserImpl);
 
-        final List<SQueriableLog> retrievedLogs = getLogs(retrievedHuman.getId(), TEST_DELETE);
+        final List<SQueriableLog> retrievedLogs = getLogs(retrievedSUserImpl.getId(), TEST_DELETE);
         assertEquals(0, retrievedLogs.size());
 
         getTransactionService().complete();
 
         // clean up:
         getTransactionService().begin();
-        recorder.recordDelete(new DeleteRecord(retrievedHuman), null);
+        recorder.recordDelete(new DeleteRecord(retrievedSUserImpl), null);
         getTransactionService().complete();
     }
 
@@ -259,8 +244,5 @@ public class RecorderTest extends CommonBPMServicesTest {
         return logModelBuilderFactory;
     }
 
-    private enum HumanRecordType {
-        updateHuman
-    }
 
 }

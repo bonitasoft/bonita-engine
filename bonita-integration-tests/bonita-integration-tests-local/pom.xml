@@ -10,11 +10,6 @@
 
     <artifactId>bonita-integration-tests-local</artifactId>
 
-    <properties>
-        <bonita.home>${project.build.directory}/bonita-home</bonita.home>
-        <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -30,6 +25,12 @@
             <groupId>org.bonitasoft.engine.test</groupId>
             <artifactId>bonita-integration-tests-client</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.identity</groupId>
+            <artifactId>bonita-identity-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -66,96 +67,7 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-dependency-plugin</artifactId>
-                                        <versionRange>[1.6,)</versionRange>
-                                        <goals>
-                                            <goal>unpack</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-server-tests-util</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.bonitasoft.engine.test</groupId>
-                                    <artifactId>bonita-server-test-utils</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>unpack-bonita-home</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/bonita-home-community</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.bonitasoft.engine</groupId>
-                                    <artifactId>bonita-home</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>complete test conf setup</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target name="build-home-tests">
-                                <ant antfile="build-home-tests.xml" target="build-home-tests" />
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -180,8 +92,6 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
-                        <bonita.home>${bonita.home}</bonita.home>
                         <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                     </systemPropertyVariables>
                     <includes>
@@ -198,24 +108,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>distrib-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -228,10 +120,7 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <!-- for the TestShades -->
                                 <bonita.version>${project.version}</bonita.version>
-                                <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
-                                <bonita.home>${bonita.home}</bonita.home>
                                 <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                             </systemPropertyVariables>
                             <includes>

@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.data.instance;
 
 import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,13 +33,13 @@ import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -73,11 +77,8 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
 
     protected DataInstanceService dataInstanceService;
 
-    protected ParentContainerResolver parentContainerResolver;
+    protected ParentContainerResolverImpl parentContainerResolver;
 
-    public DataInstanceServiceTest() {
-        expressionService = getTenantAccessor().getExpressionService();
-    }
 
     @Before
     public void setupDataInstanceService() {
@@ -85,9 +86,11 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
         final ReadPersistenceService persistenceService = getTenantAccessor().getReadPersistenceService();
         final TechnicalLoggerService technicalLoggerService = getTenantAccessor().getTechnicalLoggerService();
         final ArchiveService archiveService = getTenantAccessor().getArchiveService();
-        parentContainerResolver = getTenantAccessor().getParentContainerResolver();
+        expressionService = getTenantAccessor().getExpressionService();
+        parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
         dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService,
                 technicalLoggerService);
+        parentContainerResolver.setAllowUnknownContainer(true);
         final CacheService cacheService = getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
@@ -107,6 +110,7 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
         } catch (final SBonitaException e) {
             throw new RuntimeException(e);
         }
+        parentContainerResolver.setAllowUnknownContainer(false);
     }
 
     public SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,

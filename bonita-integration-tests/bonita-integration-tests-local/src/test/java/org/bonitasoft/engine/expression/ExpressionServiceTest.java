@@ -29,11 +29,11 @@ import java.util.Map;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
@@ -64,6 +64,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
     private static ExpressionService expressionService;
 
     private static CacheService cacheService;
+    private ParentContainerResolverImpl containerResolver;
 
     public ExpressionServiceTest() {
     }
@@ -72,6 +73,8 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
     public void setup() throws NoSuchFieldException, IllegalAccessException {
         expressionService = getTenantAccessor().getExpressionService();
         dataInstanceService = getTenantAccessor().getDataInstanceService();
+        containerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
+        containerResolver.setAllowUnknownContainer(true);
         cacheService = getTenantAccessor().getCacheService();
         if (cacheService.isStopped()) {
             try {
@@ -90,6 +93,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         } catch (final SBonitaException e) {
             throw new RuntimeException(e);
         }
+        containerResolver.setAllowUnknownContainer(false);
     }
 
 

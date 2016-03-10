@@ -31,11 +31,11 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
+import org.bonitasoft.engine.data.ParentContainerResolverImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
@@ -49,6 +49,7 @@ import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,17 +63,21 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     private OperationService operationService;
 
     private DataInstanceService dataInstanceService;
-    private ParentContainerResolver parentContainerResolver;
+    private ParentContainerResolverImpl parentContainerResolver;
 
     @Before
     public void setup() {
         transactionService = getTransactionService();
         dataInstanceService = getTenantAccessor().getDataInstanceService();
         operationService = getTenantAccessor().getOperationService();
-        parentContainerResolver = getTenantAccessor().getParentContainerResolver();
+        parentContainerResolver = (ParentContainerResolverImpl) getTenantAccessor().getParentContainerResolver();
+        parentContainerResolver.setAllowUnknownContainer(true);
     }
 
-
+    @After
+    public void after() throws Exception {
+        parentContainerResolver.setAllowUnknownContainer(false);
+    }
     /**
      * Assign a new value to a String Variable. Using an expression which is a constant.
      * variableName = "afterUpdate"

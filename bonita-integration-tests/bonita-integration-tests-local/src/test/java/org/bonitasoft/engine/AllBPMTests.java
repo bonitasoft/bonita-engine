@@ -38,7 +38,7 @@ import org.bonitasoft.engine.dependency.DependencyServiceTest;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
 import org.bonitasoft.engine.page.PageMappingServiceIT;
-import org.bonitasoft.engine.persistence.PersistenceTests;
+import org.bonitasoft.engine.persistence.PersistenceTest;
 import org.bonitasoft.engine.platform.TenantManagementTest;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
@@ -54,7 +54,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
         CacheServiceTest.class,
-        PersistenceTests.class,
+        PersistenceTest.class,
         ArchiveServiceTest.class,
         ClassLoaderServiceTest.class,
         ExpressionServiceTest.class,
