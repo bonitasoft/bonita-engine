@@ -38,6 +38,7 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
+import org.bonitasoft.engine.api.impl.transaction.platform.IsDefaultTenantCreated;
 import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -71,7 +72,6 @@ import org.bonitasoft.engine.platform.exception.STenantDeletionException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
@@ -125,18 +125,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
         try {
-            final SPlatform platform = constructPlatform(platformAccessor);
-            platformService.createTables();
-
             transactionService.begin();
             try {
-                platformService.initializePlatformStructure();
-            } finally {
-                transactionService.complete();
-            }
-            transactionService.begin();
-            try {
-                platformService.createPlatform(platform);
                 platformService.getPlatform();
             } finally {
                 transactionService.complete();
@@ -192,25 +182,11 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
-    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) {
-        final PlatformService platformService = platformAccessor.getPlatformService();
-
-        // FIXME construct platform object from a configuration file
-        final String version = platformService.getSPlatformProperties().getPlatformVersion();
-        final String previousVersion = "";
-        final String initialVersion = version;
-        // FIXME createdBy when PlatformSessionAccessor will exist
-        final String createdBy = "platformAdmin";
-        // FIXME do that in the builder
-        final long created = System.currentTimeMillis();
-        return BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
-    }
-
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
-        if(isNodeStarted){
+        if (isNodeStarted) {
             throw new StartNodeException("Node already started");
         }
         final PlatformServiceAccessor platformAccessor;
@@ -266,6 +242,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Registers missing default jobs (if any) for the provided tenants
+     * 
      * @param platformAccessor
      * @param sessionAccessor
      * @param tenants
@@ -277,10 +254,11 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @throws InvocationTargetException
      * @throws SBonitaException
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
-    protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
-            InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
+    protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
+            final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
+                    InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
         final TransactionService transactionService = platformAccessor.getTransactionService();
         for (final STenant tenant : tenants) {
             long platformSessionId = -1;
@@ -305,12 +283,10 @@ public class PlatformAPIImpl implements PlatformAPI {
                             registerJob(schedulerService, defaultJob);
                         }
                     }
-                }
-                finally {
+                } finally {
                     transactionService.complete();
                 }
-            }
-            finally {
+            } finally {
                 cleanSessionAccessor(sessionAccessor, platformSessionId);
             }
         }
@@ -546,7 +522,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
-        } catch (final SBonitaException | BonitaHomeNotSetException |InstantiationException | IllegalAccessException | ClassNotFoundException | IOException e) {
+        } catch (final SBonitaException | BonitaHomeNotSetException | InstantiationException | IllegalAccessException | ClassNotFoundException
+                | IOException e) {
             throw new StopNodeException(e);
         } catch (final BonitaHomeConfigurationException e) {
             throw new StopNodeException(e.getMessage());
@@ -838,7 +815,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final STenantActivationException stae) {
             log(platformAccessor, stae);
             throw stae;
-        }  catch (final Exception e) {
+        } catch (final Exception e) {
             log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
@@ -868,6 +845,25 @@ public class PlatformAPIImpl implements PlatformAPI {
         final long sessionId = createSession(tenantId, sessionService);
         sessionAccessor.setSessionInfo(sessionId, tenantId);
         return sessionId;
+    }
+
+    @Override
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public boolean isDefaultTenantCreated() throws PlatformNotFoundException {
+        PlatformServiceAccessor platformAccessor;
+        try {
+            platformAccessor = getPlatformAccessor();
+        } catch (final Exception e) {
+            throw new PlatformNotFoundException(e);
+        }
+        try {
+            final IsDefaultTenantCreated isDefaultTenantCreated = new IsDefaultTenantCreated(platformAccessor.getPlatformService());
+            platformAccessor.getTransactionExecutor().execute(isDefaultTenantCreated);
+            return isDefaultTenantCreated.getResult();
+        } catch (final SBonitaException e) {
+            throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
+        }
     }
 
     @Override

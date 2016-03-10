@@ -119,7 +119,6 @@
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <!-- read SQL files from within bonita-server.jar -->
         <constructor-arg name="sqlFolders" ref="sqlFolders" />
-        <constructor-arg name="statementDelimiter" value="${${db.vendor}.sql.delimiter}" />
     </bean>
 
     <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />

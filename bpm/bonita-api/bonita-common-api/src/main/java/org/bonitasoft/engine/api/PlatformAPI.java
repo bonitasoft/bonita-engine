@@ -60,9 +60,6 @@ public interface PlatformAPI {
      * <b>Initialize the platform.</b>
      * The running environment of Bonita Engine is initialized and marked as activated.<br>
      * Business elements linked to the execution are initialized, after this step the technical user will be able to connect to the engine and to import the
-     * organization. No user are created by default and the default username/password to connect to the Bonita Engine are stored in the file bonita-platform.properties
-     * that is in the Bonita home.
-     *
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
@@ -71,7 +68,7 @@ public interface PlatformAPI {
     void initializePlatform() throws CreationException;
 
     /**
-     * Utilitary method that call {@link #createPlatform()} and {@link #initializePlatform()}
+     * Utility method that call {@link #createPlatform()} and {@link #initializePlatform()}
      *
      * @see #createPlatform()
      * @see #initializePlatform()
@@ -178,9 +175,18 @@ public interface PlatformAPI {
     Platform getPlatform() throws PlatformNotFoundException;
 
     /**
+     * Check if the default tenant is created or not.
+     *
+     * @return true if the default tenant exists
+     * @throws PlatformNotFoundException when the default tenant existence cannot be determined
+     * @since 7.3
+     */
+    boolean isDefaultTenantCreated() throws PlatformNotFoundException;
+
+    /**
      * Check if the platform created or not.
      *
-     * @return true if the platform existed
+     * @return true if the platform exists
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException

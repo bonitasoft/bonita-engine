@@ -19,6 +19,11 @@
             <artifactId>bonita-client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.platform</groupId>
+            <artifactId>platform-setup</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Add common for IDE shade issue, remove that if the shade of common is fixed -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -31,7 +36,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -57,7 +61,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-
 
         <!-- jdbc connectors -->
         <dependency>
