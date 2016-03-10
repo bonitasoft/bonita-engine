@@ -23,7 +23,6 @@ public class BonitaEngineRule implements MethodRule {
 
     private TestEngine testEngine;
     private boolean cleanAfterTest;
-    private boolean reuseExistingPlatform;
 
     protected BonitaEngineRule(TestEngine testEngine) {
         this.testEngine = testEngine;
@@ -37,16 +36,17 @@ public class BonitaEngineRule implements MethodRule {
         return new BonitaEngineRule(testEngine);
     }
 
-
     public BonitaEngineRule withCleanAfterTest() {
         cleanAfterTest = true;
         return this;
     }
-    public BonitaEngineRule reuseExistingPlatform(){
+
+    public BonitaEngineRule reuseExistingPlatform() {
         testEngine.setDropOnStart(false);
         return this;
     }
-    public BonitaEngineRule keepPlatformOnShutdown(){
+
+    public BonitaEngineRule keepPlatformOnShutdown() {
         testEngine.setDropOnStop(false);
         return this;
     }
@@ -54,13 +54,12 @@ public class BonitaEngineRule implements MethodRule {
     public BonitaEngineRule addCustomConfig(String path, String file) {
         try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file)) {
             final byte[] bytes = IOUtils.toByteArray(resourceAsStream);
-            testEngine.overrideConfiguration(path,bytes);
+            testEngine.overrideConfiguration(path, bytes);
         } catch (IOException e) {
             throw new IllegalStateException("error while fetching the custom configuration", e);
         }
         return this;
     }
-
 
     @Override
     public Statement apply(Statement statement, FrameworkMethod method, Object target) {
@@ -88,8 +87,8 @@ public class BonitaEngineRule implements MethodRule {
         }
     }
 
-
     private static class WithTestEngine extends Statement {
+
         private Statement statement;
         private TestEngine testEngine;
 
@@ -108,6 +107,7 @@ public class BonitaEngineRule implements MethodRule {
             final boolean start = testEngine.start();
             if (start) {
                 Runtime.getRuntime().addShutdownHook(new Thread() {
+
                     public void run() {
                         try {
                             testEngine.stop();
@@ -125,6 +125,7 @@ public class BonitaEngineRule implements MethodRule {
     }
 
     private class WithCleanAfterTest extends Statement {
+
         private Statement statement;
         private TestEngine testEngine;
 

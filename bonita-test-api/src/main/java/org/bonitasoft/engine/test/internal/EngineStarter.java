@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.naming.Context;
+import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -28,15 +27,16 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
-import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
-import org.bonitasoft.engine.util.APITypeManager;
+import org.bonitasoft.platform.setup.PlatformSetupException;
+import org.bonitasoft.platform.setup.ScriptExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Baptiste Mesta
@@ -50,9 +50,10 @@ public class EngineStarter {
     private Object h2Server;
     private static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
-    private Map<String, byte[]> overridenConfiguration = new HashMap<>();
+    private Map<String, byte[]> overrideConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
     private boolean dropOnStop = true;
+    private String dbVendor;
 
     public void start() throws Exception {
         LOGGER.info("=====================================================");
@@ -60,8 +61,17 @@ public class EngineStarter {
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
         prepareEnvironment();
+        setupPlatform();
         initPlatformAndTenant();
         LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+    }
+
+    private void setupPlatform() throws NamingException, PlatformSetupException {
+        ScriptExecutor scriptExecutor = new ScriptExecutor(dbVendor);
+        if (isDropOnStart() && scriptExecutor.isPlatformAlreadyCreated()) {
+            scriptExecutor.deleteTables();
+        }
+        scriptExecutor.createAndInitializePlatformIfNecessary();
     }
 
     //--------------  engine life cycle methods
@@ -78,10 +88,10 @@ public class EngineStarter {
             if (outputFolder.exists()) {
                 FileUtils.deleteDirectory(outputFolder);
             }
-            outputFolder.mkdir();
+            assert outputFolder.mkdir();
             IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
             bonitaHomePath = outputFolder.getAbsolutePath() + "/bonita-home";
-            for (Map.Entry<String, byte[]> customConfig : overridenConfiguration.entrySet()) {
+            for (Map.Entry<String, byte[]> customConfig : overrideConfiguration.entrySet()) {
                 IOUtil.write(new File(bonitaHomePath, customConfig.getKey()), customConfig.getValue());
             }
             System.setProperty(BONITA_HOME_PROPERTY, bonitaHomePath);
@@ -94,24 +104,16 @@ public class EngineStarter {
         return this.getClass().getResourceAsStream("/bonita-home.zip");
     }
 
-    protected void prepareEnvironment()
-            throws Exception {
-
+    protected void prepareEnvironment() throws Exception {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        String bonitaHome = prepareBonitaHome();
-        final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
-        if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
-            // configure data sources only if we are using a local bonita engine, can do better?
-            File platformInit = new File(bonitaHome, "engine-server/conf/platform-init");
-            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"), new File(platformInit, "local-server.xml"));
-            FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
-            setSystemPropertyIfNotSet(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.test.local.SimpleMemoryContextFactory");
-            setSystemPropertyIfNotSet(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.test.local");
-        }
+        prepareBonitaHome();
+        dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
         if ("h2".equals(dbVendor)) {
             LOGGER.info("Using h2, starting H2 server: ");
             this.h2Server = startH2Server();
         }
+        //init jndi
+        new ClassPathXmlApplicationContext("classpath:local-server.xml").refresh();
     }
 
     private Object startH2Server()
@@ -287,11 +289,11 @@ public class EngineStarter {
     }
 
     protected void initPlatformAndTenant() throws Exception {
-
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        if (!platformAPI.isPlatformCreated() || dropOnStart) {
+
+        if (!platformAPI.isDefaultTenantCreated()) {
             LOGGER.info("=========  INIT PLATFORM =======");
             createPlatformAndTenant(platformAPI);
         } else {
@@ -299,11 +301,9 @@ public class EngineStarter {
             platformAPI.startNode();
         }
         platformLoginAPI.logout(session);
-
     }
 
     protected void createPlatformAndTenant(PlatformAPI platformAPI) throws BonitaException {
-        createPlatformStructure(platformAPI, false);
         initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
     }
 
@@ -354,17 +354,6 @@ public class EngineStarter {
         return finalValue;
     }
 
-    protected void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
-        if (platformAPI.isPlatformCreated()) {
-            if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
-                stopPlatformAndTenant(platformAPI, deployCommands);
-            }
-            platformAPI.cleanPlatform();
-            platformAPI.deletePlatform();
-        }
-        platformAPI.createPlatform();
-    }
-
     protected void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (undeployCommands) {
             undeployCommands();
@@ -390,7 +379,7 @@ public class EngineStarter {
     }
 
     public void overrideConfiguration(String path, byte[] file) {
-        overridenConfiguration.put(path, file);
+        overrideConfiguration.put(path, file);
     }
 
     public void setDropOnStart(boolean dropOnStart) {
