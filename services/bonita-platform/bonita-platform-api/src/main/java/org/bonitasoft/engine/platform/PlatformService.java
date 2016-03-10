@@ -60,7 +60,7 @@ public interface PlatformService {
      *
      * @return sPlatform
      * @throws SPlatformNotFoundException
-     *             occurs when the identifier does not refer to an existing sPlatform
+     *         occurs when the identifier does not refer to an existing sPlatform
      * @since 6.0
      */
     SPlatform getPlatform() throws SPlatformNotFoundException;
@@ -73,9 +73,9 @@ public interface PlatformService {
      * Create a sPlatform
      *
      * @param platform
-     *            sPlatform
+     *        sPlatform
      * @throws SPlatformCreationException
-     *             occurs when an exception is thrown during sPlatform creation
+     *         occurs when an exception is thrown during sPlatform creation
      * @since 6.0
      */
     void createPlatform(SPlatform platform) throws SPlatformCreationException;
@@ -84,9 +84,9 @@ public interface PlatformService {
      * Delete the current sPlatform
      *
      * @throws SPlatformDeletionException
-     *             occurs when an exception is thrown during sPlatform deletion
+     *         occurs when an exception is thrown during sPlatform deletion
      * @throws SPlatformNotFoundException
-     *             occurs when the identifier does not refer to an existing sPlatform
+     *         occurs when the identifier does not refer to an existing sPlatform
      * @since 6.0
      */
     void deletePlatform() throws SPlatformDeletionException, SPlatformNotFoundException;
@@ -97,11 +97,11 @@ public interface PlatformService {
      * Update a sPlatform from given sPlatform and new content.
      *
      * @param platform
-     *            sPlatform
+     *        sPlatform
      * @param descriptor
-     *            the update descriptor
+     *        the update descriptor
      * @throws SPlatformUpdateException
-     *             occurs when an exception is thrown during sPlatform update
+     *         occurs when an exception is thrown during sPlatform update
      * @since 6.0
      */
     void updatePlatform(SPlatform platform, EntityUpdateDescriptor descriptor) throws SPlatformUpdateException;
@@ -113,12 +113,12 @@ public interface PlatformService {
      * case 2 - create tenants tables + insert rows where necessary (sequences for example) + insert default users (defined in configuration)
      *
      * @param tenant
-     *            sTenant
+     *        sTenant
      * @return id of new created tenant
      * @throws STenantCreationException
-     *             occurs when an exception is thrown during sTenant creation
+     *         occurs when an exception is thrown during sTenant creation
      * @throws STenantAlreadyExistException
-     *             occurs when the sTenant has already been taken
+     *         occurs when the sTenant has already been taken
      * @since 6.0
      */
     long createTenant(STenant tenant) throws STenantCreationException, STenantAlreadyExistException;
@@ -129,11 +129,11 @@ public interface PlatformService {
      *
      * @param tenantId
      * @throws STenantDeletionException
-     *             occurs when an exception is thrown during sTenant deletion
+     *         occurs when an exception is thrown during sTenant deletion
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @throws SDeletingActivatedTenantException
-     *             occurs when an exception is thrown during deleting an activated sTenant
+     *         occurs when an exception is thrown during deleting an activated sTenant
      * @since 6.0
      */
     void deleteTenant(long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException;
@@ -152,11 +152,11 @@ public interface PlatformService {
      * Update a sTenant from given sTenant and new content.
      *
      * @param tenant
-     *            sTenant
+     *        sTenant
      * @param descriptor
-     *            new content
+     *        new content
      * @throws STenantUpdateException
-     *             occurs when an exception is thrown during sTenant update
+     *         occurs when an exception is thrown during sTenant update
      * @since 6.0
      */
     void updateTenant(STenant tenant, EntityUpdateDescriptor descriptor) throws STenantUpdateException;
@@ -165,10 +165,10 @@ public interface PlatformService {
      * Get tenant by its id
      *
      * @param id
-     *            tenant id
+     *        tenant id
      * @return sTenant
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @since 6.0
      */
     STenant getTenant(long id) throws STenantNotFoundException;
@@ -177,10 +177,10 @@ public interface PlatformService {
      * Get tenant by its name
      *
      * @param name
-     *            tenant's name
+     *        tenant's name
      * @return sTenant
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @since 6.0
      */
     STenant getTenantByName(String name) throws STenantNotFoundException;
@@ -190,21 +190,30 @@ public interface PlatformService {
      *
      * @return sTenant
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @since 6.0
      */
     STenant getDefaultTenant() throws STenantNotFoundException;
 
     /**
+     * Is the default tenant already created?
+     *
+     * @return true if the default tenant exists, false otherwise.
+     * @throws SBonitaReadException when we cannot determine if default tenant is created
+     * @since 7.3
+     */
+    boolean isDefaultTenantCreated() throws SBonitaReadException;
+
+    /**
      * Get tenants which ids belong to given collection
      *
      * @param ids
-     *            a collection of ids
+     *        a collection of ids
      * @param queryOptions
-     *            The criterion used to search tenants
+     *        The criterion used to search tenants
      * @return a list of sTenant
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @throws STenantException
      * @since 6.0
      */
@@ -216,9 +225,9 @@ public interface PlatformService {
      * @param tenantId
      * @return TODO
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @throws STenantActivationException
-     *             occurs when an exception is thrown during activating sTenant
+     *         occurs when an exception is thrown during activating sTenant
      * @since 6.0
      */
     boolean activateTenant(long tenantId) throws STenantNotFoundException, STenantActivationException;
@@ -228,9 +237,9 @@ public interface PlatformService {
      *
      * @param tenantId
      * @throws STenantNotFoundException
-     *             occurs when the identifier does not refer to an existing sTenant
+     *         occurs when the identifier does not refer to an existing sTenant
      * @throws STenantDeactivationException
-     *             occurs when an exception is thrown during deactivating sTenant
+     *         occurs when an exception is thrown during deactivating sTenant
      * @since 6.0
      */
     void deactiveTenant(long tenantId) throws STenantNotFoundException, STenantDeactivationException;
@@ -265,7 +274,7 @@ public interface PlatformService {
      * Get all tenants
      *
      * @param queryOptions
-     *            The criterion used to search tenants
+     *        The criterion used to search tenants
      * @return a list of sTenant
      * @throws STenantException
      * @since 6.0

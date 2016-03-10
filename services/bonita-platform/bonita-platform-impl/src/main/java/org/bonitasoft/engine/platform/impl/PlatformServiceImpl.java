@@ -132,15 +132,13 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final DataSource datasource;
 
-    private final String statementDelimiter;
-
     private final PlatformRetriever platformRetriever;
 
     private final List<String> sqlFolders;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever, final Recorder recorder,
             final TechnicalLoggerService logger, final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties,
-            final DataSource datasource, final List<String> sqlFolders, final String statementDelimiter) {
+            final DataSource datasource, final List<String> sqlFolders) {
         this.platformPersistenceService = platformPersistenceService;
         this.logger = logger;
         this.platformCacheService = platformCacheService;
@@ -148,7 +146,6 @@ public class PlatformServiceImpl implements PlatformService {
         this.recorder = recorder;
         this.datasource = datasource;
         this.sqlFolders = sqlFolders;
-        this.statementDelimiter = statementDelimiter;
         this.platformRetriever = platformRetriever;
 
         isTraced = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
@@ -222,13 +219,15 @@ public class PlatformServiceImpl implements PlatformService {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                     logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Processing SQL resource : " + path);
                 }
-                final String regex = statementDelimiter.concat("\r?\n");
-                final List<String> commands = new ArrayList<>(asList(fileContent.split(regex)));
+                final List<String> commands = new ArrayList<>(asList(fileContent.split("(;|GO)\r?\n"))); // to be compatible with SQL Server and other RDBMS
                 final int lastIndex = commands.size() - 1;
 
-                // TODO : Review the algo and see if we can avoid the array.
+                // TODO : Review the algorithm and see if we can avoid the array.
                 String lastCommand = commands.get(lastIndex);
-                final int index = lastCommand.lastIndexOf(statementDelimiter);
+                int index = lastCommand.indexOf(";");
+                if (index == -1) {
+                    index = lastCommand.indexOf("GO");
+                }
                 if (index > 0) {
                     lastCommand = lastCommand.substring(0, index);
                     commands.remove(lastIndex);
@@ -581,6 +580,11 @@ public class PlatformServiceImpl implements PlatformService {
         } catch (final SBonitaReadException e) {
             throw new STenantNotFoundException("Unable to check if a default tenant already exists: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public boolean isDefaultTenantCreated() throws SBonitaReadException {
+        return platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>(QUERY_GET_DEFAULT_TENANT, null, STenant.class)) != null;
     }
 
     @Override

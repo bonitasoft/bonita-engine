@@ -11,22 +11,32 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test.local;
+package org.bonitasoft.engine.api.impl.transaction.platform;
 
-import javax.naming.CompositeName;
-import javax.naming.Name;
-import javax.naming.NameParser;
-import javax.naming.NamingException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.platform.PlatformService;
 
-public class SimpleNameParser implements NameParser {
+/**
+ * @author Emmanuel Duchastenier
+ */
+public class IsDefaultTenantCreated implements TransactionContentWithResult<Boolean> {
 
-    public SimpleNameParser(final String name) {
-        // TODO Auto-generated constructor stub
+    private final PlatformService platformService;
+    private boolean created;
+
+    public IsDefaultTenantCreated(final PlatformService platformService) {
+        this.platformService = platformService;
     }
 
     @Override
-    public Name parse(final String name) throws NamingException {
-        return new CompositeName(name);
+    public void execute() throws SBonitaException {
+        created = platformService.isDefaultTenantCreated();
+    }
+
+    @Override
+    public Boolean getResult() {
+        return created;
     }
 
 }

@@ -47,7 +47,7 @@ public class PlatformTenantManagerTest {
     public void testCreatePlatform() throws Exception {
         when(platformAPI.isPlatformCreated()).thenReturn(false);
         platformTenantManager.createPlatform(platformAPI);
-        verify(platformAPI, times(1)).createAndInitializePlatform();
+        verify(platformAPI, times(1)).initializePlatform();
     }
 
     @Test
