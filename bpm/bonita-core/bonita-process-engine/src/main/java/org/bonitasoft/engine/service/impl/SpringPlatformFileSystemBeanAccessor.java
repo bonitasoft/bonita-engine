@@ -18,9 +18,10 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,18 +31,71 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
 
 
-    public SpringPlatformFileSystemBeanAccessor(SpringFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
-        super(parent);
+    private final SpringPlatformInitFileSystemBeanAccessor parent;
+    private AbsoluteFileSystemXmlApplicationContext context;
+
+    public SpringPlatformFileSystemBeanAccessor(SpringPlatformInitFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
+        this.parent = parent;
     }
 
-    @Override
     protected Properties getProperties() throws BonitaHomeNotSetException, IOException {
         return BonitaHomeServer.getInstance().getPlatformProperties();
     }
 
-    @Override
     protected String[] getResources() throws BonitaHomeNotSetException, IOException {
         return BonitaHomeServer.getInstance().getPlatformConfigurationFiles();
     }
 
+    public <T> T getService(final Class<T> serviceClass) {
+        return getContext().getBean(serviceClass);
+    }
+
+    protected <T> T getService(final String name, final Class<T> serviceClass) {
+        return getContext().getBean(name, serviceClass);
+    }
+
+    protected <T> T getService(final String name) {
+        return (T) getContext().getBean(name);
+    }
+
+    public void destroy() {
+        if (context != null) {
+            context.close();
+            context = null;
+        }
+    }
+
+    public ApplicationContext getContext() {
+        if (context == null) {
+            try {
+                ApplicationContext parentContext = null;
+                if (parent != null) {
+                    parentContext = parent.getContext();
+                }
+                context = new AbsoluteFileSystemXmlApplicationContext(getResources(), parentContext);
+                final Properties properties = getProperties();
+                context.addClassPathResource("bonita-platform-community.xml");
+                context.addClassPathResource("bonita-platform-sp.xml");
+                if (Boolean.valueOf(properties.getProperty("bonita.cluster", "false"))) {
+                    context.addClassPathResource("bonita-platform-sp-cluster.xml");
+                }
+
+                final PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
+                configurer.setProperties(properties);
+                context.addBeanFactoryPostProcessor(configurer);
+                final String[] activeProfiles = getActiveProfiles();
+                context.getEnvironment().setActiveProfiles(activeProfiles);
+                context.refresh();
+            } catch (IOException | BonitaHomeNotSetException e) {
+                throw new BonitaRuntimeException(e);
+            }
+        }
+        return context;
+    }
+
+    private String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
+        final Properties properties = BonitaHomeServer.getInstance().getPrePlatformInitProperties();
+        final String activeProfiles = (String) properties.get("activeProfiles");
+        return activeProfiles.split(",");
+    }
 }

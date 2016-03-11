@@ -13,79 +13,11 @@
      **/
     package org.bonitasoft.engine.service.impl;
 
-    import java.io.IOException;
-    import java.util.Properties;
-
-    import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-    import org.bonitasoft.engine.exception.BonitaRuntimeException;
-    import org.bonitasoft.engine.home.BonitaHomeServer;
-    import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-    import org.springframework.context.ApplicationContext;
-
     /**
      * @author Charles Souillard
      */
     public abstract class SpringFileSystemBeanAccessor {
 
-        private AbsoluteFileSystemXmlApplicationContext context;
-
-        private final SpringFileSystemBeanAccessor parent;
-
-        public SpringFileSystemBeanAccessor(final SpringFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
-            this.parent = parent;
-        }
-
-        public <T> T getService(final Class<T> serviceClass) {
-            return getContext().getBean(serviceClass);
-        }
 
 
-        protected <T> T getService(final String name, final Class<T> serviceClass) {
-            return getContext().getBean(name, serviceClass);
-        }
-
-        protected <T> T getService(final String name) {
-            return (T) getContext().getBean(name);
-        }
-
-
-        public void destroy() {
-            if (context != null) {
-                context.close();
-                context = null;
-            }
-        }
-
-        protected abstract Properties getProperties() throws BonitaHomeNotSetException, IOException;
-
-        protected abstract String[] getResources() throws BonitaHomeNotSetException, IOException;
-
-        public ApplicationContext getContext() {
-            if (context == null) {
-                try {
-                    ApplicationContext parentContext = null;
-                    if (parent != null) {
-                        parentContext = parent.getContext();
-                    }
-                    context = new AbsoluteFileSystemXmlApplicationContext(getResources(), parentContext);
-
-                    final PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-                    final Properties properties = getProperties();
-                    configurer.setProperties(properties);
-                    context.addBeanFactoryPostProcessor(configurer);
-                    final String[] activeProfiles = getActiveProfiles();
-                    context.getEnvironment().setActiveProfiles(activeProfiles);
-                    context.refresh();
-                } catch (IOException | BonitaHomeNotSetException e) {
-                    throw new BonitaRuntimeException(e);
-                }
-            }
-            return context;
-        }
-
-        private String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
-            final Properties properties = BonitaHomeServer.getInstance().getPrePlatformInitProperties();
-            final String activeProfiles = (String) properties.get("activeProfiles");
-            return activeProfiles.split(",");
-        }
     }
