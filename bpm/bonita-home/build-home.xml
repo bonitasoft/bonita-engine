@@ -29,7 +29,6 @@
         <!-- ENGINE SERVER - WORK -->
         <copy todir="${bh.dir}/engine-server/work/platform-init">
             <fileset dir="${resources.dir}">
-                <include name="bonita-platform-init-community.xml" />
                 <include name="bonita-platform-init-community.properties" />
             </fileset>
         </copy>
@@ -38,7 +37,6 @@
             <fileset dir="${resources.dir}">
                 <include name="bonita-platform-community.properties" />
                 <include name="bonita-platform-private-community.properties" />
-                <include name="bonita-platform-community.xml" />
             </fileset>
         </copy>
 
@@ -58,7 +56,6 @@
             <fileset dir="${resources.dir}">
                 <include name="bonita-tenant-community.properties" />
                 <include name="bonita-tenant-private-community.properties" />
-                <include name="bonita-tenant-community.xml" />
             </fileset>
         </copy>
 

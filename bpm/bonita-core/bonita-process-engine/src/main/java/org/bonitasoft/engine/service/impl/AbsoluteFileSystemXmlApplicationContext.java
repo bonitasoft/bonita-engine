@@ -13,9 +13,15 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -24,17 +30,16 @@ import org.springframework.core.io.Resource;
  */
 public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplicationContext {
 
+    private List<Resource> classpathResources = new ArrayList<>();
+
     /**
      * Create a new FileSystemXmlApplicationContext with the given parent,
      * loading the definitions from the given XML files and automatically
      * refreshing the context.
-     * 
-     * @param configLocations
-     *            array of file paths
-     * @param parent
-     *            the parent context
-     * @throws BeansException
-     *             if context creation failed
+     *
+     * @param configLocations array of file paths
+     * @param parent          the parent context
+     * @throws BeansException if context creation failed
      */
     public AbsoluteFileSystemXmlApplicationContext(final String[] configLocations, final ApplicationContext parent)
             throws BeansException {
@@ -47,4 +52,27 @@ public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplic
         return new FileSystemResource(path);
     }
 
+
+    public void addClassPathResource(String location) {
+        ClassPathResource classPathResource = new ClassPathResource(location);
+        if (classPathResource.exists()) {
+            classpathResources.add(classPathResource);
+        }
+    }
+
+
+    @Override
+    protected Resource[] getConfigResources() {
+        String[] configLocations = getConfigLocations();
+        ArrayList<Resource> resourcesList = new ArrayList<>();
+        for (String configLocation : configLocations) {
+            try {
+                resourcesList.addAll(Arrays.asList(getResources(configLocation)));
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        resourcesList.addAll(classpathResources);
+        return resourcesList.toArray(new Resource[resourcesList.size()]);
+    }
 }

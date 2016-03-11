@@ -31,7 +31,7 @@
         public static SpringPlatformInitFileSystemBeanAccessor getPlatformInitAccessor() {
             if (platformInit == null) {
                 try {
-                    platformInit = new SpringPlatformInitFileSystemBeanAccessor(null);
+                    platformInit = new SpringPlatformInitFileSystemBeanAccessor();
                 } catch (IOException | BonitaHomeNotSetException e) {
                     throw new RuntimeException(e);
                 }
