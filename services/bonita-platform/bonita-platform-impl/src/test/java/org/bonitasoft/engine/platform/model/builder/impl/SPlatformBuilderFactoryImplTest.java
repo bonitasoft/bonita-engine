@@ -15,7 +15,10 @@
 package org.bonitasoft.engine.platform.model.builder.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
+import org.bonitasoft.engine.platform.model.SPlatform;
+import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.junit.Test;
 
 public class SPlatformBuilderFactoryImplTest {
@@ -27,6 +30,27 @@ public class SPlatformBuilderFactoryImplTest {
 
         //then
         assertThat(builderFactory.getInformationKey()).isEqualTo("information");
+    }
+
+
+    @Test
+    public void testPlatformBuilder() {
+        final String version = "myVersion";
+        final String createdBy = "mycreatedBy";
+        final long created = System.currentTimeMillis();
+        final String initialVersion = "initialVersion";
+        final String previousVersion = "previousVersion";
+
+        final SPlatformBuilder sPlatformBuilder = new SPlatformBuilderFactoryImpl().createNewInstance(version, previousVersion, initialVersion,
+                createdBy, created);
+
+        final SPlatform platform = sPlatformBuilder.done();
+
+        assertEquals(version, platform.getVersion());
+        assertEquals(createdBy, platform.getCreatedBy());
+        assertEquals(created, platform.getCreated());
+        assertEquals(initialVersion, platform.getInitialVersion());
+        assertEquals(previousVersion, platform.getPreviousVersion());
     }
 
 }
