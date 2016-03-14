@@ -28,22 +28,18 @@ import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.PlatformTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,23 +53,30 @@ public class PlatformIT extends CommonAPIIT {
 
     private static PlatformTestUtil platformTestUtil = new PlatformTestUtil();
 
-    @BeforeClass
-    public static void beforeClass() throws BonitaException {
-        session = platformTestUtil.loginOnPlatform();
-        platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BonitaException {
+    @After
+    public void after() throws BonitaException {
+        if(!platformAPI.isPlatformInitialized()){
+            platformAPI.initializePlatform();
+        }
+        if (!platformAPI.isNodeStarted()) {
+            platformAPI.startNode();
+        }
         platformTestUtil.logoutOnPlatform(session);
-        // Restore initial state:
-        platformTestUtil.deployCommandsOnDefaultTenant();
+        try {
+            platformTestUtil.deployCommandsOnDefaultTenant();
+        } catch (AlreadyExistsException ignored) {
+
+        }
     }
 
     @Before
     public void before() throws BonitaException {
+        session = platformTestUtil.loginOnPlatform();
+        platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         if (!platformAPI.isPlatformCreated()) {
             platformAPI.createAndInitializePlatform();
+        }
+        if(!platformAPI.isNodeStarted()){
             platformAPI.startNode();
         }
     }
@@ -86,28 +89,26 @@ public class PlatformIT extends CommonAPIIT {
         }
     };
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Test if platform is created.", jira = "")
     @Test
     public void isPlatformCreated() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
     }
+    @Test
+    public void isPlatformInitialized() throws BonitaException {
+        assertTrue(platformAPI.isPlatformInitialized());
+    }
+    @Test
+    public void should_cleanPlatform_remove_tenant() throws BonitaException {
+        platformAPI.cleanPlatform();
+        assertFalse(platformAPI.isPlatformInitialized());
+    }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Get exception when creating platform.", jira = "")
     @Test(expected = CreationException.class)
     public void createPlatformException() throws BonitaException {
-        assertTrue(platformAPI.isPlatformCreated());
-        platformAPI.createAndInitializePlatform();
+        assertTrue(platformAPI.isPlatformInitialized());
+        platformAPI.initializePlatform();
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.", jira = "")
-    @Test
-    public void deletePlatform() throws BonitaException {
-        platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlatform();
-        assertFalse(platformAPI.isPlatformCreated());
-    }
-
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "State" }, story = "Try to get platform state.", jira = "")
     @Test
     public void getPlatformState() throws Exception {
         // test started state
@@ -118,29 +119,17 @@ public class PlatformIT extends CommonAPIIT {
         state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STOPPED, state);
         // test exception:PlatformNotFoundException
-        platformAPI.cleanAndDeletePlatform();
+        platformAPI.cleanPlatform();
         // when platform does not exists it return STOPPED now
         assertEquals(PlatformState.STOPPED, platformAPI.getPlatformState());
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "Get exception when starting node.", jira = "ENGINE-621")
-    @Test(expected = StartNodeException.class)
-    public void unableToStartANodeIfTheNodeIsNotCreated() throws Exception {
-        platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlatform();
-        assertFalse(platformAPI.isPlatformCreated());
-        platformAPI.startNode();
-    }
-
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "Get exception when stopping node.", jira = "ENGINE-621")
     @Test
     public void callStopNodeTwice() throws Exception {
         platformAPI.stopNode();
         platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlatform();
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "stop node then start it with same session.", jira = "")
     @Test
     public void stopNodeAndStartNode() throws Exception {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();

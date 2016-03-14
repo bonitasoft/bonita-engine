@@ -53,7 +53,9 @@ public interface PlatformAPI {
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *         occurs when an exception is thrown during platform creation
+     * @deprecated since 7.3.0. Use {@link #initializePlatform()} instead.
      */
+    @Deprecated
     void createPlatform() throws CreationException;
 
     /**
@@ -76,7 +78,9 @@ public interface PlatformAPI {
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *         occurs when an exception is thrown during platform creation
+     * @deprecated since 7.3.0. Use {@link #initializePlatform()} instead.
      */
+    @Deprecated
     void createAndInitializePlatform() throws CreationException;
 
     /**
@@ -134,7 +138,9 @@ public interface PlatformAPI {
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *         occurs when an exception is thrown during platform deletion
+     * @deprecated since 7.3.0. Use {@link #cleanPlatform()} instead.
      */
+    @Deprecated
     void deletePlatform() throws DeletionException;
 
     /**
@@ -146,7 +152,7 @@ public interface PlatformAPI {
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *         occurs when an exception is thrown during platform deletion
-     * @deprecated since 6.5.0 (typo in method name). Use {@link #cleanAndDeletePlatform()} instead.
+     * @deprecated since 6.5.0 (typo in method name). Use {@link #cleanPlatform()} instead.
      */
     @Deprecated
     void cleanAndDeletePlaftorm() throws DeletionException;
@@ -160,7 +166,9 @@ public interface PlatformAPI {
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *         occurs when an exception is thrown during platform deletion
+     * @deprecated since 7.3.0. Use {@link #cleanPlatform()} instead.
      */
+    @Deprecated
     void cleanAndDeletePlatform() throws DeletionException;
 
     /**
@@ -181,7 +189,7 @@ public interface PlatformAPI {
      * @throws PlatformNotFoundException when the default tenant existence cannot be determined
      * @since 7.3
      */
-    boolean isDefaultTenantCreated() throws PlatformNotFoundException;
+    boolean isPlatformInitialized() throws PlatformNotFoundException;
 
     /**
      * Check if the platform created or not.

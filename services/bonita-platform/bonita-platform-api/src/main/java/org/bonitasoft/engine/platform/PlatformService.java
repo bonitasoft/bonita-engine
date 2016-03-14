@@ -19,11 +19,7 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.exception.SPlatformAlreadyExistException;
-import org.bonitasoft.engine.platform.exception.SPlatformCreationException;
-import org.bonitasoft.engine.platform.exception.SPlatformDeletionException;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
-import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
 import org.bonitasoft.engine.platform.exception.STenantCreationException;
@@ -44,14 +40,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface PlatformService {
 
-    // IMPORTANT: database platform (not tables) MUST BE CREATED before using this service
-
-    // IMPORTANT: any access to this service MAY BE PROTECTED by a platform login (it is in the default implementation)
-
-    // This service MUST BE re implemented in case multi tenancy is managed in a different way. To illustrate this, let's take 2 examples:
-    // 1 - multi tenancy based on a discriminator column (same DB, same schema, same tables)
-    // 2 - multi tenancy done using different schemas
-
     String TENANT = "TENANT";
 
     /**
@@ -65,46 +53,6 @@ public interface PlatformService {
      */
     SPlatform getPlatform() throws SPlatformNotFoundException;
 
-    // create platform tables (platform only, not tenant related tables)
-    // insert the SPlatform row
-    void createTables() throws SPlatformCreationException, SPlatformAlreadyExistException;
-
-    /**
-     * Create a sPlatform
-     *
-     * @param platform
-     *        sPlatform
-     * @throws SPlatformCreationException
-     *         occurs when an exception is thrown during sPlatform creation
-     * @since 6.0
-     */
-    void createPlatform(SPlatform platform) throws SPlatformCreationException;
-
-    /**
-     * Delete the current sPlatform
-     *
-     * @throws SPlatformDeletionException
-     *         occurs when an exception is thrown during sPlatform deletion
-     * @throws SPlatformNotFoundException
-     *         occurs when the identifier does not refer to an existing sPlatform
-     * @since 6.0
-     */
-    void deletePlatform() throws SPlatformDeletionException, SPlatformNotFoundException;
-
-    void deleteTables() throws SPlatformDeletionException;
-
-    /**
-     * Update a sPlatform from given sPlatform and new content.
-     *
-     * @param platform
-     *        sPlatform
-     * @param descriptor
-     *        the update descriptor
-     * @throws SPlatformUpdateException
-     *         occurs when an exception is thrown during sPlatform update
-     * @since 6.0
-     */
-    void updatePlatform(SPlatform platform, EntityUpdateDescriptor descriptor) throws SPlatformUpdateException;
 
     /**
      * insert a new row in the Tenant table
@@ -223,7 +171,6 @@ public interface PlatformService {
      * Set status of the tenant into activated
      *
      * @param tenantId
-     * @return TODO
      * @throws STenantNotFoundException
      *         occurs when the identifier does not refer to an existing sTenant
      * @throws STenantActivationException
@@ -289,13 +236,6 @@ public interface PlatformService {
      * @throws SBonitaReadException
      */
     long getNumberOfTenants(QueryOptions options) throws SBonitaReadException;
-
-    void cleanTenantTables() throws STenantUpdateException;
-
-    /**
-     * @throws SPlatformCreationException
-     */
-    void initializePlatformStructure() throws SPlatformCreationException;
 
     /**
      * Return the platform properties
