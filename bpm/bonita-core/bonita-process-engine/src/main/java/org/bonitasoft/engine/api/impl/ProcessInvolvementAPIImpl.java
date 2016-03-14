@@ -90,36 +90,39 @@ public class ProcessInvolvementAPIImpl {
     }
 
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = processAPI.getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-
-        try {
-            // Part specific to active process instances:
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            if (userId == processInstance.getStartedBy()) {
-                return true;
-            }
-            // is user assigned or has pending tasks on this process instance:
-            final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.<OrderByOption>emptyList(), Collections.singletonList(new FilterOption(SHumanTaskInstance.class,
-                    "logicalGroup2", processInstanceId)), null);
-            if (activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0) {
-                return true;
-            }
-        } catch (SProcessInstanceReadException | SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (SProcessInstanceNotFoundException e) {
-            // process instance may be completed already:
-            if (isInvolvedInArchivedProcessInstance(userId, processInstanceId, processInstanceService)) return true;
-        }
-
-        // Part common to active and archived process instances:
-        try {
-            return isAssignedToArchivedTaskOfProcess(userId, processInstanceId, activityInstanceService);
-        } catch (final SBonitaException e) {
-            // no rollback, read only method
-            throw new RetrieveException(e);
-        }
+    	//FIXME fix this method implementation for 7.3.0 and make it configurable (see BS-14958, BS-14959, BS-14960, BS-14976)
+    	//meanwhile return true to make the overview form accessible to anyone
+    	return true;
+//        final TenantServiceAccessor tenantAccessor = processAPI.getTenantAccessor();
+//        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+//        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+//
+//        try {
+//            // Part specific to active process instances:
+//            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+//            if (userId == processInstance.getStartedBy()) {
+//                return true;
+//            }
+//            // is user assigned or has pending tasks on this process instance:
+//            final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.<OrderByOption>emptyList(), Collections.singletonList(new FilterOption(SHumanTaskInstance.class,
+//                    "logicalGroup2", processInstanceId)), null);
+//            if (activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0) {
+//                return true;
+//            }
+//        } catch (SProcessInstanceReadException | SBonitaReadException e) {
+//            throw new RetrieveException(e);
+//        } catch (SProcessInstanceNotFoundException e) {
+//            // process instance may be completed already:
+//            if (isInvolvedInArchivedProcessInstance(userId, processInstanceId, processInstanceService)) return true;
+//        }
+//
+//        // Part common to active and archived process instances:
+//        try {
+//            return isAssignedToArchivedTaskOfProcess(userId, processInstanceId, activityInstanceService);
+//        } catch (final SBonitaException e) {
+//            // no rollback, read only method
+//            throw new RetrieveException(e);
+//        }
 
     }
 
