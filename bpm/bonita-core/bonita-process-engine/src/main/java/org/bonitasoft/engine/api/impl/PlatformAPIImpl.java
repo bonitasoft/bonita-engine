@@ -33,20 +33,15 @@ import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
-import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.IsDefaultTenantCreated;
-import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -116,24 +111,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void createPlatform() throws CreationException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-        try {
-            transactionService.begin();
-            try {
-                platformService.getPlatform();
-            } finally {
-                transactionService.complete();
-            }
-        } catch (final SBonitaException e) {
-            throw new CreationException("Platform Creation failed.", e);
-        }
+        //nothing to do
     }
 
     @Override
@@ -242,7 +220,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Registers missing default jobs (if any) for the provided tenants
-     * 
+     *
      * @param platformAccessor
      * @param sessionAccessor
      * @param tenants
@@ -546,29 +524,27 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void cleanPlatform() throws DeletionException {
-        PlatformServiceAccessor platformAccessor;
+        final PlatformServiceAccessor platformAccessor;
+
         try {
             platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new DeletionException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-        final CleanPlatformTableContent clean = new CleanPlatformTableContent(platformService);
-        final DeleteAllTenants deleteAll = new DeleteAllTenants(platformService);
-        try {
-            transactionService.executeInTransaction(new Callable<Void>() {
+            List<STenant> sTenants = platformAccessor.getTransactionService().executeInTransaction(new Callable<List<STenant>>() {
 
                 @Override
-                public Void call() throws Exception {
-                    clean.execute();
-                    deleteAll.execute();
-                    return null;
+                public List<STenant> call() throws Exception {
+                    final PlatformService platformService = platformAccessor.getPlatformService();
+                    final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
+                    for (final STenant sTenant : tenants) {
+                        platformService.deactiveTenant(sTenant.getId());
+                    }
+                    return tenants;
                 }
+
             });
-        } catch (final DeletionException e) {
-            throw e;
-        } catch (final Exception e) {
+            for (STenant sTenant : sTenants) {
+                deleteTenant(sTenant.getId());
+            }
+        } catch (Exception e) {
             throw new DeletionException(e);
         }
     }
@@ -577,41 +553,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void deletePlatform() throws DeletionException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new DeletionException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        try {
-            if (isPlatformCreated()) {
-                // to ensure Hibernate cache is up-to-date before we drop tables with its content:
-                platformAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
 
-                    @Override
-                    public Void call() throws Exception {
-                        final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
-                        for (final STenant sTenant : tenants) {
-                            if (sTenant.isActivated()) {
-                                throw new DeletionException("Cannot delete platform with some active tenants.");
-                            }
-                        }
-                        platformService.deletePlatform();
-                        return null;
-                    }
-                });
-            }
-        } catch (final DeletionException e) {
-            throw e;
-        } catch (final Exception e) {
-            // ignore not existing platform
-        }
-        try {
-            platformService.deleteTables();
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
     }
 
     @Override
@@ -766,16 +708,12 @@ public class PlatformAPIImpl implements PlatformAPI {
             final BonitaHomeServer home = BonitaHomeServer.getInstance();
             home.getTenantManager().deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
-            log(platformAccessor, e);
             throw new STenantDeletionException(e);
         } catch (final SDeletingActivatedTenantException e) {
-            log(platformAccessor, e);
             throw new STenantDeletionException("Unable to delete an activated tenant " + tenantId);
         } catch (final STenantDeletionException e) {
-            log(platformAccessor, e);
             throw e;
         } catch (final Exception e) {
-            log(platformAccessor, e);
             throw new STenantDeletionException(e);
         }
     }
@@ -812,11 +750,9 @@ public class PlatformAPIImpl implements PlatformAPI {
                     tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
             sessionService.deleteSession(sessionId);
-        } catch (final STenantActivationException stae) {
-            log(platformAccessor, stae);
-            throw stae;
+        } catch (final STenantActivationException e) {
+            throw e;
         } catch (final Exception e) {
-            log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
@@ -825,17 +761,6 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
         return sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
-    }
-
-    private void log(final PlatformServiceAccessor platformAccessor, final Exception e) {
-        if (platformAccessor != null) {
-            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-            }
-        } else {
-            e.printStackTrace();
-        }
     }
 
     private long createSessionAndMakeItActive(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final long tenantId)
@@ -850,24 +775,15 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public boolean isDefaultTenantCreated() throws PlatformNotFoundException {
-        PlatformServiceAccessor platformAccessor;
+    public boolean isPlatformInitialized() throws PlatformNotFoundException {
         try {
-            platformAccessor = getPlatformAccessor();
+            return getPlatformAccessor().getPlatformService().isDefaultTenantCreated();
         } catch (final Exception e) {
-            throw new PlatformNotFoundException(e);
-        }
-        try {
-            final IsDefaultTenantCreated isDefaultTenantCreated = new IsDefaultTenantCreated(platformAccessor.getPlatformService());
-            platformAccessor.getTransactionExecutor().execute(isDefaultTenantCreated);
-            return isDefaultTenantCreated.getResult();
-        } catch (final SBonitaException e) {
             throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
         }
     }
 
     @Override
-    @CustomTransactions
     @AvailableOnStoppedNode
     public boolean isPlatformCreated() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
@@ -877,18 +793,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new PlatformNotFoundException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContentWithResult<Boolean> transactionContent = new IsPlatformCreated(platformService);
-        try {
-            transactionExecutor.execute(transactionContent);
-            return transactionContent.getResult();
-        } catch (final SBonitaException e) {
-            final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
-            if (technicalLoggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                technicalLoggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
-            }
-            return false;
-        }
+        return platformService.isPlatformCreated();
     }
 
     @Override
@@ -902,16 +807,13 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private STenant getDefaultTenant() throws STenantNotFoundException {
-        PlatformServiceAccessor platformAccessor = null;
         try {
-            platformAccessor = getPlatformAccessor();
+            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
             return platformService.getDefaultTenant();
         } catch (final STenantNotFoundException e) {
-            log(platformAccessor, e);
             throw e;
         } catch (final Exception e) {
-            log(platformAccessor, e);
             throw new STenantNotFoundException("Unable to retrieve the defaultTenant.", e);
         }
     }

@@ -293,7 +293,7 @@ public class EngineStarter {
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
 
-        if (!platformAPI.isDefaultTenantCreated()) {
+        if (!platformAPI.isPlatformInitialized()) {
             LOGGER.info("=========  INIT PLATFORM =======");
             createPlatformAndTenant(platformAPI);
         } else {

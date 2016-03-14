@@ -38,7 +38,7 @@ public class PlatformTenantManager {
     }
 
     public boolean createPlatform(final PlatformAPI platformAPI) throws Exception {
-        if (!platformAPI.isDefaultTenantCreated()) {
+        if (!platformAPI.isPlatformInitialized()) {
             platformAPI.initializePlatform();
             return true;
         }
