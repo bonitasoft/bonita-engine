@@ -23,7 +23,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -49,7 +48,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final SessionAccessor sessionAccessor;
 
     private final IdentityService identityService;
-    
+
     private final TechnicalLoggerService logger;
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService, final SessionService sessionService,
@@ -118,7 +117,7 @@ public class SecuredLoginServiceImpl implements LoginService {
      * Processes the failed authentication behaviour.
      * 
      * @throws SLoginException
-     *             the appropriate exception
+     *         the appropriate exception
      */
     protected void authenticationFailed() throws SLoginException {
         try {
@@ -133,10 +132,10 @@ public class SecuredLoginServiceImpl implements LoginService {
      * retrieve password from credentials assuming it is stored under the {@link AuthenticationConstants#BASIC_PASSWORD} key
      * 
      * @param credentials
-     *            the credentials to check
+     *        the credentials to check
      * @return the password
      * @throws SLoginException
-     *             if password is absent or if credentials is null
+     *         if password is absent or if credentials is null
      */
     protected String retrievePasswordFromCredentials(final Map<String, Serializable> credentials) throws SLoginException {
         if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_PASSWORD)
@@ -150,10 +149,10 @@ public class SecuredLoginServiceImpl implements LoginService {
      * retrieve username from credentials assuming it is stored under the {@link AuthenticationConstants#BASIC_USERNAME} key
      * 
      * @param credentials
-     *            the credentials to check
+     *        the credentials to check
      * @return the username
      * @throws SLoginException
-     *             if username is absent, blank or if credentials is null
+     *         if username is absent, blank or if credentials is null
      */
     protected String retrieveUsernameFromCredentials(final Map<String, Serializable> credentials) throws SLoginException {
         String userName;
@@ -185,11 +184,11 @@ public class SecuredLoginServiceImpl implements LoginService {
             final String userName = (String) properties.get("userName");
             final String password = (String) properties.get("userPassword");
             return new TechnicalUser(userName, password);
-        } catch (final BonitaHomeNotSetException | IOException e) {
+        } catch (IOException e) {
             throw new SLoginException(e);
         }
     }
-    
+
     protected void debugLog(String message) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);

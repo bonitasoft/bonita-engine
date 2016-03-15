@@ -28,7 +28,6 @@ import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -104,7 +103,7 @@ public class ProfilesImporter {
     public List<ImportStatus> importProfiles(final long importerId) throws ExecutionException {
         importStrategy.beforeImport();
         try {
-            final List<ImportStatus> importStatus = new ArrayList<ImportStatus>(exportedProfiles.size());
+            final List<ImportStatus> importStatus = new ArrayList<>(exportedProfiles.size());
             for (final ExportedProfile exportedProfile : exportedProfiles) {
                 if (exportedProfile.getName() == null || exportedProfile.getName().isEmpty()) {
                     continue;
@@ -153,8 +152,8 @@ public class ProfilesImporter {
 
     protected List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
             final long profileId)
-            throws SProfileEntryCreationException {
-        final ArrayList<ImportError> errors = new ArrayList<ImportError>();
+                    throws SProfileEntryCreationException {
+        final ArrayList<ImportError> errors = new ArrayList<>();
         for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
             if (parentProfileEntry.hasErrors()) {
                 errors.addAll(parentProfileEntry.getErrors());
@@ -179,7 +178,7 @@ public class ProfilesImporter {
     List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
             final long profileId,
             final ExportedProfileMapping exportedProfileMapping) throws SProfileMemberCreationException {
-        final ArrayList<ImportError> errors = new ArrayList<ImportError>();
+        final ArrayList<ImportError> errors = new ArrayList<>();
 
         for (final String userName : exportedProfileMapping.getUsers()) {
             SUser user = null;
@@ -236,8 +235,8 @@ public class ProfilesImporter {
     protected SProfile importTheProfile(final long importerId,
             final ExportedProfile exportedProfile,
             final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
-            SProfileUpdateException,
-            SProfileCreationException {
+                    SProfileUpdateException,
+                    SProfileCreationException {
         final SProfile newProfile;
         if (existingProfile != null) {
             newProfile = importStrategy.whenProfileExists(importerId, exportedProfile, existingProfile);
@@ -269,7 +268,7 @@ public class ProfilesImporter {
     }
 
     public static List<String> toWarnings(final List<ImportStatus> importProfiles) {
-        final ArrayList<String> warns = new ArrayList<String>();
+        final ArrayList<String> warns = new ArrayList<>();
         for (final ImportStatus importStatus : importProfiles) {
             for (final ImportError error : importStatus.getErrors()) {
                 warns.add("Unable to find the " + error.getType().name().toLowerCase() + " " + error.getName() + " on " + importStatus.getName());
@@ -294,6 +293,7 @@ public class ProfilesImporter {
     }
 
     public static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
-        return BonitaHomeServer.getInstance().getTenantManager().getTenantWorkFile(tenantId, "profiles.md5");
+        //FIXME store md5 somewhere in database? or just check everytime?
+        return null;
     }
 }

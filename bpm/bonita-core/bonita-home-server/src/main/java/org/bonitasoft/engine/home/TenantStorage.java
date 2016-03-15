@@ -21,9 +21,7 @@ import java.util.logging.FileHandler;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
 /**
- *
  * Handles tenant related files of the bonita home, mainly bdm and security scripts
- *
  *
  * @author Baptiste Mesta
  */
@@ -36,7 +34,8 @@ public class TenantStorage {
     }
 
     public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
-        Folder current = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);
+        Folder current = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+        createFolders(current);
         for (String folder : folders) {
             current = new Folder(current, folder);
             current.create();
@@ -45,17 +44,24 @@ public class TenantStorage {
         org.bonitasoft.engine.commons.io.IOUtil.writeFile(fileToWrite, scriptFileContent);
     }
 
+    private void createFolders(Folder current) {
+        if (!current.exists()) {
+            current.getFile().mkdirs();
+        }
+    }
+
     public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId).getFile();
+        Folder tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+        createFolders(tenantWorkSecurityFolder);
+        return tenantWorkSecurityFolder.getFile();
     }
 
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
-        final File incidentFile = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("incidents.log");
+        Folder tenantWorkFolder = FolderMgr.getTenantWorkFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+        createFolders(tenantWorkFolder);
+        final File incidentFile = tenantWorkFolder.getFile("incidents.log");
         return new FileHandler(incidentFile.getAbsolutePath());
 
     }
 
-    public File getBonitaHomeFolder() throws BonitaHomeNotSetException {
-        return bonitaHomeServer.getBonitaHomeFolder();
-    }
 }

@@ -13,28 +13,29 @@
  **/
 package org.bonitasoft.engine.home;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+
+import javax.naming.NamingException;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.io.PropertiesManager;
+import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 
 /**
  * Utility class that handles the path to the server part of the bonita home
  * <p>
  * The server part of the bonita home contains configuration files and working directories
  * </p>
- * 
+ *
  * @author Baptiste Mesta
  * @author Frederic Bouquet
  * @author Matthieu Chaffotte
@@ -45,19 +46,75 @@ public class BonitaHomeServer extends BonitaHome {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
-    private final TenantManager tenantManager;
     private final TenantStorage tenantStorage;
-    private Properties platformProperties = null;
+    private ConfigurationService configurationService;
     private String version;
 
     private BonitaHomeServer() {
-        platformProperties = null;
-        tenantManager = new TenantManager(this);
         tenantStorage = new TenantStorage(this);
     }
 
     public static BonitaHomeServer getInstance() {
         return INSTANCE;
+    }
+
+    public Properties getPlatformInitProperties() throws IOException {
+        return getAllProperties(getConfigurationService().getPlatformInitEngineConf());
+    }
+
+    private ConfigurationService getConfigurationService() {
+        if (configurationService == null) {
+            try {
+                configurationService = new ConfigurationServiceImpl();
+            } catch (NamingException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return configurationService;
+    }
+
+    public Properties getPlatformProperties() throws IOException {
+        return getAllProperties(getConfigurationService().getPlatformEngineConf());
+    }
+
+    public Properties getTenantProperties(long tenantId) throws IOException {
+        Properties allProperties = getAllProperties(getConfigurationService().getTenantEngineConf(tenantId));
+        allProperties.setProperty("tenantId", String.valueOf(tenantId));
+        return allProperties;
+    }
+
+    public List<BonitaConfiguration> getPlatformInitConfiguration() throws IOException {
+        return getAllXmlConfiguration(getConfigurationService().getPlatformInitEngineConf());
+    }
+
+    public List<BonitaConfiguration> getPlatformConfiguration() throws IOException {
+        return getAllXmlConfiguration(getConfigurationService().getPlatformEngineConf());
+    }
+
+    public List<BonitaConfiguration> getTenantConfiguration(long tenantId) throws IOException {
+        return getAllXmlConfiguration(getConfigurationService().getTenantEngineConf(tenantId));
+    }
+
+    private Properties getAllProperties(List<BonitaConfiguration> configurationFiles) throws IOException {
+        Properties allProperties = new Properties();
+        for (BonitaConfiguration bonitaConfiguration : configurationFiles) {
+            if (bonitaConfiguration.getResourceName().endsWith(".properties")) {
+                Properties properties = new Properties();
+                properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
+                allProperties.putAll(properties);
+            }
+        }
+        return allProperties;
+    }
+
+    private List<BonitaConfiguration> getAllXmlConfiguration(List<BonitaConfiguration> configurationFiles) throws IOException {
+        List<BonitaConfiguration> configurations = new ArrayList<>();
+        for (BonitaConfiguration bonitaConfiguration : configurationFiles) {
+            if (bonitaConfiguration.getResourceName().endsWith(".xml")) {
+                configurations.add(bonitaConfiguration);
+            }
+        }
+        return configurations;
     }
 
     /*
@@ -66,84 +123,8 @@ public class BonitaHomeServer extends BonitaHome {
      * =================================================
      */
 
-
-    public TenantManager getTenantManager() {
-        return tenantManager;
-    }
-
     public TenantStorage getTenantStorage() {
         return tenantStorage;
-    }
-
-    /*
-     * =================================================
-     * Bootstrap the engine
-     * =================================================
-     */
-    public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
-        final Folder f1 = FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder());
-        final Folder f2 = FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder());
-        return getConfigurationFiles(f1, f2);
-    }
-
-    public String[] getPlatformConfigurationFiles() throws BonitaHomeNotSetException, IOException {
-        final Folder f1 = FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder());
-        final Folder f2 = FolderMgr.getPlatformConfFolder(getBonitaHomeFolder());
-        return getConfigurationFiles(f1, f2);
-    }
-
-    public String[] getTenantConfigurationFiles(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final Folder f1 = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
-        final Folder f2 = FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId);
-        return getConfigurationFiles(f1, f2);
-    }
-
-    private String[] getConfigurationFiles(final Folder... folders) throws BonitaHomeNotSetException, IOException {
-        final Properties platformProperties = getPlatformProperties();
-        final List<File> files = new ArrayList<>();
-        for (Folder folder : folders) {
-            files.addAll(getXmlResourcesOfFolder(folder, new NonClusterXmlFilesFilter()));
-        }
-        //if cluster is activated, add cluster files at the end. We have to ensure cluster files are loaded "last"
-        final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
-        if (cluster) {
-            for (Folder folder : folders) {
-                files.addAll(getXmlResourcesOfFolder(folder, new ClusterXmlFilesFilter()));
-            }
-        }
-
-        return getResourcesFromFiles(files);
-    }
-
-    private static List<File> getXmlResourcesOfFolder(final Folder folder, final FileFilter filter) throws IOException {
-        //sort this to have always the same order
-        File[] listFiles = folder.listFiles(filter);
-        List<File> listFilesCollection = Arrays.asList(listFiles);
-        Collections.sort(listFilesCollection);
-        return listFilesCollection;
-    }
-
-    private String[] getResourcesFromFiles(final List<File> files) {
-        final List<String> resources = new ArrayList<>();
-        if (files != null) {
-            for (File file : files) {
-                resources.add(file.getAbsolutePath());
-            }
-        }
-        return resources.toArray(new String[resources.size()]);
-    }
-
-    /*
-     * =================================================
-     * Configuration
-     * =================================================
-     */
-    private String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
-        try {
-            return getPlatformProperties().getProperty(propertyName);
-        } catch (BonitaHomeNotSetException | IOException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     /**
@@ -151,41 +132,14 @@ public class BonitaHomeServer extends BonitaHome {
      * <code>bonita-platform.properties</code>
      *
      * @return the name of the class implementing {@link org.bonitasoft.engine.api.internal.ServerAPI}
-     * @throws IllegalStateException
-     *         if the name of the implementation cannot be retrieved
+     * @throws IllegalStateException if the name of the implementation cannot be retrieved
      */
     public String getServerAPIImplementation() throws IllegalStateException {
-        return getBonitaHomeProperty(SERVER_API_IMPLEMENTATION);
-    }
-
-    private Properties mergeProperties(final Folder folder, Properties mergeInto) throws IOException {
-        final FilenameFilter filter = new FilenameFilter() {
-
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(".properties");
-            }
-        };
-        final List<File> files = folder.listFiles(filter);
-        for (File file : files) {
-            Properties properties = getProperties(file);
-            for (Map.Entry<Object, Object> property : properties.entrySet()) {
-                mergeInto.put(property.getKey(), property.getValue());
-            }
+        try {
+            return getPlatformProperties().getProperty(SERVER_API_IMPLEMENTATION);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
-        return mergeInto;
-    }
-
-    private Properties getProperties(final File propertiesFile) throws IOException {
-        return PropertiesManager.getProperties(propertiesFile);
-    }
-
-    public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
-        if (platformProperties == null) {
-            platformProperties = new Properties();
-            mergeProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()), platformProperties);
-            mergeProperties(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder()), platformProperties);
-        }
-        return platformProperties;
     }
 
     /**
@@ -206,24 +160,8 @@ public class BonitaHomeServer extends BonitaHome {
         return version;
     }
 
-    public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        Properties tenantProperties = new Properties();
-        Folder tenantWorkFolder = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
-        mergeProperties(tenantWorkFolder, tenantProperties);
-        mergeProperties(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId), tenantProperties);
-        return tenantProperties;
-    }
-
-    public Properties getPrePlatformInitProperties() throws BonitaHomeNotSetException, IOException {
-        Properties preInitProperties = new Properties();
-        mergeProperties(FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder()), preInitProperties);
-        mergeProperties(FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder()), preInitProperties);
-        return preInitProperties;
-    }
-
     @Override
     protected void refresh() {
-        platformProperties = null;
     }
 
     /*
@@ -248,28 +186,28 @@ public class BonitaHomeServer extends BonitaHome {
         return FolderMgr.getPlatformLocalClassLoaderFolder(artifactType, artifactId).toURI();
     }
 
-    private static class XmlFilesFilter implements FileFilter {
-
-        @Override
-        public boolean accept(final File pathname) {
-            return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().endsWith("-cache.xml");
-        }
+    public void createTenant(final long tenantId) {
+        getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(), tenantId);
     }
 
-    private static class NonClusterXmlFilesFilter extends XmlFilesFilter {
-
-        @Override
-        public boolean accept(final File pathname) {
-            return super.accept(pathname) && !pathname.getName().contains("cluster");
-        }
+    public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        //TODO ?????
     }
 
-    private static class ClusterXmlFilesFilter extends XmlFilesFilter {
-
-        @Override
-        public boolean accept(final File pathname) {
-            return super.accept(pathname) && pathname.getName().contains("cluster");
+    public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
+        List<BonitaConfiguration> tenantEngineConf = getConfigurationService().getTenantEngineConf(tenantId);
+        for (BonitaConfiguration bonitaConfiguration : tenantEngineConf) {
+            if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community.properties")) {
+                Properties properties = new Properties();
+                properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
+                properties.setProperty("userName", userName);
+                properties.setProperty("userPassword", password);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                properties.store(out, "");
+                bonitaConfiguration.setResourceContent(out.toByteArray());
+                break;
+            }
         }
+        getConfigurationService().storeTenantEngineConf(tenantEngineConf, tenantId);
     }
-
 }

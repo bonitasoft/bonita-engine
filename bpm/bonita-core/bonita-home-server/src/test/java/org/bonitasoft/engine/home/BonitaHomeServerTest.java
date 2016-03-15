@@ -14,15 +14,9 @@
 package org.bonitasoft.engine.home;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.junit.Test;
 
 /**
@@ -30,13 +24,6 @@ import org.junit.Test;
  */
 public class BonitaHomeServerTest {
 
-    @Test(expected = BonitaHomeNotSetException.class)
-    public void testBonitaHomeServerNotSet() throws BonitaException, IOException {
-        System.setProperty(BonitaHome.BONITA_HOME, "");// same as not set
-        final BonitaHomeServer bonitaHome = BonitaHomeServer.getInstance();
-        bonitaHome.refreshBonitaHome();
-        bonitaHome.getBonitaHomeFolderPath();
-    }
 
     @Test
     public void generateRelativeResourcePathShouldHandleBackslashOS() {

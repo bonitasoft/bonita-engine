@@ -54,7 +54,7 @@ public class CheckPlatformVersionTest {
 
     @Test
     public void check_db_and_jars_with_same_minor_version_is_accepted() throws Exception {
-        given_DB_Jar_Home_Versions("6.1.0", "6.1.1", "6.1.1");
+        given_DB_Jar_Home_Versions("6.1.0", "6.1.1");
 
         Boolean sameVersion = checkPlatformVersion.call();
 
@@ -63,7 +63,7 @@ public class CheckPlatformVersionTest {
 
     @Test
     public void check_db_and_jars_with_same_maintenance_version_is_accepted() throws Exception {
-        given_DB_Jar_Home_Versions("6.1.1", "6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
+        given_DB_Jar_Home_Versions("6.1.1", "6.1.1-SNAPSHOT");
 
         Boolean sameVersion = checkPlatformVersion.call();
 
@@ -72,7 +72,7 @@ public class CheckPlatformVersionTest {
 
     @Test
     public void check_db_and_jars_with_exact_same_version_is_accepted() throws Exception {
-        given_DB_Jar_Home_Versions("6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
+        given_DB_Jar_Home_Versions("6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
 
         Boolean sameVersion = checkPlatformVersion.call();
 
@@ -81,7 +81,7 @@ public class CheckPlatformVersionTest {
 
     @Test
     public void check_db_and_jars_with_different_minor_version_is_rejected() throws Exception {
-        given_DB_Jar_Home_Versions("6.0.3", "6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
+        given_DB_Jar_Home_Versions("6.0.3", "6.1.1-SNAPSHOT");
 
         Boolean sameVersion = checkPlatformVersion.call();
 
@@ -93,7 +93,7 @@ public class CheckPlatformVersionTest {
 
     @Test
     public void check_db_and_jars_with_different_major_version_is_rejected() throws Exception {
-        given_DB_Jar_Home_Versions("5.0.3", "6.0.3", "6.0.3");
+        given_DB_Jar_Home_Versions("5.0.3", "6.0.3");
 
         Boolean sameVersion = checkPlatformVersion.call();
         assertFalse(sameVersion);
@@ -103,7 +103,7 @@ public class CheckPlatformVersionTest {
 
     @Test
     public void check_db_and_jars_with_different_minor_version_with_2_digits_is_rejected() throws Exception {
-        given_DB_Jar_Home_Versions("6.1", "6.10", "6.10");
+        given_DB_Jar_Home_Versions("6.1", "6.10");
 
         Boolean sameVersion = checkPlatformVersion.call();
 
@@ -112,52 +112,19 @@ public class CheckPlatformVersionTest {
                 checkPlatformVersion.getErrorMessage());
     }
 
-    @Test
-    public void check_home_and_jars_with_different_version_is_rejected() throws Exception {
-        given_DB_Jar_Home_Versions("6.2.0", "6.2.0", "6.1.0");
-
-        Boolean sameVersion = checkPlatformVersion.call();
-
-        assertFalse(sameVersion);
-        assertEquals(
-                "The version of the bonita home is not the same as expected: bonita-server version is <6.2.0> and bonita home version is <6.1.0>",
-                checkPlatformVersion.getErrorMessage());
-    }
 
     @Test
-    public void check_home_and_jars_with_different_maintenance_version_is_rejected() throws Exception {
-        given_DB_Jar_Home_Versions("6.2.1", "6.2.0", "6.2.1");
-
-        Boolean sameVersion = checkPlatformVersion.call();
-
-        assertFalse(sameVersion);
-        assertEquals(
-                "The version of the bonita home is not the same as expected: bonita-server version is <6.2.0> and bonita home version is <6.2.1>",
-                checkPlatformVersion.getErrorMessage());
-    }
-
-    @Test
-    public void check_home_and_db_with_different_maintenance_version_is_accepted() throws Exception {
-        given_DB_Jar_Home_Versions("6.2.0", "6.2.1", "6.2.1");
+    public void check_platform_and_db_with_different_maintenance_version_is_accepted() throws Exception {
+        given_DB_Jar_Home_Versions("6.2.0", "6.2.1");
 
         Boolean sameVersion = checkPlatformVersion.call();
 
         assertTrue(sameVersion);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void check_bonita_home_without_version_throw_nice_exception() throws Exception {
-        when(platform.getVersion()).thenReturn("6");
-        when(platformProperties.getPlatformVersion()).thenReturn("6");
-        when(bonitaHomeServer.getVersion()).thenThrow(new IllegalStateException("error"));
-
-        checkPlatformVersion.call();
-    }
-
-    private void given_DB_Jar_Home_Versions(final String dbVersion, final String jarVersion, final String homeVersion) {
+    private void given_DB_Jar_Home_Versions(final String dbVersion, final String jarVersion) {
         when(platform.getVersion()).thenReturn(dbVersion);
         when(platformProperties.getPlatformVersion()).thenReturn(jarVersion);
-        when(bonitaHomeServer.getVersion()).thenReturn(homeVersion);
     }
 
 }

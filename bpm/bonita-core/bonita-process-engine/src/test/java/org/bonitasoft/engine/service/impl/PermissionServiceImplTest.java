@@ -24,7 +24,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,11 +54,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BonitaHomeServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class PermissionServiceImplTest {
 
     @Rule
@@ -91,11 +88,10 @@ public class PermissionServiceImplTest {
     public void before() throws IOException, SClassLoaderException, SSessionNotFoundException, BonitaHomeNotSetException {
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
         permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, 1));
+        doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
 
-        mockStatic(BonitaHomeServer.class);
-        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
         when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
         doReturn(securityFolder).when(tenantStorage).getSecurityScriptsFolder(anyLong());
     }

@@ -32,7 +32,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -175,8 +174,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                             + " is in pause, unable to login with other user than the technical user.");
                 }
             }
-        } catch (BonitaHomeNotSetException e) {
-            throw new LoginException(e);
         } catch (IOException e) {
             throw new LoginException(e);
         }
