@@ -26,9 +26,6 @@ class FolderMgr {
         return getFolder(getServerFolder(bonitaHomeFolder), "work");
     }
 
-    private static Folder getConfFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getServerFolder(bonitaHomeFolder), "conf");
-    }
 
     private static Folder getTempFolder() throws IOException {
         final Folder tempFolder = getFolder(new File(System.getProperty("java.io.tmpdir")), "bonita_tmp_" + getJvmName());
@@ -38,21 +35,11 @@ class FolderMgr {
         return tempFolder;
     }
 
-    static Folder getPlatformInitWorkFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getWorkFolder(bonitaHomeFolder), "platform-init");
-    }
-
-    static Folder getPlatformInitConfFolder(File bonitaHomeFolder) throws IOException {
-        return getFolder(getConfFolder(bonitaHomeFolder), "platform-init");
-    }
 
     static Folder getPlatformWorkFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getWorkFolder(bonitaHomeFolder), "platform");
     }
 
-    static Folder getPlatformConfFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getConfFolder(bonitaHomeFolder), "platform");
-    }
 
     static Folder getPlatformTempFolder() throws IOException {
         return getFolder(getTempFolder(), "platform").createIfNotExists();
@@ -62,46 +49,8 @@ class FolderMgr {
         return getFolder(getWorkFolder(bonitaHomeFolder), "tenants");
     }
 
-    private static Folder getTenantsConfFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getConfFolder(bonitaHomeFolder), "tenants");
-    }
-
     static Folder getTenantWorkFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
         return getFolder(getTenantsWorkFolder(bonitaHomeFolder), Long.toString(tenantId));
-    }
-
-    static Folder getTenantConfFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
-        return getFolder(getTenantsConfFolder(bonitaHomeFolder), Long.toString(tenantId));
-    }
-
-    private static Folder getTenantTemplateWorkFolder(File bonitaHomeFolder) throws IOException {
-        return getFolder(getTenantsWorkFolder(bonitaHomeFolder), "template");
-    }
-
-    private static Folder getTenantTemplateConfFolder(File bonitaHomeFolder) throws IOException {
-        return getFolder(getTenantsConfFolder(bonitaHomeFolder), "template");
-    }
-
-    public static void deleteTenant(File bonitaHomeFolder, long tenantId) throws IOException {
-        getTenantWorkFolder(bonitaHomeFolder, tenantId).delete();
-        getTenantConfFolder(bonitaHomeFolder, tenantId).delete();
-    }
-
-    public static void createTenant(File bonitaHomeFolder, long tenantId) throws IOException {
-        final Folder tenantWorkFolder = getTenantWorkFolder(bonitaHomeFolder, tenantId);
-        final Folder tenantConfFolder = getTenantConfFolder(bonitaHomeFolder, tenantId);
-        final Folder templateWorkFolder = getTenantTemplateWorkFolder(bonitaHomeFolder);
-        final Folder templateConfFolder = getTenantTemplateConfFolder(bonitaHomeFolder);
-
-        // copy configuration file
-        try {
-            templateWorkFolder.copyTo(tenantWorkFolder);
-            templateConfFolder.copyTo(tenantConfFolder);
-            getTenantWorkSecurityFolder(bonitaHomeFolder, tenantId).create();
-        } catch (final IOException e) {
-            deleteTenant(bonitaHomeFolder, tenantId);
-            throw e;
-        }
     }
 
     static Folder getTenantWorkSecurityFolder(File bonitaHomeFolder, long tenantId) throws IOException {

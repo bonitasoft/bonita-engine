@@ -60,7 +60,7 @@ public class EngineInitializer {
 
     protected PlatformServiceAccessor getPlatformAccessor() {
         try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return getServiceAccessorFactory().createPlatformServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -82,7 +82,7 @@ public class EngineInitializer {
             // create a session to call the engine
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final SessionAccessor sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
             final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
             final PlatformAPI platformAPI = getPlatformAPI();
 
@@ -108,6 +108,10 @@ public class EngineInitializer {
             LOGGER.log(Level.INFO, "Exception while initializing the engine: " + e);
             throw e;
         }
+    }
+
+    ServiceAccessorFactory getServiceAccessorFactory() {
+        return ServiceAccessorFactory.getInstance();
     }
 
     protected PlatformAPI getPlatformAPI() {
@@ -154,7 +158,7 @@ public class EngineInitializer {
         // create a session to call the engine
         PlatformSessionService platformSessionService;
         final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-        final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+        final SessionAccessor sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
         platformSessionService = platformAccessor.getPlatformSessionService();
         final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
         final PlatformAPI platformAPI = getPlatformAPI();
@@ -171,7 +175,7 @@ public class EngineInitializer {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
         // after that the engine is unloaded
-        ServiceAccessorFactory.getInstance().destroyAccessors();
+        getServiceAccessorFactory().destroyAccessors();
         LOGGER.log(Level.INFO, "Bonita Engine stopped!");
 
     }

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.service.impl;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.authentication.SInvalidPasswordException;
@@ -41,8 +40,6 @@ public class PlatformAuthenticationChecker implements PlatformAuthenticationServ
             if (passProperty == null || !passProperty.equals(password)) {
                 throw new SInvalidPasswordException("Invalid password");
             }
-        } catch (final BonitaHomeNotSetException bhnse) {
-            throw new SInvalidUserException(bhnse);
         } catch (final IOException ioe) {
             throw new SInvalidUserException(ioe);
         }

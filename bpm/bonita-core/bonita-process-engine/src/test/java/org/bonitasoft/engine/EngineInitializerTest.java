@@ -16,12 +16,12 @@ package org.bonitasoft.engine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -29,52 +29,46 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ SpringPlatformFileSystemBeanAccessor.class, ServiceAccessorFactory.class })
+@RunWith(MockitoJUnitRunner.class)
 public class EngineInitializerTest {
 
+    @Mock
     private PlatformTenantManager platformManager;
-
+    @Mock
     private EngineInitializerProperties platformProperties;
-
+    @Spy
+    @InjectMocks
     private EngineInitializer engineInitializer;
-
+    @Mock
     private ServiceAccessorFactory serviceAccessorFactory;
 
     @Before
     public void before() throws Exception {
         // static mocks
-        mockStatic(ServiceAccessorFactory.class);
-        mockStatic(SpringPlatformFileSystemBeanAccessor.class);
 
-        serviceAccessorFactory = mock(ServiceAccessorFactory.class);
-        when(ServiceAccessorFactory.getInstance()).thenReturn(serviceAccessorFactory);
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         when(serviceAccessorFactory.createPlatformServiceAccessor()).thenReturn(platformServiceAccessor);
 
         // services
-        final SessionAccessor sessionAccessor = mock(SessionAccessor.class);
-        when(serviceAccessorFactory.createSessionAccessor()).thenReturn(sessionAccessor);
+        when(serviceAccessorFactory.createSessionAccessor()).thenReturn(mock(SessionAccessor.class));
         final PlatformSessionService platformSessionService = mock(PlatformSessionService.class);
         when(platformServiceAccessor.getPlatformSessionService()).thenReturn(platformSessionService);
 
         // sessions
-        final SPlatformSession platformSession = mock(SPlatformSession.class);
-        when(platformSessionService.createSession(anyString())).thenReturn(platformSession);
+        when(platformSessionService.createSession(anyString())).thenReturn(mock(SPlatformSession.class));
 
-        platformManager = mock(PlatformTenantManager.class);
-        platformProperties = mock(EngineInitializerProperties.class);
-        engineInitializer = new EngineInitializer(platformManager, platformProperties);
-
+        doReturn(serviceAccessorFactory).when(engineInitializer).getServiceAccessorFactory();
     }
+
 
     @Test
     public void testInitializeEngine() throws Exception {

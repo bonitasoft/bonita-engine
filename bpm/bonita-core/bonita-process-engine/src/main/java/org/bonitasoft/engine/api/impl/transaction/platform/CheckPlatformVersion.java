@@ -51,19 +51,12 @@ public class CheckPlatformVersion implements Callable<Boolean> {
         platformProperties = platformService.getSPlatformProperties();
         final String jarVersion = platformProperties.getPlatformVersion();
         // the version in bonita home
-        final String bonitaHomeVersion = bonitaHomeServer.getVersion();
         final String platformMinorVersion = format(dbVersion);
         final String propertiesMinorVersion = format(jarVersion);
         boolean same = platformMinorVersion.equals(propertiesMinorVersion);
         if (!same) {
             errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <" + jarVersion
                     + "> and database version is <" + dbVersion + ">";
-        } else {
-            same = bonitaHomeVersion.equals(jarVersion);
-            if (!same) {
-                errorMessage = "The version of the bonita home is not the same as expected: bonita-server version is <" + jarVersion
-                        + "> and bonita home version is <" + bonitaHomeVersion + ">";
-            }
         }
         return same;
     }
