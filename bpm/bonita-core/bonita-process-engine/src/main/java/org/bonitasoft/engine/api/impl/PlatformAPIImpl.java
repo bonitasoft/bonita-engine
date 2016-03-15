@@ -773,7 +773,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    @CustomTransactions
     @AvailableOnStoppedNode
     public boolean isPlatformInitialized() throws PlatformNotFoundException {
         try {
