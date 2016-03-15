@@ -21,8 +21,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         CancelProcessInstanceIT.class,
         AbortProcessInstanceIT.class,
-        ProcessInstanceIT.class,
-        InvolvedInProcessInstanceIT.class
+        ProcessInstanceIT.class/*,
+        InvolvedInProcessInstanceIT.class*/
 })
 public class ProcessInstanceTests {
 
