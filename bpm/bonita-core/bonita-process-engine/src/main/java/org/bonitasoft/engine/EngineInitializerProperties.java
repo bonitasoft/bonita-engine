@@ -40,17 +40,24 @@ public class EngineInitializerProperties {
      * properties of the platform
      */
     private Properties platformProperties;
+    private BonitaHomeServer bonitaHomeServer;
 
     /**
      * Private constructor to prevent instantiation
      */
     public EngineInitializerProperties() {
+        this(BonitaHomeServer.getInstance());
+    }
+
+    EngineInitializerProperties(BonitaHomeServer bonitaHomeServer) {
         try {
-            platformProperties = BonitaHomeServer.getInstance().getPlatformProperties();
+            this.bonitaHomeServer = bonitaHomeServer;
+            platformProperties = this.bonitaHomeServer.getPlatformProperties();
         } catch (Exception e) {
             throw new BonitaRuntimeException(e.getMessage(), e);
         }
     }
+
 
     public boolean shouldCreatePlatform() {
         final String needCreate = getProperty(PLATFORM_CREATE, platformProperties);
@@ -82,7 +89,7 @@ public class EngineInitializerProperties {
 
     public String getTenantAdminUsername(final long tenantId) {
         try {
-            return getProperty(TENANT_ADMIN_USERNAME, BonitaHomeServer.getInstance().getTenantProperties(tenantId));
+            return getProperty(TENANT_ADMIN_USERNAME, bonitaHomeServer.getTenantProperties(tenantId));
         } catch (Exception e) {
             throw new BonitaRuntimeException(e.getMessage(), e);
         }

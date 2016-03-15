@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -30,7 +32,7 @@ import org.springframework.core.io.Resource;
  */
 public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplicationContext {
 
-    private List<Resource> classpathResources = new ArrayList<>();
+    private List<Resource> resources = new ArrayList<>();
 
     /**
      * Create a new FileSystemXmlApplicationContext with the given parent,
@@ -56,7 +58,7 @@ public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplic
     public void addClassPathResource(String location) {
         ClassPathResource classPathResource = new ClassPathResource(location);
         if (classPathResource.exists()) {
-            classpathResources.add(classPathResource);
+            resources.add(classPathResource);
         }
     }
 
@@ -72,7 +74,11 @@ public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplic
                 throw new IllegalStateException(e);
             }
         }
-        resourcesList.addAll(classpathResources);
+        resourcesList.addAll(resources);
         return resourcesList.toArray(new Resource[resourcesList.size()]);
+    }
+
+    public void addByteArrayResource(BonitaConfiguration configuration) {
+        resources.add(new ByteArrayResource(configuration.getResourceContent(), configuration.getResourceName()));
     }
 }

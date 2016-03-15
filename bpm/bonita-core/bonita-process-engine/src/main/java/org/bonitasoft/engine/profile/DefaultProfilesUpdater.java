@@ -32,6 +32,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 /**
  * Class that creates and updates default profiles<br/>
  * Called at node restart and tenant creation
+ * 
  * @author Philippe Ozil
  */
 public class DefaultProfilesUpdater {
@@ -48,6 +49,7 @@ public class DefaultProfilesUpdater {
 
     /**
      * Executes a default profile update
+     * 
      * @param shouldCreateTransaction whether or not a new transaction is created to execute updater
      * @return whether the default profiles where updated
      * @throws Exception if execution fails
@@ -64,8 +66,7 @@ public class DefaultProfilesUpdater {
                 if (shouldCreateTransaction) {
                     final TransactionService transactionService = platformServiceAccessor.getTransactionService();
                     transactionService.executeInTransaction(getUpdateProfilesCallable(md5File, defaultProfilesXml, defaultProfiles));
-                }
-                else {
+                } else {
                     doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
                 }
                 return true;
@@ -104,7 +105,9 @@ public class DefaultProfilesUpdater {
             final List<ImportStatus> importStatuses = profilesImporter.importProfiles(-1);
             tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                     "Updated default profiles " + importStatuses);
-            IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
+            if (md5File != null) {
+                IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
+            }
         } catch (ExecutionException e) {
             tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.ERROR,
                     "Unable to update default profiles", e);
@@ -123,13 +126,14 @@ public class DefaultProfilesUpdater {
 
     /**
      * Checks if profiles should be updated: if MD5 file differs from MD5 of XML file
+     * 
      * @param md5File
      * @param defaultProfilesXml
      * @return true if profiles should be updated
      * @throws NoSuchAlgorithmException
      */
     boolean shouldUpdateProfiles(final File md5File, final String defaultProfilesXml) throws NoSuchAlgorithmException {
-        return !IOUtil.checkMD5(md5File, defaultProfilesXml.getBytes());
+        return md5File == null || !IOUtil.checkMD5(md5File, defaultProfilesXml.getBytes());
     }
 
     /**

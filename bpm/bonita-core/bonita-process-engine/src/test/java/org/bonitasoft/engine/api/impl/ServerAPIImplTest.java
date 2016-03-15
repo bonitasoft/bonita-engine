@@ -59,7 +59,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Celine Souchet
@@ -145,7 +144,7 @@ public class ServerAPIImplTest {
 
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(new Object());
-        final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
+        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
         doThrow(BonitaRuntimeException.class).when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session),
                 eq(false));
         doReturn(new UserTransactionService() {
@@ -184,7 +183,7 @@ public class ServerAPIImplTest {
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
-        final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
+        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
         doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
 
         try {
@@ -209,7 +208,7 @@ public class ServerAPIImplTest {
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
-        final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
+        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
         doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
         doReturn(null).when(mockedServerAPIImpl).invokeAPI(FakeAPI.class.getMethod(methodName), apiImpl, parametersValues);
 
@@ -235,7 +234,7 @@ public class ServerAPIImplTest {
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
-        final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
+        final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
         doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
         doReturn(null).when(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session,
                 apiInterfaceName);

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -29,32 +28,30 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * 
  * @author Baptiste Mesta
  * 
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BonitaHomeServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class EngineInitializerPropertiesTest {
 
     private EngineInitializerProperties engineInitializerProperties;
 
+    @Mock
     private BonitaHomeServer bonitaHomeServer;
 
     private Properties properties;
 
     @Before
     public void before() throws BonitaHomeNotSetException, IOException {
-        mockStatic(BonitaHomeServer.class);
         bonitaHomeServer = mock(BonitaHomeServer.class);
-        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
         properties = new Properties();
         when(bonitaHomeServer.getPlatformProperties()).thenReturn(properties);
-        engineInitializerProperties = new EngineInitializerProperties();
+        engineInitializerProperties = new EngineInitializerProperties(bonitaHomeServer);
     }
 
     @Test

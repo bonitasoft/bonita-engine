@@ -656,11 +656,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
-        try {
-            BonitaHomeServer.getInstance().getTenantManager().createTenant(tenantId);
-        } catch (Exception e) {
-            throw new STenantCreationException("Exception while creating tenant folder");
-        }
+        BonitaHomeServer.getInstance().createTenant(tenantId);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
@@ -705,8 +701,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            final BonitaHomeServer home = BonitaHomeServer.getInstance();
-            home.getTenantManager().deleteTenant(tenantId);
+            BonitaHomeServer.getInstance().deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
             throw new STenantDeletionException(e);
         } catch (final SDeletingActivatedTenantException e) {

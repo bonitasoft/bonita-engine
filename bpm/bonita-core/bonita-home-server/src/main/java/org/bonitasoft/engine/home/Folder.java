@@ -3,15 +3,10 @@ package org.bonitasoft.engine.home;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
@@ -73,25 +68,6 @@ public class Folder {
             throw new IOException("File " + newFile.getAbsolutePath() + " cannot be created");
         }
         return newFile;
-    }
-
-    public File[] listFiles(FileFilter filter) throws IOException {
-        checkFolderExists();
-        return folder.listFiles(filter);
-    }
-
-    public List<File> listFiles(FilenameFilter filter) throws IOException {
-        checkFolderExists();
-        File[] filesArray = folder.listFiles(filter);
-        List<File> files = Arrays.asList(filesArray);
-        Collections.sort(files, new Comparator<File>() {
-
-            @Override
-            public int compare(File file, File t1) {
-                return file.getName().compareTo(t1.getName());
-            }
-        });
-        return files;
     }
 
     public void create() throws IOException {

@@ -14,12 +14,11 @@
 package org.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -28,74 +27,30 @@ import org.springframework.context.ApplicationContext;
  */
 public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
     private final long tenantId;
-    private final SpringPlatformFileSystemBeanAccessor parent;
-    private AbsoluteFileSystemXmlApplicationContext context;
 
-    public SpringTenantFileSystemBeanAccessor(final SpringPlatformFileSystemBeanAccessor parent, final long tenantId) throws IOException, BonitaHomeNotSetException {
-        this.parent = parent;
+    public SpringTenantFileSystemBeanAccessor(final ApplicationContext parent, final long tenantId) {
+        super(parent);
         this.tenantId = tenantId;
     }
 
-
-    protected String[] getResources() throws IOException, BonitaHomeNotSetException {
-        return BonitaHomeServer.getInstance().getTenantConfigurationFiles(tenantId);
+    @Override
+    protected Properties getProperties() throws IOException {
+        return BONITA_HOME_SERVER.getTenantProperties(tenantId);
     }
 
-    protected Properties getProperties() throws BonitaHomeNotSetException, IOException {
-        return BonitaHomeServer.getInstance().getTenantProperties(tenantId);
+    @Override
+    protected List<BonitaConfiguration> getConfiguration() throws IOException {
+        return BONITA_HOME_SERVER.getTenantConfiguration(tenantId);
     }
 
-    public <T> T getService(final Class<T> serviceClass) {
-        return getContext().getBean(serviceClass);
-    }
-
-    protected <T> T getService(final String name, final Class<T> serviceClass) {
-        return getContext().getBean(name, serviceClass);
-    }
-
-    protected <T> T getService(final String name) {
-        return (T) getContext().getBean(name);
-    }
-
-    public void destroy() {
-        if (context != null) {
-            context.close();
-            context = null;
+    @Override
+    protected List<String> getClassPathResources(Properties properties) {
+        ArrayList<String> resources = new ArrayList<>();
+        resources.add("bonita-tenant-community.xml");
+        resources.add("bonita-tenant-sp.xml");
+        if (Boolean.valueOf(properties.getProperty("bonita.cluster", "false"))) {
+            resources.add("bonita-tenant-sp-cluster.xml");
         }
-    }
-
-    public ApplicationContext getContext() {
-        if (context == null) {
-            try {
-                ApplicationContext parentContext = null;
-                if (parent != null) {
-                    parentContext = parent.getContext();
-                }
-                context = new AbsoluteFileSystemXmlApplicationContext(getResources(), parentContext);
-                final Properties properties = getProperties();
-                context.addClassPathResource("bonita-tenant-community.xml");
-                context.addClassPathResource("bonita-tenant-sp.xml");
-                if (Boolean.valueOf(properties.getProperty("bonita.cluster", "false"))) {
-                    context.addClassPathResource("bonita-tenant-sp-cluster.xml");
-                }
-
-
-                final PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-                configurer.setProperties(properties);
-                context.addBeanFactoryPostProcessor(configurer);
-                final String[] activeProfiles = getActiveProfiles();
-                context.getEnvironment().setActiveProfiles(activeProfiles);
-                context.refresh();
-            } catch (IOException | BonitaHomeNotSetException e) {
-                throw new BonitaRuntimeException(e);
-            }
-        }
-        return context;
-    }
-
-    private String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
-        final Properties properties = BonitaHomeServer.getInstance().getPrePlatformInitProperties();
-        final String activeProfiles = (String) properties.get("activeProfiles");
-        return activeProfiles.split(",");
+        return resources;
     }
 }

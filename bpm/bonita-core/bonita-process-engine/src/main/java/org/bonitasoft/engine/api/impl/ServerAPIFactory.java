@@ -43,8 +43,6 @@ public class ServerAPIFactory {
         String serverAPIClassName = bonitaHomeServer.getServerAPIImplementation();
         try {
             return (ServerAPI) Class.forName(serverAPIClassName).newInstance();
-        } catch (RuntimeException e) {
-            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         } catch (Exception e) {
             throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         }
@@ -55,8 +53,6 @@ public class ServerAPIFactory {
         try {
             Class<?> serverApiClass = Class.forName(serverAPIClassName);
             return (ServerAPI) serverApiClass.getConstructor(boolean.class).newInstance(cleanSession);
-        } catch (RuntimeException e) {
-            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         } catch (Exception e) {
             throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
         }
