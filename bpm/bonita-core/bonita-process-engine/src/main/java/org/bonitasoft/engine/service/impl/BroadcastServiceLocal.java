@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.service.TaskResult;
 
 /**
@@ -25,8 +27,19 @@ import org.bonitasoft.engine.service.TaskResult;
  */
 public class BroadcastServiceLocal implements BroadcastService {
 
+    private ServicesResolver servicesResolver;
+
+    public BroadcastServiceLocal(ServicesResolver servicesResolver) {
+        this.servicesResolver = servicesResolver;
+    }
+
     @Override
-    public <T> Map<String, TaskResult<T>> execute(final Callable<T> callable) {
+    public <T> Map<String, TaskResult<T>> executeOnAllNodes(final Callable<T> callable) {
+        try {
+            servicesResolver.injectServices(null, callable);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new IllegalStateException("Unable to inject service on broadcast task", e);
+        }
         try {
             T call = callable.call();
             return Collections.singletonMap("local", TaskResult.ok(call));
@@ -37,17 +50,35 @@ public class BroadcastServiceLocal implements BroadcastService {
     }
 
     @Override
-    public <T> Map<String, TaskResult<T>> execute(final Callable<T> callable, final Long tenantId) {
-        return execute(callable);
+    public <T> Map<String, TaskResult<T>> executeOnOthers(Callable<T> callable) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public <T> Map<String, TaskResult<T>> executeOnAllNodes(final Callable<T> callable, final Long tenantId) {
+        try {
+            servicesResolver.injectServices(tenantId, callable);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new IllegalStateException("Unable to inject service on broadcast task", e);
+        }
+        try {
+            T call = callable.call();
+            return Collections.singletonMap("local", TaskResult.ok(call));
+        } catch (Exception e) {
+            return Collections.singletonMap("local", TaskResult.<T> error(e));
+        }
+
+    }
+
+    @Override
+    public <T> Map<String, TaskResult<T>> executeOnOthers(Callable<T> callable, Long tenantId) {
+        return Collections.emptyMap();
     }
 
     @Override
     public void submit(final Callable<?> callable) {
-        try {
-            callable.call();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        //In local it is the same as execute
+        executeOnAllNodes(callable);
     }
 
 }

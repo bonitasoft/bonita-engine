@@ -214,7 +214,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             final ServiceStrategy serviceStrategy) throws UpdateException {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
         final SetServiceState setServiceState = new SetServiceState(tenantId, serviceStrategy);
-        final Map<String, TaskResult<Void>> result = broadcastService.execute(setServiceState, tenantId);
+        final Map<String, TaskResult<Void>> result = broadcastService.executeOnAllNodes(setServiceState, tenantId);
         handleResult(result);
     }
 

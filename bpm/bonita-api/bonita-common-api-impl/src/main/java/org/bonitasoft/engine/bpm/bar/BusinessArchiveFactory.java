@@ -125,11 +125,12 @@ public class BusinessArchiveFactory {
     //--------------- instance methods
 
 
-    protected BusinessArchive readBusinessArchive(final InputStream inputStream,  List<BusinessArchiveContribution> contributions) throws IOException, InvalidBusinessArchiveFormatException {  File barFolder = null;
+    protected BusinessArchive readBusinessArchive(final InputStream inputStream,  List<BusinessArchiveContribution> contributions) throws IOException, InvalidBusinessArchiveFormatException {  
+        File barFolder = File.createTempFile("tempBarFolder", null);
+        barFolder.delete();
+        barFolder.mkdir();
         try {
-            barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBarFolder");
             IOUtil.unzipToFolder(inputStream, barFolder);
-
             return getBusinessArchive(barFolder, contributions);
         } catch (final InvalidBusinessArchiveFormatException e) {
             throw e;
@@ -175,7 +176,10 @@ public class BusinessArchiveFactory {
     }
 
     protected void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile, List<BusinessArchiveContribution> contributions) throws IOException {
-        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBarFolder");
+        final File tempFile = File.createTempFile("tempBarFolder",null);
+        
+        tempFile.delete();
+        tempFile.mkdir();
         try {
             writeBusinessArchiveToFolder(businessArchive, tempFile);
             zipBarFolder(businessArchiveFile, tempFile);

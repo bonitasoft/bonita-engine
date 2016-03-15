@@ -63,7 +63,6 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -140,7 +139,7 @@ public class ProcessDefinitionServiceImplTest {
     private DesignProcessDefinition designProcessDefinition;
 
     @Before
-    public void before() throws SProcessDefinitionNotFoundException, SBonitaReadException, IOException, XMLParseException {
+    public void before() throws SProcessDefinitionNotFoundException, SBonitaReadException, IOException {
         final Parser parser = mock(Parser.class);
         doReturn(parser).when(parserFactory).createParser(Matchers.<ElementBindingsFactory> any());
 
@@ -1664,7 +1663,7 @@ public class ProcessDefinitionServiceImplTest {
         doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
         SProcessDefinitionDesignContent processDefinitionDesignContent = mock(SProcessDefinitionDesignContent.class);
         when(processDefinitionDeployInfo.getDesignContent()).thenReturn(processDefinitionDesignContent);
-        when(processDefinitionBARContribution.convertXmlToProcess(null)).thenThrow(new XMLParseException("impossible to parse content"));
+        when(processDefinitionBARContribution.convertXmlToProcess(null)).thenThrow(new IOException("impossible to parse content"));
         processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
     }
 

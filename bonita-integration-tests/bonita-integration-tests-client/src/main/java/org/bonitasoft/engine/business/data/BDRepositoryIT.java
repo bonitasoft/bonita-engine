@@ -92,6 +92,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 import org.xml.sax.SAXException;
 
 public class BDRepositoryIT extends CommonAPIIT {
@@ -296,9 +297,12 @@ public class BDRepositoryIT extends CommonAPIIT {
         return model;
     }
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Before
     public void setUp() throws Exception {
-        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
+        clientFolder = temporaryFolder.newFolder();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         matti = createUser("matti", "bpm");
 

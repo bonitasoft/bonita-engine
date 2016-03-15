@@ -89,14 +89,10 @@ public class ProcessDefinitionBARContributionTest {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage("Deserialization of the ProcessDesignFailed");
         final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
-        final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
+        final File createTempFile = temporaryFolder.newFile();
 
-        try {
-            IOUtil.writeContentToFile(allContentFrom, createTempFile);
-            new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
-        } finally {
-            createTempFile.delete();
-        }
+        IOUtil.writeContentToFile(allContentFrom, createTempFile);
+        new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
     }
 
     @Test

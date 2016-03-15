@@ -45,10 +45,10 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.scheduler.InjectedService;
+import org.bonitasoft.engine.service.InjectedService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
-import org.bonitasoft.engine.scheduler.ServicesResolver;
+import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
@@ -90,6 +90,7 @@ public class SchedulerServiceImplTest {
     @Mock
     private PersistenceService persistenceService;
 
+    @Mock
     ServicesResolver servicesResolver;
 
     @Before
@@ -111,7 +112,8 @@ public class SchedulerServiceImplTest {
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 
         servicesResolver = mock(ServicesResolver.class);
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver, persistenceService);
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver,
+                persistenceService);
     }
 
     @Test
@@ -230,19 +232,6 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void should_injectService_inject_setter_hacing_the_annotation() throws Exception {
-        final BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
-
-        final Long myService = new Long(1);
-        when(servicesResolver.lookup("myService")).thenReturn(myService);
-
-        schedulerService.injectServices(beanThatNeedMyService);
-
-        assertEquals(myService, beanThatNeedMyService.getMyService());
-
-    }
-
-    @Test
     public void schedule_should_store_jobDescriptor_store_parameters_and_call_executor_schedule_using_tenantId()
             throws Exception {
         // given
@@ -279,7 +268,7 @@ public class SchedulerServiceImplTest {
 
         // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
-        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>>any(), eq(TENANT_ID), anyLong());
+        verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
         verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), anyString(), anyBoolean());
     }
 
@@ -289,40 +278,6 @@ public class SchedulerServiceImplTest {
 
         verify(schedulerExecutor).deleteJobs(String.valueOf(TENANT_ID));
         verify(jobService).deleteAllJobDescriptors();
-    }
-
-    private final class BeanThatNeedMyService implements StatelessJob {
-
-        private static final long serialVersionUID = 1L;
-
-        private Object myService;
-
-        @InjectedService
-        public void setMyService(final Object myService) {
-            this.myService = myService;
-        }
-
-        public Object getMyService() {
-            return myService;
-        }
-
-        @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public String getDescription() {
-            return null;
-        }
-
-        @Override
-        public void execute() {
-        }
-
-        @Override
-        public void setAttributes(final Map<String, Serializable> attributes) {
-        }
     }
 
     @Test

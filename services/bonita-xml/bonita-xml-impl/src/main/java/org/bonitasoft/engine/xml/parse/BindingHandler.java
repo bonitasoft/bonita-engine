@@ -38,32 +38,31 @@ public class BindingHandler extends DefaultHandler {
 
     private final Stack<String> elements;
 
-    private StringBuilder tempVal;
+    StringBuilder tempVal;
 
     private Map<String, String> tempAttributes;
 
     public BindingHandler(final List<Class<? extends ElementBinding>> binders) {
         this.binders = this.setBinders(binders);
-        model = new Stack<ElementBinding>();
-        elements = new Stack<String>();
-        tempAttributes = new HashMap<String, String>();
+        model = new Stack<>();
+        elements = new Stack<>();
+        tempAttributes = new HashMap<>();
         bindingsFactory = null;
     }
 
     public BindingHandler(final ElementBindingsFactory bindingsFactory) {
         this.bindingsFactory = bindingsFactory;
-        model = new Stack<ElementBinding>();
-        elements = new Stack<String>();
-        tempAttributes = new HashMap<String, String>();
+        model = new Stack<>();
+        elements = new Stack<>();
+        tempAttributes = new HashMap<>();
         binders = this.setBinders(bindingsFactory);
     }
 
     private Map<String, Class<? extends ElementBinding>> setBinders(final ElementBindingsFactory bindingsFactory) {
         final List<ElementBinding> elementBindings = bindingsFactory.getElementBindings();
 
-        final Map<String, Class<? extends ElementBinding>> temp = new HashMap<String, Class<? extends ElementBinding>>();
-        for (int i = 0; i < elementBindings.size(); i++) {
-            final ElementBinding elementBinding = elementBindings.get(i);
+        final Map<String, Class<? extends ElementBinding>> temp = new HashMap<>();
+        for (final ElementBinding elementBinding : elementBindings) {
             try {
                 final String tag = elementBinding.getElementTag();
                 temp.put(tag, elementBinding.getClass());
@@ -75,9 +74,8 @@ public class BindingHandler extends DefaultHandler {
     }
 
     private Map<String, Class<? extends ElementBinding>> setBinders(final List<Class<? extends ElementBinding>> binders) {
-        final Map<String, Class<? extends ElementBinding>> temp = new HashMap<String, Class<? extends ElementBinding>>();
-        for (int i = 0; i < binders.size(); i++) {
-            final Class<? extends ElementBinding> binderClass = binders.get(i);
+        final Map<String, Class<? extends ElementBinding>> temp = new HashMap<>();
+        for (final Class<? extends ElementBinding> binderClass : binders) {
             try {
                 final String tag = binderClass.newInstance().getElementTag();
                 temp.put(tag, binderClass);
@@ -98,18 +96,14 @@ public class BindingHandler extends DefaultHandler {
         if (tempVal == null) {
             tempVal = new StringBuilder();
         }
-        String tempString = new String(ch, start, length);
-        if ("".equals(tempString.trim())) {
-            tempString = "";
-        }
-        tempVal.append(tempString);
+        tempVal.append(new String(ch, start, length));
     }
 
     @Override
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
         final Class<? extends ElementBinding> binderClass = binders.get(localName);
         if (binderClass != null) {
-            final Map<String, String> elementAttributes = new HashMap<String, String>();
+            final Map<String, String> elementAttributes = new HashMap<>();
             for (int i = 0; i < attributes.getLength(); i++) {
                 final String attributeLocalName = attributes.getLocalName(i);
                 final String attributeValue = attributes.getValue(i);
@@ -125,7 +119,7 @@ public class BindingHandler extends DefaultHandler {
                 throw new SAXException(e);
             }
         } else {
-            tempAttributes = new HashMap<String, String>();
+            tempAttributes = new HashMap<>();
             for (int i = 0; i < attributes.getLength(); i++) {
                 final String attributeLocalName = attributes.getLocalName(i);
                 final String attributeValue = attributes.getValue(i);
@@ -167,7 +161,7 @@ public class BindingHandler extends DefaultHandler {
             final ElementBinding binder = model.peek();
             try {
                 if (tempVal != null) {
-                    binder.setChildElement(localName, tempVal.toString(), tempAttributes);
+                    binder.setChildElement(localName, tempVal.toString().trim(), tempAttributes);
                 } else {
                     binder.setChildElement(localName, "", tempAttributes);
                 }

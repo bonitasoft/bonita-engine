@@ -19,8 +19,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.bonitasoft.engine.DeepRegexFileFilter;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.commons.io.IOUtil;
 
 /**
@@ -57,11 +55,6 @@ public class Folder {
         }
     }
 
-    public File[] listFiles() throws IOException {
-        checkFolderExists();
-        return folder.listFiles();
-    }
-
     public void delete() throws IOException {
         //System.err.println("DELETING FOLDER: " + folder);
         checkFolderExists();
@@ -71,12 +64,6 @@ public class Folder {
     public File getFile(final String name) throws IOException {
         checkFolderExists();
         return new File(folder, name);
-    }
-
-    public byte[] getFileContent(final String name) throws IOException {
-        checkFolderExists();
-        final File file = new File(folder, name);
-        return IOUtil.getAllContentFrom(file);
     }
 
     public File newFile(final String name) throws IOException {
@@ -91,17 +78,6 @@ public class Folder {
     public File[] listFiles(FileFilter filter) throws IOException {
         checkFolderExists();
         return folder.listFiles(filter);
-    }
-
-    public void deleteFile(String fileName) throws IOException {
-        checkFolderExists();
-        final File file = getFile(fileName);
-        if (!file.exists()) {
-            //FIXME WARN ?
-            return;
-            //throw new IOException("File denoted by path " + file.getAbsolutePath() + " does not exist.");
-        }
-        file.delete();
     }
 
     public List<File> listFiles(FilenameFilter filter) throws IOException {
@@ -119,7 +95,6 @@ public class Folder {
     }
 
     public void create() throws IOException {
-        //System.err.println("CREATING FOLDER: " + folder);
         if (!folder.getParentFile().exists()) {
             throw new IOException("Folder denoted by path " + folder.getAbsolutePath() + " cannot be created as its parent does not exist.");
         }
@@ -157,10 +132,6 @@ public class Folder {
             res.put(key, value);
         }
         return res;
-    }
-
-    public void writeBusinessArchive(BusinessArchive businessArchive) throws IOException {
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, getFile());
     }
 
     public Map<String, byte[]> listFilesAsResources() throws IOException {

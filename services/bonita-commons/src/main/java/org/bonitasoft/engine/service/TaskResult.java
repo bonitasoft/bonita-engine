@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.service;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -104,4 +105,30 @@ public class TaskResult<T> {
         return timeunit;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TaskResult<?> that = (TaskResult<?>) o;
+        return Objects.equals(throwable, that.throwable) &&
+                Objects.equals(result, that.result) &&
+                Objects.equals(timeout, that.timeout) &&
+                timeunit == that.timeunit;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(throwable, result, timeout, timeunit);
+    }
+
+    @Override
+    public String toString() {
+        return "TaskResult{" +
+                "throwable=" + throwable +
+                ", result=" + result +
+                ", timeout=" + timeout +
+                ", timeunit=" + timeunit +
+                '}';
+    }
 }
