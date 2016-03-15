@@ -65,7 +65,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -262,12 +261,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             } else {
                 return processWithTimestamp.getValue();
             }
-        } catch (XMLParseException | IOException | SReflectException | SCacheException e) {
+        } catch (IOException | SReflectException | SCacheException e) {
             throw new SBonitaReadException(e);
         }
     }
 
-    SProcessDefinition readSProcessDefinitionFromDatabase(long processId, SProcessDefinitionDeployInfo processDeploymentInfo) throws IOException, XMLParseException, SReflectException, SCacheException {
+    SProcessDefinition readSProcessDefinitionFromDatabase(long processId, SProcessDefinitionDeployInfo processDeploymentInfo) throws IOException, SReflectException, SCacheException {
         final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
                         .getContent());
         SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
@@ -946,7 +945,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             SBonitaReadException {
         try {
             return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
-        } catch (IOException | XMLParseException e) {
+        } catch (IOException e) {
             throw new SBonitaReadException(e);
         }
     }

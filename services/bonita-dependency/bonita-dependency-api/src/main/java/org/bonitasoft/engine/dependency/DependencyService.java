@@ -267,6 +267,12 @@ public interface DependencyService {
      */
     void deleteDependencies(long id, ScopeType type) throws SDependencyException;
 
+    /**
+     * refresh classloader on this node only
+     * @param type
+     * @param id
+     * @throws SDependencyException
+     */
     void refreshClassLoader(ScopeType type, long id) throws SDependencyException;
 
     /**

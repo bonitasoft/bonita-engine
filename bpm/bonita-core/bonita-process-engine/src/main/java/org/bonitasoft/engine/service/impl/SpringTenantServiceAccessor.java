@@ -60,6 +60,7 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -111,6 +112,7 @@ import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -502,6 +504,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public DataInstanceService getDataInstanceService() {
+
         if (dataInstanceService == null) {
             dataInstanceService = beanAccessor.getService(DataInstanceService.class);
         }
@@ -731,8 +734,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public <T> T lookup(final String serviceName) {
+    public <T> T lookup(final String serviceName) throws NotFoundException {
+        try{
+
         return beanAccessor.getService(serviceName);
+        }catch (NoSuchBeanDefinitionException e){
+            throw new NotFoundException(e);
+        }
     }
 
     @Override

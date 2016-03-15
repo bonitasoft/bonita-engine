@@ -164,7 +164,7 @@ public class TenantAdministrationAPIImplTest {
     public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_fail() throws Exception {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
-        doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).execute(any(SetServiceState.class), eq(tenantId));
+        doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).executeOnAllNodes(any(SetServiceState.class), eq(tenantId));
 
         // When a tenant moved to available mode
         tenantManagementAPI.resume();
@@ -174,7 +174,7 @@ public class TenantAdministrationAPIImplTest {
     public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_is_time_out() throws Exception {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(5l, TimeUnit.HOURS);
-        doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).execute(any(SetServiceState.class), eq(tenantId));
+        doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).executeOnAllNodes(any(SetServiceState.class), eq(tenantId));
 
         // When a tenant moved to available mode
         tenantManagementAPI.resume();

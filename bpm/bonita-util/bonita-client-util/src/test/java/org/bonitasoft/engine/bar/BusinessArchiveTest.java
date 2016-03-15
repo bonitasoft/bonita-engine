@@ -15,7 +15,11 @@
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,9 +84,10 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Baptiste Mesta
@@ -97,20 +102,14 @@ public class BusinessArchiveTest {
 
     private File barFile;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Before
     public void before() throws IOException {
-        final String barFolderName = "tmpBar";
-        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory(barFolderName);
-        deleteDirOnExit(tempFolder);
-        IOUtil.deleteDir(tempFolder);
-        barFile = IOUtil.createTempFileInDefaultTempDirectory(barFolderName, ".bar");
-        IOUtil.deleteFile(barFile, 2, 3);
-    }
-
-    @After
-    public void after() throws IOException {
-        IOUtil.deleteFile(barFile, 1, 0);
-        IOUtil.deleteDir(tempFolder);
+        tempFolder = temporaryFolder.newFolder();
+        this.barFile = File.createTempFile("barFile", ".bar", tempFolder);
+        barFile.delete();
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
@@ -125,15 +124,7 @@ public class BusinessArchiveTest {
     }
 
     private File getFile(final String fileName) {
-        final File infoFile = new File(tempFolder, fileName);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                IOUtil.deleteFile(infoFile, 1, 0);
-            }
-        });
-        return infoFile;
+        return new File(tempFolder, fileName);
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
@@ -205,7 +196,7 @@ public class BusinessArchiveTest {
         BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         file.delete();
-        createNewFile(file);
+        file.createNewFile();
         final FileWriter fileWriter = new FileWriter(file);
         fileWriter.write("test");
         fileWriter.flush();
@@ -246,7 +237,7 @@ public class BusinessArchiveTest {
 
     @Test(expected = IOException.class)
     public void exportBusinessArchiveAsFileOnExistingFile() throws Exception {
-        barFile = IOUtil.createTempFileInDefaultTempDirectory("exportBusinessArchiveAsFileOnExistingFile-businessArchive", ".bar");
+        barFile = temporaryFolder.newFile();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
@@ -1084,7 +1075,7 @@ public class BusinessArchiveTest {
         fileContent = fileContent.replace("<def:processDefinition", "<def:pro_cessDefinition");
         fileContent = fileContent.replace("</def:processDefinition", "</def:pro_cessDefinition");
         file.delete();
-        createNewFile(file);
+        file.createNewFile();
         IOUtil.writeContentToFile(fileContent, file);
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
@@ -1113,36 +1104,9 @@ public class BusinessArchiveTest {
         String fileContent = IOUtil.read(file);
         fileContent = fileContent.replace("<def:processDefinition", "<def:pro_typo_cessDefinition");
         file.delete();
-        createNewFile(file);
+        file.createNewFile();
         IOUtil.writeContentToFile(fileContent, file);
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
-    }
-
-    private void createNewFile(final File file) throws IOException {
-        file.createNewFile();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                IOUtil.deleteFile(file, 1, 0);
-            }
-        });
-    }
-
-    private void deleteDirOnExit(final File directory) {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                if (directory != null) {
-                    try {
-                        IOUtil.deleteDir(directory);
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)

@@ -13,20 +13,29 @@
  **/
 package org.bonitasoft.engine.service;
 
-import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * @author Baptiste Mesta
- * 
  */
-public class ProcessEngineServicesResolver implements ServicesResolver {
+public class ProcessEngineServicesResolver implements ServicesLookup {
 
     @Override
-    public <T> T lookup(final String serviceName) {
-        long tenantId;
+    public <T> T lookupOnPlatform(String serviceName) {
         try {
-            tenantId = ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
+            PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return platformServiceAccessor.lookup(serviceName);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to find the service " + serviceName, e);
+        }
+    }
+
+    @Override
+    public <T> T lookupOnTenant(Long tenantId, final String serviceName) {
+        if (tenantId == null) {
+            return lookupOnPlatform(serviceName);
+        }
+        try {
             TenantServiceAccessor instance = TenantServiceSingleton.getInstance(tenantId);
             return instance.lookup(serviceName);
         } catch (Exception e) {

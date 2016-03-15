@@ -44,12 +44,13 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Baptiste Mesta
@@ -58,6 +59,9 @@ import org.junit.Test;
  * @author Céline Souchet
  */
 public class ProcessDeploymentIT extends TestWithUser {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void deployProcessInDisabledState() throws Exception {
@@ -84,8 +88,8 @@ public class ProcessDeploymentIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final File tempFile = IOUtil.createTempFile("testbar", ".bar", new File(IOUtil.TMP_DIRECTORY));
-        tempFile.delete();
+        File folder = temporaryFolder.newFolder();
+        File tempFile = new File(folder, "tempFile");
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
 
         // read from the file
@@ -101,7 +105,6 @@ public class ProcessDeploymentIT extends TestWithUser {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // Clean up
-        tempFile.delete();
         disableAndDeleteProcess(processDefinition);
     }
 
