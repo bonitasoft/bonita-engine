@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -21,8 +22,14 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Collections;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -570,4 +577,47 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         assertNotSame(c1, c2);
     }
 
+    @Test
+    public void should_getResource_point_to_existing_file_after_classloader_refresh() throws Exception {
+        //given a classloader that is refreshed
+        getTransactionService().begin();
+        Map<String, byte[]> jarResources = Collections.singletonMap("test.xml", "<node>content</mode>".getBytes());
+        byte[] jarContent = IOUtil.generateJar(jarResources);
+        dependencyService.createMappedDependency("myResource.jar", jarContent, "myResource.jar", ID1, TYPE1);
+        Map<String, byte[]> resources = Collections.singletonMap("myResource.jar", jarContent);
+        getTransactionService().complete();
+        getTransactionService().begin();
+        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, resources);
+        getTransactionService().complete();
+        getTransactionService().begin();
+        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, resources);
+        getTransactionService().complete();
+
+        //when
+        ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+        URL resource = localClassLoader.getResource("test.xml");
+        assertThat(resource).isNotNull();
+        String stringUrl = resource.toExternalForm();
+        URL url = new URL(stringUrl);
+
+        //then
+        assertThat(url).isNotNull();
+        String contentFromUrlOfTheClassLoader = readUrl(resource);
+        String contentFromUrlRecreated = readUrl(url);
+
+        assertThat(contentFromUrlOfTheClassLoader).isEqualTo("<node>content</mode>");
+        assertThat(contentFromUrlRecreated).isEqualTo("<node>content</mode>");
+
+    }
+
+    private String readUrl(URL resource) throws IOException {
+        URLConnection urlConnection = resource.openConnection();
+        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        String inputLine;
+        StringBuilder content = new StringBuilder();
+        while ((inputLine = in.readLine()) != null)
+            content.append(inputLine);
+        in.close();
+        return content.toString();
+    }
 }

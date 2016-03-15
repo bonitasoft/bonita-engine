@@ -39,41 +39,41 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  */
+@RunWith(MockitoJUnitRunner.class)
 public class DependencyServiceImplTest {
 
+    @Mock
     private ReadPersistenceService persistenceService;
-
+    @Mock
     private Recorder recorder;
-
+    @Mock
     private EventService eventService;
-
+    @Mock
     private TechnicalLoggerService logger;
-
+    @Mock
     private QueriableLoggerService queriableLoggerService;
-
+    @Mock
     private ClassLoaderService classLoaderService;
-
+    @Mock
+    private BroadcastService broadcastService;
+    @Mock
+    private ReadSessionAccessor readSessionAccessor;
+    @InjectMocks
     private DependencyServiceImpl dependencyServiceImpl;
-
-    @Before
-    public void setUp() {
-        persistenceService = mock(ReadPersistenceService.class);
-        recorder = mock(Recorder.class);
-        eventService = mock(EventService.class);
-        queriableLoggerService = mock(QueriableLoggerService.class);
-        logger = mock(TechnicalLoggerService.class);
-        classLoaderService = mock(ClassLoaderService.class);
-        dependencyServiceImpl = new DependencyServiceImpl(persistenceService, recorder, eventService, logger, queriableLoggerService, classLoaderService);
-    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependency(long)}.
@@ -138,11 +138,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencies(options);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyIds(long, java.lang.String, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void getDependencyIds() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();

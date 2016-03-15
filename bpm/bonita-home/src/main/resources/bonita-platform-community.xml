@@ -58,7 +58,11 @@
         <constructor-arg name="batchSize" value="${bonita.platform.scheduler.batchsize}" />
     </bean>
 
-    <bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
+    <bean id="servicesResolver" class="org.bonitasoft.engine.service.ServicesResolver">
+        <constructor-arg name="servicesLookup" ref="servicesLookup"/>
+    </bean>
+
+    <bean id="servicesLookup" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver"/>
 
     <bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
         <constructor-arg name="props" ref="quartzProperties" />
@@ -215,6 +219,8 @@
     <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyServiceImpl">
         <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="broadcastService" ref="broadcastService" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
     <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
@@ -289,7 +295,9 @@
         <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
     </bean>
 
-    <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal" />
+    <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal">
+        <constructor-arg name="servicesResolver" ref="servicesResolver" />
+    </bean>
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
@@ -659,14 +667,14 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10202:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.STaskContractData" />
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.core.contract.data.STaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SProcessContractData</value>
+            </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10210" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10210:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SProcessContractData" />
-        <constructor-arg name="sequenceId" value="10220" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10220:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
@@ -759,14 +767,14 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20040:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SATaskContractData" />
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.core.contract.data.SATaskContractData</value>
+                <value>org.bonitasoft.engine.core.contract.data.SAProcessContractData</value>
+            </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="20210" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20210:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SAProcessContractData" />
-        <constructor-arg name="sequenceId" value="20220" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20220:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">

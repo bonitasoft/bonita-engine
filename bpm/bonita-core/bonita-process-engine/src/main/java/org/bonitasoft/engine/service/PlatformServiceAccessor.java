@@ -17,16 +17,15 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -71,4 +70,8 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     BroadcastService getBroadcastService();
 
     PlatformAuthenticationService getPlatformAuthenticationService();
+
+    <T> T lookup(String serviceName) throws NotFoundException;
+
+    ServicesResolver getServicesResolver();
 }

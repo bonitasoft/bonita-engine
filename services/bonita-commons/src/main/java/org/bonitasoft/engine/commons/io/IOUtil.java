@@ -77,14 +77,6 @@ public class IOUtil {
         // For Sonar
     }
 
-    public static File createDirectory(final String path) {
-        final File file = new File(path);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        return file;
-    }
-
     public static List<String> getClassNameList(final byte[] jarContent) throws IOException {
         final List<String> classes = new ArrayList<String>(10);
         JarInputStream stream = null;
@@ -112,63 +104,6 @@ public class IOUtil {
 
     private static String toQualifiedClassName(final String name) {
         return name.replace('/', '.').replaceAll(".class", "");
-    }
-
-    public static File createTempFile(final String prefix, final String suffix, final File directory) throws IOException {
-        final File tmpFile = createTempFileUntilSuccess(prefix, suffix, directory);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                if (tmpFile != null) {
-                    deleteFile(tmpFile, 1, 0);
-                }
-            }
-        });
-        return tmpFile;
-    }
-
-    private static File createTempFileUntilSuccess(final String prefix, final String suffix, final File directory) throws IOException {
-        // By-pass for the bug #6325169 on SUN JDK 1.5 on windows
-        // The createTempFile could fail while creating a file with the same name of
-        // an existing directory
-        // So if the file creation fail, it retry (with a limit of 10 retry)
-        // Rethrow the IOException if all retries failed
-        File tmpFile = null;
-        final int retryNumber = 10;
-        int j = 0;
-        boolean succeded = false;
-        do {
-            try {
-                /*
-                 * If the prefix contained file separator
-                 * we need to create the parent directories if missing
-                 */
-                final int lastIndexOfSeparatorChar = prefix.lastIndexOf('/');
-                String fileName = prefix;
-                if (lastIndexOfSeparatorChar > -1) {
-                    final String dirToCreate = prefix.substring(0, lastIndexOfSeparatorChar);
-                    new File(directory.getAbsolutePath() + File.separator + dirToCreate).mkdirs();
-                    fileName = prefix.substring(lastIndexOfSeparatorChar, prefix.length());
-                }
-
-                /* Create the file */
-                tmpFile = File.createTempFile(fileName, suffix, directory);
-
-                succeded = true;
-            } catch (final IOException e) {
-                if (j == retryNumber) {
-                    throw e;
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (final InterruptedException e1) {
-                }
-                j++;
-            }
-        } while (!succeded);
-        return tmpFile;
     }
 
     public static void write(final File file, final byte[] fileContent) throws IOException {
@@ -428,27 +363,7 @@ public class IOUtil {
         return retries > 0;
     }
 
-    public static String getFileContent(final File file) {
-        final StringBuilder sb = new StringBuilder();
-        try {
-            final BufferedReader reader = new BufferedReader(new FileReader(file));
-            try {
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                    sb.append(System.getProperty("line.separator"));
-                }
-            } finally {
-                reader.close();
-            }
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return sb.toString();
-    }
-
-    public static void writeFile(final File file, final String fileContent) throws FileNotFoundException, IOException {
+    public static void writeFile(final File file, final String fileContent) throws IOException {
         if (file == null) {
             throw new IllegalArgumentException("File should not be null.");
         }
@@ -468,20 +383,6 @@ public class IOUtil {
             output.write(fileContent);
         } finally {
             output.close();
-        }
-    }
-
-    public static void copyFile(final ZipInputStream inputStream, final File target) throws IOException {
-        final FileOutputStream fos = new FileOutputStream(target);
-        int n;
-        final int BUFF_SIZE = 1024;
-        final byte[] buf = new byte[BUFF_SIZE];
-        try {
-            while ((n = inputStream.read(buf)) > 0) {
-                fos.write(buf, 0, n);
-            }
-        } finally {
-            fos.close();
         }
     }
 
@@ -538,38 +439,6 @@ public class IOUtil {
             zipInputstream.close();
         }
         return files;
-    }
-
-    public static void unzipToFolder(final InputStream inputStream, final File outputFolder) throws IOException {
-        final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
-        ZipEntry zipEntry = null;
-
-        try {
-            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
-                extractZipEntry(zipInputstream, zipEntry, outputFolder);
-            }
-        } finally {
-            zipInputstream.close();
-        }
-    }
-
-    private static void extractZipEntry(final ZipInputStream zipInputstream, final ZipEntry zipEntry, final File outputFolder) throws FileNotFoundException,
-            IOException {
-        try {
-            final String entryName = zipEntry.getName();
-
-            // For each entry, a file is created in the output directory "folder"
-            final File outputFile = new File(outputFolder.getAbsolutePath(), entryName);
-
-            // If the entry is a directory, it creates in the output folder, and we go to the next entry (return).
-            if (zipEntry.isDirectory()) {
-                mkdirs(outputFile);
-                return;
-            }
-            writeZipInputToFile(zipInputstream, outputFile);
-        } finally {
-            zipInputstream.closeEntry();
-        }
     }
 
     private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {

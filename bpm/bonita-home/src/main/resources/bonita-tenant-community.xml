@@ -1339,6 +1339,9 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="broadcastService" ref="broadcastService" />
+        <constructor-arg name="readSessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
@@ -1531,6 +1534,7 @@
                 <entry key="hibernate.validator.autoregister_listeners" value="${bonita.tenant.bdm.repository.validator.autoregister_listeners}" />
                 <entry key="hibernate.validator.apply_to_ddl" value="${bonita.tenant.bdm.repository.validator.apply_to_ddl}" />
                 <entry key="javax.persistence.validation.mode" value="${bonita.tenant.bdm.repository.javax.persistence.validation.mode}" />
+                <entry key="hibernate.current_session_context_class" value="thread" />
             </map>
         </constructor-arg>
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />

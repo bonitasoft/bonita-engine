@@ -192,19 +192,8 @@ public class IOUtil {
         }
     }
 
-    public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + JVM_NAME + "_" + System.currentTimeMillis());
-        createTempDirectory(tmpDir);
-        return tmpDir;
-    }
-
     public static File createTempDirectory(final URI directoryPath) {
         final File tmpDir = new File(directoryPath);
-        createTempDirectory(tmpDir);
-        return tmpDir;
-    }
-
-    private static void createTempDirectory(final File tmpDir) {
         tmpDir.setReadable(true);
         tmpDir.setWritable(true);
 
@@ -224,6 +213,7 @@ public class IOUtil {
                 }
             }
         });
+        return tmpDir;
     }
 
     public static boolean deleteDir(final File dir) throws IOException {
@@ -249,67 +239,6 @@ public class IOUtil {
             return result && deleteFile(dir, attempts, sleepTime);
         }
         return false;
-    }
-
-    public static File createTempFileInDefaultTempDirectory(final String prefix, final String suffix) throws IOException {
-        return createTempFile(prefix, suffix, new File(TMP_DIRECTORY));
-    }
-
-    public static File createTempFile(final String prefix, final String suffix, final File directory) throws IOException {
-        final File tmpFile = createTempFileUntilSuccess(prefix, suffix, directory);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                if (tmpFile != null) {
-                    deleteFile(tmpFile, 1, 0);
-                }
-            }
-        });
-        return tmpFile;
-    }
-
-    private static File createTempFileUntilSuccess(final String prefix, final String suffix, final File directory) throws IOException {
-        // By-pass for the bug #6325169 on SUN JDK 1.5 on windows
-        // The createTempFile could fail while creating a file with the same name of
-        // an existing directory
-        // So if the file creation fail, it retry (with a limit of 10 retry)
-        // Rethrow the IOException if all retries failed
-        File tmpFile = null;
-        final int retryNumber = 10;
-        int j = 0;
-        boolean succeeded = false;
-        do {
-            try {
-                /*
-                 * If the prefix contained file separator
-                 * we need to create the parent directories if missing
-                 */
-                final int lastIndexOfSeparatorChar = prefix.lastIndexOf('/');
-                String fileName = prefix;
-                if (lastIndexOfSeparatorChar > -1) {
-                    final String dirToCreate = prefix.substring(0, lastIndexOfSeparatorChar);
-                    new File(directory.getAbsolutePath() + File.separator + dirToCreate).mkdirs();
-                    fileName = prefix.substring(lastIndexOfSeparatorChar, prefix.length());
-                }
-
-                /* Create the file */
-                tmpFile = File.createTempFile(fileName, suffix, directory);
-
-                succeeded = true;
-            } catch (final IOException e) {
-                if (j == retryNumber) {
-                    throw e;
-                }
-                try {
-                    Thread.sleep(100);
-                } catch (final InterruptedException ignored) {
-                }
-                j++;
-            }
-        } while (!succeeded);
-        return tmpFile;
     }
 
     public static boolean deleteFile(final File f, final int attempts, final long sleepTime) {
