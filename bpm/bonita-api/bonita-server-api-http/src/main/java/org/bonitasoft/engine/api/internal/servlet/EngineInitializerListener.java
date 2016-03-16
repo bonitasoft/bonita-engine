@@ -22,6 +22,7 @@ import javax.servlet.ServletContextListener;
 import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.engine.EngineInitializerProperties;
 import org.bonitasoft.engine.PlatformTenantManager;
+import org.bonitasoft.platform.setup.PlatformSetup;
 
 public class EngineInitializerListener implements ServletContextListener {
 
@@ -39,6 +40,7 @@ public class EngineInitializerListener implements ServletContextListener {
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
         try {
+            new PlatformSetup().setup(); // init tables and default configuration
             new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
         } catch (final Exception e) {
             LOGGER.log(Level.SEVERE, "Error while initializing the Engine", e);
