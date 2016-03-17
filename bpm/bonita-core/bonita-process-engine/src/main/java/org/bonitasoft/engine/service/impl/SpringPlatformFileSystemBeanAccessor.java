@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.context.ApplicationContext;
 
@@ -29,6 +31,7 @@ import org.springframework.context.ApplicationContext;
  */
 public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
 
+    private File bonita_conf;
 
     public SpringPlatformFileSystemBeanAccessor(ApplicationContext parent) {
         super(parent);
@@ -36,12 +39,27 @@ public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAc
 
     @Override
     protected Properties getProperties() throws IOException {
-        return BONITA_HOME_SERVER.getPlatformProperties();
+        Properties platformProperties = BONITA_HOME_SERVER.getPlatformProperties();
+        platformProperties.setProperty("bonita.conf.folder", bonita_conf.getAbsolutePath());
+        return platformProperties;
     }
 
     @Override
     protected List<BonitaConfiguration> getConfiguration() throws IOException {
-        return BONITA_HOME_SERVER.getPlatformConfiguration();
+        List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
+        //handle special case for cache configuration files
+        Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
+        bonita_conf = File.createTempFile("bonita_conf", "");
+        bonita_conf.delete();
+        bonita_conf.mkdir();
+        while (iterator.hasNext()) {
+            BonitaConfiguration bonitaConfiguration = iterator.next();
+            if (bonitaConfiguration.getResourceName().contains("cache")) {
+                iterator.remove();
+                IOUtil.write(new File(bonita_conf, bonitaConfiguration.getResourceName()), bonitaConfiguration.getResourceContent());
+            }
+        }
+        return platformConfiguration;
     }
 
     @Override
