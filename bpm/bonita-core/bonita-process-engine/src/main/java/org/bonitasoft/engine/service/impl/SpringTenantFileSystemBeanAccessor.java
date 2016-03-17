@@ -40,7 +40,7 @@ public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAcce
 
     @Override
     protected List<BonitaConfiguration> getConfiguration() throws IOException {
-        return BONITA_HOME_SERVER.getTenantConfiguration(tenantId);
+        return  BONITA_HOME_SERVER.getTenantConfiguration(tenantId);
     }
 
     @Override
