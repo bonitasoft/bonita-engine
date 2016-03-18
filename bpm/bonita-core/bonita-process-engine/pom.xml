@@ -333,6 +333,18 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!-- platform setup -->
+        <dependency>
+            <groupId>org.bonitasoft.platform</groupId>
+            <artifactId>platform-setup</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.platform</groupId>
+            <artifactId>platform-sql-resources</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Others -->
         <dependency>
             <groupId>commons-io</groupId>
