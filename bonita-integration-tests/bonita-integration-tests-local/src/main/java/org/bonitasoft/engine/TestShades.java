@@ -29,6 +29,7 @@ import org.junit.Test;
 public class TestShades {
 
     private static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";
+    protected static final String ORG_BONITASOFT_PLATFORM = "org.bonitasoft.platform";
 
     @Test
     public void testShades() throws IOException {
@@ -82,6 +83,10 @@ public class TestShades {
         outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-server", "");
         outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-client", "");
         outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-common", "");
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-setup", "");
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-common", ""); // FIXME: remove this once this module has been merged !!!
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-configuration", ""); // FIXME: remove this once this module has been merged !!!
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-sql-resources", "");
         return outputOfMaven;
     }
 
