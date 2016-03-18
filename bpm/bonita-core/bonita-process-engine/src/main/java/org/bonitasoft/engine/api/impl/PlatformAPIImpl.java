@@ -418,7 +418,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
 
-        final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService, BonitaHomeServer.getInstance());
+        final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
         if (!transactionService.executeInTransaction(checkPlatformVersion)) {
             throw new StartNodeException(checkPlatformVersion.getErrorMessage());
         }

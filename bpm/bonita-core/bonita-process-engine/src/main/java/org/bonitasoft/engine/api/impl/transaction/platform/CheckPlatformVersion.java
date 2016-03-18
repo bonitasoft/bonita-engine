@@ -33,13 +33,10 @@ public class CheckPlatformVersion implements Callable<Boolean> {
 
     private SPlatformProperties platformProperties;
 
-    private final BonitaHomeServer bonitaHomeServer;
-
     private String errorMessage;
 
     public CheckPlatformVersion(final PlatformService platformService, final BonitaHomeServer bonitaHomeServer) {
         this.platformService = platformService;
-        this.bonitaHomeServer = bonitaHomeServer;
     }
 
     @Override
