@@ -7,23 +7,11 @@
     <target name="build-home">
         <delete dir="${bh.dir}" />
 
-        <!-- ENGINE CLIENT WORK -->
-
-        <copy todir="${bh.dir}/engine-client/work">
+        <copy todir="${bh.dir}">
             <fileset dir="${resources.dir}">
-                <include name="bonita-client-community.properties" />
+                <include name=".notused" />
             </fileset>
         </copy>
-
-        <!-- ENGINE CLIENT CONF -->
-        <copy file="${resources.dir}/bonita-client-community.properties" tofile="${bh.dir}/engine-client/conf/bonita-client-custom.properties">
-            <filterchain>
-                <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
-                    <param name="prefix" value="#" />
-                </filterreader>
-            </filterchain>
-        </copy>
-
     </target>
 
 </project>

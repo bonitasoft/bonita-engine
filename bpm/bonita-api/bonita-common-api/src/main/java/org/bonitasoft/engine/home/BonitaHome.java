@@ -54,13 +54,8 @@ public abstract class BonitaHome {
         return this.home;
     }
 
-    public File getBonitaHomeFolder() throws BonitaHomeNotSetException {
+    File getBonitaHomeFolder() throws BonitaHomeNotSetException {
         return new File(getBonitaHomeFolderPath());
-    }
-
-    public final void refreshBonitaHome() {
-        this.home = null;
-        this.refresh();
     }
 
     protected abstract void refresh();

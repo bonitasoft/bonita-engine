@@ -24,7 +24,6 @@ import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.bdm.BusinessObjectDaoCreationException;
 import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.LoginException;
@@ -69,34 +68,25 @@ public class APIClient {
         return session;
     }
 
-    protected ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ApiAccessType apiType = getApiAccessType();
-        Map<String, String> parameters;
-        switch (apiType) {
-            case LOCAL:
-                return LocalServerAPIFactory.getServerAPI();
-            case EJB3:
-                parameters = getAPITypeParameters();
-                return new EJB3ServerAPI(parameters);
-            case HTTP:
-                parameters = getAPITypeParameters();
-                return new HTTPServerAPI(parameters);
-            default:
-                throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
-        }
-    }
-
-    protected Map<String, String> getAPITypeParameters() throws BonitaHomeNotSetException, ServerAPIException {
+    ServerAPI getServerAPI() throws ServerAPIException, UnknownAPITypeException {
         try {
-            return APITypeManager.getAPITypeParameters();
-        } catch (IOException e) {
-            throw new ServerAPIException(e);
-        }
-    }
-
-    protected ApiAccessType getApiAccessType() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        try {
-            return APITypeManager.getAPIType();
+            final ApiAccessType apiType = APITypeManager.getAPIType();
+            Map<String, String> parameters;
+            switch (apiType) {
+                case LOCAL:
+                    return LocalServerAPIFactory.getServerAPI();
+                case EJB3:
+                    parameters = APITypeManager.getAPITypeParameters();
+                    return new EJB3ServerAPI(parameters);
+                case HTTP:
+                    parameters = APITypeManager.getAPITypeParameters();
+                    return new HTTPServerAPI(parameters);
+                case TCP:
+                    parameters = APITypeManager.getAPITypeParameters();
+                    return new TCPServerAPI(parameters);
+                default:
+                    throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
+            }
         } catch (IOException e) {
             throw new ServerAPIException(e);
         }
@@ -109,7 +99,7 @@ public class APIClient {
             @SuppressWarnings("unchecked")
             final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, clientInterceptor);
             return api;
-        } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
+        } catch (ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
@@ -139,7 +129,7 @@ public class APIClient {
             @SuppressWarnings("unchecked")
             final T api = (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { apiClass }, interceptor);
             return api;
-        } catch (BonitaHomeNotSetException | ServerAPIException | UnknownAPITypeException e) {
+        } catch (ServerAPIException | UnknownAPITypeException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
@@ -170,7 +160,7 @@ public class APIClient {
                 getLoginAPI().logout(session);
                 session = null;
             }
-        } catch (SessionNotFoundException e) {
+        } catch (SessionNotFoundException ignored) {
             // If the session is not found on server, then the client is already logged out.
             // Do nothing
         }
@@ -192,7 +182,7 @@ public class APIClient {
             throw new IllegalArgumentException(daoInterface.getName() + " is not an interface");
         }
 
-        Class<T> daoImplClass = null;
+        Class<T> daoImplClass;
         try {
             daoImplClass = loadClass(daoInterface);
 
@@ -200,7 +190,8 @@ public class APIClient {
                 final Constructor<T> constructor = daoImplClass.getConstructor(APISession.class);
                 return constructor.newInstance(session);
             }
-        } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (final ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException
+                | IllegalAccessException | InvocationTargetException e) {
             throw new BusinessObjectDaoCreationException(e);
         }
         throw new BusinessObjectDaoCreationException("No Implementation of the DAO available.");

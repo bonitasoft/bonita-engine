@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 
 import java.io.IOException;
 
@@ -74,15 +73,6 @@ public class APIClientTest {
         expectedEx.expectMessage("You must call login() prior to accessing any API.");
 
         client.getProcessAPI();
-    }
-
-    @Test
-    public void should_throw_exception_when_bonitaHome_not_set() throws LoginException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        doThrow(new BonitaHomeNotSetException("not set")).when(client).getServerAPI();
-        expectedEx.expect(IllegalStateException.class);
-        expectedEx.expectMessage("not set");
-
-        client.login(VALID_USERNAME, VALID_PASSWORD);
     }
 
     @Test
