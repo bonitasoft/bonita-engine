@@ -24,21 +24,6 @@
             </filterchain>
         </copy>
 
-        <!-- ENGINE SERVER -->
-
-
-        <copy todir="${bh.dir}/engine-server/work/platform">
-            <fileset dir="${target.dir}">
-                <include name="VERSION" />
-            </fileset>
-        </copy>
-
-        <copy todir="${bh.dir}">
-            <fileset dir="${resources.dir}">
-                <include name="README.md" />
-            </fileset>
-        </copy>
-
     </target>
 
 </project>
