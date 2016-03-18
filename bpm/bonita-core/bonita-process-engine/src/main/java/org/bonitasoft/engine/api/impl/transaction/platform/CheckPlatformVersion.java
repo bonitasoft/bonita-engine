@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
@@ -33,11 +32,11 @@ public class CheckPlatformVersion implements Callable<Boolean> {
 
     private SPlatformProperties platformProperties;
 
-    private String errorMessage;
-
-    public CheckPlatformVersion(final PlatformService platformService, final BonitaHomeServer bonitaHomeServer) {
+    public CheckPlatformVersion(final PlatformService platformService) {
         this.platformService = platformService;
     }
+
+    private String errorMessage;
 
     @Override
     public Boolean call() throws SBonitaException {

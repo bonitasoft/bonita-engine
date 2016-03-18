@@ -75,7 +75,7 @@ public class EngineInitializerTest {
         when(platformProperties.shouldCreatePlatform()).thenReturn(true);
         when(platformProperties.shouldStartPlatform()).thenReturn(true);
         engineInitializer.initializeEngine();
-        verify(platformManager, times(1)).createPlatform(any(PlatformAPI.class));
+        verify(platformManager, times(1)).initializePlatform(any(PlatformAPI.class));
         verify(platformManager, times(1)).startPlatform(any(PlatformAPI.class));
     }
 
@@ -84,7 +84,7 @@ public class EngineInitializerTest {
         when(platformProperties.shouldCreatePlatform()).thenReturn(false);
         when(platformProperties.shouldStartPlatform()).thenReturn(true);
         engineInitializer.initializeEngine();
-        verify(platformManager, times(0)).createPlatform(any(PlatformAPI.class));
+        verify(platformManager, times(0)).initializePlatform(any(PlatformAPI.class));
         verify(platformManager, times(1)).startPlatform(any(PlatformAPI.class));
     }
 
@@ -93,7 +93,7 @@ public class EngineInitializerTest {
         when(platformProperties.shouldCreatePlatform()).thenReturn(false);
         when(platformProperties.shouldStartPlatform()).thenReturn(false);
         engineInitializer.initializeEngine();
-        verify(platformManager, times(0)).createPlatform(any(PlatformAPI.class));
+        verify(platformManager, times(0)).initializePlatform(any(PlatformAPI.class));
         verify(platformManager, times(0)).startPlatform(any(PlatformAPI.class));
     }
 
