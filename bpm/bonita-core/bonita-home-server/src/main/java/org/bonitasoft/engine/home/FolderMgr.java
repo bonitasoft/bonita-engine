@@ -38,23 +38,23 @@ class FolderMgr {
         return tempFolder;
     }
 
-    public static Folder getPlatformInitWorkFolder(final File bonitaHomeFolder) throws IOException {
+    static Folder getPlatformInitWorkFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getWorkFolder(bonitaHomeFolder), "platform-init");
     }
 
-    public static Folder getPlatformInitConfFolder(File bonitaHomeFolder) throws IOException {
+    static Folder getPlatformInitConfFolder(File bonitaHomeFolder) throws IOException {
         return getFolder(getConfFolder(bonitaHomeFolder), "platform-init");
     }
 
-    public static Folder getPlatformWorkFolder(final File bonitaHomeFolder) throws IOException {
+    static Folder getPlatformWorkFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getWorkFolder(bonitaHomeFolder), "platform");
     }
 
-    public static Folder getPlatformConfFolder(final File bonitaHomeFolder) throws IOException {
+    static Folder getPlatformConfFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getConfFolder(bonitaHomeFolder), "platform");
     }
 
-    public static Folder getPlatformTempFolder() throws IOException {
+    static Folder getPlatformTempFolder() throws IOException {
         return getFolder(getTempFolder(), "platform").createIfNotExists();
     }
 
@@ -66,35 +66,25 @@ class FolderMgr {
         return getFolder(getConfFolder(bonitaHomeFolder), "tenants");
     }
 
-    private static Folder getTenantsTempFolder() throws IOException {
-        return getFolder(getTempFolder(), "tenants").createIfNotExists();
-    }
-
-    public static Folder getTenantWorkFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
+    static Folder getTenantWorkFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
         return getFolder(getTenantsWorkFolder(bonitaHomeFolder), Long.toString(tenantId));
     }
 
-    public static Folder getTenantConfFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
+    static Folder getTenantConfFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
         return getFolder(getTenantsConfFolder(bonitaHomeFolder), Long.toString(tenantId));
     }
 
-    public static Folder getTenantTempFolder(long tenantId) throws IOException {
-        Folder tenantsTempFolder = getTenantsTempFolder();
-        return getFolder(tenantsTempFolder, Long.toString(tenantId)).createIfNotExists();
-    }
-
-    public static Folder getTenantTemplateWorkFolder(File bonitaHomeFolder) throws IOException {
+    private static Folder getTenantTemplateWorkFolder(File bonitaHomeFolder) throws IOException {
         return getFolder(getTenantsWorkFolder(bonitaHomeFolder), "template");
     }
 
-    public static Folder getTenantTemplateConfFolder(File bonitaHomeFolder) throws IOException {
+    private static Folder getTenantTemplateConfFolder(File bonitaHomeFolder) throws IOException {
         return getFolder(getTenantsConfFolder(bonitaHomeFolder), "template");
     }
 
     public static void deleteTenant(File bonitaHomeFolder, long tenantId) throws IOException {
         getTenantWorkFolder(bonitaHomeFolder, tenantId).delete();
         getTenantConfFolder(bonitaHomeFolder, tenantId).delete();
-        getTenantTempFolder(tenantId).delete();
     }
 
     public static void createTenant(File bonitaHomeFolder, long tenantId) throws IOException {
@@ -114,11 +104,11 @@ class FolderMgr {
         }
     }
 
-    public static Folder getTenantWorkSecurityFolder(File bonitaHomeFolder, long tenantId) throws IOException {
+    static Folder getTenantWorkSecurityFolder(File bonitaHomeFolder, long tenantId) throws IOException {
         return getFolder(getTenantWorkFolder(bonitaHomeFolder, tenantId), "security-scripts");
     }
 
-    public static Folder getPlatformClassLoaderFolder() throws IOException {
+    private static Folder getPlatformClassLoaderFolder() throws IOException {
         return getFolder(getPlatformTempFolder(), "classloaders").createIfNotExists();
     }
 
@@ -126,7 +116,7 @@ class FolderMgr {
         return ManagementFactory.getRuntimeMXBean().getName();
     }
 
-    public static Folder getPlatformGlobalClassLoaderFolder() throws IOException {
+    static Folder getPlatformGlobalClassLoaderFolder() throws IOException {
         final Folder globalFolder = getFolder(getPlatformClassLoaderFolder(), "global");
         globalFolder.createIfNotExists();
         return globalFolder;
@@ -138,7 +128,7 @@ class FolderMgr {
         return localFolder;
     }
 
-    public static Folder getPlatformLocalClassLoaderFolder(String artifactType, long artifactId) throws IOException {
+    static Folder getPlatformLocalClassLoaderFolder(String artifactType, long artifactId) throws IOException {
         final Folder localFolder = getPlatformLocalClassLoaderFolder();
         final Folder artifactTypeFolder = getFolder(localFolder, artifactType);
         artifactTypeFolder.createIfNotExists();
