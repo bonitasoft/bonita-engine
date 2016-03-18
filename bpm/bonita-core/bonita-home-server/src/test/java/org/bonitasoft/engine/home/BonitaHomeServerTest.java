@@ -24,7 +24,6 @@ import org.junit.Test;
  */
 public class BonitaHomeServerTest {
 
-
     @Test
     public void generateRelativeResourcePathShouldHandleBackslashOS() {
         // given:

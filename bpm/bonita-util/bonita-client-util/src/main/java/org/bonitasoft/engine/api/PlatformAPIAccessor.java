@@ -41,10 +41,10 @@ import org.bonitasoft.engine.util.APITypeManager;
  */
 public class PlatformAPIAccessor {
 
-    private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         try {
             final ApiAccessType apiType = APITypeManager.getAPIType();
-            Map<String, String> parameters = null;
+            Map<String, String> parameters;
             switch (apiType) {
                 case LOCAL:
                     return LocalServerAPIFactory.getServerAPI();
@@ -83,14 +83,14 @@ public class PlatformAPIAccessor {
         return getAPI(PlatformLoginAPI.class);
     }
 
-    private static <T> T getAPI(final Class<T> clazz, final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
+    static <T> T getAPI(final Class<T> clazz, final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
         return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
     }
 
-    private static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException,
+    static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI);

@@ -258,9 +258,6 @@
                                         <copy todir="${bonita.home}" verbose="true">
                                             <fileset dir="${distrib.dir}/resources/bonita-home/" />
                                         </copy>
-
-                                        <copy file="${basedir}/bonita-client-custom.properties"
-                                              todir="${bonita.home}/engine-client/conf" overwrite="true" />
                                     </target>
                                 </configuration>
                             </execution>
@@ -289,6 +286,9 @@
                                             <jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m" />
                                             <classpath refid="test.path" />
                                             <sysproperty key="bonita.home" value="${bonita.home}" />
+                                            <sysproperty key="org.bonitasoft.engine.api-type" value="HTTP" />
+                                            <sysproperty key="org.bonitasoft.engine.api-type.server.url" value="http://localhost:8184" />
+                                            <sysproperty key="org.bonitasoft.engine.api-type.application.name" value="bonita" />
                                             <formatter type="xml" />
                                             <test todir="${report.xml}" name="${test.class}" />
                                         </junit>

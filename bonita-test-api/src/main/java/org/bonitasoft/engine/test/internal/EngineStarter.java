@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,11 @@ public class EngineStarter {
         LOGGER.info("============  Starting Bonita BPM Engine  ===========");
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
-        if (System.getProperty(BONITA_HOME_PROPERTY) == null || APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
+        if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
+            //force it to local if not specified
+            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+        }
+        if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
             prepareEnvironment();
             setupPlatform();
             initPlatformAndTenant();

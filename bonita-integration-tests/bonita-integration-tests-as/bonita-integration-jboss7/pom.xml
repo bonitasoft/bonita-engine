@@ -250,9 +250,6 @@
                                             <fileset dir="${distrib.dir}/resources/bonita-home/" />
                                         </copy>
 
-                                        <copy file="${basedir}/client/bonita-client-custom.properties" todir="${bonita.home}/engine-client/conf" overwrite="true" />
-                                        <replace file="${bonita.home}/engine-client/conf/bonita-client-custom.properties" token="#provider.port#" value="${provider.port}" />
-
                                         <!-- set the bonita client to use ejb3 -->
                                         <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
 
@@ -301,10 +298,12 @@
                                             <classpath refid="test.path" />
                                             <classpath refid="jboss.path" />
                                             <sysproperty key="bonita.home" value="${bonita.home}" />
+                                            <sysproperty key="org.bonitasoft.engine.api-type" value="EJB3" />
+                                            <sysproperty key="org.bonitasoft.engine.api-type.java.naming.factory.url.pkgs" value="org.jboss.ejb.client.naming" />
                                             <formatter type="xml" />
                                             <test todir="${report.xml}" name="${test.class}" />
-                                            <!--<jvmarg value="-Xdebug" />-->
-                                            <!--<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000" />-->
+                                            <!--  <jvmarg value="-Xdebug"/>
+                                             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/> -->
                                         </junit>
                                         <junitreport todir="${report.xml}">
                                             <fileset dir="${report.xml}" includes="TEST-*.xml" />
