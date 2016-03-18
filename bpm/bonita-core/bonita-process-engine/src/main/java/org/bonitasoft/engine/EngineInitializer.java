@@ -141,7 +141,7 @@ public class EngineInitializer {
     protected void initPlatform(final PlatformAPI platformAPI) throws Exception {
         if (platformProperties.shouldCreatePlatform()) {
             LOGGER.log(Level.INFO, "Creating platform...");
-            platformManager.createPlatform(platformAPI);
+            platformManager.initializePlatform(platformAPI);
         }
     }
 

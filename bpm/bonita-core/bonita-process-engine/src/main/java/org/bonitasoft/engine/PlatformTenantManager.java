@@ -37,7 +37,7 @@ public class PlatformTenantManager {
         return instance;
     }
 
-    public boolean createPlatform(final PlatformAPI platformAPI) throws Exception {
+    public boolean initializePlatform(final PlatformAPI platformAPI) throws Exception {
         if (!platformAPI.isPlatformInitialized()) {
             platformAPI.initializePlatform();
             return true;
