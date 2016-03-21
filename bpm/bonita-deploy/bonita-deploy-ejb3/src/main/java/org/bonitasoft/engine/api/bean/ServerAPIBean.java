@@ -25,6 +25,7 @@ import javax.ejb.SessionContext;
 import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.api.internal.servlet.EngineInitializerListener;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 /**
@@ -37,9 +38,15 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
 
     protected SessionContext ctx;
 
+    public static boolean isInitialized = false;
+
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+        if (!isInitialized) {
+            isInitialized = true;
+            new EngineInitializerListener().contextInitialized(null);
+        }
         final ServerAPI apiImpl = ServerAPIFactory.getServerAPI();
         try {
             return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
