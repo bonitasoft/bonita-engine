@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
@@ -72,7 +73,6 @@ public class EngineStarter {
         }
         platformSetup.setup();
     }
-
 
     //--------------  engine life cycle methods
 
@@ -139,8 +139,8 @@ public class EngineStarter {
     }
 
     private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
+        final String[] args = new String[] { "-tcp", "-tcpAllowOthers", "-tcpPort", h2Port };
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[] { args });
         final Method start = server.getClass().getMethod("start");
         LOGGER.info("Starting h2 on port " + h2Port);
         try {
@@ -177,7 +177,7 @@ public class EngineStarter {
     protected void deleteTenantAndPlatform() throws BonitaException {
         LOGGER.info("=========  CLEAN PLATFORM =======");
 
-        stopAndCleanPlatformAndTenant(true);
+        stopAndCleanPlatformAndTenant();
         if (dropOnStop) {
             deletePlatformStructure();
         }
@@ -194,16 +194,17 @@ public class EngineStarter {
         platformAPI.cleanPlatform();
     }
 
-    protected void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
+    protected void stopAndCleanPlatformAndTenant() throws BonitaException {
+        undeployCommands();
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
+        stopAndCleanPlatformAndTenant(platformAPI);
         logoutOnPlatform(session);
     }
 
-    protected void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
+    protected void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI) throws BonitaException {
         if (platformAPI.isNodeStarted()) {
-            stopPlatformAndTenant(platformAPI, undeployCommands);
+            stopPlatformAndTenant(platformAPI);
             if (dropOnStop) {
                 cleanPlatform(platformAPI);
             }
@@ -300,11 +301,12 @@ public class EngineStarter {
             LOGGER.info("=========  REUSING EXISTING PLATFORM =======");
             platformAPI.startNode();
         }
+        deployCommandsOnDefaultTenant();
         platformLoginAPI.logout(session);
     }
 
     protected void createPlatformAndTenant(PlatformAPI platformAPI) throws BonitaException {
-        initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
+        initializeAndStartPlatformWithDefaultTenant(platformAPI);
     }
 
     protected PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -340,12 +342,9 @@ public class EngineStarter {
         platformLoginAPI.logout(session);
     }
 
-    protected void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
+    protected void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI) throws BonitaException {
         platformAPI.initializePlatform();
         platformAPI.startNode();
-        if (deployCommands) {
-            deployCommandsOnDefaultTenant();
-        }
     }
 
     protected static String setSystemPropertyIfNotSet(final String property, final String value) {
@@ -354,10 +353,7 @@ public class EngineStarter {
         return finalValue;
     }
 
-    protected void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
-        if (undeployCommands) {
-            undeployCommands();
-        }
+    protected void stopPlatformAndTenant(final PlatformAPI platformAPI) throws BonitaException {
 
         platformAPI.stopNode();
     }
