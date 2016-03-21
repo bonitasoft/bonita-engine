@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.bonitasoft.platform.setup.PlatformSetupException;
 import org.slf4j.Logger;
@@ -60,9 +62,11 @@ public class EngineStarter {
         LOGGER.info("============  Starting Bonita BPM Engine  ===========");
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
-        prepareEnvironment();
-        setupPlatform();
-        initPlatformAndTenant();
+        if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
+            prepareEnvironment();
+            setupPlatform();
+            initPlatformAndTenant();
+        }
         LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
@@ -108,6 +112,7 @@ public class EngineStarter {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
         prepareBonitaHome();
         dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+        //is h2 and not started outside
         if ("h2".equals(dbVendor)) {
             LOGGER.info("Using h2, starting H2 server: ");
             this.h2Server = startH2Server();

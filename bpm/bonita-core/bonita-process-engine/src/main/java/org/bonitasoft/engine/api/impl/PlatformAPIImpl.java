@@ -46,6 +46,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -785,16 +786,23 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     @AvailableOnStoppedNode
     public boolean isPlatformCreated() throws PlatformNotFoundException {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new PlatformNotFoundException(e);
+            final PlatformService platformService = platformAccessor.getPlatformService();
+            return platformAccessor.getTransactionService().executeInTransaction(new Callable<Boolean>() {
+
+                @Override
+                public Boolean call() throws Exception {
+                    return platformService.isPlatformCreated();
+                }
+            });
+        } catch (Exception e) {
+            throw new BonitaRuntimeException(e);
         }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        return platformService.isPlatformCreated();
     }
 
     @Override
