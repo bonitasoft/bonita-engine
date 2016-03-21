@@ -161,6 +161,7 @@ public class EngineStarter {
 
     protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         try {
+            undeployCommands();
             deleteTenantAndPlatform();
         } finally {
             cleanupEnvironment();
@@ -176,7 +177,6 @@ public class EngineStarter {
 
     protected void deleteTenantAndPlatform() throws BonitaException {
         LOGGER.info("=========  CLEAN PLATFORM =======");
-
         stopAndCleanPlatformAndTenant();
         if (dropOnStop) {
             deletePlatformStructure();
@@ -195,7 +195,6 @@ public class EngineStarter {
     }
 
     protected void stopAndCleanPlatformAndTenant() throws BonitaException {
-        undeployCommands();
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         stopAndCleanPlatformAndTenant(platformAPI);
