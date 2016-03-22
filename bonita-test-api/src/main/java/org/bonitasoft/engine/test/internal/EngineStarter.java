@@ -67,6 +67,7 @@ public class EngineStarter {
             setupPlatform();
             initPlatformAndTenant();
         }
+        deployCommandsOnDefaultTenant();
         LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
@@ -305,7 +306,6 @@ public class EngineStarter {
             LOGGER.info("=========  REUSING EXISTING PLATFORM =======");
             platformAPI.startNode();
         }
-        deployCommandsOnDefaultTenant();
         platformLoginAPI.logout(session);
     }
 
