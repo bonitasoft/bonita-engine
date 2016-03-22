@@ -14,7 +14,7 @@ class FolderMgr {
         return new Folder(new Folder(baseFolder), subFolder);
     }
 
-    private static Folder getFolder(final Folder baseFolder, final String subFolder) throws IOException {
+    static Folder getFolder(final Folder baseFolder, final String subFolder) throws IOException {
         return new Folder(baseFolder, subFolder);
     }
 
@@ -26,7 +26,6 @@ class FolderMgr {
         return getFolder(getServerFolder(bonitaHomeFolder), "work");
     }
 
-
     private static Folder getTempFolder() throws IOException {
         final Folder tempFolder = getFolder(new File(System.getProperty("java.io.tmpdir")), "bonita_tmp_" + getJvmName());
         if (!tempFolder.exists()) {
@@ -35,17 +34,15 @@ class FolderMgr {
         return tempFolder;
     }
 
-
     static Folder getPlatformWorkFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getWorkFolder(bonitaHomeFolder), "platform");
     }
-
 
     static Folder getPlatformTempFolder() throws IOException {
         return getFolder(getTempFolder(), "platform").createIfNotExists();
     }
 
-    private static Folder getTenantsWorkFolder(final File bonitaHomeFolder) throws IOException {
+    static Folder getTenantsWorkFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getWorkFolder(bonitaHomeFolder), "tenants");
     }
 
