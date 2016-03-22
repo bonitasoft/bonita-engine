@@ -188,6 +188,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     public void createTenant(final long tenantId) {
         getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(), tenantId);
+        tenantStorage.copyTenantTemplateSecurityScriptsTo(tenantId);
     }
 
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
