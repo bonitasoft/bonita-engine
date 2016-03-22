@@ -16,6 +16,7 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.FileHandler;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
  * @author Baptiste Mesta
  */
 public class TenantStorage {
+
     private final BonitaHomeServer bonitaHomeServer;
 
     public TenantStorage(BonitaHomeServer bonitaHomeServer) {
@@ -54,6 +56,25 @@ public class TenantStorage {
         Folder tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
         createFolders(tenantWorkSecurityFolder);
         return tenantWorkSecurityFolder.getFile();
+    }
+
+    // temporary method
+    public void copyTenantTemplateSecurityScriptsTo(long tenantId) {
+        Folder tenantWorkSecurityFolder = null;
+        try {
+            tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+            Folder template = FolderMgr.getFolder(FolderMgr.getFolder(FolderMgr.getTenantsWorkFolder(bonitaHomeServer.getBonitaHomeFolder()), "template"),
+                    "security-scripts");
+            if (template.exists()) {
+                Map<String, byte[]> scripts = template.listFilesAsResources();
+                for (Map.Entry<String, byte[]> script : scripts.entrySet()) {
+                    final File fileToWrite = tenantWorkSecurityFolder.newFile(script.getKey());
+                    org.bonitasoft.engine.commons.io.IOUtil.write(fileToWrite, script.getValue());
+                }
+            }
+        } catch (IOException | BonitaHomeNotSetException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
