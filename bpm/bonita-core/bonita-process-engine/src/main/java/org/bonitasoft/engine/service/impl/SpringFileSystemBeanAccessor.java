@@ -93,4 +93,14 @@ public abstract class SpringFileSystemBeanAccessor {
 
     protected abstract List<String> getClassPathResources(Properties properties);
 
+    String getPropertyWithPlaceholder(Properties properties, String key, String defaultValue) {
+        String property = properties.getProperty(key, defaultValue);
+        if (property.startsWith("${") && property.endsWith("}")) {
+            property = property.substring(2, property.length() - 1);
+            String sysPropertyKey = property.substring(0, property.indexOf(':'));
+            String sysPropertyDefaultValue = property.substring(property.indexOf(':')+1, property.length());
+            return System.getProperty(sysPropertyKey, sysPropertyDefaultValue);
+        }
+        return property;
+    }
 }
