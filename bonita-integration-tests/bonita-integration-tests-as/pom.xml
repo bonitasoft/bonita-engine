@@ -62,6 +62,7 @@
             <id>jboss</id>
             <modules>
                 <module>bonita-deploy-resources</module>
+                <module>bonita-deploy-war</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-integration-jboss7</module>
             </modules>
