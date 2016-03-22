@@ -62,7 +62,7 @@ public class EngineStarter {
         LOGGER.info("============  Starting Bonita BPM Engine  ===========");
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
-        if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
+        if (System.getProperty(BONITA_HOME_PROPERTY) == null || APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
             prepareEnvironment();
             setupPlatform();
             initPlatformAndTenant();
