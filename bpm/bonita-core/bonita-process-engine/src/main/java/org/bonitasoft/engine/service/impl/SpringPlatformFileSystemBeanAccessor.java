@@ -67,9 +67,10 @@ public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAc
         ArrayList<String> resources = new ArrayList<>();
         resources.add("bonita-platform-community.xml");
         resources.add("bonita-platform-sp.xml");
-        if (Boolean.valueOf(properties.getProperty("bonita.cluster", "false"))) {
+        if (Boolean.valueOf(getPropertyWithPlaceholder(properties, "bonita.cluster", "false"))) {
             resources.add("bonita-platform-sp-cluster.xml");
         }
         return resources;
     }
+
 }

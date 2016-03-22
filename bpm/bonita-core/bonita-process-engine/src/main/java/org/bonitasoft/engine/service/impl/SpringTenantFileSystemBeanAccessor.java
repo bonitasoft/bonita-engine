@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContext;
  * @author Charles Souillard
  */
 public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
+
     private final long tenantId;
 
     public SpringTenantFileSystemBeanAccessor(final ApplicationContext parent, final long tenantId) {
@@ -40,7 +41,7 @@ public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAcce
 
     @Override
     protected List<BonitaConfiguration> getConfiguration() throws IOException {
-        return  BONITA_HOME_SERVER.getTenantConfiguration(tenantId);
+        return BONITA_HOME_SERVER.getTenantConfiguration(tenantId);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAcce
         ArrayList<String> resources = new ArrayList<>();
         resources.add("bonita-tenant-community.xml");
         resources.add("bonita-tenant-sp.xml");
-        if (Boolean.valueOf(properties.getProperty("bonita.cluster", "false"))) {
+        if (Boolean.valueOf(getPropertyWithPlaceholder(properties, "bonita.cluster", "false"))) {
             resources.add("bonita-tenant-sp-cluster.xml");
         }
         return resources;
