@@ -84,9 +84,7 @@ public class TestShades {
         outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-client", "");
         outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-common", "");
         outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-setup", "");
-        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-common", ""); // FIXME: remove this once this module has been merged !!!
-        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-configuration", ""); // FIXME: remove this once this module has been merged !!!
-        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-sql-resources", ""); // FIXME: remove this once this module has been merged !!!
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_PLATFORM + ":platform-resources", "");
         return outputOfMaven;
     }
 

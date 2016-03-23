@@ -24,11 +24,6 @@
             <artifactId>platform-setup</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.platform</groupId>
-            <artifactId>platform-configuration</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Add common for IDE shade issue, remove that if the shade of common is fixed -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
