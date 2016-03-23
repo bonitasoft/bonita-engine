@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bonitasoft.platform</groupId>
-            <artifactId>platform-configuration</artifactId>
+            <artifactId>platform-setup</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Core -->
@@ -341,7 +341,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.platform</groupId>
-            <artifactId>platform-sql-resources</artifactId>
+            <artifactId>platform-resources</artifactId>
             <version>${project.version}</version>
         </dependency>
 
