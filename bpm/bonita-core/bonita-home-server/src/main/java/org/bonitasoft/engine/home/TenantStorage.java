@@ -60,9 +60,9 @@ public class TenantStorage {
 
     // temporary method
     public void copyTenantTemplateSecurityScriptsTo(long tenantId) {
-        Folder tenantWorkSecurityFolder = null;
         try {
-            tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+            Folder tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+            tenantWorkSecurityFolder.getFile().mkdirs();
             Folder template = FolderMgr.getFolder(FolderMgr.getFolder(FolderMgr.getTenantsWorkFolder(bonitaHomeServer.getBonitaHomeFolder()), "template"),
                     "security-scripts");
             if (template.exists()) {
