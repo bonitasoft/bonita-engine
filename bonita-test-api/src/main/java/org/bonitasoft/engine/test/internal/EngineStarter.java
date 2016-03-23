@@ -77,7 +77,7 @@ public class EngineStarter {
     }
 
     private void setupPlatform() throws NamingException, PlatformSetupException {
-        PlatformSetup platformSetup = new PlatformSetup(dbVendor);
+        PlatformSetup platformSetup = new PlatformSetup();
         if (isDropOnStart()) {
             platformSetup.destroy();
         }
