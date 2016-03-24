@@ -299,7 +299,7 @@
                                             <classpath refid="jboss.path" />
                                             <sysproperty key="bonita.home" value="${bonita.home}" />
                                             <sysproperty key="org.bonitasoft.engine.api-type" value="EJB3" />
-                                            <sysproperty key="org.bonitasoft.engine.api-type.java.naming.factory.url.pkgs" value="org.jboss.ejb.client.naming" />
+                                            <sysproperty key="java.naming.factory.url.pkgs" value="org.jboss.ejb.client.naming" />
                                             <formatter type="xml" />
                                             <test todir="${report.xml}" name="${test.class}" />
                                             <!--  <jvmarg value="-Xdebug"/>
