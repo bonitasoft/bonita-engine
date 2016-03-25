@@ -201,8 +201,12 @@ public class BonitaHomeServer extends BonitaHome {
             if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community.properties")) {
                 Properties properties = new Properties();
                 properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
-                properties.setProperty("userName", userName);
-                properties.setProperty("userPassword", password);
+                if (userName != null) {
+                    properties.setProperty("userName", userName);
+                }
+                if (password != null) {
+                    properties.setProperty("userPassword", password);
+                }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 properties.store(out, "");
                 bonitaConfiguration.setResourceContent(out.toByteArray());
