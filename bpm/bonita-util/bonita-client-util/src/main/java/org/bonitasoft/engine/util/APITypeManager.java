@@ -70,14 +70,14 @@ public class APITypeManager {
 
     public static ApiAccessType getAPIType() throws ServerAPIException, UnknownAPITypeException, IOException {
         if (apiAccessType == null) {
-            final String apiType = getProperties().getProperty(API_TYPE);
+            final String apiType = getAPITypeFromProperties();
             if (LOCAL.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = LOCAL;
             } else if (EJB3.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = EJB3;
-            } else if (apiType.equalsIgnoreCase(HTTP.name())) {
+            } else if (HTTP.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = HTTP;
-            } else if (apiType.equalsIgnoreCase(TCP.name())) {
+            } else if (TCP.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = TCP;
             } else {
                 throw new UnknownAPITypeException("Invalid API type: " + apiType);
@@ -86,15 +86,23 @@ public class APITypeManager {
         return apiAccessType;
     }
 
+    private static String getAPITypeFromProperties() throws IOException {
+        String property = getProperties().get(API_TYPE);
+        if (property != null) {
+            return property;
+        }
+        return LOCAL.name();
+    }
+
     public static Map<String, String> getAPITypeParameters() throws ServerAPIException, IOException {
         if (apiTypeParameters == null) {
-            final Properties properties = getProperties();
+            final Map<String, String> properties = getProperties();
             apiTypeParameters = new HashMap<>(properties.size());
-            for (String property : properties.stringPropertyNames()) {
-                if (API_TYPE.equals(property)) {
+            for (Map.Entry<String, String> property : properties.entrySet()) {
+                if (API_TYPE.equals(property.getKey())) {
                     continue;
                 }
-                apiTypeParameters.put(property, properties.getProperty(property));
+                apiTypeParameters.put(property.getKey(), property.getValue());
             }
         }
         return apiTypeParameters;
@@ -108,24 +116,22 @@ public class APITypeManager {
         }
     }
 
-    private static Properties getProperties() throws IOException {
-        Properties properties = getPropertiesFromSystemProperties();
-        if (!properties.isEmpty()) {
-            return properties;
-        }
-        properties = getPropertiesFromBonitaHome();
-        if (properties == null || properties.isEmpty()) {
-            properties = new Properties();
-            properties.setProperty(API_TYPE, LOCAL.name());
+    private static Map<String, String> getProperties() throws IOException {
+        Map<String, String> properties = getPropertiesFromSystemProperties();
+        Properties propertiesFromBonitaHome = getPropertiesFromBonitaHome();
+        for (String property : propertiesFromBonitaHome.stringPropertyNames()) {
+            if (!properties.containsKey(property)) {
+                properties.put(property, propertiesFromBonitaHome.getProperty(property));
+            }
         }
         return properties;
     }
 
-    private static Properties getPropertiesFromSystemProperties() {
-        Properties properties = new Properties();
+    private static Map<String, String> getPropertiesFromSystemProperties() {
+        Map<String, String> properties = new HashMap<>();
         String apiType = System.getProperty("org.bonitasoft.engine.api-type");
         if (apiType != null) {
-            properties.setProperty("org.bonitasoft.engine.api-type", apiType);
+            properties.put("org.bonitasoft.engine.api-type", apiType);
         }
         addParameter(properties, "org.bonitasoft.engine.api-type.", "server.url");
         addParameter(properties, "org.bonitasoft.engine.api-type.", "application.name");
@@ -136,10 +142,10 @@ public class APITypeManager {
         return properties;
     }
 
-    private static void addParameter(Properties properties, String parameterPrefix, String parameterName) {
+    private static void addParameter(Map<String, String> properties, String parameterPrefix, String parameterName) {
         String parameter = System.getProperty(parameterPrefix + parameterName);
         if (parameter != null) {
-            properties.setProperty(parameterName, parameter);
+            properties.put(parameterName, parameter);
         }
     }
 
@@ -149,7 +155,7 @@ public class APITypeManager {
     private static Properties getPropertiesFromBonitaHome() throws IOException {
         String bonitaHomePath = System.getProperty("bonita.home");
         if (bonitaHomePath == null || bonitaHomePath.isEmpty()) {
-            return null;
+            return new Properties();
         }
         File clientFolder = new File(bonitaHomePath.trim(), "engine-client");
         final Properties result = new Properties();
