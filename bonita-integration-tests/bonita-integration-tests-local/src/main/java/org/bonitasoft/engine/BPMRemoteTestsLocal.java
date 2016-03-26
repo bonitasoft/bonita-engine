@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.ContractIT;
 import org.bonitasoft.engine.activity.TaskTests;
 import org.bonitasoft.engine.business.data.BDRepositoryIT;
@@ -48,7 +47,6 @@ import org.junit.runners.Suite.SuiteClasses;
         SupervisorTests.class,
         OperationIT.class,
         TaskTests.class,
-        TenantAccessorTest.class,
         MultiThreadCallsIT.class,
         ContractIT.class,
         BDRepositoryIT.class,
