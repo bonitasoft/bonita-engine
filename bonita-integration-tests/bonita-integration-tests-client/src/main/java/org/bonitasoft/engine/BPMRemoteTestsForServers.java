@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.business.application.ApplicationIT;
 import org.bonitasoft.engine.business.data.BDRepositoryIT;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.process.actor.ImportActorMappingIT;
 import org.bonitasoft.engine.profile.ProfileIT;
 import org.bonitasoft.engine.search.SearchProcessInstanceIT;
 import org.bonitasoft.engine.supervisor.ProcessSupervisedIT;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -56,7 +54,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ExternalCommandsTests.class,
         ProcessSupervisedIT.class,
         OperationIT.class,
-        TenantAccessorTest.class,
         MultiThreadCallsIT.class,
         AdvancedStartProcessCommandIT.class,
         MultipleStartPointsProcessCommandIT.class,
