@@ -21,15 +21,10 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.bonitasoft.engine.util.APITypeManager;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class TenantAccessorTest {
-
-    @Rule
-    public BonitaEngineRule bonitaEngineRule = BonitaEngineRule.create();
 
     @Test
     public void testSetAPITypeAndParams() throws Exception {
