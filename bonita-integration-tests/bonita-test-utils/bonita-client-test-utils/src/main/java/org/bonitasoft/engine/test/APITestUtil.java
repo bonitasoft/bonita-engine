@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,12 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.model.Query;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
@@ -158,6 +165,21 @@ public class APITestUtil extends PlatformTestUtil {
     public static final String GROUP_NAME = BuildTestUtil.GROUP_NAME;
 
     public static final String ROLE_NAME = BuildTestUtil.ROLE_NAME;
+    public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
+    public static final String COUNT_FOR_FIND_BY_HIRE_DATE_RANGE = "countForFindByHireDateRange";
+    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
+    protected static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
+    protected static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
+    protected static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
+    protected static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
+    protected static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
+    protected static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
+    protected static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
+    protected static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
+    protected static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
+    protected static final String COUNT_EMPLOYEE = "countEmployee";
+    protected static final String COUNT_ADDRESS = "countAddress";
+    private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
 
     private final APIClient apiClient = new APIClient();
 
@@ -746,10 +768,6 @@ public class APITestUtil extends PlatformTestUtil {
         return waitForUserTaskAndGetIt(-1, taskName, DEFAULT_TIMEOUT);
     }
 
-    public long waitForUserTask(final ProcessInstance processInstance, final String taskName) throws Exception {
-        return waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
-    }
-
     public long waitForUserTask(final long processInstanceId, final String taskName) throws Exception {
         return waitForUserTask(processInstanceId, taskName, DEFAULT_TIMEOUT);
     }
@@ -796,6 +814,10 @@ public class APITestUtil extends PlatformTestUtil {
         } catch (final FlowNodeInstanceNotFoundException e) {
             throw new RuntimeException("no id returned for flow node instance ");
         }
+    }
+
+    public long waitForUserTask(final ProcessInstance processInstance, final String taskName) throws Exception {
+        return waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
     }
 
     public void deleteSupervisor(final long id) throws BonitaException {
@@ -1480,5 +1502,177 @@ public class APITestUtil extends PlatformTestUtil {
         } catch (final IOException e) {
             throw new BonitaException(e);
         }
+    }
+
+    protected BusinessObjectModel buildBOM() {
+        final SimpleField name = new SimpleField();
+        name.setName("name");
+        name.setType(FieldType.STRING);
+
+        final BusinessObject countryBO = new BusinessObject();
+        countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
+        countryBO.addField(name);
+        countryBO.addUniqueConstraint("uk_name", "name");
+
+        final SimpleField street = new SimpleField();
+        street.setName("street");
+        street.setType(FieldType.STRING);
+
+        final SimpleField city = new SimpleField();
+        city.setName("city");
+        city.setType(FieldType.STRING);
+
+        final RelationField country = new RelationField();
+        country.setType(RelationField.Type.AGGREGATION);
+        country.setFetchType(RelationField.FetchType.LAZY);
+        country.setName("country");
+        country.setCollection(Boolean.FALSE);
+        country.setNullable(Boolean.TRUE);
+        country.setReference(countryBO);
+
+        final BusinessObject addressBO = new BusinessObject();
+        addressBO.setQualifiedName(ADDRESS_QUALIFIED_NAME);
+        addressBO.addField(street);
+        addressBO.addField(city);
+        addressBO.addField(country);
+        addressBO.addQuery(COUNT_ADDRESS, "SELECT count(a) FROM Address a", Long.class.getName());
+        addressBO.addUniqueConstraint("addressUK_with_relation", "city", "country");
+
+        final RelationField addresses = new RelationField();
+        addresses.setType(RelationField.Type.AGGREGATION);
+        addresses.setFetchType(RelationField.FetchType.EAGER);
+        addresses.setName("addresses");
+        addresses.setCollection(Boolean.TRUE);
+        addresses.setNullable(Boolean.TRUE);
+        addresses.setReference(addressBO);
+
+        final RelationField address = new RelationField();
+        address.setType(RelationField.Type.AGGREGATION);
+        address.setFetchType(RelationField.FetchType.LAZY);
+        address.setName("address");
+        address.setCollection(Boolean.FALSE);
+        address.setNullable(Boolean.TRUE);
+        address.setReference(addressBO);
+
+        final SimpleField firstName = new SimpleField();
+        firstName.setName("firstName");
+        firstName.setType(FieldType.STRING);
+        firstName.setLength(Integer.valueOf(10));
+
+        final SimpleField lastName = new SimpleField();
+        lastName.setName("lastName");
+        lastName.setType(FieldType.STRING);
+        lastName.setNullable(Boolean.FALSE);
+
+        final SimpleField phoneNumbers = new SimpleField();
+        phoneNumbers.setName("phoneNumbers");
+        phoneNumbers.setType(FieldType.STRING);
+        phoneNumbers.setLength(Integer.valueOf(10));
+        phoneNumbers.setCollection(Boolean.TRUE);
+
+        final SimpleField hireDate = new SimpleField();
+        hireDate.setName("hireDate");
+        hireDate.setType(FieldType.DATE);
+
+        final SimpleField booleanField = new SimpleField();
+        booleanField.setName("booleanField");
+        booleanField.setType(FieldType.BOOLEAN);
+
+        final BusinessObject employee = new BusinessObject();
+        employee.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        employee.addField(hireDate);
+        employee.addField(booleanField);
+        employee.addField(firstName);
+        employee.addField(lastName);
+        employee.addField(phoneNumbers);
+        employee.addField(addresses);
+        employee.addField(address);
+        employee.setDescription("Describe a simple employee");
+        employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
+
+        final Query getEmployeeByPersistId = employee
+                .addQuery("findByPersistId", "SELECT e FROM Employee e WHERE e.persistenceId=:id", EMPLOYEE_QUALIFIED_NAME);
+        getEmployeeByPersistId.addQueryParameter("id", Long.class.getName());
+
+        final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
+                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
+        getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
+
+        final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery(FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER,
+                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", List.class.getName());
+        findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
+        findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
+
+        final Query findByFirstNameFetchAddresses = employee.addQuery(FIND_BY_FIRST_NAME_FETCH_ADDRESSES,
+                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", List.class.getName());
+        findByFirstNameFetchAddresses.addQueryParameter("firstName", String.class.getName());
+
+        final Query findByHireDate = employee.addQuery(FIND_BY_HIRE_DATE_RANGE,
+                "SELECT e FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", List.class.getName());
+        findByHireDate.addQueryParameter("date1", Date.class.getName());
+        findByHireDate.addQueryParameter("date2", Date.class.getName());
+
+        final Query countForFindByHireDate = employee.addQuery(COUNT_FOR_FIND_BY_HIRE_DATE_RANGE,
+                "SELECT count(e) FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", Long.class.getName());
+        countForFindByHireDate.addQueryParameter("date1", Date.class.getName());
+        countForFindByHireDate.addQueryParameter("date2", Date.class.getName());
+
+        employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
+
+        employee.addIndex("IDX_LSTNM", "lastName");
+        employee.addIndex("IDX_LSTNM", "address");
+
+        final BusinessObject person = new BusinessObject();
+        person.setQualifiedName(PERSON_QUALIFIED_NAME);
+        person.addField(hireDate);
+        person.addField(firstName);
+        person.addField(lastName);
+        person.addField(phoneNumbers);
+        person.setDescription("Describe a simple person");
+        person.addUniqueConstraint("uk_fl", "firstName", "lastName");
+
+        final BusinessObject productBO = new BusinessObject();
+        productBO.setQualifiedName(PRODUCT_QUALIFIED_NAME);
+        productBO.addField(name);
+
+        final RelationField products = new RelationField();
+        products.setType(RelationField.Type.AGGREGATION);
+        products.setFetchType(RelationField.FetchType.LAZY);
+        products.setName("products");
+        products.setCollection(Boolean.TRUE);
+        products.setNullable(Boolean.TRUE);
+        products.setReference(productBO);
+
+        final SimpleField releaseYear = new SimpleField();
+        releaseYear.setName("releaseYear");
+        releaseYear.setType(FieldType.STRING);
+
+        final BusinessObject editionBO = new BusinessObject();
+        editionBO.setQualifiedName("com.company.model.Edition");
+        editionBO.addField(releaseYear);
+
+        final RelationField editionField = new RelationField();
+        editionField.setType(RelationField.Type.COMPOSITION);
+        editionField.setFetchType(RelationField.FetchType.EAGER);
+        editionField.setName("editions");
+        editionField.setCollection(Boolean.TRUE);
+        editionField.setNullable(Boolean.TRUE);
+        editionField.setReference(editionBO);
+
+        final BusinessObject catalogBO = new BusinessObject();
+        catalogBO.setQualifiedName(PRODUCT_CATALOG_QUALIFIED_NAME);
+        catalogBO.addField(name);
+        catalogBO.addField(products);
+        catalogBO.addField(editionField);
+
+        final BusinessObjectModel model = new BusinessObjectModel();
+        model.addBusinessObject(employee);
+        model.addBusinessObject(person);
+        model.addBusinessObject(addressBO);
+        model.addBusinessObject(countryBO);
+        model.addBusinessObject(productBO);
+        model.addBusinessObject(editionBO);
+        model.addBusinessObject(catalogBO);
+        return model;
     }
 }
