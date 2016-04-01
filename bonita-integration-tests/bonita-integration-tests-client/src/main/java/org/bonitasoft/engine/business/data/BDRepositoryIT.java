@@ -25,12 +25,12 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -43,9 +43,7 @@ import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.model.Query;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -68,7 +66,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -77,7 +74,6 @@ import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -97,208 +93,19 @@ import org.xml.sax.SAXException;
 
 public class BDRepositoryIT extends CommonAPIIT {
 
-    public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
-    public static final String ENTITY_CLASS_NAME = "entityClassName";
-    public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
-    public static final String COUNT_FOR_FIND_BY_HIRE_DATE_RANGE = "countForFindByHireDateRange";
-
-    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
-    private static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
-    private static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
-    private static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
-    private static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
-    private static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
-    private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
-    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
-    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
-    private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
-    private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
-    private static final String COUNT_EMPLOYEE = "countEmployee";
-    private static final String COUNT_ADDRESS = "countAddress";
-    private User matti;
-
-    private File clientFolder;
-    private Long tenantId;
-
+    private static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
+    private static final String ENTITY_CLASS_NAME = "entityClassName";
     private static String bdmDeployedVersion = "0";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private BusinessObjectModel buildBOM() {
-        final SimpleField name = new SimpleField();
-        name.setName("name");
-        name.setType(FieldType.STRING);
-
-        final BusinessObject countryBO = new BusinessObject();
-        countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
-        countryBO.addField(name);
-        countryBO.addUniqueConstraint("uk_name", "name");
-
-        final SimpleField street = new SimpleField();
-        street.setName("street");
-        street.setType(FieldType.STRING);
-
-        final SimpleField city = new SimpleField();
-        city.setName("city");
-        city.setType(FieldType.STRING);
-
-        final RelationField country = new RelationField();
-        country.setType(RelationField.Type.AGGREGATION);
-        country.setFetchType(RelationField.FetchType.LAZY);
-        country.setName("country");
-        country.setCollection(Boolean.FALSE);
-        country.setNullable(Boolean.TRUE);
-        country.setReference(countryBO);
-
-        final BusinessObject addressBO = new BusinessObject();
-        addressBO.setQualifiedName(ADDRESS_QUALIFIED_NAME);
-        addressBO.addField(street);
-        addressBO.addField(city);
-        addressBO.addField(country);
-        addressBO.addQuery(COUNT_ADDRESS, "SELECT count(a) FROM Address a", Long.class.getName());
-        addressBO.addUniqueConstraint("addressUK_with_relation", "city", "country");
-
-        final RelationField addresses = new RelationField();
-        addresses.setType(RelationField.Type.AGGREGATION);
-        addresses.setFetchType(RelationField.FetchType.EAGER);
-        addresses.setName("addresses");
-        addresses.setCollection(Boolean.TRUE);
-        addresses.setNullable(Boolean.TRUE);
-        addresses.setReference(addressBO);
-
-        final RelationField address = new RelationField();
-        address.setType(RelationField.Type.AGGREGATION);
-        address.setFetchType(RelationField.FetchType.LAZY);
-        address.setName("address");
-        address.setCollection(Boolean.FALSE);
-        address.setNullable(Boolean.TRUE);
-        address.setReference(addressBO);
-
-        final SimpleField firstName = new SimpleField();
-        firstName.setName("firstName");
-        firstName.setType(FieldType.STRING);
-        firstName.setLength(Integer.valueOf(10));
-
-        final SimpleField lastName = new SimpleField();
-        lastName.setName("lastName");
-        lastName.setType(FieldType.STRING);
-        lastName.setNullable(Boolean.FALSE);
-
-        final SimpleField phoneNumbers = new SimpleField();
-        phoneNumbers.setName("phoneNumbers");
-        phoneNumbers.setType(FieldType.STRING);
-        phoneNumbers.setLength(Integer.valueOf(10));
-        phoneNumbers.setCollection(Boolean.TRUE);
-
-        final SimpleField hireDate = new SimpleField();
-        hireDate.setName("hireDate");
-        hireDate.setType(FieldType.DATE);
-
-        final SimpleField booleanField = new SimpleField();
-        booleanField.setName("booleanField");
-        booleanField.setType(FieldType.BOOLEAN);
-
-        final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
-        employee.addField(hireDate);
-        employee.addField(booleanField);
-        employee.addField(firstName);
-        employee.addField(lastName);
-        employee.addField(phoneNumbers);
-        employee.addField(addresses);
-        employee.addField(address);
-        employee.setDescription("Describe a simple employee");
-        employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
-
-        final Query getEmployeeByPersistId = employee
-                .addQuery("findByPersistId", "SELECT e FROM Employee e WHERE e.persistenceId=:id", EMPLOYEE_QUALIFIED_NAME);
-        getEmployeeByPersistId.addQueryParameter("id", Long.class.getName());
-
-        final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
-                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
-        getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
-
-        final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery(FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER,
-                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", List.class.getName());
-        findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
-        findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
-
-        final Query findByFirstNameFetchAddresses = employee.addQuery(FIND_BY_FIRST_NAME_FETCH_ADDRESSES,
-                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", List.class.getName());
-        findByFirstNameFetchAddresses.addQueryParameter("firstName", String.class.getName());
-
-        final Query findByHireDate = employee.addQuery(FIND_BY_HIRE_DATE_RANGE,
-                "SELECT e FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", List.class.getName());
-        findByHireDate.addQueryParameter("date1", Date.class.getName());
-        findByHireDate.addQueryParameter("date2", Date.class.getName());
-
-        final Query countForFindByHireDate = employee.addQuery(COUNT_FOR_FIND_BY_HIRE_DATE_RANGE,
-                "SELECT count(e) FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", Long.class.getName());
-        countForFindByHireDate.addQueryParameter("date1", Date.class.getName());
-        countForFindByHireDate.addQueryParameter("date2", Date.class.getName());
-
-        employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
-
-        employee.addIndex("IDX_LSTNM", "lastName");
-        employee.addIndex("IDX_LSTNM", "address");
-
-        final BusinessObject person = new BusinessObject();
-        person.setQualifiedName(PERSON_QUALIFIED_NAME);
-        person.addField(hireDate);
-        person.addField(firstName);
-        person.addField(lastName);
-        person.addField(phoneNumbers);
-        person.setDescription("Describe a simple person");
-        person.addUniqueConstraint("uk_fl", "firstName", "lastName");
-
-        final BusinessObject productBO = new BusinessObject();
-        productBO.setQualifiedName(PRODUCT_QUALIFIED_NAME);
-        productBO.addField(name);
-
-        final RelationField products = new RelationField();
-        products.setType(RelationField.Type.AGGREGATION);
-        products.setFetchType(RelationField.FetchType.LAZY);
-        products.setName("products");
-        products.setCollection(Boolean.TRUE);
-        products.setNullable(Boolean.TRUE);
-        products.setReference(productBO);
-
-        final SimpleField releaseYear = new SimpleField();
-        releaseYear.setName("releaseYear");
-        releaseYear.setType(FieldType.STRING);
-
-        final BusinessObject editionBO = new BusinessObject();
-        editionBO.setQualifiedName("com.company.model.Edition");
-        editionBO.addField(releaseYear);
-
-        final RelationField editionField = new RelationField();
-        editionField.setType(RelationField.Type.COMPOSITION);
-        editionField.setFetchType(RelationField.FetchType.EAGER);
-        editionField.setName("editions");
-        editionField.setCollection(Boolean.TRUE);
-        editionField.setNullable(Boolean.TRUE);
-        editionField.setReference(editionBO);
-
-        final BusinessObject catalogBO = new BusinessObject();
-        catalogBO.setQualifiedName(PRODUCT_CATALOG_QUALIFIED_NAME);
-        catalogBO.addField(name);
-        catalogBO.addField(products);
-        catalogBO.addField(editionField);
-
-        final BusinessObjectModel model = new BusinessObjectModel();
-        model.addBusinessObject(employee);
-        model.addBusinessObject(person);
-        model.addBusinessObject(addressBO);
-        model.addBusinessObject(countryBO);
-        model.addBusinessObject(productBO);
-        model.addBusinessObject(editionBO);
-        model.addBusinessObject(catalogBO);
-        return model;
-    }
+    private User matti;
+    private File clientFolder;
+    private long tenantId;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -322,18 +129,14 @@ public class BDRepositoryIT extends CommonAPIIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        uninstallBusinessObjectModel();
-
-        deleteUser(matti);
-        logoutOnTenant();
-    }
-
-    private void uninstallBusinessObjectModel() throws UpdateException, BusinessDataRepositoryDeploymentException {
         if (!getTenantAdministrationAPI().isPaused()) {
             getTenantAdministrationAPI().pause();
             getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
             getTenantAdministrationAPI().resume();
         }
+
+        deleteUser(matti);
+        logoutOnTenant();
     }
 
     @Test
@@ -405,7 +208,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String initialLastNameValue = "Trebi";
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployee",
-                new StringBuilder().append("import ")
+                new StringBuilder("import ")
                         .append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = " + processContractInputName + "; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME, new ExpressionBuilder().createContractInputExpression(processContractInputName, String.class.getName()));
@@ -996,8 +799,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .addOperation(
                         new OperationBuilder().attachBusinessDataSetAttributeOperation(retrievedCountryData, countryQueryExpression))
                 .addOperation(
-                            new OperationBuilder().createBusinessDataSetAttributeOperation(retrievedCountryData, "setName", String.class.getName(),
-                                    new ExpressionBuilder().createConstantStringExpression("FRANCE")));
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(retrievedCountryData, "setName", String.class.getName(),
+                                new ExpressionBuilder().createConstantStringExpression("FRANCE")));
         processDefinitionBuilder.addUserTask("step3", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition("step2", "step3");
@@ -1367,7 +1170,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        final long step2 = waitForUserTask(instance, "step2");
+        waitForUserTask(instance, "step2");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
@@ -1450,7 +1253,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         verifyCommandGetQuery_countEmployee();
         verifyCommandGetQuery_findByHireDate();
 
-
         disableAndDeleteProcess(processDefinition.getId());
     }
 
@@ -1510,9 +1312,8 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // when
         ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
-        getCommandAPI().addDependency("temporaryDeps", new byte[] {0, 1});
+        getCommandAPI().addDependency("temporaryDeps", new byte[] { 0, 1 });
         Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
-
 
         // then
         assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
@@ -1560,7 +1361,8 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // then
         assertThat(businessDataQueryResult.getBusinessDataQueryMetadata()).as("should have no metadata when custom countFor is not here").isNull();
-        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
+        assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee")
+                .hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
 
     }
 
@@ -1600,7 +1402,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         // then
         assertThatJson(businessDataQueryResult.getJsonResults()).as("should get employee").hasSameStructureAs(getJsonContent("findByHireDate.json"));
         final BusinessDataQueryMetadata businessDataQueryMetadata = businessDataQueryResult.getBusinessDataQueryMetadata();
-        assertThat(businessDataQueryMetadata).as ("should have metadata").isNotNull();
+        assertThat(businessDataQueryMetadata).as("should have metadata").isNotNull();
         assertThat(businessDataQueryMetadata.getCount()).isEqualTo(1L);
         assertThat(businessDataQueryMetadata.getStartIndex()).isEqualTo(0);
         assertThat(businessDataQueryMetadata.getMaxResults()).isEqualTo(10);
@@ -2042,4 +1844,9 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(processDefinition);
     }
 
+    private Expression createBusinessDataExpressionWithName(final String businessDataName) throws InvalidExpressionException {
+        Expression createBusinessDataExpression;
+        createBusinessDataExpression = new ExpressionBuilder().createBusinessDataExpression(businessDataName, ADDRESS_QUALIFIED_NAME);
+        return createBusinessDataExpression;
+    }
 }

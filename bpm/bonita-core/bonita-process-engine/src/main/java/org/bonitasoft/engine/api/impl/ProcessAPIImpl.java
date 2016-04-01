@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -121,7 +120,6 @@ import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
-import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
@@ -2240,26 +2238,10 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
-        final Map<String, byte[]> processResources = new HashMap<>();
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
-        List<SBARResource> sbarResources;
-        Pattern pattern = Pattern.compile(filenamesPattern);
-        int from = 0;
         try {
-            sbarResources = processResourcesService.get(processDefinitionId, BARResourceType.EXTERNAL, from, BATCH_SIZE);
-            do {
-                from += BATCH_SIZE;
-                for (SBARResource sbarResource : sbarResources) {
-                    String name = ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + sbarResource.getName();
-                    if (pattern.matcher(name).matches()) {
-                        processResources.put(name, sbarResource.getContent());
-                    }
-                }
-            } while (sbarResources.size() == BATCH_SIZE);
-
-            return processResources;
-        } catch (SBonitaReadException e) {
+            BusinessArchive businessArchive = getTenantAccessor().getBusinessArchiveService().export(processDefinitionId);
+            return businessArchive.getResources(filenamesPattern);
+        } catch (SBonitaException | InvalidBusinessArchiveFormatException e) {
             throw new RetrieveException(e);
         }
     }
