@@ -889,9 +889,9 @@ public interface ProcessManagementAPI {
     int getNumberOfProcessDataDefinitions(long processDefinitionId) throws ProcessDefinitionNotFoundException;
 
     /**
-     * Retrieves resources inside .bar file representing the deployed process. Resources to retrieved are specified with a file names pattern. The pattern
-     * format must be relative to the root of the business archive, without starting with a '^' * or '/' character. The pattern can contain forward slashes
-     * after the first character.
+     * Retrieves resources inside .bar (or <code>BusinessArchive</code>) file representing the deployed process. Resources to retrieved are specified with a
+     * file names pattern. The pattern format must be relative to the root of the business archive, without starting with a '/' character. The pattern can
+     * contain forward slashes after the first character.
      * eg. if you have an image in resources/folder/image.jpg in your bar file, you can call:
      * 
      * <pre>
@@ -905,7 +905,26 @@ public interface ProcessManagementAPI {
      * </pre>
      * 
      * would retrieve all .txt files in a first-level subfolder. The key in the map is the path for each matching resource.
+     * <p>
+     * <u>Note</u> that this method is <b>expensive</b>, as it rebuilds the business archive with all its resources. If you need to retrieve several resources,
+     * instead of calling this method several times, consider using the following code:
+     * 
+     * <pre>
+     *{@code
      *
+     *      final BusinessArchive businessArchive = BusinessArchiveFactory
+     *          .readBusinessArchive(new ByteArrayInputStream(getProcessAPI().exportBarProcessContentUnderHome(processDefinitionId)));
+     *      // loop here if needed:
+     *      for (String myPattern : myPatterns) {
+     *          Map<String, byte[]> myResources = businessArchive.getResources(myPattern);
+     *          // deal with myResources here
+     *      }
+     *
+     * }
+     * </pre>
+     * 
+     * </p>
+     * 
      * @param processDefinitionId
      *        The identifier of the process definition.
      * @param filenamesPattern
@@ -914,6 +933,8 @@ public interface ProcessManagementAPI {
      * @throws RetrieveException
      *         If an exception occurs when getting the resources of the process definition.
      * @since 6.0
+     * @see #exportBarProcessContentUnderHome(long)
+     * @see BusinessArchive#getResources(String)
      */
     Map<String, byte[]> getProcessResources(long processDefinitionId, String filenamesPattern) throws RetrieveException;
 
@@ -1095,12 +1116,12 @@ public interface ProcessManagementAPI {
      * Searches the number and the list of processes that the user can start which have no category.
      *
      * @param userId
-     *            The identifier of the user.
+     *        The identifier of the user.
      * @param searchOptions
-     *            The search criteria.
+     *        The search criteria.
      * @return The number and the list of uncategorized processes that the user can start.
      * @throws SearchException
-     *             If an exception occurs when searching the process deployment information.
+     *         If an exception occurs when searching the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosCanBeStartedBy(long userId, SearchOptions searchOptions)
@@ -1638,10 +1659,10 @@ public interface ProcessManagementAPI {
      * Gets how many parameters the process definition contains.
      *
      * @param processDefinitionId
-     *            The identifier of the processDefinition
+     *        The identifier of the processDefinition
      * @return The number of parameters of a process definition
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 7.0.0
      */
     int getNumberOfParameterInstances(long processDefinitionId);
@@ -1650,14 +1671,14 @@ public interface ProcessManagementAPI {
      * Get a parameter instance by process definition UUID
      *
      * @param processDefinitionId
-     *            The identifier of the processDefinition
+     *        The identifier of the processDefinition
      * @param parameterName
-     *            The parameter name for get ParameterInstance
+     *        The parameter name for get ParameterInstance
      * @return The ParameterInstance of the process with processDefinitionUUID and name parameterName
      * @throws org.bonitasoft.engine.exception.NotFoundException
-     *             Error thrown if the given parameter is not found.
+     *         Error thrown if the given parameter is not found.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 7.0.0
      */
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException;
@@ -1666,16 +1687,16 @@ public interface ProcessManagementAPI {
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
      *
      * @param processDefinitionId
-     *            The identifier of the processDefinition
+     *        The identifier of the processDefinition
      * @param startIndex
-     *            The index of the page to be returned. First page has index 0.
+     *        The index of the page to be returned. First page has index 0.
      * @param maxResults
-     *            The number of result per page. Maximum number of result returned.
+     *        The number of result per page. Maximum number of result returned.
      * @param sort
-     *            The criterion to sort the result
+     *        The criterion to sort the result
      * @return The ordered list of parameter instances
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 7.0.0
      */
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);

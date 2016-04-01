@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.bar;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -27,7 +26,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -104,23 +102,12 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
+        String content = IOUtil.read(file);
         try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            Object deserializedObject = unmarshaller.unmarshal(file);
-            if (!(deserializedObject instanceof DesignProcessDefinition)) {
-                throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + deserializedObject);
-            }
-            DesignProcessDefinitionImpl process = (DesignProcessDefinitionImpl) deserializedObject;
-            if (process.getActorInitiator() != null) {
-                process.getActorInitiator().setInitiator(true);
-            }
-            addEventTriggerOnEvents(process.getFlowElementContainer());
-            return (DesignProcessDefinition) deserializedObject;
-        } catch (final ValidationException e) {
-            checkVersion(IOUtil.read(file));
+            return convertXmlToProcess(content);
+        } catch (final IOException e) {
+            checkVersion(content);
             throw new InvalidBusinessArchiveFormatException(e);
-        } catch (JAXBException e) {
-            throw new InvalidBusinessArchiveFormatException("Deserialization of the ProcessDesignFailed", e);
         }
     }
 
@@ -145,16 +132,11 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
-        StringWriter result = new StringWriter();
         try {
-            Marshaller marshaller = getMarshaller();
-            marshaller.marshal(processDefinition, result);
-            try (FileOutputStream outputStream = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML))) {
-                outputStream.write(result.toString().getBytes());
-            }
+            IOUtil.writeContentToFile(convertProcessToXml(processDefinition), new File(barFolder, PROCESS_DEFINITION_XML));
             final String infos = generateInfosFromDefinition(processDefinition);
             IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
-        } catch (final FileNotFoundException | JAXBException e) {
+        } catch (final FileNotFoundException e) {
             throw new IOException(e);
         }
     }

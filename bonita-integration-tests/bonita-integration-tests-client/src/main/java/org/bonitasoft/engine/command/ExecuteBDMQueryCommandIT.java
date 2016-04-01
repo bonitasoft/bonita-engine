@@ -91,7 +91,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     private static File clientFolder;
 
-    private BusinessObjectModel buildBOM() {
+    private BusinessObjectModel buildCustomBOM() {
         final BusinessObject addressBO = aBO(ADDRESS_QUALIF_CLASSNAME).withField(aSimpleField().withName("street").ofType(FieldType.STRING).build()).build();
         final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee")
                 .withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build())
@@ -144,7 +144,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(buildBOM());
+        final byte[] zip = converter.zip(buildCustomBOM());
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
         getTenantAdministrationAPI().pause();
