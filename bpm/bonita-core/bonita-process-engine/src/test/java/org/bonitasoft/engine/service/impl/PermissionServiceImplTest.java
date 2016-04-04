@@ -19,11 +19,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +33,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.home.TenantStorage;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -79,8 +74,6 @@ public class PermissionServiceImplTest {
 
     @Mock
     private BonitaHomeServer bonitaHomeServer;
-    @Mock
-    private TenantStorage tenantStorage;
 
     private File securityFolder = new File(System.getProperty("java.io.tmpdir"));
 
@@ -92,8 +85,7 @@ public class PermissionServiceImplTest {
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
 
-        when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
-        doReturn(securityFolder).when(tenantStorage).getSecurityScriptsFolder(anyLong());
+        doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
     }
 
     @Test
@@ -183,8 +175,6 @@ public class PermissionServiceImplTest {
         assertThat(myCustomRule).isTrue();
         verify(logger).log(argThat(new HasName("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
-
-
 
     @Test
     public void should_checkAPICallWithScript_run_the_class_with_package_in_script_root_folder() throws SBonitaException, ClassNotFoundException, IOException {

@@ -98,7 +98,7 @@ public class PermissionServiceImpl implements PermissionService {
         groovyClassLoader = new GroovyClassLoader(classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId));
         groovyClassLoader.setShouldRecompile(true);
         try {
-            final File folder = getBonitaHomeServer().getTenantStorage().getSecurityScriptsFolder(tenantId);
+            final File folder = getBonitaHomeServer().getSecurityScriptsFolder(tenantId);
             groovyClassLoader.addClasspath(folder.getAbsolutePath());
         } catch (BonitaHomeNotSetException | IOException e) {
             throw new SExecutionException(e);

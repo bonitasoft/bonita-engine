@@ -16,16 +16,22 @@ package org.bonitasoft.engine.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+
+import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,6 +62,23 @@ public class PermissionAPIIT extends CommonAPILocalIT {
         getPermissionAPI().checkAPICallWithScript("RuleWithException", apiCallContext, false);
 
         //then: ExecutionException
+    }
+
+    @Test
+    public void execute_provided_security_script_works() throws Exception {
+        //given
+        apiCallContext = new APICallContext("GET", "identity", "user", null, "query", "body") {
+
+            @Override
+            public Map<String, String> getFilters() {
+                return Collections.singletonMap("user_id", String.valueOf(getSession().getUserId()));
+            }
+        };
+        //when
+        boolean processPermissionRule = getPermissionAPI().checkAPICallWithScript("ProcessPermissionRule", apiCallContext, false);
+
+        //then
+        assertThat(processPermissionRule).isTrue();
     }
 
     @Test
@@ -97,10 +120,18 @@ public class PermissionAPIIT extends CommonAPILocalIT {
         //then: ExecutionException
     }
 
-    private void writeScriptToBonitaHome(final String scriptFileContent, final String fileName, final String... folders) throws IOException, SBonitaException, BonitaHomeNotSetException {
-        BonitaHomeServer.getInstance().getTenantStorage().storeSecurityScript(getSession().getTenantId(), scriptFileContent, fileName + ".groovy", folders);
+    private void writeScriptToBonitaHome(final String scriptFileContent, final String fileName, final String... folders)
+            throws IOException, SBonitaException, BonitaHomeNotSetException, NamingException {
+        ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl();
+        String path = "";
+        for (String folder : folders) {
+            path += folder + "/";
+        }
+        path += fileName + ".groovy";
 
-        //System.out.println("write to file " + fileName + " in folders: " + folders);
+        configurationService.storeTenantSecurityScripts(Arrays.asList(new BonitaConfiguration(path, scriptFileContent.getBytes())),
+                getTenantAccessor().getTenantId());
+
         final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
         //restart the service to reload scripts
         permissionService.stop();
