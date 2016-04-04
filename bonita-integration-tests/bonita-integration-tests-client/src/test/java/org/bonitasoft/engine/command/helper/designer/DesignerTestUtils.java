@@ -34,7 +34,7 @@ public class DesignerTestUtils {
     }
 
     public static <O> String stringify(Collection<O> items, Stringifier<O> stringifier) {
-        List<String> strings = new ArrayList<String>(items.size());
+        List<String> strings = new ArrayList<>(items.size());
         for (O item : items) {
             strings.add(stringifier.stringify(item));
         }
@@ -42,37 +42,40 @@ public class DesignerTestUtils {
         return strings.toString();
     }
 
-    public static String getGateways(DesignProcessDefinition design) {
-        return stringify(design.getProcessContainer().getGatewaysList(), new Stringifier<GatewayDefinition>() {
+    public static String getGateways(final DesignProcessDefinition design) {
+        return stringify(design.getFlowElementContainer().getGatewaysList(), new Stringifier<GatewayDefinition>() {
+
             @Override
             public String stringify(GatewayDefinition gateway) {
                 String text = gateway.getName();
                 if (gateway.getDefaultTransition() != null) {
-                    text += " (" + gateway.getDefaultTransition().getName() + ")";
+                    text += " (" + getTransitionName(gateway.getDefaultTransition(), design) + ")";
                 }
                 return text;
             }
         });
     }
 
-    public static String getActivities(DesignProcessDefinition design) {
-        return stringify(design.getProcessContainer().getActivities(), new Stringifier<ActivityDefinition>() {
+    public static String getActivities(final DesignProcessDefinition design) {
+        return stringify(design.getFlowElementContainer().getActivities(), new Stringifier<ActivityDefinition>() {
+
             @Override
             public String stringify(ActivityDefinition activity) {
                 String text = activity.getName();
                 if (activity.getDefaultTransition() != null) {
-                    text += " (" + activity.getDefaultTransition().getName() + ")";
+                    text += " (" + getTransitionName(activity.getDefaultTransition(), design) + ")";
                 }
                 return text;
             }
         });
     }
 
-    public static String getTransactions(DesignProcessDefinition design) {
-        return stringify(design.getProcessContainer().getTransitions(), new Stringifier<TransitionDefinition>() {
+    public static String getTransitions(final DesignProcessDefinition design) {
+        return stringify(design.getFlowElementContainer().getTransitions(), new Stringifier<TransitionDefinition>() {
+
             @Override
             public String stringify(TransitionDefinition transition) {
-                String text = transition.getName();
+                String text = getTransitionName(transition, design);
                 if (transition.getCondition() != null) {
                     text += " (" + transition.getCondition().getName() + ")";
                 }
@@ -81,5 +84,11 @@ public class DesignerTestUtils {
         });
     }
 
+    private static String getTransitionName(TransitionDefinition transition, DesignProcessDefinition design) {
+        String text = design.getFlowElementContainer().getFlowNode(transition.getSource()).getName();
+        text += "_->_";
+        text += design.getFlowElementContainer().getFlowNode(transition.getTarget()).getName();
+        return text;
+    }
 
 }
