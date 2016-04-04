@@ -13,71 +13,58 @@
  **/
 package org.bonitasoft.engine.home;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
-import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
+import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BonitaHomeServerTest {
 
+    @InjectMocks
+    BonitaHomeServer bonitaHomeServer;
+
+    @Mock
+    ConfigurationService configurationService;
+
     @Test
-    public void generateRelativeResourcePathShouldHandleBackslashOS() {
-        // given:
-        final String pathname = "C:\\hello\\hi\\folder";
-        final String resourceRelativePath = "resource/toto.lst";
+    public void should_createTenant_copy_tenant_template_files() throws Exception {
+        //given
+        List<BonitaConfiguration> tenantTemplateConf = confs(conf("file1", "file1Content".getBytes()),
+                conf("file2", "file2Content".getBytes()));
+        doReturn(tenantTemplateConf)
+                .when(configurationService).getTenantTemplateEngineConf();
+        List<BonitaConfiguration> tenantTemplateScripts = confs(conf("org/bonitasoft/package/TrueScript.groovy", "return true".getBytes()),
+                conf("org/bonitasoft/package/FalseScript.groovy", "return false".getBytes()));
+        doReturn(tenantTemplateScripts)
+                .when(configurationService).getTenantTemplateSecurityScripts();
 
-        // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
+        //when
+        bonitaHomeServer.createTenant(12L);
+        //then
+        verify(configurationService).storeTenantEngineConf(tenantTemplateConf, 12L);
+        verify(configurationService).storeTenantSecurityScripts(tenantTemplateScripts, 12L);
 
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
     }
 
-    @Test
-    public void generateRelativeResourcePathShouldHandleNetWorkBackslash() {
-        // given:
-        final String pathname = "\\\\hello\\hi\\folder";
-        final String resourceRelativePath = "resource/toto.lst";
-
-        // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
-
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    private List<BonitaConfiguration> confs(BonitaConfiguration... bonitaConfiguration) {
+        return Arrays.asList(bonitaConfiguration);
     }
 
-    @Test
-    public void generateRelativeResourcePathShouldNotContainFirstSlash() {
-        // given:
-        final String pathname = "/home/target/some_folder/";
-        final String resourceRelativePath = "resource/toto.lst";
-
-        // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
-
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
-    }
-
-    @Test
-    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() {
-        // given:
-        final String pathname = "target/nuns";
-        final String resourceRelativePath = "resource/toto.lst";
-
-        // when:
-        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
-
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    private BonitaConfiguration conf(String file1, byte[] bytes) {
+        return new BonitaConfiguration(file1, bytes);
     }
 
 }

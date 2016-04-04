@@ -16,7 +16,6 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.FileHandler;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -35,45 +34,9 @@ public class TenantStorage {
         this.bonitaHomeServer = bonitaHomeServer;
     }
 
-    public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
-        Folder current = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
-        createFolders(current);
-        for (String folder : folders) {
-            current = new Folder(current, folder);
-            current.create();
-        }
-        final File fileToWrite = current.newFile(fileName);
-        org.bonitasoft.engine.commons.io.IOUtil.writeFile(fileToWrite, scriptFileContent);
-    }
-
     private void createFolders(Folder current) {
         if (!current.exists()) {
             current.getFile().mkdirs();
-        }
-    }
-
-    public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
-        Folder tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
-        createFolders(tenantWorkSecurityFolder);
-        return tenantWorkSecurityFolder.getFile();
-    }
-
-    // temporary method
-    public void copyTenantTemplateSecurityScriptsTo(long tenantId) {
-        try {
-            Folder tenantWorkSecurityFolder = FolderMgr.getTenantWorkSecurityFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
-            tenantWorkSecurityFolder.getFile().mkdirs();
-            Folder template = FolderMgr.getFolder(FolderMgr.getFolder(FolderMgr.getTenantsWorkFolder(bonitaHomeServer.getBonitaHomeFolder()), "template"),
-                    "security-scripts");
-            if (template.exists()) {
-                Map<String, byte[]> scripts = template.listFilesAsResources();
-                for (Map.Entry<String, byte[]> script : scripts.entrySet()) {
-                    final File fileToWrite = tenantWorkSecurityFolder.newFile(script.getKey());
-                    org.bonitasoft.engine.commons.io.IOUtil.write(fileToWrite, script.getValue());
-                }
-            }
-        } catch (IOException | BonitaHomeNotSetException e) {
-            throw new IllegalStateException(e);
         }
     }
 

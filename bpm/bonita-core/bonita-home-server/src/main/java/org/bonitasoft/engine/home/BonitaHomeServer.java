@@ -13,11 +13,15 @@
  **/
 package org.bonitasoft.engine.home;
 
+import static org.bonitasoft.engine.home.FolderMgr.getFolder;
+import static org.bonitasoft.engine.home.FolderMgr.getPlatformTempFolder;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -52,6 +56,11 @@ public class BonitaHomeServer extends BonitaHome {
 
     private BonitaHomeServer() {
         tenantStorage = new TenantStorage(this);
+    }
+
+    BonitaHomeServer(ConfigurationService configurationService) {
+        this();
+        this.configurationService = configurationService;
     }
 
     public static BonitaHomeServer getInstance() {
@@ -171,7 +180,7 @@ public class BonitaHomeServer extends BonitaHome {
      */
 
     public File getPlatformTempFile(final String fileName) throws BonitaHomeNotSetException, IOException {
-        final Folder tempFolder = FolderMgr.getPlatformTempFolder();
+        final Folder tempFolder = getPlatformTempFolder();
         final File file = tempFolder.getFile(fileName);
         file.delete();
         file.createNewFile();
@@ -188,7 +197,8 @@ public class BonitaHomeServer extends BonitaHome {
 
     public void createTenant(final long tenantId) {
         getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(), tenantId);
-        tenantStorage.copyTenantTemplateSecurityScriptsTo(tenantId);
+        getConfigurationService().storeTenantSecurityScripts(getConfigurationService().getTenantTemplateSecurityScripts(), tenantId);
+
     }
 
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
@@ -215,4 +225,25 @@ public class BonitaHomeServer extends BonitaHome {
         }
         getConfigurationService().storeTenantEngineConf(tenantEngineConf, tenantId);
     }
+
+    public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
+        final Folder localFolder = getFolder(getPlatformTempFolder(), "security-scripts").createIfNotExists();
+        final Folder tenantSecurityScriptsFolder = getFolder(localFolder, String.valueOf(tenantId)).createIfNotExists();
+        List<BonitaConfiguration> tenantSecurityScripts = getConfigurationService().getTenantSecurityScripts(tenantId);
+        writeBonitaConfiguration(tenantSecurityScriptsFolder.getFile(), tenantSecurityScripts);
+        return tenantSecurityScriptsFolder.getFile();
+    }
+
+    private void writeBonitaConfiguration(File folder, List<BonitaConfiguration> bonitaConfigurations) throws IOException {
+        for (BonitaConfiguration bonitaConfiguration : bonitaConfigurations) {
+            String[] pathArray = bonitaConfiguration.getResourceName().split("/");
+            Path path = folder.toPath();
+            for (String pathChunk : pathArray) {
+                path = path.resolve(pathChunk);
+            }
+            path.toFile().getParentFile().mkdirs();
+            IOUtil.write(path.toFile(), bonitaConfiguration.getResourceContent());
+        }
+    }
+
 }
