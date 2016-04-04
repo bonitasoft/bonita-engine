@@ -793,9 +793,9 @@ CREATE TABLE user_membership (
 CREATE TABLE queriable_log (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  timeStamp NUMBER(19, 0) NOT NULL,
-  year SMALLINT NOT NULL,
-  month SMALLINT NOT NULL,
+  log_timestamp NUMBER(19, 0) NOT NULL,
+  whatYear SMALLINT NOT NULL,
+  whatMonth SMALLINT NOT NULL,
   dayOfYear SMALLINT NOT NULL,
   weekOfYear SMALLINT NOT NULL,
   userId VARCHAR2(255 CHAR) NOT NULL,

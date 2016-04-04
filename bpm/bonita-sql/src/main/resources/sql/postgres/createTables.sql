@@ -802,9 +802,9 @@ CREATE TABLE user_membership (
 CREATE TABLE queriable_log (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
-  timeStamp INT8 NOT NULL,
-  year SMALLINT NOT NULL,
-  month SMALLINT NOT NULL,
+  log_timestamp INT8 NOT NULL,
+  whatYear SMALLINT NOT NULL,
+  whatMonth SMALLINT NOT NULL,
   dayOfYear SMALLINT NOT NULL,
   weekOfYear SMALLINT NOT NULL,
   userId VARCHAR(255) NOT NULL,

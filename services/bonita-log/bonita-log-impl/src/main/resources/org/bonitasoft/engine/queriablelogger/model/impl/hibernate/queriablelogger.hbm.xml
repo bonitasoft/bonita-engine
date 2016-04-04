@@ -13,9 +13,9 @@
 			<key-property name="tenantId" column="tenantid" type="long"/>
 			<key-property name="id" column="ID" type="long"/>
 		</composite-id>
-		<property name="timeStamp" column="TIMESTAMP" />
-		<property name="year" column="YEAR" />
-		<property name="month" column="MONTH" />
+		<property name="timeStamp" column="log_timestamp" />
+		<property name="year" column="whatYear" />
+		<property name="month" column="whatMonth" />
 		<property name="dayOfYear" column="dayOfYear" />
 		<property name="weekOfYear" column="weekOfYear" />		
 		<property name="userId" column="userId" />
