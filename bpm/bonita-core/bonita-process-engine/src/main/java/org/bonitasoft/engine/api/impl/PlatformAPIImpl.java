@@ -18,7 +18,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -44,11 +46,13 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.dependency.SDependencyException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -65,6 +69,7 @@ import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantExceptio
 import org.bonitasoft.engine.platform.exception.STenantActivationException;
 import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantDeletionException;
+import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -843,6 +848,27 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformAccessor.getSchedulerService().rescheduleErroneousTriggers();
         } catch (final Exception e) {
             throw new UpdateException(e);
+        }
+    }
+
+    @Override
+    public Map<String, byte[]> getClientPlatformConfigurations() {
+        return BonitaHomeServer.getInstance().getClientPlatformConfigurations();
+    }
+
+    @Override
+    public Map<Long, Map<String, byte[]>> getClientTenantConfigurations() {
+        try {
+            PlatformService platformService = getPlatformAccessor().getPlatformService();
+            List<STenant> tenants = platformService.getTenants(QueryOptions.countQueryOptions());
+            HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
+            for (STenant tenant : tenants) {
+                conf.put(tenant.getId(),
+                        BonitaHomeServer.getInstance().getClientTenantConfigurations(tenant.getId()));
+            }
+            return conf;
+        } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException | InstantiationException | STenantException e) {
+            throw new RetrieveException(e);
         }
     }
 
