@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.platform.login.SPlatformLoginException;
 import org.bonitasoft.engine.platform.InvalidPlatformCredentialsException;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformLogoutException;
+import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -40,7 +41,7 @@ public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements Platfo
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public PlatformSession login(final String userName, final String password) throws PlatformLoginException, InvalidPlatformCredentialsException {
+    public PlatformSession login(final String userName, final String password) throws PlatformLoginException {
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -88,4 +89,18 @@ public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements Platfo
         }
     }
 
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public PlatformSession localLogin() throws PlatformLoginException {
+        try {
+            PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            final PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
+            SPlatformSession platformSession = platformSessionService.createSession("local");
+            final Date creationDate = platformSession.getCreationDate();
+            return new PlatformSessionImpl(platformSession.getId(), creationDate, platformSession.getDuration(), "local", platformSession.getUserId());
+        } catch (final Exception e) {
+            throw new PlatformLoginException(e);
+        }
+
+    }
 }

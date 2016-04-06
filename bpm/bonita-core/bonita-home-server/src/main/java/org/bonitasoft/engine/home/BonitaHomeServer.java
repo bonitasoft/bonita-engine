@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.naming.NamingException;
@@ -198,6 +200,7 @@ public class BonitaHomeServer extends BonitaHome {
     public void createTenant(final long tenantId) {
         getConfigurationService().storeTenantEngineConf(getConfigurationService().getTenantTemplateEngineConf(), tenantId);
         getConfigurationService().storeTenantSecurityScripts(getConfigurationService().getTenantTemplateSecurityScripts(), tenantId);
+        getConfigurationService().storeTenantPortalConf(getConfigurationService().getTenantTemplatePortalConf(), tenantId);
 
     }
 
@@ -246,4 +249,21 @@ public class BonitaHomeServer extends BonitaHome {
         }
     }
 
+    public Map<String, byte[]> getClientPlatformConfigurations() {
+        List<BonitaConfiguration> platformPortalConf = getConfigurationService().getPlatformPortalConf();
+        HashMap<String, byte[]> map = new HashMap<>();
+        for (BonitaConfiguration bonitaConfiguration : platformPortalConf) {
+            map.put(bonitaConfiguration.getResourceName(), bonitaConfiguration.getResourceContent());
+        }
+        return map;
+    }
+
+    public Map<String, byte[]> getClientTenantConfigurations(long tenantId) {
+        List<BonitaConfiguration> platformPortalConf = getConfigurationService().getTenantPortalConf(tenantId);
+        HashMap<String, byte[]> map = new HashMap<>();
+        for (BonitaConfiguration bonitaConfiguration : platformPortalConf) {
+            map.put(bonitaConfiguration.getResourceName(), bonitaConfiguration.getResourceContent());
+        }
+        return map;
+    }
 }

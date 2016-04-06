@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -62,6 +64,7 @@ public interface PlatformAPI {
      * <b>Initialize the platform.</b>
      * The running environment of Bonita Engine is initialized and marked as activated.<br>
      * Business elements linked to the execution are initialized, after this step the technical user will be able to connect to the engine and to import the
+     * 
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
@@ -230,4 +233,8 @@ public interface PlatformAPI {
      */
     void rescheduleErroneousTriggers() throws UpdateException;
 
+    Map<String, byte[]> getClientPlatformConfigurations();
+
+    //FIXME find a better format
+    Map<Long, Map<String, byte[]>> getClientTenantConfigurations();
 }
