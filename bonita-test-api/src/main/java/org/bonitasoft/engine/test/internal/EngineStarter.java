@@ -52,7 +52,7 @@ public class EngineStarter {
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
     private Object h2Server;
-    private static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
+    protected static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
     private Map<String, byte[]> overrideConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
@@ -77,7 +77,7 @@ public class EngineStarter {
         LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
-    private void setupPlatform() throws NamingException, PlatformSetupException {
+    protected void setupPlatform() throws NamingException, PlatformSetupException {
         PlatformSetup platformSetup = new PlatformSetup();
         if (isDropOnStart()) {
             platformSetup.destroy();
@@ -172,6 +172,7 @@ public class EngineStarter {
     }
 
     protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+
         try {
             undeployCommands();
             deleteTenantAndPlatform();
