@@ -49,7 +49,7 @@ public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAc
         List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
         //handle special case for cache configuration files
         Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
-        bonita_conf = File.createTempFile("bonita_conf", "");
+        bonita_conf = org.bonitasoft.engine.io.IOUtil.createTempDirectory(File.createTempFile("bonita_conf", "").toURI());
         bonita_conf.delete();
         bonita_conf.mkdir();
         while (iterator.hasNext()) {
