@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.test.internal;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -65,7 +66,7 @@ public class EngineStarter {
         final long startTime = System.currentTimeMillis();
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
             //force it to local if not specified
-            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
         }
         if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
             prepareEnvironment();
@@ -150,8 +151,8 @@ public class EngineStarter {
     }
 
     private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[] { "-tcp", "-tcpAllowOthers", "-tcpPort", h2Port };
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[] { args });
+        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
         final Method start = server.getClass().getMethod("start");
         LOGGER.info("Starting h2 on port " + h2Port);
         try {
@@ -380,7 +381,33 @@ public class EngineStarter {
         LOGGER.info("=====================================================");
 
         shutdown();
+        checkTempFolderIsCleaned();
         checkThreadsAreStopped();
+    }
+
+    private void checkTempFolderIsCleaned() {
+        final String[] folders = getTemporaryFolders();
+        StringBuilder builder = new StringBuilder();
+        for (String folder : folders) {
+            builder.append("[");
+            builder.append(folder);
+            builder.append("] ");
+        }
+        if (folders.length > 0) {
+            throw new IllegalStateException("Temporary configuration folders are not cleaned:" + builder.toString());
+        }
+        LOGGER.info("Temporary configuration folder is cleaned");
+    }
+
+    private String[] getTemporaryFolders() {
+        File tempFolder = new File(IOUtil.TMP_DIRECTORY);
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String s) {
+                return s.startsWith("bonita_conf");
+            }
+        };
+        return tempFolder.list(filter);
     }
 
     public void overrideConfiguration(String path, byte[] file) {
