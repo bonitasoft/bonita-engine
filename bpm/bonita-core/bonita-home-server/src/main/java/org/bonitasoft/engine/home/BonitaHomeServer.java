@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import java.util.Properties;
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
@@ -265,5 +267,17 @@ public class BonitaHomeServer extends BonitaHome {
             map.put(bonitaConfiguration.getResourceName(), bonitaConfiguration.getResourceContent());
         }
         return map;
+    }
+
+    public void updateTenantPortalConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
+        List<BonitaConfiguration> tenantPortalConf = getConfigurationService().getTenantPortalConf(tenantId);
+        for (BonitaConfiguration bonitaConfiguration : tenantPortalConf) {
+            if (bonitaConfiguration.getResourceName().equals(file)) {
+                bonitaConfiguration.setResourceContent(content);
+                getConfigurationService().storeTenantPortalConf(Collections.singletonList(bonitaConfiguration), tenantId);
+                return;
+            }
+        }
+        throw new UpdateException("unable to update the configuration file " + file + " because it does not exists");
     }
 }

@@ -233,8 +233,30 @@ public interface PlatformAPI {
      */
     void rescheduleErroneousTriggers() throws UpdateException;
 
+    /**
+     * get client configuration files of the platform
+     * 
+     * @return the client platform configuration files as a map containing file name and file content
+     * @since 7.3
+     */
     Map<String, byte[]> getClientPlatformConfigurations();
 
-    //FIXME find a better format
+    /**
+     * get client configuration files of the tenants
+     * 
+     * @return the client tenants configuration files as a map containing for each tenant id a map with file name and file content
+     * @since 7.3
+     */
     Map<Long, Map<String, byte[]>> getClientTenantConfigurations();
+
+    /**
+     * update a single client configuration file of the tenant
+     *
+     * @param tenantId tenant to update
+     * @param file file name to update
+     * @param content the new content of the file
+     * @throws UpdateException
+     * @since 7.3
+     */
+    void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException;
 }

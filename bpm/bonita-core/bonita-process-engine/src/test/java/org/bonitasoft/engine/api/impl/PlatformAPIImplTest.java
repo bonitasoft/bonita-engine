@@ -17,12 +17,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -33,6 +28,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
@@ -55,6 +51,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PlatformAPIImplTest {
 
+    public static final long TENANT_ID = 56423L;
     @Mock
     private PlatformServiceAccessor platformServiceAccessor;
 
@@ -75,6 +72,8 @@ public class PlatformAPIImplTest {
 
     @Mock
     private TenantConfiguration tenantConfiguration;
+    @Mock
+    private BonitaHomeServer bonitaHomeServer;
 
     private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
 
@@ -102,6 +101,7 @@ public class PlatformAPIImplTest {
         doReturn(tenantServiceAccessor).when(platformAPI).getTenantServiceAccessor(anyLong());
         doReturn(-1L).when(platformAPI).createSession(anyLong(), any(SessionService.class));
         doReturn(tenants).when(platformAPI).getTenants(platformServiceAccessor);
+        doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServerInstance();
         PlatformAPIImpl.isNodeStarted = false;
     }
 
@@ -289,5 +289,13 @@ public class PlatformAPIImplTest {
         verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
         verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaTenantJobListener.class), anyString());
         verify(schedulerService).start();
+    }
+
+    @Test
+    public void should_updateTenantPortalConfigurationFile_call_bonitaHomeServer() throws Exception {
+        //when
+        platformAPI.updateClientTenantConfigurationFile(TENANT_ID, "myProps.properties", "updated content".getBytes());
+        //then
+        verify(bonitaHomeServer).updateTenantPortalConfigurationFile(TENANT_ID, "myProps.properties", "updated content".getBytes());
     }
 }
