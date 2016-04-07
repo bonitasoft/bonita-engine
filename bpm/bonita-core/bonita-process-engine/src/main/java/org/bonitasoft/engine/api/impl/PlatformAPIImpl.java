@@ -241,8 +241,8 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @throws ClassNotFoundException
      */
     protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-            final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
-                    InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
+                                                     final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
         final TransactionService transactionService = platformAccessor.getTransactionService();
         for (final STenant tenant : tenants) {
             long platformSessionId = -1;
@@ -299,7 +299,7 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @throws SBonitaException
      */
     void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-            final List<STenant> tenants) {
+                                                     final List<STenant> tenants) {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
 
@@ -317,7 +317,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-            final List<STenant> tenants) throws Exception {
+                                                      final List<STenant> tenants) throws Exception {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
 
         if (platformConfiguration.shouldResumeElements()) {
@@ -398,7 +398,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     void startServicesOfTenants(final PlatformServiceAccessor platformAccessor,
-            final SessionAccessor sessionAccessor, final List<STenant> tenants) throws Exception {
+                                final SessionAccessor sessionAccessor, final List<STenant> tenants) throws Exception {
 
         for (final STenant tenant : tenants) {
             final long tenantId = tenant.getId();
@@ -599,7 +599,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createDefaultTenant(final PlatformServiceAccessor platformAccessor, final PlatformService platformService,
-            final TransactionService transactionService) throws STenantCreationException {
+                                     final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
         String userName;
@@ -662,7 +662,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
-        BonitaHomeServer.getInstance().createTenant(tenantId);
+        getBonitaHomeServerInstance().createTenant(tenantId);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
@@ -675,7 +675,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private String getUserName(final long tenantId) throws IOException, BonitaHomeNotSetException {
-        final Properties properties = BonitaHomeServer.getInstance().getTenantProperties(tenantId);
+        final Properties properties = getBonitaHomeServerInstance().getTenantProperties(tenantId);
         return properties.getProperty("userName");
     }
 
@@ -707,7 +707,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            BonitaHomeServer.getInstance().deleteTenant(tenantId);
+            getBonitaHomeServerInstance().deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
             throw new STenantDeletionException(e);
         } catch (final SDeletingActivatedTenantException e) {
@@ -853,7 +853,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public Map<String, byte[]> getClientPlatformConfigurations() {
-        return BonitaHomeServer.getInstance().getClientPlatformConfigurations();
+        return getBonitaHomeServerInstance().getClientPlatformConfigurations();
     }
 
     @Override
@@ -864,7 +864,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             HashMap<Long, Map<String, byte[]>> conf = new HashMap<>();
             for (STenant tenant : tenants) {
                 conf.put(tenant.getId(),
-                        BonitaHomeServer.getInstance().getClientTenantConfigurations(tenant.getId()));
+                        getBonitaHomeServerInstance().getClientTenantConfigurations(tenant.getId()));
             }
             return conf;
         } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException | InstantiationException | STenantException e) {
@@ -872,4 +872,12 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
+    BonitaHomeServer getBonitaHomeServerInstance() {
+        return BonitaHomeServer.getInstance();
+    }
+
+    @Override
+    public void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
+        getBonitaHomeServerInstance().updateTenantPortalConfigurationFile(tenantId, file, content);
+    }
 }
