@@ -48,8 +48,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class EngineStarter {
 
     private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
-
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
+    private static final String DATABASE_DIR = "org.bonitasoft.h2.database.dir";
 
     private Object h2Server;
     protected static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
@@ -66,7 +66,7 @@ public class EngineStarter {
         final long startTime = System.currentTimeMillis();
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
             //force it to local if not specified
-            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
+            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
         }
         if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
             prepareEnvironment();
@@ -131,7 +131,7 @@ public class EngineStarter {
     private Object startH2Server()
             throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
         final int h2Port = 6666;
-        //        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
+        setSystemPropertyIfNotSet(DATABASE_DIR, "target/database");
 
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
         final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", String[].class);
@@ -151,8 +151,8 @@ public class EngineStarter {
     }
 
     private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
+        final String[] args = new String[] { "-tcp", "-tcpAllowOthers", "-tcpPort", h2Port };
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[] { args });
         final Method start = server.getClass().getMethod("start");
         LOGGER.info("Starting h2 on port " + h2Port);
         try {
@@ -403,6 +403,7 @@ public class EngineStarter {
     private String[] getTemporaryFolders() {
         File tempFolder = new File(IOUtil.TMP_DIRECTORY);
         FilenameFilter filter = new FilenameFilter() {
+
             @Override
             public boolean accept(File file, String s) {
                 return s.startsWith("bonita_conf");

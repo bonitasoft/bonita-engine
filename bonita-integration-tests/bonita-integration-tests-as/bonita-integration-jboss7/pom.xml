@@ -183,7 +183,7 @@
                                                 <copydir dest="${jboss.deploy.dir}/h2.sar"
                                                          src="jboss/${db.vendor}/h2.sar" />
                                                 <replace file="${jboss.deploy.dir}/h2.sar/META-INF/jboss-service.xml"
-                                                         token="#bonita.home#" value="${bonita.home}" />
+                                                         token="#database.dir#" value="${project.build.directory}/database" />
                                                 <touch file="${jboss.deploy.dir}/h2.sar.dodeploy" />
                                                 <copy file="${project.build.directory}/driver/h2.jar"
                                                       todir="${jboss.deploy.dir}/h2.sar" />
