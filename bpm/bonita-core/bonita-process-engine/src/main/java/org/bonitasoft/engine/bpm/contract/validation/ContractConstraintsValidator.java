@@ -50,7 +50,7 @@ public class ContractConstraintsValidator {
             throws SContractViolationException {
         final Map<String, Serializable> vars = (variables == null ? Collections.<String, Serializable> emptyMap() : variables);
         final List<String> comments = new ArrayList<>();
-        Map<String, Object> context = new HashMap<>(vars.size());
+        final Map<String, Object> context = new HashMap<>(vars.size());
         context.putAll(vars);
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, processDefinitionId);
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
@@ -72,6 +72,8 @@ public class ContractConstraintsValidator {
             valid = (Boolean) expressionService.evaluate(createGroovyExpression(constraint), variables, Collections.<Integer, Object> emptyMap(),
                     ContainerState.ACTIVE);
         } catch (SExpressionTypeUnknownException | SExpressionEvaluationException | SExpressionDependencyMissingException | SInvalidExpressionException e) {
+            logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.ERROR,
+                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " evaluation failed.", e);
             throw new SContractViolationException("Exception while validating constraints", e);
         }
         if (!valid) {
