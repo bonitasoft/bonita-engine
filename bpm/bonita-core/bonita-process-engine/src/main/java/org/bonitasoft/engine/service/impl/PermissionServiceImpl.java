@@ -65,7 +65,7 @@ public class PermissionServiceImpl implements PermissionService {
         //groovy class loader load class from files and cache then when loaded, no need to do some lazy loading or load all class on start
         Class<?> aClass;
         if (reload) {
-            groovyClassLoader.clearCache();
+            reload();
             aClass = groovyClassLoader.loadClass(className, true, true, true);
         } else {
             aClass = Class.forName(className, true, groovyClassLoader);
@@ -80,6 +80,15 @@ public class PermissionServiceImpl implements PermissionService {
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(), new ServerLoggerWrapper(permissionRule.getClass(), logger));
         } catch (final Throwable e) {
             throw new SExecutionException("The permission rule thrown an exception", e);
+        }
+    }
+
+    private void reload() throws SExecutionException {
+        stop();
+        try {
+            start();
+        } catch (SBonitaException e) {
+            throw new SExecutionException("The permission rule could not be reloaded", e);
         }
     }
 
