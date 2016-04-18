@@ -54,6 +54,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionServiceImplTest {
 
+    public static final long TENANT_ID = 12L;
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     @Rule
@@ -75,12 +76,14 @@ public class PermissionServiceImplTest {
     @Mock
     private BonitaHomeServer bonitaHomeServer;
 
-    private File securityFolder = new File(System.getProperty("java.io.tmpdir"));
+    private File securityFolder;
 
     @Before
     public void before() throws IOException, SClassLoaderException, SSessionNotFoundException, BonitaHomeNotSetException {
+        securityFolder = temporaryFolder.newFolder("security");
+
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
-        permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, 1));
+        permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, TENANT_ID));
         doReturn(bonitaHomeServer).when(permissionService).getBonitaHomeServer();
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
@@ -151,21 +154,8 @@ public class PermissionServiceImplTest {
     @Test
     public void should_checkAPICallWithScript_run_the_class_in_script_folder() throws SBonitaException, ClassNotFoundException, IOException {
         //given
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
-                "import org.bonitasoft.engine.api.APIAccessor\n" +
-                "import org.bonitasoft.engine.api.Logger\n" +
-                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
-                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
-                "import org.bonitasoft.engine.session.APISession\n" +
-                "\n" +
-                "class MyCustomRule implements PermissionRule {\n" +
-                "    @Override\n" +
-                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
-                "        logger.warning(\"Executing my custom rule\")\n" +
-                "        return true\n" +
-                "    }\n" +
-                "}" +
-                "");
+        final String methodBody = "        return true\n";
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody));
 
         permissionService.start();
 
@@ -181,23 +171,7 @@ public class PermissionServiceImplTest {
         //given
         File test = new File(securityFolder, "test");
         test.mkdir();
-        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), "" +
-                "package test;" +
-                "" +
-                "import org.bonitasoft.engine.api.APIAccessor\n" +
-                "import org.bonitasoft.engine.api.Logger\n" +
-                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
-                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
-                "import org.bonitasoft.engine.session.APISession\n" +
-                "\n" +
-                "class MyCustomRule implements PermissionRule {\n" +
-                "    @Override\n" +
-                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
-                "        logger.warning(\"Executing my custom rule\")\n" +
-                "        return true\n" +
-                "    }\n" +
-                "}" +
-                "");
+        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), getRuleContent("test", "        return true\n"));
 
         permissionService.start();
 
@@ -239,64 +213,28 @@ public class PermissionServiceImplTest {
      */
 
     @Test
-    public void should_checkAPICallWithScript_reload_classes() throws SBonitaException, ClassNotFoundException, IOException {
+    public void should_checkAPICallWithScript_reload_classes() throws Exception {
         //given
         permissionService.start();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
-                "import org.bonitasoft.engine.api.APIAccessor\n" +
-                "import org.bonitasoft.engine.api.Logger\n" +
-                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
-                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
-                "import org.bonitasoft.engine.session.APISession\n" +
-                "\n" +
-                "class MyCustomRule implements PermissionRule {\n" +
-                "    @Override\n" +
-                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
-                "        return true\n" +
-                "    }\n" +
-                "}" +
-                "");
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return true\n"));
 
         //when
         boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
         assertThat(myCustomRule).isTrue();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
-                "import org.bonitasoft.engine.api.APIAccessor\n" +
-                "import org.bonitasoft.engine.api.Logger\n" +
-                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
-                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
-                "import org.bonitasoft.engine.session.APISession\n" +
-                "\n" +
-                "class MyCustomRule implements PermissionRule {\n" +
-                "    @Override\n" +
-                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
-                "        return false\n" +
-                "    }\n" +
-                "}" +
-                "");
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return false\n"));
+
         myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
         assertThat(myCustomRule).isFalse();
+        verify(bonitaHomeServer, times(3)).getSecurityScriptsFolder(TENANT_ID);
+
     }
 
     @Test
-    public void should_checkAPICallWithScript_that_throw_exception() throws SBonitaException, ClassNotFoundException, IOException {
+    public void should_checkAPICallWithScript_that_throw_exception() throws Exception {
         //given
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
-                "import org.bonitasoft.engine.api.APIAccessor\n" +
-                "import org.bonitasoft.engine.api.Logger\n" +
-                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
-                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
-                "import org.bonitasoft.engine.session.APISession\n" +
-                "\n" +
-                "class MyCustomRule implements PermissionRule {\n" +
-                "    @Override\n" +
-                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
-                "        throw new RuntimeException()\n" +
-                "    }\n" +
-                "}" +
-                "");
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        throw new RuntimeException()\n"));
 
         permissionService.start();
 
@@ -304,6 +242,9 @@ public class PermissionServiceImplTest {
         expectedException.expectCause(CoreMatchers.<Throwable> instanceOf(RuntimeException.class));
         //when
         permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
+
+        //then
+        verify(bonitaHomeServer).getSecurityScriptsFolder(TENANT_ID);
     }
 
     @Test
@@ -314,6 +255,33 @@ public class PermissionServiceImplTest {
 
         //when
         permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
+    }
+
+    private String getRuleContent(String methodBody) {
+        return getRuleContent(null, methodBody);
+    }
+
+    private String getRuleContent(String packageName, String methodBody) {
+        StringBuilder content = new StringBuilder();
+        if (packageName != null) {
+            content.append("package ").append(packageName).append(";\n");
+
+        }
+        content.append("import org.bonitasoft.engine.api.APIAccessor\n")
+                .append("import org.bonitasoft.engine.api.Logger\n")
+                .append("import org.bonitasoft.engine.api.permission.APICallContext\n")
+                .append("import org.bonitasoft.engine.api.permission.PermissionRule\n")
+                .append("import org.bonitasoft.engine.session.APISession\n")
+                .append("\n")
+                .append("class MyCustomRule implements PermissionRule {\n")
+                .append("    @Override\n")
+                .append("    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n")
+                .append("        logger.warning(\"Executing my custom rule\")\n")
+                .append(methodBody)
+                .append("    }\n")
+                .append("}")
+                .append("");
+        return content.toString();
     }
 
     private static class HasName extends BaseMatcher<Class> {
