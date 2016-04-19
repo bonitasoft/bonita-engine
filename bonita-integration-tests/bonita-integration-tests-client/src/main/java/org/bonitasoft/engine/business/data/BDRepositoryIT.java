@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -597,7 +598,13 @@ public class BDRepositoryIT extends CommonAPIIT {
             final BusinessObjectDAO daoImpl = client.getDAO(daoInterface);
             assertThat(daoImpl.getClass().getName()).isEqualTo(EMPLOYEE_QUALIFIED_NAME + "DAOImpl");
 
-            Method daoMethod = daoImpl.getClass().getMethod("findByLastName", String.class, int.class, int.class);
+            Method daoMethod = daoImpl.getClass().getMethod("countForFindByLastName", String.class);
+            assertThat(daoMethod).isNotNull();
+            assertThat(daoMethod.getReturnType().getName()).isEqualTo(Long.class.getName());
+            final Long count = (Long) daoMethod.invoke(daoImpl, "Pagnol");
+            assertThat(count).isEqualTo(1);
+
+            daoMethod = daoImpl.getClass().getMethod("findByLastName", String.class, int.class, int.class);
             assertThat(daoMethod).isNotNull();
             assertThat(daoMethod.getReturnType().getName()).isEqualTo(List.class.getName());
             List<?> result = (List<?>) daoMethod.invoke(daoImpl, "Pagnol", 0, 10);
@@ -773,7 +780,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData("address", ADDRESS_QUALIFIED_NAME, createNewAddressExpression);
         processDefinitionBuilder.addBusinessData("country", COUNTRY_QUALIFIED_NAME, createNewCountryExpression);
-        String retrievedCountryData = "retrievedCountry";
+        final String retrievedCountryData = "retrievedCountry";
         processDefinitionBuilder.addBusinessData(retrievedCountryData, COUNTRY_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData("noneAddress", ADDRESS_QUALIFIED_NAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -811,17 +818,17 @@ public class BDRepositoryIT extends CommonAPIIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(processInstance, "step3");
 
-        Expression getEmployeeAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("getEmployeeAddress",
+        final Expression getEmployeeAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("getEmployeeAddress",
                 "if (" + businessDataName2 + ".address == null) return \"null\"\n" + businessDataName2 + ".address.city", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(businessDataName2, EMPLOYEE_QUALIFIED_NAME));
-        Expression getCountryExpression = new ExpressionBuilder().createGroovyScriptExpression("getCountry",
+        final Expression getCountryExpression = new ExpressionBuilder().createGroovyScriptExpression("getCountry",
                 "if (" + retrievedCountryData + " == null) return \"null\"\n" + retrievedCountryData + ".name", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(retrievedCountryData, COUNTRY_QUALIFIED_NAME));
 
-        Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(getEmployeeAddressExpression, null);
         expressions.put(getCountryExpression, null);
-        Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(),
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(),
                 expressions);
         assertThat(result.get(getEmployeeAddressExpression.getName())).isEqualTo("null");
         assertThat(result.get(getCountryExpression.getName())).isEqualTo("FRANCE");
@@ -1136,7 +1143,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final long step1Id = waitForUserTask("step1");
         final Expression employee = new ExpressionBuilder().createGroovyScriptExpression("script", "employee.firstName", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression("employee", EMPLOYEE_QUALIFIED_NAME));
-        Serializable employeeResult = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
+        final Serializable employeeResult = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
                 Collections.<Expression, Map<String, Serializable>> singletonMap(employee, null)).get("script");
         assertThat(employeeResult).isEqualTo("theValue");
         getProcessAPI().assignUserTask(step1Id, matti.getId());
@@ -1315,7 +1322,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         // when
         ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
         getCommandAPI().addDependency("temporaryDeps", new byte[] { 0, 1 });
-        Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
+        final Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
 
         // then
         assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
@@ -1336,7 +1343,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        BusinessDataQueryResultImpl businessDataQueryResult = (BusinessDataQueryResultImpl) getCommandAPI().execute("getBusinessDataByQueryCommand",
+        final BusinessDataQueryResultImpl businessDataQueryResult = (BusinessDataQueryResultImpl) getCommandAPI().execute("getBusinessDataByQueryCommand",
                 parameters);
         final String jsonResult = (String) businessDataQueryResult.getJsonResults();
 
@@ -1801,7 +1808,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void evaluate_context_on_process_and_task() throws Exception {
-        ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithContext", "1.0");
+        final ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithContext", "1.0");
         final Expression bizDataValue = new ExpressionBuilder()
                 .createGroovyScriptExpression("createNewEmployee",
                         new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
@@ -1811,19 +1818,19 @@ public class BDRepositoryIT extends CommonAPIIT {
         final Expression bizData = new ExpressionBuilder().createBusinessDataExpression("bizData", EMPLOYEE_QUALIFIED_NAME);
         p1Builder.addContextEntry("process_key1",
                 new ExpressionBuilder().createGroovyScriptExpression("retrieve_firstname", "bizData.firstName", String.class.getName(), bizData));
-        UserTaskDefinitionBuilder task1 = p1Builder.addUserTask("step1", "actor");
+        final UserTaskDefinitionBuilder task1 = p1Builder.addUserTask("step1", "actor");
         task1.addShortTextData("task1Data", new ExpressionBuilder().createConstantStringExpression("task1DataValue"));
         task1.addContextEntry("task_key1", new ExpressionBuilder().createDataExpression("task1Data", String.class.getName()));
         task1.addContextEntry("task_key2", new ExpressionBuilder().createConstantStringExpression("constantValue"));
         task1.addContextEntry("processBizDataFromTask1",
                 new ExpressionBuilder().createGroovyScriptExpression("retrieve_firstname", "bizData.lastName", String.class.getName(), bizData));
-        UserTaskDefinitionBuilder task2 = p1Builder.addUserTask("step2", "actor");
+        final UserTaskDefinitionBuilder task2 = p1Builder.addUserTask("step2", "actor");
         task2.addShortTextData("task2Data", new ExpressionBuilder().createConstantStringExpression("task2DataValue"));
         p1Builder.addActor("actor");
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(p1Builder.done(), "actor", matti);
-        ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        long step1 = waitForUserTask(processInstance1.getId(), "step1");
-        long step2 = waitForUserTask(processInstance1.getId(), "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(p1Builder.done(), "actor", matti);
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1 = waitForUserTask(processInstance1.getId(), "step1");
+        final long step2 = waitForUserTask(processInstance1.getId(), "step2");
 
         assertThat(getProcessAPI().getProcessInstanceExecutionContext(processInstance1.getId())).containsOnly(entry("process_key1", "Jane"));
         assertThat(getProcessAPI().getUserTaskExecutionContext(step1)).containsOnly(entry("task_key1", "task1DataValue"), entry("task_key2", "constantValue"),
@@ -1834,9 +1841,9 @@ public class BDRepositoryIT extends CommonAPIIT {
         assignAndExecuteStep(step2, matti.getId());
         waitForProcessToFinish(processInstance1);
         Thread.sleep(10);
-        ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance1.getId());
-        ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1);
-        ArchivedActivityInstance archivedStep2 = getProcessAPI().getArchivedActivityInstance(step2);
+        final ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance1.getId());
+        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1);
+        final ArchivedActivityInstance archivedStep2 = getProcessAPI().getArchivedActivityInstance(step2);
         assertThat(getProcessAPI().getArchivedProcessInstanceExecutionContext(finalArchivedProcessInstance.getId()))
                 .containsOnly(entry("process_key1", "Jane"));
         assertThat(getProcessAPI().getArchivedUserTaskExecutionContext(archivedStep1.getId())).containsOnly(entry("task_key1", "task1DataValue"),

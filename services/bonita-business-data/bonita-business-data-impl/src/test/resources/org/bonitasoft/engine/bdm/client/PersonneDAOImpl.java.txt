@@ -142,7 +142,7 @@ public class PersonneDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("prenom", prenom);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return ((Long) commandApi.execute("executeBDMQuery", commandParameters));
+            return ((Long) deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Long.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -158,7 +158,7 @@ public class PersonneDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("nom", nom);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return ((Long) commandApi.execute("executeBDMQuery", commandParameters));
+            return ((Long) deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Long.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -174,7 +174,7 @@ public class PersonneDAOImpl
             Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
             queryParameters.put("birthDate", birthDate);
             commandParameters.put("queryParameters", ((Serializable) queryParameters));
-            return ((Long) commandApi.execute("executeBDMQuery", commandParameters));
+            return ((Long) deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Long.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -187,7 +187,7 @@ public class PersonneDAOImpl
             commandParameters.put("queryName", "Personne.countForFind");
             commandParameters.put("returnsList", false);
             commandParameters.put("returnType", "java.lang.Long");
-            return ((Long) commandApi.execute("executeBDMQuery", commandParameters));
+            return ((Long) deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Long.class));
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
