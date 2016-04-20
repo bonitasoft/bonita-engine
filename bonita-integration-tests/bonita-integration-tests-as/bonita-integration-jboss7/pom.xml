@@ -291,7 +291,7 @@
                                             <socket server="localhost" port="${provider.port}" />
                                         </waitfor> -->
 
-                                        <sleep seconds="40" />
+                                        <sleep seconds="60" />
 
                                         <mkdir dir="${report.xml}" />
                                         <junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
