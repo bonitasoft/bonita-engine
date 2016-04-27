@@ -25,11 +25,11 @@ import org.springframework.context.ApplicationContext;
  * @author Matthieu Chaffotte
  * @author Charles Souillard
  */
-public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
+public class TenantBeanAccessor extends SpringBeanAccessor {
 
     private final long tenantId;
 
-    public SpringTenantFileSystemBeanAccessor(final ApplicationContext parent, final long tenantId) {
+    public TenantBeanAccessor(final ApplicationContext parent, final long tenantId) {
         super(parent);
         this.tenantId = tenantId;
     }

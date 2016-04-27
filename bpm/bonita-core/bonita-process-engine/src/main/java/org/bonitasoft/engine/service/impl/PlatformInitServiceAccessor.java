@@ -19,7 +19,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SessionAccessorAccessor {
+public interface PlatformInitServiceAccessor {
 
     SessionAccessor getSessionAccessor();
 

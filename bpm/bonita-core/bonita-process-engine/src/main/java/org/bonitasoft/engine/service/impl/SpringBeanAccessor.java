@@ -25,15 +25,17 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * Spring bean accessor that get its configuration from configuration file in classpath and in database
+ *
  * @author Charles Souillard
  */
-public abstract class SpringFileSystemBeanAccessor {
+public abstract class SpringBeanAccessor {
 
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
     private final ApplicationContext parent;
     private AbsoluteFileSystemXmlApplicationContext context;
 
-    public SpringFileSystemBeanAccessor(ApplicationContext parent) {
+    public SpringBeanAccessor(ApplicationContext parent) {
         this.parent = parent;
     }
 
@@ -98,7 +100,7 @@ public abstract class SpringFileSystemBeanAccessor {
         if (property.startsWith("${") && property.endsWith("}")) {
             property = property.substring(2, property.length() - 1);
             String sysPropertyKey = property.substring(0, property.indexOf(':'));
-            String sysPropertyDefaultValue = property.substring(property.indexOf(':')+1, property.length());
+            String sysPropertyDefaultValue = property.substring(property.indexOf(':') + 1, property.length());
             return System.getProperty(sysPropertyKey, sysPropertyDefaultValue);
         }
         return property;
