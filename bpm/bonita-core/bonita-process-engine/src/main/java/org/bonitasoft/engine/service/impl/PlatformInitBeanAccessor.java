@@ -21,12 +21,15 @@ import java.util.Properties;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 
 /**
+ *
+ *
+ *
  * @author Matthieu Chaffotte
  * @author Charles Souillard
  */
-public class SpringPlatformInitFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
+public class PlatformInitBeanAccessor extends SpringBeanAccessor {
 
-    public SpringPlatformInitFileSystemBeanAccessor() {
+    public PlatformInitBeanAccessor() {
         super(null);
     }
 

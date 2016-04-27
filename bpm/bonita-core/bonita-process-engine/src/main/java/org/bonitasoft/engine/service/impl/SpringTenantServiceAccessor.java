@@ -122,7 +122,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  */
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
-    private final SpringTenantFileSystemBeanAccessor beanAccessor;
+    private final TenantBeanAccessor beanAccessor;
     private final long tenantId;
     private IdentityService identityService;
     private LoginService loginService;
@@ -241,7 +241,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private TenantResourcesService tenantResourceService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
-        beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
+        beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantBeanAccessor(tenantId);
         this.tenantId = tenantId;
     }
 
@@ -636,7 +636,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return eventService;
     }
 
-    public SpringTenantFileSystemBeanAccessor getBeanAccessor() {
+    public TenantBeanAccessor getBeanAccessor() {
         return beanAccessor;
     }
 

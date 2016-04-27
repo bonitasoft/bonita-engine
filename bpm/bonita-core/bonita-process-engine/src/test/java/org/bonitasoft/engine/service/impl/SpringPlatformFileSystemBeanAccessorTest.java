@@ -27,7 +27,7 @@ public class SpringPlatformFileSystemBeanAccessorTest {
     @Test
     public void should_getPropertyWithPlaceholder_with_placeholder_return_system_property() throws Exception {
         //given
-        SpringPlatformFileSystemBeanAccessor springPlatformFileSystemBeanAccessor = new SpringPlatformFileSystemBeanAccessor(null);
+        PlatformBeanAccessor springPlatformFileSystemBeanAccessor = new PlatformBeanAccessor(null);
         Properties properties = new Properties();
         properties.setProperty("myTestProperty", "${system.test.property:default value if not set in syst prop}");
         System.setProperty("system.test.property", "the value set in syst properties");
@@ -41,7 +41,7 @@ public class SpringPlatformFileSystemBeanAccessorTest {
     @Test
     public void should_getPropertyWithPlaceholder_with_placeholder_return_default_value_from_property() throws Exception {
         //given
-        SpringPlatformFileSystemBeanAccessor springPlatformFileSystemBeanAccessor = new SpringPlatformFileSystemBeanAccessor(null);
+        PlatformBeanAccessor springPlatformFileSystemBeanAccessor = new PlatformBeanAccessor(null);
         Properties properties = new Properties();
         properties.setProperty("myTestProperty", "${system.test.property2:default value if not set in syst prop}");
         //when
@@ -54,7 +54,7 @@ public class SpringPlatformFileSystemBeanAccessorTest {
     @Test
     public void should_getPropertyWithPlaceholder_without_placeholder_return_default_value() throws Exception {
         //given
-        SpringPlatformFileSystemBeanAccessor springPlatformFileSystemBeanAccessor = new SpringPlatformFileSystemBeanAccessor(null);
+        PlatformBeanAccessor springPlatformFileSystemBeanAccessor = new PlatformBeanAccessor(null);
         Properties properties = new Properties();
         //when
         String value = springPlatformFileSystemBeanAccessor.getPropertyWithPlaceholder(properties, "myTestProperty", "default");
@@ -66,7 +66,7 @@ public class SpringPlatformFileSystemBeanAccessorTest {
     @Test
     public void should_getPropertyWithPlaceholder_without_placeholder_return_value() throws Exception {
         //given
-        SpringPlatformFileSystemBeanAccessor springPlatformFileSystemBeanAccessor = new SpringPlatformFileSystemBeanAccessor(null);
+        PlatformBeanAccessor springPlatformFileSystemBeanAccessor = new PlatformBeanAccessor(null);
         Properties properties = new Properties();
         properties.setProperty("myTestProperty", "toto}");
         //when

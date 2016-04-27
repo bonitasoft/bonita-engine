@@ -22,7 +22,6 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**

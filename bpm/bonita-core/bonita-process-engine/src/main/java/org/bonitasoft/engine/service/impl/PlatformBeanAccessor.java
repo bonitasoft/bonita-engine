@@ -29,11 +29,11 @@ import org.springframework.context.ApplicationContext;
  * @author Charles Souillard
  * @author Celine Souchet
  */
-public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
+public class PlatformBeanAccessor extends SpringBeanAccessor {
 
     private File bonita_conf;
 
-    public SpringPlatformFileSystemBeanAccessor(ApplicationContext parent) {
+    public PlatformBeanAccessor(ApplicationContext parent) {
         super(parent);
     }
 

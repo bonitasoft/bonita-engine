@@ -41,7 +41,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  */
 public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
-    private final SpringPlatformFileSystemBeanAccessor beanAccessor;
+    private final PlatformBeanAccessor beanAccessor;
 
     private PlatformService platformService;
 
@@ -71,7 +71,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private ServicesResolver servicesResolver;
 
     public SpringPlatformServiceAccessor() {
-        beanAccessor = SpringFileSystemBeanAccessorFactory.getPlatformAccessor();
+        beanAccessor = SpringFileSystemBeanAccessorFactory.getPlatformBeanAccessor();
     }
     
     @Override
