@@ -185,7 +185,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/platform-resources/security-scripts/</source>
+                                <source>${project.build.directory}/platform-resources/tenant_template_security_scripts/</source>
                             </sources>
                         </configuration>
                     </execution>
