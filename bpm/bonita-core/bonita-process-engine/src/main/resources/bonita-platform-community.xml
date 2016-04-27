@@ -316,12 +316,6 @@
     <bean id="sequenceMappingProvider" class="org.bonitasoft.engine.sequence.SequenceMappingProvider" autowire="byType" />
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
-        <constructor-arg name="sequenceId" value="0" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.0:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
         <constructor-arg name="sequenceId" value="1" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.1:${bonita.platform.sequence.defaultRangeSize}}" />

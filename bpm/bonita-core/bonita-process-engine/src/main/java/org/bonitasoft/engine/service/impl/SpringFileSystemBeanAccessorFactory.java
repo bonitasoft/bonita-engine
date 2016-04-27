@@ -21,27 +21,27 @@ import java.util.Map;
  */
 public class SpringFileSystemBeanAccessorFactory {
 
-    private static SpringPlatformInitFileSystemBeanAccessor platformInit;
-    private static SpringPlatformFileSystemBeanAccessor platform;
-    private static Map<Long, SpringTenantFileSystemBeanAccessor> tenants = new HashMap<>();
+    private static PlatformInitBeanAccessor platformInit;
+    private static PlatformBeanAccessor platform;
+    private static Map<Long, TenantBeanAccessor> tenants = new HashMap<>();
 
-    public static SpringPlatformInitFileSystemBeanAccessor getPlatformInitAccessor() {
+    public static PlatformInitBeanAccessor getPlatformInitBeanAccessor() {
         if (platformInit == null) {
-            platformInit = new SpringPlatformInitFileSystemBeanAccessor();
+            platformInit = new PlatformInitBeanAccessor();
         }
         return platformInit;
     }
 
-    public static SpringPlatformFileSystemBeanAccessor getPlatformAccessor() {
+    public static PlatformBeanAccessor getPlatformBeanAccessor() {
         if (platform == null) {
-            platform = new SpringPlatformFileSystemBeanAccessor(getPlatformInitAccessor().getContext());
+            platform = new PlatformBeanAccessor(getPlatformInitBeanAccessor().getContext());
         }
         return platform;
     }
 
-    public static SpringTenantFileSystemBeanAccessor getTenantAccessor(final long tenantId) {
+    public static TenantBeanAccessor getTenantBeanAccessor(final long tenantId) {
         if (!tenants.containsKey(tenantId)) {
-            tenants.put(tenantId, new SpringTenantFileSystemBeanAccessor(getPlatformAccessor().getContext(), tenantId));
+            tenants.put(tenantId, new TenantBeanAccessor(getPlatformBeanAccessor().getContext(), tenantId));
         }
         return tenants.get(tenantId);
     }
