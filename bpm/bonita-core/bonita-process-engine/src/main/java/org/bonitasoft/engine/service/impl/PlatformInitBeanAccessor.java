@@ -18,12 +18,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import javax.naming.NamingException;
+
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.platform.configuration.exception.PlatformConfigurationException;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 
 /**
- *
- *
- *
  * @author Matthieu Chaffotte
  * @author Charles Souillard
  */
@@ -33,6 +34,18 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
         super(null);
     }
 
+    @Override
+    protected void init() {
+        try {
+            getPlatformLicensesSetup().extractLicenses();
+        } catch (IOException | NamingException | PlatformConfigurationException e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
+
+    PlatformLicensesSetup getPlatformLicensesSetup() {
+        return new PlatformLicensesSetup();
+    }
 
     @Override
     protected Properties getProperties() throws IOException {

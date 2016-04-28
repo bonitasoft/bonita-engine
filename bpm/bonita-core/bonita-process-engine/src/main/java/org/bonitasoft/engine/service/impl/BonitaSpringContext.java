@@ -30,7 +30,7 @@ import org.springframework.core.io.Resource;
 /**
  * @author Matthieu Chaffotte
  */
-public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplicationContext {
+public class BonitaSpringContext extends FileSystemXmlApplicationContext {
 
     private List<Resource> resources = new ArrayList<>();
 
@@ -43,7 +43,7 @@ public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplic
      * @param parent          the parent context
      * @throws BeansException if context creation failed
      */
-    public AbsoluteFileSystemXmlApplicationContext(final String[] configLocations, final ApplicationContext parent)
+    public BonitaSpringContext(final String[] configLocations, final ApplicationContext parent)
             throws BeansException {
         super(configLocations, false, parent);
 

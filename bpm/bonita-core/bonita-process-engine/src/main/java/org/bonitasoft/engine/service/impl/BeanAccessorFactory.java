@@ -17,9 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Factory that build bean accessor ( == spring contexts )
+ * It is the entry point on the configuration of the engine
+ *
  * @author Charles Souillard
  */
-public class SpringFileSystemBeanAccessorFactory {
+public class BeanAccessorFactory {
 
     private static PlatformInitBeanAccessor platformInit;
     private static PlatformBeanAccessor platform;

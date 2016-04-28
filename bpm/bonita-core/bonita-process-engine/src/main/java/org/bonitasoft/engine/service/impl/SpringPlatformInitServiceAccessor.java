@@ -35,14 +35,14 @@ public class SpringPlatformInitServiceAccessor implements PlatformInitServiceAcc
     @Override
     public SessionAccessor getSessionAccessor() {
         if (sessionAccessor == null) {
-            sessionAccessor = SpringFileSystemBeanAccessorFactory.getPlatformInitBeanAccessor().getService(SessionAccessor.class);
+            sessionAccessor = BeanAccessorFactory.getPlatformInitBeanAccessor().getService(SessionAccessor.class);
         }
         return sessionAccessor;
     }
 
     @Override
     public void destroy() {
-        SpringFileSystemBeanAccessorFactory.getPlatformInitBeanAccessor().destroy();
+        BeanAccessorFactory.getPlatformInitBeanAccessor().destroy();
 
     }
 

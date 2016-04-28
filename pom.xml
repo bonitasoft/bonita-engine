@@ -65,6 +65,7 @@
 
         <!-- Tests -->
         <powermock.version>1.5.1</powermock.version>
+        <system-rules.version>1.16.0</system-rules.version>
 
         <!-- ************************ -->
         <!-- Sonar/Reporting settings -->
@@ -258,6 +259,11 @@
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>3.18.1-GA</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-rules</artifactId>
+                <version>${system-rules.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -459,7 +465,8 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <argLine>-Xmx1024m -XX:MaxPermSize=256m
-                        -XX:+HeapDumpOnOutOfMemoryError</argLine>
+                        -XX:+HeapDumpOnOutOfMemoryError
+                    </argLine>
                 </configuration>
             </plugin>
         </plugins>
@@ -641,7 +648,8 @@
                                 if overriding this property in lower-level pom files: -->
                             <argLine>-Xmx1024m -XX:MaxPermSize=256m
                                 -XX:+HeapDumpOnOutOfMemoryError
-                                ${jacoco.agent.it.arg}</argLine>
+                                ${jacoco.agent.it.arg}
+                            </argLine>
                             <!-- Listener to show coverage for each test -->
                             <properties>
                                 <property>
