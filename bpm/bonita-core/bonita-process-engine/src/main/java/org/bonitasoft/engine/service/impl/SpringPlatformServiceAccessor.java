@@ -71,7 +71,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private ServicesResolver servicesResolver;
 
     public SpringPlatformServiceAccessor() {
-        beanAccessor = SpringFileSystemBeanAccessorFactory.getPlatformBeanAccessor();
+        beanAccessor = BeanAccessorFactory.getPlatformBeanAccessor();
     }
     
     @Override

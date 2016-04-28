@@ -241,7 +241,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private TenantResourcesService tenantResourceService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
-        beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantBeanAccessor(tenantId);
+        beanAccessor = BeanAccessorFactory.getTenantBeanAccessor(tenantId);
         this.tenantId = tenantId;
     }
 

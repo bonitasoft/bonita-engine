@@ -33,14 +33,14 @@ public abstract class SpringBeanAccessor {
 
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
     private final ApplicationContext parent;
-    private AbsoluteFileSystemXmlApplicationContext context;
+    private BonitaSpringContext context;
 
     public SpringBeanAccessor(ApplicationContext parent) {
         this.parent = parent;
     }
 
     protected String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
-        final Properties properties = BONITA_HOME_SERVER.getPlatformInitProperties();
+        final Properties properties = getBonitaHomeServer().getPlatformInitProperties();
         final String activeProfiles = (String) properties.get("activeProfiles");
         return activeProfiles.split(",");
     }
@@ -59,9 +59,10 @@ public abstract class SpringBeanAccessor {
 
     public ApplicationContext getContext() {
         if (context == null) {
+            init();
             try {
-                context = new AbsoluteFileSystemXmlApplicationContext(new String[] {}, parent);
-                List<String> classPathResources = getClassPathResources(BONITA_HOME_SERVER.getPlatformProperties());
+                context = createSpringContext();
+                List<String> classPathResources = getClassPathResources(getBonitaHomeServer().getPlatformProperties());
                 for (String classPathResource : classPathResources) {
                     context.addClassPathResource(classPathResource);
                 }
@@ -80,6 +81,18 @@ public abstract class SpringBeanAccessor {
             }
         }
         return context;
+    }
+
+    BonitaSpringContext createSpringContext() {
+        return new BonitaSpringContext(new String[] {}, parent);
+    }
+
+    BonitaHomeServer getBonitaHomeServer() {
+        return BONITA_HOME_SERVER;
+    }
+
+    void init() {
+
     }
 
     public void destroy() {
