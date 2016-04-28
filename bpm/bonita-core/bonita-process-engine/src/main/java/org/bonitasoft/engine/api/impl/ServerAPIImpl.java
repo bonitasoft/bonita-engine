@@ -222,7 +222,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
             final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SBonitaException, BonitaHomeNotSetException, IOException,
-                    BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 
         checkTenantSession(platformServiceAccessor, session);
         final long tenantId = ((APISession) session).getTenantId();

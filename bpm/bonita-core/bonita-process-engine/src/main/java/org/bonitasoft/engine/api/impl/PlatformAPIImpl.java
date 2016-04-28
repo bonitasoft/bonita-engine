@@ -241,8 +241,8 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @throws ClassNotFoundException
      */
     protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-                                                     final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
-            InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
+            final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
+                    InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
         final TransactionService transactionService = platformAccessor.getTransactionService();
         for (final STenant tenant : tenants) {
             long platformSessionId = -1;
@@ -299,7 +299,7 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @throws SBonitaException
      */
     void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-                                                     final List<STenant> tenants) {
+            final List<STenant> tenants) {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
 
@@ -317,7 +317,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-                                                      final List<STenant> tenants) throws Exception {
+            final List<STenant> tenants) throws Exception {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
 
         if (platformConfiguration.shouldResumeElements()) {
@@ -366,7 +366,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
             BonitaHomeNotSetException, BonitaHomeConfigurationException, IOException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException {
+            InvocationTargetException, ClassNotFoundException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
@@ -379,14 +379,15 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private void addTenantJobListeners(final List<STenant> tenants, final SchedulerService schedulerService) throws SBonitaException,
             BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            InvocationTargetException {
+            InvocationTargetException, ClassNotFoundException {
         for (STenant tenant : tenants) {
             addTenantJobListener(schedulerService, tenant.getId());
         }
     }
 
     private void addTenantJobListener(final SchedulerService schedulerService, final long tenantId) throws SBonitaException, BonitaHomeNotSetException,
-            IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
+            ClassNotFoundException {
         final List<AbstractBonitaTenantJobListener> jobListeners = getTenantServiceAccessor(tenantId).getTenantConfiguration().getJobListeners();
         TenantJobListenerManager tenantJobListenerManager = new TenantJobListenerManager(schedulerService);
         tenantJobListenerManager.registerListeners(jobListeners, tenantId);
@@ -398,7 +399,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     void startServicesOfTenants(final PlatformServiceAccessor platformAccessor,
-                                final SessionAccessor sessionAccessor, final List<STenant> tenants) throws Exception {
+            final SessionAccessor sessionAccessor, final List<STenant> tenants) throws Exception {
 
         for (final STenant tenant : tenants) {
             final long tenantId = tenant.getId();
@@ -475,7 +476,8 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
+            ClassNotFoundException {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
     }
 
@@ -599,7 +601,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void createDefaultTenant(final PlatformServiceAccessor platformAccessor, final PlatformService platformService,
-                                     final TransactionService transactionService) throws STenantCreationException {
+            final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
         String userName;
