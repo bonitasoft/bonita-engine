@@ -46,6 +46,7 @@ import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryMetadata;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataQueryResult;
@@ -1802,10 +1803,11 @@ public class BDRepositoryIT extends CommonAPIIT {
         ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithContext", "1.0");
         final Expression bizDataValue = new ExpressionBuilder()
                 .createGroovyScriptExpression("createNewEmployee",
-                        new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
-                                .append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(),
+                        "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;",
                         EMPLOYEE_QUALIFIED_NAME);
         p1Builder.addBusinessData("bizData", EMPLOYEE_QUALIFIED_NAME, bizDataValue);
+        p1Builder.addDocumentDefinition("myDoc").addFile("myDoc.txt").addContentFileName("myDoc.txt");
+
         final Expression bizData = new ExpressionBuilder().createBusinessDataExpression("bizData", EMPLOYEE_QUALIFIED_NAME);
         p1Builder.addContextEntry("process_key1",
                 new ExpressionBuilder().createGroovyScriptExpression("retrieve_firstname", "bizData.firstName", String.class.getName(), bizData));
@@ -1815,17 +1817,22 @@ public class BDRepositoryIT extends CommonAPIIT {
         task1.addContextEntry("task_key2", new ExpressionBuilder().createConstantStringExpression("constantValue"));
         task1.addContextEntry("processBizDataFromTask1",
                 new ExpressionBuilder().createGroovyScriptExpression("retrieve_firstname", "bizData.lastName", String.class.getName(), bizData));
+        task1.addContextEntry("doc_key", new ExpressionBuilder().createGroovyScriptExpression("doc.name", "myDoc.fileName", String.class.getName(),
+                new ExpressionBuilder().createDocumentReferenceExpression("myDoc")));
         UserTaskDefinitionBuilder task2 = p1Builder.addUserTask("step2", "actor");
         task2.addShortTextData("task2Data", new ExpressionBuilder().createConstantStringExpression("task2DataValue"));
         p1Builder.addActor("actor");
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(p1Builder.done(), "actor", matti);
+        final String myDocumentContent = "Some document content";
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(p1Builder.getProcess())
+                .addDocumentResource(new BarResource("myDoc.txt", myDocumentContent.getBytes())).done();
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, "actor", matti);
         ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
         long step1 = waitForUserTask(processInstance1.getId(), "step1");
         long step2 = waitForUserTask(processInstance1.getId(), "step2");
 
         assertThat(getProcessAPI().getProcessInstanceExecutionContext(processInstance1.getId())).containsOnly(entry("process_key1", "Jane"));
         assertThat(getProcessAPI().getUserTaskExecutionContext(step1)).containsOnly(entry("task_key1", "task1DataValue"), entry("task_key2", "constantValue"),
-                entry("processBizDataFromTask1", "Doe"));
+                entry("processBizDataFromTask1", "Doe"), entry("doc_key", "myDoc.txt"));
         assertThat(getProcessAPI().getUserTaskExecutionContext(step2)).isEmpty();
 
         assignAndExecuteStep(step1, matti.getId());
@@ -1838,7 +1845,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(getProcessAPI().getArchivedProcessInstanceExecutionContext(finalArchivedProcessInstance.getId()))
                 .containsOnly(entry("process_key1", "Jane"));
         assertThat(getProcessAPI().getArchivedUserTaskExecutionContext(archivedStep1.getId())).containsOnly(entry("task_key1", "task1DataValue"),
-                entry("task_key2", "constantValue"), entry("processBizDataFromTask1", "Doe"));
+                entry("task_key2", "constantValue"), entry("processBizDataFromTask1", "Doe"), entry("doc_key", "myDoc.txt"));
         assertThat(getProcessAPI().getArchivedUserTaskExecutionContext(archivedStep2.getId())).isEmpty();
 
         disableAndDeleteProcess(processDefinition);

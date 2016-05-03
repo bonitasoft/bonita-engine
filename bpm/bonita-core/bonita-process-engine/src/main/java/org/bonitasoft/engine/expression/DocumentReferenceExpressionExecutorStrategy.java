@@ -70,8 +70,8 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         final Long time = (Long) context.get("time");
 
         try {
-            final long processInstanceId = getProcessInstance(containerId, containerType);
-            final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
+            final long processInstanceId = getProcessInstance(containerId, containerType, time);
+            final ArrayList<Object> results = new ArrayList<>(expressions.size());
             for (final SExpression expression : expressions) {
                 results.add(getDocument(processInstanceId, expression, time));
             }
@@ -97,7 +97,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private long getProcessInstance(final Long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+    long getProcessInstance(final Long containerId, final String containerType, Long time) throws SFlowNodeNotFoundException, SFlowNodeReadException,
             SExpressionDependencyMissingException {
         if (containerId == null || containerType == null) {
             throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
@@ -105,7 +105,11 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
             return containerId;
         }
-        return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
+        if (time != null) {
+            return flowNodeInstanceService.getArchivedFlowNodeInstance(containerId).getParentProcessInstanceId();
+        } else {
+            return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
+        }
     }
 
     @Override
