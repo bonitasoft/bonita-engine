@@ -22,13 +22,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessManagementAPI;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
@@ -44,7 +50,8 @@ import org.junit.Test;
 public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "expression context", "flow node container hierarchy" }, jira = "ENGINE-1848")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "expression context",
+            "flow node container hierarchy" }, jira = "ENGINE-1848")
     public void evaluateExpressionsOnLoopUserTaskInSupProcess() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
@@ -162,7 +169,8 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal", "parent process data" }, jira = "ENGINE-536")
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
+            "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
@@ -192,13 +200,15 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+            throws DataNotFoundException {
         final DataInstance activityDataInstance;
         activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal", "call activity" }, jira = "ENGINE-536")
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
+            "call activity" }, jira = "ENGINE-536")
     @Test
     public void signalEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithSignalEventSubProcess(false, false);
@@ -223,4 +233,5 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(callerProcess.getId());
         disableAndDeleteProcess(targetProcess.getId());
     }
+
 }
