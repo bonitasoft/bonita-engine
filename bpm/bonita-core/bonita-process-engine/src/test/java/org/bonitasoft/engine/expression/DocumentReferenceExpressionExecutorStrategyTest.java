@@ -13,24 +13,12 @@
  **/
 package org.bonitasoft.engine.expression;
 
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -40,6 +28,18 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * @author Vincent Elcrin
@@ -99,7 +99,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_process_document_when_container_is_a_process_instance() throws Exception {
-        final Map<String, Object> dependencies = new HashMap<>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
 
@@ -108,9 +108,11 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document, documentService));
     }
 
+
+
     @Test
     public void evaluate_result_should_contains_parent_process_document_when_container_is_not_a_process_instance() throws Exception {
-        final Map<String, Object> dependencies = new HashMap<>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
 
@@ -122,7 +124,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString());
-        final Map<String, Object> dependencies = new HashMap<>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
 
@@ -134,7 +136,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
-        final Map<String, Object> dependencies = new HashMap<>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
 
@@ -145,7 +147,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_archived_document_when_a_time_is_defined() throws Exception {
-        final Map<String, Object> dependencies = new HashMap<>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
         dependencies.put("time", A_LONG_TIME_AGO);
@@ -153,21 +155,5 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument, documentService));
-    }
-
-    @Test
-    public void getProcessInstance_should_query_archives_if_time_is_set() throws Exception {
-        final long containerId = 123456L;
-        final String containerType = "ACTIVITY_INSTANCE";
-        final SAFlowNodeInstance archivedFlowNodeInstance = mock(SAFlowNodeInstance.class);
-        doReturn(archivedFlowNodeInstance).when(flownodeInstanceService).getArchivedFlowNodeInstance(containerId);
-        final long processInstanceId = 99998888777L;
-        doReturn(processInstanceId).when(archivedFlowNodeInstance).getParentProcessInstanceId();
-
-        final long retrievedPIId = strategy.getProcessInstance(containerId, containerType, A_LONG_TIME_AGO);
-
-        verify(flownodeInstanceService).getArchivedFlowNodeInstance(containerId);
-        assertThat(retrievedPIId).isEqualTo(processInstanceId);
-
     }
 }
