@@ -16,8 +16,7 @@ package org.bonitasoft.engine.business.data;
 import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +53,9 @@ import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
+import org.bonitasoft.engine.bpm.document.DocumentValue;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -64,6 +66,8 @@ import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -98,7 +102,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     private static final String ENTITY_CLASS_NAME = "entityClassName";
     private static String bdmDeployedVersion = "0";
 
-    private User matti;
+    private User testUser;
     private File clientFolder;
     private long tenantId;
 
@@ -112,7 +116,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     public void setUp() throws Exception {
         clientFolder = temporaryFolder.newFolder();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        matti = createUser("matti", "bpm");
+        testUser = createUser("testUser", "bpm");
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
 
@@ -136,7 +140,7 @@ public class BDRepositoryIT extends CommonAPIIT {
             getTenantAdministrationAPI().resume();
         }
 
-        deleteUser(matti);
+        deleteUser(testUser);
         logoutOnTenant();
     }
 
@@ -185,7 +189,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done()).done());
-        getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, matti.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, testUser.getId());
         return processDefinition;
     }
 
@@ -235,7 +239,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addContract().addInput(processContractInputName, Type.TEXT, null);
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(definition.getId(),
                 Collections.singletonMap(processContractInputName, (Serializable) initialLastNameValue));
 
@@ -250,7 +254,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 expressionName);
         assertThat(returnedInitialLastName).isEqualTo(initialLastNameValue);
 
-        assignAndExecuteStep(step0, matti);
+        assignAndExecuteStep(step0, testUser);
         final long step2 = waitForUserTask(processInstance, "step2");
 
         // Let's check the updated firstName + lastName values by calling an expression:
@@ -269,7 +273,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         assertCount(processInstance.getId());
 
-        assignAndExecuteStep(step2, matti);
+        assignAndExecuteStep(step2, testUser);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -292,14 +296,14 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
         final long step1Id = waitForUserTask(processInstance, "step1");
         final String employeeToString = getEmployeeToString("myEmployee", processInstance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 
-        assignAndExecuteStep(step1Id, matti);
+        assignAndExecuteStep(step1Id, testUser);
         waitForUserTask(processInstance, "step2");
         final String people = getEmployeeToString(secondBizData, processInstance.getId());
         assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
@@ -323,7 +327,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addDisplayDescription(scriptExpression);
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(instance, "step1");
 
@@ -392,7 +396,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         try {
             getProcessAPI().startProcess(definition.getId());
         } finally {
@@ -412,7 +416,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         try {
             getProcessAPI().startProcess(definition.getId());
         } finally {
@@ -478,7 +482,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(processInstance, "step2");
 
@@ -510,7 +514,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantAdministrationAPI().resume();
         logoutOnTenant();
 
-        loginOnDefaultTenantWith("matti", "bpm");
+        loginOnDefaultTenantWith("testUser", "bpm");
 
         evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
@@ -647,9 +651,9 @@ public class BDRepositoryIT extends CommonAPIIT {
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -729,7 +733,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         barResource = BuildTestUtil.generateJarAndBuildBarResource(BusinessDataUpdateConnector.class, "BusinessDataUpdateConnector.jar");
         businessArchiveBuilder.addClasspathResource(barResource);
 
-        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, matti);
+        return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
     }
 
     private String getEmployeeToString(final String businessDataName, final long processInstanceId) throws InvalidExpressionException {
@@ -806,7 +810,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition("step2", "step3");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(processInstance, "step3");
 
@@ -843,7 +847,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
         final long step1Id = waitForUserTask(processInstance, "step1");
@@ -855,7 +859,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         assertThat(result.get("countEmployee")).isEqualTo(1L);
 
-        assignAndExecuteStep(step1Id, matti);
+        assignAndExecuteStep(step1Id, testUser);
         waitForUserTask(processInstance, "step2");
         result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         assertThat(result.get("countEmployee")).isEqualTo(0L);
@@ -892,14 +896,14 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final long step1Id = waitForUserTask(instance, "step1");
         String employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
 
-        assignAndExecuteStep(step1Id, matti);
+        assignAndExecuteStep(step1Id, testUser);
         waitForUserTask(instance, "step2");
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John, Jack], lastName=[Doe, Doe, Doe]]");
@@ -943,11 +947,11 @@ public class BDRepositoryIT extends CommonAPIIT {
                 new ExpressionBuilder().createConstantStringExpression("Smith")));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
 
         waitForUserTask(instance, "step2");
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
@@ -978,7 +982,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addUserTask("step1", ACTOR_NAME)
                 .addOperation(operationBuilder.createBusinessDataSetAttributeOperation("employee", "setLastName", String.class.getName(),
                         new ExpressionBuilder().createConstantStringExpression("Smith")));
-        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployees",
@@ -1001,11 +1005,11 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .addMultiInstance(true, "myEmployees").addDataInputItemRef("miEmployee");
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
         waitForUserTask(instance, "step2");
 
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
@@ -1023,7 +1027,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addUserTask("step1", ACTOR_NAME)
                 .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("employee", "setLastName", String.class.getName(),
                         new ExpressionBuilder().createConstantStringExpression("Smith")));
-        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployees",
@@ -1051,11 +1055,11 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .addDataOutputItemRef("newEmployee").addLoopDataOutputRef("myNewEmployees");
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
         waitForUserTask(instance, "step2");
 
         final String employeeToString = getEmployeesToString("myNewEmployees", instance.getId());
@@ -1077,7 +1081,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addBusinessData("employee", EMPLOYEE_QUALIFIED_NAME, null);
         builder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("employee",
                 employeeExpression));
-        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         builder = new ProcessDefinitionBuilder().createNewInstance("MBIMI", "1.2-beta");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, null).setMultiple(true);
@@ -1093,11 +1097,11 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .addLoopDataOutputRef("myEmployees");
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
         waitForUserTask(instance, "step2");
 
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
@@ -1119,7 +1123,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addContract().addInput("theInput", Type.TEXT, "the input");
         builder.addBusinessData("employee", EMPLOYEE_QUALIFIED_NAME, employeeExpression);
         builder.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         builder = new ProcessDefinitionBuilder().createNewInstance("createEmployeeInCallActivityMaster", "1.2-beta");
         builder.addActor(ACTOR_NAME);
@@ -1129,7 +1133,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                         new ExpressionBuilder().createConstantStringExpression("theValue"));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("call", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask("step1");
@@ -1138,7 +1142,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         Serializable employeeResult = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
                 Collections.<Expression, Map<String, Serializable>> singletonMap(employee, null)).get("script");
         assertThat(employeeResult).isEqualTo("theValue");
-        getProcessAPI().assignUserTask(step1Id, matti.getId());
+        getProcessAPI().assignUserTask(step1Id, testUser.getId());
         getProcessAPI().executeFlowNode(step1Id);
         waitForUserTask(instance, "step2");
 
@@ -1166,11 +1170,11 @@ public class BDRepositoryIT extends CommonAPIIT {
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("name", new ExpressionBuilder().createConstantStringExpression("Doe")));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTaskAndExecuteIt(instance, "step1", matti);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
         waitForUserTask(instance, "step2");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
@@ -1239,7 +1243,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step2");
 
@@ -1438,7 +1442,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final long step1Id = waitForUserTask(instance, "step1");
@@ -1446,7 +1450,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(firstNames(employeeToString)).isEmpty();
         assertThat(lastNames(employeeToString)).isEmpty();
 
-        assignAndExecuteStep(step1Id, matti);
+        assignAndExecuteStep(step1Id, testUser);
         waitForUserTask(instance, "step2");
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
@@ -1489,9 +1493,9 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .addOperation(new OperationBuilder().createSetDataOperation("count", nbOfProducts));
         builder.addTransition("initCatalogs", "next");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTaskAndExecuteIt(processInstance, "next", matti);
+        waitForUserTaskAndExecuteIt(processInstance, "next", testUser);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -1525,10 +1529,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addTransition("updateCatalog", "unreferenceCatalog");
         builder.addTransition("unreferenceCatalog", "result");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTaskAndExecuteIt("updateCatalog", matti);
-        waitForUserTaskAndExecuteIt("unreferenceCatalog", matti);
+        waitForUserTaskAndExecuteIt("updateCatalog", testUser);
+        waitForUserTaskAndExecuteIt("unreferenceCatalog", testUser);
         waitForUserTask(processInstance, "result");
 
         final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getBusinessDataAPI().getProcessBusinessDataReference(
@@ -1565,7 +1569,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(processInstance, "step2");
 
@@ -1586,7 +1590,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefBuilder.addActor(ACTOR_NAME);
         processDefBuilder.addUserTask("step2", ACTOR_NAME);
 
-        final ProcessDefinition definition2 = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition2 = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(definition2.getId());
         waitForUserTask(processInstance2, "step2");
 
@@ -1622,7 +1626,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addTransition("step1", "step2");
         processDefinitionBuilder.addTransition("step2", "step3");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final long userTaskId = waitForUserTask(processInstance, "step2");
 
@@ -1631,7 +1635,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         String address = getAddressAsAString("myAddress", processInstance.getId());
         assertThat(address).isEqualTo("Address [street=32, rue Gustave Eiffel, city=Grenoble]");
 
-        assignAndExecuteStep(userTaskId, matti);
+        assignAndExecuteStep(userTaskId, testUser);
         waitForUserTask(processInstance, "step3");
 
         numberOfAddresses = getNumberOfAddresses(processInstance.getId());
@@ -1657,7 +1661,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, queryBusinessDataExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
 
         //when
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -1704,7 +1708,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, queryBusinessDataExpression).setMultiple(true);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
 
         //when
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -1825,7 +1829,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String myDocumentContent = "Some document content";
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(p1Builder.getProcess())
                 .addDocumentResource(new BarResource("myDoc.txt", myDocumentContent.getBytes())).done();
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, "actor", matti);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, "actor", testUser);
         ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
         long step1 = waitForUserTask(processInstance1.getId(), "step1");
         long step2 = waitForUserTask(processInstance1.getId(), "step2");
@@ -1835,8 +1839,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 entry("processBizDataFromTask1", "Doe"), entry("doc_key", "myDoc.txt"));
         assertThat(getProcessAPI().getUserTaskExecutionContext(step2)).isEmpty();
 
-        assignAndExecuteStep(step1, matti.getId());
-        assignAndExecuteStep(step2, matti.getId());
+        assignAndExecuteStep(step1, testUser.getId());
+        assignAndExecuteStep(step2, testUser.getId());
         waitForProcessToFinish(processInstance1);
         Thread.sleep(10);
         ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance1.getId());
@@ -1851,9 +1855,69 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private Expression createBusinessDataExpressionWithName(final String businessDataName) throws InvalidExpressionException {
-        Expression createBusinessDataExpression;
-        createBusinessDataExpression = new ExpressionBuilder().createBusinessDataExpression(businessDataName, ADDRESS_QUALIFIED_NAME);
-        return createBusinessDataExpression;
+    @Test
+    public void should_event_sub_process_only_start_element_in_the_event_sub_process() throws Exception {
+        /*
+         * We test here that an event sub process instantiation do nothing on the parent process
+         * see bug BS-15123 and BS-15275
+         */
+        //given
+        ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("ParentProcessWithSignalEventSubProcess", "1.0");
+        parentProcessBuilder.addActor(ACTOR_NAME);
+        parentProcessBuilder.addAutomaticTask("updateTask").addOperation(new OperationBuilder().createSetDocument("myDoc",
+                new ExpressionBuilder().createGroovyScriptExpression("updateDocContent",
+                        "import org.bonitasoft.engine.bpm.document.DocumentValue;return new DocumentValue('updatedContents'.getBytes(),'plain/text','myDoc.txt');",
+                        DocumentValue.class.getName())));
+        parentProcessBuilder.addUserTask("userTask", ACTOR_NAME);
+        parentProcessBuilder.addTransition("updateTask", "userTask");
+        parentProcessBuilder.addContract().addInput("employeeName", Type.TEXT, "the name of the business data");
+        parentProcessBuilder.addBusinessData("myBusinessData", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("initBD",
+                        "import " + EMPLOYEE_QUALIFIED_NAME + "\n" +
+                                "Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = employeeName; return e;",
+                        EMPLOYEE_QUALIFIED_NAME,
+                        new ExpressionBuilder().createContractInputExpression("employeeName", String.class.getName())));
+        parentProcessBuilder.addShortTextData("textData", new ExpressionBuilder().createConstantStringExpression("parentVar"));
+        parentProcessBuilder.addIntegerData("intData", new ExpressionBuilder().createConstantIntegerExpression(1));
+        parentProcessBuilder.addDocumentDefinition("myDoc").addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("updateDocContent",
+                "import org.bonitasoft.engine.bpm.document.DocumentValue;return new DocumentValue('initialContent'.getBytes(),'plain/text','myDoc.txt');",
+                DocumentValue.class.getName()));
+        parentProcessBuilder.addDocumentListDefinition("MyList").addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("updateDocContent",
+                "import org.bonitasoft.engine.bpm.document.DocumentValue;return [new DocumentValue('initialContent'.getBytes(),'plain/text','myDoc1.txt'), new DocumentValue('initialContent'.getBytes(),'plain/text','myDoc2.txt')];",
+                List.class.getName()));
+        //construct sub process
+        SubProcessDefinitionBuilder subProcessBuilder = parentProcessBuilder.addSubProcess("interruptWithSignalProcess", true).getSubProcessBuilder();
+        StartEventDefinitionBuilder startEventDefinitionBuilder = subProcessBuilder.addStartEvent("signalStart");
+        startEventDefinitionBuilder.addSignalEventTrigger("theSignal");
+        subProcessBuilder.addUserTask("userTaskInSubProcess", ACTOR_NAME);
+        subProcessBuilder.addEndEvent("endSubProcess");
+        subProcessBuilder.addTransition("signalStart", "userTaskInSubProcess");
+        subProcessBuilder.addTransition("userTaskInSubProcess", "endSubProcess");
+        subProcessBuilder.addShortTextData("textDataInSub", new ExpressionBuilder().createConstantStringExpression("childVar"));
+        subProcessBuilder.addDoubleData("value", new ExpressionBuilder().createConstantDoubleExpression(10.0));
+        DesignProcessDefinition processDefinition1 = parentProcessBuilder.done();
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
+        ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
+                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
+        //when
+        waitForUserTask("userTask");
+        assertThat(new String(getProcessAPI().getDocumentContent(getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
+                .isEqualTo("updatedContents");
+
+        getProcessAPI().sendSignal("theSignal");
+        //then
+        ActivityInstance eventSubProcessActivity = getProcessAPI().getActivityInstance(waitForUserTask("userTaskInSubProcess"));
+        //instantiation of the event sub process work and did not reinitialized elements
+        assertThat(new String(getProcessAPI().getDocumentContent(getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
+                .isEqualTo("updatedContents");
+        assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "MyList", 0, 100)).hasSize(2);
+        try {
+            getProcessAPI().getLastDocument(eventSubProcessActivity.getParentProcessInstanceId(), "myDoc");
+            fail("should not be found");
+        } catch (DocumentNotFoundException ignored) {
+        }
+        assertThat(getProcessAPI().getDocumentList(eventSubProcessActivity.getParentProcessInstanceId(), "MyList", 0, 100)).isEmpty();
+        disableAndDeleteProcess(processDefinition);
     }
 }
