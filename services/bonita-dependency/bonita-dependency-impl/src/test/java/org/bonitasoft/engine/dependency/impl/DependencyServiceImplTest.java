@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.dependency.ArtifactAccessor;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -152,6 +154,31 @@ public class DependencyServiceImplTest {
     }
 
     /**
+     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMapping(long)}.
+     */
+    @Test
+    public final void getDependencyMappingById() throws SBonitaReadException, SDependencyMappingNotFoundException {
+        final SDependencyMapping sDependencyMapping = mock(SDependencyMapping.class);
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMapping);
+
+        Assert.assertEquals(sDependencyMapping, dependencyServiceImpl.getDependencyMapping(456L));
+    }
+
+    @Test(expected = SDependencyMappingNotFoundException.class)
+    public final void getDependencyMappingByIdNotExists() throws SBonitaReadException, SDependencyMappingNotFoundException {
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependencyMapping>> any())).thenReturn(null);
+
+        dependencyServiceImpl.getDependencyMapping(456L);
+    }
+
+    @Test(expected = SDependencyMappingNotFoundException.class)
+    public final void getDependencyMappingByIdThrowException() throws SBonitaReadException, SDependencyMappingNotFoundException {
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependencyMapping>> any())).thenThrow(new SBonitaReadException(""));
+
+        dependencyServiceImpl.getDependencyMapping(456L);
+    }
+
+    /**
      * Test method for
      * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMappings(long, org.bonitasoft.engine.persistence.QueryOptions)}.
      */
@@ -191,6 +218,44 @@ public class DependencyServiceImplTest {
 
         final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDependencyMappings(options);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDisconnectedDependencyMappings(org.bonitasoft.engine.dependency.ArtifactAccessor, org.bonitasoft.engine.persistence.QueryOptions)}
+     * .
+     */
+    @Test
+    public final void getDisconnectedDependencyMappingsNothing() throws SBonitaReadException, SDependencyException {
+        final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);
+        when(artifactAccessor.artifactExists(any(ScopeType.class), any(Long.class))).thenReturn(true);
+        final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
+        sDependencyMappings.add(mock(SDependencyMapping.class));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMappings);
+
+        final QueryOptions options = new QueryOptions(0, 10);
+        Assert.assertEquals(Collections.emptyList(), dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options));
+    }
+
+    @Test
+    public final void getDisconnectedDependencyMappings() throws SBonitaReadException, SDependencyException {
+        final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);
+        when(artifactAccessor.artifactExists(any(ScopeType.class), any(Long.class))).thenReturn(false);
+        final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
+        sDependencyMappings.add(mock(SDependencyMapping.class));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMappings);
+
+        final QueryOptions options = new QueryOptions(0, 10);
+        Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options));
+    }
+
+    @Test(expected = SDependencyException.class)
+    public final void getDisconnectedDependencyMappingsThrowException() throws SBonitaReadException, SDependencyException {
+        final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
+
+        final QueryOptions options = new QueryOptions(0, 10);
+        dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options);
     }
 
     @Test(expected = SDependencyNotFoundException.class)
