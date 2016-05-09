@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.impl.SPageImpl;
 import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 
@@ -39,7 +38,7 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     private String contentType;
 
-    private Long processDefinitionId;
+    private long processDefinitionId;
 
     private byte[] content;
 

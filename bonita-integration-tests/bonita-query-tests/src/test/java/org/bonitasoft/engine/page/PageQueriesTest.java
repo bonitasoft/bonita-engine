@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.PageRepository;
@@ -57,6 +58,22 @@ public class PageQueriesTest {
 
         // //then
         assertThat(pageByName.getId()).isEqualTo(page2.getId());
+    }
+
+    @Test
+    public void should_getPageByName_return_the_page_without_processDefinitionId() throws Exception {
+        //given
+        repository.add(aPage().withName("aPage").withContent("content of the global page".getBytes()).build());
+        repository.add(aPage().withName("aPage").withContent("content of the process page 1".getBytes()).withProcessDefinitionId(123L).build());
+        repository.add(aPage().withName("anOtherPage").withContent("content of the process page 2".getBytes()).withProcessDefinitionId(123L).build());
+        //when
+        SPage globalPage = repository.getPageByName("aPage");
+        SPage processPage1 = repository.getPageByNameAndProcessDefinitionId("aPage", 123L);
+        SPage processPage2 = repository.getPageByNameAndProcessDefinitionId("anOtherPage", 123L);
+        //then
+        assertThat(new String(repository.getPageContent(globalPage.getId()).getContent())).isEqualTo("content of the global page");
+        assertThat(new String(repository.getPageContent(processPage1.getId()).getContent())).isEqualTo("content of the process page 1");
+        assertThat(new String(repository.getPageContent(processPage2.getId()).getContent())).isEqualTo("content of the process page 2");
     }
 
     @Test
