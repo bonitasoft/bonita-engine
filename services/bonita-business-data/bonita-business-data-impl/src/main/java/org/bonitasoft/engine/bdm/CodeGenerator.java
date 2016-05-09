@@ -28,11 +28,11 @@ import java.util.Set;
 import javax.lang.model.SourceVersion;
 
 import org.apache.commons.lang3.text.WordUtils;
-
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
@@ -183,8 +183,9 @@ public class CodeGenerator {
         ifListIsNull._then().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
 
         final JBlock elseBlock = ifListIsNull._else();
+        final JVar copyVar = elseBlock.decl(field.type(), "copy", JExpr._new(getModel().ref(ArrayList.class)).arg(field));
         elseBlock.invoke(JExpr._this().ref(field.name()), "clear");
-        elseBlock.invoke(JExpr._this().ref(field.name()), "addAll").arg(field);
+        elseBlock.invoke(JExpr._this().ref(field.name()), "addAll").arg(copyVar);
 
         return method;
     }
