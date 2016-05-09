@@ -50,10 +50,10 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     private final DocumentHelper documentHelper;
 
     public DocumentListReferenceExpressionExecutorStrategy(final DocumentService documentService,
-            final ActivityInstanceService flowNodeInstanceService, final ProcessDefinitionService processDefinitionService,
+            final ActivityInstanceService activityInstanceService, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
-        activityInstanceService = flowNodeInstanceService;
+        this.activityInstanceService = activityInstanceService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
     }
 
