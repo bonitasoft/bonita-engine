@@ -15,11 +15,7 @@ package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataModelRepositoryImplTest {
 
+    public static final long TENANT_ID = 67453L;
     @Mock
     private DependencyService dependencyService;
 
@@ -53,7 +50,7 @@ public class BusinessDataModelRepositoryImplTest {
 
     @Before
     public void setUp() {
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), tenantResourcesService));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), tenantResourcesService, TENANT_ID));
     }
 
     @Test
@@ -75,7 +72,7 @@ public class BusinessDataModelRepositoryImplTest {
 
         businessDataModelRepository.createAndDeployClientBDMZip(bom);
 
-        verify(tenantResourcesService).add("client-bdm.zip", TenantResourceType.BDM ,"some bytes".getBytes());
+        verify(tenantResourcesService).add("client-bdm.zip", TenantResourceType.BDM, "some bytes".getBytes());
     }
 
     @Test
