@@ -66,14 +66,14 @@ public class PageModelConverter {
     }
 
     public Page toPage(final SPage sPage) {
-        final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
+        Long processDefinitionId = sPage.getProcessDefinitionId() > 0 ? sPage.getProcessDefinitionId() : null;
+        return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
                 sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName(),
-                sPage.getContentType(), sPage.getProcessDefinitionId());
-        return page;
+                sPage.getContentType(), processDefinitionId);
     }
 
     public List<Page> toPages(final List<SPage> sPages) {
-        final List<Page> pages = new ArrayList<Page>(sPages.size());
+        final List<Page> pages = new ArrayList<>(sPages.size());
         for (final SPage sPage : sPages) {
             pages.add(toPage(sPage));
         }

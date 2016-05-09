@@ -152,7 +152,7 @@ public class PageServiceImpl implements PageService {
         this.queriableLoggerService = queriableLoggerService;
         this.profileService = profileService;
         helper = new SPageContentHelper();
-        this.providedPages=Collections.EMPTY_LIST;
+        this.providedPages = Collections.EMPTY_LIST;
     }
 
     @Override
@@ -186,7 +186,8 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public List<SPage> getPageByProcessDefinitionId(final long processDefinitionId, final int fromIndex, final int numberOfResults) throws SBonitaReadException {
+    public List<SPage> getPageByProcessDefinitionId(final long processDefinitionId, final int fromIndex, final int numberOfResults)
+            throws SBonitaReadException {
         final Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("processDefinitionId", processDefinitionId);
         final OrderByOption orderByOption = new OrderByOption(SPage.class, SPageFields.PAGE_NAME, OrderByType.ASC);
@@ -287,7 +288,7 @@ public class PageServiceImpl implements PageService {
 
     private SPage checkIfPageAlreadyExists(final SPage page) throws SBonitaReadException {
         SPage existingPage;
-        if (page.getProcessDefinitionId() != null) {
+        if (page.getProcessDefinitionId() > 0) {
             existingPage = getPageByNameAndProcessDefinitionId(page.getName(), page.getProcessDefinitionId());
         } else {
             existingPage = getPageByName(page.getName());
@@ -525,11 +526,11 @@ public class PageServiceImpl implements PageService {
     protected void checkPageDuplicate(final SPage sPage, final EntityUpdateDescriptor entityUpdateDescriptor,
             final SPageLogBuilder logBuilder,
             final String logMethodName)
-            throws SBonitaReadException, SObjectAlreadyExistsException {
+                    throws SBonitaReadException, SObjectAlreadyExistsException {
         if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)
                 || entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_PROCESS_DEFINITION_ID)) {
             String sPageName = sPage.getName();
-            Long sPageProcessDefinitionId = sPage.getProcessDefinitionId();
+            long sPageProcessDefinitionId = sPage.getProcessDefinitionId();
             if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
                 sPageName = entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString();
             }
@@ -538,7 +539,7 @@ public class PageServiceImpl implements PageService {
             }
 
             final SPage page;
-            if (sPageProcessDefinitionId != null) {
+            if (sPageProcessDefinitionId > 0) {
                 page = getPageByNameAndProcessDefinitionId(sPageName, sPageProcessDefinitionId);
             } else {
                 page = getPageByName(sPageName);

@@ -47,7 +47,7 @@ public class SPageImpl implements SPage {
 
     private String contentType;
 
-    private Long processDefinitionId;
+    private long processDefinitionId;
 
     protected SPageImpl() {
 
@@ -181,7 +181,7 @@ public class SPageImpl implements SPage {
     }
 
     @Override
-    public Long getProcessDefinitionId() {
+    public long getProcessDefinitionId() {
         return processDefinitionId;
     }
 
@@ -198,88 +198,6 @@ public class SPageImpl implements SPage {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    //    @Override
-    //    public int hashCode() {
-    //        final int prime = 31;
-    //        int result = 1;
-    //        result = prime * result + (contentName == null ? 0 : contentName.hashCode());
-    //        result = prime * result + (description == null ? 0 : description.hashCode());
-    //        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-    //        result = prime * result + (int) (id ^ id >>> 32);
-    //        result = prime * result + (int) (installationDate ^ installationDate >>> 32);
-    //        result = prime * result + (int) (installedBy ^ installedBy >>> 32);
-    //        result = prime * result + (int) (lastModificationDate ^ lastModificationDate >>> 32);
-    //        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
-    //        result = prime * result + (name == null ? 0 : name.hashCode());
-    //        result = prime * result + (provided ? 1231 : 1237);
-    //        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-    //        return result;
-    //    }
-    //
-    //    @Override
-    //    public boolean equals(final Object obj) {
-    //        if (this == obj) {
-    //            return true;
-    //        }
-    //        if (obj == null) {
-    //            return false;
-    //        }
-    //        if (getClass() != obj.getClass()) {
-    //            return false;
-    //        }
-    //        SPageImpl other = (SPageImpl) obj;
-    //        if (contentName == null) {
-    //            if (other.contentName != null) {
-    //                return false;
-    //            }
-    //        } else if (!contentName.equals(other.contentName)) {
-    //            return false;
-    //        }
-    //        if (description == null) {
-    //            if (other.description != null) {
-    //                return false;
-    //            }
-    //        } else if (!description.equals(other.description)) {
-    //            return false;
-    //        }
-    //        if (displayName == null) {
-    //            if (other.displayName != null) {
-    //                return false;
-    //            }
-    //        } else if (!displayName.equals(other.displayName)) {
-    //            return false;
-    //        }
-    //        if (id != other.id) {
-    //            return false;
-    //        }
-    //        if (installationDate != other.installationDate) {
-    //            return false;
-    //        }
-    //        if (installedBy != other.installedBy) {
-    //            return false;
-    //        }
-    //        if (lastModificationDate != other.lastModificationDate) {
-    //            return false;
-    //        }
-    //        if (lastUpdatedBy != other.lastUpdatedBy) {
-    //            return false;
-    //        }
-    //        if (name == null) {
-    //            if (other.name != null) {
-    //                return false;
-    //            }
-    //        } else if (!name.equals(other.name)) {
-    //            return false;
-    //        }
-    //        if (provided != other.provided) {
-    //            return false;
-    //        }
-    //        if (tenantId != other.tenantId) {
-    //            return false;
-    //        }
-    //        return true;
-    //    }
-
     @Override
     public String toString() {
         return new StringBuilder().append("SPageImpl [tenantId=").append(tenantId).append(", id=").append(id).append(", name=").append(name)
@@ -294,7 +212,7 @@ public class SPageImpl implements SPage {
         this.contentType = contentType;
     }
 
-    public void setProcessDefinitionId(Long processDefinitionId) {
+    public void setProcessDefinitionId(long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 }
