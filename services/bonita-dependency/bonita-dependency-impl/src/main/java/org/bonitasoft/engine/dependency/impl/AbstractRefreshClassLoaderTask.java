@@ -14,29 +14,29 @@
 
 package org.bonitasoft.engine.dependency.impl;
 
+import java.io.Serializable;
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.service.InjectedService;
 
 /**
  * @author Baptiste Mesta
  */
-public class RefreshClassLoaderTask extends AbstractRefreshClassLoaderTask {
+public abstract class AbstractRefreshClassLoaderTask implements Callable<Void>, Serializable {
+    protected ScopeType scopeType;
+    protected long id;
 
-    private transient DependencyService dependencyService;
-
-    public RefreshClassLoaderTask(ScopeType scopeType, long id) {
-        super(id, scopeType);
-    }
-
-
-    @InjectedService
-    public void setDependencyService(DependencyService dependencyService) {
-        this.dependencyService = dependencyService;
+    public AbstractRefreshClassLoaderTask(long id, ScopeType scopeType) {
+        this.id = id;
+        this.scopeType = scopeType;
     }
 
     @Override
-    public DependencyService getDependencyService() {
-        return dependencyService;
+    public Void call() throws Exception {
+        getDependencyService().refreshClassLoader(scopeType, id);
+        return null;
     }
+
+    public abstract DependencyService getDependencyService();
 }
