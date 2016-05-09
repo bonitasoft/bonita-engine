@@ -23,7 +23,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -43,12 +44,11 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     private final DocumentService documentService;
 
-    private final FlowNodeInstanceService flowNodeInstanceService;
+    private final ActivityInstanceService activityInstanceService;
 
-    public DocumentReferenceExpressionExecutorStrategy(final DocumentService documentService,
-            final FlowNodeInstanceService flowNodeInstanceService) {
+    public DocumentReferenceExpressionExecutorStrategy(final DocumentService documentService, final ActivityInstanceService activityInstanceService) {
         this.documentService = documentService;
-        this.flowNodeInstanceService = flowNodeInstanceService;
+        this.activityInstanceService = activityInstanceService;
     }
 
     @Override
@@ -70,8 +70,8 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         final Long time = (Long) context.get("time");
 
         try {
-            final long processInstanceId = getProcessInstance(containerId, containerType);
-            final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
+            final long processInstanceId = getProcessInstance(containerId, containerType, time);
+            final ArrayList<Object> results = new ArrayList<>(expressions.size());
             for (final SExpression expression : expressions) {
                 results.add(getDocument(processInstanceId, expression, time));
             }
@@ -97,15 +97,20 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private long getProcessInstance(final Long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException,
-            SExpressionDependencyMissingException {
+    long getProcessInstance(final Long containerId, final String containerType, Long time) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+            SExpressionDependencyMissingException, SActivityInstanceNotFoundException {
         if (containerId == null || containerType == null) {
             throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
         }
         if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
             return containerId;
         }
-        return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
+        // on a flownode instance, containerId is always the original id:
+        if (time != null) {
+            return activityInstanceService.getMostRecentArchivedActivityInstance(containerId).getParentProcessInstanceId();
+        } else {
+            return activityInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
+        }
     }
 
     @Override
