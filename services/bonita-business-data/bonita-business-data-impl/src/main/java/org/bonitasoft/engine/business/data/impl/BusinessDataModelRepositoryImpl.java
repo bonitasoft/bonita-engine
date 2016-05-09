@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+import static java.util.Arrays.asList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -44,6 +46,10 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.io.IOUtils;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.resources.STenantResource;
@@ -57,7 +63,6 @@ import org.xml.sax.SAXException;
 public class BusinessDataModelRepositoryImpl implements BusinessDataModelRepository {
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
-    public static final String BDR_DEPENDENCY_FILENAME = BDR_DEPENDENCY_NAME + ".jar";
     private static final String CLIENT_BDM_ZIP = "client-bdm.zip";
 
     private static final String MODEL_JAR_NAME = "bdm-model.jar";
@@ -70,14 +75,12 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private final SchemaManager schemaManager;
     private TenantResourcesService tenantResourcesService;
-    private long tenantId;
 
     public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager,
-                                           TenantResourcesService tenantResourcesService, long tenantId) {
+            TenantResourcesService tenantResourcesService) {
         this.dependencyService = dependencyService;
         this.schemaManager = schemaManager;
         this.tenantResourcesService = tenantResourcesService;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -96,14 +99,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
-        try {
-            final SDependency searchBDMDependencies = getBDMDependency();
-            if (searchBDMDependencies != null) {
-                return String.valueOf(searchBDMDependencies.getId());
-            }
-        } catch (SBonitaReadException e) {
-            throw new SBusinessDataRepositoryException(e);
-
+        final List<SDependency> searchBDMDependencies = searchBDMDependencies();
+        if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
+            return String.valueOf(searchBDMDependencies.get(0).getId());
         }
         return null;
     }
@@ -125,16 +123,22 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         return null;
     }
 
-    private SDependency getBDMDependency() throws SBonitaReadException {
-        return dependencyService.getDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
-
+    private List<SDependency> searchBDMDependencies() throws SBusinessDataRepositoryException {
+        try {
+            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, asList(new OrderByOption(SDependency.class, "name",
+                    OrderByType.ASC)), asList(new FilterOption(SDependency.class, "name", BDR_DEPENDENCY_NAME)), null);
+            return dependencyService.getDependencies(queryOptions);
+        } catch (final SDependencyException e) {
+            throw new SBusinessDataRepositoryException(e);
+        }
     }
 
     @Override
     public boolean isDBMDeployed() {
         try {
-            return getBDMDependency() != null;
-        } catch (SBonitaReadException e) {
+            final List<SDependency> dependencies = searchBDMDependencies();
+            return !dependencies.isEmpty();
+        } catch (final SBusinessDataRepositoryException e) {
             return false;
         }
     }
@@ -151,7 +155,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
-            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_FILENAME, tenantId, ScopeType.TENANT);
+            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_NAME + ".jar",
+                    tenantId, ScopeType.TENANT);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException e) {

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,10 +24,14 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.dependency.ArtifactAccessor;
+import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
+import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
@@ -41,10 +46,11 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -60,19 +66,24 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.TransactionState;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class DependencyServiceImpl extends AbstractDependencyService {
+public class DependencyServiceImpl implements DependencyService {
 
+    private static final int BATCH_SIZE = 100;
 
     private final ReadPersistenceService persistenceService;
     private final Recorder recorder;
@@ -80,19 +91,32 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     private final TechnicalLoggerService logger;
     private final QueriableLoggerService queriableLoggerService;
     private final ClassLoaderService classLoaderService;
+    private BroadcastService broadcastService;
     private ReadSessionAccessor readSessionAccessor;
+    private UserTransactionService userTransactionService;
+
+    private final Map<String, Long> lastUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
 
     public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
                                  final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
                                  BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
-        super(broadcastService, userTransactionService, persistenceService);
+        super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.classLoaderService = classLoaderService;
+        this.broadcastService = broadcastService;
         this.readSessionAccessor = readSessionAccessor;
+        this.userTransactionService = userTransactionService;
+    }
+
+    private String getKey(final ScopeType artifactType, final long artifactId) {
+        final StringBuilder sb = new StringBuilder(artifactType.name());
+        sb.append("________");
+        sb.append(artifactId);
+        return sb.toString();
     }
 
     private SDependencyLogBuilder getQueriableLog(final ActionType actionType, final String message) {
@@ -120,67 +144,111 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     }
 
     @Override
-    protected List<SDependency> getDependencies(QueryOptions queryOptions) throws SDependencyException {
+    public void createDependency(final SDependency dependency) throws SDependencyCreationException {
+        final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency with name " + dependency.getName());
+        NullCheckingUtil.checkArgsNotNull(dependency);
+        try {
+            final InsertRecord insertRecord = new InsertRecord(dependency);
+            SInsertEvent insertEvent = null;
+            if (eventService.hasHandlers(DEPENDENCY, EventActionType.CREATED)) {
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DEPENDENCY).setObject(dependency).done();
+            }
+            recorder.recordInsert(insertRecord, insertEvent);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createDependency"));
+            }
+            log(dependency.getId(), SQueriableLog.STATUS_OK, logBuilder, "createDependency");
+        } catch (final SRecorderException e) {
+            log(dependency.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createDependency");
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createDependency", e));
+            }
+            throw new SDependencyCreationException("Can't create dependency " + dependency, e);
+        }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Created dependency " + dependency);
+        }
+    }
+
+    @Override
+    public void createDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
+        final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency mapping", dependencyMapping);
+        NullCheckingUtil.checkArgsNotNull(dependencyMapping);
+        try {
+            final InsertRecord insertRecord = new InsertRecord(dependencyMapping);
+
+            SInsertEvent insertEvent = null;
+            if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.CREATED)) {
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DEPENDENCYMAPPING).setObject(dependencyMapping)
+                        .done();
+            }
+            recorder.recordInsert(insertRecord, insertEvent);
+            log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createDependencyMapping");
+            lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), System.currentTimeMillis());
+            refreshLocalClassLoader(dependencyMapping);
+        } catch (final SRecorderException e) {
+            log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createDependencyMapping");
+            throw new SDependencyException("Can't create dependency mapping" + dependencyMapping, e);
+        }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Created dependency mapping " + dependencyMapping);
+        }
+    }
+
+    @Override
+    public void deleteAllDependencies() throws SDependencyDeletionException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAllDependencies"));
+        }
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SDependency.class, "id", OrderByType.ASC);
         List<SDependency> dependencies;
-        try {
-            dependencies = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
-                    SDependency.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new SDependencyException("Can't get dependencies", e);
-        }
-        return dependencies;
-    }
-
-    @Override
-    protected SDependency getDependency(String name) throws SDependencyDeletionException, SDependencyNotFoundException {
-        final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
-        final SelectOneDescriptor<SDependency> desc = new SelectOneDescriptor<>("getDependencyByName", parameters, SDependency.class);
-        final SDependency sDependency;
-        try {
-            sDependency = persistenceService.selectOne(desc);
-        } catch (SBonitaReadException e) {
-            throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
-        }
-        if (sDependency == null) {
-            throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
-        }
-        return sDependency;
-    }
-
-    @Override
-    protected AbstractRefreshClassLoaderTask getRefreshClassLoaderTask(ScopeType type, long id) {
-        return new RefreshClassLoaderTask(type, id);
-    }
-
-    @Override
-    protected List<SDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
-        NullCheckingUtil.checkArgsNotNull(dependencyId, queryOptions);
-        try {
-            final Map<String, Object> parameters = new HashMap<>();
-            parameters.put("dependencyId", dependencyId);
-            final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<>("getDependencyMappingsByDependency", parameters,
-                    SDependencyMapping.class, queryOptions);
-            return persistenceService.selectList(desc);
-        } catch (final SBonitaReadException e) {
-            throw new SDependencyException("Can't get dependency mappings by dependencyId: " + dependencyId, e);
+        do {
+            try {
+                dependencies = getDependencies(queryOptions);
+            } catch (final SDependencyException e) {
+                throw new SDependencyDeletionException(e);
+            }
+            for (final SDependency dependency : dependencies) {
+                deleteDependency(dependency);
+            }
+        } while (dependencies.size() == queryOptions.getNumberOfResults());
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteAllDependencies"));
         }
     }
 
     @Override
-    protected QueryOptions getDefaultQueryOptionForDependency() {
-        return new QueryOptions(0, 100, SDependency.class, "id", OrderByType.ASC);
-    }
-    @Override
-    protected QueryOptions getDefaultQueryOptionForDependencyMapping() {
-        return new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
+    public void deleteAllDependencyMappings() throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteAllDependencyMappings"));
+        }
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
+        List<SDependencyMapping> dependencyMappings;
+        do {
+            dependencyMappings = getDependencyMappings(queryOptions);
+            for (final SDependencyMapping dependencyMapping : dependencyMappings) {
+                deleteDependencyMapping(dependencyMapping);
+            }
+        } while (dependencyMappings.size() == queryOptions.getNumberOfResults());
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteAllDependencyMappings"));
+        }
     }
 
     @Override
-    protected void delete(SDependency dependency) throws SDependencyDeletionException {
+    public void deleteDependency(final SDependency dependency) throws SDependencyDeletionException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Deleting dependency " + dependency);
+        }
         NullCheckingUtil.checkArgsNotNull(dependency);
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency named " + dependency.getName());
+        SDeleteEvent deleteEvent = null;
+        if (eventService.hasHandlers(DEPENDENCY, EventActionType.DELETED)) {
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DEPENDENCY).setObject(dependency).done();
+        }
         try {
-            delete(dependency, DEPENDENCY);
+            final DeleteRecord record = new DeleteRecord(dependency);
+            recorder.recordDelete(record, deleteEvent);
             log(dependency.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDependency");
         } catch (final SRecorderException e) {
             log(dependency.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDependency");
@@ -188,70 +256,404 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         }
     }
 
-    private void delete(PersistentObject object, String eventType) throws SRecorderException {
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(eventType, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(eventType).setObject(object).done();
+    @Override
+    public void deleteDependency(final long id) throws SDependencyNotFoundException, SDependencyDeletionException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteDependency"));
         }
-        final DeleteRecord record = new DeleteRecord(object);
-        recorder.recordDelete(record, deleteEvent);
+        NullCheckingUtil.checkArgsNotNull(id);
+        deleteDependency(getDependency(id));
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
+        }
     }
 
+    @Override
+    public void deleteDependency(final String name) throws SDependencyNotFoundException, SDependencyDeletionException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteDependency"));
+        }
+        final SDependency dependency = getDependencyByName(name);
+        try {
+            delete(dependency);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
+            }
+        } catch (final SDependencyException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
+            }
+            throw new SDependencyDeletionException("Can't delete dependency with name: " + name, e);
+        }
+    }
+
+    private SDependency getDependencyByName(final String name) throws SDependencyNotFoundException {
+        final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
+        final SelectOneDescriptor<SDependency> desc = new SelectOneDescriptor<SDependency>("getDependencyByName", parameters, SDependency.class);
+        try {
+            final SDependency sDependency = persistenceService.selectOne(desc);
+            if (sDependency == null) {
+                throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
+            }
+            return sDependency;
+        } catch (final SBonitaReadException sbre) {
+            throw new SDependencyNotFoundException(sbre);
+        }
+    }
+
+    @Override
+    public void deleteDependencyMapping(final long id) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteDependencyMapping"));
+        }
+        NullCheckingUtil.checkArgsNotNull(id);
+        final SDependencyMapping dependencyMapping = getDependencyMapping(id);
+        deleteDependencyMapping(dependencyMapping);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependencyMapping"));
+        }
+    }
+
+    @Override
     public void deleteDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Deleting dependency mapping " + dependencyMapping);
+        }
         NullCheckingUtil.checkArgsNotNull(dependencyMapping);
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency mapping", dependencyMapping);
+        SDeleteEvent deleteEvent = null;
+        if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.DELETED)) {
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DEPENDENCYMAPPING).setObject(dependencyMapping)
+                    .done();
+        }
         try {
-            delete(dependencyMapping, DEPENDENCYMAPPING);
+            final DeleteRecord deleteRecord = new DeleteRecord(dependencyMapping);
+            recorder.recordDelete(deleteRecord, deleteEvent);
             log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDependencyMapping");
-            registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
+            lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), System.currentTimeMillis());
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependencyMapping"));
+            }
+            refreshLocalClassLoader(dependencyMapping);
         } catch (final SRecorderException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependencyMapping", e));
+            }
             log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDependencyMapping");
             throw new SDependencyException("Can't delete dependency mapping" + dependencyMapping, e);
         }
     }
 
     @Override
-    public List<SDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
-        NullCheckingUtil.checkArgsNotNull(ids);
+    public List<SDependency> getDependencies(final QueryOptions queryOptions) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencies"));
+        }
+        NullCheckingUtil.checkArgsNotNull(queryOptions);
         try {
-            final SelectListDescriptor<SDependency> desc = new SelectListDescriptor<>("getDependenciesByIds", CollectionUtil.buildSimpleMap("ids",
-                    ids), SDependency.class, QueryOptions.countQueryOptions());
-            return persistenceService.selectList(desc);
+            final List<SDependency> listSDependency = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
+                    SDependency.class, queryOptions));
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
+            }
+            return listSDependency;
         } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencies", e));
+            }
             throw new SDependencyException("Can't get dependencies", e);
         }
     }
 
     @Override
-    protected SelectListDescriptor<Long> getSelectDescriptorForDependencyIds(QueryOptions queryOptions, Map<String, Object> parameters) {
-        return new SelectListDescriptor<>("getDependencyIds", parameters, SDependencyMapping.class, Long.class,
-                queryOptions);
-    }
-
-    @Override
-    public List<SDependencyMapping> getDependencyMappings(final QueryOptions queryOptions) throws SDependencyException {
-        NullCheckingUtil.checkArgsNotNull(queryOptions);
+    public List<SDependency> getDependencies(final Collection<Long> ids) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencies"));
+        }
+        NullCheckingUtil.checkArgsNotNull(ids);
         try {
-            return persistenceService.selectList(new SelectListDescriptor<SDependencyMapping>(
-                    "getDependencyMappings", null, SDependencyMapping.class, queryOptions));
+            final SelectListDescriptor<SDependency> desc = new SelectListDescriptor<SDependency>("getDependenciesByIds", CollectionUtil.buildSimpleMap("ids",
+                    ids), SDependency.class, QueryOptions.countQueryOptions());
+            final List<SDependency> listSDependency = persistenceService.selectList(desc);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
+            }
+            return listSDependency;
         } catch (final SBonitaReadException e) {
-            throw new SDependencyException("Can't get dependency mappings", e);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencies", e));
+            }
+            throw new SDependencyException("Can't get dependencies", e);
         }
     }
 
     @Override
     public SDependency getDependency(final long id) throws SDependencyNotFoundException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependency"));
+        }
         NullCheckingUtil.checkArgsNotNull(id);
         try {
-            final SelectByIdDescriptor<SDependency> desc = new SelectByIdDescriptor<>(SDependency.class, id);
+            final SelectByIdDescriptor<SDependency> desc = new SelectByIdDescriptor<SDependency>(SDependency.class, id);
             final SDependency sDependency = persistenceService.selectById(desc);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependency"));
+            }
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("Can't get dependency with id: " + id);
             }
             return sDependency;
         } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependency", e));
+            }
             throw new SDependencyNotFoundException("Can't get dependency with id: " + id, e);
         }
+    }
+
+    @Override
+    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final int startIndex, final int maxResult)
+            throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyIds"));
+        }
+        NullCheckingUtil.checkArgsNotNull(artifactId, artifactType, startIndex, maxResult);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResult);
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("artifactId", artifactId);
+            parameters.put("artifactType", artifactType);
+            final SelectListDescriptor<Long> desc = new SelectListDescriptor<Long>("getDependencyIds", parameters, SDependencyMapping.class, Long.class,
+                    queryOptions);
+            final List<Long> listIds = persistenceService.selectList(desc);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyIds"));
+            }
+            return listIds;
+        } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyIds", e));
+            }
+            throw new SDependencyException("Can't get dependencies", e);
+        }
+    }
+
+    @Override
+    public SDependencyMapping getDependencyMapping(final long id) throws SDependencyMappingNotFoundException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyMapping"));
+        }
+        NullCheckingUtil.checkArgsNotNull(id);
+        try {
+            final SelectByIdDescriptor<SDependencyMapping> desc = new SelectByIdDescriptor<SDependencyMapping>(
+                    SDependencyMapping.class, id);
+            final SDependencyMapping sDependencyMapping = persistenceService.selectById(desc);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyMapping"));
+            }
+            if (sDependencyMapping == null) {
+                throw new SDependencyMappingNotFoundException("Can't get dependency mapping with id: " + id);
+            }
+            return sDependencyMapping;
+        } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMapping", e));
+            }
+            throw new SDependencyMappingNotFoundException("Can't get dependency mapping with id: " + id, e);
+        }
+    }
+
+    @Override
+    public List<SDependencyMapping> getDependencyMappings(final QueryOptions queryOptions) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyMappings"));
+        }
+        NullCheckingUtil.checkArgsNotNull(queryOptions);
+        try {
+            final List<SDependencyMapping> listSDependencyMapping = persistenceService.selectList(new SelectListDescriptor<SDependencyMapping>(
+                    "getDependencyMappings", null, SDependencyMapping.class, queryOptions));
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyMappings"));
+            }
+            return listSDependencyMapping;
+        } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
+            }
+            throw new SDependencyException("Can't get dependency mappings", e);
+        }
+    }
+
+    @Override
+    public List<SDependencyMapping> getDependencyMappings(final long dependencyId, final QueryOptions queryOptions) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyMappings"));
+        }
+        NullCheckingUtil.checkArgsNotNull(dependencyId, queryOptions);
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("dependencyId", dependencyId);
+            final SelectListDescriptor<SDependencyMapping> desc = new SelectListDescriptor<SDependencyMapping>("getDependencyMappingsByDependency", parameters,
+                    SDependencyMapping.class, queryOptions);
+            final List<SDependencyMapping> listSDependencyMapping = persistenceService.selectList(desc);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencyMappings"));
+            }
+            return listSDependencyMapping;
+        } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDependencyMappings", e));
+            }
+            throw new SDependencyException("Can't get dependency mappings by dependencyId: " + dependencyId, e);
+        }
+    }
+
+    @Override
+    public long getLastUpdatedTimestamp(final ScopeType artifactType, final long artifactId) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLastUpdatedTimestamp"));
+        }
+        NullCheckingUtil.checkArgsNotNull(artifactType, artifactId);
+        final String key = getKey(artifactType, artifactId);
+        if (lastUpdates.containsKey(key)) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLastUpdatedTimestamp"));
+            }
+            return lastUpdates.get(key);
+        }
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLastUpdatedTimestamp"));
+        }
+        return 0;
+    }
+
+    @Override
+    public void updateDependency(final SDependency dependency, final EntityUpdateDescriptor descriptor) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateDependency"));
+        }
+        NullCheckingUtil.checkArgsNotNull(dependency, descriptor);
+        final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a dependency named " + dependency.getName());
+        SUpdateEvent updateEvent = null;
+        if (eventService.hasHandlers(DEPENDENCY, EventActionType.UPDATED)) {
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCY).setObject(dependency).done();
+        }
+        try {
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependency, descriptor);
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(dependency.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateDependency");
+            QueryOptions queryOptions = new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
+            List<SDependencyMapping> dependencyMappings;
+            final long updateTimeStamp = System.currentTimeMillis();
+            do {
+                dependencyMappings = getDependencyMappings(dependency.getId(), queryOptions);
+                for (final SDependencyMapping dependencyMapping : dependencyMappings) {
+                    lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), updateTimeStamp);
+                    refreshLocalClassLoader(dependencyMapping);
+                }
+                queryOptions = QueryOptions.getNextPage(queryOptions);
+            } while (dependencyMappings.size() == queryOptions.getNumberOfResults());
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "updateDependency"));
+            }
+        } catch (final SRecorderException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateDependency", e));
+            }
+            log(dependency.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateDependency");
+            throw new SDependencyException("Can't update dependency " + dependency, e);
+        }
+    }
+
+    @Override
+    public void updateDependencyMapping(final SDependencyMapping dependencyMapping, final EntityUpdateDescriptor descriptor) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateDependencyMapping"));
+        }
+        NullCheckingUtil.checkArgsNotNull(dependencyMapping, descriptor);
+        final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a dependency mapping", dependencyMapping);
+        SUpdateEvent updateEvent = null;
+        if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.UPDATED)) {
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCYMAPPING).setObject(dependencyMapping)
+                    .done();
+        }
+        try {
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependencyMapping, descriptor);
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateDependencyMapping");
+            lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), System.currentTimeMillis());
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "updateDependencyMapping"));
+            }
+            refreshLocalClassLoader(dependencyMapping);
+        } catch (final SRecorderException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateDependencyMapping", e));
+            }
+            log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateDependencyMapping");
+            throw new SDependencyException("Can't update dependency mapping " + dependencyMapping, e);
+        }
+    }
+
+    @Override
+    public List<SDependencyMapping> removeDisconnectedDependencyMappings(final ArtifactAccessor artifactAccessor) throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeDisconnectedDependencyMappings"));
+        }
+        QueryOptions loopQueryOptions = new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
+        List<SDependencyMapping> dependencyMappings;
+        final List<SDependencyMapping> result = new ArrayList<SDependencyMapping>();
+        do {
+            dependencyMappings = getDependencyMappings(loopQueryOptions);
+            for (final SDependencyMapping dependencyMapping : dependencyMappings) {
+                if (!artifactAccessor.artifactExists(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId())) {
+                    result.add(dependencyMapping);
+                    deleteDependencyMapping(dependencyMapping);
+                }
+            }
+            loopQueryOptions = QueryOptions.getNextPage(loopQueryOptions);
+        } while (dependencyMappings.size() == loopQueryOptions.getNumberOfResults());
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeDisconnectedDependencyMappings"));
+        }
+        return result;
+    }
+
+    @Override
+    public List<SDependencyMapping> getDisconnectedDependencyMappings(final ArtifactAccessor artifactAccessor, final QueryOptions queryOptions)
+            throws SDependencyException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDisconnectedDependencyMappings"));
+        }
+
+        List<SDependencyMapping> dependencyMappings;
+        final List<SDependencyMapping> result = new ArrayList<SDependencyMapping>();
+        int numberOfResultsFound = 0;
+        final int startIndex = queryOptions.getFromIndex();
+        final int numberOfResults = queryOptions.getNumberOfResults();
+
+        QueryOptions loopQueryOptions = new QueryOptions(queryOptions);
+        do {
+            dependencyMappings = getDependencyMappings(loopQueryOptions);
+            for (final SDependencyMapping dependencyMapping : dependencyMappings) {
+                if (!artifactAccessor.artifactExists(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId())) {
+                    numberOfResultsFound++;
+                    if (numberOfResultsFound > startIndex) {
+                        // add it in the results
+                        result.add(dependencyMapping);
+                    }
+                    if (result.size() == numberOfResults) {
+                        // stop the for iteration, we have the number of results we want
+                        break;
+                    }
+                }
+            }
+            loopQueryOptions = QueryOptions.getNextPage(loopQueryOptions);
+        } while (dependencyMappings.size() == numberOfResults && result.size() < numberOfResults);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDisconnectedDependencyMappings"));
+        }
+        return result;
     }
 
     private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
@@ -264,6 +666,47 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         }
     }
 
+    @Override
+    public void deleteDependencies(final long id, final ScopeType type) throws SDependencyException {
+        final QueryOptions queryOptionsForMapping = new QueryOptions(0, 2, SDependencyMapping.class, "id", OrderByType.ASC);
+        int fromIndex = 0;
+
+        List<Long> dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        while (!dependencyIds.isEmpty()) {
+            for (final Long dependencyId : dependencyIds) {
+                final List<SDependencyMapping> dependencyMappings = getDependencyMappings(dependencyId, queryOptionsForMapping);
+                if (dependencyMappings.size() == 1) {// only when the dependency is linked only to on element
+                    final SDependencyMapping dependencyMapping = dependencyMappings.get(0);
+                    deleteDependencyMapping(dependencyMapping);
+                    deleteDependency(dependencyId);
+                } else {
+                    fromIndex++;
+                }
+            }
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        }
+    }
+
+    private void refreshLocalClassLoader(final SDependencyMapping dependencyMapping) throws SDependencyException {
+        registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
+    }
+
+    private Map<String, byte[]> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
+        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        int fromIndex = 0;
+        List<Long> dependencyIds = null;
+        do {
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+            if (dependencyIds != null && dependencyIds.size() > 0) {
+                final List<SDependency> dependencies = getDependencies(dependencyIds);
+                for (final SDependency dependency : dependencies) {
+                    resources.put(dependency.getFileName(), dependency.getValue());
+                }
+            }
+            fromIndex = fromIndex + BATCH_SIZE;
+        } while (dependencyIds != null && dependencyIds.size() == BATCH_SIZE);
+        return resources;
+    }
 
     @Override
     public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
@@ -275,60 +718,112 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         }
     }
 
-    @Override
-    protected Long getTenantId() throws STenantIdNotSetException {
-        return readSessionAccessor.getTenantId();
-    }
-
-
-    public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
-            throws SDependencyException {
-        final SDependency sDependency = createDependency(name, jarContent, fileName, artifactId, scopeType);
-        createDependencyMapping(artifactId, scopeType, sDependency);
-        return sDependency;
-    }
-
-    private SDependency createDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyCreationException {
-        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId, scopeType, fileName, jarContent)
-                .done();
-        final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency with name " + sDependency.getName());
-        NullCheckingUtil.checkArgsNotNull(sDependency);
+    /**
+     * register a synchronization that will refresh the classloader everywhere
+     * is called when a dependency change is triggered
+     *
+     * @param type
+     * @param id
+     * @throws SDependencyException
+     */
+        void registerRefreshOnAllNodes(final ScopeType type, final long id) throws SDependencyException {
         try {
-            insert(sDependency, DEPENDENCY);
-        } catch (final SRecorderException e) {
-            log(sDependency.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createDependency");
-            throw new SDependencyCreationException("Can't create dependency " + sDependency, e);
+            final long tenantId = readSessionAccessor.getTenantId();
+            final RefreshClassLoaderTask callable = new RefreshClassLoaderTask(type, id);
+            callable.setDependencyService(this);
+            callable.call();
+            userTransactionService.registerBonitaSynchronization(new BonitaTransactionSynchronization() {
+
+                @Override
+                public void beforeCommit() {
+
+                }
+
+                @Override
+                public void afterCompletion(TransactionState txState) {
+                    Map<String, TaskResult<Void>> execute = broadcastService.executeOnOthers(callable, tenantId);
+                    for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
+                        if (resultEntry.getValue().isError()) {
+                            throw new IllegalStateException(resultEntry.getValue().getThrowable());
+                        }
+
+                    }
+                }
+            });
+        } catch (Exception e) {
+            throw new SDependencyException(e);
         }
-        return sDependency;
     }
 
-    private void insert(PersistentObject object, String eventType) throws SRecorderException {
-        final InsertRecord insertRecord = new InsertRecord(object);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(eventType, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(eventType).setObject(object).done();
+    @Override
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final List<SDependency> dependencies) throws SDependencyException {
+        final Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
+        int fromIndex = 0;
+
+        List<Long> dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
+        while (!dependencyIds.isEmpty()) {
+            final List<SDependency> currentDependencies = getDependencies(dependencyIds);
+            for (final SDependency currentDependency : currentDependencies) {
+                if (!newDependenciesByName.containsKey(currentDependency.getName())) {
+                    delete(currentDependency);
+                } else {
+                    final SDependency newDependency = newDependenciesByName.get(currentDependency.getName());
+                    update(currentDependency, newDependency);
+                }
+                // remove from list
+                newDependenciesByName.remove(currentDependency.getName());
+            }
+            fromIndex = fromIndex + BATCH_SIZE;
+            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
         }
-        recorder.recordInsert(insertRecord, insertEvent);
+
+        // all artifact that are still here must be created
+        for (final SDependency sDependency : newDependenciesByName.values()) {
+            createForArtifact(id, type, sDependency);
+        }
     }
 
-    private void createDependencyMapping(long artifactId, ScopeType scopeType, SDependency sDependency) throws SDependencyException {
+    private void createForArtifact(final long id, final ScopeType type, final SDependency sDependency) throws SDependencyCreationException,
+            SDependencyException {
+        createDependency(sDependency);
         final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
-                .createNewInstance(sDependency.getId(), artifactId, scopeType).done();
+                .createNewInstance(sDependency.getId(), id, type).done();
         createDependencyMapping(sDependencyMapping);
     }
 
-    @Override
-    protected void createDependencyMapping(SDependencyMapping dependencyMapping) throws SDependencyException {
-        final SDependencyMappingLogBuilder logBuilder1 = getQueriableLog(ActionType.CREATED, "Creating a dependency mapping", dependencyMapping);
-        NullCheckingUtil.checkArgsNotNull(dependencyMapping);
-        try {
-            insert(dependencyMapping, DEPENDENCYMAPPING);
-            log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder1, "createDependencyMapping");
-            registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
-        } catch (final SRecorderException e) {
-            log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder1, "createDependencyMapping");
-            throw new SDependencyException("Can't create dependency mapping" + dependencyMapping, e);
+    private void update(final SDependency currentDependency, final SDependency newDependency) throws SDependencyException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getDescriptionKey(), newDependency.getDescription());
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getFileNameKey(), newDependency.getFileName());
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getValueKey(), newDependency.getValue());
+        updateDependency(currentDependency, descriptor);
+    }
+
+    private void delete(final SDependency dependency) throws SDependencyException, SDependencyDeletionException {
+        final QueryOptions queryOptions = new QueryOptions(0, 10, SDependencyMapping.class, "id", OrderByType.ASC);
+        final SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), queryOptions).get(0);
+        deleteDependencyMapping(sDependencyMapping);
+        deleteDependency(dependency);
+    }
+
+    private Map<String, SDependency> getMapOfNames(final List<SDependency> dependencies) {
+        final HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
+        for (final SDependency sDependency : dependencies) {
+            hashMap.put(sDependency.getName(), sDependency);
         }
+        return hashMap;
+    }
+
+    @Override
+    public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
+            throws SDependencyException {
+        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId, scopeType, fileName, jarContent)
+                .done();
+        createDependency(sDependency);
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
+                .createNewInstance(sDependency.getId(), artifactId, scopeType).done();
+        createDependencyMapping(sDependencyMapping);
+        return sDependency;
     }
 
     @Override
@@ -339,5 +834,4 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         inputParameters.put("fileName", fileName);
         return persistenceService.selectOne(new SelectOneDescriptor<SDependency>("getDependencyOfArtifact", inputParameters, SDependency.class));
     }
-
 }
