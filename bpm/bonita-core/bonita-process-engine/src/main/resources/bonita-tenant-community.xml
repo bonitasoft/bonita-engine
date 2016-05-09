@@ -217,13 +217,13 @@
     <bean id="documentReferenceExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">
         <constructor-arg name="documentService" ref="documentService" />
-        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
     </bean>
 
     <bean id="documentListReferenceExpressionExecutorStrategy"
           class="org.bonitasoft.engine.expression.DocumentListReferenceExpressionExecutorStrategy">
         <constructor-arg name="documentService" ref="documentService" />
-        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
     </bean>
