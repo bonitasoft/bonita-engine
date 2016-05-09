@@ -440,8 +440,8 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given operations. <b>Note</b>: If the process instantiation contract requires inputs, you must use
-     * {@link #startProcessWithInputs(long, long, Map)} instead. The best practice is to design contract inputs in the process definition, and use these
+     * given operations. <b>Note</b>: If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, long, Map)}
+     * instead. The best practice is to design contract inputs in the process definition, and use these
      * contract inputs in operations, instead of providing operations at start time.
      *
      * @param userId
@@ -470,8 +470,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
-     * given initialVariables. <b>Note</b>: If the process instantiation contract requires inputs, you must use
-     * {@link #startProcessWithInputs(long, long, Map)}
+     * given initialVariables. <b>Note</b>: If the process instantiation contract requires inputs, you must use {@link #startProcessWithInputs(long, long, Map)}
      * instead, using contract inputs stored in process variables, instead of using directly initialVariables.
      *
      * @param userId
@@ -2549,7 +2548,18 @@ public interface ProcessRuntimeAPI {
     Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
 
     /**
-     * return the context defined in the process definition for this user task instance
+     * return the context defined in the process definition for this user task instance. Context includes:
+     * <ul>
+     * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * Key of
+     * data reference is the name of the business data as declared in process definition followed by "_ref".
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * <li>For multi-instantiated task only: iterator name with "_ref" suffix (type of the value is
+     * {@link org.bonitasoft.engine.business.data.BusinessDataReference}). By default: multiInstanceIterator_ref. Only exist if iterator value is set using
+     * a business variable.
+     * <li>
+     * </ul>
      *
      * @param userTaskInstanceId the id of the user task instance
      * @return a map containing the evaluated context
@@ -2558,7 +2568,18 @@ public interface ProcessRuntimeAPI {
     Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
 
     /**
-     * return the context defined in the process definition for this user task instance
+     * return the context defined in the process definition for this user task instance. Context includes:
+     * <ul>
+     * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * Key of
+     * data reference is the name of the business data as declared in process definition followed by "_ref".
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * <li>For multi-instantiated task only: iterator name with "_ref" suffix (type of the value is
+     * {@link org.bonitasoft.engine.business.data.BusinessDataReference}). By default: multiInstanceIterator_ref. Only exist if iterator value is set using
+     * a business variable.
+     * <li>
+     * </ul>
      *
      * @param archivedUserTaskInstanceId the id of the archived version of the user task instance
      * @return a map containing the evaluated context
@@ -2568,8 +2589,15 @@ public interface ProcessRuntimeAPI {
             throws UserTaskNotFoundException, ExpressionEvaluationException;
 
     /**
-     * return the context defined in the process definition for this process instance
-     *
+     * return the context defined in the process definition for this process instance. Context includes:
+     * <ul>
+     * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * Key of
+     * data reference is the name of the business data as declared in process definition followed by "_ref".
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * </ul>
+     * 
      * @param processInstanceId the id of the process instance
      * @return a map containing the evaluated context
      * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing process.
@@ -2577,9 +2605,17 @@ public interface ProcessRuntimeAPI {
     Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 
     /**
-     * return the context defined in the process definition for this process instance
+     * return the context defined in the process definition for this process instance. Context includes:
+     * <ul>
+     * <li>Business data references (see {@link org.bonitasoft.engine.business.data.BusinessDataReference},
+     * {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference} and {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}).
+     * Key of
+     * data reference is the name of the business data as declared in process definition followed by "_ref".
+     * <li>Documents reference (see {@link org.bonitasoft.engine.bpm.document.Document}). Naming convention is the same as for business data ("_ref" suffix).
+     * </ul>
      *
-     * @param archivedProcessInstanceId the id of the archived version of a process instance
+     * @param archivedProcessInstanceId the id of the archived version of a process instance. You can use {@link #getFinalArchivedProcessInstance(long)} to get
+     *        the id of an archived instance based on the id of the same instance while it was running.
      * @return a map containing the evaluated context
      * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any existing process.
      */
