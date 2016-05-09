@@ -79,8 +79,9 @@ public class Employee implements org.bonitasoft.engine.bdm.Entity
         if (this.addresses == null) {
             this.addresses = addresses;
         } else {
+            List<Address> copy = new ArrayList(addresses);
             this.addresses.clear();
-            this.addresses.addAll(addresses);
+            this.addresses.addAll(copy);
         }
     }
 
@@ -102,8 +103,9 @@ public class Employee implements org.bonitasoft.engine.bdm.Entity
         if (this.skills == null) {
             this.skills = skills;
         } else {
+            List<Skill> copy = new ArrayList(skills);
             this.skills.clear();
-            this.skills.addAll(skills);
+            this.skills.addAll(copy);
         }
     }
 
