@@ -58,8 +58,9 @@ public class Forecast implements org.bonitasoft.engine.bdm.Entity
         if (this.temperatures == null) {
             this.temperatures = temperatures;
         } else {
+            List<Double> copy = new ArrayList(temperatures);
             this.temperatures.clear();
-            this.temperatures.addAll(temperatures);
+            this.temperatures.addAll(copy);
         }
     }
 
