@@ -12,7 +12,7 @@
 	   SELECT page
 	   FROM org.bonitasoft.engine.page.impl.SPageImpl AS page
 	   WHERE page.name = :pageName
-       AND  page.processDefinitionId is null
+       AND  page.processDefinitionId = 0
    </query>
 
     <query name="getPageByNameAndProcessDefinitionId">

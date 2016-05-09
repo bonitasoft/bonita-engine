@@ -5,12 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.ContentType;
+import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageUpdater;
-import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SContentType;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.impl.SPageImpl;
 import org.junit.Test;
 
@@ -81,6 +81,20 @@ public class PageModelConverterTest {
     }
 
     @Test
+    public void should_constructSPage_with_null_processDefinitionId_set_it_to_0() throws Exception {
+        //given
+        PageModelConverter pageModelConverter = new PageModelConverter();
+        final PageUpdater pageUpdater = new PageUpdater().setName(NAME).setContentName(ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
+                .setContentType(ContentType.PAGE).setProcessDefinitionId(null);
+
+        //when
+        final SPage sPage = pageModelConverter.constructSPage(pageUpdater, LAST_UPDATED_BY);
+
+        //then
+        SPageAssert.assertThat(sPage).hasName(NAME).hasProcessDefinitionId(0);
+    }
+
+    @Test
     public void should_construct_Page_with_SPage() throws Exception {
         //given
         PageModelConverter pageModelConverter = new PageModelConverter();
@@ -104,6 +118,19 @@ public class PageModelConverterTest {
                 .isProvided()
                 .hasLastUpdatedBy(LAST_UPDATED_BY);
 
+    }
+
+    @Test
+    public void should_construct_Page_with_SPage_with_no_processDefinitionId() throws Exception {
+        //given
+        PageModelConverter pageModelConverter = new PageModelConverter();
+        final SPageImpl sPage = new SPageImpl(NAME, DESCRIPTION, DISPLAY_NAME, INSTALLATION_DATE, INSTALLED_BY, PROVIDED, LAST_MODIFICATION_DATE,
+                LAST_UPDATED_BY,
+                CONTENT_ZIP);
+        //when
+        final Page page = pageModelConverter.toPage(sPage);
+        //then
+        assertThat(page.getProcessDefinitionId()).isNull();
     }
 
     @Test

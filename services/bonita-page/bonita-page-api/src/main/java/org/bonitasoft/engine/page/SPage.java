@@ -43,6 +43,6 @@ public interface SPage extends PersistentObject {
 
     String getContentType();
 
-    Long getProcessDefinitionId();
+    long getProcessDefinitionId();
 
 }

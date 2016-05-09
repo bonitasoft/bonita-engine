@@ -43,7 +43,11 @@ public class SPageBuilderImpl implements SPageBuilder {
 
     @Override
     public SPageBuilder setProcessDefinitionId(Long processDefinitionId) {
-        page.setProcessDefinitionId(processDefinitionId);
+        if (processDefinitionId == null) {
+            page.setProcessDefinitionId(0);
+        } else {
+            page.setProcessDefinitionId(processDefinitionId);
+        }
         return this;
     }
 
