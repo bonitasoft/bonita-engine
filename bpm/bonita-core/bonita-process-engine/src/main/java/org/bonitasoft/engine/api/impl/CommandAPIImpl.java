@@ -89,6 +89,7 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public void addDependency(final String name, final byte[] jar) throws AlreadyExistsException, CreationException {
+        // FIXME method in dependency service which get a dependency using its name
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         try {
@@ -102,14 +103,15 @@ public class CommandAPIImpl implements CommandAPI {
 
     @Override
     public void removeDependency(final String name) throws DependencyNotFoundException, DeletionException {
+        // FIXME it is maybe too much to delete dependency mappings with the dependency -> better if there are mappings of this dependency throws an exception.
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         try {
             dependencyService.deleteDependency(name);
-        } catch (final SDependencyNotFoundException e) {
-            throw new DependencyNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
+        } catch (final SDependencyNotFoundException sdnfe) {
+            throw new DependencyNotFoundException(sdnfe);
+        } catch (final SBonitaException sbe) {
+            throw new DeletionException(sbe);
         }
     }
 
