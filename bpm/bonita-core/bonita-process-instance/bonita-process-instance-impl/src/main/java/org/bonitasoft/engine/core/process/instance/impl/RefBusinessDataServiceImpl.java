@@ -99,7 +99,6 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
                 flowNodeInstanceId);
         final SRefBusinessDataInstance ref = persistenceRead.selectOne(descriptor);
         if (ref == null) {
-            //FIXME
             throw new SRefBusinessDataInstanceNotFoundException(flowNodeInstanceId, name);
         }
         return ref;

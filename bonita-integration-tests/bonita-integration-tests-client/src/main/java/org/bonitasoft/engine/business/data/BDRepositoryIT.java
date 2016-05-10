@@ -69,6 +69,9 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
@@ -1919,5 +1922,61 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
         assertThat(getProcessAPI().getDocumentList(eventSubProcessActivity.getParentProcessInstanceId(), "MyList", 0, 100)).isEmpty();
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_be_able_to_update_business_object_in_event_sub_process() throws Exception {
+        //given
+        //given
+        ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("UpdateBusinessDataInEventSubProcess", "1.0");
+        parentProcessBuilder.addActor(ACTOR_NAME);
+        parentProcessBuilder.addUserTask("userTask", ACTOR_NAME);
+        parentProcessBuilder.addContextEntry("ref_myBusinessData", new ExpressionBuilder().createBusinessDataReferenceExpression("myBusinessData"));
+        parentProcessBuilder.addContract().addInput("employeeName", Type.TEXT, "the name of the business data");
+        parentProcessBuilder.addBusinessData("myBusinessData", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("initBD",
+                        "import " + EMPLOYEE_QUALIFIED_NAME + "\n" +
+                                "Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = employeeName; return e;",
+                        EMPLOYEE_QUALIFIED_NAME,
+                        new ExpressionBuilder().createContractInputExpression("employeeName", String.class.getName())));
+        //construct sub process
+        SubProcessDefinitionBuilder subProcessBuilder = parentProcessBuilder.addSubProcess("updateBusinessData", true).getSubProcessBuilder();
+        StartEventDefinitionBuilder startEventDefinitionBuilder = subProcessBuilder.addStartEvent("signalStart");
+        startEventDefinitionBuilder.addSignalEventTrigger("theSignal");
+        subProcessBuilder.addAutomaticTask("updateBD")
+                .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("myBusinessData", "setLastName", String.class.getName(),
+                        new ExpressionBuilder().createConstantStringExpression("newName")));
+        subProcessBuilder.addUserTask("userTaskInSubProcess", ACTOR_NAME);
+        subProcessBuilder.addEndEvent("endSubProcess");
+        subProcessBuilder.addTransition("signalStart", "updateBD");
+        subProcessBuilder.addTransition("updateBD", "userTaskInSubProcess");
+        subProcessBuilder.addTransition("userTaskInSubProcess", "endSubProcess");
+        DesignProcessDefinition processDefinition1 = parentProcessBuilder.done();
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
+        ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
+                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
+        waitForUserTask("userTask");
+        assertThatJson(getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
+                processInstance.getId()).get("ref_myBusinessData")))
+                        .node("lastName").isEqualTo("\"Doe\"");
+        //when
+        getProcessAPI().sendSignal("theSignal");
+        waitForUserTask("userTaskInSubProcess");
+
+        //then
+        assertThatJson(getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
+                processInstance.getId()).get("ref_myBusinessData")))
+                        .node("lastName").isEqualTo("\"newName\"");
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private String getBusinessDataAsJson(SimpleBusinessDataReference myBusinessData)
+            throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException {
+        final Map<String, Serializable> parameters = new HashMap<>();
+        parameters.put("businessDataId", myBusinessData.getStorageId());
+        parameters.put("entityClassName", EMPLOYEE_QUALIFIED_NAME);
+        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
+        return (String) getCommandAPI().execute("getBusinessDataById", parameters);
     }
 }
