@@ -669,4 +669,21 @@ public class PageAPIIT extends CommonAPIIT {
         getPageAPI().updatePageContent(page.getId(), pageContent2);
     }
 
+    @Test
+    public void should_search_work_with_processDefinitionId_set_to_null() throws Exception {
+        // given
+        String name = generateUniquePageName(345);
+        getPageAPI().createPage(new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                CommonTestUtil.createTestPageContent(name, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        final SearchResult<Page> searchPages = getPageAPI().searchPages(
+                new SearchOptionsBuilder(0, 1).filter(PageSearchDescriptor.NAME, name).filter(PageSearchDescriptor.PROCESS_DEFINITION_ID, null).done());
+
+        // then
+        final List<Page> results = searchPages.getResult();
+        assertThat(results.get(0).getName()).isEqualTo(name);
+
+    }
+
 }
