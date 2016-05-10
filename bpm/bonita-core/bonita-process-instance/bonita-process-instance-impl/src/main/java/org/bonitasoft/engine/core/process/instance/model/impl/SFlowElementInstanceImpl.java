@@ -31,12 +31,16 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
 
     private SStateCategory stateCategory = SStateCategory.NORMAL;
 
+    //process definition id
     private long logicalGroup1;
 
+    //root process instance id
     private long logicalGroup2;
 
+    //parent activity instance id
     private long logicalGroup3;
 
+    //parent process instance id
     private long logicalGroup4;
 
     private String description;

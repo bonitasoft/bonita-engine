@@ -17,12 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +31,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateC
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -72,33 +66,6 @@ public class ActivityInstanceServiceImplTest {
     private ActivityInstanceServiceImpl activityInstanceServiceImpl;
 
     private final SFlowNodeInstanceBuilderFactory keyProvider = new SUserTaskInstanceBuilderFactoryImpl();
-
-    @Test
-    public void getProcessInstanceId_should_return_container_id_if_containerType_is_process() throws Exception {
-        final long expectedContainerId = 1L;
-
-        final long processInstanceId = activityInstanceServiceImpl.getProcessInstanceId(expectedContainerId, DataInstanceContainer.PROCESS_INSTANCE.name());
-
-        assertThat(processInstanceId).isEqualTo(expectedContainerId);
-    }
-
-    @Test
-    public void getProcessInstanceId_should_return_taskInstance_processId_if_containerType_is_activity() throws Exception {
-        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
-        when(flowNode.getParentProcessInstanceId()).thenReturn(1234L);
-        final long activityInstanceId = 456L;
-        when(flowNode.getId()).thenReturn(activityInstanceId);
-        final ActivityInstanceServiceImpl spy = spy(activityInstanceServiceImpl);
-        doReturn(flowNode).when(spy).getFlowNodeInstance(activityInstanceId);
-        final long processInstanceId = spy.getProcessInstanceId(flowNode.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
-
-        assertThat(processInstanceId).isEqualTo(flowNode.getParentProcessInstanceId());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void getProcessInstanceId_should_throw_an_exception_for_a_not_supported_container_type() throws Exception {
-        activityInstanceServiceImpl.getProcessInstanceId(1L, DataInstanceContainer.MESSAGE_INSTANCE.name());
-    }
 
     @Test
     public void getPossibleUserIdsOfPendingTasks() throws Exception {
