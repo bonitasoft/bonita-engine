@@ -167,10 +167,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     }
 
     @Override
-    protected QueryOptions getDefaultQueryOptionForDependency() {
-        return new QueryOptions(0, 100, SDependency.class, "id", OrderByType.ASC);
-    }
-    @Override
     protected QueryOptions getDefaultQueryOptionForDependencyMapping() {
         return new QueryOptions(0, 100, SDependencyMapping.class, "id", OrderByType.ASC);
     }
@@ -203,7 +199,7 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         try {
             delete(dependencyMapping, DEPENDENCYMAPPING);
             log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDependencyMapping");
-            registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
+            refreshClassLoaderAfterUpdate(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
         } catch (final SRecorderException e) {
             log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDependencyMapping");
             throw new SDependencyException("Can't delete dependency mapping" + dependencyMapping, e);
@@ -324,7 +320,7 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         try {
             insert(dependencyMapping, DEPENDENCYMAPPING);
             log(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder1, "createDependencyMapping");
-            registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
+            refreshClassLoaderAfterUpdate(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
         } catch (final SRecorderException e) {
             log(dependencyMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder1, "createDependencyMapping");
             throw new SDependencyException("Can't create dependency mapping" + dependencyMapping, e);

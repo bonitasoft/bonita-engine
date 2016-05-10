@@ -73,7 +73,10 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final DependencyService dependencyService = platformAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         try {
-            dependencyService.createMappedDependency(name, jar, name, classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+            ScopeType type = ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType());
+            long id = classLoaderService.getGlobalClassLoaderId();
+            dependencyService.createMappedDependency(name, jar, name, id, type);
+            dependencyService.refreshClassLoaderAfterUpdate(type, id);
         } catch (SDependencyException e) {
             throw new CreationException(e);
         }
@@ -83,9 +86,11 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     public void removeDependency(final String name) throws DependencyNotFoundException, DeletionException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final DependencyService dependencyService = platformAccessor.getDependencyService();
+        ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
 
         try {
             dependencyService.deleteDependency(name);
+            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
         } catch (final SDependencyNotFoundException e) {
             throw new DependencyNotFoundException(e);
         } catch (final SBonitaException e) {

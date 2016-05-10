@@ -69,8 +69,12 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         TestUtil.closeTransactionIfOpen(getTransactionService());
 
         getTransactionService().begin();
-        dependencyService.deleteAllDependencies();
-        platformDependencyService.deleteAllDependencies();
+
+        dependencyService.deleteDependencies(ID1, TYPE1);
+        dependencyService.deleteDependencies(ID1, TYPE2);
+        dependencyService.deleteDependencies(ID2, TYPE1);
+        dependencyService.deleteDependencies(ID2, TYPE2);
+        platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
         getTransactionService().complete();
         classLoaderService = null;
         dependencyService = null;
@@ -103,7 +107,9 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
     private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
                                   final byte[] value) throws SDependencyException {
-        return dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
+        long id = dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
+        dependencyService.refreshClassLoaderAfterUpdate(artifactType, artifactId);
+        return id;
     }
 
     private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException {
@@ -111,6 +117,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
                 .createNewInstance(name, fileName, value);
         final SDependency dependency = builder.done();
         platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
         return dependency.getId();
     }
 
@@ -337,6 +344,7 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         assertSameClassloader(globalClassLoader, classLoader);
 
         platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
 
         globalClassLoader = classLoaderService.getGlobalClassLoader();
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
