@@ -926,6 +926,7 @@
     <bean id="refBusinessDataRetriever" class="org.bonitasoft.engine.business.data.RefBusinessDataRetriever">
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
     </bean>
 
     <bean id="updateDataRefAction" class="org.bonitasoft.engine.operation.UpdateDataRefAction">

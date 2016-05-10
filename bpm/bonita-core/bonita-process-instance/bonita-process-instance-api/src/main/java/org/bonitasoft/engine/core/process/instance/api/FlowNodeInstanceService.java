@@ -317,23 +317,6 @@ public interface FlowNodeInstanceService {
     void deleteFlowNodeInstance(SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
 
     /**
-     * Get the process instance ID. It can be itself if containerType is a PROCESS_INSTANCE, or the containing process instance id if containerType is a
-     * ACTIVITY_INSTANCE.
-     *
-     * @param containerId
-     *        the ID of the container of the flownode or process to get the process instance ID for.
-     * @param containerType
-     *        the type of container, can be one of {@link DataInstanceContainer#PROCESS_INSTANCE} or {@link DataInstanceContainer#ACTIVITY_INSTANCE}
-     * @return the process instance id found
-     * @throws SFlowNodeNotFoundException
-     *         if containerType is an ACTIVITY_INSTANCE and the flownode/activity instance is not found with id containerId.
-     * @throws SFlowNodeReadException
-     *         if a read exception occurs.
-     * @since 6.3
-     */
-    long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException;
-
-    /**
      * retrieve ids of elements that need to be restarted
      * Called on start node to set the flag to tell the engine to restart these flow nodes
      * Should not be called when the engine is started!
@@ -345,8 +328,8 @@ public interface FlowNodeInstanceService {
     List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     *
      * get the number of flow node is this root container
+     * 
      * @param rootContainerId
      * @return the number of flow node
      * @since 6.5
