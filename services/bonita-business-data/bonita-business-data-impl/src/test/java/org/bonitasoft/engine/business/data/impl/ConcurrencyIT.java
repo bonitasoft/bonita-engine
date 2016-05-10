@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +55,7 @@ import com.company.pojo.Employee;
 @ContextConfiguration(locations = { "/testContext.xml" })
 public class ConcurrencyIT {
 
+    public static final long TENANT_ID = 654643L;
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
     @Autowired
@@ -100,7 +99,7 @@ public class ConcurrencyIT {
         final TransactionService transactionService = mock(TransactionService.class);
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaManager, mock(TenantResourcesService.class)));
+                schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
@@ -108,7 +107,7 @@ public class ConcurrencyIT {
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
 
-        final Set<String> classNames = new HashSet<String>();
+        final Set<String> classNames = new HashSet<>();
         classNames.add(Employee.class.getName());
 
         businessDataModelRepositoryImpl.update(classNames);

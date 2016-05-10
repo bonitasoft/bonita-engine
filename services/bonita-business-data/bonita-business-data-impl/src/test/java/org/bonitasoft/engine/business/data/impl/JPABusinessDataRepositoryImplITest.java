@@ -17,10 +17,7 @@ import static com.company.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
@@ -65,6 +62,7 @@ import com.company.pojo.Person;
 @ContextConfiguration(locations = { "/testContext.xml" })
 public class JPABusinessDataRepositoryImplITest {
 
+    public static final long TENANT_ID = 54236235L;
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
     private TransactionService transactionService;
@@ -112,14 +110,14 @@ public class JPABusinessDataRepositoryImplITest {
         transactionService = mock(TransactionService.class);
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
-                schemaManager, mock(TenantResourcesService.class)));
+                schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
 
-        final Set<String> classNames = new HashSet<String>();
+        final Set<String> classNames = new HashSet<>();
         classNames.add(Employee.class.getName());
         classNames.add(Person.class.getName());
 
@@ -222,7 +220,7 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void should_return_an_empty_list_when_getting_entities_with_empty_ids_list() throws Exception {
-        ArrayList<Long> emptyIdsList = new ArrayList<Long>();
+        ArrayList<Long> emptyIdsList = new ArrayList<>();
 
         List<Employee> emps = businessDataRepository.findByIds(Employee.class, emptyIdsList);
 
