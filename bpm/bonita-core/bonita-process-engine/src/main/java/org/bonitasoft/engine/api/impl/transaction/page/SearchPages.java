@@ -55,5 +55,4 @@ public class SearchPages extends AbstractSearchEntity<Page, SPage> {
     public List<Page> convertToClientObjects(final List<SPage> pages) {
         return new PageModelConverter().toPages(pages);
     }
-
 }
