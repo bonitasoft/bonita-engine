@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.dependency;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
@@ -63,17 +61,6 @@ public class DependencyServiceTest extends CommonBPMServicesTest {
         } catch (final SDependencyNotFoundException e) {
             // OK
         }
-
-        getTransactionService().complete();
-    }
-
-    @Test
-    public void testDeleteAllDependencies() throws Exception {
-        getTransactionService().begin();
-
-        SDependency mappedDependency = dependencyService.createMappedDependency(defaultName, defaultValue, defaultFileName, 2L, ScopeType.PROCESS);
-        dependencyService.deleteAllDependencies();
-        assertEquals(0, dependencyService.getDependencies(Collections.singleton(mappedDependency.getId())).size());
 
         getTransactionService().complete();
     }

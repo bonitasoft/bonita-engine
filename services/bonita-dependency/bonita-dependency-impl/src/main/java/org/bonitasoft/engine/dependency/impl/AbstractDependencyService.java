@@ -57,40 +57,14 @@ public abstract class AbstractDependencyService implements DependencyService {
     protected abstract SDependency getDependency(String name) throws SDependencyNotFoundException, SDependencyDeletionException;
 
     @Override
-    public void deleteAllDependencies() throws SDependencyException {
-        final QueryOptions queryOptions1 = getDefaultQueryOptionForDependencyMapping();
-        List<SDependencyMapping> dependencyMappings;
-        do {
-            dependencyMappings = getDependencyMappings(queryOptions1);
-            for (final SDependencyMapping dependencyMapping : dependencyMappings) {
-                deleteDependencyMapping(dependencyMapping);
-            }
-        } while (dependencyMappings.size() == queryOptions1.getNumberOfResults());
-        final QueryOptions queryOptions = getDefaultQueryOptionForDependency();
-        List<SDependency> dependencies;
-        do {
-            dependencies = getDependencies(queryOptions);
-            for (final SDependency dependency : dependencies) {
-                delete(dependency);
-            }
-        } while (dependencies.size() == queryOptions.getNumberOfResults());
-    }
-
-    @Override
     public void deleteDependency(final String name) throws SDependencyException {
         final SDependency sDependency = getDependency(name);
         deleteDependency(sDependency);
     }
 
-    /**
-     * register a synchronization that will refresh the classloader everywhere
-     * is called when a dependency change is triggered
-     *
-     * @param type
-     * @param id
-     * @throws SDependencyException
-     */
-    void registerRefreshOnAllNodes(final ScopeType type, final long id) throws SDependencyException {
+
+    @Override
+    public void refreshClassLoaderAfterUpdate(final ScopeType type, final long id) throws SDependencyException {
         refreshClassLoader(type, id);
         try {
             registerRefreshOnOtherNodes(type, id);
@@ -148,8 +122,6 @@ public abstract class AbstractDependencyService implements DependencyService {
     }
 
     protected abstract SelectListDescriptor<Long> getSelectDescriptorForDependencyIds(QueryOptions queryOptions, Map<String, Object> parameters);
-
-    protected abstract QueryOptions getDefaultQueryOptionForDependency();
 
     protected abstract QueryOptions getDefaultQueryOptionForDependencyMapping();
 

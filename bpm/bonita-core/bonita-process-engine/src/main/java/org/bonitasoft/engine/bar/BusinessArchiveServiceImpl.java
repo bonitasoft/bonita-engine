@@ -69,9 +69,9 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
 
             final boolean isResolved = businessArchiveArtifactsManager.resolveDependencies(businessArchive, sProcessDefinition);
             if (isResolved) {
-                businessArchiveArtifactsManager.resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
-                        sProcessDefinition);
+                processDefinitionService.resolveProcess(sProcessDefinition.getId());
             }
+            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sProcessDefinition.getId());
         } catch (SAlreadyExistsException e) {
             throw e;
         } catch (final SBonitaException e) {

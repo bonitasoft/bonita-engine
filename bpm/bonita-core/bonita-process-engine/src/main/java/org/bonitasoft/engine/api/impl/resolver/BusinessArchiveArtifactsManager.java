@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.INFO;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -200,33 +199,6 @@ public class BusinessArchiveArtifactsManager {
             fromIndex = fromIndex + BATCH_SIZE;
         } while (currentPage.size() == BATCH_SIZE);
         return dependencyIds;
-    }
-
-    /**
-     * create dependencies based on the business archive
-     *
-     * @param businessArchive
-     * @param processDefinitionService
-     * @param dependencyService
-     * @param sDefinition
-     * @throws SBonitaException
-     */
-    public void resolveAndCreateDependencies(final BusinessArchive businessArchive, final ProcessDefinitionService processDefinitionService,
-                                             final DependencyService dependencyService, final SProcessDefinition sDefinition) throws SBonitaException {
-        final Long processDefinitionId = sDefinition.getId();
-        if (businessArchive != null) {
-            final Map<String, byte[]> resources = businessArchive.getResources("^classpath/.*$");
-
-            // remove the classpath/ on path of dependencies
-            final Map<String, byte[]> resourcesWithRealName = new HashMap<>(resources.size());
-            for (final Entry<String, byte[]> resource : resources.entrySet()) {
-                final String name = resource.getKey().substring(10);
-                final byte[] jarContent = resource.getValue();
-                resourcesWithRealName.put(name, jarContent);
-            }
-            addDependencies(resourcesWithRealName, dependencyService, sDefinition.getId());
-        }
-        processDefinitionService.resolveProcess(processDefinitionId);
     }
 
     private void addDependency(final String name, final byte[] jarContent, final DependencyService dependencyService,
