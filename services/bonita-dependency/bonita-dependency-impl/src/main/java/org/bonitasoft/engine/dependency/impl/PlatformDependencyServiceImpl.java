@@ -130,7 +130,6 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
     protected void createDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
         try {
             platformPersistenceService.insert(dependencyMapping);
-            registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
         } catch (final SPersistenceException pe) {
             throw new SDependencyException(pe);
         }
@@ -140,7 +139,6 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
     protected void deleteDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
         try {
             platformPersistenceService.delete(dependencyMapping);
-            registerRefreshOnAllNodes(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
         } catch (final SPersistenceException pe) {
             throw new SDependencyException(pe);
         }
@@ -198,10 +196,6 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
         return null;
     }
 
-    @Override
-    protected QueryOptions getDefaultQueryOptionForDependency() {
-        return new QueryOptions(0, 100, SPlatformDependency.class, "id", OrderByType.ASC);
-    }
     @Override
     protected QueryOptions getDefaultQueryOptionForDependencyMapping() {
         return new QueryOptions(0, 100, SPlatformDependencyMapping.class, "id", OrderByType.ASC);

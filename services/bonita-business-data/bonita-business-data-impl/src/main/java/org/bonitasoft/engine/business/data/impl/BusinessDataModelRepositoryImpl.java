@@ -152,6 +152,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
             final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_FILENAME, tenantId, ScopeType.TENANT);
+            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
         } catch (final SDependencyException e) {
@@ -229,6 +230,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public void uninstall(final long tenantId) throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR_DEPENDENCY_NAME);
+            dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
         } catch (final SDependencyNotFoundException sde) {
             // do nothing
         } catch (final SDependencyException sde) {

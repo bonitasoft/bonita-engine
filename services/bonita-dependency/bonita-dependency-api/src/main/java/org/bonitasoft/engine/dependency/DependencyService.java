@@ -58,14 +58,6 @@ public interface DependencyService {
     void deleteDependency(String name) throws SDependencyException;
 
     /**
-     * Delete all dependencies in DB
-     *
-     * @throws SDependencyDeletionException
-     *         Error thrown if has exception during the dependency deletion.
-     */
-    void deleteAllDependencies() throws SDependencyException;
-
-    /**
      * Get dependency by its id
      * 
      * @param id
@@ -96,6 +88,17 @@ public interface DependencyService {
      * @throws SDependencyException
      */
     List<SDependencyMapping> getDependencyMappings(QueryOptions queryOptions) throws SDependencyException;
+
+    /**
+     * Refresh classloader after a dependency update
+     *
+     * difference with #refreshClassLoader is that this one is done on all nodes
+     *
+     * @param type
+     * @param id
+     * @throws SDependencyException
+     */
+    void refreshClassLoaderAfterUpdate(ScopeType type, long id) throws SDependencyException;
 
     /**
      * Get all dependency ids for specific artifact

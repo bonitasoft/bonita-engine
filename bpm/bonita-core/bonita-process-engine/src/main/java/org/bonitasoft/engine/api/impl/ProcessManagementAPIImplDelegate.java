@@ -48,9 +48,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Matthieu Chaffotte
@@ -72,13 +70,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
-        try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+        return APIUtils.getTenantAccessor();
     }
 
     public void deleteProcessDefinition(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
