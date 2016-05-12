@@ -1417,7 +1417,7 @@ public class ModelConvertor {
         if (enabled != null) {
             userBuilder.setEnabled(enabled);
         } else {
-            userBuilder.setEnabled(Boolean.FALSE);
+            userBuilder.setEnabled(Boolean.TRUE);
         }
         userBuilder.setCreationDate(now);
         userBuilder.setLastUpdate(now);

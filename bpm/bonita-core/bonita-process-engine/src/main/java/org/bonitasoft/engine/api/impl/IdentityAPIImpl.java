@@ -29,7 +29,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMemberships;
 import org.bonitasoft.engine.api.impl.transaction.identity.CreateGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.CreateRole;
-import org.bonitasoft.engine.api.impl.transaction.identity.CreateUser;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroups;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRole;
@@ -55,7 +54,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersInRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateMembershipByRoleIdAndGroupId;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateRole;
-import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -186,28 +184,39 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public User createUser(final UserCreator creator) throws AlreadyExistsException, CreationException {
+    public User createUser(final UserCreator creator) throws CreationException {
+        validateUserCreator(creator);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUser sUser = ModelConvertor.constructSUser(creator);
+        final SContactInfo personalContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), true);
+        final SContactInfo proContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), false);
+        try {
+            SUser user = identityService.createUser(sUser, personalContactInfo, proContactInfo);
+            return ModelConvertor.toUser(user);
+        } catch (final SBonitaException sbe) {
+            throw new CreationException(sbe);
+        }
+    }
+
+    private void validateUserCreator(UserCreator creator) throws CreationException {
         if (creator == null) {
             throw new CreationException("Can not create a null user.");
         }
-        final Map<org.bonitasoft.engine.identity.UserCreator.UserField, Serializable> fields = creator.getFields();
-        final String userName = (String) fields.get(org.bonitasoft.engine.identity.UserCreator.UserField.NAME);
+        final Map<UserCreator.UserField, Serializable> fields = creator.getFields();
+        final String userName = (String) fields.get(UserCreator.UserField.NAME);
         if (userName == null || userName.trim().isEmpty()) {
             throw new CreationException("The user name cannot be null or empty.");
         }
-        final String password = (String) fields.get(org.bonitasoft.engine.identity.UserCreator.UserField.PASSWORD);
+        final String password = (String) fields.get(UserCreator.UserField.PASSWORD);
         if (password == null || password.trim().isEmpty()) {
             throw new CreationException("The password cannot be null or empty.");
         }
-        final Boolean isEnabled = (Boolean) fields.get(org.bonitasoft.engine.identity.UserCreator.UserField.ENABLED);
-        if (isEnabled == null) {
-            creator.setEnabled(true);
+        try {
+            getUserByUserName(userName);
+            throw new AlreadyExistsException("A user with name \"" + userName + "\" already exists");
+        } catch (final UserNotFoundException ignored) {
         }
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SUser sUser = ModelConvertor.constructSUser(creator);
-        final SContactInfo sPersoData = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), true);
-        final SContactInfo sProlData = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), false);
-        return createUser(tenantAccessor, sUser, sPersoData, sProlData);
     }
 
     @Override
@@ -220,20 +229,18 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
-        // User change
-        final EntityUpdateDescriptor userChangeDescriptor = getUserUpdateDescriptor(updater);
-        // Personal data change
-        final EntityUpdateDescriptor persoDataChangeDescriptor = getUserContactInfoUpdateDescriptor(updater.getPersoContactUpdater());
-        // Professional data change
-        final EntityUpdateDescriptor proDataChangeDescriptor = getUserContactInfoUpdateDescriptor(updater.getProContactUpdater());
 
+        // User change
+        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater);
+        // Personal data change
+        final EntityUpdateDescriptor personalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getPersoContactUpdater());
+        // Professional data change
+        final EntityUpdateDescriptor professionalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getProContactUpdater());
         try {
-            final UpdateUser updateUserTransaction = new UpdateUser(identityService, userId, userChangeDescriptor, persoDataChangeDescriptor,
-                    proDataChangeDescriptor);
-            updateUserTransaction.execute();
-            return ModelConvertor.toUser(updateUserTransaction.getResult());
-        } catch (final SUserNotFoundException sunfe) {
-            throw new UserNotFoundException(sunfe);
+            SUser sUser = identityService.updateUser(userId, userUpdateDescriptor, personalDataUpdateDescriptor, professionalDataUpdateDescriptor);
+            return ModelConvertor.toUser(sUser);
+        } catch (final SUserNotFoundException e) {
+            throw new UserNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
@@ -1092,23 +1099,6 @@ public class IdentityAPIImpl implements IdentityAPI {
             return searchGroups.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);
-        }
-    }
-
-    private User createUser(final TenantServiceAccessor tenantAccessor, final SUser sUser, final SContactInfo sPersonalData,
-            final SContactInfo sProfessionalData) throws AlreadyExistsException, CreationException {
-        try {
-            getUserByUserName(sUser.getUserName());
-            throw new AlreadyExistsException("A user with name \"" + sUser.getUserName() + "\" already exists");
-        } catch (final UserNotFoundException unfe) {
-            // user does not exist but was unable to be created
-        }
-        try {
-            final CreateUser createUser = new CreateUser(sUser, sPersonalData, sProfessionalData, tenantAccessor.getIdentityService());
-            createUser.execute();
-            return ModelConvertor.toUser(createUser.getResult());
-        } catch (final SBonitaException sbe) {
-            throw new CreationException(sbe);
         }
     }
 

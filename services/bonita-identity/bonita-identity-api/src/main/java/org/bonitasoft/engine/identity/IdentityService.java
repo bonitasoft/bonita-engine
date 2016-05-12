@@ -1215,4 +1215,28 @@ public interface IdentityService {
      */
     @Deprecated
     SUser createUserWithoutEncryptingPassword(SUser user) throws SUserCreationException;
+
+    /**
+     * Update the user having id userId according to the entity update descriptors in parameters
+     * 
+     * @param userId the user to update
+     * @param userUpdateDescriptor the entity update descriptor of the user itself
+     * @param personalDataUpdateDescriptor the entity update descriptor for the personal data
+     * @param professionalDataUpdateDescriptor the entity update descriptor for the professional data
+     * @return the updated user
+     * @throws SIdentityException
+     */
+    SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor personalDataUpdateDescriptor,
+            EntityUpdateDescriptor professionalDataUpdateDescriptor) throws SIdentityException;
+
+    /**
+     * create a new user in database along with its contact data
+     * 
+     * @param sUser the user to persist
+     * @param personalContactInfo its personal contact info
+     * @param proContactInfo its professional contact info
+     * @return the user persisted
+     * @throws SUserCreationException
+     */
+    SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo) throws SUserCreationException;
 }
