@@ -252,13 +252,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void insertUser(String methodName, SUser hashedUser, SUserLogBuilder logBuilder, SUserLoginImpl sUserLogin) throws SRecorderException {
-        ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
-        sUserLogin.setsUser(hashedUser);
-        sUserLogin.setId(hashedUser.getId());
-        sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
-        recorder.recordInsert(new InsertRecord(sUserLogin), null);
-        log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-    }
+            ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
+            sUserLogin.setsUser(hashedUser);
+            sUserLogin.setId(hashedUser.getId());
+            sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
+            recorder.recordInsert(new InsertRecord(sUserLogin), null);
+            log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+        }
 
     private SUserLoginImpl insertUserLogin(SUser hashedUser) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(hashedUser);
@@ -982,6 +982,7 @@ public class IdentityServiceImpl implements IdentityService {
     public SUser getUser(final long userId) throws SUserNotFoundException {
         try {
             final SUser user = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
+
             if (user == null) {
                 throw new SUserNotFoundException(userId);
             }
@@ -1436,7 +1437,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options) throws SBonitaReadException {
         return persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
-    }
+        }
 
     @Override
     public SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor personalDataUpdateDescriptor,
@@ -1445,7 +1446,7 @@ public class IdentityServiceImpl implements IdentityService {
         SUser sUser = getUser(userId);
         if (userUpdateDescriptor != null && !userUpdateDescriptor.getFields().isEmpty()) {
             updateUser(sUser, userUpdateDescriptor);
-        }
+    }
 
         // Personal data change
         if (personalDataUpdateDescriptor != null && !personalDataUpdateDescriptor.getFields().isEmpty()) {
@@ -1453,9 +1454,9 @@ public class IdentityServiceImpl implements IdentityService {
             if (persoContactInfo == null) {
                 persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
                 createUserContactInfo(persoContactInfo);
-            }
-            updateUserContactInfo(persoContactInfo, personalDataUpdateDescriptor);
         }
+            updateUserContactInfo(persoContactInfo, personalDataUpdateDescriptor);
+    }
 
         // Professional data change
         if (professionalDataUpdateDescriptor != null && !professionalDataUpdateDescriptor.getFields().isEmpty()) {
