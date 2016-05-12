@@ -82,7 +82,7 @@ public class EngineStarter {
         if (isDropOnStart()) {
             platformSetup.destroy();
         }
-        platformSetup.setup();
+        platformSetup.init();
     }
 
     //--------------  engine life cycle methods
