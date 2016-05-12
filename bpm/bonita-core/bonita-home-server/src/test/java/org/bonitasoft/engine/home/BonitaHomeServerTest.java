@@ -89,6 +89,15 @@ public class BonitaHomeServerTest {
         bonitaHomeServer.updateTenantPortalConfigurationFile(TENANT_ID, "myFile.properties", "the updated content".getBytes());
     }
 
+    @Test
+    public void should_delete_tenant_delete_configuration_files() throws Exception {
+        //when
+        bonitaHomeServer.deleteTenant(TENANT_ID);
+
+        //then 
+        verify(configurationService).deleteTenantConfiguration(TENANT_ID);
+    }
+
     private List<BonitaConfiguration> confs(BonitaConfiguration... bonitaConfiguration) {
         return Arrays.asList(bonitaConfiguration);
     }

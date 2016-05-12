@@ -207,7 +207,7 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        //TODO ?????
+        getConfigurationService().deleteTenantConfiguration(tenantId);
     }
 
     public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
