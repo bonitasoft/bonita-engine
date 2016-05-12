@@ -22,7 +22,6 @@ import java.util.concurrent.Callable;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.Logout;
@@ -44,7 +43,6 @@ import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.UnknownUserException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -213,9 +211,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                     }
                     final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
                     final long lastConnection = System.currentTimeMillis();
-                    final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
-                    final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null);
-                    updateUser.execute();
+                    identityService.updateUser(sUser, userUpdateBuilder.updateLastConnection(lastConnection).done());
                 }
             } catch (SUserNotFoundException e) {
                 throw new UnknownUserException("Unable to find user in database.");
