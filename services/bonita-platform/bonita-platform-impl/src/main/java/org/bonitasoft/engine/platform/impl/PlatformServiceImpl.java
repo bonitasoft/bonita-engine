@@ -140,7 +140,6 @@ public class PlatformServiceImpl implements PlatformService {
         isTraced = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }
 
-
     /**
      * @param sqlFiles the sql files to execute
      * @throws SQLException
@@ -225,26 +224,20 @@ public class PlatformServiceImpl implements PlatformService {
         final Connection connection = getConnection();
         connection.setAutoCommit(false);
         try {
+            Statement stmt = connection.createStatement();
             for (final String command : commands) {
                 if (command.trim().length() > 0) {
-                    String filledCommand = null;
-                    try (Statement stmt = connection.createStatement()) {
-                        if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                            logger.log(getClass(), TechnicalLogSeverity.TRACE, command);
-                        }
-                        filledCommand = fillTemplate(command, replacements);
-                        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Executing the following command : " + filledCommand);
-                        }
-
-                        stmt.execute(filledCommand);
-                    } catch (final SQLException e) {
-                        // Just log the failing command in case of ERROR:
-                        logger.log(getClass(), TechnicalLogSeverity.ERROR, "Following SQL command failed: " + filledCommand);
-                        throw e;
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                        logger.log(getClass(), TechnicalLogSeverity.TRACE, command);
                     }
+                    final String filledCommand = fillTemplate(command, replacements);
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Executing the following command : " + filledCommand);
+                    }
+                    stmt.addBatch(filledCommand);
                 }
             }
+            stmt.executeBatch();
             connection.commit();
         } catch (final SQLException sqe) {
             connection.rollback();
@@ -662,7 +655,6 @@ public class PlatformServiceImpl implements PlatformService {
             throw new SBonitaReadException(bre);
         }
     }
-
 
     @Override
     public SPlatformProperties getSPlatformProperties() {
