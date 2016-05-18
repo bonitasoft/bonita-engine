@@ -28,6 +28,7 @@ import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -293,7 +294,6 @@ public class ProfilesImporter {
     }
 
     public static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
-        //FIXME store md5 somewhere in database? or just check everytime?
-        return null;
+        return BonitaHomeServer.getInstance().getTenantStorage().getProfileMD5(tenantId);
     }
 }

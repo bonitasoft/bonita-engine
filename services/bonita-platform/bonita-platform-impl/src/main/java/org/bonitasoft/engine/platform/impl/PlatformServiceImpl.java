@@ -240,6 +240,7 @@ public class PlatformServiceImpl implements PlatformService {
             stmt.executeBatch();
             connection.commit();
         } catch (final SQLException sqe) {
+            logger.log(getClass(), TechnicalLogSeverity.ERROR, "Error while executing sql batch: " + sqe.getNextException().getMessage());
             connection.rollback();
             throw sqe;
         } finally {
