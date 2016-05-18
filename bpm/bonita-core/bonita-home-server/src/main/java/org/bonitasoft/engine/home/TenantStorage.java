@@ -41,11 +41,22 @@ public class TenantStorage {
     }
 
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
-        Folder tenantWorkFolder = FolderMgr.getTenantWorkFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
-        createFolders(tenantWorkFolder);
+        Folder tenantWorkFolder = getTenantWorkFolder(tenantId);
         final File incidentFile = tenantWorkFolder.getFile("incidents.log");
         return new FileHandler(incidentFile.getAbsolutePath());
 
+    }
+
+    public File getProfileMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
+        Folder tenantWorkFolder = getTenantWorkFolder(tenantId);
+        return tenantWorkFolder.getFile("profiles.md5");
+
+    }
+
+    private Folder getTenantWorkFolder(long tenantId) throws IOException, BonitaHomeNotSetException {
+        Folder tenantWorkFolder = FolderMgr.getTenantWorkFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+        createFolders(tenantWorkFolder);
+        return tenantWorkFolder;
     }
 
 }
