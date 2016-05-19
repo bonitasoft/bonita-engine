@@ -13,15 +13,6 @@
  */
 package org.bonitasoft.engine.core.form.impl;
 
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_ACTOR_INITIATOR;
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_ADMIN;
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_INVOLVED_IN_PROCESS_INSTANCE;
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_PROCESS_INITIATOR;
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_PROCESS_OWNER;
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_TASK_AVAILABLE_FOR_USER;
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_TASK_PERFORMER;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +24,7 @@ import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.form.AuthorizationRuleMapping;
 import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
@@ -88,10 +80,12 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final String legacyUrlAdapter;
     private final Map<FormMappingType, List<String>> authorizationRulesMap;
     private QueriableLoggerService queriableLoggerService;
+    private final AuthorizationRuleMapping authorizationRuleMapping;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
             ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService,
-            FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter, QueriableLoggerService queriableLoggerService) {
+            FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter,
+            QueriableLoggerService queriableLoggerService, AuthorizationRuleMapping authorizationRuleMapping) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -102,12 +96,13 @@ public class FormMappingServiceImpl implements FormMappingService {
         this.externalUrlAdapter = externalUrlAdapter;
         this.legacyUrlAdapter = legacyUrlAdapter;
         this.queriableLoggerService = queriableLoggerService;
+        this.authorizationRuleMapping = authorizationRuleMapping;
 
         authorizationRulesMap = new HashMap<>(3);
-        authorizationRulesMap.put(FormMappingType.PROCESS_START, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
-        authorizationRulesMap.put(FormMappingType.PROCESS_OVERVIEW,
-                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE));
-        authorizationRulesMap.put(FormMappingType.TASK, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_TASK_AVAILABLE_FOR_USER));
+        authorizationRulesMap.put(FormMappingType.PROCESS_START, authorizationRuleMapping.getProcessStartRuleKeys());
+        authorizationRulesMap.put(FormMappingType.TASK, authorizationRuleMapping.getTaskRuleKeys());
+        authorizationRulesMap.put(FormMappingType.PROCESS_OVERVIEW, authorizationRuleMapping.getProcessOverviewRuleKeys());
+
     }
 
     @Override
