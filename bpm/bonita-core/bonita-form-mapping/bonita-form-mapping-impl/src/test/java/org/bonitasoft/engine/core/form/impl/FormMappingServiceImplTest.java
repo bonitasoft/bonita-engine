@@ -47,6 +47,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -81,13 +82,16 @@ public class FormMappingServiceImplTest {
     @Captor
     private ArgumentCaptor<UpdateRecord> updateRecordCaptor;
 
+    @Spy
+    private AuthorizationRuleMappingImpl authorizationRuleMapping;
+
     @InjectMocks
     private FormMappingServiceImpl formMappingService;
 
     @Before
     public void before() throws Exception {
         formMappingService = new FormMappingServiceImpl(recorder, persistenceService, sessionService, sessionAccessor, pageMappingService, pageService,
-                formMappingKeyGenerator, EXTERNAL, LEGACY, queriableLoggerService);
+                formMappingKeyGenerator, EXTERNAL, LEGACY, queriableLoggerService, authorizationRuleMapping);
         doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
         doReturn(new SPageImpl("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
     }
@@ -100,6 +104,7 @@ public class FormMappingServiceImplTest {
 
         verifyZeroInteractions(pageMappingService);
     }
+
     @Test
     public void createFormMapping_with_none_should_create_empty_form_mapping() throws Exception {
         doReturn("mockedKey").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "someHumanTask", 84);
@@ -136,7 +141,6 @@ public class FormMappingServiceImplTest {
         verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
     }
 
-
     @Test
     public void createLegacyFormShouldNotAddCorrectAuthorizations() throws Exception {
         doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId());
@@ -166,7 +170,7 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.getNumberOfFormMappings(queryOptions);
 
-        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Test
@@ -174,7 +178,7 @@ public class FormMappingServiceImplTest {
         formMappingService.get("theKey");
 
         verify(persistenceService).selectOne(
-                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object>singletonMap("key", "theKey"), SFormMapping.class));
+                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object> singletonMap("key", "theKey"), SFormMapping.class));
     }
 
     @Test
@@ -182,7 +186,7 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.searchFormMappings(queryOptions);
 
-        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Test
@@ -192,7 +196,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "http://fake.url", null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_URL), entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_URL), entry("pageMapping.url", "http://fake.url"),
+                entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", EXTERNAL));
     }
 
@@ -203,7 +208,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, null, null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_NONE),entry("pageMapping.url", null), entry("pageMapping.pageId", null),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_NONE), entry("pageMapping.url", null),
+                entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", null));
     }
 
@@ -222,7 +228,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, null, PAGE_ID);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_INTERNAL),entry("pageMapping.url", null), entry("pageMapping.pageId", PAGE_ID),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_INTERNAL), entry("pageMapping.url", null),
+                entry("pageMapping.pageId", PAGE_ID),
                 entry("pageMapping.urlAdapter", null));
     }
 
