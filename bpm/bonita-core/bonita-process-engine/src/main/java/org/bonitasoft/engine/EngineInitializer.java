@@ -29,7 +29,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * 
  * Initialize the engine and create/start or not the platform based on bonita-platform.xml
  * properties used are:
  * platform.create -- create the platform on startup
@@ -37,7 +36,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * node.stop -- stop the platform (node) on shutdown
  *
  * @author Baptiste Mesta
- * 
  */
 public class EngineInitializer {
 
@@ -89,12 +87,9 @@ public class EngineInitializer {
             try {
                 // initialization of the platform
                 try {
-                    LOGGER.log(Level.INFO, "Initializing platform...");
                     initPlatform(platformAPI);
-                    LOGGER.log(Level.INFO, "Platform initialized successfully.");
                 } catch (final Exception e) {
                     LOGGER.log(Level.INFO, "Platform is already initialized.", e);
-                    // platform is already initialized.
                 }
                 // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to
                 // start
@@ -140,8 +135,9 @@ public class EngineInitializer {
 
     protected void initPlatform(final PlatformAPI platformAPI) throws Exception {
         if (platformProperties.shouldCreatePlatform()) {
-            LOGGER.log(Level.INFO, "Creating platform...");
-            platformManager.initializePlatform(platformAPI);
+            if (platformManager.initializePlatform(platformAPI)) {
+                LOGGER.log(Level.INFO, "Platform initialized successfully");
+            }
         }
     }
 
