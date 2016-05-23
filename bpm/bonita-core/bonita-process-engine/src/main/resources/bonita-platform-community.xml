@@ -59,10 +59,10 @@
     </bean>
 
     <bean id="servicesResolver" class="org.bonitasoft.engine.service.ServicesResolver">
-        <constructor-arg name="servicesLookup" ref="servicesLookup"/>
+        <constructor-arg name="servicesLookup" ref="servicesLookup" />
     </bean>
 
-    <bean id="servicesLookup" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver"/>
+    <bean id="servicesLookup" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
 
     <bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
         <constructor-arg name="props" ref="quartzProperties" />
@@ -382,6 +382,11 @@
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
         <constructor-arg name="sequenceId" value="26" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.26:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SIconImpl" />
+        <constructor-arg name="sequenceId" value="27" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.27:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
@@ -928,6 +933,7 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
                 <!-- archived process instance -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="ap" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="aa" />
@@ -973,6 +979,7 @@
                 <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="custom_usr_inf_val" />
                 <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
                 <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
+                <entry key="org.bonitasoft.engine.identity.model.SIcon" value="icon" />
                 <!-- external identity -->
                 <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
                 <!-- document -->
@@ -1158,6 +1165,7 @@
                 <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" />
                 <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
                 <entry key="org.bonitasoft.engine.identity.model.SUserLogin" value="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SIcon" value="org.bonitasoft.engine.identity.model.impl.SIconImpl" />
                 <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
                 <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
                 <entry key="org.bonitasoft.engine.scheduler.model.SJobDescriptor" value="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" />
