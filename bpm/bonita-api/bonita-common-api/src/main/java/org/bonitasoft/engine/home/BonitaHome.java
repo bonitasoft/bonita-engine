@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.home;
 
-import java.io.File;
-
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-
 /**
  * Utility class to retrieve the bonita home based on the system property <code>bonita.home</code>
  * <p>
@@ -30,35 +26,5 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 public abstract class BonitaHome {
 
     public static final String BONITA_HOME = "bonita.home";
-
-    private String home;
-
-    /**
-     * @return the path to the bonita home
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public final String getBonitaHomeFolderPath() throws BonitaHomeNotSetException {
-        if (this.home == null) {// once set bonita home will never change
-            String path = System.getProperty(BONITA_HOME);
-            if (path == null || path.isEmpty()) {
-                throw new BonitaHomeNotSetException("You need to set the system property: " + BONITA_HOME);
-            }
-            path = path.trim();
-            if (path.charAt(path.length() - 1) == File.separatorChar) {
-                path = path.substring(0, path.length() - 1);
-            }
-            this.home = path;
-        }
-        return this.home;
-    }
-
-    File getBonitaHomeFolder() throws BonitaHomeNotSetException {
-        return new File(getBonitaHomeFolderPath());
-    }
-
-    protected abstract void refresh();
-
 
 }
