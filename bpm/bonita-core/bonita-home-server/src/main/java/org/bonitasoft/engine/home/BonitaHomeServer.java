@@ -50,16 +50,15 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
  * @author Charles Souillard
  * @since 6.0.0
  */
-public class BonitaHomeServer extends BonitaHome {
+public class BonitaHomeServer {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
     private final TenantStorage tenantStorage;
     private ConfigurationService configurationService;
-    private String version;
 
     private BonitaHomeServer() {
-        tenantStorage = new TenantStorage(this);
+        tenantStorage = new TenantStorage();
     }
 
     BonitaHomeServer(ConfigurationService configurationService) {
@@ -153,28 +152,6 @@ public class BonitaHomeServer extends BonitaHome {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    /**
-     * get the version of the bonita home
-     *
-     * @return the version of the bonita home
-     */
-    public String getVersion() {
-        if (version == null) {
-            File versionFile = null;
-            try {
-                versionFile = FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("VERSION");
-                version = IOUtil.read(versionFile);
-            } catch (Exception e) {
-                throw new IllegalStateException("Error while reading file" + versionFile, e);
-            }
-        }
-        return version;
-    }
-
-    @Override
-    protected void refresh() {
     }
 
     /*

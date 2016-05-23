@@ -16,6 +16,7 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.logging.FileHandler;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -27,11 +28,10 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
  */
 public class TenantStorage {
 
-    private final BonitaHomeServer bonitaHomeServer;
+    static final String INCIDENT_LOG_FOLDER_PROPERTY = "org.bonitasoft.engine.incident.folder";
+    public static final String INCIDENTS_LOG_FILENAME = "incidents.log";
 
-    public TenantStorage(BonitaHomeServer bonitaHomeServer) {
-
-        this.bonitaHomeServer = bonitaHomeServer;
+    TenantStorage() {
     }
 
     private void createFolders(Folder current) {
@@ -41,20 +41,28 @@ public class TenantStorage {
     }
 
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
-        Folder tenantWorkFolder = getTenantWorkFolder(tenantId);
-        final File incidentFile = tenantWorkFolder.getFile("incidents.log");
-        return new FileHandler(incidentFile.getAbsolutePath());
+        final String incidentLogFolder = System.getProperty(INCIDENT_LOG_FOLDER_PROPERTY);
+        if (incidentLogFolder != null) {
+            return getFileHandler(Paths.get(incidentLogFolder).resolve(INCIDENTS_LOG_FILENAME).toString());
+        } else {
+            Folder tenantWorkFolder = getTenantTempFolder(tenantId);
+            final File incidentFile = tenantWorkFolder.getFile(INCIDENTS_LOG_FILENAME);
+            return getFileHandler(incidentFile.getAbsolutePath());
+        }
+    }
 
+    FileHandler getFileHandler(String incidentFileAbsolutePath) throws IOException {
+        return new FileHandler(incidentFileAbsolutePath);
     }
 
     public File getProfileMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
-        Folder tenantWorkFolder = getTenantWorkFolder(tenantId);
+        Folder tenantWorkFolder = getTenantTempFolder(tenantId);
         return tenantWorkFolder.getFile("profiles.md5");
 
     }
 
-    private Folder getTenantWorkFolder(long tenantId) throws IOException, BonitaHomeNotSetException {
-        Folder tenantWorkFolder = FolderMgr.getTenantWorkFolder(bonitaHomeServer.getBonitaHomeFolder(), tenantId);
+    Folder getTenantTempFolder(long tenantId) throws IOException, BonitaHomeNotSetException {
+        Folder tenantWorkFolder = FolderMgr.getTenantTempFolder(tenantId);
         createFolders(tenantWorkFolder);
         return tenantWorkFolder;
     }

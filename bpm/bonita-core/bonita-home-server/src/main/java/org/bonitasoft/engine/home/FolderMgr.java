@@ -18,14 +18,6 @@ class FolderMgr {
         return new Folder(baseFolder, subFolder);
     }
 
-    private static Folder getServerFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(bonitaHomeFolder, "engine-server");
-    }
-
-    private static Folder getWorkFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getServerFolder(bonitaHomeFolder), "work");
-    }
-
     private static Folder getTempFolder() throws IOException {
         final Folder tempFolder = getFolder(new File(System.getProperty("java.io.tmpdir")), "bonita_tmp_" + getJvmName());
         if (!tempFolder.exists()) {
@@ -34,24 +26,16 @@ class FolderMgr {
         return tempFolder;
     }
 
-    static Folder getPlatformWorkFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getWorkFolder(bonitaHomeFolder), "platform");
-    }
-
     static Folder getPlatformTempFolder() throws IOException {
         return getFolder(getTempFolder(), "platform").createIfNotExists();
     }
 
-    static Folder getTenantsWorkFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getWorkFolder(bonitaHomeFolder), "tenants");
+    static Folder getTenantsWorkFolder(final File parentFolder) throws IOException {
+        return getFolder(parentFolder, "tenants");
     }
 
-    static Folder getTenantWorkFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
-        return getFolder(getTenantsWorkFolder(bonitaHomeFolder), Long.toString(tenantId));
-    }
-
-    static Folder getTenantWorkSecurityFolder(File bonitaHomeFolder, long tenantId) throws IOException {
-        return getFolder(getTenantWorkFolder(bonitaHomeFolder, tenantId), "security-scripts");
+    static Folder getTenantTempFolder(long tenantId) throws IOException {
+        return getFolder(getTenantsWorkFolder(getTempFolder().getFile()), Long.toString(tenantId));
     }
 
     private static Folder getPlatformClassLoaderFolder() throws IOException {
