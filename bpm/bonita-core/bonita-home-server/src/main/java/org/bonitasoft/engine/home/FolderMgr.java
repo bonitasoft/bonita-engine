@@ -19,7 +19,7 @@ class FolderMgr {
     }
 
     private static Folder getTempFolder() throws IOException {
-        final Folder tempFolder = getFolder(new File(System.getProperty("java.io.tmpdir")), "bonita_tmp_" + getJvmName());
+        final Folder tempFolder = getFolder(new File(System.getProperty("java.io.tmpdir")), "bonita_engine_" + getJvmName());
         if (!tempFolder.exists()) {
             tempFolder.createAsTemporaryFolder();
         }
