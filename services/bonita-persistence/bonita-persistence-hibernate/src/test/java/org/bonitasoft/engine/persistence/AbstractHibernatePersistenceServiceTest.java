@@ -36,7 +36,6 @@ public class AbstractHibernatePersistenceServiceTest {
         // We can't call the constructor as Hibernate currently tries to instantiate a Connection
         doCallRealMethod().when(persistenceService).buildLikeClauseForOneFieldOneTerm(Mockito.any(StringBuilder.class), anyString(), anyString(), anyBoolean());
         doCallRealMethod().when(persistenceService).buildLikeEscapeClause(anyString(), anyString(), anyString());
-        doCallRealMethod().when(persistenceService).escapeTerm(anyString());
         doReturn("#").when(persistenceService).getLikeEscapeCharacter();
 
         final StringBuilder queryBuilder = new StringBuilder();
@@ -50,7 +49,6 @@ public class AbstractHibernatePersistenceServiceTest {
         // We can't call the constructor as Hibernate currently tries to instantiate a Connection
         doCallRealMethod().when(persistenceService).buildLikeClauseForOneFieldOneTerm(Mockito.any(StringBuilder.class), anyString(), anyString(), anyBoolean());
         doCallRealMethod().when(persistenceService).buildLikeEscapeClause(anyString(), anyString(), anyString());
-        doCallRealMethod().when(persistenceService).escapeTerm(anyString());
         doReturn("#").when(persistenceService).getLikeEscapeCharacter();
 
         final StringBuilder queryBuilder = new StringBuilder();
@@ -60,14 +58,15 @@ public class AbstractHibernatePersistenceServiceTest {
     }
 
     @Test
-    public void should_escapeString_escape_quote(){
+    public void should_escapeString_escape_quote() {
         doCallRealMethod().when(persistenceService).escapeString(anyString());
         final String s = persistenceService.escapeString("toto'toto");
 
         assertThat(s).isEqualTo("toto''toto");
     }
+
     @Test
-    public void should_escapeString_do_not_escape_like_wildcard(){
+    public void should_escapeString_do_not_escape_like_wildcard() {
         doCallRealMethod().when(persistenceService).escapeString(anyString());
         final String s = persistenceService.escapeString("%to'to%t_oto%");
 
