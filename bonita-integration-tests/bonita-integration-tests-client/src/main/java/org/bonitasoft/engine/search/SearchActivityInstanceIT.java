@@ -1211,7 +1211,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step#1a", ACTOR_NAME).addUserTask("step#1_b", ACTOR_NAME)
                 .addUserTask("step#1_c", ACTOR_NAME).addUserTask("%step#2", ACTOR_NAME).addUserTask("mystep3", ACTOR_NAME).addUserTask("%step#4_a", ACTOR_NAME)
-                .getProcess();
+                .addUserTask("step:5", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -1221,6 +1221,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         waitForUserTask(processInstance, "%step#2");
         waitForUserTask(processInstance, "mystep3");
         waitForUserTask(processInstance, "%step#4_a");
+        waitForUserTask(processInstance, "step:5");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -1246,6 +1247,14 @@ public class SearchActivityInstanceIT extends TestWithUser {
         assertEquals(2, searchHumanTaskInstancesWithPercentageCharacter.getCount());
         tasks = searchHumanTaskInstancesWithPercentageCharacter.getResult();
         assertThat(tasks, nameAre("%step#2", "%step#4_a"));
+
+        builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        builder.searchTerm("step:5");
+        final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithColonCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
+        assertEquals(1, searchHumanTaskInstancesWithColonCharacter.getCount());
+        tasks = searchHumanTaskInstancesWithColonCharacter.getResult();
+        assertThat(tasks, nameAre("step:5"));
 
         disableAndDeleteProcess(processDefinition);
     }
