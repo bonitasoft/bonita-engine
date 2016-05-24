@@ -22,14 +22,13 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Celine Souchet
- * 
  */
 public abstract class AbstractArchivingStrategy implements ArchivingStrategy {
 
-    protected final Map<String, Boolean> archives;
+    final Map<String, Boolean> archives;
 
-    public AbstractArchivingStrategy() {
-        archives = new HashMap<String, Boolean>();
+    AbstractArchivingStrategy() {
+        archives = new HashMap<>();
     }
 
     public AbstractArchivingStrategy(final Map<String, Boolean> archives) {
