@@ -64,6 +64,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -80,6 +81,7 @@ import org.bonitasoft.engine.identity.GroupCriterion;
 import org.bonitasoft.engine.identity.GroupNotFoundException;
 import org.bonitasoft.engine.identity.GroupUpdater;
 import org.bonitasoft.engine.identity.GroupUpdater.GroupField;
+import org.bonitasoft.engine.identity.Icon;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
@@ -107,6 +109,7 @@ import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -130,6 +133,7 @@ import org.bonitasoft.engine.identity.xml.ExportOrganization;
 import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -192,7 +196,9 @@ public class IdentityAPIImpl implements IdentityAPI {
         final SContactInfo personalContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), true);
         final SContactInfo proContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), false);
         try {
-            SUser user = identityService.createUser(sUser, personalContactInfo, proContactInfo);
+            SUser user = identityService.createUser(sUser, personalContactInfo, proContactInfo,
+                    (String) creator.getFields().get(UserCreator.UserField.ICON_FILENAME),
+                    (byte[]) creator.getFields().get(UserCreator.UserField.ICON_CONTENT));
             return ModelConvertor.toUser(user);
         } catch (final SBonitaException sbe) {
             throw new CreationException(sbe);
@@ -229,21 +235,30 @@ public class IdentityAPIImpl implements IdentityAPI {
 
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
-
         // User change
         final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater);
         // Personal data change
         final EntityUpdateDescriptor personalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getPersoContactUpdater());
         // Professional data change
         final EntityUpdateDescriptor professionalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getProContactUpdater());
+        final EntityUpdateDescriptor iconUpdater = getIconUpdater(updater);
         try {
-            SUser sUser = identityService.updateUser(userId, userUpdateDescriptor, personalDataUpdateDescriptor, professionalDataUpdateDescriptor);
+            SUser sUser = identityService.updateUser(userId, userUpdateDescriptor, personalDataUpdateDescriptor, professionalDataUpdateDescriptor, iconUpdater);
             return ModelConvertor.toUser(sUser);
         } catch (final SUserNotFoundException e) {
             throw new UserNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
+    }
+
+    private EntityUpdateDescriptor getIconUpdater(UserUpdater updater) {
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        if (updater.getFields().containsKey(UserField.ICON_CONTENT)) {
+            entityUpdateDescriptor.addField("filename", updater.getFields().get(UserField.ICON_FILENAME));
+            entityUpdateDescriptor.addField("content", updater.getFields().get(UserField.ICON_CONTENT));
+        }
+        return entityUpdateDescriptor;
     }
 
     private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor) {
@@ -268,10 +283,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                         userUpdateBuilder.updateManagerUserId((Long) field.getValue());
                         break;
                     case ICON_NAME:
-                        userUpdateBuilder.updateIconName((String) field.getValue());
                         break;
                     case ICON_PATH:
-                        userUpdateBuilder.updateIconPath((String) field.getValue());
                         break;
                     case TITLE:
                         userUpdateBuilder.updateTitle((String) field.getValue());
@@ -281,6 +294,9 @@ public class IdentityAPIImpl implements IdentityAPI {
                         break;
                     case ENABLED:
                         userUpdateBuilder.updateEnabled((Boolean) field.getValue());
+                        break;
+                    case ICON_FILENAME:
+                    case ICON_CONTENT:
                         break;
                     default:
                         throw new IllegalStateException();
@@ -483,7 +499,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public Map<Long, User> getUsers(final List<Long> userIds) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final Map<Long, User> users = new HashMap<Long, User>();
+        final Map<Long, User> users = new HashMap<>();
         try {
             final List<SUser> sUsers = identityService.getUsers(userIds);
             for (final SUser sUser : sUsers) {
@@ -499,7 +515,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public Map<String, User> getUsersByUsernames(final List<String> userNames) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final Map<String, User> users = new HashMap<String, User>();
+        final Map<String, User> users = new HashMap<>();
         try {
             final List<SUser> sUsers = identityService.getUsersByUsername(userNames);
             for (final SUser sUser : sUsers) {
@@ -845,7 +861,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public Map<Long, Role> getRoles(final List<Long> roleIds) {
-        final Map<Long, Role> roles = new HashMap<Long, Role>();
+        final Map<Long, Role> roles = new HashMap<>();
         for (final Long roleId : roleIds) {
             try {
                 final Role role = getRole(roleId);
@@ -1040,7 +1056,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public Map<Long, Group> getGroups(final List<Long> groupIds) {
-        final Map<Long, Group> groups = new HashMap<Long, Group>();
+        final Map<Long, Group> groups = new HashMap<>();
         for (final Long groupId : groupIds) {
             try {
                 final Group group = getGroup(groupId);
@@ -1107,7 +1123,7 @@ public class IdentityAPIImpl implements IdentityAPI {
      */
     private void updateActorProcessDependencies(final TenantServiceAccessor tenantAccessor, final ActorMappingService actorMappingService,
             final Set<Long> removedActorIds) throws SBonitaException {
-        final Set<Long> processDefinitionIds = new HashSet<Long>(removedActorIds.size());
+        final Set<Long> processDefinitionIds = new HashSet<>(removedActorIds.size());
         for (final Long actorId : removedActorIds) {
             final GetActor getActor = new GetActor(actorMappingService, actorId);
             getActor.execute();
@@ -1306,7 +1322,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults, final UserMembershipCriterion pagingCrterion) {
+    public List<UserMembership> getUserMemberships(final long userId, final int startIndex, final int maxResults,
+            final UserMembershipCriterion pagingCrterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final IdentityService identityService = tenantAccessor.getIdentityService();
@@ -1490,5 +1507,18 @@ public class IdentityAPIImpl implements IdentityAPI {
     private SCustomUserInfoValueAPI createCustomUserInfoValueAPI() {
         return new SCustomUserInfoValueAPI(getTenantAccessor().getIdentityService(), BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class),
                 BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class));
+    }
+
+    @Override
+    public Icon getIcon(long id) throws NotFoundException {
+        try {
+            SIcon icon = getTenantAccessor().getIdentityService().getIcon(id);
+            if (icon == null) {
+                throw new NotFoundException("unable to find icon with id " + id);
+            }
+            return ModelConvertor.toIcon(icon);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
     }
 }

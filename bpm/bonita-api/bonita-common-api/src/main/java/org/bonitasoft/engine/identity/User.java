@@ -59,11 +59,13 @@ public interface User extends BonitaObject {
     /**
      * @return The user's icon name
      */
+    @Deprecated
     String getIconName();
 
     /**
      * @return The user's icon path
      */
+    @Deprecated
     String getIconPath();
 
     /**
@@ -112,5 +114,10 @@ public interface User extends BonitaObject {
     //FIXME Remove ASAP
     @Deprecated
     String getManagerUserName();
+
+    /**
+     * @return the id of the icon used as avatar
+     */
+    Long getIconId();
 
 }

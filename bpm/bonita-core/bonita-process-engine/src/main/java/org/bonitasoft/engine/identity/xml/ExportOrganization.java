@@ -76,7 +76,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
 
     @Override
     public void execute() throws SBonitaException {
-        userNames = new HashMap<Long, String>(20);
+        userNames = new HashMap<>(20);
         final List<SCustomUserInfoDefinition> customUserInfoDefinitions = getAllCustomUserInfoDefinitions();
         final List<ExportedUser> users = getAllUsers(getUserInfoDefinitionNames(customUserInfoDefinitions));
 
@@ -84,7 +84,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         final List<Role> roles = getAllRoles();
 
         final List<SGroup> groups = getAllGroups();
-        final Map<Long, String> groupIdParentPath = new HashMap<Long, String>(groups.size());
+        final Map<Long, String> groupIdParentPath = new HashMap<>(groups.size());
         for (final SGroup group : groups) {
             groupIdParentPath.put(group.getId(), group.getParentPath());
         }
@@ -100,7 +100,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     }
 
     private static Map<Long, String> getUserInfoDefinitionNames(final List<SCustomUserInfoDefinition> userInfoDefinitions) {
-        final Map<Long, String> names = new HashMap<Long, String>(userInfoDefinitions.size());
+        final Map<Long, String> names = new HashMap<>(userInfoDefinitions.size());
         for (final SCustomUserInfoDefinition userInfoDefinition : userInfoDefinitions) {
             names.put(userInfoDefinition.getId(), userInfoDefinition.getName());
         }
@@ -125,7 +125,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     }
 
     protected List<SCustomUserInfoDefinition> getAllCustomUserInfoDefinitions() throws SIdentityException {
-        final List<SCustomUserInfoDefinition> allCustomUserInfoDefinitions = new ArrayList<SCustomUserInfoDefinition>(5);
+        final List<SCustomUserInfoDefinition> allCustomUserInfoDefinitions = new ArrayList<>(5);
         List<SCustomUserInfoDefinition> currentPage = null;
         int startIndex = 0;
         do {
@@ -138,7 +138,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
 
     private List<SUserMembership> getAllUserMemberships() throws SIdentityException {
         final long numberOfUserMemberships = identityService.getNumberOfUserMemberships();
-        final List<SUserMembership> sUserMemberships = new ArrayList<SUserMembership>();
+        final List<SUserMembership> sUserMemberships = new ArrayList<>();
         for (int startIndex = 0; startIndex < numberOfUserMemberships; startIndex = startIndex + maxResults) {
             sUserMemberships.addAll(identityService.getUserMemberships(startIndex, maxResults));
         }
@@ -148,7 +148,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     private List<SGroup> getAllGroups() throws SIdentityException {
         List<SGroup> groups;
         final long groupNumber = identityService.getNumberOfGroups();
-        groups = new ArrayList<SGroup>(getInitialListCapacity(groupNumber));
+        groups = new ArrayList<>(getInitialListCapacity(groupNumber));
         for (int startIndex = 0; startIndex < groupNumber; startIndex = startIndex + maxResults) {
             groups.addAll(identityService.getGroups(startIndex, maxResults));
         }
@@ -157,7 +157,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
 
     private List<Role> getAllRoles() throws SIdentityException {
         final long roleNumber = identityService.getNumberOfRoles();
-        final List<Role> roles = new ArrayList<Role>(getInitialListCapacity(roleNumber));
+        final List<Role> roles = new ArrayList<>(getInitialListCapacity(roleNumber));
         for (int startIndex = 0; startIndex < roleNumber; startIndex = startIndex + maxResults) {
             final List<SRole> sRoles = identityService.getRoles(startIndex, maxResults);
             roles.addAll(ModelConvertor.toRoles(sRoles));
@@ -167,7 +167,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
 
     private List<ExportedUser> getAllUsers(final Map<Long, String> userInfoDefinitionNames) throws SBonitaException {
         final long userNumber = identityService.getNumberOfUsers();
-        final List<ExportedUser> users = new ArrayList<ExportedUser>(getInitialListCapacity(userNumber));
+        final List<ExportedUser> users = new ArrayList<>(getInitialListCapacity(userNumber));
         for (int startIndex = 0; startIndex <= userNumber; startIndex = startIndex + maxResults) {
             users.addAll(getNextUsersPage(startIndex, maxResults, userInfoDefinitionNames));
         }
@@ -180,7 +180,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
 
     private List<ExportedUser> getNextUsersPage(final int startIndex, final int numberPerPage, final Map<Long, String> userInfoDefinitionNames)
             throws SBonitaException {
-        final List<ExportedUser> currentUsersPage = new ArrayList<ExportedUser>(numberPerPage);
+        final List<ExportedUser> currentUsersPage = new ArrayList<>(numberPerPage);
         final List<SUser> sUsers = identityService.getUsers(startIndex, numberPerPage);
         for (final SUser sUser : sUsers) {
             userNames.put(sUser.getId(), sUser.getUserName());
@@ -200,8 +200,6 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         clientUserbuilder.setTitle(sUser.getTitle());
         clientUserbuilder.setJobTitle(sUser.getJobTitle());
         clientUserbuilder.setCreatedBy(sUser.getCreatedBy());
-        clientUserbuilder.setIconName(sUser.getIconName());
-        clientUserbuilder.setIconPath(sUser.getIconPath());
         clientUserbuilder.setEnabled(sUser.isEnabled());
 
         setManagerInfo(managerUserName, clientUserbuilder, sUser.getManagerUserId());
@@ -221,7 +219,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     }
 
     protected List<SCustomUserInfoValue> getAllCustomUserInfoForUser(final long userId) throws SBonitaReadException {
-        final List<SCustomUserInfoValue> allValues = new ArrayList<SCustomUserInfoValue>(5);
+        final List<SCustomUserInfoValue> allValues = new ArrayList<>(5);
         int fromIndex = 0;
         List<SCustomUserInfoValue> currentPage;
         do {

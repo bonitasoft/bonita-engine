@@ -36,7 +36,7 @@ public class UserCreator implements Serializable {
      * represents the available {@link User} field
      */
     public enum UserField {
-        NAME, PASSWORD, FIRST_NAME, LAST_NAME, ICON_NAME, ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED;
+        NAME, PASSWORD, FIRST_NAME, LAST_NAME, @Deprecated ICON_NAME, @Deprecated ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<UserField, Serializable> fields;
@@ -52,11 +52,11 @@ public class UserCreator implements Serializable {
      * @param password the password of the user to create
      */
     public UserCreator(final String name, final String password) {
-        fields = new HashMap<UserField, Serializable>(5);
+        fields = new HashMap<>(5);
         fields.put(UserField.NAME, name);
         fields.put(UserField.PASSWORD, password);
-        persoFields = new HashMap<ContactDataCreator.ContactDataField, Serializable>();
-        proFields = new HashMap<ContactDataCreator.ContactDataField, Serializable>();
+        persoFields = new HashMap<>();
+        proFields = new HashMap<>();
     }
 
     /**
@@ -80,18 +80,20 @@ public class UserCreator implements Serializable {
     /**
      * @param iconName the user's icon name to create
      * @return the current {@link UserCreator}
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public UserCreator setIconName(final String iconName) {
-        fields.put(UserField.ICON_NAME, iconName);
         return this;
     }
 
     /**
      * @param iconPath the user's icon path to create
      * @return the current {@link UserCreator}
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public UserCreator setIconPath(final String iconPath) {
-        fields.put(UserField.ICON_PATH, iconPath);
         return this;
     }
 
@@ -171,6 +173,12 @@ public class UserCreator implements Serializable {
         if (creator != null && creator.getFields() != null) {
             proFields.putAll(creator.getFields());
         }
+        return this;
+    }
+
+    public UserCreator setIcon(String filename, byte[] content) {
+        fields.put(UserField.ICON_FILENAME, filename);
+        fields.put(UserField.ICON_CONTENT, content);
         return this;
     }
 

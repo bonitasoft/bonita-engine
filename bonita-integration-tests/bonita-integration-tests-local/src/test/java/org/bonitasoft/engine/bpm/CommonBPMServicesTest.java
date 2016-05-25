@@ -119,7 +119,6 @@ public class CommonBPMServicesTest {
     };
     private APISession apiSession = null;
 
-
     protected ServiceAccessorFactory getServiceAccessorFactory() {
         return ServiceAccessorFactory.getInstance();
     }
@@ -315,7 +314,8 @@ public class CommonBPMServicesTest {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SStartEventInstanceBuilderFactory.class)
                 .createNewStartEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, rootProcessInstanceId, processDefinitionId,
-                        rootProcessInstanceId, parentProcessInstanceId).done();
+                        rootProcessInstanceId, parentProcessInstanceId)
+                .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -326,7 +326,8 @@ public class CommonBPMServicesTest {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SEndEventInstanceBuilderFactory.class)
                 .createNewEndEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, rootProcessInstanceId, processDefinitionId,
-                        rootProcessInstanceId, parentProcessInstanceId).done();
+                        rootProcessInstanceId, parentProcessInstanceId)
+                .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -337,7 +338,8 @@ public class CommonBPMServicesTest {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SIntermediateCatchEventInstanceBuilderFactory.class)
                 .createNewIntermediateCatchEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, parentProcessInstanceId, processDefinitionId,
-                        rootProcessInstanceId, parentProcessInstanceId).done();
+                        rootProcessInstanceId, parentProcessInstanceId)
+                .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -348,7 +350,8 @@ public class CommonBPMServicesTest {
         final SEventInstance eventInstance = BuilderFactory
                 .get(SIntermediateThrowEventInstanceBuilderFactory.class)
                 .createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId, processInstanceId, processDefinitionId,
-                        processInstanceId, parentProcessInstanceId).done();
+                        processInstanceId, parentProcessInstanceId)
+                .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -503,8 +506,6 @@ public class CommonBPMServicesTest {
         userBuilder.setCreationDate(6);
         userBuilder.setEnabled(true);
         userBuilder.setFirstName(firstName);
-        userBuilder.setIconName("iconName");
-        userBuilder.setIconPath("iconPath");
         userBuilder.setJobTitle("jobTitle");
         userBuilder.setLastName(lastName);
         userBuilder.setLastUpdate(4L);

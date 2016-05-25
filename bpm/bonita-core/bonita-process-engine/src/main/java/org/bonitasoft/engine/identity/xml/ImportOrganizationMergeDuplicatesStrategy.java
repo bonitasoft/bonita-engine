@@ -213,8 +213,6 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     protected EntityUpdateDescriptor getUserDescriptor(final ExportedUser user) {
         final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
         userUpdateBuilder.updateFirstName(user.getFirstName());
-        userUpdateBuilder.updateIconName(user.getIconName());
-        userUpdateBuilder.updateIconPath(user.getIconPath());
         userUpdateBuilder.updateJobTitle(user.getJobTitle());
         userUpdateBuilder.updateLastName(user.getLastName());
         userUpdateBuilder.updateManagerUserId(user.getManagerUserId());

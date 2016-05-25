@@ -41,10 +41,6 @@ public interface SUser extends PersistentObject {
      */
     long getManagerUserId();
 
-    String getIconName();
-
-    String getIconPath();
-
     long getCreationDate();
 
     long getCreatedBy();
@@ -54,5 +50,7 @@ public interface SUser extends PersistentObject {
     SUserLogin getSUserLogin();
 
     boolean isEnabled();
+
+    Long getIconId();
 
 }

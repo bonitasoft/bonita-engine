@@ -19,6 +19,7 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -1227,7 +1228,7 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor personalDataUpdateDescriptor,
-            EntityUpdateDescriptor professionalDataUpdateDescriptor) throws SIdentityException;
+            EntityUpdateDescriptor professionalDataUpdateDescriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException;
 
     /**
      * create a new user in database along with its contact data
@@ -1235,8 +1236,20 @@ public interface IdentityService {
      * @param sUser the user to persist
      * @param personalContactInfo its personal contact info
      * @param proContactInfo its professional contact info
+     * @param iconFilename original name of the icon, used to determine the mime type
+     * @param iconContent content of the icon
      * @return the user persisted
      * @throws SUserCreationException
      */
-    SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo) throws SUserCreationException;
+    SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo, String iconFilename, byte[] iconContent)
+            throws SUserCreationException;
+
+    /**
+     * get the icon using its id
+     * 
+     * @param id id of the icon
+     * @return the icon
+     * @throws SBonitaReadException
+     */
+    SIcon getIcon(long id) throws SBonitaReadException;
 }
