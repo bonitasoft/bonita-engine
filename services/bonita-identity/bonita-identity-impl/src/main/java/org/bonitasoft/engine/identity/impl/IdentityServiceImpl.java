@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.MimetypesFileTypeMap;
+
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
@@ -51,6 +53,7 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
@@ -69,6 +72,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
+import org.bonitasoft.engine.identity.model.impl.SIconImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
@@ -78,6 +82,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -106,6 +111,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class IdentityServiceImpl implements IdentityService {
 
+    private static final MimetypesFileTypeMap MIMETYPES_FILE_TYPE_MAP = new MimetypesFileTypeMap();
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -117,6 +123,13 @@ public class IdentityServiceImpl implements IdentityService {
     private final EventService eventService;
 
     private final CredentialsEncrypter encrypter;
+
+    static {
+        //on jdk 8 there is no png by default in mime types
+        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/png\t\tpng PNG");
+        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/gif\t\tgif GIF");
+        MIMETYPES_FILE_TYPE_MAP.addMimeTypes("image/jpeg\t\tjpeg jpg jpe JPG");
+    }
 
     public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
             final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final CredentialsEncrypter encrypter) {
@@ -384,7 +397,7 @@ public class IdentityServiceImpl implements IdentityService {
         return logBuilder;
     }
 
-    private SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
+    SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
         final SUserLogBuilder logBuilder = BuilderFactory.get(SUserLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
@@ -482,9 +495,24 @@ public class IdentityServiceImpl implements IdentityService {
         SUser user;
         try {
             user = getUser(userId);
+            if (user.getIconId() != null) {
+                deleteIcon(user.getIconId());
+            }
             deleteUser(user);
         } catch (final SUserNotFoundException e) {
             // ignored, let's switch to the next one
+        }
+    }
+
+    private void deleteIcon(Long iconId) throws SUserDeletionException {
+        try {
+            SIcon icon = getIcon(iconId);
+            if (icon == null) {
+                return;
+            }
+            recorder.recordDelete(new DeleteRecord(icon), null);
+        } catch (SRecorderException | SBonitaReadException e) {
+            throw new SUserDeletionException(e);
         }
     }
 
@@ -1441,9 +1469,12 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor personalDataUpdateDescriptor,
-            EntityUpdateDescriptor professionalDataUpdateDescriptor) throws SIdentityException {
+            EntityUpdateDescriptor professionalDataUpdateDescriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
         // User change
         SUser sUser = getUser(userId);
+        if (iconUpdater.getFields().containsKey("content")) {
+            updateOrRemoveIcon(userUpdateDescriptor, iconUpdater, sUser);
+        }
         if (userUpdateDescriptor != null && !userUpdateDescriptor.getFields().isEmpty()) {
             updateUser(sUser, userUpdateDescriptor);
     }
@@ -1470,8 +1501,32 @@ public class IdentityServiceImpl implements IdentityService {
         return sUser;
     }
 
+    private void updateOrRemoveIcon(EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor iconUpdater, SUser sUser) throws SIdentityException {
+        byte[] content = (byte[]) iconUpdater.getFields().get("content");
+        if (content != null) {
+            updateIcon(sUser.getIconId(), (String) iconUpdater.getFields().get("filename"), content, userUpdateDescriptor);
+        } else {
+            removeIcon(userUpdateDescriptor, sUser);
+        }
+    }
+
+    private void removeIcon(EntityUpdateDescriptor userUpdateDescriptor, SUser sUser) throws SUserDeletionException {
+        Long iconId = sUser.getIconId();
+        if (iconId != null) {
+
+            deleteIcon(iconId);
+            userUpdateDescriptor.addField("iconId", null);
+
+        }
+    }
+
     @Override
-    public SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo) throws SUserCreationException {
+    public SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo, String iconFilename, byte[] iconContent)
+            throws SUserCreationException {
+        if (iconFilename != null && iconContent != null) {
+            SIcon icon = createIcon(iconFilename, iconContent);
+            ((SUserImpl) sUser).setIconId(icon.getId());
+        }
         SUser user = createUser(sUser);
         if (personalContactInfo != null) {
             createUserContactInfo(BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(personalContactInfo).setUserId(user.getId()).done());
@@ -1480,5 +1535,45 @@ public class IdentityServiceImpl implements IdentityService {
             createUserContactInfo(BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(proContactInfo).setUserId(user.getId()).done());
         }
         return user;
+    }
+
+    private void updateIcon(Long iconId, String iconFilename, byte[] iconContent, EntityUpdateDescriptor userUpdateDescriptor) throws SIdentityException {
+        try {
+            if (iconId == null) {
+                SIcon newIcon = createIcon(iconFilename, iconContent);
+                userUpdateDescriptor.addField("iconId", newIcon.getId());
+            } else {
+                SIcon icon = getIcon(iconId);
+                HashMap<String, Object> fields = new HashMap<>();
+                fields.put("mimeType", getContentType(iconFilename));
+                fields.put("content", iconContent);
+                recorder.recordUpdate(UpdateRecord.buildSetFields(icon, fields), null);
+            }
+        } catch (SBonitaReadException | SRecorderException e) {
+            throw new SIdentityException(e);
+        }
+
+    }
+
+    private SIcon createIcon(String iconFilename, byte[] iconContent) throws SUserCreationException {
+        try {
+            SIconImpl entity = new SIconImpl(getContentType(iconFilename), iconContent);
+            recorder.recordInsert(new InsertRecord(entity), null);
+            return entity;
+        } catch (SRecorderException e) {
+            throw new SUserCreationException(e);
+        }
+    }
+
+    private String getContentType(String iconFilename) {
+        if (iconFilename == null) {
+            return "image/png";
+        }
+        return MIMETYPES_FILE_TYPE_MAP.getContentType(iconFilename);
+    }
+
+    @Override
+    public SIcon getIcon(long id) throws SBonitaReadException {
+        return persistenceService.selectById(new SelectByIdDescriptor<>(SIcon.class, id));
     }
 }

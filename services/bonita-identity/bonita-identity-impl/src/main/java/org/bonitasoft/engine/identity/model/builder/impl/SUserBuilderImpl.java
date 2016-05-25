@@ -81,18 +81,6 @@ public class SUserBuilderImpl implements SUserBuilder {
     }
 
     @Override
-    public SUserBuilder setIconName(final String iconName) {
-        entity.setIconName(iconName);
-        return this;
-    }
-
-    @Override
-    public SUserBuilder setIconPath(final String iconPath) {
-        entity.setIconPath(iconPath);
-        return this;
-    }
-
-    @Override
     public SUserBuilder setLastUpdate(final long lastUpdate) {
         entity.setLastUpdate(lastUpdate);
         return this;
@@ -115,4 +103,11 @@ public class SUserBuilderImpl implements SUserBuilder {
         entity.setEnabled(enabled);
         return this;
     }
+
+    @Override
+    public SUserBuilder setIconId(Long iconId) {
+        entity.setIconId(iconId);
+        return this;
+    }
+
 }

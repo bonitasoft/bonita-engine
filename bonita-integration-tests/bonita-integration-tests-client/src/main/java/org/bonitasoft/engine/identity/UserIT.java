@@ -30,8 +30,10 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -40,9 +42,14 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class UserIT extends TestWithTechnicalUser {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     /**
      * This test is here for arbitrary reason: it has to be tested on ANY API call.
@@ -270,7 +277,7 @@ public class UserIT extends TestWithTechnicalUser {
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(userCreated1.getId());
         userIds.add(userCreated2.getId());
 
@@ -291,7 +298,7 @@ public class UserIT extends TestWithTechnicalUser {
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(userCreated1.getId());
         userIds.add(userCreated2.getId() + 100);
 
@@ -365,7 +372,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void deleteUsers() throws BonitaException {
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(getIdentityAPI().createUser("user1", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user2", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user3", "engine").getId());
@@ -383,7 +390,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void deleteUsersDeleteAllExistingOnesAndIgnoresOthers() throws BonitaException {
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(getIdentityAPI().createUser("user1", "engine").getId());
         userIds.add(getIdentityAPI().createUser("user2", "engine").getId());
         userIds.add(152458L);
@@ -429,8 +436,6 @@ public class UserIT extends TestWithTechnicalUser {
         assertNotNull(updatedUser);
         assertEquals("new_user_name", updatedUser.getUserName());
         assertEquals("Changed first name", updatedUser.getFirstName());
-        assertEquals("new icon name", updatedUser.getIconName());
-        assertEquals("new_icon_path", updatedUser.getIconPath());
         assertEquals("New job title", updatedUser.getJobTitle());
         assertEquals("Modified Last name", updatedUser.getLastName());
         assertEquals(12354L, updatedUser.getManagerUserId());
@@ -690,7 +695,7 @@ public class UserIT extends TestWithTechnicalUser {
             "Column not unique" }, jira = "ENGINE-1557")
     @Test
     public void searchUser() throws BonitaException {
-        final List<User> users = new ArrayList<User>();
+        final List<User> users = new ArrayList<>();
         users.add(getIdentityAPI().createUser("jgrGF[|00", "bpm", "John", "Taylor"));
         users.add(getIdentityAPI().createUser("45èDG'fgb", "bpm", "Jack", "Jack"));
         users.add(getIdentityAPI().createUser("à\"(èg", "bpm", "John", "Smith"));
@@ -737,7 +742,7 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void searchUserSortedById() throws BonitaException {
-        final List<User> users = new ArrayList<User>();
+        final List<User> users = new ArrayList<>();
         users.add(getIdentityAPI().createUser("jgrGF[|00", "bpm", "John", "Taylor"));
         users.add(getIdentityAPI().createUser("user02", "bpm", "Pierre", "Smith"));
         users.add(getIdentityAPI().createUser("User00", "bpm", "Marie", "Taylor"));
@@ -977,13 +982,13 @@ public class UserIT extends TestWithTechnicalUser {
 
     @Test
     public void getUsersFromIdsShouldReturnUsersInTheRightOrder() throws BonitaException {
-        final List<User> expectedUsers = new ArrayList<User>();
+        final List<User> expectedUsers = new ArrayList<>();
         expectedUsers.add(getIdentityAPI().createUser("zhao", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("qian", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("sun", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("li", "engine"));
         expectedUsers.add(getIdentityAPI().createUser("zhou", "engine"));
-        final List<Long> userIds = new ArrayList<Long>(5);
+        final List<Long> userIds = new ArrayList<>(5);
         userIds.add(expectedUsers.get(4).getId());
         userIds.add(expectedUsers.get(0).getId());
         userIds.add(expectedUsers.get(2).getId());
@@ -1021,7 +1026,7 @@ public class UserIT extends TestWithTechnicalUser {
         final User matti = getIdentityAPI().createUser("matti", "bpm");
         final User jani = getIdentityAPI().createUser("jani", "bpm");
 
-        final List<String> userNames = new ArrayList<String>(3);
+        final List<String> userNames = new ArrayList<>(3);
         userNames.add("jani");
         userNames.add("liisa");
         userNames.add("matti");
@@ -1163,6 +1168,80 @@ public class UserIT extends TestWithTechnicalUser {
         assertThat(connection2).isBefore(connection3);
         assertThat(connection3).isEqualTo(connection4);
 
+    }
+
+    @Test
+    public void should_create_user_with_icon_create_the_icon() throws Exception {
+        //given
+        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
+        //when
+        Icon icon = getIdentityAPI().getIcon(user.getIconId());
+        //then
+        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", "avatarContent".getBytes()));
+        //cleanup
+        getIdentityAPI().deleteUser("userWithIcon");
+    }
+
+    @Test
+    public void should_delete_user_delete_the_icon() throws Exception {
+        //given
+        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
+        //when
+        getIdentityAPI().deleteUser(user.getId());
+        //then
+        expectedException.expect(NotFoundException.class);
+        expectedException.expectMessage("unable to find icon with id " + user.getIconId());
+        try {
+            getIdentityAPI().getIcon(user.getIconId());
+        } finally {
+            getIdentityAPI().deleteUser("userWithIcon");
+        }
+
+    }
+
+    @Test
+    public void should_update_user_create_a_new_icon() throws Exception {
+        //given
+        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword"));
+        //when
+        User updatedUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon("myFile.png", "content".getBytes()));
+        //then
+        Icon icon = getIdentityAPI().getIcon(updatedUser.getIconId());
+        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/png", "content".getBytes()));
+        //cleanup
+        getIdentityAPI().deleteUser("userWithIcon");
+    }
+
+    @Test
+    public void should_update_user_update_icon() throws Exception {
+        //given
+        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.png", "avatarContent".getBytes()));
+        Icon icon = getIdentityAPI().getIcon(user.getIconId());
+        //when
+        User updatedUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon("myFile.jpg", "content".getBytes()));
+        //then
+        Icon newIcon = getIdentityAPI().getIcon(updatedUser.getIconId());
+        assertThat(newIcon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", "content".getBytes()));
+        //cleanup
+        getIdentityAPI().deleteUser("userWithIcon");
+    }
+
+    @Test
+    public void should_update_user_delete_the_icon() throws Exception {
+        //given
+        User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.jpg", "avatarContent".getBytes()));
+        Icon icon = getIdentityAPI().getIcon(user.getIconId());
+        //when
+        User updateUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon(null, null));
+        //then
+        try {
+            getIdentityAPI().getIcon(icon.getId());
+            fail();
+        } catch (NotFoundException ignored) {
+        }
+        assertThat(updateUser.getIconId()).isNull();
+        //cleanup
+        getIdentityAPI().deleteUser("userWithIcon");
     }
 
 }

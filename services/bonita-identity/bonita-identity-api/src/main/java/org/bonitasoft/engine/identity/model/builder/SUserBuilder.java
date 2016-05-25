@@ -35,10 +35,6 @@ public interface SUserBuilder {
 
     SUserBuilder setJobTitle(final String jobTitle);
 
-    SUserBuilder setIconName(final String iconName);
-
-    SUserBuilder setIconPath(final String iconPath);
-
     SUserBuilder setLastUpdate(final long lastUpdate);
 
     SUserBuilder setCreatedBy(final long createdBy);
@@ -48,6 +44,8 @@ public interface SUserBuilder {
     SUserBuilder setManagerUserId(final long managerUserId);
 
     SUserBuilder setEnabled(final boolean enabled);
+
+    SUserBuilder setIconId(Long iconId);
 
     SUser done();
 

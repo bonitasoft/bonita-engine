@@ -55,11 +55,10 @@
                   column="managerUserId" />
         <property name="title" type="java.lang.String" column="title" />
         <property name="jobTitle" type="java.lang.String" column="jobTitle" />
-        <property name="iconName" type="java.lang.String" column="iconName" />
-        <property name="iconPath" type="java.lang.String" column="iconPath" />
         <property name="createdBy" type="long" column="createdBy" />
         <property name="creationDate" type="long" column="creationDate" />
         <property name="lastUpdate" type="long" column="lastUpdate" />
+        <property name="iconId" type="long" column="iconid" />
         <one-to-one name="sUserLogin" class="SUserLoginImpl" cascade="all" />
         <filter name="tenantFilter" />
     </class>

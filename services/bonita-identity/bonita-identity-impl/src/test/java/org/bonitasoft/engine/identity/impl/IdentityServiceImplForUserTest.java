@@ -13,14 +13,12 @@
  **/
 package org.bonitasoft.engine.identity.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,9 +26,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
+import org.bonitasoft.engine.identity.model.impl.SIconImpl;
+import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -38,39 +42,65 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@RunWith(MockitoJUnitRunner.class)
 public class IdentityServiceImplForUserTest {
 
+    public static final long USER_ID = 6543L;
+    public static final long ICON_ID = 5247890L;
+    @Mock
+    private CredentialsEncrypter encrypter;
     @Mock
     private Recorder recorder;
-
     @Mock
     private ReadPersistenceService persistenceService;
-
     @Mock
     private EventService eventService;
-
     @Mock
     private TechnicalLoggerService logger;
-
+    @Spy
     @InjectMocks
     private IdentityServiceImpl identityServiceImpl;
+    @Captor
+    private ArgumentCaptor<InsertRecord> insertRecordArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<DeleteRecord> deleteRecordArgumentCaptor;
+    @Mock
+    private SUserLogBuilder sUserLogBuilder;
+    @Mock
+    private SQueriableLog log;
+    @Mock
+    private QueriableLoggerService queriableLoggerService;
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        doReturn(sUserLogBuilder).when(identityServiceImpl).getUserLog(any(ActionType.class), anyString());
+        doReturn(log).when(sUserLogBuilder).done();
     }
 
     /**
@@ -276,6 +306,92 @@ public class IdentityServiceImplForUserTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(SUser.class, options, null);
 
         identityServiceImpl.searchUsers(options).get(0);
+    }
+
+    @Test
+    public void should_createUser_create_the_icon() throws Exception {
+        //given
+        SUserImpl sUser = new SUserImpl();
+        sUser.setId(6543L);
+
+        //when
+        SUser user = identityServiceImpl.createUser(sUser, null, null, "test.jpg", "iconContent".getBytes());
+        //then
+        verify(recorder, times(3)).recordInsert(insertRecordArgumentCaptor.capture(), any(SInsertEvent.class));
+        assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
+                .hasSize(3)
+                .contains(new SIconImpl("image/jpeg", "iconContent".getBytes()));
+    }
+
+    @Test
+    public void should_updateUser_create_the_icon_if_it_does_not_exists() throws Exception {
+        //given
+        haveUser();
+
+        //when
+        EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
+        iconUpdateDescriptor.addField("filename", "theNewIcon.gif");
+        iconUpdateDescriptor.addField("content", "theContent".getBytes());
+        identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
+        //then
+        verify(recorder, times(1)).recordInsert(insertRecordArgumentCaptor.capture(), any(SInsertEvent.class));
+        assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
+                .hasSize(1)
+                .contains(new SIconImpl("image/gif", "theContent".getBytes()));
+    }
+
+    @Test
+    public void should_updateUser_update_the_icon_if_it_exists() throws Exception {
+        //given
+        SUserImpl sUser = haveUser();
+        haveIcon(sUser);
+        //when
+        EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
+        iconUpdateDescriptor.addField("filename", "theNewIcon.jpg");
+        iconUpdateDescriptor.addField("content", "updated content".getBytes());
+        identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
+        //then
+        verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), any(SUpdateEvent.class));
+        assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("mimeType", "image/jpeg"),
+                entry("content", "updated content".getBytes()));
+    }
+
+    private SUserImpl haveUser() throws SUserNotFoundException {
+        SUserImpl sUser = new SUserImpl();
+        sUser.setId(USER_ID);
+        doReturn(sUser).when(identityServiceImpl).getUser(USER_ID);
+        return sUser;
+    }
+
+    @Test
+    public void should_deleteUser_delete_the_icon_if_it_exists() throws Exception {
+        //given
+        SUserImpl sUser = haveUser();
+        SIconImpl icon = haveIcon(sUser);
+        //when
+        identityServiceImpl.deleteUser(USER_ID);
+        //then
+        verify(recorder, times(2)).recordDelete(deleteRecordArgumentCaptor.capture(), any(SDeleteEvent.class));
+        assertThat(deleteRecordArgumentCaptor.getAllValues()).extracting("entity").containsOnly(sUser, icon);
+    }
+
+    @Test
+    public void should_deleteUser_not_delete_the_icon_if_it_does_not_exists() throws Exception {
+        //given
+        SUserImpl sUser = haveUser();
+        //when
+        identityServiceImpl.deleteUser(USER_ID);
+        //then
+        verify(recorder, times(1)).recordDelete(deleteRecordArgumentCaptor.capture(), any(SDeleteEvent.class));
+        assertThat(deleteRecordArgumentCaptor.getAllValues()).extracting("entity").containsOnly(sUser);
+    }
+
+    private SIconImpl haveIcon(SUserImpl sUser) throws SBonitaReadException {
+        sUser.setIconId(ICON_ID);
+        SIconImpl icon = new SIconImpl("image/gif", "theContent".getBytes());
+        doReturn(icon).when(identityServiceImpl).getIcon(ICON_ID);
+        return icon;
     }
 
 }
