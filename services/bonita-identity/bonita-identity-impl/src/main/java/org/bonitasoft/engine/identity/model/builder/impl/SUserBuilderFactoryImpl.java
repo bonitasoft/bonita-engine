@@ -51,10 +51,6 @@ public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
 
     static final String CREATION_DATE = "creationDate";
 
-    static final String ICON_NAME = "iconName";
-
-    static final String ICON_PATH = "iconPath";
-
     static final String ENABLED = "enabled";
 
     @Override
@@ -107,16 +103,6 @@ public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
     @Override
     public String getManagerUserIdKey() {
         return MANAGER_USER_ID;
-    }
-
-    @Override
-    public String getIconNameKey() {
-        return ICON_NAME;
-    }
-
-    @Override
-    public String getIconPathKey() {
-        return ICON_PATH;
     }
 
     @Override

@@ -237,6 +237,7 @@ import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
+import org.bonitasoft.engine.identity.Icon;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCreator.RoleField;
@@ -248,6 +249,7 @@ import org.bonitasoft.engine.identity.impl.ContactDataImpl;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
 import org.bonitasoft.engine.identity.impl.GroupImpl;
+import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.identity.impl.RoleImpl;
 import org.bonitasoft.engine.identity.impl.UserImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
@@ -255,6 +257,7 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
@@ -940,8 +943,7 @@ public class ModelConvertor {
         user.setJobTitle(sUser.getJobTitle());
         user.setCreatedBy(sUser.getCreatedBy());
         user.setCreationDate(new Date(sUser.getCreationDate()));
-        user.setIconName(sUser.getIconName());
-        user.setIconPath(sUser.getIconPath());
+        user.setIconId(sUser.getIconId());
         user.setLastUpdate(new Date(sUser.getLastUpdate()));
         user.setEnabled(sUser.isEnabled());
         final long managerUserId = sUser.getManagerUserId();
@@ -1389,14 +1391,6 @@ public class ModelConvertor {
         final String lastName = (String) fields.get(UserField.LAST_NAME);
         if (lastName != null) {
             userBuilder.setLastName(lastName);
-        }
-        final String iconName = (String) fields.get(UserField.ICON_NAME);
-        if (iconName != null) {
-            userBuilder.setIconName(iconName);
-        }
-        final String iconPath = (String) fields.get(UserField.ICON_PATH);
-        if (iconPath != null) {
-            userBuilder.setIconPath(iconPath);
         }
         final String jobTitle = (String) fields.get(UserField.JOB_TITLE);
         if (jobTitle != null) {
@@ -2176,5 +2170,9 @@ public class ModelConvertor {
 
     public static PageURL toPageURL(final SPageURL sPageURL) {
         return new PageURL(sPageURL.getUrl(), sPageURL.getPageId());
+    }
+
+    public static Icon toIcon(SIcon icon) {
+        return new IconImpl(icon.getId(), icon.getMimeType(), icon.getContent());
     }
 }

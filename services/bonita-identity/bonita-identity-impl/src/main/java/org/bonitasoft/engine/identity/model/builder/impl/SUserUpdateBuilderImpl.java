@@ -79,18 +79,6 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     }
 
     @Override
-    public SUserUpdateBuilder updateIconName(final String iconName) {
-        descriptor.addField(SUserBuilderFactoryImpl.ICON_NAME, iconName);
-        return this;
-    }
-
-    @Override
-    public SUserUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(SUserBuilderFactoryImpl.ICON_PATH, iconPath);
-        return this;
-    }
-
-    @Override
     public SUserUpdateBuilder updateLastUpdate(final long lastUpdate) {
         descriptor.addField(SUserBuilderFactoryImpl.LAST_UPDATE, lastUpdate);
         return this;

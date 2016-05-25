@@ -41,10 +41,6 @@ public interface SUserBuilderFactory {
 
     String getJobTitleKey();
 
-    String getIconNameKey();
-
-    String getIconPathKey();
-
     String getLastUpdateKey();
 
     String getLastConnectionKey();

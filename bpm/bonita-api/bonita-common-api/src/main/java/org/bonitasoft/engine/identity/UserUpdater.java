@@ -35,7 +35,7 @@ public class UserUpdater implements Serializable {
      * represent the available {@link User} fields
      */
     public enum UserField {
-        USER_NAME, PASSWORD, FIRST_NAME, LAST_NAME, ICON_NAME, ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED;
+        USER_NAME, PASSWORD, FIRST_NAME, LAST_NAME, @Deprecated ICON_NAME, @Deprecated ICON_PATH, TITLE, JOB_TITLE, MANAGER_ID, ENABLED, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<UserField, Serializable> fields;
@@ -48,7 +48,7 @@ public class UserUpdater implements Serializable {
      * Default Constructor.
      */
     public UserUpdater() {
-        fields = new HashMap<UserField, Serializable>(5);
+        fields = new HashMap<>(5);
     }
 
     /**
@@ -90,9 +90,10 @@ public class UserUpdater implements Serializable {
     /**
      * @param iconName the user's icon name to update
      * @return the current {@link UserUpdater} for chaining purpose
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public UserUpdater setIconName(final String iconName) {
-        fields.put(UserField.ICON_NAME, iconName);
         return this;
     }
 
@@ -108,9 +109,10 @@ public class UserUpdater implements Serializable {
     /**
      * @param iconPath the user's icon path to update
      * @return the current {@link UserUpdater} for chaining purpose
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public UserUpdater setIconPath(final String iconPath) {
-        fields.put(UserField.ICON_PATH, iconPath);
         return this;
     }
 
@@ -188,5 +190,11 @@ public class UserUpdater implements Serializable {
     public boolean hasFields() {
         return !getFields().isEmpty() || getPersoContactUpdater() != null && getPersoContactUpdater().hasFields()
                 || getProContactUpdater() != null && getProContactUpdater().hasFields();
+    }
+
+    public UserUpdater setIcon(String filename, byte[] content) {
+        fields.put(UserField.ICON_FILENAME, filename);
+        fields.put(UserField.ICON_CONTENT, content);
+        return this;
     }
 }

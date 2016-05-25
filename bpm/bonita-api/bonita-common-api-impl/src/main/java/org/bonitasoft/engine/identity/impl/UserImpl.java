@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.impl;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.bonitasoft.engine.identity.User;
 
@@ -37,9 +38,7 @@ public class UserImpl implements User {
 
     private final String userName;
 
-    private String iconName;
-
-    private String iconPath;
+    private Long iconId;
 
     private String title;
 
@@ -71,8 +70,6 @@ public class UserImpl implements User {
         firstName = user.getFirstName();
         lastName = user.getLastName();
         password = user.getPassword();
-        iconName = user.getIconName();
-        iconPath = user.getIconPath();
         title = user.getTitle();
         jobTitle = user.getJobTitle();
         creationDate = user.getCreationDate();
@@ -147,12 +144,12 @@ public class UserImpl implements User {
 
     @Override
     public String getIconName() {
-        return iconName;
+        return iconId != null ? iconId.toString() : "";
     }
 
     @Override
     public String getIconPath() {
-        return iconPath;
+        return iconId != null ? iconId.toString() : "";
     }
 
     public void setFirstName(final String firstName) {
@@ -191,14 +188,6 @@ public class UserImpl implements User {
         this.enabled = enabled;
     }
 
-    public void setIconName(final String iconName) {
-        this.iconName = iconName;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
-    }
-
     public void setManagerUserId(final long managerUserId) {
         this.managerUserId = managerUserId;
     }
@@ -218,126 +207,60 @@ public class UserImpl implements User {
     }
 
     @Override
+    public Long getIconId() {
+        return iconId;
+    }
+
+    public void setIconId(Long iconId) {
+        this.iconId = iconId;
+    }
+
+    @Override
     public String toString() {
-        return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", managerUserId=" + managerUserId + "]";
+        return "UserImpl{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", iconId=" + iconId +
+                ", title='" + title + '\'' +
+                ", jobTitle='" + jobTitle + '\'' +
+                ", creationDate=" + creationDate +
+                ", createdBy=" + createdBy +
+                ", lastUpdate=" + lastUpdate +
+                ", lastConnection=" + lastConnection +
+                ", managerUserName='" + managerUserName + '\'' +
+                ", managerUserId=" + managerUserId +
+                ", enabled=" + enabled +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserImpl user = (UserImpl) o;
+        return id == user.id &&
+                createdBy == user.createdBy &&
+                managerUserId == user.managerUserId &&
+                enabled == user.enabled &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(userName, user.userName) &&
+                Objects.equals(iconId, user.iconId) &&
+                Objects.equals(title, user.title) &&
+                Objects.equals(jobTitle, user.jobTitle) &&
+                Objects.equals(creationDate, user.creationDate) &&
+                Objects.equals(lastUpdate, user.lastUpdate) &&
+                Objects.equals(managerUserName, user.managerUserName);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
-        result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
-        result = prime * result + (enabled ? 1231 : 1237);
-        result = prime * result + (firstName == null ? 0 : firstName.hashCode());
-        result = prime * result + (iconName == null ? 0 : iconName.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (jobTitle == null ? 0 : jobTitle.hashCode());
-        result = prime * result + (lastName == null ? 0 : lastName.hashCode());
-        result = prime * result + (lastUpdate == null ? 0 : lastUpdate.hashCode());
-        result = prime * result + (int) (managerUserId ^ managerUserId >>> 32);
-        result = prime * result + (password == null ? 0 : password.hashCode());
-        result = prime * result + (title == null ? 0 : title.hashCode());
-        result = prime * result + (userName == null ? 0 : userName.hashCode());
-        return result;
+        return Objects.hash(id, firstName, lastName, password, userName, iconId, title, jobTitle, creationDate, createdBy, lastUpdate, lastConnection,
+                managerUserName, managerUserId, enabled);
     }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final UserImpl other = (UserImpl) obj;
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate == null) {
-            if (other.creationDate != null) {
-                return false;
-            }
-        } else if (!creationDate.equals(other.creationDate)) {
-            return false;
-        }
-        if (enabled != other.enabled) {
-            return false;
-        }
-        if (firstName == null) {
-            if (other.firstName != null) {
-                return false;
-            }
-        } else if (!firstName.equals(other.firstName)) {
-            return false;
-        }
-        if (iconName == null) {
-            if (other.iconName != null) {
-                return false;
-            }
-        } else if (!iconName.equals(other.iconName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (jobTitle == null) {
-            if (other.jobTitle != null) {
-                return false;
-            }
-        } else if (!jobTitle.equals(other.jobTitle)) {
-            return false;
-        }
-        if (lastName == null) {
-            if (other.lastName != null) {
-                return false;
-            }
-        } else if (!lastName.equals(other.lastName)) {
-            return false;
-        }
-        if (lastUpdate == null) {
-            if (other.lastUpdate != null) {
-                return false;
-            }
-        } else if (!lastUpdate.equals(other.lastUpdate)) {
-            return false;
-        }
-        if (managerUserId != other.managerUserId) {
-            return false;
-        }
-        if (password == null) {
-            if (other.password != null) {
-                return false;
-            }
-        } else if (!password.equals(other.password)) {
-            return false;
-        }
-        if (title == null) {
-            if (other.title != null) {
-                return false;
-            }
-        } else if (!title.equals(other.title)) {
-            return false;
-        }
-        if (userName == null) {
-            if (other.userName != null) {
-                return false;
-            }
-        } else if (!userName.equals(other.userName)) {
-            return false;
-        }
-        return true;
-    }
-
 }
