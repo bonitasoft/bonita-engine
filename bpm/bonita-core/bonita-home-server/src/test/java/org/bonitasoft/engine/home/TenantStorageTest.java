@@ -61,10 +61,12 @@ public class TenantStorageTest {
         //given
         final String newFolder = temporaryFolder.newFolder().getAbsolutePath();
         System.setProperty(TenantStorage.INCIDENT_LOG_FOLDER_PROPERTY, newFolder);
-        final String expectedIncidentFileAbsolutePath = Paths.get(newFolder).resolve(INCIDENTS_LOG_FILENAME).toString();
+        final long tenantId = 14L;
+        final String expectedIncidentFileAbsolutePath = Paths.get(newFolder).resolve("tenants").resolve("" + tenantId).resolve(INCIDENTS_LOG_FILENAME)
+                .toString();
 
         // when
-        tenantStorage.getIncidentFileHandler(14L);
+        tenantStorage.getIncidentFileHandler(tenantId);
 
         //then:
         verify(tenantStorage).getFileHandler(expectedIncidentFileAbsolutePath);

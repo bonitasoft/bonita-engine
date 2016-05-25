@@ -16,6 +16,7 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.FileHandler;
 
@@ -43,7 +44,9 @@ public class TenantStorage {
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
         final String incidentLogFolder = System.getProperty(INCIDENT_LOG_FOLDER_PROPERTY);
         if (incidentLogFolder != null) {
-            return getFileHandler(Paths.get(incidentLogFolder).resolve(INCIDENTS_LOG_FILENAME).toString());
+            final Path tenantFolder = Paths.get(incidentLogFolder).resolve("tenants").resolve("" + tenantId);
+            createFolders(new Folder(tenantFolder.toFile()));
+            return getFileHandler(tenantFolder.resolve(INCIDENTS_LOG_FILENAME).toString());
         } else {
             Folder tenantWorkFolder = getTenantTempFolder(tenantId);
             final File incidentFile = tenantWorkFolder.getFile(INCIDENTS_LOG_FILENAME);
