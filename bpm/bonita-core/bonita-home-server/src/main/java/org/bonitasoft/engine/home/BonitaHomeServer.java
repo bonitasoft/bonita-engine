@@ -37,6 +37,7 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * Utility class that handles the path to the server part of the bonita home
@@ -71,7 +72,7 @@ public class BonitaHomeServer {
     }
 
     public Properties getPlatformInitProperties() throws IOException {
-        return getAllProperties(getConfigurationService().getPlatformInitEngineConf());
+        return mergeProperties(getPropertiesFromClassPath("bonita-platform-init-community.properties"), getConfigurationService().getPlatformInitEngineConf());
     }
 
     private ConfigurationService getConfigurationService() {
@@ -86,13 +87,36 @@ public class BonitaHomeServer {
     }
 
     public Properties getPlatformProperties() throws IOException {
-        return getAllProperties(getConfigurationService().getPlatformEngineConf());
+        return mergeProperties(getPropertiesFromClassPath("bonita-platform-community.properties",
+                "bonita-platform-private-community.properties",
+                "bonita-platform-private-sp.properties",
+                "bonita-platform-sp.properties",
+                "bonita-platform-sp-cluster.properties"), getConfigurationService().getPlatformEngineConf());
     }
 
     public Properties getTenantProperties(long tenantId) throws IOException {
-        Properties allProperties = getAllProperties(getConfigurationService().getTenantEngineConf(tenantId));
+        Properties allProperties = mergeProperties(getPropertiesFromClassPath("bonita-tenant-community.properties",
+                "bonita-tenant-private-community.properties",
+                "bonita-tenant-sp.properties",
+                "bonita-tenant-sp-cluster.properties"), getConfigurationService().getTenantEngineConf(tenantId));
         allProperties.setProperty("tenantId", String.valueOf(tenantId));
         return allProperties;
+    }
+
+    public Properties getPropertiesFromClassPath(String... files) throws IOException {
+        Properties properties = new Properties();
+        for (String file : files) {
+            Properties fileProperties = new Properties();
+            ClassPathResource classPathResource = new ClassPathResource(file);
+            if (!classPathResource.exists()) {
+                continue;
+            }
+            fileProperties.load(classPathResource.getInputStream());
+            for (String property : fileProperties.stringPropertyNames()) {
+                properties.put(property, fileProperties.getProperty(property));
+            }
+        }
+        return properties;
     }
 
     public List<BonitaConfiguration> getPlatformInitConfiguration() throws IOException {
@@ -107,16 +131,15 @@ public class BonitaHomeServer {
         return getAllXmlConfiguration(getConfigurationService().getTenantEngineConf(tenantId));
     }
 
-    private Properties getAllProperties(List<BonitaConfiguration> configurationFiles) throws IOException {
-        Properties allProperties = new Properties();
+    private Properties mergeProperties(Properties mergeInto, List<BonitaConfiguration> configurationFiles) throws IOException {
         for (BonitaConfiguration bonitaConfiguration : configurationFiles) {
             if (bonitaConfiguration.getResourceName().endsWith(".properties")) {
                 Properties properties = new Properties();
                 properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
-                allProperties.putAll(properties);
+                mergeInto.putAll(properties);
             }
         }
-        return allProperties;
+        return mergeInto;
     }
 
     private List<BonitaConfiguration> getAllXmlConfiguration(List<BonitaConfiguration> configurationFiles) throws IOException {
@@ -190,7 +213,7 @@ public class BonitaHomeServer {
     public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
         List<BonitaConfiguration> tenantEngineConf = getConfigurationService().getTenantEngineConf(tenantId);
         for (BonitaConfiguration bonitaConfiguration : tenantEngineConf) {
-            if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community.properties")) {
+            if (bonitaConfiguration.getResourceName().equals("bonita-tenant-community-custom.properties")) {
                 Properties properties = new Properties();
                 properties.load(new ByteArrayInputStream(bonitaConfiguration.getResourceContent()));
                 if (userName != null) {
@@ -257,4 +280,5 @@ public class BonitaHomeServer {
         }
         throw new UpdateException("unable to update the configuration file " + file + " because it does not exists");
     }
+
 }
