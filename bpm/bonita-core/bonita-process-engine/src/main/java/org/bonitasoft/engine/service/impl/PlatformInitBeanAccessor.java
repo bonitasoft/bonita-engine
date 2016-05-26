@@ -53,12 +53,12 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected List<BonitaConfiguration> getConfiguration() throws IOException {
+    protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
         return BONITA_HOME_SERVER.getPlatformInitConfiguration();
     }
 
     @Override
-    protected List<String> getClassPathResources(Properties properties) {
+    protected List<String> getSpringFileFromClassPath(boolean cluster) {
         return Collections.singletonList("bonita-platform-init-community.xml");
     }
 }

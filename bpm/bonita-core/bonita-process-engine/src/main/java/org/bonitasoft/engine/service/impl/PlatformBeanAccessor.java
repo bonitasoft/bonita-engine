@@ -45,7 +45,7 @@ public class PlatformBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected List<BonitaConfiguration> getConfiguration() throws IOException {
+    protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
         List<BonitaConfiguration> platformConfiguration = BONITA_HOME_SERVER.getPlatformConfiguration();
         //handle special case for cache configuration files
         Iterator<BonitaConfiguration> iterator = platformConfiguration.iterator();
@@ -63,11 +63,11 @@ public class PlatformBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected List<String> getClassPathResources(Properties properties) {
+    protected List<String> getSpringFileFromClassPath(boolean cluster) {
         ArrayList<String> resources = new ArrayList<>();
         resources.add("bonita-platform-community.xml");
         resources.add("bonita-platform-sp.xml");
-        if (Boolean.valueOf(getPropertyWithPlaceholder(properties, "bonita.cluster", "false"))) {
+        if (cluster) {
             resources.add("bonita-platform-sp-cluster.xml");
         }
         return resources;

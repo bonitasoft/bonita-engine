@@ -61,12 +61,13 @@ public class SpringBeanAccessorTest {
     @Test
     public void should_getContext_call_init_first() throws Exception {
         //given
+        doReturn(true).when(springBeanAccessor).isCluster();
         //when
         springBeanAccessor.getContext();
         //then
         InOrder inOrder = inOrder(springBeanAccessor, bonitaHomeServer);
         inOrder.verify(springBeanAccessor).init();
-        inOrder.verify(bonitaHomeServer).getPlatformProperties();
+        inOrder.verify(springBeanAccessor).createSpringContext();
     }
 
     private SpringBeanAccessor createSpringBeanAccessor() {
@@ -78,12 +79,12 @@ public class SpringBeanAccessorTest {
             }
 
             @Override
-            protected List<BonitaConfiguration> getConfiguration() throws IOException {
+            protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
                 return Collections.emptyList();
             }
 
             @Override
-            protected List<String> getClassPathResources(Properties properties) {
+            protected List<String> getSpringFileFromClassPath(boolean cluster) {
                 return Collections.emptyList();
             }
         });
@@ -93,7 +94,8 @@ public class SpringBeanAccessorTest {
     @Test
     public void should_getContext_create_context_using_classpathResources() throws Exception {
         //given
-        doReturn(Arrays.asList("classpathResource1", "classpathResource2")).when(springBeanAccessor).getClassPathResources(any(Properties.class));
+        doReturn(Arrays.asList("classpathResource1", "classpathResource2")).when(springBeanAccessor).getSpringFileFromClassPath(anyBoolean());
+        doReturn(true).when(springBeanAccessor).isCluster();
         //when
         springBeanAccessor.getContext();
         //then
@@ -107,7 +109,8 @@ public class SpringBeanAccessorTest {
         //given
         BonitaConfiguration res1 = new BonitaConfiguration("res1", "c1".getBytes());
         BonitaConfiguration res2 = new BonitaConfiguration("res2", "c2".getBytes());
-        doReturn(Arrays.asList(res1, res2)).when(springBeanAccessor).getConfiguration();
+        doReturn(Arrays.asList(res1, res2)).when(springBeanAccessor).getConfigurationFromDatabase();
+        doReturn(true).when(springBeanAccessor).isCluster();
         //when
         springBeanAccessor.getContext();
         //then
