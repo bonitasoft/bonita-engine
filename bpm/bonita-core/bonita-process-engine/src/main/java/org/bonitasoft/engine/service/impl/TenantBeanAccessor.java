@@ -40,18 +40,19 @@ public class TenantBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected List<BonitaConfiguration> getConfiguration() throws IOException {
+    protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
         return BONITA_HOME_SERVER.getTenantConfiguration(tenantId);
     }
 
     @Override
-    protected List<String> getClassPathResources(Properties properties) {
+    protected List<String> getSpringFileFromClassPath(boolean cluster) {
         ArrayList<String> resources = new ArrayList<>();
         resources.add("bonita-tenant-community.xml");
         resources.add("bonita-tenant-sp.xml");
-        if (Boolean.valueOf(getPropertyWithPlaceholder(properties, "bonita.cluster", "false"))) {
+        if (cluster) {
             resources.add("bonita-tenant-sp-cluster.xml");
         }
         return resources;
     }
+
 }

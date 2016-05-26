@@ -62,16 +62,14 @@ public abstract class SpringBeanAccessor {
             init();
             try {
                 context = createSpringContext();
-                List<String> classPathResources = getClassPathResources(getBonitaHomeServer().getPlatformProperties());
-                for (String classPathResource : classPathResources) {
+                for (String classPathResource : getSpringFileFromClassPath(isCluster())) {
                     context.addClassPathResource(classPathResource);
                 }
-                for (BonitaConfiguration bonitaConfiguration : getConfiguration()) {
+                for (BonitaConfiguration bonitaConfiguration : getConfigurationFromDatabase()) {
                     context.addByteArrayResource(bonitaConfiguration);
                 }
                 final PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-                final Properties properties = getProperties();
-                configurer.setProperties(properties);
+                configurer.setProperties(getProperties());
                 context.addBeanFactoryPostProcessor(configurer);
                 final String[] activeProfiles = getActiveProfiles();
                 context.getEnvironment().setActiveProfiles(activeProfiles);
@@ -104,9 +102,9 @@ public abstract class SpringBeanAccessor {
 
     protected abstract Properties getProperties() throws IOException;
 
-    protected abstract List<BonitaConfiguration> getConfiguration() throws IOException;
+    protected abstract List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException;
 
-    protected abstract List<String> getClassPathResources(Properties properties);
+    protected abstract List<String> getSpringFileFromClassPath(boolean cluster);
 
     String getPropertyWithPlaceholder(Properties properties, String key, String defaultValue) {
         String property = properties.getProperty(key, defaultValue);
@@ -118,4 +116,9 @@ public abstract class SpringBeanAccessor {
         }
         return property;
     }
+
+    protected boolean isCluster() throws IOException {
+        return Boolean.valueOf(getPropertyWithPlaceholder(BONITA_HOME_SERVER.getPlatformProperties(), "bonita.cluster", "false"));
+    }
+
 }
