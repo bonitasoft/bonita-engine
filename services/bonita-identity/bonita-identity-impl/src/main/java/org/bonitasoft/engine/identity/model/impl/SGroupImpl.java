@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.identity.model.SGroup;
 
 /**
@@ -26,15 +28,13 @@ public class SGroupImpl extends SNamedElementImpl implements SGroup {
 
     private String parentPath;
 
-    private String iconName;
-
-    private String iconPath;
-
     private long createdBy;
 
     private long creationDate;
 
     private long lastUpdate;
+
+    private Long iconId;
 
     public SGroupImpl() {
         super();
@@ -52,24 +52,6 @@ public class SGroupImpl extends SNamedElementImpl implements SGroup {
 
     public void setParentPath(final String parentPath) {
         this.parentPath = parentPath;
-    }
-
-    @Override
-    public String getIconName() {
-        return iconName;
-    }
-
-    public void setIconName(final String iconName) {
-        this.iconName = iconName;
-    }
-
-    @Override
-    public String getIconPath() {
-        return iconPath;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
     }
 
     @Override
@@ -108,68 +90,43 @@ public class SGroupImpl extends SNamedElementImpl implements SGroup {
     }
 
     @Override
+    public Long getIconId() {
+        return iconId;
+    }
+
+    public void setIconId(Long iconId) {
+        this.iconId = iconId;
+    }
+
+    @Override
     public String toString() {
-        return "SGroupImpl [path=" + getPath() + ", getDescription()=" + getDescription() + ", getDisplayName()=" + getDisplayName() + ", getId()=" + getId()
-                + ", getIconName()=" + getIconName() + ", getIconPath()=" + getIconPath() + ", getCreatedBy()=" + getCreatedBy() + ", getCreationDate()="
-                + getCreationDate() + ", getLastUpdate()=" + getLastUpdate() + "]";
+        return "SGroupImpl{" +
+                "parentPath='" + parentPath + '\'' +
+                ", createdBy=" + createdBy +
+                ", creationDate=" + creationDate +
+                ", lastUpdate=" + lastUpdate +
+                ", iconId=" + iconId +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        SGroupImpl sGroup = (SGroupImpl) o;
+        return createdBy == sGroup.createdBy &&
+                creationDate == sGroup.creationDate &&
+                lastUpdate == sGroup.lastUpdate &&
+                Objects.equals(parentPath, sGroup.parentPath) &&
+                Objects.equals(iconId, sGroup.iconId);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
-        result = prime * result + (int) (creationDate ^ creationDate >>> 32);
-        result = prime * result + (iconName == null ? 0 : iconName.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (lastUpdate ^ lastUpdate >>> 32);
-        result = prime * result + (parentPath == null ? 0 : parentPath.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), parentPath, createdBy, creationDate, lastUpdate, iconId);
     }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SGroupImpl other = (SGroupImpl) obj;
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate != other.creationDate) {
-            return false;
-        }
-        if (iconName == null) {
-            if (other.iconName != null) {
-                return false;
-            }
-        } else if (!iconName.equals(other.iconName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (lastUpdate != other.lastUpdate) {
-            return false;
-        }
-        if (parentPath == null) {
-            if (other.parentPath != null) {
-                return false;
-            }
-        } else if (!parentPath.equals(other.parentPath)) {
-            return false;
-        }
-        return true;
-    }
-
 }

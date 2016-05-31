@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.impl;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.bonitasoft.engine.identity.Group;
 
@@ -34,10 +35,6 @@ public class GroupImpl implements Group {
 
     private String description;
 
-    private String iconName;
-
-    private String iconPath;
-
     private long createdBy;
 
     private String parentPath;
@@ -45,6 +42,8 @@ public class GroupImpl implements Group {
     private Date creationDate;
 
     private Date lastUpdate;
+
+    private Long iconId;
 
     public GroupImpl(final long id, final String name) {
         super();
@@ -80,14 +79,6 @@ public class GroupImpl implements Group {
         this.description = description;
     }
 
-    public void setIconName(final String iconName) {
-        this.iconName = iconName;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
-    }
-
     public void setCreatedBy(final long createdBy) {
         this.createdBy = createdBy;
     }
@@ -106,12 +97,12 @@ public class GroupImpl implements Group {
 
     @Override
     public String getIconName() {
-        return iconName;
+        return iconId != null ? iconId.toString() : "";
     }
 
     @Override
     public String getIconPath() {
-        return iconPath;
+        return iconId != null ? iconId.toString() : "";
     }
 
     @Override
@@ -143,97 +134,49 @@ public class GroupImpl implements Group {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
-        result = prime * result + ((iconName == null) ? 0 : iconName.hashCode());
-        result = prime * result + ((iconPath == null) ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((lastUpdate == null) ? 0 : lastUpdate.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((parentPath == null) ? 0 : parentPath.hashCode());
-        return result;
+    public Long getIconId() {
+        return iconId;
+    }
+
+    public void setIconId(Long iconId) {
+        this.iconId = iconId;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final GroupImpl other = (GroupImpl) obj;
-        if (id != other.id) {
-            return false;
-        }
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate == null) {
-            if (other.creationDate != null) {
-                return false;
-            }
-        } else if (!creationDate.equals(other.creationDate)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (iconName == null) {
-            if (other.iconName != null) {
-                return false;
-            }
-        } else if (!iconName.equals(other.iconName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (lastUpdate == null) {
-            if (other.lastUpdate != null) {
-                return false;
-            }
-        } else if (!lastUpdate.equals(other.lastUpdate)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (parentPath == null) {
-            if (other.parentPath != null) {
-                return false;
-            }
-        } else if (!parentPath.equals(other.parentPath)) {
-            return false;
-        }
-        return true;
+    public String toString() {
+        return "GroupImpl{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", description='" + description + '\'' +
+                ", createdBy=" + createdBy +
+                ", parentPath='" + parentPath + '\'' +
+                ", creationDate=" + creationDate +
+                ", lastUpdate=" + lastUpdate +
+                ", iconId=" + iconId +
+                '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        GroupImpl group = (GroupImpl) o;
+        return id == group.id &&
+                createdBy == group.createdBy &&
+                Objects.equals(name, group.name) &&
+                Objects.equals(displayName, group.displayName) &&
+                Objects.equals(description, group.description) &&
+                Objects.equals(parentPath, group.parentPath) &&
+                Objects.equals(creationDate, group.creationDate) &&
+                Objects.equals(lastUpdate, group.lastUpdate) &&
+                Objects.equals(iconId, group.iconId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, displayName, description, createdBy, parentPath, creationDate, lastUpdate, iconId);
+    }
 }

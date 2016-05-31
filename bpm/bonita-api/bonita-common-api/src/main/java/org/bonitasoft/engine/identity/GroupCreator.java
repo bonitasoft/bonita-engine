@@ -33,7 +33,7 @@ public class GroupCreator implements Serializable {
      * represents the available {@link Group} field
      */
     public enum GroupField {
-        NAME, DISPLAY_NAME, DESCRIPTION, ICON_NAME, ICON_PATH, PARENT_PATH;
+        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated ICON_NAME, @Deprecated ICON_PATH, PARENT_PATH, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<GroupField, Serializable> fields;
@@ -45,7 +45,7 @@ public class GroupCreator implements Serializable {
      *        The name of the group that will be created
      */
     public GroupCreator(final String name) {
-        fields = new HashMap<GroupField, Serializable>(3);
+        fields = new HashMap<>(3);
         fields.put(GroupField.NAME, name);
     }
 
@@ -78,18 +78,26 @@ public class GroupCreator implements Serializable {
     /**
      * @param iconName
      *        The group's icon name to create
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public GroupCreator setIconName(final String iconName) {
-        fields.put(GroupField.ICON_NAME, iconName);
         return this;
     }
 
     /**
      * @param iconPath
      *        The group's icon file path to create
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public GroupCreator setIconPath(final String iconPath) {
-        fields.put(GroupField.ICON_PATH, iconPath);
+        return this;
+    }
+
+    public GroupCreator setIcon(String filename, byte[] content) {
+        fields.put(GroupField.ICON_FILENAME, filename);
+        fields.put(GroupField.ICON_CONTENT, content);
         return this;
     }
 

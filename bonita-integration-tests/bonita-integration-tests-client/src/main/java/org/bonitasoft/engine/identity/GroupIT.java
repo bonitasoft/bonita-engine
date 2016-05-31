@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +26,8 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -35,11 +35,15 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class GroupIT extends TestWithTechnicalUser {
 
     private Group defaultGroup;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Override
     @Before
@@ -126,7 +130,7 @@ public class GroupIT extends TestWithTechnicalUser {
         final String group2 = "Group2";
         final Group groupCreated2 = getIdentityAPI().createGroup(group2, null);
 
-        final List<Long> groupIds = new ArrayList<Long>();
+        final List<Long> groupIds = new ArrayList<>();
         groupIds.add(groupCreated1.getId());
         groupIds.add(groupCreated2.getId());
 
@@ -146,7 +150,7 @@ public class GroupIT extends TestWithTechnicalUser {
         final String group2 = "Group2";
         final Group groupCreated2 = getIdentityAPI().createGroup(group2, null);
 
-        final List<Long> groupIds = new ArrayList<Long>();
+        final List<Long> groupIds = new ArrayList<>();
         groupIds.add(groupCreated1.getId());
         groupIds.add(groupCreated2.getId() + 100);
 
@@ -243,7 +247,7 @@ public class GroupIT extends TestWithTechnicalUser {
     public void deleteGroups() throws BonitaException {
         assertNotNull(getIdentityAPI().getNumberOfGroups());
         assertEquals(1, getIdentityAPI().getNumberOfGroups());
-        final List<Long> groupIdList = new ArrayList<Long>();
+        final List<Long> groupIdList = new ArrayList<>();
 
         final Group group1 = getIdentityAPI().createGroup("testName1", null);
         groupIdList.add(group1.getId());
@@ -262,7 +266,7 @@ public class GroupIT extends TestWithTechnicalUser {
     public void deleteGroupsWithNotExistId() throws BonitaException {
         assertNotNull(getIdentityAPI().getNumberOfGroups());
         assertEquals(1, getIdentityAPI().getNumberOfGroups());
-        final List<Long> groupIdList = new ArrayList<Long>();
+        final List<Long> groupIdList = new ArrayList<>();
 
         final Group group1 = getIdentityAPI().createGroup("testName1", null);
         groupIdList.add(group1.getId());
@@ -421,7 +425,7 @@ public class GroupIT extends TestWithTechnicalUser {
         final User dUser = getIdentityAPI().createUser("testnameD", "bpm");
 
         final Group group = createGroup("group", "testLabel", "description");
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(aUserInRoleA.getId());
         userIds.add(bUserInRoleA.getId());
         final RoleCreator roleCreatorA = new RoleCreator("RoleA");
@@ -429,7 +433,7 @@ public class GroupIT extends TestWithTechnicalUser {
         final Role testRoleA = getIdentityAPI().createRole(roleCreatorA);
         getIdentityAPI().addUserMemberships(userIds, defaultGroup.getId(), testRoleA.getId());
 
-        final List<Long> testIds = new ArrayList<Long>();
+        final List<Long> testIds = new ArrayList<>();
         testIds.add(cUserInRoleB.getId());
         final RoleCreator roleCreatorB = new RoleCreator("RoleB");
         roleCreatorB.setDisplayName("LabelB").setDescription("DescriptionB");
@@ -457,7 +461,7 @@ public class GroupIT extends TestWithTechnicalUser {
     public void getNumberOfUsersInGroup() throws BonitaException {
         final User aUser = getIdentityAPI().createUser("testnameA", "bpm");
         final User bUser = getIdentityAPI().createUser("testnameB", "bpm");
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(aUser.getId());
         userIds.add(bUser.getId());
         final Role testRole = getIdentityAPI().createRole("testRole");
@@ -536,7 +540,8 @@ public class GroupIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(groupD.getId());
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchGroup", "Apostrophe" }, jira = "ENGINE-366")
+    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchGroup",
+            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchGroupWithApostrophe() throws BonitaException {
         final Group groupA = createGroup("test'A", "labelA", "desc");
@@ -569,7 +574,8 @@ public class GroupIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { Group.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-2423", keywords = { "group" }, story = "create a lot of groups make long parent path and it should work")
+    @Cover(classes = { Group.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-2423", keywords = {
+            "group" }, story = "create a lot of groups make long parent path and it should work")
     public void should_be_able_to_create_big_groups_hierarchy() throws BonitaException {
         // this should work
         // acme -> Site -> Service -> Departement -> Back Office & Logistique
@@ -583,6 +589,41 @@ public class GroupIT extends TestWithTechnicalUser {
         assertEquals("Administration Titres", getIdentityAPI().getGroupByPath("/acme/Site/Service/Departement/Back Office & Logistique/Administration Titres")
                 .getName());
         deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
+    }
 
+    @Test
+    public void should_createGroup_with_icon_create_the_icon() throws Exception {
+        //given
+        Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        //when
+        Icon icon = getIdentityAPI().getIcon(mainGroup.getIconId());
+        //then
+        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/png", new byte[] { 1, 2, 3 }));
+        //clean up
+        deleteGroups(getIdentityAPI().getGroupByPath("/mainGroup"));
+    }
+
+    @Test
+    public void should_updateGroup_with_icon_update_the_icon() throws Exception {
+        //given
+        Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        //when
+        Group group = getIdentityAPI().updateGroup(mainGroup.getId(), new GroupUpdater().updateIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
+        //then
+        Icon icon = getIdentityAPI().getIcon(group.getIconId());
+        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", new byte[] { 3, 4, 5 }));
+        //clean up
+        deleteGroups(getIdentityAPI().getGroupByPath("/mainGroup"));
+    }
+
+    @Test
+    public void should_deleteGroup_with_icon_delete_the_icon() throws Exception {
+        //given
+        Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        //when
+        getIdentityAPI().deleteGroup(mainGroup.getId());
+        //then
+        expectedException.expect(NotFoundException.class);
+        getIdentityAPI().getIcon(mainGroup.getIconId());
     }
 }

@@ -34,10 +34,6 @@ public class SGroupBuilderFactoryImpl implements SGroupBuilderFactory {
 
     static final String DISPLAY_NAME = "displayName";
 
-    static final String ICON_NAME = "iconName";
-
-    static final String ICON_PATH = "iconPath";
-
     static final String CREATED_BY = "createdBy";
 
     static final String CREATION_DATE = "creationDate";
@@ -68,16 +64,6 @@ public class SGroupBuilderFactoryImpl implements SGroupBuilderFactory {
     @Override
     public String getDescriptionKey() {
         return DESCRIPTION;
-    }
-
-    @Override
-    public String getIconNameKey() {
-        return ICON_NAME;
-    }
-
-    @Override
-    public String getIconPathKey() {
-        return ICON_PATH;
     }
 
     @Override

@@ -31,9 +31,7 @@ public interface SGroupBuilder {
 
     SGroupBuilder setParentPath(final String parentPath);
 
-    SGroupBuilder setIconName(final String iconName);
-
-    SGroupBuilder setIconPath(final String iconPath);
+    SGroupBuilder setIconId(final Long iconId);
 
     SGroupBuilder setCreatedBy(final long createdBy);
 

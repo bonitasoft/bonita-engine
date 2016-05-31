@@ -925,8 +925,7 @@ public class ModelConvertor {
         group.setCreationDate(new Date(sGroup.getCreationDate()));
         group.setDescription(sGroup.getDescription());
         group.setDisplayName(sGroup.getDisplayName());
-        group.setIconName(sGroup.getIconName());
-        group.setIconPath(sGroup.getIconPath());
+        group.setIconId(sGroup.getIconId());
         group.setLastUpdate(new Date(sGroup.getLastUpdate()));
         return group;
     }
@@ -1556,14 +1555,6 @@ public class ModelConvertor {
         final String description = (String) fields.get(GroupField.DESCRIPTION);
         if (description != null) {
             groupBuilder.setDescription(description);
-        }
-        final String iconName = (String) fields.get(GroupField.ICON_NAME);
-        if (iconName != null) {
-            groupBuilder.setIconName(iconName);
-        }
-        final String iconPath = (String) fields.get(GroupField.ICON_PATH);
-        if (iconPath != null) {
-            groupBuilder.setIconPath(iconPath);
         }
         return groupBuilder.done();
     }

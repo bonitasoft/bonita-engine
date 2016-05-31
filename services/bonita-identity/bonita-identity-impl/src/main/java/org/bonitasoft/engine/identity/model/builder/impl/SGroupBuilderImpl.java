@@ -67,14 +67,8 @@ public class SGroupBuilderImpl implements SGroupBuilder {
     }
 
     @Override
-    public SGroupBuilder setIconName(final String iconName) {
-        group.setIconName(iconName);
-        return this;
-    }
-
-    @Override
-    public SGroupBuilder setIconPath(final String iconPath) {
-        group.setIconPath(iconPath);
+    public SGroupBuilder setIconId(final Long iconId) {
+        group.setIconId(iconId);
         return this;
     }
 

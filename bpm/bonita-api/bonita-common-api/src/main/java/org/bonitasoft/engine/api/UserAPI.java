@@ -417,5 +417,13 @@ public interface UserAPI {
      */
     List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults);
 
+    /**
+     * get the icon having specified id
+     * 
+     * @param id the id of the icon
+     * @return the icon with its content
+     * @throws NotFoundException
+     * @since 7.3.0
+     */
     Icon getIcon(long id) throws NotFoundException;
 }
