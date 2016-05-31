@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * represents a helper for creating a {@link Role}. Chaining is possible with this creator to ease the {@link Role} creation.
@@ -35,7 +36,7 @@ public class RoleCreator implements Serializable {
      * represents the available {@link Role} field
      */
     public enum RoleField {
-        NAME, DISPLAY_NAME, DESCRIPTION, ICON_NAME, ICON_PATH;
+        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated ICON_NAME, @Deprecated ICON_PATH, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<RoleField, Serializable> fields;
@@ -47,7 +48,7 @@ public class RoleCreator implements Serializable {
      *        The name of the role to create
      */
     public RoleCreator(final String name) {
-        fields = new HashMap<RoleField, Serializable>(5);
+        fields = new HashMap<>(5);
         fields.put(RoleField.NAME, name);
     }
 
@@ -75,9 +76,10 @@ public class RoleCreator implements Serializable {
      * @param iconName
      *        The role's icon name to create
      * @return The current {@link RoleCreator}
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public RoleCreator setIconName(final String iconName) {
-        fields.put(RoleField.ICON_NAME, iconName);
         return this;
     }
 
@@ -85,9 +87,23 @@ public class RoleCreator implements Serializable {
      * @param iconPath
      *        The role's icon path to create
      * @return The current {@link RoleCreator}
+     * @deprecated since 7.3.0 use #setIcon
      */
+    @Deprecated
     public RoleCreator setIconPath(final String iconPath) {
-        fields.put(RoleField.ICON_PATH, iconPath);
+        return this;
+    }
+
+    /**
+     * set the icon on the role to be created
+     * 
+     * @param filename the filename of the icon
+     * @param content the content of the icon
+     * @return the role created
+     */
+    public RoleCreator setIcon(String filename, byte[] content) {
+        fields.put(RoleField.ICON_FILENAME, filename);
+        fields.put(RoleField.ICON_CONTENT, content);
         return this;
     }
 
@@ -98,4 +114,25 @@ public class RoleCreator implements Serializable {
         return fields;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        RoleCreator that = (RoleCreator) o;
+        return Objects.equals(fields, that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fields);
+    }
+
+    @Override
+    public String toString() {
+        return "RoleCreator{" +
+                "fields=" + fields +
+                '}';
+    }
 }

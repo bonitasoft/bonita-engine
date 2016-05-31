@@ -596,7 +596,7 @@ public class CommonBPMServicesTest {
     public SRole createSRole(final String roleName) throws SBonitaException {
         openTx();
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName(roleName).done();
-        getTenantAccessor().getIdentityService().createRole(role);
+        getTenantAccessor().getIdentityService().createRole(role, null, null);
         closeTx();
         return role;
     }

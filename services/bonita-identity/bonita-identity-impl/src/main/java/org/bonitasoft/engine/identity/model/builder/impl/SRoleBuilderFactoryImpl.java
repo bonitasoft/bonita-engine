@@ -69,16 +69,6 @@ public class SRoleBuilderFactoryImpl implements SRoleBuilderFactory {
     }
 
     @Override
-    public String getIconNameKey() {
-        return ICON_NAME;
-    }
-
-    @Override
-    public String getIconPathKey() {
-        return ICON_PATH;
-    }
-
-    @Override
     public String getCreatedByKey() {
         return CREATED_BY;
     }

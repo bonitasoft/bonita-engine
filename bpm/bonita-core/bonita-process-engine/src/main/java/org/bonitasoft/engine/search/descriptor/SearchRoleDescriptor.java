@@ -34,18 +34,16 @@ public class SearchRoleDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> roleAllFields;
 
     SearchRoleDescriptor() {
-        roleKeys = new HashMap<String, FieldDescriptor>(5);
+        roleKeys = new HashMap<>(5);
         roleKeys.put(RoleSearchDescriptor.ID, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getIdKey()));
         roleKeys.put(RoleSearchDescriptor.NAME, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey()));
         roleKeys.put(RoleSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey()));
 
-        roleAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> roleFields = new HashSet<String>(8);
+        roleAllFields = new HashMap<>(1);
+        final Set<String> roleFields = new HashSet<>(3);
         roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getNameKey());
         roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey());
         roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getDescriptionKey());
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getIconNameKey());
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getIconPathKey());
         roleAllFields.put(SRole.class, roleFields);
     }
 

@@ -54,18 +54,6 @@ public class SRoleUpdateBuilderImpl implements SRoleUpdateBuilder {
     }
 
     @Override
-    public SRoleUpdateBuilder updateIconName(final String iconName) {
-        descriptor.addField(SRoleBuilderFactoryImpl.ICON_NAME, iconName);
-        return this;
-    }
-
-    @Override
-    public SRoleUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(SRoleBuilderFactoryImpl.ICON_PATH, iconPath);
-        return this;
-    }
-
-    @Override
     public SRoleUpdateBuilder updateCreatedBy(final long createdBy) {
         descriptor.addField(SRoleBuilderFactoryImpl.CREATED_BY, createdBy);
         return this;
@@ -81,4 +69,5 @@ public class SRoleUpdateBuilderImpl implements SRoleUpdateBuilder {
     public SRoleUpdateBuilder updateLastUpdate(final long lastUpdate) {
         descriptor.addField(SRoleBuilderFactoryImpl.LAST_UPDATE, lastUpdate);
         return this;
-    }}
+    }
+}

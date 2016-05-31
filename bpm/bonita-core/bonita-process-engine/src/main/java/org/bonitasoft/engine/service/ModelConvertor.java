@@ -994,8 +994,7 @@ public class ModelConvertor {
         final RoleImpl role = new RoleImpl(sRole.getId(), sRole.getName());
         role.setDisplayName(sRole.getDisplayName());
         role.setDescription(sRole.getDescription());
-        role.setIconName(sRole.getIconName());
-        role.setIconPath(sRole.getIconPath());
+        role.setIconId(sRole.getIconId());
         role.setCreatedBy(sRole.getCreatedBy());
         role.setCreationDate(new Date(sRole.getCreationDate()));
         role.setLastUpdate(new Date(sRole.getLastUpdate()));
@@ -1525,14 +1524,6 @@ public class ModelConvertor {
         final String description = (String) fields.get(RoleField.DESCRIPTION);
         if (description != null) {
             roleBuilder.setDescription(description);
-        }
-        final String iconName = (String) fields.get(RoleField.ICON_NAME);
-        if (iconName != null) {
-            roleBuilder.setIconName(iconName);
-        }
-        final String iconPath = (String) fields.get(RoleField.ICON_PATH);
-        if (iconPath != null) {
-            roleBuilder.setIconPath(iconPath);
         }
         return roleBuilder.done();
     }

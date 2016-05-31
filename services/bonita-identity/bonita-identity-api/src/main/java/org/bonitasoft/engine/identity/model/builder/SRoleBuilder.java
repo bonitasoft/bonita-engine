@@ -30,10 +30,6 @@ public interface SRoleBuilder {
 
     SRoleBuilder setDescription(final String description);
 
-    SRoleBuilder setIconName(final String iconName);
-
-    SRoleBuilder setIconPath(final String iconPath);
-
     SRoleBuilder setCreatedBy(final long createdBy);
 
     SRoleBuilder setCreationDate(final long creationDate);

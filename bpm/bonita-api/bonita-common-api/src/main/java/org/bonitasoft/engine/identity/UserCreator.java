@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 
@@ -182,4 +183,29 @@ public class UserCreator implements Serializable {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserCreator that = (UserCreator) o;
+        return Objects.equals(fields, that.fields) &&
+                Objects.equals(persoFields, that.persoFields) &&
+                Objects.equals(proFields, that.proFields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fields, persoFields, proFields);
+    }
+
+    @Override
+    public String toString() {
+        return "UserCreator{" +
+                "fields=" + fields +
+                ", persoFields=" + persoFields +
+                ", proFields=" + proFields +
+                '}';
+    }
 }
