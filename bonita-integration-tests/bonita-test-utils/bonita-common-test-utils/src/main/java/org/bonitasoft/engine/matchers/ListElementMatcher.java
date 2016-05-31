@@ -31,19 +31,11 @@ public class ListElementMatcher extends BaseMatcher<List<?>> {
 
     private enum TYPE {
         NAME(String.class,
-             "getName"),
-        ID(long.class,
-           "getId"),
-        VERSION(String.class,
-                "getVersion"),
-        DESCRIPTION(String.class,
-                    "getDescription"),
-        USERNAME(String.class,
-                 "getUserName"),
-        MANAGER(long.class,
-                "getManagerUserId"),
-        STATE(String.class,
-              "getState");
+                "getName"), ID(long.class,
+                        "getId"), VERSION(String.class,
+                                "getVersion"), DESCRIPTION(String.class,
+                                        "getDescription"), STATE(String.class,
+                                                "getState");
 
         private final Class<?> clazz;
 
@@ -84,18 +76,6 @@ public class ListElementMatcher extends BaseMatcher<List<?>> {
         return new ListElementMatcher(TYPE.VERSION, names);
     }
 
-    public static ListElementMatcher usernamesAre(final String... names) {
-        return new ListElementMatcher(TYPE.USERNAME, names);
-    }
-
-    public static ListElementMatcher managersAre(final Long... ids) {
-        return new ListElementMatcher(TYPE.MANAGER, ids);
-    }
-
-    public static ListElementMatcher idAre(final Long... ids) {
-        return new ListElementMatcher(TYPE.ID, ids);
-    }
-
     public static ListElementMatcher stateAre(final String... states) {
         return new ListElementMatcher(TYPE.STATE, states);
     }
@@ -117,22 +97,14 @@ public class ListElementMatcher extends BaseMatcher<List<?>> {
             }
             final Method m = list.get(0).getClass().getMethod(type.getGetter());
             for (int i = 0; i < expected.length; i++) {
-                final Object invoke = m.invoke(list.get(i), null);
+                final Object invoke = m.invoke(list.get(i));
                 match &= expected[i] == null && invoke == null || expected[i].equals(invoke);
                 if (!match) {
                     return false;
                 }
             }
             return match;
-        } catch (final SecurityException e) {
-            e.printStackTrace();
-        } catch (final NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (final IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (final IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (final InvocationTargetException e) {
+        } catch (final SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return false;

@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.managersAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.usernamesAre;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -474,7 +472,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
 
         final List<User> users = getIdentityAPI().getUsers(0, 10, UserCriterion.USER_NAME_ASC);
-        assertThat(users, match(usernamesAre("user1", "user2", "user3")).and(managersAre(users.get(1).getId(), users.get(2).getId(), users.get(0).getId())));
+        assertThat(users).extracting("userName", "managerUserId").containsExactly(tuple("user1", users.get(1).getId()), tuple("user2", users.get(2).getId()),
+                tuple("user3", users.get(0).getId()));
         assertEquals(3, users.size());
 
         getIdentityAPI().deleteOrganization();

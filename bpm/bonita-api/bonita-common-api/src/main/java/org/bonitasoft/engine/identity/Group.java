@@ -49,12 +49,21 @@ public interface Group extends BonitaObject {
     /**
      * @return The group's icon name
      */
+    @Deprecated
     String getIconName();
 
     /**
      * @return The group's icon file path
+     * @deprecated since 7.3.0, use #getIconId
      */
+    @Deprecated
     String getIconPath();
+
+    /**
+     * @return the id of the icon of this group or null
+     * @since 7.3.0
+     */
+    Long getIconId();
 
     /**
      * @return The identifier of the user that created the group

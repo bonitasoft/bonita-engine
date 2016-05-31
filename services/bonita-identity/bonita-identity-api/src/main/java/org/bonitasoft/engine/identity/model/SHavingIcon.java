@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2016 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,26 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity.model.builder;
+
+package org.bonitasoft.engine.identity.model;
 
 /**
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
  */
-public interface SGroupUpdateBuilder extends SIdentityUpdateBuilder {
+public interface SHavingIcon {
 
-    SGroupUpdateBuilder updateName(final String name);
-
-    SGroupUpdateBuilder updateDisplayName(final String displayName);
-
-    SGroupUpdateBuilder updateDescription(final String description);
-
-    SGroupUpdateBuilder updateParentPath(final String parentPath);
-
-    SGroupUpdateBuilder updateCreatedBy(final long createdBy);
-
-    SGroupUpdateBuilder updateCreationDate(final long creationDate);
-
-    SGroupUpdateBuilder updateLastUpdate(final long lastUpdate);
-
+    Long getIconId();
 }

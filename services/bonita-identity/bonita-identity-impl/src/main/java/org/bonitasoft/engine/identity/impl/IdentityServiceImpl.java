@@ -53,6 +53,7 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SHavingIcon;
 import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -72,6 +73,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
+import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
 import org.bonitasoft.engine.identity.model.impl.SIconImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
@@ -142,12 +144,15 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createGroup(final SGroup group) throws SGroupCreationException {
+    public void createGroup(final SGroup group, String iconFileName, byte[] iconContent) throws SGroupCreationException {
         final String methodName = "createGroup";
         final long objectId = group.getId();
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.CREATED, "Adding a new group with name " + group.getName());
         try {
-
+            if (iconFileName != null && iconContent != null) {
+                SIcon icon = createIcon(iconFileName, iconContent);
+                ((SGroupImpl) group).setIconId(icon.getId());
+            }
             final InsertRecord insertRecord = new InsertRecord(group);
             final SInsertEvent insertEvent = getInsertEvent(group, GROUP);
             recorder.recordInsert(insertRecord, insertEvent);
@@ -265,13 +270,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void insertUser(String methodName, SUser hashedUser, SUserLogBuilder logBuilder, SUserLoginImpl sUserLogin) throws SRecorderException {
-            ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
-            sUserLogin.setsUser(hashedUser);
-            sUserLogin.setId(hashedUser.getId());
-            sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
-            recorder.recordInsert(new InsertRecord(sUserLogin), null);
-            log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        }
+        ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
+        sUserLogin.setsUser(hashedUser);
+        sUserLogin.setId(hashedUser.getId());
+        sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
+        recorder.recordInsert(new InsertRecord(sUserLogin), null);
+        log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+    }
 
     private SUserLoginImpl insertUserLogin(SUser hashedUser) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(hashedUser);
@@ -324,15 +329,17 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteGroup(final SGroup group) throws SGroupDeletionException {
-        final String methodName = "deleteGroup";
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.DELETED, "Deleting group " + group.getName());
         try {
+            if (group.getIconId() != null) {
+                deleteIcon(group.getIconId());
+            }
             final DeleteRecord deleteRecord = new DeleteRecord(group);
             final SDeleteEvent deleteEvent = getDeleteEvent(group, GROUP);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        } catch (final SRecorderException re) {
-            log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteGroup");
+        } catch (final SRecorderException | SBonitaReadException re) {
+            log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteGroup");
             throw new SGroupDeletionException(re);
         }
     }
@@ -501,19 +508,17 @@ public class IdentityServiceImpl implements IdentityService {
             deleteUser(user);
         } catch (final SUserNotFoundException e) {
             // ignored, let's switch to the next one
-        }
-    }
-
-    private void deleteIcon(Long iconId) throws SUserDeletionException {
-        try {
-            SIcon icon = getIcon(iconId);
-            if (icon == null) {
-                return;
-            }
-            recorder.recordDelete(new DeleteRecord(icon), null);
         } catch (SRecorderException | SBonitaReadException e) {
             throw new SUserDeletionException(e);
         }
+    }
+
+    private void deleteIcon(Long iconId) throws SBonitaReadException, SRecorderException {
+        SIcon icon = getIcon(iconId);
+        if (icon == null) {
+            return;
+        }
+        recorder.recordDelete(new DeleteRecord(icon), null);
     }
 
     @Override
@@ -1168,9 +1173,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateGroup(final SGroup group, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateGroup(final SGroup group, final EntityUpdateDescriptor descriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.UPDATED, "Updating the group");
         try {
+            if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
+                updateOrRemoveIcon(descriptor, iconUpdater, group);
+            }
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(group, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(GROUP, EventActionType.UPDATED)) {
@@ -1178,7 +1186,7 @@ public class IdentityServiceImpl implements IdentityService {
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateGroup");
-        } catch (final SRecorderException e) {
+        } catch (final SRecorderException | SBonitaReadException e) {
             log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateGroup");
             throw new SIdentityException("Can't update group " + group, e);
         }
@@ -1465,7 +1473,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options) throws SBonitaReadException {
         return persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
-        }
+    }
 
     @Override
     public SUser updateUser(long userId, EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor personalDataUpdateDescriptor,
@@ -1473,11 +1481,15 @@ public class IdentityServiceImpl implements IdentityService {
         // User change
         SUser sUser = getUser(userId);
         if (iconUpdater.getFields().containsKey("content")) {
-            updateOrRemoveIcon(userUpdateDescriptor, iconUpdater, sUser);
+            try {
+                updateOrRemoveIcon(userUpdateDescriptor, iconUpdater, sUser);
+            } catch (SBonitaReadException | SRecorderException e) {
+                throw new SIdentityException(e);
+            }
         }
         if (userUpdateDescriptor != null && !userUpdateDescriptor.getFields().isEmpty()) {
             updateUser(sUser, userUpdateDescriptor);
-    }
+        }
 
         // Personal data change
         if (personalDataUpdateDescriptor != null && !personalDataUpdateDescriptor.getFields().isEmpty()) {
@@ -1485,9 +1497,9 @@ public class IdentityServiceImpl implements IdentityService {
             if (persoContactInfo == null) {
                 persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
                 createUserContactInfo(persoContactInfo);
-        }
+            }
             updateUserContactInfo(persoContactInfo, personalDataUpdateDescriptor);
-    }
+        }
 
         // Professional data change
         if (professionalDataUpdateDescriptor != null && !professionalDataUpdateDescriptor.getFields().isEmpty()) {
@@ -1501,22 +1513,21 @@ public class IdentityServiceImpl implements IdentityService {
         return sUser;
     }
 
-    private void updateOrRemoveIcon(EntityUpdateDescriptor userUpdateDescriptor, EntityUpdateDescriptor iconUpdater, SUser sUser) throws SIdentityException {
+    private void updateOrRemoveIcon(EntityUpdateDescriptor updateDescriptor, EntityUpdateDescriptor iconUpdater, SHavingIcon element)
+            throws SBonitaReadException, SRecorderException {
         byte[] content = (byte[]) iconUpdater.getFields().get("content");
         if (content != null) {
-            updateIcon(sUser.getIconId(), (String) iconUpdater.getFields().get("filename"), content, userUpdateDescriptor);
+            updateIcon(element.getIconId(), (String) iconUpdater.getFields().get("filename"), content, updateDescriptor);
         } else {
-            removeIcon(userUpdateDescriptor, sUser);
+            removeIcon(updateDescriptor, element);
         }
     }
 
-    private void removeIcon(EntityUpdateDescriptor userUpdateDescriptor, SUser sUser) throws SUserDeletionException {
-        Long iconId = sUser.getIconId();
+    private void removeIcon(EntityUpdateDescriptor updateDescriptor, SHavingIcon element) throws SBonitaReadException, SRecorderException {
+        Long iconId = element.getIconId();
         if (iconId != null) {
-
             deleteIcon(iconId);
-            userUpdateDescriptor.addField("iconId", null);
-
+            updateDescriptor.addField("iconId", null);
         }
     }
 
@@ -1524,8 +1535,12 @@ public class IdentityServiceImpl implements IdentityService {
     public SUser createUser(SUser sUser, SContactInfo personalContactInfo, SContactInfo proContactInfo, String iconFilename, byte[] iconContent)
             throws SUserCreationException {
         if (iconFilename != null && iconContent != null) {
-            SIcon icon = createIcon(iconFilename, iconContent);
-            ((SUserImpl) sUser).setIconId(icon.getId());
+            try {
+                SIcon icon = createIcon(iconFilename, iconContent);
+                ((SUserImpl) sUser).setIconId(icon.getId());
+            } catch (SRecorderException e) {
+                throw new SUserCreationException(e);
+            }
         }
         SUser user = createUser(sUser);
         if (personalContactInfo != null) {
@@ -1537,32 +1552,25 @@ public class IdentityServiceImpl implements IdentityService {
         return user;
     }
 
-    private void updateIcon(Long iconId, String iconFilename, byte[] iconContent, EntityUpdateDescriptor userUpdateDescriptor) throws SIdentityException {
-        try {
-            if (iconId == null) {
-                SIcon newIcon = createIcon(iconFilename, iconContent);
-                userUpdateDescriptor.addField("iconId", newIcon.getId());
-            } else {
-                SIcon icon = getIcon(iconId);
-                HashMap<String, Object> fields = new HashMap<>();
-                fields.put("mimeType", getContentType(iconFilename));
-                fields.put("content", iconContent);
-                recorder.recordUpdate(UpdateRecord.buildSetFields(icon, fields), null);
-            }
-        } catch (SBonitaReadException | SRecorderException e) {
-            throw new SIdentityException(e);
+    private void updateIcon(Long iconId, String iconFilename, byte[] iconContent, EntityUpdateDescriptor userUpdateDescriptor)
+            throws SRecorderException, SBonitaReadException {
+        if (iconId == null) {
+            SIcon newIcon = createIcon(iconFilename, iconContent);
+            userUpdateDescriptor.addField("iconId", newIcon.getId());
+        } else {
+            SIcon icon = getIcon(iconId);
+            HashMap<String, Object> fields = new HashMap<>();
+            fields.put("mimeType", getContentType(iconFilename));
+            fields.put("content", iconContent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(icon, fields), null);
         }
 
     }
 
-    private SIcon createIcon(String iconFilename, byte[] iconContent) throws SUserCreationException {
-        try {
-            SIconImpl entity = new SIconImpl(getContentType(iconFilename), iconContent);
-            recorder.recordInsert(new InsertRecord(entity), null);
-            return entity;
-        } catch (SRecorderException e) {
-            throw new SUserCreationException(e);
-        }
+    private SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
+        SIconImpl entity = new SIconImpl(getContentType(iconFilename), iconContent);
+        recorder.recordInsert(new InsertRecord(entity), null);
+        return entity;
     }
 
     private String getContentType(String iconFilename) {

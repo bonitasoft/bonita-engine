@@ -33,7 +33,7 @@ public class GroupUpdater implements Serializable {
      * represents the available {@link Group} fields
      */
     public enum GroupField {
-        NAME, DISPLAY_NAME, DESCRIPTION, ICON_NAME, ICON_PATH, PARENT_PATH;
+        NAME, DISPLAY_NAME, DESCRIPTION, @Deprecated ICON_NAME, @Deprecated ICON_PATH, PARENT_PATH, ICON_FILENAME, ICON_CONTENT
     }
 
     private final Map<GroupField, Serializable> fields;
@@ -42,55 +42,69 @@ public class GroupUpdater implements Serializable {
      * Default Constructor.
      */
     public GroupUpdater() {
-        fields = new HashMap<GroupField, Serializable>(3);
+        fields = new HashMap<>(3);
     }
 
     /**
      * @param name
      *        The group's name to update
      */
-    public void updateName(final String name) {
+    public GroupUpdater updateName(final String name) {
         fields.put(GroupField.NAME, name);
+        return this;
     }
 
     /**
      * @param displayName
      *        The group's display name to update
      */
-    public void updateDisplayName(final String displayName) {
+    public GroupUpdater updateDisplayName(final String displayName) {
         fields.put(GroupField.DISPLAY_NAME, displayName);
+        return this;
     }
 
     /**
      * @param description
      *        The group's description to update
      */
-    public void updateDescription(final String description) {
+    public GroupUpdater updateDescription(final String description) {
         fields.put(GroupField.DESCRIPTION, description);
+        return this;
     }
 
     /**
      * @param iconName
      *        The group's icon name to update
+     * @deprecated since 7.3.0 use #updateIcon
      */
-    public void updateIconName(final String iconName) {
-        fields.put(GroupField.ICON_NAME, iconName);
+    @Deprecated
+    public GroupUpdater updateIconName(final String iconName) {
+        return this;
     }
 
     /**
      * @param iconPath
      *        The group's icon path to update
+     * @deprecated since 7.3.0 use #updateIcon
      */
-    public void updateIconPath(final String iconPath) {
-        fields.put(GroupField.ICON_PATH, iconPath);
+    @Deprecated
+    public GroupUpdater updateIconPath(final String iconPath) {
+        return this;
+    }
+
+    public GroupUpdater updateIcon(String filename, byte[] content) {
+        fields.put(GroupField.ICON_FILENAME, filename);
+        fields.put(GroupField.ICON_CONTENT, content);
+        return this;
     }
 
     /**
      * @param parentPath
      *        The group's parent path to update
      */
-    public void updateParentPath(final String parentPath) {
+    public GroupUpdater updateParentPath(final String parentPath) {
         fields.put(GroupField.PARENT_PATH, parentPath);
+        return this;
     }
 
     /**

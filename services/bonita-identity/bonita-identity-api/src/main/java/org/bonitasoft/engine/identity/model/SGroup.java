@@ -18,15 +18,11 @@ package org.bonitasoft.engine.identity.model;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SGroup extends SNamedElement {
+public interface SGroup extends SNamedElement, SHavingIcon {
 
     String getPath();
 
     String getParentPath();
-
-    String getIconName();
-
-    String getIconPath();
 
     long getCreatedBy();
 

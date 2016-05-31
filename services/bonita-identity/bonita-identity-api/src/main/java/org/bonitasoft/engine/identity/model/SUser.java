@@ -22,7 +22,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
-public interface SUser extends PersistentObject {
+public interface SUser extends PersistentObject, SHavingIcon {
 
     String getUserName();
 
@@ -50,7 +50,5 @@ public interface SUser extends PersistentObject {
     SUserLogin getSUserLogin();
 
     boolean isEnabled();
-
-    Long getIconId();
 
 }

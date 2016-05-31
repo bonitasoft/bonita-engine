@@ -17,11 +17,10 @@
         <property name="displayName" type="java.lang.String" column="displayName" />
         <property name="description" type="java.lang.String" column="description" />
         <property name="parentPath" type="java.lang.String" column="parentPath" />
-        <property name="iconName" type="java.lang.String" column="iconName" />
-        <property name="iconPath" type="java.lang.String" column="iconPath" />
         <property name="createdBy" type="long" column="createdBy" />
         <property name="creationDate" type="long" column="creationDate" />
         <property name="lastUpdate" type="long" column="lastUpdate" />
+        <property name="iconId" type="long" column="iconid" />
         <filter name="tenantFilter" />
     </class>
 
