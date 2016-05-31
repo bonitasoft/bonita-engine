@@ -25,7 +25,6 @@
         <tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
         <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
         <tomcat.zip.folder>${java.io.tmpdir}</tomcat.zip.folder>
-        <bonita.home>${tomcat.home}/bonita</bonita.home>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
         <db.vendor>h2</db.vendor>
         <cargo.jvmargs>-Xms128m -Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
@@ -82,25 +81,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>unpack</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.bonitasoft.engine</groupId>
-                                            <artifactId>bonita-home</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${distrib.dir}/resources</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
                             <execution>
                                 <id>copy</id>
                                 <phase>prepare-package</phase>
@@ -253,11 +233,6 @@
                                         </copy>
                                         <copy tofile="${tomcat.deploy.dir}/bonita.war"
                                               file="${distrib.dir}/war/bonita-deploy-war-${project.version}.war" />
-
-                                        <!-- Create default bonita.home folder -->
-                                        <copy todir="${bonita.home}" verbose="true">
-                                            <fileset dir="${distrib.dir}/resources/bonita-home/" />
-                                        </copy>
                                     </target>
                                 </configuration>
                             </execution>
@@ -285,7 +260,6 @@
                                             <!--<jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500" />-->
                                             <jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m" />
                                             <classpath refid="test.path" />
-                                            <sysproperty key="bonita.home" value="${bonita.home}" />
                                             <sysproperty key="org.bonitasoft.engine.api-type" value="HTTP" />
                                             <sysproperty key="org.bonitasoft.engine.api-type.server.url" value="http://localhost:8184" />
                                             <sysproperty key="org.bonitasoft.engine.api-type.application.name" value="bonita" />
@@ -330,7 +304,6 @@
                                 <type>installed</type>
                                 <home>${tomcat.home}</home>
                                 <systemProperties>
-                                    <bonita.home>${bonita.home}</bonita.home>
                                     <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
                                     <sysprop.bonita.bdm.db.vendor>${db.vendor}</sysprop.bonita.bdm.db.vendor>
                                     <db.vendor>${db.vendor}</db.vendor>

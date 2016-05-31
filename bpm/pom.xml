@@ -21,7 +21,6 @@
                 <module>bonita-common</module>
                 <module>bonita-client</module>
                 <module>bonita-server</module>
-                <module>bonita-home</module>
             </modules>
         </profile>
         <profile>
@@ -32,7 +31,6 @@
                 <module>bonita-server</module>
                 <module>bonita-core</module>
                 <module>bonita-api</module>
-                <module>bonita-home</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
                 <module>bonita-expression-resolver</module>
@@ -49,7 +47,6 @@
                 <module>bonita-server</module>
                 <module>bonita-core</module>
                 <module>bonita-api</module>
-                <module>bonita-home</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
                 <module>bonita-expression-resolver</module>
@@ -69,7 +66,6 @@
                 <module>bonita-server</module>
                 <module>bonita-core</module>
                 <module>bonita-api</module>
-                <module>bonita-home</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
                 <module>bonita-expression-resolver</module>
@@ -86,7 +82,6 @@
                 <module>bonita-server</module>
                 <module>bonita-core</module>
                 <module>bonita-api</module>
-                <module>bonita-home</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
                 <module>bonita-expression-resolver</module>
@@ -103,7 +98,6 @@
                 <module>bonita-server</module>
                 <module>bonita-core</module>
                 <module>bonita-api</module>
-                <module>bonita-home</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
                 <module>bonita-expression-resolver</module>
