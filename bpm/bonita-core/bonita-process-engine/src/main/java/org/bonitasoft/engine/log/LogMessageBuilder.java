@@ -62,7 +62,7 @@ public class LogMessageBuilder {
         }
         stb.append("has executed the task");
         stb.append(LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
-        if (inputs != null) {
+        if (inputs != null && !inputs.isEmpty()) {
             stb.append(" with task inputs: " + inputs);
         }
         return stb.toString();
