@@ -3,7 +3,6 @@ package org.bonitasoft.engine.test.internal;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -47,8 +45,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class EngineStarter {
 
-    private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
-    private static final String BONITA_HOME_PROPERTY = "bonita.home";
     private static final String DATABASE_DIR = "org.bonitasoft.h2.database.dir";
 
     private Object h2Server;
@@ -87,37 +83,8 @@ public class EngineStarter {
 
     //--------------  engine life cycle methods
 
-    protected String prepareBonitaHome() throws IOException {
-        String bonitaHomePath = System.getProperty(BONITA_HOME_PROPERTY);
-        if (bonitaHomePath == null || bonitaHomePath.trim().isEmpty()) {
-            final InputStream bonitaHomeIS = getBonitaHomeInputStream();
-            if (bonitaHomeIS == null) {
-                throw new IllegalStateException("No bonita home found in the class path");
-            }
-            final File outputFolder = new File(BONITA_HOME_DEFAULT_PATH);
-            LOGGER.info("No bonita home specified using: " + outputFolder.getAbsolutePath());
-            if (outputFolder.exists()) {
-                FileUtils.deleteDirectory(outputFolder);
-            }
-            assert outputFolder.mkdir();
-            IOUtil.unzipToFolder(bonitaHomeIS, outputFolder);
-            bonitaHomePath = outputFolder.getAbsolutePath() + "/bonita-home";
-            for (Map.Entry<String, byte[]> customConfig : overrideConfiguration.entrySet()) {
-                IOUtil.write(new File(bonitaHomePath, customConfig.getKey()), customConfig.getValue());
-            }
-            System.setProperty(BONITA_HOME_PROPERTY, bonitaHomePath);
-
-        }
-        return bonitaHomePath;
-    }
-
-    protected InputStream getBonitaHomeInputStream() {
-        return this.getClass().getResourceAsStream("/bonita-home.zip");
-    }
-
     protected void prepareEnvironment() throws Exception {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        prepareBonitaHome();
         dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
         //is h2 and not started outside
         if ("h2".equals(dbVendor)) {
