@@ -26,10 +26,6 @@ public interface SRoleUpdateBuilder extends SIdentityUpdateBuilder {
 
     SRoleUpdateBuilder updateDescription(final String description);
 
-    SRoleUpdateBuilder updateIconName(final String iconName);
-
-    SRoleUpdateBuilder updateIconPath(final String iconPath);
-
     SRoleUpdateBuilder updateCreatedBy(final long createdBy);
 
     SRoleUpdateBuilder updateCreationDate(final long creationDate);

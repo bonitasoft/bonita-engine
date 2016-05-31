@@ -113,7 +113,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     public void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws SIdentityException {
         final EntityUpdateDescriptor descriptor = getRoleDescriptor(existingRole, newRole);
         if (!descriptor.getFields().isEmpty()) {
-            identityService.updateRole(existingRole, descriptor);
+            identityService.updateRole(existingRole, descriptor, null);
         }
     }
 
@@ -136,14 +136,6 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         final String displayName = (String) fields.get(RoleField.DISPLAY_NAME);
         if (displayName != null && !displayName.equals(existingRole.getDisplayName())) {
             roleUpdateBuilder.updateDisplayName(displayName);
-        }
-        final String iconName = (String) fields.get(RoleField.ICON_NAME);
-        if (iconName != null && !iconName.equals(existingRole.getIconName())) {
-            roleUpdateBuilder.updateIconName(iconName);
-        }
-        final String iconPath = (String) fields.get(RoleField.ICON_PATH);
-        if (iconPath != null && !iconPath.equals(existingRole.getIconPath())) {
-            roleUpdateBuilder.updateIconPath(iconPath);
         }
         return roleUpdateBuilder.done();
     }

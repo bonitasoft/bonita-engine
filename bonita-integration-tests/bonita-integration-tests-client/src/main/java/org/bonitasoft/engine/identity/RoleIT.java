@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,9 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -141,7 +142,7 @@ public class RoleIT extends TestWithTechnicalUser {
         final String teamManager = "teamManager";
         final Role roleCreated2 = getIdentityAPI().createRole(teamManager);
 
-        final List<Long> roleIds = new ArrayList<Long>();
+        final List<Long> roleIds = new ArrayList<>();
         roleIds.add(roleCreated1.getId());
         roleIds.add(roleCreated2.getId());
 
@@ -161,7 +162,7 @@ public class RoleIT extends TestWithTechnicalUser {
         final String teamManager = "teamManager";
         final Role roleCreated2 = getIdentityAPI().createRole(teamManager);
 
-        final List<Long> roleIds = new ArrayList<Long>();
+        final List<Long> roleIds = new ArrayList<>();
         roleIds.add(roleCreated1.getId());
         roleIds.add(roleCreated2.getId() + 100);
 
@@ -214,7 +215,7 @@ public class RoleIT extends TestWithTechnicalUser {
         final String developer = "developer";
         final Role role1 = getIdentityAPI().createRole(manager);
         final Role role2 = getIdentityAPI().createRole(developer);
-        final List<Long> roleIds = new ArrayList<Long>();
+        final List<Long> roleIds = new ArrayList<>();
         roleIds.add(role2.getId());
         roleIds.add(role1.getId());
         getIdentityAPI().deleteRoles(roleIds);
@@ -233,7 +234,7 @@ public class RoleIT extends TestWithTechnicalUser {
 
     @Test
     public void canDeleteNoRole() throws BonitaException {
-        final List<Long> roleIds = new ArrayList<Long>();
+        final List<Long> roleIds = new ArrayList<>();
         getIdentityAPI().deleteRoles(roleIds);
     }
 
@@ -285,7 +286,7 @@ public class RoleIT extends TestWithTechnicalUser {
         final User user1 = getIdentityAPI().createUser("user1", "bpm");
         final User user2 = getIdentityAPI().createUser("user2", "bpm");
         final User user3 = getIdentityAPI().createUser("user3", "bpm");
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(user1.getId());
         userIds.add(user2.getId());
 
@@ -313,7 +314,7 @@ public class RoleIT extends TestWithTechnicalUser {
 
         final User user1 = getIdentityAPI().createUser("user1", "bpm");
         final User user2 = getIdentityAPI().createUser("user2", "bpm");
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(user1.getId());
         userIds.add(user2.getId());
 
@@ -443,7 +444,8 @@ public class RoleIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteRole(dev.getId());
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchRole", "Apostrophe" }, jira = "ENGINE-366")
+    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchRole",
+            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchRoleWithApostrophe() throws BonitaException {
         final RoleCreator roleCreator1 = new RoleCreator("mana'ger");
@@ -487,7 +489,7 @@ public class RoleIT extends TestWithTechnicalUser {
         final long roleCId = RoleC.getId();
         final long roleDId = RoleD.getId();
 
-        final List<Long> roleIds = new ArrayList<Long>();
+        final List<Long> roleIds = new ArrayList<>();
         roleIds.add(roleAId);
         roleIds.add(roleBId);
         roleIds.add(roleCId);
@@ -514,4 +516,38 @@ public class RoleIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteRole(createdRole.getId());
     }
 
+    @Test
+    public void should_createRole_with_icon_creates_the_icon() throws Exception {
+        //given
+        Role aRole = getIdentityAPI().createRole(new RoleCreator("aRole").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        //when
+        Icon icon = getIdentityAPI().getIcon(aRole.getIconId());
+        //then
+        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/png", new byte[] { 1, 2, 3 }));
+        //clean up
+        deleteRoles(aRole);
+    }
+
+    @Test
+    public void should_updateRole_with_icon_update_the_icon() throws Exception {
+        //given
+        Role aRole = getIdentityAPI().createRole(new RoleCreator("aRole").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        //when
+        Role role = getIdentityAPI().updateRole(aRole.getId(), new RoleUpdater().setIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
+        //then
+        Icon icon = getIdentityAPI().getIcon(role.getIconId());
+        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", new byte[] { 3, 4, 5 }));
+        //clean up
+        deleteRoles(aRole);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void should_deleteRole_with_icon_delete_the_icon() throws Exception {
+        //given
+        Role aRole = getIdentityAPI().createRole(new RoleCreator("aRole").setIcon("main.png", new byte[] { 1, 2, 3 }));
+        //when
+        getIdentityAPI().deleteRole(aRole.getId());
+        //then
+        getIdentityAPI().getIcon(aRole.getIconId());
+    }
 }

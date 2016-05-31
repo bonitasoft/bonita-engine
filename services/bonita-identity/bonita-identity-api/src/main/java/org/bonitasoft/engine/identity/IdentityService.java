@@ -860,9 +860,10 @@ public interface IdentityService {
      *
      * @param role
      *        A role object
-     * @throws SIdentityException
+     * @param iconFilename
+     * @param iconContent @throws SIdentityException
      */
-    void createRole(SRole role) throws SIdentityException;
+    void createRole(SRole role, String iconFilename, byte[] iconContent) throws SIdentityException;
 
     /**
      * Update role according to the descriptor
@@ -871,9 +872,10 @@ public interface IdentityService {
      *        The role will be updated
      * @param descriptor
      *        The update description
+     * @param iconUpdater
      * @throws SIdentityException
      */
-    void updateRole(SRole role, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    SRole updateRole(SRole role, EntityUpdateDescriptor descriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException;
 
     /**
      * Create group in DB for the given group object
@@ -1254,4 +1256,5 @@ public interface IdentityService {
      * @throws SBonitaReadException
      */
     SIcon getIcon(long id) throws SBonitaReadException;
+
 }

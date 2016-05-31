@@ -161,7 +161,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final String roleName = "myRole";
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName(roleName).done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final SRole role2 = identityService.getRoleByName(roleName);
         getTransactionService().complete();
         assertNotNull("can't find the role after adding it", role2);
@@ -208,7 +208,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id = new Date().getTime();
         final SRole testGetRole = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRole").setId(id).done();
-        identityService.createRole(testGetRole);
+        identityService.createRole(testGetRole, null, null);
         final SRole role2 = identityService.getRole(id);
         getTransactionService().complete();
 
@@ -313,10 +313,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
         final SRole role1 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles1").setId(id1).done();
-        identityService.createRole(role1);
+        identityService.createRole(role1, null, null);
         final long id2 = id1 + 1L;
         final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
-        identityService.createRole(role2);
+        identityService.createRole(role2, null, null);
 
         final List<SRole> retrievedUsers = identityService.getRoles(Arrays.asList(new Long[] { id1, id2 }));
         getTransactionService().complete();
@@ -332,10 +332,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
         final SRole role1 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles1").setId(id1).done();
-        identityService.createRole(role1);
+        identityService.createRole(role1, null, null);
         final long id2 = id1 + 1L;
         final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
-        identityService.createRole(role2);
+        identityService.createRole(role2, null, null);
 
         final List<SRole> retrievedUsers = identityService.getRoles(null);
         getTransactionService().complete();
@@ -348,10 +348,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
         final SRole role1 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles1").setId(id1).done();
-        identityService.createRole(role1);
+        identityService.createRole(role1, null, null);
         final long id2 = id1 + 1L;
         final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
-        identityService.createRole(role2);
+        identityService.createRole(role2, null, null);
 
         final List<SRole> retrievedUsers = identityService.getRoles(Collections.<Long> emptyList());
         getTransactionService().complete();
@@ -419,7 +419,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         for (int i = 0; i < 30; i++) {
             id = time + i;
             role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRolesPaginated" + i).setId(id).done();
-            identityService.createRole(role);
+            identityService.createRole(role, null, null);
         }
 
         List<SRole> retrievedRoles = identityService.getRoles(5, 5);
@@ -471,7 +471,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final ArrayList<SRole> results = new ArrayList<>();
         for (int j = 0; j < i; j++) {
             final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName(baseName + j).setDisplayName(baseLabel + j).done();
-            identityService.createRole(role);
+            identityService.createRole(role, null, null);
             results.add(role);
         }
         return results;
@@ -494,7 +494,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         for (int i = 0; i < 5; i++) {
             id = time + i;
             role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetNumberOfRoles" + i).setId(id).done();
-            identityService.createRole(role);
+            identityService.createRole(role, null, null);
         }
         assertEquals("bad count of roles", numberOfRoles + 5, identityService.getNumberOfRoles());
         getTransactionService().complete();
@@ -707,7 +707,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetUsersByRolePaginated() throws Exception {
         getTransactionService().begin();
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         for (int i = 0; i < 10; i++) {
             final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("user" + i).setPassword("kikoo");
@@ -736,7 +736,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 10; i++) {
@@ -770,7 +770,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetNumberOfUsersByRole() throws Exception {
         getTransactionService().begin();
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetNumberOfUsersByRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final long numberOfUsersByRole = identityService.getNumberOfUsersByRole(role.getId());
         final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetUsersByGroup").done();
         identityService.createGroup(group, null, null);
@@ -790,7 +790,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetUsersByGroupPaginated() throws Exception {
         getTransactionService().begin();
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
@@ -819,7 +819,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
@@ -855,7 +855,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetUsersByRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final List<SGroup> groups = createGroups(2, "testGetUsersByRoleGroup", "testGetUsersByRoleGroup", null);
         SUser user;
         for (int i = 0; i < 5; i++) {
@@ -1114,7 +1114,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id = new Date().getTime();
         final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setId(id).setName("testAddRole").done();
-        identityService.createRole(role);
+        identityService.createRole(role, null, null);
         final SRole role2 = identityService.getRole(id);
         getTransactionService().complete();
         assertNotNull("can't find the added role", role2);
@@ -1129,7 +1129,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long id = role.getId();
         final String newName = "newRoleName";
         final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SRoleUpdateBuilderFactory.class).createNewInstance().updateName(newName).done();
-        identityService.updateRole(role, changeDescriptor);
+        identityService.updateRole(role, changeDescriptor, null);
         final SRole role2 = identityService.getRole(id);
         getTransactionService().complete();
         assertNotNull("can't find the updated role", role2);
