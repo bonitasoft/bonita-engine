@@ -50,18 +50,6 @@ public class SRoleBuilderImpl implements SRoleBuilder {
     }
 
     @Override
-    public SRoleBuilder setIconName(final String iconName) {
-        role.setIconName(iconName);
-        return this;
-    }
-
-    @Override
-    public SRoleBuilder setIconPath(final String iconPath) {
-        role.setIconPath(iconPath);
-        return this;
-    }
-
-    @Override
     public SRoleBuilder setCreatedBy(final long createdBy) {
         role.setCreatedBy(createdBy);
         return this;

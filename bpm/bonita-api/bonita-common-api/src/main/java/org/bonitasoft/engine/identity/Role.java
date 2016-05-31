@@ -49,13 +49,22 @@ public interface Role extends BonitaObject {
 
     /**
      * @return the role's icon name
+     * @deprecated since 7.3.0, use #getIconId
      */
+    @Deprecated
     String getIconName();
 
     /**
      * @return the role's icon file path
+     * @deprecated since 7.3.0, use #getIconId
      */
+    @Deprecated
     String getIconPath();
+
+    /**
+     * @return the icon id of the role or null if there is no icon
+     */
+    Long getIconId();
 
     /**
      * @return the id of the user that created the role

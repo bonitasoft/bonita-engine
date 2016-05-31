@@ -329,7 +329,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     private SRole addRole(final RoleCreator creator) throws SIdentityException {
         final SRole sRole = ModelConvertor.constructSRole(creator);
-        identityService.createRole(sRole);
+        identityService.createRole(sRole, null, null);
         return sRole;
     }
 

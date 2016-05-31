@@ -27,7 +27,6 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMemberships;
-import org.bonitasoft.engine.api.impl.transaction.identity.CreateRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroups;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRole;
@@ -38,8 +37,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.GetGroups;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfUserMemberships;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfUsersInType;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetRole;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetRoleByName;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetRoles;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSContactInfo;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
@@ -50,7 +47,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersInGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersInRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateMembershipByRoleIdAndGroupId;
-import org.bonitasoft.engine.api.impl.transaction.identity.UpdateRole;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -269,6 +265,15 @@ public class IdentityAPIImpl implements IdentityAPI {
         if (updater.getFields().containsKey(GroupField.ICON_CONTENT)) {
             entityUpdateDescriptor.addField("filename", updater.getFields().get(GroupField.ICON_FILENAME));
             entityUpdateDescriptor.addField("content", updater.getFields().get(GroupField.ICON_CONTENT));
+        }
+        return entityUpdateDescriptor;
+    }
+
+    private EntityUpdateDescriptor getIconUpdater(RoleUpdater updater) {
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        if (updater.getFields().containsKey(RoleUpdater.RoleField.ICON_CONTENT)) {
+            entityUpdateDescriptor.addField("filename", updater.getFields().get(RoleUpdater.RoleField.ICON_FILENAME));
+            entityUpdateDescriptor.addField("content", updater.getFields().get(RoleUpdater.RoleField.ICON_CONTENT));
         }
         return entityUpdateDescriptor;
     }
@@ -695,20 +700,24 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
+        if (creator.getFields().containsKey(RoleCreator.RoleField.ICON_NAME) || creator.getFields().containsKey(RoleCreator.RoleField.ICON_PATH)) {
+            tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                    "setIconName and setIconPath are deprecated, use setIcon instead");
+        }
         final SRole sRole = ModelConvertor.constructSRole(creator);
         try {
             getRoleByName(sRole.getName());
             throw new AlreadyExistsException("A role named \"" + sRole.getName() + "\" already exists");
-        } catch (final RoleNotFoundException rnfe) {
+        } catch (final RoleNotFoundException ignored) {
             // Ok, role can now be created.
         }
         try {
-            final CreateRole createRole = new CreateRole(sRole, identityService);
-            createRole.execute();
+            identityService.createRole(sRole,
+                    (String) creator.getFields().get(RoleCreator.RoleField.ICON_FILENAME),
+                    (byte[]) creator.getFields().get(RoleCreator.RoleField.ICON_CONTENT));
             return ModelConvertor.toRole(sRole);
-        } catch (final SBonitaException sbe) {
-            throw new CreationException("Role create exception!", sbe);
+        } catch (final SIdentityException e) {
+            throw new CreationException("Role create exception!", e);
         }
     }
 
@@ -719,20 +728,17 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
         try {
-            final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(updateDescriptor);
-            final UpdateRole updateRole = new UpdateRole(changeDescriptor, roleId, identityService);
-            updateRole.execute();
-            return getRole(roleId);
-        } catch (final SRoleNotFoundException srnfe) {
-            throw new RoleNotFoundException(srnfe);
-        } catch (final SBonitaException e) {
+            final EntityUpdateDescriptor changeDescriptor = getRoleUpdateDescriptor(updateDescriptor, tenantAccessor.getTechnicalLoggerService());
+            return ModelConvertor.toRole(identityService.updateRole(identityService.getRole(roleId), changeDescriptor, getIconUpdater(updateDescriptor)));
+        } catch (final SRoleNotFoundException e) {
+            throw new RoleNotFoundException(e);
+        } catch (SIdentityException e) {
             throw new UpdateException(e);
         }
     }
 
-    private EntityUpdateDescriptor getRoleUpdateDescriptor(final RoleUpdater updateDescriptor) {
+    private EntityUpdateDescriptor getRoleUpdateDescriptor(final RoleUpdater updateDescriptor, TechnicalLoggerService technicalLoggerService) {
         final SRoleUpdateBuilder roleUpdateBuilder = BuilderFactory.get(SRoleUpdateBuilderFactory.class).createNewInstance();
         final Map<RoleField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<RoleField, Serializable> field : fields.entrySet()) {
@@ -747,10 +753,10 @@ public class IdentityAPIImpl implements IdentityAPI {
                     roleUpdateBuilder.updateDescription((String) field.getValue());
                     break;
                 case ICON_NAME:
-                    roleUpdateBuilder.updateIconName((String) field.getValue());
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconPath is deprecated, use setIcon instead");
                     break;
                 case ICON_PATH:
-                    roleUpdateBuilder.updateIconPath((String) field.getValue());
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconPath is deprecated, use setIcon instead");
                     break;
                 default:
                     break;
@@ -772,8 +778,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             deleteRole.execute();
             final Set<Long> removedActorIds = deleteRole.getRemovedActorIds();
             updateActorProcessDependencies(tenantAccessor, actorMappingService, removedActorIds);
-        } catch (final SRoleNotFoundException srnfe) {
-
+        } catch (final SRoleNotFoundException ignored) {
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -803,11 +808,9 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetRole getRole = new GetRole(roleId, identityService);
-            getRole.execute();
-            return ModelConvertor.toRole(getRole.getResult());
-        } catch (final SBonitaException sbe) {
-            throw new RoleNotFoundException(sbe);
+            return ModelConvertor.toRole(identityService.getRole(roleId));
+        } catch (SRoleNotFoundException e) {
+            throw new RoleNotFoundException(e);
         }
     }
 
@@ -816,10 +819,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetRoleByName getRoleByName = new GetRoleByName(roleName, identityService);
-            getRoleByName.execute();
-            return ModelConvertor.toRole(getRoleByName.getResult());
-        } catch (final SBonitaException e) {
+            return ModelConvertor.toRole(identityService.getRoleByName(roleName));
+        } catch (final SRoleNotFoundException e) {
             throw new RoleNotFoundException(e);
         }
     }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.identity.model.SRole;
 
 /**
@@ -24,15 +26,13 @@ public class SRoleImpl extends SNamedElementImpl implements SRole {
 
     private static final long serialVersionUID = 1062675620062005462L;
 
-    private String iconName;
-
-    private String iconPath;
-
     private long createdBy;
 
     private long creationDate;
 
     private long lastUpdate;
+
+    private Long iconId;
 
     public SRoleImpl() {
         super();
@@ -41,14 +41,6 @@ public class SRoleImpl extends SNamedElementImpl implements SRole {
     @Override
     public String getDiscriminator() {
         return SRole.class.getName();
-    }
-
-    public void setIconName(final String iconName) {
-        this.iconName = iconName;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
     }
 
     public void setCreatedBy(final long createdBy) {
@@ -61,16 +53,6 @@ public class SRoleImpl extends SNamedElementImpl implements SRole {
 
     public void setLastUpdate(final long lastUpdate) {
         this.lastUpdate = lastUpdate;
-    }
-
-    @Override
-    public String getIconName() {
-        return iconName;
-    }
-
-    @Override
-    public String getIconPath() {
-        return iconPath;
     }
 
     @Override
@@ -89,60 +71,31 @@ public class SRoleImpl extends SNamedElementImpl implements SRole {
     }
 
     @Override
-    public String toString() {
-        return "SRoleImpl [getDescription()=" + getDescription() + ", getLabel()=" + getDisplayName() + ", getName()=" + getName() + ", getId()=" + getId()
-                + ", getIconName()=" + getIconName() + ", getIconPath()=" + getIconPath() + ", getCreatedBy()=" + getCreatedBy() + ", getCreationDate()="
-                + getCreationDate() + ", getLastUpdate()=" + getLastUpdate() + "]";
+    public Long getIconId() {
+        return iconId;
+    }
+
+    public void setIconId(Long iconId) {
+        this.iconId = iconId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        SRoleImpl sRole = (SRoleImpl) o;
+        return createdBy == sRole.createdBy &&
+                creationDate == sRole.creationDate &&
+                lastUpdate == sRole.lastUpdate &&
+                Objects.equals(iconId, sRole.iconId);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
-        result = prime * result + (int) (creationDate ^ creationDate >>> 32);
-        result = prime * result + (iconName == null ? 0 : iconName.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (lastUpdate ^ lastUpdate >>> 32);
-        return result;
+        return Objects.hash(super.hashCode(), createdBy, creationDate, lastUpdate, iconId);
     }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SRoleImpl other = (SRoleImpl) obj;
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate != other.creationDate) {
-            return false;
-        }
-        if (iconName == null) {
-            if (other.iconName != null) {
-                return false;
-            }
-        } else if (!iconName.equals(other.iconName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (lastUpdate != other.lastUpdate) {
-            return false;
-        }
-        return true;
-    }
-
 }

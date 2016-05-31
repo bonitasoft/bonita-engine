@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.impl;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.bonitasoft.engine.identity.Role;
 
@@ -34,15 +35,13 @@ public class RoleImpl implements Role {
 
     private String description;
 
-    private String iconName;
-
-    private String iconPath;
-
     private long createdBy;
 
     private Date creationDate;
 
     private Date lastUpdate;
+
+    private Long iconId;
 
     public RoleImpl(final long id, final String name) {
         super();
@@ -56,14 +55,6 @@ public class RoleImpl implements Role {
 
     public void setDescription(final String description) {
         this.description = description;
-    }
-
-    public void setIconName(final String iconName) {
-        this.iconName = iconName;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
     }
 
     public void setCreatedBy(final long createdBy) {
@@ -100,12 +91,12 @@ public class RoleImpl implements Role {
 
     @Override
     public String getIconName() {
-        return iconName;
+        return iconId != null ? iconId.toString() : "";
     }
 
     @Override
     public String getIconPath() {
-        return iconPath;
+        return iconId != null ? iconId.toString() : "";
     }
 
     @Override
@@ -124,89 +115,47 @@ public class RoleImpl implements Role {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
-        result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (iconName == null ? 0 : iconName.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (lastUpdate == null ? 0 : lastUpdate.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (int) (id ^ id >>> 32);
-        return result;
+    public Long getIconId() {
+        return iconId;
+    }
+
+    public void setIconId(Long iconId) {
+        this.iconId = iconId;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RoleImpl other = (RoleImpl) obj;
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate == null) {
-            if (other.creationDate != null) {
-                return false;
-            }
-        } else if (!creationDate.equals(other.creationDate)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (iconName == null) {
-            if (other.iconName != null) {
-                return false;
-            }
-        } else if (!iconName.equals(other.iconName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (lastUpdate == null) {
-            if (other.lastUpdate != null) {
-                return false;
-            }
-        } else if (!lastUpdate.equals(other.lastUpdate)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        return true;
+    public String toString() {
+        return "RoleImpl{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", description='" + description + '\'' +
+                ", createdBy=" + createdBy +
+                ", creationDate=" + creationDate +
+                ", lastUpdate=" + lastUpdate +
+                ", iconId=" + iconId +
+                '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        RoleImpl role = (RoleImpl) o;
+        return id == role.id &&
+                createdBy == role.createdBy &&
+                Objects.equals(name, role.name) &&
+                Objects.equals(displayName, role.displayName) &&
+                Objects.equals(description, role.description) &&
+                Objects.equals(creationDate, role.creationDate) &&
+                Objects.equals(lastUpdate, role.lastUpdate) &&
+                Objects.equals(iconId, role.iconId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, displayName, description, createdBy, creationDate, lastUpdate, iconId);
+    }
 }

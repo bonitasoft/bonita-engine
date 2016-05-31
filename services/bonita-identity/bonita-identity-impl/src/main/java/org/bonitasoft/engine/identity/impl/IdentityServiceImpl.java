@@ -75,6 +75,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
 import org.bonitasoft.engine.identity.model.impl.SIconImpl;
+import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
@@ -224,10 +225,14 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createRole(final SRole role) throws SIdentityException {
+    public void createRole(final SRole role, String iconFilename, byte[] iconContent) throws SIdentityException {
         final String methodName = "createRole";
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.CREATED, "Adding a new role with name " + role.getName());
         try {
+            if (iconFilename != null && iconContent != null) {
+                SIcon icon = createIcon(iconFilename, iconContent);
+                (((SRoleImpl) role)).setIconId(icon.getId());
+            }
             final InsertRecord insertRecord = new InsertRecord(role);
             final SInsertEvent insertEvent = getInsertEvent(role, ROLE);
             recorder.recordInsert(insertRecord, insertEvent);
@@ -477,11 +482,14 @@ public class IdentityServiceImpl implements IdentityService {
         final String methodName = "deleteRole";
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.DELETED, "Deleting role with name " + role.getName());
         try {
+            if (role.getIconId() != null) {
+                deleteIcon(role.getIconId());
+            }
             final DeleteRecord deleteRecord = new DeleteRecord(role);
             final SDeleteEvent deleteEvent = getDeleteEvent(role, ROLE);
             recorder.recordDelete(deleteRecord, deleteEvent);
             log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        } catch (final SRecorderException re) {
+        } catch (final SRecorderException | SBonitaReadException re) {
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SRoleDeletionException(re);
         }
@@ -1229,10 +1237,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateRole(final SRole role, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public SRole updateRole(final SRole role, final EntityUpdateDescriptor descriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException {
         final String methodName = "updateRole";
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.UPDATED, "Updating the role with name " + role.getName());
         try {
+            if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
+                updateOrRemoveIcon(descriptor, iconUpdater, role);
+            }
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(role, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(ROLE, EventActionType.UPDATED)) {
@@ -1240,10 +1251,11 @@ public class IdentityServiceImpl implements IdentityService {
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-        } catch (final SRecorderException e) {
+        } catch (final SRecorderException | SBonitaReadException e) {
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't update role " + role, e);
         }
+        return role;
     }
 
     @Override

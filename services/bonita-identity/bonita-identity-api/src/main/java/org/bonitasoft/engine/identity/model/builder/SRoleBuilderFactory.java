@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.identity.model.builder;
 
-
 /**
  * @author Baptiste Mesta
  * @author Bole Zhang
@@ -30,10 +29,6 @@ public interface SRoleBuilderFactory {
     String getDisplayNameKey();
 
     String getDescriptionKey();
-
-    String getIconNameKey();
-
-    String getIconPathKey();
 
     String getCreatedByKey();
 

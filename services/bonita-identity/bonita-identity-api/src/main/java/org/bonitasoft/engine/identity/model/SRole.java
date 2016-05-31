@@ -18,11 +18,7 @@ package org.bonitasoft.engine.identity.model;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SRole extends SNamedElement {
-
-    String getIconName();
-
-    String getIconPath();
+public interface SRole extends SNamedElement, SHavingIcon {
 
     long getCreatedBy();
 

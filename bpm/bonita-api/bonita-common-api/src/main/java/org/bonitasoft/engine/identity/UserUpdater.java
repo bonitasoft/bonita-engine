@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * represents a helper for updating a {@link User}. Chaining is possible with this updator to ease the {@link User} update.
@@ -196,5 +197,31 @@ public class UserUpdater implements Serializable {
         fields.put(UserField.ICON_FILENAME, filename);
         fields.put(UserField.ICON_CONTENT, content);
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserUpdater that = (UserUpdater) o;
+        return Objects.equals(fields, that.fields) &&
+                Objects.equals(persoContactUpdater, that.persoContactUpdater) &&
+                Objects.equals(proContactUpdater, that.proContactUpdater);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fields, persoContactUpdater, proContactUpdater);
+    }
+
+    @Override
+    public String toString() {
+        return "UserUpdater{" +
+                "fields=" + fields +
+                ", persoContactUpdater=" + persoContactUpdater +
+                ", proContactUpdater=" + proContactUpdater +
+                '}';
     }
 }
