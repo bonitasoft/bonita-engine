@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +91,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     private SGroup createSGroup(final String groupName) throws SBonitaException {
         this.transactionService.begin();
         final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName(groupName).done();
-        this.identityService.createGroup(group);
+        this.identityService.createGroup(group, null, null);
         this.transactionService.complete();
         return group;
     }
@@ -170,9 +168,10 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SProcessSupervisor> createUserSupervisors(final List<SUser> users) throws Exception {
-        final List<SProcessSupervisor> supervisorList = new ArrayList<SProcessSupervisor>();
+        final List<SProcessSupervisor> supervisorList = new ArrayList<>();
         for (final SUser sUser : users) {
-            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setUserId(sUser.getId()).done();
+            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId)
+                    .setUserId(sUser.getId()).done();
             final SProcessSupervisor createdSupervisor = createSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
         }
@@ -191,10 +190,11 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SProcessSupervisor> createRoleSupervisors(final List<SRole> roles) throws Exception {
-        final List<SProcessSupervisor> supervisorList = new ArrayList<SProcessSupervisor>();
+        final List<SProcessSupervisor> supervisorList = new ArrayList<>();
         this.transactionService.begin();
         for (final SRole sRole : roles) {
-            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setRoleId(sRole.getId()).done();
+            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId)
+                    .setRoleId(sRole.getId()).done();
             final SProcessSupervisor createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
         }
@@ -203,10 +203,11 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SProcessSupervisor> createGroupSupervisors(final List<SGroup> groups) throws Exception {
-        final List<SProcessSupervisor> supervisorList = new ArrayList<SProcessSupervisor>();
+        final List<SProcessSupervisor> supervisorList = new ArrayList<>();
         this.transactionService.begin();
         for (final SGroup sGroup : groups) {
-            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setGroupId(sGroup.getId()).done();
+            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId)
+                    .setGroupId(sGroup.getId()).done();
             final SProcessSupervisor createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
         }
@@ -215,10 +216,11 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SProcessSupervisor> createRoleAndGroupSupervisors(final Map<Long, Long> roleGroupMap) throws Exception {
-        final List<SProcessSupervisor> supervisorList = new ArrayList<SProcessSupervisor>();
+        final List<SProcessSupervisor> supervisorList = new ArrayList<>();
         this.transactionService.begin();
         for (final Entry<Long, Long> roleGroup : roleGroupMap.entrySet()) {
-            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId).setRoleId(roleGroup.getKey())
+            final SProcessSupervisor supervisor = BuilderFactory.get(SProcessSupervisorBuilderFactory.class).createNewInstance(this.processDefId)
+                    .setRoleId(roleGroup.getKey())
                     .setGroupId(roleGroup.getValue()).done();
             final SProcessSupervisor createdSupervisor = supervisorService.createProcessSupervisor(supervisor);
             supervisorList.add(createdSupervisor);
@@ -229,7 +231,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testSearchProcessDefSupervisorsInOrder() throws Exception {
-        final List<SUser> users = new ArrayList<SUser>(5);
+        final List<SUser> users = new ArrayList<>(5);
         users.add(createSUser("roberto", "bpm"));
         users.add(createSUser("joao", "bpm"));
         users.add(createSUser("maria", "bpm"));
@@ -238,14 +240,16 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
         final List<SProcessSupervisor> createdSupervisorList = createUserSupervisors(users);
         assertEquals(5, createdSupervisorList.size());
         this.transactionService.begin();
-        final List<OrderByOption> oderByOptions = Collections.singletonList(new OrderByOption(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey(),
-                OrderByType.DESC));
-        final List<FilterOption> filterOptions = Collections.singletonList(new FilterOption(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class)
-                .getProcessDefIdKey(),
-                this.processDefId));
+        final List<OrderByOption> orderByOptions = Collections
+                .singletonList(new OrderByOption(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey(),
+                        OrderByType.DESC));
+        final List<FilterOption> filterOptions = Collections
+                .singletonList(new FilterOption(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class)
+                        .getProcessDefIdKey(),
+                        this.processDefId));
 
         // test ASC
-        final QueryOptions searchOptions = new QueryOptions(0, 6, oderByOptions, filterOptions, null);
+        final QueryOptions searchOptions = new QueryOptions(0, 6, orderByOptions, filterOptions, null);
         final List<SProcessSupervisor> gotSupervisorList1 = supervisorService.searchProcessSupervisors(searchOptions);
         assertEquals(5, gotSupervisorList1.size());
         assertEquals(createdSupervisorList.get(4).getId(), gotSupervisorList1.get(0).getId());

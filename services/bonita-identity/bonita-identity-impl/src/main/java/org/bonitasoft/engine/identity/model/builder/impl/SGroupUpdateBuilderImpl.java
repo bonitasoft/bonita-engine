@@ -61,18 +61,6 @@ public class SGroupUpdateBuilderImpl implements SGroupUpdateBuilder {
     }
 
     @Override
-    public SGroupUpdateBuilder updateIconName(final String iconName) {
-        descriptor.addField(SGroupBuilderFactoryImpl.ICON_NAME, iconName);
-        return this;
-    }
-
-    @Override
-    public SGroupUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(SGroupBuilderFactoryImpl.ICON_PATH, iconPath);
-        return this;
-    }
-
-    @Override
     public SGroupUpdateBuilder updateCreatedBy(final long createdBy) {
         descriptor.addField(SGroupBuilderFactoryImpl.CREATED_BY, createdBy);
         return this;

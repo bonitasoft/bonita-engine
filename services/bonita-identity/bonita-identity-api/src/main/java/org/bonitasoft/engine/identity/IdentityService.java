@@ -880,9 +880,10 @@ public interface IdentityService {
      *
      * @param group
      *        A group object
-     * @throws SGroupCreationException
+     * @param iconFileName
+     * @param iconContent @throws SGroupCreationException
      */
-    void createGroup(SGroup group) throws SGroupCreationException;
+    void createGroup(SGroup group, String iconFileName, byte[] iconContent) throws SGroupCreationException;
 
     /**
      * Update group according to the descriptor
@@ -891,9 +892,10 @@ public interface IdentityService {
      *        The group will be updated
      * @param descriptor
      *        The update description
+     * @param iconUpdater
      * @throws SIdentityException
      */
-    void updateGroup(SGroup group, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    void updateGroup(SGroup group, EntityUpdateDescriptor descriptor, EntityUpdateDescriptor iconUpdater) throws SIdentityException;
 
     /**
      * Create userMembership in DB for the given userMembership object

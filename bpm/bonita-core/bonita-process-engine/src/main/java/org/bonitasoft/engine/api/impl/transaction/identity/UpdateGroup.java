@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -31,7 +29,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class UpdateGroup implements TransactionContent {
+public class UpdateGroup {
 
     private static final int BATCH_SIZE = 100;
 
@@ -40,55 +38,47 @@ public class UpdateGroup implements TransactionContent {
     private final EntityUpdateDescriptor changeDescriptor;
 
     private final IdentityService identityService;
+    private EntityUpdateDescriptor iconUpdater;
 
-    private SGroup sGroup;
-
-    public UpdateGroup(final long groupId, final EntityUpdateDescriptor changeDescriptor, final IdentityService identityService) {
+    public UpdateGroup(final long groupId, final EntityUpdateDescriptor changeDescriptor, final IdentityService identityService,
+            EntityUpdateDescriptor iconUpdater) {
         this.groupId = groupId;
         this.changeDescriptor = changeDescriptor;
         this.identityService = identityService;
+        this.iconUpdater = iconUpdater;
     }
 
-    @Override
-    public void execute() throws SBonitaException {
-        sGroup = identityService.getGroup(groupId);
+    public SGroup update() throws SIdentityException {
+        SGroup sGroup = identityService.getGroup(groupId);
 
-        updateGroup(sGroup, changeDescriptor);
-    }
-
-    private void updateGroup(final SGroup group, final EntityUpdateDescriptor changeDescriptor) throws SIdentityException {
-        final SGroupBuilderFactory sGroupFactiry = BuilderFactory.get(SGroupBuilderFactory.class);
+        final SGroupBuilderFactory sGroupBuilderFactory = BuilderFactory.get(SGroupBuilderFactory.class);
         // if the parent path changes it's also necessary to change the children's parent path
-        final String parentPathKey = sGroupFactiry.getParentPathKey();
-        final String nameKey = sGroupFactiry.getNameKey();
+        final String parentPathKey = sGroupBuilderFactory.getParentPathKey();
+        final String nameKey = sGroupBuilderFactory.getNameKey();
         final Map<String, Object> fields = changeDescriptor.getFields();
         if (fields.containsKey(parentPathKey) || fields.containsKey(nameKey)) {
-            final String parentPath = fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : group.getParentPath();
-            final String groupName = fields.containsKey(nameKey) ? (String) fields.get(nameKey) : group.getName();
-            updateChildren(group, parentPath, sGroupFactiry.getIdKey(), parentPathKey, groupName);
+            final String parentPath = fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : sGroup.getParentPath();
+            final String groupName = fields.containsKey(nameKey) ? (String) fields.get(nameKey) : sGroup.getName();
+            updateChildren(sGroup, parentPath, sGroupBuilderFactory.getIdKey(), parentPathKey, groupName);
         }
-        identityService.updateGroup(group, changeDescriptor);
+        identityService.updateGroup(sGroup, changeDescriptor, iconUpdater);
+        return sGroup;
     }
 
     private void updateChildren(final SGroup group, final String parentPath, final String idKey, final String parentPathKey, final String groupName)
             throws SIdentityException {
-        List<SGroup> groupChildren = null;
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(parentPath);
-        stringBuilder.append('/');
-        stringBuilder.append(groupName);
-        final String parentPath2 = stringBuilder.toString();
+        List<SGroup> groupChildren;
         int i = 0;
         do {
             groupChildren = identityService.getGroupChildren(group.getId(), i * BATCH_SIZE, BATCH_SIZE, idKey, OrderByType.ASC);
             i++;
             for (final SGroup child : groupChildren) {
-                updateChildren(child, parentPath2, idKey, parentPathKey, child.getName());
+                updateChildren(child, parentPath + '/' + groupName, idKey, parentPathKey, child.getName());
             }
         } while (!groupChildren.isEmpty());
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         updateDescriptor.addField(parentPathKey, parentPath);
-        identityService.updateGroup(group, updateDescriptor);
+        identityService.updateGroup(group, updateDescriptor, null);
 
     }
 

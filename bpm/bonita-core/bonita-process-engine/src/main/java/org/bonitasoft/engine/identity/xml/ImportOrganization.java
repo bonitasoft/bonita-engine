@@ -86,14 +86,14 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy,
             final SCustomUserInfoValueAPI userInfoValueAPI)
-                    throws OrganizationImportException {
+            throws OrganizationImportException {
         this.serviceAccessor = serviceAccessor;
         this.userInfoValueAPI = userInfoValueAPI;
         identityService = serviceAccessor.getIdentityService();
         this.organizationContent = updateNamespace(organizationContent);
         parser = serviceAccessor.getParserFactgory().createParser(OrganizationNodeBuilder.BINDINGS);
         logger = serviceAccessor.getTechnicalLoggerService();
-        warnings = new ArrayList<String>();
+        warnings = new ArrayList<>();
         switch (policy) {
             case FAIL_ON_DUPLICATES:
                 strategy = new ImportOrganizationFailOnDuplicatesStrategy();
@@ -238,7 +238,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     }
 
     private Map<String, Long> importGroups(final List<GroupCreator> groupCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
-        final Map<String, Long> groupPathToIdMap = new HashMap<String, Long>(groupCreators.size());
+        final Map<String, Long> groupPathToIdMap = new HashMap<>(groupCreators.size());
         for (final GroupCreator groupCreator : groupCreators) {
             SGroup sGroup;
             try {
@@ -264,7 +264,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     }
 
     private Map<String, Long> importRoles(final List<RoleCreator> roleCreators) throws ImportDuplicateInOrganizationException, SIdentityException {
-        final Map<String, Long> roleNameToIdMap = new HashMap<String, Long>(roleCreators.size());
+        final Map<String, Long> roleNameToIdMap = new HashMap<>(roleCreators.size());
         for (final RoleCreator roleCreator : roleCreators) {
             SRole sRole;
             try {
@@ -322,7 +322,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     private SGroup addGroup(final GroupCreator creator) throws SGroupCreationException {
         final SGroup sGroup = ModelConvertor.constructSGroup(creator);
-        identityService.createGroup(sGroup);
+        identityService.createGroup(sGroup, (String) creator.getFields().get(GroupField.ICON_FILENAME),
+                (byte[]) creator.getFields().get(GroupField.ICON_CONTENT));
         return sGroup;
     }
 

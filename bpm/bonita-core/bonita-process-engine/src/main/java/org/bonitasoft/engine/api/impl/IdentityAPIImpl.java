@@ -27,7 +27,6 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.AddUserMemberships;
-import org.bonitasoft.engine.api.impl.transaction.identity.CreateGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.CreateRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteGroups;
@@ -35,7 +34,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteRoles;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUser;
 import org.bonitasoft.engine.api.impl.transaction.identity.DeleteUsers;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetGroupByPath;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetGroups;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetNumberOfUserMemberships;
@@ -44,7 +42,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.GetRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetRoleByName;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetRoles;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSContactInfo;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetSGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembershipsOfGroup;
@@ -57,7 +54,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.UpdateRole;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -93,6 +89,7 @@ import org.bonitasoft.engine.identity.RoleCriterion;
 import org.bonitasoft.engine.identity.RoleNotFoundException;
 import org.bonitasoft.engine.identity.RoleUpdater;
 import org.bonitasoft.engine.identity.RoleUpdater.RoleField;
+import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -131,6 +128,8 @@ import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportOrganization;
 import org.bonitasoft.engine.identity.xml.ImportOrganization;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -192,6 +191,10 @@ public class IdentityAPIImpl implements IdentityAPI {
         validateUserCreator(creator);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         IdentityService identityService = tenantAccessor.getIdentityService();
+        if (creator.getFields().containsKey(UserCreator.UserField.ICON_NAME) || creator.getFields().containsKey(UserCreator.UserField.ICON_PATH)) {
+            tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                    "setIconName and setIconPath are deprecated, use setIcon instead");
+        }
         final SUser sUser = ModelConvertor.constructSUser(creator);
         final SContactInfo personalContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), true);
         final SContactInfo proContactInfo = ModelConvertor.constructSUserContactInfo(creator, sUser.getId(), false);
@@ -236,7 +239,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
 
         // User change
-        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater);
+        final EntityUpdateDescriptor userUpdateDescriptor = getUserUpdateDescriptor(updater, tenantAccessor.getTechnicalLoggerService());
         // Personal data change
         final EntityUpdateDescriptor personalDataUpdateDescriptor = getUserContactInfoUpdateDescriptor(updater.getPersoContactUpdater());
         // Professional data change
@@ -261,7 +264,16 @@ public class IdentityAPIImpl implements IdentityAPI {
         return entityUpdateDescriptor;
     }
 
-    private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor) {
+    private EntityUpdateDescriptor getIconUpdater(GroupUpdater updater) {
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        if (updater.getFields().containsKey(GroupField.ICON_CONTENT)) {
+            entityUpdateDescriptor.addField("filename", updater.getFields().get(GroupField.ICON_FILENAME));
+            entityUpdateDescriptor.addField("content", updater.getFields().get(GroupField.ICON_CONTENT));
+        }
+        return entityUpdateDescriptor;
+    }
+
+    private EntityUpdateDescriptor getUserUpdateDescriptor(final UserUpdater updateDescriptor, TechnicalLoggerService technicalLoggerService) {
         final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
         if (updateDescriptor != null) {
             final Map<UserField, Serializable> fields = updateDescriptor.getFields();
@@ -283,8 +295,10 @@ public class IdentityAPIImpl implements IdentityAPI {
                         userUpdateBuilder.updateManagerUserId((Long) field.getValue());
                         break;
                     case ICON_NAME:
+                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconName is deprecated, use setIcon instead");
                         break;
                     case ICON_PATH:
+                        technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "setIconPath is deprecated, use setIcon instead");
                         break;
                     case TITLE:
                         userUpdateBuilder.updateTitle((String) field.getValue());
@@ -888,30 +902,38 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public Group createGroup(final String name, final String parentPath) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final String name, final String parentPath) throws CreationException {
         final GroupCreator groupCreator = new GroupCreator(name);
         groupCreator.setParentPath(parentPath);
         return createGroup(groupCreator);
     }
 
     @Override
-    public Group createGroup(final GroupCreator creator) throws AlreadyExistsException, CreationException {
+    public Group createGroup(final GroupCreator creator) throws CreationException {
         if (creator == null) {
             throw new CreationException("Cannot create a null group");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-
+        if (creator.getFields().containsKey(GroupCreator.GroupField.ICON_NAME) || creator.getFields().containsKey(GroupCreator.GroupField.ICON_PATH)) {
+            tenantAccessor.getTechnicalLoggerService().log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING,
+                    "setIconName and setIconPath are deprecated, use setIcon instead");
+        }
         final SGroup sGroup = ModelConvertor.constructSGroup(creator);
         try {
-            final CreateGroup createGroup = new CreateGroup(sGroup, identityService);
-            createGroup.execute();
-            return ModelConvertor.toGroup(sGroup);
-        } catch (final SObjectAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        } catch (final SBonitaException e) {
+            identityService.getGroupByPath(sGroup.getPath());
+            throw new AlreadyExistsException("Group named \"" + sGroup.getName() + "\" already exists");
+        } catch (final SGroupNotFoundException ignored) {
+
+        }
+        try {
+            identityService.createGroup(sGroup,
+                    (String) creator.getFields().get(GroupCreator.GroupField.ICON_FILENAME),
+                    (byte[]) creator.getFields().get(GroupCreator.GroupField.ICON_CONTENT));
+        } catch (SGroupCreationException e) {
             throw new CreationException(e);
         }
+        return ModelConvertor.toGroup(sGroup);
     }
 
     @Override
@@ -922,42 +944,43 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final SGroup group = getSGroup(groupId, tenantAccessor);
-            final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater);
-            final UpdateGroup updateGroup = new UpdateGroup(group.getId(), changeDescriptor, identityService);
-            updateGroup.execute();
-            return getGroup(groupId);
-        } catch (final SGroupNotFoundException sgnfe) {
-            throw new GroupNotFoundException(sgnfe);
-        } catch (final SBonitaException sbe) {
+            final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater, tenantAccessor.getTechnicalLoggerService());
+            return ModelConvertor.toGroup(new UpdateGroup(groupId, changeDescriptor, identityService, getIconUpdater(updater)).update());
+        } catch (final SGroupNotFoundException e) {
+            throw new GroupNotFoundException(e);
+        } catch (final SIdentityException sbe) {
             throw new UpdateException(sbe);
         }
     }
 
-    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor) throws UpdateException {
+    private EntityUpdateDescriptor getGroupUpdateDescriptor(final GroupUpdater updateDescriptor, TechnicalLoggerService technicalLoggerService)
+            throws UpdateException {
         final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class).createNewInstance();
         final Map<GroupField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<GroupField, Serializable> field : fields.entrySet()) {
-            final String value = (String) field.getValue();
+            final Serializable value = field.getValue();
             switch (field.getKey()) {
                 case NAME:
-                    groupUpdateBuilder.updateName(value);
+                    groupUpdateBuilder.updateName((String) value);
                     break;
                 case DISPLAY_NAME:
-                    groupUpdateBuilder.updateDisplayName(value);
+                    groupUpdateBuilder.updateDisplayName((String) value);
                     break;
                 case DESCRIPTION:
-                    groupUpdateBuilder.updateDescription(value);
+                    groupUpdateBuilder.updateDescription((String) value);
                     break;
                 case ICON_NAME:
-                    groupUpdateBuilder.updateIconName(value);
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "updateIconName is deprecated, use updateIcon instead");
                     break;
                 case ICON_PATH:
-                    groupUpdateBuilder.updateIconPath(value);
+                    technicalLoggerService.log(IdentityAPIImpl.class, TechnicalLogSeverity.WARNING, "updateIconPath is deprecated, use updateIcon instead");
+                    break;
+                case ICON_CONTENT:
+                    break;
+                case ICON_FILENAME:
                     break;
                 case PARENT_PATH:
-                    final String parentPath = (value != null && value.isEmpty()) ? null : value;
-                    groupUpdateBuilder.updateParentPath(parentPath);
+                    groupUpdateBuilder.updateParentPath((value != null && ((String) value).isEmpty()) ? null : (String) value);
                     break;
                 default:
                     throw new UpdateException("Invalid field: " + field.getKey().name());
@@ -1006,38 +1029,18 @@ public class IdentityAPIImpl implements IdentityAPI {
     public Group getGroup(final long groupId) throws GroupNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final SGroup sGroup = getSGroup(groupId, tenantAccessor);
-            return ModelConvertor.toGroup(sGroup);
-        } catch (final SGroupNotFoundException sgnfe) {
-            throw new GroupNotFoundException(sgnfe);
-        }
-    }
-
-    private SGroup getSGroup(final long groupId, final TenantServiceAccessor tenantAccessor) throws SGroupNotFoundException {
-        final IdentityService identityService = tenantAccessor.getIdentityService();
-        try {
-            final GetSGroup getSGroup = new GetSGroup(groupId, identityService);
-            getSGroup.execute();
-            return getSGroup.getResult();
-        } catch (final SGroupNotFoundException sgnfe) {
-            throw sgnfe;
-        } catch (final SBonitaException sbe) {
-            throw new RetrieveException(sbe);
+            return ModelConvertor.toGroup(tenantAccessor.getIdentityService().getGroup(groupId));
+        } catch (final SGroupNotFoundException e) {
+            throw new GroupNotFoundException(e);
         }
     }
 
     @Override
     public Group getGroupByPath(final String groupPath) throws GroupNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final GetGroupByPath getGroup = new GetGroupByPath(groupPath, identityService);
-            getGroup.execute();
-            return ModelConvertor.toGroup(getGroup.getResult());
-        } catch (final SGroupNotFoundException sgnfe) {
-            throw new GroupNotFoundException(sgnfe);
-        } catch (final SBonitaException sbe) {
-            throw new RetrieveException(sbe);
+            return ModelConvertor.toGroup(getTenantAccessor().getIdentityService().getGroupByPath(groupPath));
+        } catch (final SGroupNotFoundException e) {
+            throw new GroupNotFoundException(e);
         }
     }
 

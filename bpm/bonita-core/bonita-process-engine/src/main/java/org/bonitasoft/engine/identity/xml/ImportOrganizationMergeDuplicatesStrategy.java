@@ -67,7 +67,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     public void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws SIdentityException {
         final EntityUpdateDescriptor descriptor = getGroupDescriptor(existingGroup, newGroup);
         if (!descriptor.getFields().isEmpty()) {
-            identityService.updateGroup(existingGroup, descriptor);
+            identityService.updateGroup(existingGroup, descriptor, null);
         }
     }
 
@@ -166,14 +166,6 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         final String displayName = (String) fields.get(GroupField.DISPLAY_NAME);
         if (displayName != null && !displayName.equals(existingGroup.getDisplayName())) {
             groupUpdateBuilder.updateDisplayName(displayName);
-        }
-        final String iconName = (String) fields.get(GroupField.ICON_NAME);
-        if (iconName != null && !iconName.equals(existingGroup.getIconName())) {
-            groupUpdateBuilder.updateIconName(iconName);
-        }
-        final String iconPath = (String) fields.get(GroupField.ICON_PATH);
-        if (iconPath != null && !iconPath.equals(existingGroup.getIconPath())) {
-            groupUpdateBuilder.updateIconPath(iconPath);
         }
         return groupUpdateBuilder.done();
     }

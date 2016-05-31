@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,7 +221,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id = new Date().getTime();
         final SGroup testGetGroup = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroup").setId(id).done();
-        identityService.createGroup(testGetGroup);
+        identityService.createGroup(testGetGroup, null, null);
         getTransactionService().complete();
 
         getTransactionService().begin();
@@ -240,9 +236,9 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     public void testGetGroupByPath() throws Exception {
         getTransactionService().begin();
         final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("R&D").done();
-        identityService.createGroup(group);
+        identityService.createGroup(group, null, null);
         final SGroup subGroup = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setParentPath(group.getPath()).setName("R&D").done();
-        identityService.createGroup(subGroup);
+        identityService.createGroup(subGroup, null, null);
         getTransactionService().complete();
 
         getTransactionService().begin();
@@ -368,10 +364,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
         final SGroup group1 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups1").setId(id1).done();
-        identityService.createGroup(group1);
+        identityService.createGroup(group1, null, null);
         final long id2 = id1 + 1L;
         final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
-        identityService.createGroup(group2);
+        identityService.createGroup(group2, null, null);
 
         final List<SGroup> retrievedGroups = identityService.getGroups(Arrays.asList(new Long[] { id1, id2 }));
         getTransactionService().complete();
@@ -387,10 +383,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
         final SGroup group1 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups1").setId(id1).done();
-        identityService.createGroup(group1);
+        identityService.createGroup(group1, null, null);
         final long id2 = id1 + 1L;
         final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
-        identityService.createGroup(group2);
+        identityService.createGroup(group2, null, null);
 
         final List<SGroup> retrievedGroups = identityService.getGroups(null);
         getTransactionService().complete();
@@ -403,10 +399,10 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id1 = new Date().getTime();
         final SGroup group1 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups1").setId(id1).done();
-        identityService.createGroup(group1);
+        identityService.createGroup(group1, null, null);
         final long id2 = id1 + 1L;
         final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
-        identityService.createGroup(group2);
+        identityService.createGroup(group2, null, null);
 
         final List<SGroup> retrievedGroups = identityService.getGroups(Collections.<Long> emptyList());
         getTransactionService().complete();
@@ -472,7 +468,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SRole> createRoles(final int i, final String baseName, final String baseLabel) throws SIdentityException {
-        final ArrayList<SRole> results = new ArrayList<SRole>();
+        final ArrayList<SRole> results = new ArrayList<>();
         for (int j = 0; j < i; j++) {
             final SRole role = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName(baseName + j).setDisplayName(baseLabel + j).done();
             identityService.createRole(role);
@@ -516,7 +512,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         for (int i = 0; i < 30; i++) {
             id = time + i;
             group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroupsPaginated" + i).setId(id).done();
-            identityService.createGroup(group);
+            identityService.createGroup(group, null, null);
         }
 
         List<SGroup> retrievedGroups = identityService.getGroups(5, 5);
@@ -567,14 +563,14 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SGroup> createGroups(final int i, final String basename, final String baseLabel, final SGroup g) throws SIdentityException {
-        final List<SGroup> groups = new ArrayList<SGroup>();
+        final List<SGroup> groups = new ArrayList<>();
         for (int j = 0; j < i; j++) {
             final SGroupBuilder inst = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName(basename + j).setDisplayName(baseLabel + j);
             if (g != null) {
                 inst.setParentPath(g.getPath());
             }
             final SGroup group = inst.done();
-            identityService.createGroup(group);
+            identityService.createGroup(group, null, null);
             groups.add(group);
         }
         return groups;
@@ -597,7 +593,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         for (int i = 0; i < 5; i++) {
             id = time + i;
             group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetNumberOfGroups" + i).setId(id).done();
-            identityService.createGroup(group);
+            identityService.createGroup(group, null, null);
         }
         assertEquals("bad count of groups", numberOfGroups + 5, identityService.getNumberOfGroups());
         getTransactionService().complete();
@@ -777,7 +773,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         identityService.createRole(role);
         final long numberOfUsersByRole = identityService.getNumberOfUsersByRole(role.getId());
         final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetUsersByGroup").done();
-        identityService.createGroup(group);
+        identityService.createGroup(group, null, null);
         SUser user;
         for (int i = 0; i < 5; i++) {
             user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testGetNumberOfUsersByRole" + i).setPassword("kikoo").done();
@@ -950,7 +946,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SUser> createUsers(final int i, final String baseUsername) throws SIdentityException {
-        final List<SUser> ids = new ArrayList<SUser>();
+        final List<SUser> ids = new ArrayList<>();
         for (int j = 0; j < i; j++) {
             final SUser user = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(baseUsername + j).setFirstName("firstName" + j)
                     .setLastName("lastName" + j).setPassword("password" + j).done();
@@ -1145,7 +1141,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         final long id = new Date().getTime();
         final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setId(id).setName("testAddGroup").done();
-        identityService.createGroup(group);
+        identityService.createGroup(group, null, null);
         final SGroup group2 = identityService.getGroup(id);
         getTransactionService().complete();
         assertNotNull("can't find the added group", group2);
@@ -1159,7 +1155,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final long id = group.getId();
         final String newName = "newGroupName";
         final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SGroupUpdateBuilderFactory.class).createNewInstance().updateName(newName).done();
-        identityService.updateGroup(group, changeDescriptor);
+        identityService.updateGroup(group, changeDescriptor, null);
         final SGroup group2 = identityService.getGroup(id);
         getTransactionService().complete();
         assertNotNull("can't find the updated group", group2);
@@ -1297,8 +1293,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
                 .setLastName("lastname2").setPassword("mlbxcvjmsdkljf").done());
         getTransactionService().complete();
 
-        final Map<Class<? extends PersistentObject>, Set<String>> userAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
-        final Set<String> fields = new HashSet<String>(4);
+        final Map<Class<? extends PersistentObject>, Set<String>> userAllFields = new HashMap<>();
+        final Set<String> fields = new HashSet<>(4);
         fields.add("userName");
         fields.add("firstName");
         fields.add("lastName");

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.identity.model.builder;
 
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -29,10 +28,6 @@ public interface SGroupBuilderFactory {
     String getDisplayNameKey();
 
     String getDescriptionKey();
-
-    String getIconNameKey();
-
-    String getIconPathKey();
 
     String getCreatedByKey();
 
