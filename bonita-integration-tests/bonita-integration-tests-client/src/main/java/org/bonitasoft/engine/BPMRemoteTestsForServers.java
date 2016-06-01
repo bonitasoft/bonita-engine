@@ -27,6 +27,7 @@ import org.bonitasoft.engine.login.LoginAPIIT;
 import org.bonitasoft.engine.login.PlatformLoginAPIIT;
 import org.bonitasoft.engine.operation.OperationIT;
 import org.bonitasoft.engine.page.PageAPIIT;
+import org.bonitasoft.engine.platform.PlatformLoginIT;
 import org.bonitasoft.engine.platform.command.PlatformCommandIT;
 import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.bonitasoft.engine.process.actor.ImportActorMappingIT;
@@ -39,6 +40,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+        PlatformLoginIT.class,
         RemoteEngineIT.class, // this class is only in remote (we test that server stack trace are reported in client side)
         ImportActorMappingIT.class,
         PlatformCommandIT.class,
