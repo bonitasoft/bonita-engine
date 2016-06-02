@@ -34,8 +34,8 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
+import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.PlatformSetup;
-import org.bonitasoft.platform.setup.PlatformSetupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -73,7 +73,7 @@ public class EngineStarter {
         LOGGER.info("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
-    protected void setupPlatform() throws NamingException, PlatformSetupException {
+    protected void setupPlatform() throws NamingException, PlatformException {
         PlatformSetup platformSetup = new PlatformSetup();
         if (isDropOnStart()) {
             platformSetup.destroy();

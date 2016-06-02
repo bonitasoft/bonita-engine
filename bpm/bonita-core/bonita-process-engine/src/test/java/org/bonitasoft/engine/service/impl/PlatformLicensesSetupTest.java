@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.platform.configuration.exception.PlatformConfigurationException;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.exception.PlatformException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -135,7 +135,7 @@ public class PlatformLicensesSetupTest {
     @Test
     public void should_throw_exception_when_unable_to_retrieve_licenses() throws Exception {
         //given
-        doThrow(PlatformConfigurationException.class).when(configurationService).getLicenses();
+        doThrow(PlatformException.class).when(configurationService).getLicenses();
 
         //then
         expectedException.expect(IllegalStateException.class);
