@@ -23,9 +23,9 @@ import javax.naming.NamingException;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.exception.PlatformConfigurationException;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.exception.PlatformException;
 
 /**
  * @author Laurent Leseigneur
@@ -39,13 +39,13 @@ public class PlatformLicensesSetup {
         if (shouldExtractLicensesToTempFolder(bonitaClientHomePath)) {
             try {
                 extractLicenses();
-            } catch (NamingException | PlatformConfigurationException | IOException e) {
+            } catch (NamingException | PlatformException | IOException e) {
                 throw new IllegalStateException("unable to get license files from database", e);
             }
         }
     }
 
-    void extractLicenses() throws IOException, NamingException, PlatformConfigurationException {
+    void extractLicenses() throws IOException, NamingException, PlatformException {
         final File licensesFolder = initLicensesFolder();
         ConfigurationService configurationService = getConfigurationService();
 

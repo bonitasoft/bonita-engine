@@ -21,8 +21,8 @@ import java.util.Properties;
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.platform.configuration.exception.PlatformConfigurationException;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.exception.PlatformException;
 
 /**
  * @author Matthieu Chaffotte
@@ -38,7 +38,7 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
     protected void init() {
         try {
             getPlatformLicensesSetup().extractLicenses();
-        } catch (IOException | NamingException | PlatformConfigurationException e) {
+        } catch (IOException | NamingException | PlatformException e) {
             throw new BonitaRuntimeException(e);
         }
     }
