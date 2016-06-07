@@ -17,19 +17,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -50,143 +48,116 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class ProcessInvolvementAPIImpl {
+public class ProcessInvolvementDelegate {
 
     private static final int BATCH_SIZE = 100;
 
-    private final ProcessAPIImpl processAPI;
-
-    public ProcessInvolvementAPIImpl(final ProcessAPIImpl processAPI) {
-        this.processAPI = processAPI;
-    }
-
-    public static boolean isAssignedToArchivedTaskOfProcess(long userId, Long processInstanceId, ActivityInstanceService activityInstanceService) throws SBonitaReadException {
-        QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(processInstanceId);
-        List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
-        while (!sArchivedHumanTasks.isEmpty()) {
-            for (final SAHumanTaskInstance sArchivedHumanTask : sArchivedHumanTasks) {
-                if (userId == sArchivedHumanTask.getAssigneeId()) {
-                    return true;
-                }
-            }
-            archivedQueryOptions = QueryOptions.getNextPage(archivedQueryOptions);
-            sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
-        }
-        return false;
+    protected TenantServiceAccessor getTenantServiceAccessor() {
+        return APIUtils.getTenantAccessor();
     }
 
     private static QueryOptions buildArchivedTasksQueryOptions(final long processInstanceId) {
         final SAUserTaskInstanceBuilderFactory archUserTaskKeyFactory = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
         final String humanTaskIdKey = archUserTaskKeyFactory.getIdKey();
         final String parentProcessInstanceKey = archUserTaskKeyFactory.getParentProcessInstanceKey();
-        final List<OrderByOption> archivedOrderByOptions = Collections.singletonList(new OrderByOption(SAHumanTaskInstance.class, humanTaskIdKey, OrderByType.ASC));
-        final List<FilterOption> archivedFilterOptions = Collections.singletonList(new FilterOption(SAHumanTaskInstance.class, parentProcessInstanceKey, processInstanceId));
+        final List<OrderByOption> archivedOrderByOptions = Collections
+                .singletonList(new OrderByOption(SAHumanTaskInstance.class, humanTaskIdKey, OrderByType.ASC));
+        final List<FilterOption> archivedFilterOptions = Collections
+                .singletonList(new FilterOption(SAHumanTaskInstance.class, parentProcessInstanceKey, processInstanceId));
         return new QueryOptions(0, BATCH_SIZE, archivedOrderByOptions, archivedFilterOptions, null);
     }
 
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = processAPI.getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-
-        try {
-            // Part specific to active process instances:
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            if (userId == processInstance.getStartedBy()) {
-                return true;
-            }
-            // is user assigned or has pending tasks on this process instance:
-            final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.<OrderByOption>emptyList(), Collections.singletonList(new FilterOption(SHumanTaskInstance.class,
-                    "logicalGroup2", processInstanceId)), null);
-            if (activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0) {
-                return true;
-            }
-        } catch (SProcessInstanceReadException | SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (SProcessInstanceNotFoundException e) {
-            // process instance may be completed already:
-            if (isInvolvedInArchivedProcessInstance(userId, processInstanceId, processInstanceService)) return true;
+        final TaskInvolvementDelegate taskInvolvementDelegate = new TaskInvolvementDelegate();
+        // IS_PROCESS_INITIATOR rule
+        if (isProcessOrArchivedProcessInitiator(userId, processInstanceId)) {
+            return true;
         }
-
-        // Part common to active and archived process instances:
         try {
-            return isAssignedToArchivedTaskOfProcess(userId, processInstanceId, activityInstanceService);
-        } catch (final SBonitaException e) {
-            // no rollback, read only method
+            // IS_TASK_PERFORMER rule
+            if (taskInvolvementDelegate.isAssignedToArchivedTaskOfProcess(userId, processInstanceId)) {
+                return true;
+            }
+        } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         }
 
-    }
-
-    boolean isInvolvedInArchivedProcessInstance(long userId, long processInstanceId, ProcessInstanceService processInstanceService) throws ProcessInstanceNotFoundException {
         try {
-            final List<OrderByOption> orderByOptions = Arrays.asList(
-                    new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, OrderByType.DESC),
-                    new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.END_DATE, OrderByType.DESC));
-            final List<FilterOption> filterOptions = Collections.singletonList(new FilterOption(SAProcessInstance.class,
-                    ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId));
-            final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, filterOptions, null);
-
-            final List<SAProcessInstance> saProcessInstances = processInstanceService.searchArchivedProcessInstances(queryOptions);
-            if (saProcessInstances.isEmpty()) {
-                throw new SProcessInstanceNotFoundException(processInstanceId);
-            }
-            if (userId == saProcessInstances.get(0).getStartedBy()) {
+            // IS_INVOLVED_IN_PROCESS_INSTANCE rule
+            if (taskInvolvementDelegate.hasUserPendingOrAssignedTasks(userId, processInstanceId)) {
                 return true;
             }
-        } catch (SBonitaReadException | SProcessInstanceNotFoundException e1) {
-            throw new ProcessInstanceNotFoundException(e1);
+        } catch (SExecutionException e) {
+            throw new RetrieveException(e);
         }
+
         return false;
+
     }
 
-    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException {
+    public boolean isProcessOrArchivedProcessInitiator(long userId, long processInstanceId) throws ProcessInstanceNotFoundException {
         try {
-            return isInvolvedInHumanTaskInstance(userId, humanTaskInstanceId, processAPI.getTenantAccessor());
-        } catch (SActivityInstanceNotFoundException e) {
-            throw new ActivityInstanceNotFoundException(humanTaskInstanceId);
-        } catch (SBonitaReadException | SActivityReadException | SActorNotFoundException e) {
+            return isProcessInitiator(userId, processInstanceId);
+        } catch (SProcessInstanceNotFoundException e) {
+            return isArchivedProcessInitiator(userId, processInstanceId);
+        } catch (SProcessInstanceReadException e) {
             throw new RetrieveException(e);
         }
     }
 
-    private Boolean isInvolvedInHumanTaskInstance(final long userId, final long humanTaskInstanceId, final TenantServiceAccessor serviceAccessor)
-            throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException, SActivityReadException {
-        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
-        long assigneeId;
-        final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(humanTaskInstanceId);
-        assigneeId = humanTaskInstance.getAssigneeId();
-        if (assigneeId > 0) {
-            //check if the user is the assigned user
-            return userId == assigneeId;
-        } else {
-            //if the task is not assigned check if the user is mapped to the actor of the task
-            return activityInstanceService.isTaskPendingForUser(humanTaskInstanceId, userId);
+    private boolean isProcessInitiator(long userId, Long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
+        final ProcessInstanceService processInstanceService = getTenantServiceAccessor().getProcessInstanceService();
+        final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        return userId == processInstance.getStartedBy();
+    }
+
+    boolean isArchivedProcessInitiator(long userId, long processInstanceId) throws ProcessInstanceNotFoundException {
+        final ProcessInstanceService processInstanceService = getTenantServiceAccessor().getProcessInstanceService();
+        final List<OrderByOption> orderByOptions = Arrays.asList(
+                new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, OrderByType.DESC),
+                new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.END_DATE, OrderByType.DESC));
+        final List<FilterOption> filterOptions = Collections.singletonList(new FilterOption(SAProcessInstance.class,
+                ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, filterOptions, null);
+
+        final List<SAProcessInstance> saProcessInstances;
+        try {
+            saProcessInstances = processInstanceService.searchArchivedProcessInstances(queryOptions);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
         }
+        if (saProcessInstances.isEmpty()) {
+            throw new ProcessInstanceNotFoundException(processInstanceId);
+        }
+        return userId == (saProcessInstances.get(0).getStartedBy());
     }
 
     public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws BonitaException {
-        final TenantServiceAccessor serviceAccessor = processAPI.getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+        final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
+        final IdentityService identityService = tenantServiceAccessor.getIdentityService();
+        final TaskInvolvementDelegate taskInvolvementDelegate = new TaskInvolvementDelegate();
+        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
 
-        final List<SUser> subordinates = getSubordinates(managerUserId, serviceAccessor.getIdentityService());
+        final List<SUser> subordinates = getSubordinates(managerUserId, identityService);
 
         try {
             try {
 
                 // Part specific to active process instances:
-                final ProcessInstance processInstance = processAPI.getProcessInstance(processInstanceId);
+                final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
                 if (isUserManagerOfProcessInstanceInitiator(managerUserId, processInstance.getStartedBy())) {
                     return true;
                 }
 
                 // Has the manager at least one subordinates with at least one pending task in this process instance:
-                if (processAPI.searchPendingTasksManagedBy(managerUserId,
+                if (taskInvolvementDelegate.searchPendingTasksManagedBy(managerUserId,
                         new SearchOptionsBuilder(0, 1).filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).done())
                         .getCount() > 0) {
                     return true;
@@ -203,12 +174,12 @@ public class ProcessInvolvementAPIImpl {
                     queryOptions = QueryOptions.getNextPage(queryOptions);
                     sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
                 }
-            } catch (final ProcessInstanceNotFoundException exc) {
+            } catch (final SProcessInstanceNotFoundException exc) {
                 // process instance may be completed already:
 
                 // Part specific to archived process instances:
                 try {
-                    final ArchivedProcessInstance archProcessInstance = processAPI.getLastArchivedProcessInstance(processInstanceId);
+                    final ArchivedProcessInstance archProcessInstance = getLastArchivedProcessInstance(processInstanceId);
                     if (isUserManagerOfProcessInstanceInitiator(managerUserId, archProcessInstance.getStartedBy())) {
                         return true;
                     }
@@ -230,13 +201,15 @@ public class ProcessInvolvementAPIImpl {
         final String humanTaskIdKey = userTaskKeyFactory.getIdKey();
         final String parentProcessInstanceKey = userTaskKeyFactory.getParentProcessInstanceKey();
         final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SHumanTaskInstance.class, humanTaskIdKey, OrderByType.ASC));
-        final List<FilterOption> filterOptions = Collections.singletonList(new FilterOption(SHumanTaskInstance.class, parentProcessInstanceKey, processInstanceId));
+        final List<FilterOption> filterOptions = Collections
+                .singletonList(new FilterOption(SHumanTaskInstance.class, parentProcessInstanceKey, processInstanceId));
         return new QueryOptions(0, BATCH_SIZE, orderByOptions, filterOptions, null);
     }
 
     private List<SUser> getSubordinates(final long managerUserId, final IdentityService identityService) {
-        final List<OrderByOption> userOrderBys = Collections.singletonList(new OrderByOption(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getIdKey(),
-                OrderByType.ASC));
+        final List<OrderByOption> userOrderBys = Collections
+                .singletonList(new OrderByOption(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getIdKey(),
+                        OrderByType.ASC));
         final List<FilterOption> userFilters = Collections.singletonList(new FilterOption(SUser.class, BuilderFactory.get(SUserBuilderFactory.class)
                 .getManagerUserIdKey(), managerUserId));
         try {
@@ -247,7 +220,7 @@ public class ProcessInvolvementAPIImpl {
     }
 
     private boolean isArchivedTaskDoneByOneOfTheSubordinates(final long processInstanceId, final ActivityInstanceService activityInstanceService,
-                                                             final List<SUser> subordinates) throws SBonitaReadException {
+            final List<SUser> subordinates) throws SBonitaReadException {
         QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(processInstanceId);
 
         List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
@@ -282,7 +255,7 @@ public class ProcessInvolvementAPIImpl {
     }
 
     private boolean isUserManagerOfProcessInstanceInitiator(final long userId, final long startedByUserId) {
-        final IdentityService identityService = processAPI.getTenantAccessor().getIdentityService();
+        final IdentityService identityService = getTenantServiceAccessor().getIdentityService();
         SUser sUser;
         try {
             sUser = identityService.getUser(startedByUserId);
@@ -290,5 +263,17 @@ public class ProcessInvolvementAPIImpl {
             return false;
         }
         return userId == sUser.getManagerUserId();
+    }
+
+    public ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
+        final ProcessInstanceService processInstanceService = getTenantServiceAccessor().getProcessInstanceService();
+        final ProcessDefinitionService processDefinitionService = getTenantServiceAccessor().getProcessDefinitionService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = getTenantServiceAccessor().getSearchEntitiesDescriptor();
+
+        final GetLastArchivedProcessInstance searchArchivedProcessInstances = new GetLastArchivedProcessInstance(processInstanceService,
+                processDefinitionService, processInstanceId, searchEntitiesDescriptor);
+
+        searchArchivedProcessInstances.execute();
+        return searchArchivedProcessInstances.getResult();
     }
 }
