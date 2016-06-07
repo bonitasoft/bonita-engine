@@ -16,10 +16,9 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.ProcessInvolvementAPIImpl;
+import org.bonitasoft.engine.api.impl.TaskInvolvementDelegate;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -28,16 +27,16 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class IsTaskPerformerRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
-    private final ActivityInstanceService activityInstanceService;
-
     private final SessionService sessionService;
 
     private final SessionAccessor sessionAccessor;
 
-    public IsTaskPerformerRule(ActivityInstanceService activityInstanceService, SessionService sessionService, SessionAccessor sessionAccessor) {
-        this.activityInstanceService = activityInstanceService;
+    private final TaskInvolvementDelegate taskInvolvementDelegate;
+
+    public IsTaskPerformerRule(SessionService sessionService, SessionAccessor sessionAccessor, TaskInvolvementDelegate taskInvolvementDelegate) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
+        this.taskInvolvementDelegate = taskInvolvementDelegate;
     }
 
     @Override
@@ -49,12 +48,11 @@ public class IsTaskPerformerRule extends AuthorizationRuleWithParameters impleme
                 throw new IllegalArgumentException(
                         "Parameter 'id' is mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
             }
-            return ProcessInvolvementAPIImpl.isAssignedToArchivedTaskOfProcess(userId, processInstanceId, activityInstanceService);
+            return taskInvolvementDelegate.isAssignedToArchivedTaskOfProcess(userId, processInstanceId);
         } catch (final SBonitaException e) {
             throw new SExecutionException(e);
         }
     }
-
 
     @Override
     public String getId() {

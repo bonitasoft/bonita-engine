@@ -14,20 +14,13 @@
 package org.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.TaskInvolvementDelegate;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -44,25 +37,27 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class IsInvolvedInProcessInstanceRuleTest extends RuleTest {
 
+    public static final long PROCESS_INSTANCE_ID = 189L;
+
+    public static final long LOGGED_USER_ID = 7L;
+
     @Mock
-    ActivityInstanceService activityInstanceService;
+    TaskInvolvementDelegate taskInvolvementDelegate;
 
     @Mock
     SessionService sessionService;
 
     @Mock
     SessionAccessor sessionAccessor;
-    
+
     @InjectMocks
     IsInvolvedInProcessInstanceRule rule;
-    
-    long loggedUserId = 7L;
-    
+
     @Before
     public void initMocks() throws Exception {
         when(sessionAccessor.getSessionId()).thenReturn(1L);
         SSession session = mock(SSession.class);
-        when(session.getUserId()).thenReturn(loggedUserId);
+        when(session.getUserId()).thenReturn(LOGGED_USER_ID);
         when(sessionService.getSession(1L)).thenReturn(session);
     }
 
@@ -76,7 +71,7 @@ public class IsInvolvedInProcessInstanceRuleTest extends RuleTest {
     @Test
     public void shouldNotAllowIfNotPendingOrAssignedTasks() throws Exception {
         Map<String, Serializable> context = buildContext(189L, null);
-        doReturn(0L).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(32L), any(QueryOptions.class));
+        doReturn(false).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(32L, 35L);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -85,8 +80,8 @@ public class IsInvolvedInProcessInstanceRuleTest extends RuleTest {
 
     @Test
     public void shouldAllowIfAtLeastOnePendingOrAssignedTask() throws Exception {
-        Map<String, Serializable> context = buildContext(189L, null);
-        doReturn(1L).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(loggedUserId), any(QueryOptions.class));
+        Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, LOGGED_USER_ID);
+        doReturn(true).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -95,8 +90,8 @@ public class IsInvolvedInProcessInstanceRuleTest extends RuleTest {
 
     @Test(expected = SExecutionException.class)
     public void shouldThrowExecutionExceptionIfReadException() throws Exception {
-        Map<String, Serializable> context = buildContext(189L, null);
-        doThrow(SBonitaReadException.class).when(activityInstanceService).getNumberOfPendingOrAssignedTasks(eq(loggedUserId), any(QueryOptions.class));
+        Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, LOGGED_USER_ID);
+        doThrow(SExecutionException.class).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         rule.isAllowed("someKey", context);
     }

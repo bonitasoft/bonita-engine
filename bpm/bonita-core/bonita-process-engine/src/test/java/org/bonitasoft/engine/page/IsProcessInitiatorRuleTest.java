@@ -17,20 +17,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.ProcessInvolvementDelegate;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +34,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -46,9 +43,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class IsProcessInitiatorRuleTest extends RuleTest {
 
+    public static final long PROCESS_INSTANCE_ID = 541L;
+    public static final long LOGGED_USER_ID = 7L;
+
     @Mock
-    ProcessInstanceService processInstanceService;
-    
+    ProcessInvolvementDelegate processInvolvementDelegate;
+
     @Mock
     SessionService sessionService;
 
@@ -56,33 +56,27 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     SessionAccessor sessionAccessor;
 
     @InjectMocks
+    @Spy
     IsProcessInitiatorRule rule;
-    
-    long loggedUserId = 7L;
-    
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void initMocks() throws Exception {
         when(sessionAccessor.getSessionId()).thenReturn(1L);
         SSession session = mock(SSession.class);
-        when(session.getUserId()).thenReturn(loggedUserId);
+        when(session.getUserId()).thenReturn(LOGGED_USER_ID);
         when(sessionService.getSession(1L)).thenReturn(session);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegallArgumentIfProcessInstanceIdParamNotPresent() throws Exception {
-        Map<String, Serializable> context = buildContext(null, null);
-
-        final boolean allowed = rule.isAllowed("someKey", context);
-    }
-
     @Test
-    public void shouldNotBeAllowedIfProcessInstanceInitiatorIsNotGivenUser() throws Exception {
-        final long processInstanceId = 541L;
+    public void should_not_be_allowed_if_process_instance_initiator_is_not_given_user() throws Exception {
 
-        Map<String, Serializable> context = buildContext(processInstanceId, null);
+        Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(444L).when(processInstance).getStartedBy();
-        doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
+        doReturn(LOGGED_USER_ID).when(processInstance).getStartedBy();
+        doReturn(false).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -90,65 +84,48 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     }
 
     @Test
-    public void shouldBeAllowedIfProcessInstanceInitiatorIsPreciselyTheGivenUser() throws Exception {
-        final long processInstanceId = 541L;
+    public void should_allow_if_process_instance_initiator_is_precisely_the_given_user() throws Exception {
 
-        Map<String, Serializable> context = buildContext(processInstanceId, null);
+        Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(loggedUserId).when(processInstance).getStartedBy();
-        doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
+        doReturn(LOGGED_USER_ID).when(processInstance).getStartedBy();
+        doReturn(true).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
         assertThat(allowed).isTrue();
     }
 
-    @Test(expected = SExecutionException.class)
-    public void shouldThrowExecutionExceptionIfServiceProblemOccurs() throws Exception {
-        final long processInstanceId = 541L;
-
-        final long userId = 11L;
-        Map<String, Serializable> context = buildContext(processInstanceId, userId);
-        doThrow(SProcessInstanceReadException.class).when(processInstanceService).getProcessInstance(processInstanceId);
-
-        final boolean allowed = rule.isAllowed("exception raised", context);
-    }
-
     @Test
-    public void shouldEnsureArchivedProcessInstanceStartedBy() throws Exception {
-        final long processInstanceId = 541L;
+    public void should_throw_exception_if_service_problem_occurs() throws Exception {
+        //given
+        Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, LOGGED_USER_ID);
 
-        Map<String, Serializable> context = buildContext(processInstanceId, null);
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
-        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
-        doReturn(loggedUserId).when(saProcessInstance).getStartedBy();
-        doReturn(Collections.singletonList(saProcessInstance)).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
+        ProcessInstanceNotFoundException processInstanceNotFoundException = new ProcessInstanceNotFoundException("message");
+        doThrow(processInstanceNotFoundException).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
 
-        final boolean allowed = rule.isAllowed("someKey", context);
-
-        assertThat(allowed).isTrue();
-    }
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Test
-    public void shouldThrowNotFoundIfProcessNotFoundInTheArchivesEither() throws Exception {
-        final long processInstanceId = 541L;
-
-        Map<String, Serializable> context = buildContext(processInstanceId, null);
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
-        doReturn(Collections.emptyList()).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
-
+        //expect
         expectedException.expect(SExecutionException.class);
-        expectedException.expectCause(CoreMatchers.<Throwable> instanceOf(SProcessInstanceNotFoundException.class));
 
+        //when
         rule.isAllowed("exception raised", context);
-
     }
 
     @Test
-    public void getIdShouldReturnIsProcessInitiator() throws Exception {
-        assertThat(rule.getId()).isEqualTo("IS_PROCESS_INITIATOR");
+    public void should_throw_exception_if_process_instance_id_is_missing() throws Exception {
+        //given
+        Map<String, Serializable> context = new HashMap<>();
+
+        ProcessInstanceNotFoundException processInstanceNotFoundException = new ProcessInstanceNotFoundException("message");
+        doThrow(processInstanceNotFoundException).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID,
+                PROCESS_INSTANCE_ID);
+
+        //expect
+        expectedException.expect(IllegalArgumentException.class);
+
+        //when
+        rule.isAllowed("exception raised", context);
     }
+
 }
