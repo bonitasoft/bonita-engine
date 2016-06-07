@@ -14,16 +14,10 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.TaskInvolvementDelegate;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -32,16 +26,16 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class IsInvolvedInProcessInstanceRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
-    private ActivityInstanceService activityInstanceService;
-    
-    private SessionService sessionService;
-
     private SessionAccessor sessionAccessor;
 
-    public IsInvolvedInProcessInstanceRule(ActivityInstanceService activityInstanceService, SessionService sessionService, SessionAccessor sessionAccessor) {
-        this.activityInstanceService = activityInstanceService;
+    private SessionService sessionService;
+
+    private final TaskInvolvementDelegate taskInvolvementDelegate;
+
+    public IsInvolvedInProcessInstanceRule(SessionService sessionService, SessionAccessor sessionAccessor, TaskInvolvementDelegate taskInvolvementDelegate) {
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
+        this.taskInvolvementDelegate = taskInvolvementDelegate;
     }
 
     @Override
@@ -50,17 +44,14 @@ public class IsInvolvedInProcessInstanceRule extends AuthorizationRuleWithParame
         Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
         if (processInstanceId == null) {
             throw new IllegalArgumentException(
-                    "Parameter 'id' is mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
+                    "Parameter 'id' is mandatory to execute Page Authorization rule 'IsInvolvedInProcessInstanceRule'");
         }
+        return hasUserPendingOrAssignedTasks(userId, processInstanceId);
 
-        // is user assigned or has pending tasks on this process instance:
-        final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.EMPTY_LIST, Arrays.asList(new FilterOption(SHumanTaskInstance.class,
-                "logicalGroup2", processInstanceId)), null);
-        try {
-            return activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0;
-        } catch (SBonitaReadException e) {
-            throw new SExecutionException(e);
-        }
+    }
+
+    private boolean hasUserPendingOrAssignedTasks(long userId, Long processInstanceId) throws SExecutionException {
+        return taskInvolvementDelegate.hasUserPendingOrAssignedTasks(userId, processInstanceId);
     }
 
     @Override
