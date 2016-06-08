@@ -33,7 +33,7 @@ import org.bonitasoft.engine.xml.XMLNode;
  */
 public class OrganizationNodeBuilder {
 
-    static final List<Class<? extends ElementBinding>> BINDINGS = new ArrayList<Class<? extends ElementBinding>>();
+    static final List<Class<? extends ElementBinding>> BINDINGS = new ArrayList<>();
 
     private static final String NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema/1.1";
 
@@ -50,7 +50,6 @@ public class OrganizationNodeBuilder {
         BINDINGS.add(GroupBinding.class);
         BINDINGS.add(MembershipBinding.class);
     }
-
 
     private OrganizationNodeBuilder() {
     }
@@ -176,16 +175,6 @@ public class OrganizationNodeBuilder {
             node.setContent(role.getDescription());
             roleNode.addChild(node);
         }
-        if (role.getIconName() != null) {
-            final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_NAME);
-            node.setContent(role.getIconName());
-            roleNode.addChild(node);
-        }
-        if (role.getIconPath() != null) {
-            final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_PATH);
-            node.setContent(role.getIconPath());
-            roleNode.addChild(node);
-        }
         return roleNode;
     }
 
@@ -207,16 +196,6 @@ public class OrganizationNodeBuilder {
             node.setContent(group.getDescription());
             groupNode.addChild(node);
         }
-        if (group.getIconName() != null) {
-            final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_NAME);
-            node.setContent(group.getIconName());
-            groupNode.addChild(node);
-        }
-        if (group.getIconPath() != null) {
-            final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_PATH);
-            node.setContent(group.getIconPath());
-            groupNode.addChild(node);
-        }
         return groupNode;
     }
 
@@ -226,8 +205,6 @@ public class OrganizationNodeBuilder {
         addPasswordNode(user, userNode);
         addFirstNameNode(user, userNode);
         addLastNameNode(user, userNode);
-        addIconNameNode(user, userNode);
-        addIconPathNode(user, userNode);
         addTitleNode(user, userNode);
         addJobTitleNode(user, userNode);
         addEnabledNode(user, userNode);
@@ -261,22 +238,6 @@ public class OrganizationNodeBuilder {
         if (user.getLastName() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.LAST_NAME);
             node.setContent(user.getLastName());
-            userNode.addChild(node);
-        }
-    }
-
-    private static void addIconNameNode(final ExportedUser user, final XMLNode userNode) {
-        if (user.getIconName() != null) {
-            final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_NAME);
-            node.setContent(user.getIconName());
-            userNode.addChild(node);
-        }
-    }
-
-    private static void addIconPathNode(final ExportedUser user, final XMLNode userNode) {
-        if (user.getIconPath() != null) {
-            final XMLNode node = new XMLNode(OrganizationMappingConstants.ICON_PATH);
-            node.setContent(user.getIconPath());
             userNode.addChild(node);
         }
     }
