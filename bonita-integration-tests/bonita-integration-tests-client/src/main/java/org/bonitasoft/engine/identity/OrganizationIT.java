@@ -1091,6 +1091,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         // roles
         final RoleCreator rc1 = new RoleCreator(DEVELOPER);
         rc1.setDisplayName("Bonita developer");
+        rc1.setIcon("myIcon.jpg", new byte[] { 1, 2, 3 });
         final Role persistedRole1 = getIdentityAPI().createRole(rc1);
         final RoleCreator rc2 = new RoleCreator(MANAGER);
         rc2.setDisplayName(BONITA_MANAGER);
@@ -1123,6 +1124,9 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertThat(organizationContent).contains(DEVELOPER);
         assertThat(organizationContent).contains("Bonita developer");
         assertThat(organizationContent).contains(ENGINE);
+        //Icon name and Icon path are not exported (deprecated)
+        assertThat(organizationContent).doesNotContain("<iconName/>");
+        assertThat(organizationContent).doesNotContain("<iconPath/>");
         assertThat(organizationContent).contains("engine team");
         assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
         assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
