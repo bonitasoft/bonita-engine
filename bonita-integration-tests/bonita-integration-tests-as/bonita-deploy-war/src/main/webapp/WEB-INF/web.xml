@@ -2,21 +2,29 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-	<display-name>Bonita engine</display-name>
+    <display-name>Bonita engine</display-name>
 
-	<listener>
-		<listener-class>org.bonitasoft.engine.api.internal.servlet.EngineInitializerListener</listener-class>
-	</listener>
-	
-	<servlet>
-		<servlet-name>HttpAPIServlet</servlet-name>
-		<servlet-class>org.bonitasoft.engine.api.internal.servlet.HttpAPIServlet</servlet-class>
-	</servlet>
+    <listener>
+        <listener-class>org.bonitasoft.engine.api.internal.servlet.EngineInitializerListener</listener-class>
+    </listener>
 
-	<servlet-mapping>
-		<servlet-name>HttpAPIServlet</servlet-name>
-		<url-pattern>/serverAPI/*</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <servlet-name>PingServlet</servlet-name>
+        <servlet-class>org.bonitasoft.engine.test.PingServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HttpAPIServlet</servlet-name>
+        <servlet-class>org.bonitasoft.engine.api.internal.servlet.HttpAPIServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HttpAPIServlet</servlet-name>
+        <url-pattern>/serverAPI/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PingServlet</servlet-name>
+        <url-pattern>/ping</url-pattern>
+    </servlet-mapping>
 
 
 </web-app>
