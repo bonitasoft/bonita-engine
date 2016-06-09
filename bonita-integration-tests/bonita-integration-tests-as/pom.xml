@@ -15,11 +15,6 @@
 
     <properties>
         <distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
-        <report.results>${distrib.dir}/target/testresults</report.results>
-        <report.xml>${report.results}/xml</report.xml>
-        <report.xml>${report.results}/xml</report.xml>
-        <surefire.reports>${project.build.directory}/surefire-reports</surefire.reports>
-        <test.class>org.bonitasoft.engine.BPMRemoteTestsForServers</test.class>
     </properties>
 
     <dependencies>
@@ -75,22 +70,5 @@
             </modules>
         </profile>
     </profiles>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-
-    </build>
 
 </project>

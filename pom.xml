@@ -468,6 +468,15 @@
                         -XX:+HeapDumpOnOutOfMemoryError
                     </argLine>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -661,6 +670,15 @@
                                 sonar, see http://stackoverflow.com/a/15567782/936729 -->
                             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.jacoco</groupId>
