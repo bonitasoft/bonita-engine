@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.bonitasoft.engine</groupId>
         <artifactId>bonita-engine</artifactId>
-	<version>7.3.0-SNAPSHOT</version>
+        <version>7.3.0-SNAPSHOT</version>
     </parent>
     <groupId>org.bonitasoft.engine.test</groupId>
     <artifactId>bonita-integration-tests</artifactId>
@@ -32,19 +32,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <!-- don't execute tests in test phase -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <profiles>
         <profile>
