@@ -43,7 +43,7 @@ public class EngineInitializerListener implements ServletContextListener {
             new PlatformSetup().init(); // init tables and default configuration
             new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
         } catch (final Exception e) {
-            LOGGER.log(Level.SEVERE, "Error while initializing the Engine", e);
+            throw new RuntimeException("Error while initializing the Engine", e);
         }
     }
 
