@@ -76,7 +76,7 @@ public class IsTaskPerformerRuleTest extends RuleTest {
     @Test
     public void shouldNotBeAllowedIfNoArchivedTasks() throws Exception {
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, USER_ID);
-        doReturn(false).when(taskInvolvementDelegate).isAssignedToArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
+        doReturn(false).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -84,9 +84,9 @@ public class IsTaskPerformerRuleTest extends RuleTest {
     }
 
     @Test
-    public void shouldBeAllowedIAnArchivedTaskIsAssignedToGivenUser() throws Exception {
+    public void shouldBeAllowedIfAnArchivedTaskIsExecutedByGivenUser() throws Exception {
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, USER_ID);
-        doReturn(true).when(taskInvolvementDelegate).isAssignedToArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
+        doReturn(true).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 
@@ -97,7 +97,7 @@ public class IsTaskPerformerRuleTest extends RuleTest {
     public void shouldThrowSExecutionExceptionIfExceptionOccurs() throws Exception {
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, USER_ID);
         final SBonitaReadException exception = new SBonitaReadException("message");
-        doThrow(exception).when(taskInvolvementDelegate).isAssignedToArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
+        doThrow(exception).when(taskInvolvementDelegate).isExecutorOfArchivedTaskOfProcess(USER_ID, PROCESS_INSTANCE_ID);
 
         //expect
         expectedException.expect(SExecutionException.class);
