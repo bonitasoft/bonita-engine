@@ -53,15 +53,15 @@ public class TaskInvolvementDelegate {
         return APIUtils.getTenantAccessor();
     }
 
-    public boolean isAssignedToArchivedTaskOfProcess(long userId, Long processInstanceId)
+    public boolean isExecutorOfArchivedTaskOfProcess(long userId, Long rootProcessInstanceId)
             throws SBonitaReadException {
         final ActivityInstanceService activityInstanceService = getTenantServiceAccessor().getActivityInstanceService();
 
-        QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(processInstanceId);
+        QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(rootProcessInstanceId);
         List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
         while (!sArchivedHumanTasks.isEmpty()) {
             for (final SAHumanTaskInstance sArchivedHumanTask : sArchivedHumanTasks) {
-                if (userId == sArchivedHumanTask.getAssigneeId()) {
+                if (userId == sArchivedHumanTask.getExecutedBy()) {
                     return true;
                 }
             }
@@ -71,14 +71,14 @@ public class TaskInvolvementDelegate {
         return false;
     }
 
-    private static QueryOptions buildArchivedTasksQueryOptions(final long processInstanceId) {
+    private static QueryOptions buildArchivedTasksQueryOptions(final long rootProcessInstanceId) {
         final SAUserTaskInstanceBuilderFactory archUserTaskKeyFactory = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
         final String humanTaskIdKey = archUserTaskKeyFactory.getIdKey();
-        final String parentProcessInstanceKey = archUserTaskKeyFactory.getParentProcessInstanceKey();
+        final String parentProcessInstanceKey = archUserTaskKeyFactory.getRootProcessInstanceKey();
         final List<OrderByOption> archivedOrderByOptions = Collections
                 .singletonList(new OrderByOption(SAHumanTaskInstance.class, humanTaskIdKey, OrderByType.ASC));
         final List<FilterOption> archivedFilterOptions = Collections
-                .singletonList(new FilterOption(SAHumanTaskInstance.class, parentProcessInstanceKey, processInstanceId));
+                .singletonList(new FilterOption(SAHumanTaskInstance.class, parentProcessInstanceKey, rootProcessInstanceId));
         return new QueryOptions(0, BATCH_SIZE, archivedOrderByOptions, archivedFilterOptions, null);
     }
 

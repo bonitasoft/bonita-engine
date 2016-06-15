@@ -81,7 +81,7 @@ public class ProcessInvolvementDelegate {
         }
         try {
             // IS_TASK_PERFORMER rule
-            if (taskInvolvementDelegate.isAssignedToArchivedTaskOfProcess(userId, processInstanceId)) {
+            if (taskInvolvementDelegate.isExecutorOfArchivedTaskOfProcess(userId, processInstanceId)) {
                 return true;
             }
         } catch (SBonitaReadException e) {
