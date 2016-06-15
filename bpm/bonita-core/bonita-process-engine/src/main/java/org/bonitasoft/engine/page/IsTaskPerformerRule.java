@@ -48,7 +48,7 @@ public class IsTaskPerformerRule extends AuthorizationRuleWithParameters impleme
                 throw new IllegalArgumentException(
                         "Parameter 'id' is mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
             }
-            return taskInvolvementDelegate.isAssignedToArchivedTaskOfProcess(userId, processInstanceId);
+            return taskInvolvementDelegate.isExecutorOfArchivedTaskOfProcess(userId, processInstanceId);
         } catch (final SBonitaException e) {
             throw new SExecutionException(e);
         }

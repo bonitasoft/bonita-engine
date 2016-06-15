@@ -15,6 +15,8 @@ package org.bonitasoft.engine.process.instance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
+
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
@@ -26,6 +28,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -190,7 +193,6 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-
     @Test
     public void isInvolvedInUserTask() throws Exception {
         //given
@@ -242,4 +244,89 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         }
     }
 
-}
+    @Test
+    public void should_assignee_of_call_activity_task_be_involved_in_root_process_instance() throws Exception {
+        //given
+        final User callActivityAssignee = createUser(new UserCreator("john", PASSWORD));
+
+        final ProcessDefinitionBuilder subProcessDefinitionBuilder = getProcessCallActivityDefinitionBuilder();
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(subProcessDefinitionBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition rootProcessDefinition = deployAndEnableProcessWithActor(
+                BuildTestUtil.buildProcessDefinitionWithCallActivity("processWithCallActivity",
+                        new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_NAME),
+                        new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_VERSION)).done(),
+                ACTOR_NAME, user);
+
+        //when
+        final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcessDefinition.getId());
+        final long rootProcessInstanceId = rootProcessInstance.getId();
+        final HumanTaskInstance callActivityHumanTask = waitForUserTaskAndAssignIt("callActivityHumanTask", callActivityAssignee);
+
+        //then
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(callActivityAssignee.getId(), rootProcessInstanceId))
+                .as("should user assigned to call activity id:" + callActivityHumanTask.getId() + " be involved in process with Id "
+                        + rootProcessInstanceId)
+                .isTrue();
+
+        //clean up
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        disableAndDeleteProcess(rootProcessDefinition, subProcessDefinition);
+        deleteUsers(callActivityAssignee);
+
+    }
+
+    @Test
+    public void should_executor_of_call_activity_task_be_involved_in_root_process_instance() throws Exception {
+        //given
+        final User callActivityAssignee = createUser(new UserCreator("john", PASSWORD));
+        final User callActivityExecutor = createUser(new UserCreator("jack", PASSWORD));
+        final ProcessDefinitionBuilder subProcessDefinitionBuilder;
+
+        subProcessDefinitionBuilder = getProcessCallActivityDefinitionBuilder();
+
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(subProcessDefinitionBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinition rootProcessDefinition = deployAndEnableProcessWithActor(
+                BuildTestUtil.buildProcessDefinitionWithCallActivity("processWithCallActivity",
+                        new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_NAME),
+                        new ExpressionBuilder().createConstantStringExpression(BuildTestUtil.PROCESS_VERSION)).done(),
+                ACTOR_NAME, user);
+
+        //when
+        final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcessDefinition.getId());
+        final long rootProcessInstanceId = rootProcessInstance.getId();
+        final HumanTaskInstance callActivityHumanTask = waitForUserTaskAndAssignIt("callActivityHumanTask", callActivityAssignee);
+
+        logoutThenloginAs(callActivityExecutor.getUserName(), PASSWORD);
+        getProcessAPI().executeUserTask(callActivityExecutor.getId(), callActivityHumanTask.getId(), Collections.EMPTY_MAP);
+        waitForProcessToFinish(rootProcessInstanceId);
+
+        //then
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(callActivityAssignee.getId(), rootProcessInstanceId))
+                .as("should assigned user that didn't perform call activity id:" + callActivityHumanTask.getId() + " not be involved in process with Id "
+                        + rootProcessInstanceId)
+                .isFalse();
+
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(callActivityExecutor.getId(), rootProcessInstanceId))
+                .as("should user that perform call activity id:" + callActivityHumanTask.getId() + " be involved in process with Id "
+                        + rootProcessInstanceId)
+                .isTrue();
+        //clean up
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        disableAndDeleteProcess(rootProcessDefinition, subProcessDefinition);
+        deleteUsers(callActivityAssignee, callActivityExecutor);
+
+    }
+
+    private ProcessDefinitionBuilder getProcessCallActivityDefinitionBuilder() {
+        ProcessDefinitionBuilder subProcessDefinitionBuilder;
+        subProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(BuildTestUtil.PROCESS_NAME,
+                BuildTestUtil.PROCESS_VERSION);
+        subProcessDefinitionBuilder.addStartEvent("start");
+        subProcessDefinitionBuilder.addActor(ACTOR_NAME, true)
+                .addManualTask("callActivityHumanTask", ACTOR_NAME);
+        subProcessDefinitionBuilder.addEndEvent("end");
+        subProcessDefinitionBuilder.addTransition("start", "callActivityHumanTask").addTransition("callActivityHumanTask", "end");
+        return subProcessDefinitionBuilder;
+    }
+
+  }
