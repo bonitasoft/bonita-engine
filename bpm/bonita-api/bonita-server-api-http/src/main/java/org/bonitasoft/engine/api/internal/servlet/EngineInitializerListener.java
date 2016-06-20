@@ -27,23 +27,29 @@ import org.bonitasoft.platform.setup.PlatformSetup;
 public class EngineInitializerListener implements ServletContextListener {
 
     private static final Logger LOGGER = Logger.getLogger(EngineInitializerListener.class.getName());
-
-    @Override
-    public void contextDestroyed(final ServletContextEvent arg0) {
-        try {
-            new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
-        } catch (final Exception e) {
-            LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
-        }
-    }
+    private static boolean initializationOk = false;
 
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
         try {
             new PlatformSetup().init(); // init tables and default configuration
             new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
-        } catch (final Exception e) {
+            initializationOk = true;
+        } catch (final Throwable e) {
             throw new RuntimeException("Error while initializing the Engine", e);
+        }
+    }
+
+    @Override
+    public void contextDestroyed(final ServletContextEvent arg0) {
+        if (initializationOk) {
+            try {
+                new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
+            } catch (final Throwable e) {
+                LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
+            }
+        } else {
+            LOGGER.info("Initialization went wrong, no need to try to unload the Engine");
         }
     }
 
