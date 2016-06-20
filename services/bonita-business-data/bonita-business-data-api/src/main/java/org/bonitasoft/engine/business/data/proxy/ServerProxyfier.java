@@ -19,13 +19,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
-
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
 /**
  * @author Colin Puy
@@ -57,7 +57,6 @@ public class ServerProxyfier {
         }
 
         final ProxyFactory factory = new ProxyFactory();
-        factory.setUseCache(false);
         Class<?> classForProxy = entity.getClass();
 
         //It's not possible to create a Proxy on a Proxy
