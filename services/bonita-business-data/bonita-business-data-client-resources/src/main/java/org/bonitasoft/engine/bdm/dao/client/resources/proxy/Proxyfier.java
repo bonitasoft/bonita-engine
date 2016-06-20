@@ -18,12 +18,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
-
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
 /**
  * @author Colin Puy
@@ -46,7 +46,6 @@ public class Proxyfier {
             return null;
         }
         final ProxyFactory factory = new ProxyFactory();
-        factory.setUseCache(false);
         factory.setSuperclass(entity.getClass());
         factory.setFilter(new AllMethodFilter());
         try {
