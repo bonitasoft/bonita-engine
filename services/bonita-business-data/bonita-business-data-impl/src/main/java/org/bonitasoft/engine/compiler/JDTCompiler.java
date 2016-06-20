@@ -34,7 +34,7 @@ import org.eclipse.jdt.internal.compiler.batch.Main;
  */
 public class JDTCompiler {
 
-    private static final String COMPILER_COMPLIANCE_LEVEL = "-1.6";
+    private static final String COMPILER_COMPLIANCE_LEVEL = "-1.7";
     private ClassLoader classLoader;
 
     /**
@@ -98,11 +98,11 @@ public class JDTCompiler {
     private void doCompilation(final String[] commandLine, final PrintWriter outWriter, final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
             throws CompilationException {
 
-        Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */, new DummyCompilationProgress()) {
+        final Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */, new DummyCompilationProgress()) {
 
             @Override
             public FileSystem getLibraryAccess() {
-                ClassLoader contextClassLoader = classLoader;
+                final ClassLoader contextClassLoader = classLoader;
                 return new ClassLoaderEnvironment(contextClassLoader);
             }
         };
