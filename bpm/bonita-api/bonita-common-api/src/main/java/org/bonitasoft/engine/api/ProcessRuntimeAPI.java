@@ -217,8 +217,8 @@ public interface ProcessRuntimeAPI {
     /**
      * Get a paged list of archived activity instances for a process instance.
      *
-     * @param processInstanceId
-     *        The identifier of the process instance.
+     * @param sourceProcessInstanceId
+     *        The identifier of the source process instance (used as root container id of the archived activity instances).
      * @param startIndex
      *        The index of the first result (starting from 0).
      * @param maxResults
@@ -228,7 +228,8 @@ public interface ProcessRuntimeAPI {
      * @return The list of archived activity instances.
      * @since 6.0
      */
-    List<ArchivedActivityInstance> getArchivedActivityInstances(long processInstanceId, int startIndex, int maxResults, ActivityInstanceCriterion criterion);
+    List<ArchivedActivityInstance> getArchivedActivityInstances(long sourceProcessInstanceId, int startIndex, int maxResults,
+            ActivityInstanceCriterion criterion);
 
     /**
      * Retrieve a paged list of open activities for a given process instance.
@@ -627,8 +628,8 @@ public interface ProcessRuntimeAPI {
     /**
      * Get an activity instance that is archived.
      *
-     * @param activityInstanceId
-     *        The identifier of the activity instance.
+     * @param sourceActivityInstanceId
+     *        The identifier of the source activity instance.
      * @return The matching archived activity instance.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -638,7 +639,7 @@ public interface ProcessRuntimeAPI {
      *         If the archived activity instance cannot be retrieved.
      * @since 6.0
      */
-    ArchivedActivityInstance getArchivedActivityInstance(long activityInstanceId) throws ActivityInstanceNotFoundException;
+    ArchivedActivityInstance getArchivedActivityInstance(long sourceActivityInstanceId) throws ActivityInstanceNotFoundException;
 
     /**
      * Get the list of human task instances assigned to the specified user.
@@ -1120,7 +1121,7 @@ public interface ProcessRuntimeAPI {
      * A process instance is archived when it changes state, so there are several archived process instances for each process instance.
      * The last archived instance is returned.
      *
-     * @param processInstanceId
+     * @param sourceProcessInstanceId
      *        The identifier of the source process instance, i.e. not an archived version, the original process instance id.
      * @return The archived process instance.
      * @throws ArchivedProcessInstanceNotFoundException
@@ -1131,7 +1132,7 @@ public interface ProcessRuntimeAPI {
      *         If the search fails because an archived process instance cannot be read.
      * @since 6.0
      */
-    ArchivedProcessInstance getFinalArchivedProcessInstance(long processInstanceId) throws ArchivedProcessInstanceNotFoundException;
+    ArchivedProcessInstance getFinalArchivedProcessInstance(long sourceProcessInstanceId) throws ArchivedProcessInstanceNotFoundException;
 
     /**
      * Set the state of an activity instance.
@@ -2264,8 +2265,8 @@ public interface ProcessRuntimeAPI {
      *
      * @param dataName
      *        The name of the data
-     * @param processInstanceId
-     *        The identifier of the process instance
+     * @param sourceProcessInstanceId
+     *        The identifier of the source process instance (used as root container id of the archived activity instances).
      * @return An archived instance of data.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
@@ -2273,15 +2274,15 @@ public interface ProcessRuntimeAPI {
      *         If the specified data cannot be found.
      * @since 6.1
      */
-    ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long processInstanceId) throws ArchivedDataNotFoundException;
+    ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long sourceProcessInstanceId) throws ArchivedDataNotFoundException;
 
     /**
      * Gets the last archived data instance of the named data of the specified activity instance.
      *
      * @param dataName
      *        The name of the data
-     * @param activityInstanceId
-     *        The identifier of the activity instance
+     * @param sourceActivityInstanceId
+     *        The identifier of the source activity instance
      * @return An archived instance of data.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
@@ -2289,13 +2290,13 @@ public interface ProcessRuntimeAPI {
      *         If the specified data cannot be found
      * @since 6.1
      */
-    ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long activityInstanceId) throws ArchivedDataNotFoundException;
+    ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long sourceActivityInstanceId) throws ArchivedDataNotFoundException;
 
     /**
      * Lists the last archived instances of data of the specified process instance.
      *
-     * @param processInstanceId
-     *        The identifier of the process instance
+     * @param sourceProcessInstanceId
+     *        The identifier of the source process instance (used as root container id of the archived activity instances).
      * @param startIndex
      *        The start index
      * @param maxResults
@@ -2307,13 +2308,13 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
-    List<ArchivedDataInstance> getArchivedProcessDataInstances(long processInstanceId, int startIndex, int maxResults);
+    List<ArchivedDataInstance> getArchivedProcessDataInstances(long sourceProcessInstanceId, int startIndex, int maxResults);
 
     /**
      * Lists the last archived instances of data of the specified activity instance.
      *
-     * @param activityInstanceId
-     *        The identifier of the activity instance
+     * @param sourceActivityInstanceId
+     *        The identifier of the source activity instance
      * @param startIndex
      *        The start index
      * @param maxResults
@@ -2325,7 +2326,7 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
-    List<ArchivedDataInstance> getArchivedActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
+    List<ArchivedDataInstance> getArchivedActivityDataInstances(long sourceActivityInstanceId, int startIndex, int maxResults);
 
     /**
      * Lists the possible users (candidates) of the specified human task instance.
