@@ -35,13 +35,10 @@ public class PlatformLicensesSetup {
     public static final String BONITA_CLIENT_HOME = "bonita.client.home";
 
     void setupLicenses() {
-        final String bonitaClientHomePath = System.getProperty(BONITA_CLIENT_HOME);
-        if (shouldExtractLicensesToTempFolder(bonitaClientHomePath)) {
             try {
                 extractLicenses();
             } catch (NamingException | PlatformException | IOException e) {
                 throw new IllegalStateException("unable to get license files from database", e);
-            }
         }
     }
 
@@ -58,7 +55,14 @@ public class PlatformLicensesSetup {
             File licenseFile = new File(licensesFolder, license.getResourceName());
             IOUtil.write(licenseFile, license.getResourceContent());
         }
-        System.setProperty(BONITA_CLIENT_HOME, licensesFolder.getAbsolutePath());
+        setBonitaClientHomePropertyIfNotSet(licensesFolder);
+    }
+
+    private void setBonitaClientHomePropertyIfNotSet(File licensesFolder) {
+        final String bonitaClientHomePath = System.getProperty(BONITA_CLIENT_HOME);
+        if (bonitaClientHomePath == null || bonitaClientHomePath.trim().isEmpty()) {
+            System.setProperty(BONITA_CLIENT_HOME, licensesFolder.getAbsolutePath());
+        }
     }
 
     ConfigurationService getConfigurationService() throws NamingException {
@@ -74,7 +78,4 @@ public class PlatformLicensesSetup {
         return licensesFolder;
     }
 
-    private boolean shouldExtractLicensesToTempFolder(String bonitaClientHomePath) {
-        return bonitaClientHomePath == null || bonitaClientHomePath.trim().isEmpty();
-    }
 }
