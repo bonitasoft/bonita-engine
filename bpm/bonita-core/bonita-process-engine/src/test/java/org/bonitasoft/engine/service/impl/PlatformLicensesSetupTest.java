@@ -114,7 +114,7 @@ public class PlatformLicensesSetupTest {
     }
 
     @Test
-    public void should_not_extract_licenses_when_bonitaHomeClient_is_set() throws Exception {
+    public void should_extract_licenses_even_if_bonitaHomeClient_is_set() throws Exception {
         //given
         final String existing_licenses_folder = "existing_licenses_folder";
         System.setProperty(PlatformLicensesSetup.BONITA_CLIENT_HOME, existing_licenses_folder);
@@ -125,10 +125,9 @@ public class PlatformLicensesSetupTest {
 
         //then
         final String property = System.getProperty(PlatformLicensesSetup.BONITA_CLIENT_HOME);
-        assertThat(property).as("should not modify property")
-                .isEqualTo(existing_licenses_folder);
+        assertThat(property).as("should not modify property").isEqualTo(existing_licenses_folder);
 
-        verify(platformLicensesSetup, never()).extractLicenses();
+        verify(platformLicensesSetup).extractLicenses();
 
     }
 
