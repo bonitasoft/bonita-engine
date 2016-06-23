@@ -13,11 +13,6 @@
     <name>Bonita Process Engine</name>
 
     <dependencies>
-        <dependency>
-            <groupId>org.bonitasoft.platform</groupId>
-            <artifactId>platform-setup</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Core -->
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
