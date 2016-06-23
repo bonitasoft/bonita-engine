@@ -75,7 +75,7 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     public static final int NUMBER_OF_RESULTS = 100;
 
     public FormMappingAndPageArtifactManager(SessionService sessionService, SessionAccessor sessionAccessor, PageService pageService,
-            TechnicalLoggerService technicalLoggerService, FormMappingService formMappingService, ProcessDefinitionService processDefinitionService) {
+                                             TechnicalLoggerService technicalLoggerService, FormMappingService formMappingService, ProcessDefinitionService processDefinitionService) {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.pageService = pageService;
@@ -161,19 +161,21 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
         // TODO: when custom pages stop being external resources, add them here:
         final FormMappingModel formMappingModel = new FormMappingModel();
         final List<SFormMapping> formMappings = formMappingService.list(processDefinitionId, 0, Integer.MAX_VALUE);
-        for (SFormMapping formMapping : formMappings) {
-            final FormMapping client = ModelConvertor.toFormMapping(formMapping, new FormRequiredAnalyzer(processDefinitionService));
+        for (SFormMapping sFormMapping : formMappings) {
+            final FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping, new FormRequiredAnalyzer(processDefinitionService));
             String form = null;
-            switch (client.getTarget()) {
+            switch (formMapping.getTarget()) {
                 case INTERNAL:
-                    final SPage page = pageService.getPage(client.getPageId());
-                    form = page.getName();
+                    if (formMapping.getPageId() != null) {
+                        final SPage page = pageService.getPage(formMapping.getPageId());
+                        form = page.getName();
+                    }
                     break;
                 case URL:
-                    form = client.getURL();
+                    form = formMapping.getURL();
                     break;
             }
-            final FormMappingDefinition mapping = new FormMappingDefinition(form, client.getType(), client.getTarget(), client.getTask());
+            final FormMappingDefinition mapping = new FormMappingDefinition(form, formMapping.getType(), formMapping.getTarget(), formMapping.getTask());
             formMappingModel.addFormMapping(mapping);
         }
         businessArchiveBuilder.setFormMappings(formMappingModel);
@@ -261,7 +263,7 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     }
 
     void createFormMapping(long processDefinitionId, FormMappingService formMappingService, List<FormMappingDefinition> formMappings,
-            ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
+                           ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
         if (isHumanTask(activity)) {
             // create mapping as declared in form mapping:
             createFormMapping(formMappingService, processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings),
@@ -276,8 +278,8 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
     }
 
     private void createFormMapping(FormMappingService formMappingService, long processDefinitionId, FormMappingDefinition formMappingDefinition, Integer type,
-            String taskName)
-                    throws SObjectCreationException, SBonitaReadException {
+                                   String taskName)
+            throws SObjectCreationException, SBonitaReadException {
         if (formMappingDefinition != null) {
             createSFormMapping(formMappingService, processDefinitionId, formMappingDefinition);
         } else {

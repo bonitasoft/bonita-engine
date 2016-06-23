@@ -9,29 +9,27 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.bonitasoft.engine.api.impl.converter.SPageAssert;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
@@ -44,6 +42,7 @@ import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.page.impl.SPageImpl;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -73,7 +72,7 @@ public class FormMappingAndPageArtifactManagerTest {
     private java.util.Map<java.lang.String, byte[]> ressources;
     @Mock
     private Properties properties;
-    private FormMappingAndPageArtifactManager formMappingAndPageDependencyDeployer;
+    private FormMappingAndPageArtifactManager formMappingAndPageArtifactManager;
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
@@ -102,7 +101,7 @@ public class FormMappingAndPageArtifactManagerTest {
 
     @Before
     public void before() {
-        formMappingAndPageDependencyDeployer = spy(new FormMappingAndPageArtifactManager(sessionService, sessionAccessor, pageService,
+        formMappingAndPageArtifactManager = spy(new FormMappingAndPageArtifactManager(sessionService, sessionAccessor, pageService,
                 technicalLoggerService, formMappingService, processDefinitionService));
         formMappings = new ArrayList<>();
 
@@ -133,10 +132,10 @@ public class FormMappingAndPageArtifactManagerTest {
         doReturn(null).when(pageService).getPageByNameAndProcessDefinitionId(PAGE, PROCESS_DEFINITION_ID);
         BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build())
                 .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
-        doReturn(new ArrayList<Problem>()).when(formMappingAndPageDependencyDeployer).checkResolution(any(SProcessDefinition.class));
+        doReturn(new ArrayList<Problem>()).when(formMappingAndPageArtifactManager).checkResolution(any(SProcessDefinition.class));
         //when then
-        formMappingAndPageDependencyDeployer.deploy(bar, sDefinition);
-        verify(formMappingAndPageDependencyDeployer).checkResolution(any(SProcessDefinition.class));
+        formMappingAndPageArtifactManager.deploy(bar, sDefinition);
+        verify(formMappingAndPageArtifactManager).checkResolution(any(SProcessDefinition.class));
     }
 
     @Test
@@ -150,7 +149,7 @@ public class FormMappingAndPageArtifactManagerTest {
         doReturn(null).when(pageService).getPage(anyLong());
 
         //when
-        final List<Problem> problems = formMappingAndPageDependencyDeployer.checkResolution(sDefinition);
+        final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
@@ -170,7 +169,7 @@ public class FormMappingAndPageArtifactManagerTest {
         doReturn(null).when(pageService).getPage(anyLong());
 
         //when
-        final List<Problem> problems = formMappingAndPageDependencyDeployer.checkResolution(sDefinition);
+        final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
@@ -190,7 +189,7 @@ public class FormMappingAndPageArtifactManagerTest {
         doReturn(null).when(pageService).getPage(anyLong());
 
         //when
-        final List<Problem> problems = formMappingAndPageDependencyDeployer.checkResolution(sDefinition);
+        final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
 
         // then
         assertThat(problems).as("should not return a problem").isNotEmpty();
@@ -206,7 +205,7 @@ public class FormMappingAndPageArtifactManagerTest {
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
 
         //when
-        final List<Problem> problems = formMappingAndPageDependencyDeployer.checkResolution(sDefinition);
+        final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
@@ -225,7 +224,7 @@ public class FormMappingAndPageArtifactManagerTest {
         doThrow(SBonitaReadException.class).when(pageService).getPage(anyLong());
 
         //when
-        final List<Problem> problems = formMappingAndPageDependencyDeployer.checkResolution(sDefinition);
+        final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
@@ -255,7 +254,7 @@ public class FormMappingAndPageArtifactManagerTest {
         when(pageService.addPage(any(sPage.getClass()), any(byte[].class))).then(answer);
 
         //when
-        formMappingAndPageDependencyDeployer.deployProcessPages(businessArchive, PROCESS_DEFINITION_ID, USER_ID);
+        formMappingAndPageArtifactManager.deployProcessPages(businessArchive, PROCESS_DEFINITION_ID, USER_ID);
 
         //then
         verify(pageService, times(2)).addPage(any(SPage.class), any(byte[].class));
@@ -269,7 +268,7 @@ public class FormMappingAndPageArtifactManagerTest {
         doReturn(sPage).when(pageService).getPageByNameAndProcessDefinitionId(anyString(), anyLong());
 
         //when
-        formMappingAndPageDependencyDeployer.deployProcessPages(businessArchive, PROCESS_DEFINITION_ID, USER_ID);
+        formMappingAndPageArtifactManager.deployProcessPages(businessArchive, PROCESS_DEFINITION_ID, USER_ID);
 
         //then
         verify(pageService, never()).addPage(any(SPage.class), any(byte[].class));
@@ -282,7 +281,7 @@ public class FormMappingAndPageArtifactManagerTest {
         //given
 
         //when
-        final Map<String, byte[]> pageResources = formMappingAndPageDependencyDeployer.getPageResources(businessArchive);
+        final Map<String, byte[]> pageResources = formMappingAndPageArtifactManager.getPageResources(businessArchive);
 
         //then
         assertThat(pageResources).hasSize(2).containsKeys("resources/customPages/custompage_step1.zip", "resources/customPages/custompage_step2.zip");
@@ -300,7 +299,7 @@ public class FormMappingAndPageArtifactManagerTest {
         final long processDefinitionId = 3L;
         final String startForm = "startPage";
         final String overviewForm = "overviewPage";
-        formMappingAndPageDependencyDeployer.deployFormMappings(
+        formMappingAndPageArtifactManager.deployFormMappings(
                 barBuilder.setFormMappings(
                         FormMappingModelBuilder.buildFormMappingModel()
                                 .addProcessStartForm(startForm, FormMappingTarget.INTERNAL)
@@ -320,7 +319,7 @@ public class FormMappingAndPageArtifactManagerTest {
         final long processDefinitionId = 3L;
 
         // when:
-        formMappingAndPageDependencyDeployer.deployFormMappings(barBuilder.done(), processDefinitionId);
+        formMappingAndPageArtifactManager.deployFormMappings(barBuilder.done(), processDefinitionId);
 
         // then:
         verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.NONE.name(),
@@ -342,7 +341,7 @@ public class FormMappingAndPageArtifactManagerTest {
                 processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
                 buildFormMapping(form, type, FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
-        formMappingAndPageDependencyDeployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
+        formMappingAndPageArtifactManager.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
         verify(formMappingService, times(1)).create(processDefinitionId, taskname, type.getId(), FormMappingTarget.INTERNAL.name(), form);
@@ -362,7 +361,7 @@ public class FormMappingAndPageArtifactManagerTest {
                 processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
                 buildFormMapping(form, FormMappingType.valueOf(type), FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
-        formMappingAndPageDependencyDeployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
+        formMappingAndPageArtifactManager.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
         verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.NONE.name(), null);
@@ -381,7 +380,7 @@ public class FormMappingAndPageArtifactManagerTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefBuilder.done()).done();
 
         // when:
-        formMappingAndPageDependencyDeployer.deployFormMappings(businessArchive, processDefinitionId);
+        formMappingAndPageArtifactManager.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
         verify(formMappingService, times(1)).create(processDefinitionId, taskName, FormMappingType.TASK.getId(), FormMappingTarget.NONE.name(), null);
@@ -402,7 +401,7 @@ public class FormMappingAndPageArtifactManagerTest {
         final BusinessArchive businessArchive = businessArchiveBuilder.done();
 
         // when:
-        formMappingAndPageDependencyDeployer.deployFormMappings(businessArchive, processDefinitionId);
+        formMappingAndPageArtifactManager.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
         verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), eq(FormMappingType.TASK.getId()), anyString(), anyString());
@@ -422,14 +421,15 @@ public class FormMappingAndPageArtifactManagerTest {
         sFormMappingProcessOverview.setPageMapping(pageMapping);
         sFormMappingProcessStart.setPageMapping(pageMapping);
 
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingTask, problems);
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingProcessOverview, problems);
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingProcessStart, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingTask, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessOverview, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessStart, problems);
         assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3).extracting("resource", "resourceId")
                 .contains(tuple("form mapping", "Step1"),
                         tuple("form mapping", FormMappingType.PROCESS_OVERVIEW.name()),
                         tuple("form mapping", FormMappingType.PROCESS_START.name()));
     }
+
     @Test
     public void checkFormMappingResolutionShouldNotAddProblemsIfThereIsNONE() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
@@ -438,9 +438,9 @@ public class FormMappingAndPageArtifactManagerTest {
         SFormMappingImpl sFormMappingProcessOverview = new SFormMappingImpl(321324, FormMappingType.PROCESS_OVERVIEW.getId(), null, SFormMapping.TARGET_NONE);
         SFormMappingImpl sFormMappingProcessStart = new SFormMappingImpl(321324, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_NONE);
 
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingTask, problems);
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingProcessOverview, problems);
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingProcessStart, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingTask, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessOverview, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessStart, problems);
         assertThat(problems).as("the problem list should not contain any mapping problem").hasSize(0);
     }
 
@@ -453,15 +453,14 @@ public class FormMappingAndPageArtifactManagerTest {
         SFormMappingImpl sFormMappingProcessStart = new SFormMappingImpl(321324, FormMappingType.PROCESS_START.getId(), null, SFormMapping.TARGET_UNDEFINED);
 
 
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingTask, problems);
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingProcessOverview, problems);
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMappingProcessStart, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingTask, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessOverview, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMappingProcessStart, problems);
 
         assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3).extracting("resource", "resourceId").contains(tuple("form mapping", "Step1"),
                 tuple("form mapping", FormMappingType.PROCESS_OVERVIEW.name()),
                 tuple("form mapping", FormMappingType.PROCESS_START.name()));
     }
-
 
 
     @Test
@@ -475,8 +474,57 @@ public class FormMappingAndPageArtifactManagerTest {
 
         sFormMapping.setPageMapping(pageMapping);
 
-        formMappingAndPageDependencyDeployer.checkFormMappingResolution(sFormMapping, problems);
+        formMappingAndPageArtifactManager.checkFormMappingResolution(sFormMapping, problems);
         assertThat(problems).as("the problem list should not contain any mapping problems").hasSize(0);
+    }
+
+    @Test
+    public void should_export_form_mapping_with_existing_page() throws Exception {
+        //given
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").addActor("actor").addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
+        doReturn(Arrays.asList(withFormMapping("myPage1", PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW, FormMappingTarget.INTERNAL, null),
+                withFormMapping("myPage2", PROCESS_DEFINITION_ID, FormMappingType.PROCESS_START, FormMappingTarget.INTERNAL, null),
+                withFormMapping("myPage3", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL, "task1"),
+                withFormMapping("myPage4", PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL, "task2")))
+                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
+        //when
+        formMappingAndPageArtifactManager.exportToBusinessArchive(PROCESS_DEFINITION_ID, businessArchiveBuilder);
+        //then
+        FormMappingModel formMappingModel = businessArchiveBuilder.done().getFormMappingModel();
+        assertThat(formMappingModel.getFormMappings())
+                .containsOnly(new FormMappingDefinition("myPage1", FormMappingType.PROCESS_OVERVIEW, FormMappingTarget.INTERNAL),
+                        new FormMappingDefinition("myPage2", FormMappingType.PROCESS_START, FormMappingTarget.INTERNAL),
+                        new FormMappingDefinition("myPage3", FormMappingType.TASK, FormMappingTarget.INTERNAL, "task1"),
+                        new FormMappingDefinition("myPage4", FormMappingType.TASK, FormMappingTarget.INTERNAL, "task2"));
+    }
+
+    @Test
+    public void should_export_form_mapping_with_unexisting_page() throws Exception {
+        //given
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+        businessArchiveBuilder.setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0").addActor("actor").addUserTask("task1", "actor").addUserTask("task2", "actor").getProcess());
+        doReturn(Collections.singletonList(withFormMapping(null, PROCESS_DEFINITION_ID, FormMappingType.TASK, FormMappingTarget.INTERNAL, "task2")))
+                .when(formMappingService).list(PROCESS_DEFINITION_ID, 0, Integer.MAX_VALUE);
+        //when
+        formMappingAndPageArtifactManager.exportToBusinessArchive(PROCESS_DEFINITION_ID, businessArchiveBuilder);
+        //then
+        FormMappingModel formMappingModel = businessArchiveBuilder.done().getFormMappingModel();
+        assertThat(formMappingModel.getFormMappings())
+                .containsOnly(
+                        new FormMappingDefinition(null, FormMappingType.TASK, FormMappingTarget.INTERNAL, null));
+    }
+
+    private SFormMappingImpl withFormMapping(String pageName, long processDefinitionId, FormMappingType type, FormMappingTarget target, String task) throws SBonitaReadException, SObjectNotFoundException {
+        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type.getId(), task, target.name());
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        if (pageName != null) {
+            long pageId = UUID.randomUUID().getMostSignificantBits();
+            pageMapping.setPageId(pageId);
+            sFormMapping.setPageMapping(pageMapping);
+            doReturn(new SPageImpl(pageName, 0, 0, false, "page.zip")).when(pageService).getPage(pageId);
+        }
+        return sFormMapping;
     }
 
 }
