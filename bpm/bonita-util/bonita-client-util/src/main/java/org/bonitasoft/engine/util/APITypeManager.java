@@ -46,7 +46,11 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * </li>
  * <li>EJB3
  * <p>
- * connect to the server using EJB3
+ * connect to the server using EJB3, must specify<br> For JBoss AS 7 :
+ * <ul>
+ * <li>java.naming.factory.url.pkgs, e.g. org.jboss.ejb.client.naming</li>
+ * <li>org.bonitasoft.engine.ejb.naming.reference, e.g. ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI</li>
+ * </ul>
  * </p>
  * </li>
  * <li>TCP
@@ -137,8 +141,6 @@ public class APITypeManager {
         addParameter(properties, "org.bonitasoft.engine.api-type.", "application.name");
         addParameter(properties, "", "org.bonitasoft.engine.ejb.naming.reference");
         addParameter(properties, "", "java.naming.factory.url.pkgs");
-        addParameter(properties, "", "java.naming.factory.initial");
-        addParameter(properties, "", "java.naming.provider.url");
         return properties;
     }
 
