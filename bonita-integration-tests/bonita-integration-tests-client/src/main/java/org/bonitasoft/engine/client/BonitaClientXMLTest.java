@@ -21,13 +21,14 @@ import java.util.Map;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.rules.TestRule;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -38,23 +39,12 @@ public class BonitaClientXMLTest {
 
     private static final String BONITA_HOME_CLIENT_EJB3 = "target/bonita_home_client_EJB3";
 
-    private static final String bonitaHomeStandard = System.getProperty(BonitaHome.BONITA_HOME);
-
-    @BeforeClass
-    public static void beforeClass() throws BonitaHomeNotSetException {
-        if (bonitaHomeStandard == null) {
-            throw new BonitaHomeNotSetException("You must set the system property bonita.home");
-        }
-    }
+    @Rule
+    public final TestRule restoreSystemProperties = new RestoreSystemProperties();
 
     @After
     public void tearDown() {
         TenantAPIAccessor.refresh();
-        this.switchBonitaHomeStandard();
-    }
-
-    private void switchBonitaHomeStandard() {
-        System.setProperty(BonitaHome.BONITA_HOME, bonitaHomeStandard);
     }
 
     @Test
@@ -78,8 +68,7 @@ public class BonitaClientXMLTest {
         TenantAPIAccessor.refresh();
         System.setProperty(BonitaHome.BONITA_HOME, BONITA_HOME_CLIENT_EJB3);
         parameters = APITypeManager.getAPITypeParameters();
-        expectedParameters.put("java.naming.factory.initial", "org.jnp.interfaces.NamingContextFactory");
-        expectedParameters.put("java.naming.provider.url", "jnp://localhost:1099");
+        expectedParameters.put("java.naming.factory.url.pkgs", "org.jboss.ejb.client.naming");
         assertEquals(expectedParameters, parameters);
     }
 

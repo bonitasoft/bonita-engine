@@ -101,6 +101,11 @@
             <artifactId>json-unit-assertj</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.bonitasoft.engine.util</groupId>
