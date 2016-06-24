@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
@@ -74,6 +76,12 @@ public class PlatformAPIImplTest {
     private TenantConfiguration tenantConfiguration;
     @Mock
     private BonitaHomeServer bonitaHomeServer;
+
+    @Mock
+    private PlatformService platformService;
+
+    @Mock
+    private STenant sTenant;
 
     private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
 
@@ -298,4 +306,22 @@ public class PlatformAPIImplTest {
         //then
         verify(bonitaHomeServer).updateTenantPortalConfigurationFile(TENANT_ID, "myProps.properties", "updated content".getBytes());
     }
+
+    @Test
+    public void should_getTenantPortalConfigurationFile_call_bonitaHomeServer() throws Exception {
+        //given
+        final String configurationFile = "a file";
+        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
+        doReturn(sTenant).when(platformService).getTenant(TENANT_ID);
+        doReturn(TENANT_ID).when(sTenant).getId();
+        doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
+
+        //when
+        final byte[] configuration = platformAPI.getClientTenantConfiguration(TENANT_ID, configurationFile);
+
+        //then
+        assertThat(configuration).as("should return file content").isEqualTo("content".getBytes());
+        verify(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
+    }
+
 }
