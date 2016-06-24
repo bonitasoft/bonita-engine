@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -189,6 +188,10 @@ public class BonitaHomeServer {
         file.delete();
         file.createNewFile();
         return file;
+    }
+
+    public File getLicensesFolder() throws IOException {
+        return FolderMgr.getLicensesFolder().getFile();
     }
 
     public URI getGlobalTemporaryFolder() throws BonitaHomeNotSetException, IOException {

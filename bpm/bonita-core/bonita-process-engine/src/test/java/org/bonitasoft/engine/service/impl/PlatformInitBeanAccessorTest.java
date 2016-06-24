@@ -41,12 +41,12 @@ public class PlatformInitBeanAccessorTest {
     }
 
     @Test
-    public void should_getContext_call_extract_licenses() throws Exception {
+    public void should_getContext_call_setupLicenses() throws Exception {
         //when
         platformInitBeanAccessor.init();
 
         //then
-        verify(platformLicensesSetup).extractLicenses();
+        verify(platformLicensesSetup).setupLicenses();
     }
 
 }

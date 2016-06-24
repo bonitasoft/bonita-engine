@@ -134,11 +134,9 @@ public class IOUtil {
      * Warning: the whole content of stream will be kept in memory!! Use with
      * care!
      *
-     * @param in
-     *        the stream to read
+     * @param in the stream to read
      * @return the whole content of the stream in a single String.
-     * @throws IOException
-     *         if an I/O exception occurs
+     * @throws IOException if an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final InputStream in) throws IOException {
         if (in == null) {
@@ -163,11 +161,9 @@ public class IOUtil {
      * Equivalent to {@link #getAllContentFrom(InputStream) getAllContentFrom(new
      * FileInputStream(file))};
      *
-     * @param file
-     *        the file to read
+     * @param file the file to read
      * @return the whole content of the file in a single String.
-     * @throws IOException
-     *         If an I/O exception occurs
+     * @throws IOException If an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final File file) throws IOException {
         try (InputStream in = new FileInputStream(file)) {
@@ -180,11 +176,9 @@ public class IOUtil {
      * Warning: the whole content of stream will be kept in memory!! Use with
      * care!
      *
-     * @param url
-     *        the URL to read
+     * @param url the URL to read
      * @return the whole content of the stream in a single String.
-     * @throws IOException
-     *         if an I/O exception occurs
+     * @throws IOException if an I/O exception occurs
      */
     public static byte[] getAllContentFrom(final URL url) throws IOException {
         try (InputStream in = url.openStream()) {
@@ -199,20 +193,25 @@ public class IOUtil {
 
         mkdirs(tmpDir);
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        try {
 
-            @Override
-            public void run() {
-                try {
-                    final boolean deleted = deleteDir(tmpDir);
-                    if (!deleted) {
-                        System.err.println("Unable to delete the directory: " + tmpDir);
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+
+                @Override
+                public void run() {
+                    try {
+                        final boolean deleted = deleteDir(tmpDir);
+                        if (!deleted) {
+                            System.err.println("Unable to delete the directory: " + tmpDir);
+                        }
+                    } catch (final IOException e) {
+                        throw new BonitaRuntimeException(e);
                     }
-                } catch (final IOException e) {
-                    throw new BonitaRuntimeException(e);
                 }
-            }
-        });
+            });
+        } catch (IllegalStateException ignored) {
+            // happen in case of hook already registered and when shutting down
+        }
         return tmpDir;
     }
 
@@ -312,8 +311,7 @@ public class IOUtil {
     /**
      * Read the contents from the given FileInputStream. Return the result as a String.
      *
-     * @param inputStream
-     *        the stream to read from
+     * @param inputStream the stream to read from
      * @return the content read from the inputStream, as a String
      */
     public static String read(final InputStream inputStream) {
@@ -347,9 +345,8 @@ public class IOUtil {
 
     /**
      * Read the contents of the given file.
-     * 
-     * @param file
-     *        the file to read
+     *
+     * @param file the file to read
      */
     public static String read(final File file) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
@@ -367,8 +364,7 @@ public class IOUtil {
         return file.exists() || file.mkdirs();
     }
 
-    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws
-            IOException {
+    private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws IOException {
         ZipEntry zipEntry;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
@@ -446,8 +442,7 @@ public class IOUtil {
         }
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema = sf.newSchema(schemaURL);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream())
-        {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
             final Marshaller m = contextObj.createMarshaller();
             m.setSchema(schema);
