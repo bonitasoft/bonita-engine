@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.util;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -90,21 +86,7 @@ public class IOUtilTest {
         final File file = new File(folder, "aFile");
         IOUtil.writeContentToFile("content", file);
 
-        assertTrue(IOUtil.deleteDir(folder));
-
-        assertFalse(file.exists());
-        assertFalse(folder.exists());
-    }
-
-    @Test
-    public void testDeleteDirFileWithRetry() throws Exception {
-        final File folder = File.createTempFile("folder", "test");
-        folder.delete();
-        folder.mkdir();
-        final File file = new File(folder, "aFile");
-        IOUtil.writeContentToFile("content", file);
-
-        assertTrue(IOUtil.deleteDir(folder, 5, 1));
+        IOUtil.deleteDir(folder);
 
         assertFalse(file.exists());
         assertFalse(folder.exists());
@@ -129,7 +111,7 @@ public class IOUtilTest {
     }
 
     @Test
-    public void testDeleteFiledeletedAfterFewTry() {
+    public void testDeleteFileDeletedAfterFewTry() {
         final File file = mock(File.class);
         when(file.delete()).thenReturn(false, false, true);
         final boolean deleteFile = IOUtil.deleteFile(file, 6, 1);
