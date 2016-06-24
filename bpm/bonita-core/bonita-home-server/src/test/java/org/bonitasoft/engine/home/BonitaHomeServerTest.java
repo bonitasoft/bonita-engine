@@ -163,4 +163,20 @@ public class BonitaHomeServerTest {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
     }
+
+    @Test
+    public void should_getTenantPortal_Configuration() throws Exception {
+        //given
+        final String configFile = "a portal config file";
+        BonitaConfiguration tenantTemplateConf = conf(configFile, "{}".getBytes());
+        doReturn(tenantTemplateConf).when(configurationService).getTenantPortalConfiguration(TENANT_ID, configFile);
+
+        //when
+        byte[] content = bonitaHomeServer.getTenantPortalConfiguration(TENANT_ID, configFile);
+
+        //then
+        verify(configurationService).getTenantPortalConfiguration(TENANT_ID, configFile);
+        assertThat(content).isEqualTo("{}".getBytes());
+
+    }
 }

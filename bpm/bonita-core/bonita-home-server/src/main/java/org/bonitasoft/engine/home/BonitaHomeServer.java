@@ -269,6 +269,10 @@ public class BonitaHomeServer {
         return map;
     }
 
+    public byte[] getTenantPortalConfiguration(long tenantId, String file) {
+        return getConfigurationService().getTenantPortalConfiguration(tenantId, file).getResourceContent();
+    }
+
     public void updateTenantPortalConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException {
         List<BonitaConfiguration> tenantPortalConf = getConfigurationService().getTenantPortalConf(tenantId);
         for (BonitaConfiguration bonitaConfiguration : tenantPortalConf) {

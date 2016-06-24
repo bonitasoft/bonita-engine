@@ -242,7 +242,7 @@ public class PlatformAPIImpl implements PlatformAPI {
      */
     protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
             final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
-                    InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
+            InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
         final TransactionService transactionService = platformAccessor.getTransactionService();
         for (final STenant tenant : tenants) {
             long platformSessionId = -1;
@@ -872,6 +872,11 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (BonitaException | IOException | IllegalAccessException | ClassNotFoundException | InstantiationException | STenantException e) {
             throw new RetrieveException(e);
         }
+    }
+
+    @Override
+    public byte[] getClientTenantConfiguration(long tenantId, String file) {
+        return getBonitaHomeServerInstance().getTenantPortalConfiguration(tenantId, file);
     }
 
     BonitaHomeServer getBonitaHomeServerInstance() {
