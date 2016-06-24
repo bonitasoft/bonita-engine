@@ -234,30 +234,37 @@ public interface PlatformAPI {
     void rescheduleErroneousTriggers() throws UpdateException;
 
     /**
+     * INTERNAL USE ONLY
      * get client configuration files of the platform
      * 
      * @return the client platform configuration files as a map containing file name and file content
      * @since 7.3
      */
+    @Internal
     Map<String, byte[]> getClientPlatformConfigurations();
 
     /**
+     * INTERNAL USE ONLY
      * get client configuration files of the tenants
      * 
      * @return the client tenants configuration files as a map containing for each tenant id a map with file name and file content
      * @since 7.3
      */
+    @Internal
     Map<Long, Map<String, byte[]>> getClientTenantConfigurations();
 
     /**
+     * INTERNAL USE ONLY
      * get client auto login configuration file for tenant
      *
      * @return file content
      * @since 7.3
      */
+    @Internal
     byte[] getClientTenantConfiguration(long tenantId, String file);
 
     /**
+     * INTERNAL USE ONLY
      * update a single client configuration file of the tenant
      *
      * @param tenantId tenant to update
@@ -266,5 +273,6 @@ public interface PlatformAPI {
      * @throws UpdateException
      * @since 7.3
      */
+    @Internal
     void updateClientTenantConfigurationFile(long tenantId, String file, byte[] content) throws UpdateException;
 }
