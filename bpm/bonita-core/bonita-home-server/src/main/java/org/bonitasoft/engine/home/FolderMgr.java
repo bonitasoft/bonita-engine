@@ -30,6 +30,10 @@ class FolderMgr {
         return getFolder(getTempFolder(), "platform").createIfNotExists();
     }
 
+    static Folder getLicensesFolder() throws IOException {
+        return getFolder(getTempFolder(), "licenses");
+    }
+
     static Folder getTenantsWorkFolder(final File parentFolder) throws IOException {
         return getFolder(parentFolder, "tenants");
     }

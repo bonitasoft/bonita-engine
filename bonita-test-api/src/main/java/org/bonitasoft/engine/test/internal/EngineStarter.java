@@ -3,18 +3,23 @@ package org.bonitasoft.engine.test.internal;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.naming.NamingException;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -349,34 +354,55 @@ public class EngineStarter {
         LOGGER.info("=====================================================");
 
         shutdown();
-        checkTempFolderIsCleaned();
+        checkTempFoldersAreCleaned();
         checkThreadsAreStopped();
     }
 
-    private void checkTempFolderIsCleaned() {
-        final String[] folders = getTemporaryFolders();
+    private void checkTempFoldersAreCleaned() throws IOException {
+        final List<File> folders = getTemporaryFolders();
+        removeLicensesFolderAndDeleteIt(folders);
         StringBuilder builder = new StringBuilder();
-        for (String folder : folders) {
+        for (File folder : folders) {
             builder.append("[");
-            builder.append(folder);
+            builder.append(folder.getName());
             builder.append("] ");
         }
-        if (folders.length > 0) {
+        if (!folders.isEmpty()) {
             throw new IllegalStateException("Temporary configuration folders are not cleaned:" + builder.toString());
         }
         LOGGER.info("Temporary configuration folder is cleaned");
     }
 
-    private String[] getTemporaryFolders() {
+    private List<File> getTemporaryFolders() {
         File tempFolder = new File(IOUtil.TMP_DIRECTORY);
         FilenameFilter filter = new FilenameFilter() {
 
             @Override
             public boolean accept(File file, String s) {
-                return s.startsWith("bonita_conf");
+                return s.startsWith("bonita_");
             }
         };
-        return tempFolder.list(filter);
+        return new ArrayList<>(Arrays.asList(tempFolder.listFiles(filter)));
+    }
+
+    private void removeLicensesFolderAndDeleteIt(List<File> list) throws IOException {
+        Iterator<File> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            File tempFolder = iterator.next();
+            //folder of licenses not deleted because the shutdown hook that delete temp files
+            //is executed as the same time as the shutdown hook that stops the engine
+            if (tempFolder.getName().contains("bonita_engine") && tempFolder.getName().contains(ManagementFactory.getRuntimeMXBean().getName())) {
+                Path licenses = tempFolder.toPath().resolve("licenses");
+                if (Files.exists(licenses)) {
+                    FileUtils.deleteDirectory(licenses.toFile());
+                }
+                if (tempFolder.list().length == 0) {
+                    FileUtils.deleteDirectory(tempFolder);
+                    //remove this directory because there was only the licenses there
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     public void overrideConfiguration(String path, byte[] file) {
