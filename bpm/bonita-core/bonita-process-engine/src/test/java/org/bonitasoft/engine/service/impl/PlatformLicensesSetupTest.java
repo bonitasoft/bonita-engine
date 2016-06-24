@@ -15,15 +15,16 @@
 package org.bonitasoft.engine.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.service.impl.PlatformLicensesSetup.BONITA_CLIENT_HOME;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
+import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.exception.PlatformException;
@@ -46,7 +47,7 @@ import org.mockito.stubbing.Answer;
 public class PlatformLicensesSetupTest {
 
     @Rule
-    public final ClearSystemProperties bonitaClientHome = new ClearSystemProperties(PlatformLicensesSetup.BONITA_CLIENT_HOME);
+    public final ClearSystemProperties bonitaClientHome = new ClearSystemProperties(BONITA_CLIENT_HOME);
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -58,11 +59,14 @@ public class PlatformLicensesSetupTest {
     PlatformLicensesSetup platformLicensesSetup;
 
     private LicenseAnswer licenseAnswer;
+    private File licensesFolder;
 
     @Before
     public void before() throws Exception {
         licenseAnswer = new LicenseAnswer();
         doReturn(configurationService).when(platformLicensesSetup).getConfigurationService();
+        licensesFolder = BonitaHomeServer.getInstance().getLicensesFolder();
+        FileUtils.deleteDirectory(licensesFolder);
     }
 
     private final class LicenseAnswer implements Answer<List<BonitaConfiguration>> {
@@ -73,9 +77,9 @@ public class PlatformLicensesSetupTest {
         public List<BonitaConfiguration> answer(final InvocationOnMock invocation) {
             i++;
             List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
-            final String resourceName = new StringBuilder().append("license").append(i).append(".lic").toString();
+            final String resourceName = "license" + i + ".lic";
             bonitaConfigurations
-                    .add(new BonitaConfiguration(resourceName, new StringBuilder().append("license ").append(i).append(" content").toString().getBytes()));
+                    .add(new BonitaConfiguration(resourceName, ("license " + i + " content").getBytes()));
             return bonitaConfigurations;
         }
 
@@ -90,19 +94,15 @@ public class PlatformLicensesSetupTest {
         platformLicensesSetup.setupLicenses();
 
         //then
-        final String property = System.getProperty(PlatformLicensesSetup.BONITA_CLIENT_HOME);
-        assertThat(property).as("should set system property in temp folder, depends on OS")
+        assertThat(System.getProperty(BONITA_CLIENT_HOME)).as("should set system property in temp folder, depends on OS")
                 .isNotNull()
-                .contains("bonita_licenses");
+                .contains("licenses");
 
-        final File folder = new File(property);
-        assertThat(folder).exists().isDirectory();
-        assertThat(folder.listFiles()).extracting("name").contains("license1.lic");
-
+        assertThat(new File(System.getProperty(BONITA_CLIENT_HOME)).listFiles()).extracting("name").contains("license1.lic");
     }
 
     @Test
-    public void should_setup_licenses_folder_skip_property_when_no_licenses_are_found() throws Exception {
+    public void should_setup_licenses_folder_do_not_set_bonita_client_home_even_if_there_is_no_licenses() throws Exception {
         //given
         doReturn(Collections.EMPTY_LIST).when(configurationService).getLicenses();
 
@@ -110,25 +110,20 @@ public class PlatformLicensesSetupTest {
         platformLicensesSetup.setupLicenses();
 
         //then
-        assertThat(System.getProperties()).doesNotContainKey(PlatformLicensesSetup.BONITA_CLIENT_HOME);
+        assertThat(System.getProperties()).doesNotContainKey(BONITA_CLIENT_HOME);
     }
 
     @Test
-    public void should_extract_licenses_even_if_bonitaHomeClient_is_set() throws Exception {
+    public void should_not_overwrite_bonita_client_home_system_property() throws Exception {
         //given
-        final String existing_licenses_folder = "existing_licenses_folder";
-        System.setProperty(PlatformLicensesSetup.BONITA_CLIENT_HOME, existing_licenses_folder);
-        doReturn(Collections.singletonList(new BonitaConfiguration("license1.lic", "license content".getBytes()))).when(configurationService).getLicenses();
+        System.setProperty(BONITA_CLIENT_HOME, "existing_licenses_folder");
+        when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
 
         //when
         platformLicensesSetup.setupLicenses();
 
         //then
-        final String property = System.getProperty(PlatformLicensesSetup.BONITA_CLIENT_HOME);
-        assertThat(property).as("should not modify property").isEqualTo(existing_licenses_folder);
-
-        verify(platformLicensesSetup).extractLicenses();
-
+        assertThat(System.getProperty(BONITA_CLIENT_HOME)).as("should not modify system property").isEqualTo("existing_licenses_folder");
     }
 
     @Test
@@ -145,25 +140,53 @@ public class PlatformLicensesSetupTest {
     }
 
     @Test
-    public void should_extract_licenses_clear_previous_licenses_from_temp_folder() throws Exception {
+    public void should_extract_licenses_do_not_extract_it_if_already_done() throws Exception {
         //given
-        final File licensesFolder = Paths.get(IOUtil.TMP_DIRECTORY, "bonita_licenses").toFile();
         when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
 
         //when
-        platformLicensesSetup.extractLicenses();
+        platformLicensesSetup.setupLicenses();
 
         //then
         assertThat(licensesFolder).isDirectory().exists();
-        assertThat(System.getProperty(PlatformLicensesSetup.BONITA_CLIENT_HOME)).isEqualTo(licensesFolder.getAbsolutePath());
+        assertThat(System.getProperty(BONITA_CLIENT_HOME)).isEqualTo(licensesFolder.getAbsolutePath());
         assertThat(licensesFolder.listFiles()).extracting("name").as("should contains only extracted licenses").containsOnly("license1.lic");
 
         //when
-        platformLicensesSetup.extractLicenses();
+        platformLicensesSetup.setupLicenses();
 
-        //then
+        //then: licenses were not replace by new one: it was already done
+        assertThat(licensesFolder.listFiles()).extracting("name").as("should remove previous licenses").containsOnly("license1.lic");
+    }
+
+    @Test
+    public void should_extract_extract_a_second_time_if_folder_is_deleted() throws Exception {
+        //given
+        when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
+        platformLicensesSetup.setupLicenses();
+        assertThat(licensesFolder.listFiles()).extracting("name").as("should contains only extracted licenses").containsOnly("license1.lic");
+        FileUtils.deleteDirectory(licensesFolder);
+        //when
+        platformLicensesSetup.setupLicenses();
+
+        //then: licenses were not replace by new one: it was already done
         assertThat(licensesFolder.listFiles()).extracting("name").as("should remove previous licenses").containsOnly("license2.lic");
+    }
 
+    @Test
+    public void should_extract_extract_a_second_time_if_folder_is_empty() throws Exception {
+        //given
+        when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
+        platformLicensesSetup.setupLicenses();
+        assertThat(licensesFolder.listFiles()).extracting("name").as("should contains only extracted licenses").containsOnly("license1.lic");
+        for (File file : licensesFolder.listFiles()) {
+            file.delete();
+        }
+        //when
+        platformLicensesSetup.setupLicenses();
+
+        //then: licenses were not replace by new one: it was already done
+        assertThat(licensesFolder.listFiles()).extracting("name").as("should remove previous licenses").containsOnly("license2.lic");
     }
 
 }
