@@ -250,6 +250,14 @@ public interface PlatformAPI {
     Map<Long, Map<String, byte[]>> getClientTenantConfigurations();
 
     /**
+     * get client auto login configuration file for tenant
+     *
+     * @return file content
+     * @since 7.3
+     */
+    byte[] getClientTenantConfiguration(long tenantId, String file);
+
+    /**
      * update a single client configuration file of the tenant
      *
      * @param tenantId tenant to update
