@@ -30,4 +30,7 @@ public class SProcessEnablementException extends SBonitaException {
         super(message);
     }
 
+    public SProcessEnablementException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

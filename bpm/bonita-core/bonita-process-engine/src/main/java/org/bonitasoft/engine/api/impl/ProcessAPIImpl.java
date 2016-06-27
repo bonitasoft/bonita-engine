@@ -358,6 +358,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
@@ -428,6 +429,8 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -735,9 +738,12 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
+        final ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
         try {
-            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, processDefinitionId, eventsHandler,
-                    tenantAccessor.getTechnicalLoggerService(), SessionInfos.getUserNameFromSession());
+            final ConfigurationService configurationService = new ConfigurationServiceImpl();
+            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, configurationService, processResourcesService, processDefinitionId,
+                    eventsHandler,
+                    tenantAccessor.getTechnicalLoggerService(), SessionInfos.getUserNameFromSession(), SessionInfos.getSession().getTenantId());
             enableProcess.execute();
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);

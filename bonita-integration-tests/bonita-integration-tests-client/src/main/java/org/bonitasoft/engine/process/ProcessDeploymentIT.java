@@ -44,10 +44,14 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -118,6 +122,71 @@ public class ProcessDeploymentIT extends TestWithUser {
         assertEquals(APITestUtil.PROCESS_NAME, processDefinition1.getName());
         // delete data for test
         disableAndDeleteProcess(processDefinition1);
+    }
+
+    @Test
+    public void deployProcessWithAutologin_should_respect_lifecycle() throws Exception {
+        //given
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2"),
+                Arrays.asList(true, true));
+        final BusinessArchiveBuilder newBusinessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
+        final byte[] properties = IOUtil
+                .getAllContentFrom(this.getClass().getClassLoader().getResourceAsStream("org/bonitasoft/engine/process/security-config.properties"));
+        newBusinessArchive.addExternalResource(new BarResource("forms/security-config.properties", properties));
+
+        //when
+        final ProcessDefinition processDefinition = deployProcess(
+                newBusinessArchive.setProcessDefinition(designProcessDefinition).done());
+        addUserToFirstActorOfProcess(user.getId(), processDefinition);
+        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+
+        //then
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
+        checkAutoLoginConfiguration("should have no auto login for resolved process", "[]");
+
+        //when
+        getProcessAPI().enableProcess(processDefinition.getId());
+        processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+
+        //then
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+        checkAutoLoginConfiguration("should have auto login for enabled process",
+                "[{\"processname\":\"ProcessName\",\"processversion\":\"1.0\",\"username\":\"walter.bates\",\"password\":\"bpm\"}]");
+
+        //when
+        getProcessAPI().disableProcess(processDefinition.getId());
+        checkAutoLoginConfiguration("should have no auto login for disabled process", "[]");
+
+        // Clean up
+        getProcessAPI().deleteProcessDefinition(processDefinition.getId());
+    }
+
+    @Test
+    public void deployProcessWith_no_security_resource_should_not_allow_auto_login() throws Exception {
+        // given
+        final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1_1"),
+                Arrays.asList(false));
+
+        //when
+        final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
+
+        //then
+        checkAutoLoginConfiguration("should have no auto login when process has no resources", "[]");
+
+        // clean up
+        disableAndDeleteProcess(processDefinition1);
+    }
+
+    private void checkAutoLoginConfiguration(String message, String expectedJson) throws Exception {
+        final BonitaConfiguration configuration = getPortalAutoLoginConfiguration();
+        assertThat(configuration).isNotNull();
+        assertThat(new String(configuration.getResourceContent())).as(message).isEqualTo(expectedJson);
+    }
+
+    private BonitaConfiguration getPortalAutoLoginConfiguration() throws Exception {
+        ConfigurationService configurationService = new ConfigurationServiceImpl();
+        return configurationService.getTenantPortalConfiguration(getApiClient().getSession().getTenantId(), "autologin-v6.json");
     }
 
     @Test
