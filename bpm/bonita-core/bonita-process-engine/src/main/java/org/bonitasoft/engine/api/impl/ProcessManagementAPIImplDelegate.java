@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.naming.NamingException;
+
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
@@ -28,6 +30,7 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -49,12 +52,14 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
 // Uncomment the "implements" when this delegate implements all the methods.
-public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */{
+public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
 
     private static PlatformServiceAccessor getPlatformServiceAccessor() {
         try {
@@ -100,7 +105,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         } while (!sourceProcessInstanceIds.isEmpty());
     }
 
-
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
@@ -108,9 +112,20 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
-                SessionInfos.getUserNameFromSession());
+
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId, eventInstanceService, getConfigurationService(),
+                schedulerService,
+                logger, SessionInfos.getUserNameFromSession(), SessionInfos.getSession().getTenantId());
         disableProcess.execute();
+    }
+
+    public ConfigurationService getConfigurationService() throws SProcessDisablementException {
+        try {
+            return new ConfigurationServiceImpl();
+        } catch (NamingException e) {
+            throw new SProcessDisablementException(e);
+        }
+
     }
 
     public void purgeClassLoader(final long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException {
@@ -191,7 +206,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         try {
             final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
             final SParameter parameter = parameterService.get(processDefinitionId, parameterName);
-            if(parameter == null){
+            if (parameter == null) {
                 throw new NotFoundException("the parameter with name " + parameterName + " and process with id " + processDefinitionId + " was not found.");
             }
             final String name = parameter.getName();

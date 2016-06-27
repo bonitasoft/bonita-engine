@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +31,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,8 +61,15 @@ public class DisableProcessTest {
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
+    @Mock
+    private ConfigurationService configurationService;
+
+    @Mock
+    private BonitaConfiguration bonitaConfiguration;
+
     @Before
     public void setUp() {
+
         when(platformServiceAccessor.getSchedulerService()).thenReturn(scheduler);
         when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
         when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
@@ -69,10 +80,14 @@ public class DisableProcessTest {
     @Test
     public void execute_should_not_clean_the_classLoader_due_to_its_use_for_running_instances() throws SBonitaException {
         final long processDefinitionId = 1;
+        when(configurationService.getTenantPortalConfiguration(anyLong(), anyString())).thenReturn(bonitaConfiguration);
+        when(bonitaConfiguration.getResourceContent()).thenReturn("[]".getBytes());
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
         when(processDefinition.getProcessContainer()).thenReturn(flowElementCOntainerDefintion);
         when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<SStartEventDefinition>());
-        final DisableProcess disableProcess = new DisableProcess(processDefinitionService,  processDefinitionId,eventInstanceService,scheduler,logger, "matti");
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processDefinitionId, eventInstanceService, configurationService,
+                scheduler,
+                logger, "matti", 1L);
 
         disableProcess.execute();
 
