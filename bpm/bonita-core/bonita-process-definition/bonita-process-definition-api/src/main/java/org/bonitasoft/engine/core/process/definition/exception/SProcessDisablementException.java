@@ -30,4 +30,7 @@ public class SProcessDisablementException extends SBonitaException {
         super(message);
     }
 
+    public SProcessDisablementException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
