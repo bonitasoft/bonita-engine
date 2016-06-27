@@ -194,6 +194,12 @@ public class IOUtil {
         mkdirs(tmpDir);
 
         try {
+            // to initialize internal class FilenameUtils. Otherwise it cannot load the class as the shutdown is in progress:
+            FileUtils.isSymlink(tmpDir);
+        } catch (IOException ignored) {
+        }
+
+        try {
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
 
