@@ -67,7 +67,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
 
     private final BusinessDataModelRepository businessDataModelRepository;
     private final TechnicalLoggerService loggerService;
-    private ClassLoaderService classLoaderService;
+    private final ClassLoaderService classLoaderService;
     private final long tenantId;
 
     private final TransactionService transactionService;
@@ -110,7 +110,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     private synchronized void recreateEntityManagerFactory(ClassLoader newClassLoader) {
         if (businessDataModelRepository.isDBMDeployed()) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Recreate entity factory for classloader " + newClassLoader + " on tenant " + tenantId);
-            ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+            final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
                 entityManagerFactory.close();
@@ -188,7 +188,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         final T entity;
         try {
             entity = em.find(entityClass, primaryKey);
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
@@ -210,7 +210,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             final Root<T> row = criteriaQuery.from(entityClass);
             criteriaQuery.select(row).where(row.get(Field.PERSISTENCE_ID).in(primaryKeys));
             return em.createQuery(criteriaQuery).getResultList();
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
@@ -257,7 +257,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         try {
             return find(resultClass, typedQuery, parameters);
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             throw new SRetryableException(e);
         }
     }
@@ -268,7 +268,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
         try {
             return findList(typedQuery, parameters, startIndex, maxResults);
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             throw new SRetryableException(e);
         }
     }
@@ -280,7 +280,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         try {
             final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
             return find(resultClass, query, parameters);
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
@@ -293,7 +293,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         try {
             final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
             return findList(query, parameters, startIndex, maxResults);
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             //wrap in retryable exception because the issue might come from BDR reloading
             throw new SRetryableException(e);
         }
@@ -324,7 +324,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             final EntityManager em = getEntityManager();
             try {
                 em.remove(entity);
-            } catch (PersistenceException e) {
+            } catch (final PersistenceException e) {
                 throw new SRetryableException(e);
             }
         }
@@ -333,10 +333,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     @Override
     public void persist(final Entity entity) {
         if (entity != null) {
-            EntityManager entityManager = getEntityManager();
+            final EntityManager entityManager = getEntityManager();
             try {
                 entityManager.persist(entity);
-            } catch (PersistenceException e) {
+            } catch (final PersistenceException e) {
                 throw new SRetryableException(e);
             }
         }
@@ -347,7 +347,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         if (entity != null) {
             try {
                 return getEntityManager().merge(entity);
-            } catch (PersistenceException e) {
+            } catch (final PersistenceException e) {
                 throw new SRetryableException(e);
             }
         }
@@ -366,7 +366,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
 
     @Override
     public void onUpdate(ClassLoader newClassLoader) {
+        clearProxyFactoryCache();
         recreateEntityManagerFactory(newClassLoader);
+    }
+
+    private void clearProxyFactoryCache() {
+        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Clearing BDM proxy cache");
+        try {
+            new ProxyCacheManager().clearCache();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new SRetryableException(e);
+        }
     }
 
     @Override
