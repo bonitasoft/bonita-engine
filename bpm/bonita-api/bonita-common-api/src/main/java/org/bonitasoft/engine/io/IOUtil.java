@@ -51,6 +51,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.xml.sax.SAXException;
 
 /**
@@ -206,9 +207,12 @@ public class IOUtil {
                 @Override
                 public void run() {
                     try {
-                        deleteDir(tmpDir);
+                        final boolean deleted = deleteDir(tmpDir);
+                        if (!deleted) {
+                            System.err.println("Unable to delete the directory: " + tmpDir);
+                        }
                     } catch (final IOException e) {
-                        System.err.println("Unable to delete the directory: " + tmpDir + ": " + e.getMessage());
+                        throw new BonitaRuntimeException(e);
                     }
                 }
             });
@@ -218,8 +222,29 @@ public class IOUtil {
         return tmpDir;
     }
 
-    public static void deleteDir(final File dir) throws IOException {
-        FileUtils.deleteDirectory(dir);
+    public static boolean deleteDir(final File dir) throws IOException {
+        return deleteDir(dir, 1, 0);
+    }
+
+    public static boolean deleteDir(final File dir, final int attempts, final long sleepTime) throws IOException {
+        if (dir != null) {
+            boolean result = true;
+            if (!dir.exists()) {
+                return true; //already deleted
+            }
+            if (!dir.isDirectory()) {
+                throw new IOException("Unable to delete directory: " + dir + ", it is not a directory");
+            }
+            for (final File file : dir.listFiles()) {
+                if (file.isDirectory()) {
+                    result &= deleteDir(file, attempts, sleepTime);
+                } else {
+                    result &= deleteFile(file, attempts, sleepTime);
+                }
+            }
+            return result && deleteFile(dir, attempts, sleepTime);
+        }
+        return false;
     }
 
     public static boolean deleteFile(final File f, final int attempts, final long sleepTime) {
