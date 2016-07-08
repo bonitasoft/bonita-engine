@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import org.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.Query;
+
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
@@ -161,7 +162,8 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
             deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
             tryBody._return(proxyfierFieldRef.invoke("proxify").arg(deserialize));
         } else {
-            tryBody._return(JExpr.cast(getModel().ref(queryReturnType), executeQuery));
+            deserialize = deserializerFieldRef.invoke("deserialize").arg(JExpr.cast(byteArrayClass, executeQuery)).arg(entityClassExpression);
+            tryBody._return(JExpr.cast(getModel().ref(queryReturnType), deserialize));
         }
 
         final JClass exceptionClass = getModel().ref(Exception.class);
