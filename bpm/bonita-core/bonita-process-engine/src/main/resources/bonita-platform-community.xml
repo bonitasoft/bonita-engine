@@ -27,6 +27,7 @@
                 <prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
                 <prop key="org.quartz.plugin.shutdownhook.class">org.quartz.plugins.management.ShutdownHookPlugin</prop>
                 <prop key="org.quartz.plugin.shutdownhook.cleanShutdown">false</prop>
+                <prop key="org.quartz.jobStore.txIsolationLevelReadCommitted">${org.quartz.jobStore.txIsolationLevelReadCommitted:false}</prop>
             </props>
         </property>
     </bean>
