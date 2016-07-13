@@ -26,7 +26,7 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 /**
  * <b>Creates {@link BusinessArchive}</b>
  * <p>
- * A typical use of this class is to build programmatically Business archive in order to deploy it using the {@link org.bonitasoft.engine.api.ProcessAPI} <p>
+ * A typical use of this class is to build programatically Business archive in order to deploy it using the {@link org.bonitasoft.engine.api.ProcessAPI} <p>
  * <p>
  * If you wish to deploy a BusinessArchived stored in a .bar file use {@link BusinessArchiveFactory} instead.
  * <p>
@@ -207,7 +207,13 @@ public class BusinessArchiveBuilder {
     }
 
     protected void addBarResourceInPath(final BarResource resource, final String path) {
-        entity.addResource(path + resource.getName(), resource.getContent());
+        final String resourcePath = path + resource.getName();
+        final byte[] resourceContent = resource.getContent();
+        if (resourceContent == null || resourceContent.length == 0) {
+            throw new IllegalArgumentException("You are trying to add file " + resourcePath + " with empty content into the BusinessArchive (bar file)."
+                    + " Either add content to this file, or remove it from the resources.");
+        }
+        entity.addResource(resourcePath, resourceContent);
     }
 
     /**
@@ -220,7 +226,7 @@ public class BusinessArchiveBuilder {
         if (entity.getProcessDefinition() == null) {
             throw new InvalidBusinessArchiveFormatException("missing process definition");
         }
-        final ArrayList<String> errors = new ArrayList<String>();
+        final ArrayList<String> errors = new ArrayList<>();
         for (final DocumentDefinition document : entity.getProcessDefinition().getProcessContainer().getDocumentDefinitions()) {
             if (document.getFile() != null && !document.getFile().isEmpty()) {
                 final byte[] resources = entity.getResource("documents/" + document.getFile());
