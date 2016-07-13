@@ -28,6 +28,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,9 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
+import org.bonitasoft.engine.bar.BusinessArchiveService;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -56,6 +60,7 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundExcep
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
@@ -149,7 +154,9 @@ import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -214,13 +221,18 @@ public class ProcessAPIImplTest {
     private ContractDataService contractDataService;
     @Mock
     private ExpressionResolverService expressionResolverService;
+    @Mock
+    private BusinessArchiveService businessArchiveService;
     private SProcessDefinitionImpl processDefinition;
     private SUserTaskDefinition userTaskDefinition;
     @Captor
     private ArgumentCaptor<List<String>> argument;
+
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
     public void setup() throws Exception {
@@ -264,6 +276,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
         when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
         when(tenantAccessor.getContractDataService()).thenReturn(contractDataService);
+        when(tenantAccessor.getBusinessArchiveService()).thenReturn(businessArchiveService);
     }
 
     @Test
@@ -1259,5 +1272,36 @@ public class ProcessAPIImplTest {
         when(processDefinitionService.getDesignProcessDefinition(processDefinitionId)).thenThrow(
                 new SProcessDefinitionNotFoundException("impossible to found given process definition"));
         processAPI.getDesignProcessDefinition(processDefinitionId);
+    }
+
+    @Test
+    public void validateBusinessArchive_should_throw_exception_if_empty_file_detected() throws Exception {
+        try (final InputStream resourceAsStream = this.getClass().getResourceAsStream("EmptyDocument--1.0.bar")) {
+            final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
+
+            expectedEx.expect(ProcessDeployException.class);
+            expectedEx.expectMessage(
+                    "The BAR file you are trying to deploy contains an empty file: resources/forms/resources/emptyDocument2.pdf. The process cannot be deployed. Fix it or remove it from the BAR.");
+
+            processAPI.validateBusinessArchive(businessArchive);
+        }
+    }
+
+    @Test
+    public void deploy_should_not_call_service_deploy_if_bar_validation_failed() throws Exception {
+        // given:
+        doThrow(ProcessDeployException.class).when(processAPI).validateBusinessArchive(any(BusinessArchive.class));
+        final BusinessArchive businessArchive = mock(BusinessArchive.class);
+
+        // when:
+        try {
+            processAPI.deploy(businessArchive);
+            fail("Deploy should throw Exception");
+        } catch (ProcessDeployException e) {
+            // ok
+        }
+
+        // then:
+        verifyZeroInteractions(businessArchiveService);
     }
 }

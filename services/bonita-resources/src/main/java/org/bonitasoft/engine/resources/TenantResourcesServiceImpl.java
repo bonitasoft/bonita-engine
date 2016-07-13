@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -35,16 +37,23 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
+    private final TechnicalLoggerService logger;
 
-    public TenantResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
+    public TenantResourcesServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, TechnicalLoggerService logger) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
+        this.logger = logger;
     }
 
     @Override
     public void add(String name, TenantResourceType type, byte[] content) throws SRecorderException {
-        STenantResource resource = new STenantResource(name, type, content);
-        recorder.recordInsert(new InsertRecord(resource), null);
+        if (content != null && content.length > 0) {
+            STenantResource resource = new STenantResource(name, type, content);
+            recorder.recordInsert(new InsertRecord(resource), null);
+        } else {
+            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                    "Tenant resource file contains an empty file " + name + " that will be ignored. Check that this is not a mistake.");
+        }
     }
 
     @Override
@@ -60,8 +69,9 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     public List<STenantResourceLight> getLight(TenantResourceType type, int from, int numberOfElements) throws SBonitaReadException {
         Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("type", type);
-        return persistenceService.selectList(new SelectListDescriptor<STenantResourceLight>("getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class,
-                new QueryOptions(from, numberOfElements)));
+        return persistenceService
+                .selectList(new SelectListDescriptor<STenantResourceLight>("getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class,
+                        new QueryOptions(from, numberOfElements)));
     }
 
     @Override
@@ -69,7 +79,8 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("type", type);
         return persistenceService.selectList(
-                new SelectListDescriptor<STenantResource>("getTenantResourcesOfType", inputParameters, STenantResource.class, new QueryOptions(from, numberOfElements)));
+                new SelectListDescriptor<STenantResource>("getTenantResourcesOfType", inputParameters, STenantResource.class,
+                        new QueryOptions(from, numberOfElements)));
     }
 
     @Override

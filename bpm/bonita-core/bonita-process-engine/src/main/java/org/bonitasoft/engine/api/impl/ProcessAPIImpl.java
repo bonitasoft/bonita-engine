@@ -678,6 +678,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
+        validateBusinessArchive(businessArchive);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final BusinessArchiveService businessArchiveService = tenantAccessor.getBusinessArchiveService();
         try {
@@ -686,6 +687,15 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDeployException(e);
         } catch (SAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        }
+    }
+
+    void validateBusinessArchive(BusinessArchive businessArchive) throws ProcessDeployException {
+        for (Map.Entry<String, byte[]> resource : businessArchive.getResources().entrySet()) {
+            final byte[] resourceContent = resource.getValue();
+            if (resourceContent == null || resourceContent.length == 0) {
+                throw new ProcessDeployException("The BAR file you are trying to deploy contains an empty file: " + resource.getKey() + ". The process cannot be deployed. Fix it or remove it from the BAR.");
+            }
         }
     }
 
