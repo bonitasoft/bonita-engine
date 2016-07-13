@@ -15,11 +15,7 @@
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,6 +83,7 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 /**
@@ -104,6 +101,8 @@ public class BusinessArchiveTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
     public void before() throws IOException {
@@ -289,6 +288,42 @@ public class BusinessArchiveTest {
         }
 
         BusinessArchiveFactory.readBusinessArchive(barFile);
+    }
+
+    @Test
+    public void addingEmptyDocument_to_BusinessArchive_should_throw_exception() throws Exception {
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("EmptyDoc", "7.3").done());
+
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("You are trying to add file documents/resume.pdf with empty content into the BusinessArchive (bar file)."
+                + " Either add content to this file, or remove it from the resources.");
+
+        builder.addDocumentResource(new BarResource("resume.pdf", new byte[] {}));
+    }
+
+    @Test
+    public void addingEmptyResource_to_BusinessArchive_should_throw_exception() throws Exception {
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("Dummy", "11.01").done());
+
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("You are trying to add file resources/dummy.txt with empty content into the BusinessArchive (bar file)."
+                + " Either add content to this file, or remove it from the resources.");
+
+        builder.addExternalResource(new BarResource("dummy.txt", new byte[] {}));
+    }
+
+    @Test
+    public void addingNullResource_to_BusinessArchive_should_throw_exception() throws Exception {
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("Dummy", "11.02").done());
+
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("You are trying to add file resources/dummy.txt with empty content into the BusinessArchive (bar file)."
+                + " Either add content to this file, or remove it from the resources.");
+
+        builder.addExternalResource(new BarResource("dummy.txt", null));
     }
 
     @Test
