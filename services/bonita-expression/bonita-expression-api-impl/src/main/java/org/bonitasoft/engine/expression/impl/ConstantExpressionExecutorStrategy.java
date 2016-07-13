@@ -36,12 +36,12 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
-    private static final String REGEX_PARSE_DATE = "(\\d{4})(-([01]\\d)((-([0-3]\\d)(T(\\d\\d)\\:(\\d\\d)(((\\:(\\d\\d))?(\\.(\\d\\d))?(([\\+-])(\\d\\d)\\:(\\d\\d))?)?)?)?)?)?)?";
+    private static final String REGEX_PARSE_DATE = "(\\d{4})(-([01]\\d)((-([0-3]\\d)(T(\\d\\d):(\\d\\d)(((:(\\d\\d))?(\\.(\\d\\d))?(([\\+-])(\\d\\d):(\\d\\d))?)?)?)?)?)?)?";
 
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if ("".equals(expression.getContent().trim())) {
-            throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression : " + expression, expression.getName());
+            throw new SInvalidExpressionException("The expression content cannot be empty. Expression : " + expression, expression.getName());
         }
     }
 
@@ -86,7 +86,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
-        final List<Object> list = new ArrayList<Object>(expressions.size());
+        final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }
@@ -99,7 +99,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     }
 
     /**
-     * @param dateToParse
+     * @param dateToParse the date to parse, as a String
      * @return null if not a Date, new Date with properties is ISO format is recognized
      */
     private Date parseDate(final String dateToParse) {
@@ -131,9 +131,9 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
                 calendar.set(Calendar.MINUTE, Integer.valueOf(minutes));
             }
 
-            final String secondes = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$13");
-            if (secondes != null && !secondes.isEmpty() && Integer.valueOf(secondes) < 60) {
-                calendar.set(Calendar.SECOND, Integer.valueOf(secondes));
+            final String seconds = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$13");
+            if (seconds != null && !seconds.isEmpty() && Integer.valueOf(seconds) < 60) {
+                calendar.set(Calendar.SECOND, Integer.valueOf(seconds));
             }
 
             final String fractional = dateToParse.replaceFirst(REGEX_PARSE_DATE, "$15");
