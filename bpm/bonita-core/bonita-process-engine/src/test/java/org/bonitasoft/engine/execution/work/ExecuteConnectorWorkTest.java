@@ -14,12 +14,7 @@
 
 package org.bonitasoft.engine.execution.work;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 
@@ -31,7 +26,6 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
-import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
@@ -132,7 +126,7 @@ public class ExecuteConnectorWorkTest {
 
         //then
         InOrder inOrder = inOrder(lockService, userTransactionService, connectorService);
-        inOrder.verify(connectorService).executeConnector(anyLong(), any(SConnectorInstance.class), any(SConnectorImplementationDescriptor.class), any(ClassLoader.class), anyMap());
+        inOrder.verify(connectorService).executeConnector(anyLong(), any(SConnectorInstance.class), any(ClassLoader.class), anyMap());
         inOrder.verify(lockService).lock(eq(PROCESS_INSTANCE_ID), eq(SFlowElementsContainerType.PROCESS.name()), eq(TENANT_ID));
         inOrder.verify(userTransactionService).executeInTransaction(isA(ExecuteConnectorWork.EvaluateConnectorOutputsTxContent.class));
         inOrder.verify(lockService).unlock(any(BonitaLock.class), eq(TENANT_ID));
