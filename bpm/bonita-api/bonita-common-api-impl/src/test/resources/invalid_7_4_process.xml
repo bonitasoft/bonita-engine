@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tns:processDefinition displayName="Truck Handling Process" id="_0" name="MyProcess" version="1.0" xmlns:tns="http://www.bonitasoft.org/ns/process/client/7.4">
+    <description>a 2-lines
+        description
+    </description>
+    <invalid_field name="NOT" />
+    <displayDescription>A very good and clean description that will be displayed in user xp
+        with multilines
+    </displayDescription>
+    <parameters />
+    <actors>
+        <actor id="_5225478156035402904" name="Truck Driver" initiator="true">
+            <description>A man that is driving big trucks</description>
+        </actor>
+    </actors>
+    <actorInitiator>_5225478156035402904</actorInitiator>
+    <flowElements id="_8641112331032098468">
+        <automaticTask id="_8754682934302591090" name="auto1">
+            <incomingTransition>_8914622616876149523</incomingTransition>
+            <outgoingTransition>_6793075756451520341</outgoingTransition>
+            <connector id="_7393132781571293714" name="conn1" connectorId="connId1" activationEvent="ON_FINISH" version="1.0.0" failAction="IGNORE">
+                <inputs />
+                <outputs />
+            </connector>
+            <dataDefinitions />
+            <businessDataDefinitions />
+            <operations>
+                <operation operatorType="ASSIGNMENT" operator="=">
+                    <leftOperand name="testData" type="DATA" />
+                    <rightOperand id="_7557157802278106139" name="true" expressionType="TYPE_CONSTANT" returnType="java.lang.Boolean">
+                        <content>true</content>
+                    </rightOperand>
+                </operation>
+            </operations>
+            <boundaryEvents />
+        </automaticTask>
+        <manualTask id="_7906409025814023985" name="manual1" actorName="Truck Driver" expectedDuration="5000000" priority="urgent">
+            <description>description of manual task1</description>
+            <displayDescription id="_6505846811508252493" name="this is an urgent task that will take more than one hour to be done" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                <content>this is an urgent task that will take more than one hour to be done</content>
+            </displayDescription>
+            <displayName id="_5512745514856289933" name="Urgent task" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                <content>Urgent task</content>
+            </displayName>
+            <displayDescriptionAfterCompletion id="_7184917553923271783" name="this is a done task that was urgent" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                <content>this is a done task that was urgent</content>
+            </displayDescriptionAfterCompletion>
+            <dataDefinitions />
+            <businessDataDefinitions />
+            <operations />
+            <boundaryEvents />
+        </manualTask>
+        <userTask id="_5361783563515456019" name="user1" actorName="Truck Driver">
+            <incomingTransition>_5250914942072233494</incomingTransition>
+            <incomingTransition>_8462225665688055895</incomingTransition>
+            <outgoingTransition>_7535298022161104001</outgoingTransition>
+            <outgoingTransition>_6557782304540364327</outgoingTransition>
+            <connector id="_5568428361502941824" name="conn2" connectorId="connId2" activationEvent="ON_ENTER" version="1.0.0" failAction="ERROR_EVENT" errorCode="errorToBeCaught">
+                <inputs />
+                <outputs />
+            </connector>
+            <dataDefinitions>
+                <dataDefinition id="_7207106552136250224" name="testData" transient="false" className="java.lang.String" />
+                <textDataDefinition longText="false" id="_8908622098458386101" name="shortText" transient="false" className="java.lang.String">
+                    <defaultValue id="_7830704105831783863" name="shortText" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                        <content>shortText</content>
+                    </defaultValue>
+                </textDataDefinition>
+                <textDataDefinition longText="true" id="_8544724367000151684" name="longText" transient="false" className="java.lang.String">
+                    <defaultValue id="_4921965172387616513" name="longText" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                        <content>longText</content>
+                    </defaultValue>
+                </textDataDefinition>
+            </dataDefinitions>
+            <businessDataDefinitions />
+            <operations />
+            <boundaryEvents />
+            <userFilter id="_6244549942592529628" name="myUserFilter" userFilterId="org.bonitasoft.test.user.filter" version="1.0.0">
+                <inputs />
+            </userFilter>
+            <context />
+        </userTask>
+        <transitions>
+            <transition id="_8462225665688055895" name="6961061175944951501_-&gt;_5361783563515456019" source="_6961061175944951501" target="_5361783563515456019" />
+            <transition id="_6793075756451520341" name="8754682934302591090_-&gt;_6961061175944951501" source="_8754682934302591090" target="_6961061175944951501" />
+            <transition id="_8914622616876149523" name="5259044871811441891_-&gt;_8754682934302591090" source="_5259044871811441891" target="_8754682934302591090">
+                <condition id="_7646689323690383939" name="true" expressionType="TYPE_CONSTANT" returnType="java.lang.Boolean">
+                    <content>true</content>
+                </condition>
+            </transition>
+            <transition id="_7535298022161104001" name="5361783563515456019_-&gt;_8310397445877043002" source="_5361783563515456019" target="_8310397445877043002" />
+            <transition id="_5250914942072233494" name="8310397445877043002_-&gt;_5361783563515456019" source="_8310397445877043002" target="_5361783563515456019" />
+            <transition id="_6557782304540364327" name="5361783563515456019_-&gt;_5340982425819947748" source="_5361783563515456019" target="_5340982425819947748" />
+        </transitions>
+        <gateway id="_8310397445877043002" name="gate1" gatewayType="INCLUSIVE">
+            <incomingTransition>_7535298022161104001</incomingTransition>
+            <defaultTransition>_5250914942072233494</defaultTransition>
+        </gateway>
+        <startEvent id="_5259044871811441891" name="start1" interrupting="true">
+            <outgoingTransition>_8914622616876149523</outgoingTransition>
+            <timerEventTrigger type="CYCLE">
+                <expression id="_5159791376584241191" name="*/3 * * * * ?" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                    <content>*/3 * * * * ?</content>
+                </expression>
+            </timerEventTrigger>
+        </startEvent>
+        <intermediateCatchEvent id="_6961061175944951501" name="intermediateTimerEvent" interrupting="true">
+            <incomingTransition>_6793075756451520341</incomingTransition>
+            <outgoingTransition>_8462225665688055895</outgoingTransition>
+            <timerEventTrigger type="DURATION">
+                <expression id="_8567425029019983838" name="1000" expressionType="TYPE_CONSTANT" returnType="java.lang.Long">
+                    <content>1000</content>
+                </expression>
+            </timerEventTrigger>
+        </intermediateCatchEvent>
+        <endEvent id="_5340982425819947748" name="end1">
+            <incomingTransition>_6557782304540364327</incomingTransition>
+        </endEvent>
+        <dataDefinitions>
+            <dataDefinition id="_4769622998037280344" name="myData" transient="false" className="java.lang.Boolean">
+                <description>My boolean data</description>
+                <defaultValue id="_6815893057715159532" name="true" expressionType="TYPE_CONSTANT" returnType="java.lang.Boolean">
+                    <content>true</content>
+                </defaultValue>
+            </dataDefinition>
+        </dataDefinitions>
+        <businessDataDefinitions />
+        <documentDefinitions>
+            <documentDefinition id="_8362606727098773515" name="testDoc" mimeType="text/plain">
+                <file>testFile.txt</file>
+                <description>desc</description>
+                <fileName>testFile.txt</fileName>
+                <expression id="_5284158231118120390" name="plop" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
+                    <content>plop</content>
+                </expression>
+            </documentDefinition>
+            <documentDefinition id="_5453349638314816620" name="testDocUrl" mimeType="application/octet-stream">
+                <url>http://test.com/testFile.txt</url>
+                <description>desc</description>
+                <fileName>testFile.txt</fileName>
+            </documentDefinition>
+        </documentDefinitions>
+        <documentListDefinitions />
+        <connectors>
+            <connector id="_5865276411194058575" name="conn3" connectorId="connId3" activationEvent="ON_FINISH" version="1.0.0" failAction="IGNORE">
+                <inputs>
+                    <input name="input1">
+                        <expression id="_5222292890221034682" name="true" expressionType="TYPE_CONSTANT" returnType="java.lang.Boolean">
+                            <content>true</content>
+                        </expression>
+                    </input>
+                </inputs>
+                <outputs>
+                    <operation operatorType="ASSIGNMENT" operator="=">
+                        <leftOperand name="testData" type="DATA" />
+                        <rightOperand id="_8714932923741263226" name="true" expressionType="TYPE_CONSTANT" returnType="java.lang.Boolean">
+                            <content>true</content>
+                        </rightOperand>
+                    </operation>
+                </outputs>
+            </connector>
+        </connectors>
+        <elementFinder />
+    </flowElements>
+    <stringIndexes>
+        <stringIndex index="1" />
+        <stringIndex index="2" />
+        <stringIndex index="3" />
+        <stringIndex index="4" />
+        <stringIndex index="5" />
+    </stringIndexes>
+    <context />
+</tns:processDefinition>

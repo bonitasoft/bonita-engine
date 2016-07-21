@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.userfilter.impl;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +27,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MapAdapterExpression;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.NameExpressionMapAdapter;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
@@ -42,7 +44,7 @@ public class UserFilterDefinitionImpl extends NamedDefinitionElementImpl impleme
     private final String filterId;
     @XmlAttribute
     private final String version;
-    @XmlJavaTypeAdapter(MapAdapterExpression.class)
+    @XmlJavaTypeAdapter(NameExpressionMapAdapter.class)
     @XmlElement(name = "inputs")
     private final Map<String, Expression> inputs = new HashMap<>();
 
@@ -69,7 +71,7 @@ public class UserFilterDefinitionImpl extends NamedDefinitionElementImpl impleme
     }
 
     public void addInput(final String name, final Expression expression) {
-        inputs.put(name, expression);
+        inputs.put(name, getNonNullCopy(expression));
     }
 
     @Override

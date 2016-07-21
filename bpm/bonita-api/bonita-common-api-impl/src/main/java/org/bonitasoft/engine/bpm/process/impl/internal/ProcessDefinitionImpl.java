@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -26,7 +25,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessDefinitionImpl extends NamedDefinitionElementImpl implements ProcessDefinition {
 
@@ -35,7 +33,7 @@ public class ProcessDefinitionImpl extends NamedDefinitionElementImpl implements
     @XmlAttribute(required = true)
     private final String version;
 
-    @XmlElement(required = true)
+    @XmlElement
     private String description;
 
     public ProcessDefinitionImpl(final String name, final String version) {

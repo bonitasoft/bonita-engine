@@ -62,7 +62,6 @@ import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowElementContainerDefinitionImpl extends BaseDefinitionElementImpl implements FlowElementContainerDefinition, Visitable {
 

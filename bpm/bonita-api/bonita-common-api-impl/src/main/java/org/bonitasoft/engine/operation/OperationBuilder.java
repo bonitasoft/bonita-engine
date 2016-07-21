@@ -146,7 +146,8 @@ public class OperationBuilder {
     }
 
     /**
-     * Creates a new operation of type {@link org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA} that allows to update a Business Data by calling a Java setter on one of
+     * Creates a new operation of type {@link org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA} that allows to update a Business Data by calling a
+     * Java setter on one of
      * its attributes.
      *
      * @param businessDataName
@@ -277,4 +278,14 @@ public class OperationBuilder {
         return operation;
     }
 
+    /**
+     * Get a copy of this operation, so that this operation can be added at several places without conflicting because of unique ID constraint.
+     * If <code>operation</code> is null, simply returns null. In particular, the right operand expression needs to be unique, because of its ID.
+     *
+     * @param operation the operation to copy
+     * @return a deep copy of this operation, or null.
+     */
+    public static Operation getNonNullCopy(Operation operation) {
+        return operation != null ? operation.copy() : null;
+    }
 }

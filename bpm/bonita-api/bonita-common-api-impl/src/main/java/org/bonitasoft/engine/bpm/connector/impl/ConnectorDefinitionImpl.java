@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.connector.impl;
 
+import static org.bonitasoft.engine.operation.OperationBuilder.getNonNullCopy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +32,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MapAdapterExpression;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.NameExpressionMapAdapter;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 
@@ -46,12 +49,12 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
     private static final long serialVersionUID = 1892648036453422626L;
     @XmlAttribute
     private final String connectorId;
-    @XmlJavaTypeAdapter(MapAdapterExpression.class)
-    private final Map<String, Expression> inputs = new HashMap<String, Expression>();
+    @XmlJavaTypeAdapter(NameExpressionMapAdapter.class)
+    private final Map<String, Expression> inputs = new HashMap<>();
 
     @XmlElementWrapper(name = "outputs")
     @XmlElement(name = "operation", type = OperationImpl.class)
-    private final List<Operation> outputs = new ArrayList<Operation>();
+    private final List<Operation> outputs = new ArrayList<>();
 
     @XmlAttribute
     private final ConnectorEvent activationEvent;
@@ -97,11 +100,11 @@ public class ConnectorDefinitionImpl extends NamedDefinitionElementImpl implemen
     }
 
     public void addInput(final String name, final Expression expression) {
-        inputs.put(name, expression);
+        inputs.put(name, ExpressionBuilder.getNonNullCopy(expression));
     }
 
     public void addOutput(final Operation operation) {
-        outputs.add(operation);
+        outputs.add(getNonNullCopy(operation));
     }
 
     @Override

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -48,7 +50,7 @@ public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCh
 
     public MultiInstanceLoopCharacteristicsImpl(final boolean isSequential, final Expression loopCardinality) {
         this.isSequential = isSequential;
-        this.loopCardinality = loopCardinality;
+        this.loopCardinality = getNonNullCopy(loopCardinality);
     }
 
     public MultiInstanceLoopCharacteristicsImpl(final boolean isSequential, final String loopDataInputRef) {
@@ -72,7 +74,7 @@ public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCh
     }
 
     public void setLoopCardinality(final Expression loopCardinality) {
-        this.loopCardinality = loopCardinality;
+        this.loopCardinality = getNonNullCopy(loopCardinality);
     }
 
     public Expression getCompletionCondition() {
@@ -80,7 +82,7 @@ public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCh
     }
 
     public void setCompletionCondition(final Expression completionCondition) {
-        this.completionCondition = completionCondition;
+        this.completionCondition = getNonNullCopy(completionCondition);
     }
 
     public String getLoopDataInputRef() {

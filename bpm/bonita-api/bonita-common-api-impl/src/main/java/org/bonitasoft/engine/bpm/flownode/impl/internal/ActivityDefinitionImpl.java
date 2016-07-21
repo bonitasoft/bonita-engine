@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.operation.OperationBuilder.getNonNullCopy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,7 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
 public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl implements ActivityDefinition {
 
     private static final long serialVersionUID = 5575175860474559979L;
+
     @XmlElementWrapper(name = "dataDefinitions")
     @XmlElements({
             @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
@@ -57,16 +60,18 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
             @XmlElement(type = XMLDataDefinitionImpl.class, name = "xmlDataDefinition")
     })
     private final List<DataDefinition> dataDefinitions;
-    @XmlElementWrapper(name = "BusinessDataDefinitions")
-    @XmlElement(type = BusinessDataDefinitionImpl.class, name = "BusinessDataDefinition")
+
+    @XmlElementWrapper(name = "businessDataDefinitions")
+    @XmlElement(type = BusinessDataDefinitionImpl.class, name = "businessDataDefinition")
     private final List<BusinessDataDefinition> businessDataDefinitions;
+
     @XmlElementWrapper(name = "operations")
     @XmlElement(type = OperationImpl.class, name = "operation")
     private final List<Operation> operations;
-    @XmlElements(
-    {
-            @XmlElement(type = StandardLoopCharacteristicsImpl.class,name = "standardLoopCharacteristics"),
-            @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class,name = "multiInstanceLoopCharacteristics" )
+
+    @XmlElements({
+            @XmlElement(type = StandardLoopCharacteristicsImpl.class, name = "standardLoopCharacteristics"),
+            @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class, name = "multiInstanceLoopCharacteristics")
     })
     private LoopCharacteristics loopCharacteristics;
     @XmlElementWrapper(name = "boundaryEvents")
@@ -112,7 +117,7 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     }
 
     public void addOperation(final Operation operation) {
-        operations.add(operation);
+        operations.add(getNonNullCopy(operation));
     }
 
     @Override

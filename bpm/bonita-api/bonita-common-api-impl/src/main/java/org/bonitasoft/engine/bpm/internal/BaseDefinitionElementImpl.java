@@ -32,13 +32,17 @@ import org.bonitasoft.engine.bpm.BaseElement;
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.FIELD)
-public  abstract class BaseDefinitionElementImpl implements BaseElement {
+public abstract class BaseDefinitionElementImpl implements BaseElement {
 
     private static final long serialVersionUID = 1L;
     @XmlID
     @XmlJavaTypeAdapter(type = long.class, value = LongToStringAdapter.class)
     @XmlAttribute
-    private long id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+    private long id = generateId();
+
+    private long generateId() {
+        return Math.abs(UUID.randomUUID().getLeastSignificantBits());
+    }
 
     public BaseDefinitionElementImpl() {
     }

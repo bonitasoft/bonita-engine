@@ -19,24 +19,26 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.internal.BaseDefinitionElementImpl;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ActorDefinitionImpl implements ActorDefinition {
+public class ActorDefinitionImpl extends BaseDefinitionElementImpl implements ActorDefinition {
 
     private static final long serialVersionUID = 1915238328442058288L;
-    @XmlID
+
     @XmlAttribute(required = true)
     private final String name;
-    @XmlElement(required = false)
+
+    @XmlElement
     private String description;
-    @XmlAttribute(required = false)
+
+    @XmlAttribute
     private boolean initiator;
 
     /**
@@ -54,6 +56,7 @@ public class ActorDefinitionImpl implements ActorDefinition {
         this.description = null;
         initiator = false;
     }
+
     @Override
     public String getName() {
         return name;
@@ -80,8 +83,10 @@ public class ActorDefinitionImpl implements ActorDefinition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ActorDefinitionImpl that = (ActorDefinitionImpl) o;
         return Objects.equals(initiator, that.initiator) &&
                 Objects.equals(name, that.name) &&

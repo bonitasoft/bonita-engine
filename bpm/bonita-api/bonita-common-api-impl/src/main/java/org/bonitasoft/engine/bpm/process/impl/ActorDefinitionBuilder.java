@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
@@ -27,7 +28,8 @@ public class ActorDefinitionBuilder extends ProcessBuilder implements Descriptio
     ActorDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl process, final String actorName,
             final boolean initiator) {
         super(process, processDefinitionBuilder);
-        actor = new ActorDefinitionImpl(actorName);
+        // Do not create if the actor already exists:
+        actor = (ActorDefinitionImpl) getActorByName(actorName);
         actor.setInitiator(initiator);
         if (initiator) {
             process.setActorInitiator(actor);
@@ -44,4 +46,12 @@ public class ActorDefinitionBuilder extends ProcessBuilder implements Descriptio
         return this;
     }
 
+    private ActorDefinition getActorByName(String name) {
+        for (ActorDefinition actorDefinition : getProcessDefinition().getActorsList()) {
+            if (actorDefinition.getName().equals(name)) {
+                return actorDefinition;
+            }
+        }
+        return new ActorDefinitionImpl(name);
+    }
 }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -142,15 +144,15 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
     }
 
     public void setDisplayDescription(final Expression displayDescription) {
-        this.displayDescription = displayDescription;
+        this.displayDescription = getNonNullCopy(displayDescription);
     }
 
     public void setDisplayName(final Expression displayName) {
-        this.displayName = displayName;
+        this.displayName = getNonNullCopy(displayName);
     }
 
     public void setDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
-        this.displayDescriptionAfterCompletion = displayDescriptionAfterCompletion;
+        this.displayDescriptionAfterCompletion = getNonNullCopy(displayDescriptionAfterCompletion);
     }
 
     @Override
@@ -191,7 +193,8 @@ public abstract class FlowNodeDefinitionImpl extends NamedDefinitionElementImpl 
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), incomings, outgoings, connectors, description, displayDescription, displayName, displayDescriptionAfterCompletion, defaultTransition);
+        return Objects.hash(super.hashCode(), incomings, outgoings, connectors, description, displayDescription, displayName, displayDescriptionAfterCompletion,
+                defaultTransition);
     }
 
     @Override

@@ -29,7 +29,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Zhang Bole
  * @author Emmanuel Duchastenier
  */
-public interface Operation extends Serializable, Visitable {
+public interface Operation extends Serializable, Visitable, Cloneable {
 
     /**
      * @return the <code>LeftOperand</code> of this <code>Operation</code>, representing what entity will be set after execution.
@@ -56,5 +56,7 @@ public interface Operation extends Serializable, Visitable {
      * @return the right operand <code>Expression</code> to be evaluated before executing the operation
      */
     Expression getRightOperand();
+
+    Operation copy();
 
 }

@@ -13,28 +13,37 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.bonitasoft.engine.bpm.internal.BaseDefinitionElementImpl;
-import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
-import org.bonitasoft.engine.expression.Expression;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.bpm.internal.LongToStringAdapter;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
-
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExpressionImpl extends BaseDefinitionElementImpl implements Expression {
+public class ExpressionImpl implements Expression {
 
     private static final long serialVersionUID = 1663953453575781859L;
+
+    @XmlID
+    @XmlJavaTypeAdapter(type = long.class, value = LongToStringAdapter.class)
+    @XmlAttribute
+    private long id;
+
     @XmlAttribute
     private String name;
     @XmlElement
@@ -45,14 +54,20 @@ public class ExpressionImpl extends BaseDefinitionElementImpl implements Express
     private String returnType;
     @XmlAttribute
     private String interpreter;
-    @XmlElement(type = ExpressionImpl.class,name = "expression")
+
+    @XmlElement(type = ExpressionImpl.class, name = "expression")
     private List<Expression> dependencies = new ArrayList<>();
 
     public ExpressionImpl() {
     }
 
-    public ExpressionImpl(long id) {
-        setId(id);
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override
@@ -112,6 +127,7 @@ public class ExpressionImpl extends BaseDefinitionElementImpl implements Express
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("id", getId())
                 .append("name", name)
                 .append("content", content)
                 .append("expressionType", expressionType)
@@ -121,6 +137,26 @@ public class ExpressionImpl extends BaseDefinitionElementImpl implements Express
                 .toString();
     }
 
+    private long generateId() {
+        return Math.abs(UUID.randomUUID().getLeastSignificantBits());
+    }
+
+    @Override
+    public Expression copy() {
+        try {
+            final ExpressionImpl clone = (ExpressionImpl) clone();
+            clone.setId(generateId());
+            final List<Expression> depList = new ArrayList<>(getDependencies().size());
+            for (Expression expression : getDependencies()) {
+                depList.add(expression.copy());
+            }
+            clone.setDependencies(depList);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
+
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         visitor.find(this, modelId);
@@ -128,11 +164,13 @@ public class ExpressionImpl extends BaseDefinitionElementImpl implements Express
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof ExpressionImpl))
+            return false;
         ExpressionImpl that = (ExpressionImpl) o;
-        return Objects.equals(name, that.name) &&
+        return id == that.id &&
+                Objects.equals(name, that.name) &&
                 Objects.equals(content, that.content) &&
                 Objects.equals(expressionType, that.expressionType) &&
                 Objects.equals(returnType, that.returnType) &&
@@ -144,4 +182,20 @@ public class ExpressionImpl extends BaseDefinitionElementImpl implements Express
     public int hashCode() {
         return Objects.hash(super.hashCode(), name, content, expressionType, returnType, interpreter, dependencies);
     }
+
+    @Override
+    public boolean isEquivalent(Expression e) {
+        // Ignore the ID field to determine equivalence:
+        if (this == e)
+            return true;
+        if (e == null || getClass() != e.getClass())
+            return false;
+        return Objects.equals(name, e.getName()) &&
+                Objects.equals(content, e.getContent()) &&
+                Objects.equals(expressionType, e.getExpressionType()) &&
+                Objects.equals(returnType, e.getReturnType()) &&
+                Objects.equals(interpreter, e.getInterpreter()) &&
+                Objects.equals(dependencies, e.getDependencies());
+    }
+
 }

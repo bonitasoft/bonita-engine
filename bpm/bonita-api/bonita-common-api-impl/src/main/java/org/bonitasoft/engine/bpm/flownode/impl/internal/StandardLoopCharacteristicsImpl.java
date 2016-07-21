@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -44,16 +46,16 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
 
     public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore) {
         super();
-        this.loopCondition = loopCondition;
+        this.loopCondition = getNonNullCopy(loopCondition);
         this.testBefore = testBefore;
         loopMax = null;
     }
 
     public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore, final Expression loopMax) {
         super();
-        this.loopCondition = loopCondition;
+        this.loopCondition = getNonNullCopy(loopCondition);
         this.testBefore = testBefore;
-        this.loopMax = loopMax;
+        this.loopMax = getNonNullCopy(loopMax);
     }
 
     public StandardLoopCharacteristicsImpl() {
@@ -85,8 +87,10 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         StandardLoopCharacteristicsImpl that = (StandardLoopCharacteristicsImpl) o;
         return Objects.equals(testBefore, that.testBefore) &&
                 Objects.equals(loopCondition, that.loopCondition) &&
