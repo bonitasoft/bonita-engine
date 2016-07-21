@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,12 +38,12 @@ public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinit
     private static final long serialVersionUID = -1000995843357026775L;
     @XmlAttribute(name = "type")
     private final TimerType timerType;
-    @XmlElement(type = ExpressionImpl.class,name = "expression")
+    @XmlElement(type = ExpressionImpl.class, name = "expression")
     private final Expression timerValue;
 
     public TimerEventTriggerDefinitionImpl(final TimerType timerType, final Expression timerExpression) {
         this.timerType = timerType;
-        timerValue = timerExpression;
+        timerValue = getNonNullCopy(timerExpression);
     }
 
     public TimerEventTriggerDefinitionImpl() {

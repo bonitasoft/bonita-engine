@@ -13,14 +13,18 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -36,31 +40,49 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 public class TransitionDefinitionImpl extends NamedDefinitionElementImpl implements TransitionDefinition {
 
     private static final long serialVersionUID = -5629473055955264480L;
+    public static final int DEFAULT_SOURCE_TARGET_FLOWNODE = 0;
+
+    @XmlIDREF
     @XmlAttribute
-    private long source;
+    private FlowNodeDefinitionImpl source;
+
+    @XmlIDREF
     @XmlAttribute
-    private long target;
-    @XmlElement(type = ExpressionImpl.class,name = "condition")
+    private FlowNodeDefinitionImpl target;
+
+    @XmlElement(type = ExpressionImpl.class, name = "condition")
     private Expression expression;
 
-    public TransitionDefinitionImpl(final String name) {
-        this(name, -1, -1);
-    }
-
-    public TransitionDefinitionImpl(final String name, final long source, final long target) {
+    public TransitionDefinitionImpl(final String name, final FlowNodeDefinitionImpl source, final FlowNodeDefinitionImpl target) {
         super(name);
         this.source = source;
         this.target = target;
     }
 
-    public TransitionDefinitionImpl(){}
+    public TransitionDefinitionImpl(final String name) {
+        this(name, null, null);
+    }
+
+    public TransitionDefinitionImpl() {
+    }
+
     @Override
     public long getSource() {
+        return source != null ? source.getId() : DEFAULT_SOURCE_TARGET_FLOWNODE;
+    }
+
+    @Override
+    public FlowNodeDefinition getSourceFlowNode() {
         return source;
     }
 
     @Override
     public long getTarget() {
+        return target != null ? target.getId() : DEFAULT_SOURCE_TARGET_FLOWNODE;
+    }
+
+    @Override
+    public FlowNodeDefinition getTargetFlowNode() {
         return target;
     }
 
@@ -69,16 +91,8 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
         return expression;
     }
 
-    public void setTarget(final long target) {
-        this.target = target;
-    }
-
-    public void setSource(final long source) {
-        this.source = source;
-    }
-
     public void setCondition(final Expression expression) {
-        this.expression = expression;
+        this.expression = getNonNullCopy(expression);
     }
 
     @Override
@@ -92,18 +106,21 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         TransitionDefinitionImpl that = (TransitionDefinitionImpl) o;
-        return Objects.equals(source, that.source) &&
-                Objects.equals(target, that.target) &&
+        return Objects.equals(getSource(), that.getSource()) &&
+                Objects.equals(getTarget(), that.getTarget()) &&
                 Objects.equals(expression, that.expression);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), source, target, expression);
+        return Objects.hash(super.hashCode(), getSource(), getTarget(), expression);
     }
 
     @Override

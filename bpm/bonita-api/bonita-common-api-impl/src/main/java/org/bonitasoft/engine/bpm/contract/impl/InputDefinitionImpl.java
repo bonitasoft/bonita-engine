@@ -49,13 +49,14 @@ public class InputDefinitionImpl extends InputContainerDefinitionImpl implements
         this.type = type;
     }
 
-    public InputDefinitionImpl(){
+    public InputDefinitionImpl() {
         super();
         this.description = null;
         this.name = null;
         this.multiple = false;
         this.type = null;
     }
+
     public InputDefinitionImpl(final String name, final String description, final boolean multiple) {
         this(name, description, multiple, null, new ArrayList<InputDefinition>());
     }

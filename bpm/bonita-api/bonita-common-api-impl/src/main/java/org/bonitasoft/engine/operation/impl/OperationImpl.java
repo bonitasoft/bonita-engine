@@ -13,17 +13,19 @@
  **/
 package org.bonitasoft.engine.operation.impl;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Zhang Bole
@@ -43,11 +45,6 @@ public class OperationImpl implements Operation {
     @XmlElement(type = ExpressionImpl.class, name = "rightOperand")
     private Expression rightOperand;
 
-
-
-    public void OperationImpl(){
-
-    }
     public void setLeftOperand(final LeftOperand leftOperand) {
         this.leftOperand = leftOperand;
     }
@@ -78,7 +75,7 @@ public class OperationImpl implements Operation {
     }
 
     public void setRightOperand(final Expression rightOperand) {
-        this.rightOperand = rightOperand;
+        this.rightOperand = getNonNullCopy(rightOperand);
     }
 
     @Override
@@ -108,6 +105,19 @@ public class OperationImpl implements Operation {
     @Override
     public Expression getRightOperand() {
         return rightOperand;
+    }
+
+    @Override
+    public Operation copy() {
+        try {
+            final OperationImpl clone = (OperationImpl) clone();
+            if (getRightOperand() != null) {
+                clone.setRightOperand(getRightOperand().copy());
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 
     @Override

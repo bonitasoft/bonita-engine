@@ -69,19 +69,17 @@ public class IOUtils {
         if (schemaURL == null) {
             throw new IllegalArgumentException("schemaURL is null");
         }
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema = sf.newSchema(schemaURL);
-        try {
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
             final Marshaller m = contextObj.createMarshaller();
             m.setSchema(schema);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             m.marshal(jaxbModel, baos);
-        } finally {
-            baos.close();
+            return baos.toByteArray();
         }
-        return baos.toByteArray();
     }
 
     public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL) throws JAXBException, IOException,
@@ -97,13 +95,9 @@ public class IOUtils {
         final JAXBContext contextObj = JAXBContext.newInstance(objectClass);
         final Unmarshaller um = contextObj.createUnmarshaller();
         um.setSchema(schema);
-        final ByteArrayInputStream bais = new ByteArrayInputStream(xmlObject);
-        final StreamSource ss = new StreamSource(bais);
-        try {
-            final JAXBElement<T> jaxbElement = um.unmarshal(ss, objectClass);
+        try (final ByteArrayInputStream stream = new ByteArrayInputStream(xmlObject)) {
+            final JAXBElement<T> jaxbElement = um.unmarshal(new StreamSource(stream), objectClass);
             return jaxbElement.getValue();
-        } finally {
-            bais.close();
         }
     }
 
@@ -149,7 +143,7 @@ public class IOUtils {
         }
         return dir;
     }
-    
+
     private static File createDirectory(final File dir) {
         dir.delete();
         dir.mkdir();

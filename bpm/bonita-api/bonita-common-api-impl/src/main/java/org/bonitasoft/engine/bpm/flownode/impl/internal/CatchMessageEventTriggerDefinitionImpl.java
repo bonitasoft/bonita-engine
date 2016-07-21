@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.operation.OperationBuilder.getNonNullCopy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +49,7 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         super();
         operations = new ArrayList<>(1);
     }
+
     public CatchMessageEventTriggerDefinitionImpl(final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
         super(catchMessageEventTriggerDefinition);
         operations = catchMessageEventTriggerDefinition.getOperations();
@@ -58,7 +61,7 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     }
 
     public void addOperation(final Operation operation) {
-        operations.add(operation);
+        operations.add(getNonNullCopy(operation));
     }
 
     @Override

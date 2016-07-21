@@ -11,14 +11,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-/**
- * <p>
- * Contains Actor mapping model classes.
- * </p>
- */
-@XmlSchema(namespace = "http://www.bonitasoft.org/ns/process/client/7.2", elementFormDefault = XmlNsForm.UNSET, xmlns = {
-        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/process/client/7.2", prefix = "def") })
+@XmlSchema(namespace = NAMESPACE, elementFormDefault = XmlNsForm.UNSET, xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = NAMESPACE, prefix = "tns") })
 package org.bonitasoft.engine.bpm.process.impl.internal;
+
+import static org.bonitasoft.engine.bpm.ProcessDefinitionNamespace.NAMESPACE;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;

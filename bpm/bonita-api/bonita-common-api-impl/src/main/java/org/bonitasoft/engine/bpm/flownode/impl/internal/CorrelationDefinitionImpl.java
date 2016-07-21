@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -36,9 +38,10 @@ public class CorrelationDefinitionImpl implements CorrelationDefinition {
 
     public CorrelationDefinitionImpl(final Expression key, final Expression value) {
         super();
-        this.key = key;
-        this.value = value;
+        this.key = getNonNullCopy(key);
+        this.value = getNonNullCopy(value);
     }
+
     public CorrelationDefinitionImpl() {
         super();
         this.key = new ExpressionImpl();

@@ -14,58 +14,40 @@
 
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author mazourd
  */
-public class MapAdapterExpression extends XmlAdapter<MapAdapterExpression.AdaptedMapbis, Map<String, Expression>> {
-
-    public static class AdaptedMapbis {
-
-        @XmlElement(name = "input")
-        public List<Entry> entry = new ArrayList<Entry>();
-
-    }
-
-    public static class Entry {
-
-        @XmlAttribute(name = "name")
-        public String key;
-        @XmlElement(type = ExpressionImpl.class, name = "expression")
-        public Expression value;
-
-    }
+@XmlAccessorType(XmlAccessType.FIELD)
+public class NameExpressionMapAdapter extends XmlAdapter<NameExpressionMap, Map<String, Expression>> {
 
     @Override
-    public Map<String, Expression> unmarshal(AdaptedMapbis adaptedMap) throws Exception {
-        Map<String, Expression> map = new HashMap<String, Expression>();
-        for (Entry entry : adaptedMap.entry) {
-            map.put(entry.key, entry.value);
+    public Map<String, Expression> unmarshal(NameExpressionMap nameExpressionMap) throws Exception {
+        Map<String, Expression> map = new HashMap<>();
+        for (NameExpressionPair nameExpressionPair : nameExpressionMap.nameExpressionPair) {
+            map.put(nameExpressionPair.key, nameExpressionPair.value);
         }
         return map;
     }
 
     @Override
-    public AdaptedMapbis marshal(Map<String, Expression> map) throws Exception {
-        AdaptedMapbis adaptedMap = new AdaptedMapbis();
+    public NameExpressionMap marshal(Map<String, Expression> map) throws Exception {
+        NameExpressionMap nameExpressionMap = new NameExpressionMap();
         for (Map.Entry<String, Expression> mapEntry : map.entrySet()) {
-            Entry entry = new Entry();
-            entry.key = mapEntry.getKey();
-            entry.value = mapEntry.getValue();
-            adaptedMap.entry.add(entry);
+            NameExpressionPair pair = new NameExpressionPair();
+            pair.key = mapEntry.getKey();
+            pair.value = mapEntry.getValue();
+            nameExpressionMap.nameExpressionPair.add(pair);
         }
-        return adaptedMap;
+        return nameExpressionMap;
     }
 
 }

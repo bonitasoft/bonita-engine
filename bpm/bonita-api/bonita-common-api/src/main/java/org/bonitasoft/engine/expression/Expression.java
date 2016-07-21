@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bpm.process.Visitable;
 /**
  * @author Feng Hui
  */
-public interface Expression extends BaseElement, Visitable {
+public interface Expression extends BaseElement, Visitable, Cloneable {
 
     String getName();
 
@@ -35,4 +35,7 @@ public interface Expression extends BaseElement, Visitable {
 
     List<Expression> getDependencies();
 
+    Expression copy();
+
+    boolean isEquivalent(Expression e);
 }

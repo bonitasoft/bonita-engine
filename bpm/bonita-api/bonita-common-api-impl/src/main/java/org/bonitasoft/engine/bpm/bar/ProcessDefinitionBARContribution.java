@@ -22,10 +22,13 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -50,6 +53,7 @@ import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionIm
 import org.bonitasoft.engine.bpm.process.impl.internal.SubProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
+import org.xml.sax.SAXException;
 
 /**
  * @author Baptiste Mesta
@@ -119,7 +123,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
             throw new InvalidBusinessArchiveFormatException("There is no bonitasoft process namespace declaration");
         }
         final String group = matcher.group(1);
-        if (!group.equals("7.2")) {
+        if (!group.equals("7.4")) {
             throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, " + group
                     + " namespace is not compatible with your current version. Use the studio to update it.");
         }
@@ -155,6 +159,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     protected Marshaller getMarshaller() throws JAXBException {
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name()); // this is the default value, but it is more explicit like this.
         return marshaller;
     }
 
@@ -162,13 +167,15 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         try (InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
 
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            unmarshaller
+                    .setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(this.getClass().getResource("/ProcessDefinition.xsd")));
             DesignProcessDefinition process = (DesignProcessDefinition) unmarshaller.unmarshal(stream);
             if (process.getActorInitiator() != null) {
                 process.getActorInitiator().setInitiator(true);
             }
             addEventTriggerOnEvents(process.getFlowElementContainer());
             return process;
-        } catch (java.lang.UnsupportedOperationException | JAXBException e) {
+        } catch (java.lang.UnsupportedOperationException | JAXBException | SAXException e) {
             throw new IOException("Failed to deserialize the XML string provided", e);
         }
     }

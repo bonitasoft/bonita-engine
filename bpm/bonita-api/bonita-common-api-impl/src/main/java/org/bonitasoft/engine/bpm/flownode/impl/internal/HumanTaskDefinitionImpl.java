@@ -39,16 +39,17 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
     private static final long serialVersionUID = -7657152341382296289L;
     @XmlAttribute
     private final String actorName;
-    @XmlElement(type = UserFilterDefinitionImpl.class,name = "userFilter")
+    @XmlElement(type = UserFilterDefinitionImpl.class, name = "userFilter")
     private UserFilterDefinition userFilterDefinition;
     @XmlAttribute
     private Long expectedDuration;
     @XmlAttribute
     private String priority;
 
-    public HumanTaskDefinitionImpl(){
+    public HumanTaskDefinitionImpl() {
         actorName = "default actor name";
     }
+
     public HumanTaskDefinitionImpl(final String name, final String actorName) {
         super(name);
         this.actorName = actorName;

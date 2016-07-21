@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.operation.OperationBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -34,13 +36,14 @@ import org.bonitasoft.engine.operation.Operation;
 public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements ReceiveTaskDefinition {
 
     private static final long serialVersionUID = -5793747387538282891L;
-    @XmlElement(name="catchMessageEventTrigger")
+    @XmlElement(name = "catchMessageEventTrigger")
     private final CatchMessageEventTriggerDefinitionImpl trigger;
 
-    public ReceiveTaskDefinitionImpl(){
+    public ReceiveTaskDefinitionImpl() {
         super();
         trigger = new CatchMessageEventTriggerDefinitionImpl("default name");
     }
+
     public ReceiveTaskDefinitionImpl(final String name, final String messageName) {
         super(name);
         trigger = new CatchMessageEventTriggerDefinitionImpl(messageName);
@@ -56,7 +59,7 @@ public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements Rec
     }
 
     public void addMessageOperation(final Operation operation) {
-        trigger.addOperation(operation);
+        trigger.addOperation(getNonNullCopy(operation));
     }
 
     @Override

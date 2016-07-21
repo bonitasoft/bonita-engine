@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.businessdata.impl;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -43,15 +45,17 @@ public class BusinessDataDefinitionImpl extends NamedDefinitionElementImpl imple
     private String className;
     @XmlAttribute
     private boolean multiple = false;
-    @XmlElement(type = ExpressionImpl.class,name = "defaultValue")
+    @XmlElement(type = ExpressionImpl.class, name = "defaultValue")
     private Expression defaultValueExpression;
 
     public BusinessDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name);
-        this.defaultValueExpression = defaultValueExpression;
+        this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
     }
 
-    public BusinessDataDefinitionImpl(){}
+    public BusinessDataDefinitionImpl() {
+    }
+
     @Override
     public String getDescription() {
         return description;
@@ -72,7 +76,7 @@ public class BusinessDataDefinitionImpl extends NamedDefinitionElementImpl imple
     }
 
     public void setDefaultValueExpression(final Expression defaultValueExpression) {
-        this.defaultValueExpression = defaultValueExpression;
+        this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
     }
 
     public void setClassName(final String className) {
@@ -101,9 +105,12 @@ public class BusinessDataDefinitionImpl extends NamedDefinitionElementImpl imple
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         BusinessDataDefinitionImpl that = (BusinessDataDefinitionImpl) o;
         return Objects.equals(multiple, that.multiple) &&
                 Objects.equals(description, that.description) &&

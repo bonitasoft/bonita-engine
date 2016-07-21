@@ -31,8 +31,10 @@ import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implements ParameterDefinition {
 
     private static final long serialVersionUID = -3997656451808629180L;
+
     @XmlAttribute(required = true)
     private final String type;
+
     @XmlElement
     private String description;
 
@@ -40,7 +42,8 @@ public class ParameterDefinitionImpl extends NamedDefinitionElementImpl implemen
         super(parameterName);
         this.type = type;
     }
-    public ParameterDefinitionImpl(){
+
+    public ParameterDefinitionImpl() {
         super();
         this.type = "";
     }

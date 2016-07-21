@@ -21,9 +21,15 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public class LongToStringAdapter extends XmlAdapter<String, Long> {
 
+    private static final String ID_PREFIX = "_";
+
     @Override
     public Long unmarshal(String id) throws Exception {
-        return Long.parseLong(id);
+        if (id.startsWith(ID_PREFIX)) {
+            return Long.parseLong(id.substring(ID_PREFIX.length()));
+        } else {
+            return Long.parseLong(id);
+        }
     }
 
     @Override
@@ -31,6 +37,6 @@ public class LongToStringAdapter extends XmlAdapter<String, Long> {
         if (id == null) {
             return "";
         }
-        return id.toString();
+        return ID_PREFIX + id.toString();
     }
 }

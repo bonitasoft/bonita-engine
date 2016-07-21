@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
@@ -87,7 +87,8 @@ public class ProcessDefinitionBARContributionTest {
     @Test
     public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("Wrong version of your process definition, 6.0 namespace is not compatible with your current version. Use the studio to update it.");
+        exception.expectMessage(
+                "Wrong version of your process definition, 6.0 namespace is not compatible with your current version. Use the studio to update it.");
         final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
         final File createTempFile = temporaryFolder.newFile();
 
@@ -96,7 +97,7 @@ public class ProcessDefinitionBARContributionTest {
     }
 
     @Test
-    public void should_checkVersion_with_old_content_thrown_exception() throws Exception {
+    public void checkVersion_with_old_content_should_throw_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage("6.0 namespace is not compatible with your current version");
 
@@ -104,13 +105,26 @@ public class ProcessDefinitionBARContributionTest {
     }
 
     @Test
-    public void checkVersion_should_accept_new_7_2_content() throws Exception {
-        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/process_7_2.xml")));
+    public void checkVersion_should_accept_new_7_4_content() throws Exception {
+        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
     }
 
     @Test
-    public void convertXmlToProcess_should_not_fail_with_new_7_2_content() throws Exception {
-        new ProcessDefinitionBARContribution().convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_2.xml")));
+    public void convertXmlToProcess_should_accept_new_7_2_content() throws Exception {
+        new ProcessDefinitionBARContribution().convertXmlToProcess(IOUtil.read(getClass().getResourceAsStream("/process_7_4.xml")));
+    }
+
+    @Test
+    public void convertXmlToProcess_should_fail_with_invalid_7_4_content() throws Exception {
+        // given:
+        final String content = IOUtil.read(getClass().getResourceAsStream("/invalid_7_4_process.xml"));
+
+        // then:
+        exception.expect(IOException.class);
+        exception.expectMessage("Failed to deserialize the XML string provided");
+
+        // when:
+        new ProcessDefinitionBARContribution().convertXmlToProcess(content);
     }
 
     @Test
@@ -176,9 +190,21 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addActor(ACTOR_NAME);
 
         DesignProcessDefinition designProcessDefinition = checkSerializeDeserializeProcessDefinition(processBuilder.done());
-        assertThat(designProcessDefinition.getContext()).containsExactly(new ContextEntryImpl("processKey1", processValue1));
-        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext")).getContext()).containsExactly(
-                new ContextEntryImpl("key1", value1), new ContextEntryImpl("key2", value2));
+        final ContextEntry contextEntry = designProcessDefinition.getContext().get(0);
+        assertThat(contextEntry.getKey()).isEqualTo("processKey1");
+        assertThat(contextEntry.getExpression().isEquivalent(processValue1))
+                .as("expected Expression 'processValue1' is not equivalent").isTrue();
+
+        final ContextEntry taskWithContext0 = ((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext"))
+                .getContext().get(0);
+        assertThat(taskWithContext0.getKey()).isEqualTo("key1");
+        assertThat(taskWithContext0.getExpression().isEquivalent(value1)).as("expected Expression 'value1' is not equivalent").isTrue();
+
+        final ContextEntry taskWithContext1 = ((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext"))
+                .getContext().get(1);
+        assertThat(taskWithContext1.getKey()).isEqualTo("key2");
+        assertThat(taskWithContext1.getExpression().isEquivalent(value2)).as("expected Expression 'value2' is not equivalent").isTrue();
+
         assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithoutContext")).getContext()).isEmpty();
     }
 

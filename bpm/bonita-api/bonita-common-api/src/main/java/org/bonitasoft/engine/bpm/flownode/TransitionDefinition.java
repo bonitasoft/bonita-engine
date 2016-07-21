@@ -38,9 +38,19 @@ public interface TransitionDefinition extends NamedElement, Visitable {
     long getSource();
 
     /**
+     * @return The source of the transition
+     */
+    FlowNodeDefinition getSourceFlowNode();
+
+    /**
      * @return The target of the transition
      */
     long getTarget();
+
+    /**
+     * @return The target of the transition
+     */
+    FlowNodeDefinition getTargetFlowNode();
 
     /**
      * @return The condition of the transition

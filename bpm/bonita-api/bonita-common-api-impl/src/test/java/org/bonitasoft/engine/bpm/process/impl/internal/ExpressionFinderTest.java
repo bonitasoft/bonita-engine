@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -67,20 +65,16 @@ public class ExpressionFinderTest {
         final ContextEntryImpl contextEntry = new ContextEntryImpl();
         contextEntry.setExpression(new ExpressionImpl());
         def.addContextEntry(contextEntry);
-        final ExpressionImpl stringIndex = new ExpressionImpl();
-        def.setStringIndex(1, "label1", stringIndex);
+        def.setStringIndex(1, "label1", new ExpressionImpl());
         final FlowElementContainerDefinitionImpl processContainer = new FlowElementContainerDefinitionImpl();
         def.setProcessContainer(processContainer);
         final UserTaskDefinitionImpl userTask = new UserTaskDefinitionImpl("task", "actor");
         final ContextEntryImpl taskContextEntry = new ContextEntryImpl();
         userTask.addContextEntry(taskContextEntry);
-        final ExpressionImpl userTaskDisplayDesc = new ExpressionImpl(1L);
-        userTask.setDisplayDescription(userTaskDisplayDesc);
-        final ExpressionImpl displayDescriptionAfterCompletion = new ExpressionImpl(22L);
-        userTask.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
+        userTask.setDisplayDescription(new ExpressionImpl());
+        userTask.setDisplayDescriptionAfterCompletion(new ExpressionImpl());
         final TransitionDefinitionImpl userTaskDefaultTransition = new TransitionDefinitionImpl("default");
-        final ExpressionImpl transitionCondition = new ExpressionImpl(333L);
-        userTaskDefaultTransition.setCondition(transitionCondition);
+        userTaskDefaultTransition.setCondition(new ExpressionImpl());
         userTask.setDefaultTransition(userTaskDefaultTransition);
         userTask.addIncomingTransition(new TransitionDefinitionImpl("incommingTransition"));
         userTask.addOutgoingTransition(new TransitionDefinitionImpl("outgoingTransition"));
@@ -93,16 +87,14 @@ public class ExpressionFinderTest {
         userTask.setUserFilter(userFilterDefinition);
         userTask.setLoopCharacteristics(new MultiInstanceLoopCharacteristicsImpl(true, new ExpressionImpl()));
         processContainer.addActivity(userTask);
-        final ExpressionImpl bizDataDefaultValue = new ExpressionImpl();
-        processContainer.addBusinessDataDefinition(new BusinessDataDefinitionImpl("bizData", bizDataDefaultValue));
-        final ExpressionImpl dataDefaultValue = new ExpressionImpl();
-        processContainer.addDataDefinition(new DataDefinitionImpl("data", dataDefaultValue));
+        final BusinessDataDefinitionImpl bizData = new BusinessDataDefinitionImpl("bizData", new ExpressionImpl());
+        processContainer.addBusinessDataDefinition(bizData);
+        final DataDefinitionImpl data = new DataDefinitionImpl("data", new ExpressionImpl());
+        processContainer.addDataDefinition(data);
         final ConnectorDefinitionImpl connectorDefinition = new ConnectorDefinitionImpl("connector", "connDefId", "conneVersion", ConnectorEvent.ON_ENTER);
-        final ExpressionImpl connectorInput = new ExpressionImpl();
-        connectorDefinition.addInput("input", connectorInput);
+        connectorDefinition.addInput("input", new ExpressionImpl());
         final OperationImpl operation = new OperationImpl();
-        final ExpressionImpl connectorOperationRightOperand = new ExpressionImpl();
-        operation.setRightOperand(connectorOperationRightOperand);
+        operation.setRightOperand(new ExpressionImpl());
         connectorDefinition.addOutput(operation);
         processContainer.addConnector(connectorDefinition);
         processContainer.addTransition(new TransitionDefinitionImpl("transition"));
@@ -148,35 +140,35 @@ public class ExpressionFinderTest {
         expressionFinder.find(def, 999L);
 
         verify(expressionFinder).find(contextEntry, 999L);
-        verify(expressionFinder).find(stringIndex, 999L);
+        verify(expressionFinder).find(def.getContext().get(0), 999L);
         verify(expressionFinder).find(userTask, 999L);
         verify(expressionFinder).find(taskContextEntry, 999L);
-        verify(expressionFinder).find(bizDataDefaultValue, 999L);
-        verify(expressionFinder).find(dataDefaultValue, 999L);
+        verify(expressionFinder).find(bizData.getDefaultValueExpression(), 999L);
+        verify(expressionFinder).find(data.getDefaultValueExpression(), 999L);
         verify(expressionFinder).find(connectorDefinition, 999L);
-        verify(expressionFinder).find(connectorInput, 999L);
-        verify(expressionFinder).find(msgOperation, 999L);
-        verify(expressionFinder).find(connectorOperationRightOperand, 999L);
+        verify(expressionFinder).find(connectorDefinition.getInputs().get("input"), 999L);
+        verify(expressionFinder).find(receiveMessage.getOperations().get(0).getRightOperand(), 999L);
+        verify(expressionFinder).find(connectorDefinition.getOutputs().get(0).getRightOperand(), 999L);
         verify(expressionFinder).findExpressionFromNotNullContainer(startEvent, 999L);
         verify(expressionFinder).findExpressionFromNotNullContainer(intermediate_catch, 999L);
         verify(expressionFinder).findExpressionFromNotNullContainer(intermediate_throw, 999L);
-        verify(expressionFinder).find(userTaskDisplayDesc, 999L);
-        verify(expressionFinder).find(displayDescriptionAfterCompletion, 999L);
-        verify(expressionFinder).find(transitionCondition, 999L);
+        verify(expressionFinder).find(userTask.getDisplayDescription(), 999L);
+        verify(expressionFinder).find(userTask.getDisplayDescriptionAfterCompletion(), 999L);
+        verify(expressionFinder).find(userTaskDefaultTransition.getCondition(), 999L);
     }
 
     @Test
     public void findShouldFindElementIfExists() throws Exception {
         DesignProcessDefinitionImpl def = new DesignProcessDefinitionImpl("name", "version");
         final ContextEntryImpl contextEntry = new ContextEntryImpl();
-        long expressionFinderId = 6987451354L;
-        final ExpressionImpl expressionToBeFound = new ExpressionImpl(expressionFinderId);
-        contextEntry.setExpression(expressionToBeFound);
+        contextEntry.setExpression(new ExpressionImpl());
+        final Expression expressionToBeFound = contextEntry.getExpression();
+        long expressionFinderId = expressionToBeFound.getId();
         def.addContextEntry(contextEntry);
 
         expressionFinder.find(def, expressionFinderId);
         final Expression expression = expressionFinder.getFoundExpression();
-        assertThat(expression).isEqualTo(expressionToBeFound);
+        assertThat(expression.isEquivalent(expressionToBeFound)).isTrue();
 
         verify(expressionFinder).find(contextEntry, expressionFinderId);
         verify(expressionFinder).find(expressionToBeFound, expressionFinderId);
@@ -187,17 +179,18 @@ public class ExpressionFinderTest {
         DesignProcessDefinitionImpl def = new DesignProcessDefinitionImpl("name", "version");
         final ContextEntryImpl contextEntry = new ContextEntryImpl();
         long expressionFinderId = 6987451354L;
-        final ExpressionImpl expressionToBeFound = new ExpressionImpl(expressionFinderId);
-        contextEntry.setExpression(expressionToBeFound);
+        contextEntry.setExpression(new ExpressionImpl());
         def.addContextEntry(contextEntry);
+        Expression expressionToBeFound = contextEntry.getExpression();
+        ((ExpressionImpl) expressionToBeFound).setId(expressionFinderId);
         final FlowElementContainerDefinitionImpl processContainer = new FlowElementContainerDefinitionImpl();
         def.setProcessContainer(processContainer);
-        final ExpressionImpl userTaskDisplayDesc = new ExpressionImpl(1L);
+        final ExpressionImpl userTaskDisplayDesc = new ExpressionImpl();
         final UserTaskDefinitionImpl userTask = new UserTaskDefinitionImpl("task", "actor");
         userTask.setDisplayDescription(userTaskDisplayDesc);
         processContainer.addActivity(userTask);
 
-        expressionFinder.find(def, expressionFinderId);
+        expressionFinder.find(def, expressionToBeFound.getId());
         final Expression expression = expressionFinder.getFoundExpression();
         assertThat(expression).isEqualTo(expressionToBeFound);
 
