@@ -553,4 +553,14 @@ public class ExpressionBuilder {
         return done();
     }
 
+    /**
+     * Get a copy of this expression, so that this expression can be added at several places without conflicting because of its unique ID constraint.
+     * If <code>expression</code> is null, simply returns null.
+     *
+     * @param expression the expression to copy
+     * @return a deep copy of this expression, or null.
+     */
+    public static Expression getNonNullCopy(Expression expression) {
+        return expression != null ? expression.copy() : null;
+    }
 }

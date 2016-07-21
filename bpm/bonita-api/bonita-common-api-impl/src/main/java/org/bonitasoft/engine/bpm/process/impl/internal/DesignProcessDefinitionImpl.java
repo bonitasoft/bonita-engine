@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,7 +64,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     private static final long serialVersionUID = -4719128363958199300L;
     @XmlAttribute
     private String displayName;
-    @XmlElement(required = true)
+    @XmlElement
     private String displayDescription;
     @XmlElementWrapper(name = "parameters")
     @XmlElement(type = ParameterDefinitionImpl.class, name = "parameter")
@@ -223,19 +225,19 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public void setStringIndex(final int index, final String label, final Expression initialValue) {
         switch (index) {
             case 1:
-                listIndex[0] = new IndexLabel("1", label, initialValue);
+                listIndex[0] = new IndexLabel("1", label, getNonNullCopy(initialValue));
                 break;
             case 2:
-                listIndex[1] = new IndexLabel("2", label, initialValue);
+                listIndex[1] = new IndexLabel("2", label, getNonNullCopy(initialValue));
                 break;
             case 3:
-                listIndex[2] = new IndexLabel("3", label, initialValue);
+                listIndex[2] = new IndexLabel("3", label, getNonNullCopy(initialValue));
                 break;
             case 4:
-                listIndex[3] = new IndexLabel("4", label, initialValue);
+                listIndex[3] = new IndexLabel("4", label, getNonNullCopy(initialValue));
                 break;
             case 5:
-                listIndex[4] = new IndexLabel("5", label, initialValue);
+                listIndex[4] = new IndexLabel("5", label, getNonNullCopy(initialValue));
                 break;
             default:
                 throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");

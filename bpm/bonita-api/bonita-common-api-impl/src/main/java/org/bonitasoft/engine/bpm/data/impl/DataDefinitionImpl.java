@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -43,15 +45,16 @@ public class DataDefinitionImpl extends NamedDefinitionElementImpl implements Da
     private boolean transientData;
     @XmlAttribute
     private String className;
-    @XmlElement(type = ExpressionImpl.class,name = "defaultValue")
+    @XmlElement(type = ExpressionImpl.class, name = "defaultValue")
     private Expression defaultValueExpression;
 
-    public DataDefinitionImpl(){
+    public DataDefinitionImpl() {
         super();
     }
+
     public DataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name);
-        this.defaultValueExpression = defaultValueExpression;
+        this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
     }
 
     @Override
@@ -91,7 +94,7 @@ public class DataDefinitionImpl extends NamedDefinitionElementImpl implements Da
     }
 
     public void setDefaultValueExpression(final Expression defaultValueExpression) {
-        this.defaultValueExpression = defaultValueExpression;
+        this.defaultValueExpression = getNonNullCopy(defaultValueExpression);
     }
 
     public void setClassName(final String className) {

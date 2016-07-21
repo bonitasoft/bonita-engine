@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -53,7 +55,7 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
     }
 
     public void setTargetFlowNode(final Expression targetFlowNode) {
-        trigger.setTargetFlowNode(targetFlowNode);
+        trigger.setTargetFlowNode(getNonNullCopy(targetFlowNode));
     }
 
     public void addCorrelation(final Expression key, final Expression value) {

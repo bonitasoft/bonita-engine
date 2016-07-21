@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.document.impl;
 
-import java.util.Objects;
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
 
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -44,7 +45,7 @@ public class DocumentDefinitionImpl extends NamedDefinitionElementImpl implement
     private String description;
     @XmlElement
     private String fileName;
-    @XmlElement(type = ExpressionImpl.class,name = "expression")
+    @XmlElement(type = ExpressionImpl.class, name = "expression")
     private Expression initialValue;
 
     /**
@@ -54,7 +55,9 @@ public class DocumentDefinitionImpl extends NamedDefinitionElementImpl implement
         super(name);
     }
 
-    public DocumentDefinitionImpl(){}
+    public DocumentDefinitionImpl() {
+    }
+
     @Override
     public String getUrl() {
         return url;
@@ -109,7 +112,7 @@ public class DocumentDefinitionImpl extends NamedDefinitionElementImpl implement
     }
 
     public void setInitialValue(Expression initialValue) {
-        this.initialValue = initialValue;
+        this.initialValue = getNonNullCopy(initialValue);
     }
 
     public Expression getInitialValue() {

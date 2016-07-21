@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +45,7 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     private Expression targetProcess;
     @XmlElement(type = ExpressionImpl.class)
     private Expression targetFlowNode;
-    @XmlElement(type = DataDefinitionImpl.class,name = "dataDefinition")
+    @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition")
     private final List<DataDefinition> dataDefinitions;
 
     public ThrowMessageEventTriggerDefinitionImpl() {
@@ -58,14 +60,14 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
 
     public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess, final Expression targetFlowNode) {
         super(name);
-        this.targetProcess = targetProcess;
-        this.targetFlowNode = targetFlowNode;
+        this.targetProcess = getNonNullCopy(targetProcess);
+        this.targetFlowNode = getNonNullCopy(targetFlowNode);
         dataDefinitions = new ArrayList<>();
     }
 
     public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess) {
         super(name);
-        this.targetProcess = targetProcess;
+        this.targetProcess = getNonNullCopy(targetProcess);
         targetFlowNode = null;
         dataDefinitions = new ArrayList<>();
     }
@@ -73,15 +75,15 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess, final Expression targetFlowNode,
             final List<DataDefinition> dataDefinitions, final List<CorrelationDefinition> correlations) {
         super(name, correlations);
-        this.targetProcess = targetProcess;
-        this.targetFlowNode = targetFlowNode;
+        this.targetProcess = getNonNullCopy(targetProcess);
+        this.targetFlowNode = getNonNullCopy(targetFlowNode);
         this.dataDefinitions = dataDefinitions;
     }
 
     public ThrowMessageEventTriggerDefinitionImpl(final ThrowMessageEventTriggerDefinition trigger) {
         super(trigger);
-        targetFlowNode = trigger.getTargetFlowNode();
-        targetProcess = trigger.getTargetProcess();
+        targetFlowNode = getNonNullCopy(trigger.getTargetFlowNode());
+        targetProcess = getNonNullCopy(trigger.getTargetProcess());
         dataDefinitions = trigger.getDataDefinitions();
     }
 
@@ -101,15 +103,15 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     }
 
     public void setTargetProcess(final Expression targetProcess) {
-        this.targetProcess = targetProcess;
+        this.targetProcess = getNonNullCopy(targetProcess);
     }
 
     public void setTargetFlowNode(final Expression targetFlowNode) {
-        this.targetFlowNode = targetFlowNode;
+        this.targetFlowNode = getNonNullCopy(targetFlowNode);
     }
 
-    public void addDataDefinition(final DataDefinition datadefiniton) {
-        dataDefinitions.add(datadefiniton);
+    public void addDataDefinition(final DataDefinition dataDefinition) {
+        dataDefinitions.add(dataDefinition);
     }
 
     @Override

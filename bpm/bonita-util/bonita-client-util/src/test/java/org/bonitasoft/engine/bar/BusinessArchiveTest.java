@@ -56,7 +56,6 @@ import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -381,7 +380,6 @@ public class BusinessArchiveTest {
 
     @Test
     public void readProcessFromBusinessArchive() throws Exception {
-        final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
                 .addMimeType("text/plain").addInitialValue(new ExpressionBuilder().createConstantStringExpression("plop"));
@@ -390,14 +388,15 @@ public class BusinessArchiveTest {
         processDefinitionBuilder.addDescription("a 2-lines\ndescription");
         processDefinitionBuilder.addDisplayDescription("A very good and clean description that will be displayed in user xp\nwith multilines");
         processDefinitionBuilder.addDisplayName("Truck Handling Process");
-        processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
+        processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving big trucks");
+        processDefinitionBuilder.setActorInitiator("Truck Driver");
         processDefinitionBuilder.addStartEvent("start1").addTimerEventTriggerDefinition(TimerType.CYCLE,
                 new ExpressionBuilder().createConstantStringExpression("*/3 * * * * ?"));
         // No Java operation, so empty string passed:
         processDefinitionBuilder
                 .addAutomaticTask("auto1")
                 .addOperation(new LeftOperandBuilder().createNewInstance().setName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
-                        trueExpression)
+                        new ExpressionBuilder().createConstantBooleanExpression(true))
                 .addConnector("conn1", "connId1", "1.0.0", ConnectorEvent.ON_FINISH).ignoreError();
         processDefinitionBuilder
                 .addManualTask("manual1", "Truck Driver")
@@ -419,7 +418,7 @@ public class BusinessArchiveTest {
         addUserTask.addLongTextData("longText", new ExpressionBuilder().createConstantStringExpression("longText"));
         processDefinitionBuilder.addGateway("gate1", GatewayType.INCLUSIVE).addDefaultTransition("user1");
         processDefinitionBuilder.addEndEvent("end1");
-        processDefinitionBuilder.addTransition("start1", "auto1", trueExpression);
+        processDefinitionBuilder.addTransition("start1", "auto1", new ExpressionBuilder().createConstantBooleanExpression(true));
         processDefinitionBuilder.addTransition("auto1", "intermediateTimerEvent");
         processDefinitionBuilder.addTransition("intermediateTimerEvent", "user1");
         processDefinitionBuilder.addTransition("user1", "gate1");
@@ -427,10 +426,11 @@ public class BusinessArchiveTest {
         processDefinitionBuilder
                 .addConnector("conn3", "connId3", "1.0.0", ConnectorEvent.ON_FINISH)
                 .ignoreError()
-                .addInput("input1", trueExpression)
+                .addInput("input1", new ExpressionBuilder().createConstantBooleanExpression(true))
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName("testData").done(), OperatorType.ASSIGNMENT, ASSIGN_OPERATOR, null,
-                        trueExpression);
-        processDefinitionBuilder.addData("myData", "java.lang.Boolean", trueExpression).addDescription("My boolean data");
+                        new ExpressionBuilder().createConstantBooleanExpression(true));
+        processDefinitionBuilder.addData("myData", "java.lang.Boolean", new ExpressionBuilder().createConstantBooleanExpression(true))
+                .addDescription("My boolean data");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process)
@@ -529,22 +529,18 @@ public class BusinessArchiveTest {
         assertEquals(process.getFlowElementContainer().getGatewaysList().iterator().next(), result.getFlowElementContainer().getGatewaysList().iterator()
                 .next());
         assertEquals(process.getFlowElementContainer().getTransitions().size(), result.getFlowElementContainer().getTransitions().size());
-        boolean trWithConditionOk = false;
-        final long startId = result.getFlowElementContainer().getFlowNode("start1").getId();
-        for (final TransitionDefinition transition : result.getFlowElementContainer().getTransitions()) {
-            if (startId == transition.getSource() && trueExpression.equals(transition.getCondition())) {
-                trWithConditionOk = true;
-                break;
-            }
-        }
-        assertTrue("the condition on the transition was not kept", trWithConditionOk);
+
+        assertThat(result.getProcessContainer().getFlowNode("start1").getOutgoingTransitions().get(0).getCondition().getContent())
+                .as("the condition on the transition was not kept").isEqualTo("true");
+
         assertEquals(process.getFlowElementContainer().getConnectors().size(), result.getFlowElementContainer().getConnectors().size());
         boolean connectorWithInputOutputOk = false;
         for (final ConnectorDefinition connector : result.getFlowElementContainer().getConnectors()) {
             final Operation operation = connector.getOutputs().get(0);
-            if ("conn3".equals(connector.getName()) && trueExpression.equals(connector.getInputs().get("input1"))
+            if ("conn3".equals(connector.getName()) && "true".equals(connector.getInputs().get("input1").getContent())
                     && "testData".equals(operation.getLeftOperand().getName()) && OperatorType.ASSIGNMENT.equals(operation.getType())
-                    && ASSIGN_OPERATOR.equals(operation.getOperator()) && trueExpression.equals(operation.getRightOperand())) {
+                    && ASSIGN_OPERATOR.equals(operation.getOperator())
+                    && "true".equals(operation.getRightOperand().getContent())) {
                 connectorWithInputOutputOk = true;
                 break;
             }
@@ -737,7 +733,7 @@ public class BusinessArchiveTest {
         checkProcessForCallActivity(process, result);
 
         final CallActivityDefinition callActivity = (CallActivityDefinition) result.getFlowElementContainer().getActivity("callActivity");
-        assertThat(callActivity.getProcessStartContractInputs().get(supportCaseIdInputName)).isEqualTo(supportCaseIdExpression);
+        assertThat(callActivity.getProcessStartContractInputs().get(supportCaseIdInputName).isEquivalent(supportCaseIdExpression)).isTrue();
     }
 
     @Test
@@ -1107,8 +1103,8 @@ public class BusinessArchiveTest {
 
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         String fileContent = IOUtil.read(file);
-        fileContent = fileContent.replace("<def:processDefinition", "<def:pro_cessDefinition");
-        fileContent = fileContent.replace("</def:processDefinition", "</def:pro_cessDefinition");
+        fileContent = fileContent.replace("<tns:processDefinition", "<tns:pro_cessDefinition");
+        fileContent = fileContent.replace("</tns:processDefinition", "</tns:pro_cessDefinition");
         file.delete();
         file.createNewFile();
         IOUtil.writeContentToFile(fileContent, file);
@@ -1137,7 +1133,7 @@ public class BusinessArchiveTest {
 
         final File file = getFile(ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         String fileContent = IOUtil.read(file);
-        fileContent = fileContent.replace("<def:processDefinition", "<def:pro_typo_cessDefinition");
+        fileContent = fileContent.replace("<tns:processDefinition", "<tns:pro_typo_cessDefinition");
         file.delete();
         file.createNewFile();
         IOUtil.writeContentToFile(fileContent, file);

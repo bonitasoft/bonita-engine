@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.document.impl;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -58,7 +60,7 @@ public class DocumentListDefinitionImpl extends NamedDefinitionElementImpl imple
     }
 
     public void setExpression(Expression expression) {
-        this.expression = expression;
+        this.expression = getNonNullCopy(expression);
     }
 
     @Override

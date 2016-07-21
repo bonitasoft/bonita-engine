@@ -63,9 +63,9 @@ public class ServerModelConvertorTest {
     @Test
     public void shouldConvertContractInputs() throws Exception {
         final HashMap<String, Expression> contractInputs = new HashMap<>();
-        final ExpressionImpl expression1 = new ExpressionImpl(211L);
+        final ExpressionImpl expression1 = new ExpressionImpl();
         expression1.setReturnType("SomeType");
-        final ExpressionImpl expression2 = new ExpressionImpl(227L);
+        final ExpressionImpl expression2 = new ExpressionImpl();
         expression2.setReturnType("SomeReturnType");
         contractInputs.put("inputname1", expression1);
         contractInputs.put("inputname2", expression2);

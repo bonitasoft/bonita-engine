@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.bpm.context;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -42,7 +44,7 @@ public class ContextEntryImpl implements ContextEntry {
 
     public ContextEntryImpl(String key, Expression expression) {
         this.key = key;
-        this.expression = expression;
+        this.expression = getNonNullCopy(expression);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ContextEntryImpl implements ContextEntry {
     }
 
     public void setExpression(Expression expression) {
-        this.expression = expression;
+        this.expression = getNonNullCopy(expression);
     }
 
     @Override

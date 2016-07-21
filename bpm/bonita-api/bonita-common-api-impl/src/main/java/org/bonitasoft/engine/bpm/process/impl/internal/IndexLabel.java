@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -41,8 +43,8 @@ public class IndexLabel implements Serializable {
 
     public IndexLabel(String index, String label, Expression value) {
         this.index = index;
-        this.value = value;
         this.label = label;
+        this.value = getNonNullCopy(value);
     }
 
     public IndexLabel() {

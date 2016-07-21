@@ -30,13 +30,62 @@ import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConstraintDefinitionImpl implements ConstraintDefinition {
 
+    private static final long serialVersionUID = 2793703451225519896L;
+    @XmlAttribute
+    private final String name;
+    @XmlElement
+    private final String expression;
+    @XmlElement
+    private final String explanation;
+    @XmlElementWrapper
+    @XmlElement(name = "inputName")
+    private final List<String> inputNames;
+
+    public ConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
+        this.name = name;
+        this.expression = expression;
+        this.explanation = explanation;
+        inputNames = new ArrayList<>();
+    }
+
+    public ConstraintDefinitionImpl() {
+        this.name = null;
+        this.expression = null;
+        this.explanation = null;
+        inputNames = new ArrayList<>();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getExpression() {
+        return expression;
+    }
+
+    @Override
+    public String getExplanation() {
+        return explanation;
+    }
+
+    @Override
+    public List<String> getInputNames() {
+        return inputNames;
+    }
+
+    public void addInputName(final String inputName) {
+        inputNames.add(inputName);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (explanation == null ? 0 : explanation.hashCode());
         result = prime * result + (expression == null ? 0 : expression.hashCode());
-        result = prime * result + (inputNames == null ? 0 : inputNames.hashCode());
+        result = prime * result + inputNames.hashCode();
         result = prime * result + (name == null ? 0 : name.hashCode());
         return result;
     }
@@ -67,11 +116,7 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
         } else if (!expression.equals(other.expression)) {
             return false;
         }
-        if (inputNames == null) {
-            if (other.inputNames != null) {
-                return false;
-            }
-        } else if (!inputNames.equals(other.inputNames)) {
+        if (!inputNames.equals(other.inputNames)) {
             return false;
         }
         if (name == null) {
@@ -82,55 +127,6 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
             return false;
         }
         return true;
-    }
-
-    private static final long serialVersionUID = 2793703451225519896L;
-    @XmlAttribute
-    private final String name;
-    @XmlElement
-    private final String expression;
-    @XmlElement
-    private final String explanation;
-    @XmlElementWrapper
-    @XmlElement(name = "inputName")
-    private final List<String> inputNames;
-
-    public ConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
-        this.name = name;
-        this.explanation = explanation;
-        this.expression = expression;
-        inputNames = new ArrayList<String>();
-    }
-
-    public ConstraintDefinitionImpl() {
-        this.name = null;
-        this.explanation = null;
-        this.expression = null;
-        inputNames = new ArrayList<String>();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getExpression() {
-        return expression;
-    }
-
-    @Override
-    public String getExplanation() {
-        return explanation;
-    }
-
-    @Override
-    public List<String> getInputNames() {
-        return inputNames;
-    }
-
-    public void addInputName(final String inputName) {
-        inputNames.add(inputName);
     }
 
 }

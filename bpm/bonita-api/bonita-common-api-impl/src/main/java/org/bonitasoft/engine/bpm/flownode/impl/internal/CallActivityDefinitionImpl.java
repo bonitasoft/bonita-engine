@@ -31,8 +31,10 @@ import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallableElementType;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 
 /**
@@ -50,9 +52,11 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     private Expression callableElementVersion;
     @XmlElement(type = OperationImpl.class, name = "dataInputOperation")
     private final List<Operation> dataInputOperations;
-    @XmlJavaTypeAdapter(MapAdapterExpression.class)
-    @XmlElement(name="contractInput")
+
+    @XmlJavaTypeAdapter(NameExpressionMapAdapter.class)
+    @XmlElement(name = "contractInput")
     private final Map<String, Expression> contractInputs;
+
     @XmlElement(type = OperationImpl.class, name = "dataOutputOperation")
     private final List<Operation> dataOutputOperations;
     @XmlAttribute
@@ -79,13 +83,14 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
         contractInputs = new HashMap<>();
 
     }
+
     @Override
     public Expression getCallableElement() {
         return callableElement;
     }
 
     public void setCallableElement(final Expression callableElement) {
-        this.callableElement = callableElement;
+        this.callableElement = ExpressionBuilder.getNonNullCopy(callableElement);
     }
 
     @Override
@@ -94,7 +99,7 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     }
 
     public void setCallableElementVersion(final Expression callableElementVersion) {
-        this.callableElementVersion = callableElementVersion;
+        this.callableElementVersion = ExpressionBuilder.getNonNullCopy(callableElementVersion);
     }
 
     @Override
@@ -103,7 +108,7 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     }
 
     public void addDataInputOperation(final Operation dataInputOperation) {
-        dataInputOperations.add(dataInputOperation);
+        dataInputOperations.add(OperationBuilder.getNonNullCopy(dataInputOperation));
     }
 
     @Override
@@ -112,7 +117,7 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     }
 
     public void addDataOutputOperation(final Operation dataOutputOperation) {
-        dataOutputOperations.add(dataOutputOperation);
+        dataOutputOperations.add(OperationBuilder.getNonNullCopy(dataOutputOperation));
     }
 
     @Override
@@ -125,7 +130,7 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     }
 
     public void addProcessStartContractInput(String inputName, Expression value) {
-        contractInputs.put(inputName, value);
+        contractInputs.put(inputName, ExpressionBuilder.getNonNullCopy(value));
     }
 
     @Override
@@ -147,9 +152,12 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         CallActivityDefinitionImpl that = (CallActivityDefinitionImpl) o;
         return Objects.equals(callableElement, that.callableElement) &&
                 Objects.equals(callableElementVersion, that.callableElementVersion) &&
@@ -161,7 +169,8 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), callableElement, callableElementVersion, dataInputOperations, contractInputs, dataOutputOperations, callableElementType);
+        return Objects.hash(super.hashCode(), callableElement, callableElementVersion, dataInputOperations, contractInputs, dataOutputOperations,
+                callableElementType);
     }
 
     @Override

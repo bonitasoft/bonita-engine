@@ -11,11 +11,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-/**
- * 
- *     <p>
- * 
- *     </p>
- * 
- */
+@XmlSchema(namespace = NAMESPACE, elementFormDefault = XmlNsForm.UNSET, xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = NAMESPACE, prefix = "tns") })
 package org.bonitasoft.engine.bpm.flownode;
+
+import static org.bonitasoft.engine.bpm.ProcessDefinitionNamespace.NAMESPACE;
+
+import javax.xml.bind.annotation.XmlNsForm;
+import javax.xml.bind.annotation.XmlSchema;
