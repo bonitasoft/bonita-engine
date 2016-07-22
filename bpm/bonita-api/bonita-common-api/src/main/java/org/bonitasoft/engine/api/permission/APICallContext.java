@@ -170,6 +170,9 @@ public class APICallContext implements Serializable {
         this.method = method;
     }
 
+    /**
+     * @return the name of API the resource is part of
+     */
     public String getApiName() {
         return apiName;
     }
@@ -177,7 +180,10 @@ public class APICallContext implements Serializable {
     public void setApiName(String apiName) {
         this.apiName = apiName;
     }
-
+    
+    /**
+     * @return the name of the main resource (if a subresource is queried, its name will be part of the compound resource ID)
+     */
     public String getResourceName() {
         return resourceName;
     }
@@ -186,10 +192,16 @@ public class APICallContext implements Serializable {
         this.resourceName = resourceName;
     }
 
+    /**
+     * @return the list of identifiers composing the resource ID. This is useful for compound resource IDs (the identifiers are separated with  a / in the URL)
+     */
     public List<String> getCompoundResourceId() {
         return resourceId == null ? Collections.<String> emptyList() : Arrays.asList(resourceId.split("/"));
     }
 
+    /**
+     * @return the full resource ID as a string. If the resource ID is compound, it will return as it is in the URL (with a / as separator between the identifiers)
+     */
     public String getResourceId() {
         return resourceId;
     }
@@ -198,6 +210,9 @@ public class APICallContext implements Serializable {
         this.resourceId = resourceId;
     }
 
+    /**
+     * @return the full query string
+     */
     public String getQueryString() {
         return queryString;
     }
@@ -207,6 +222,9 @@ public class APICallContext implements Serializable {
         parseQueryString(queryString);
     }
 
+    /**
+     * @return the body of the request as a String
+     */
     public String getBody() {
         return body;
     }
@@ -216,10 +234,16 @@ public class APICallContext implements Serializable {
         this.body = body;
     }
 
+    /**
+     * @return a Map containing the filters of the request as they are set in the query string (f parameter)
+     */
     public Map<String, String> getFilters() {
         return filters;
     }
 
+    /**
+     * @return a string containing the search term of the request as it is set in the query string (s parameter)
+     */
     public String getSearchTerm() {
         return searchTerm;
     }
