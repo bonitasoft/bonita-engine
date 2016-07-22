@@ -63,6 +63,7 @@ public class ProcessPermissionRuleTest {
         doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
         doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
+        doReturn([]).when(apiCallContext).getCompoundResourceId()
     }
 
     @Test
@@ -89,7 +90,7 @@ public class ProcessPermissionRuleTest {
     public void should_check_verify_resourceid_on_PUT_when_is_supervisor() {
         //given
         doReturn(true).when(apiCallContext).isPUT()
-        doReturn("56").when(apiCallContext).getResourceId()
+        doReturn(["56"]).when(apiCallContext).getCompoundResourceId()
         doReturn(true).when(processAPI).isUserProcessSupervisor(56l,currentUserId)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
@@ -101,7 +102,7 @@ public class ProcessPermissionRuleTest {
     public void should_check_verify_resourceid_on_PUT_when_is_not_supervisor() {
         //given
         doReturn(true).when(apiCallContext).isPUT()
-        doReturn("56").when(apiCallContext).getResourceId()
+        doReturn(["56"]).when(apiCallContext).getCompoundResourceId()
         doReturn(false).when(processAPI).isUserProcessSupervisor(56l,currentUserId)
         //when
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
@@ -179,7 +180,7 @@ public class ProcessPermissionRuleTest {
         doReturn(currentUserId).when(apiSession).getUserId()
         doReturn(true).when(apiCallContext).isGET()
         doReturn("process").when(apiCallContext).getResourceName()
-        doReturn("45").when(apiCallContext).getResourceId()
+        doReturn(["45"]).when(apiCallContext).getCompoundResourceId()
 
         def info = mock(ProcessDeploymentInfo.class)
         doReturn(deployedBy).when(info).getDeployedBy()
