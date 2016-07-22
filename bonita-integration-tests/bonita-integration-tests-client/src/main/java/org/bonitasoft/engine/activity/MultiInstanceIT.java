@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.activity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +24,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.actor.ActorCriterion;
+import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
@@ -39,6 +40,8 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescript
 import org.bonitasoft.engine.bpm.flownode.ArchivedAutomaticTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedMultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
@@ -185,26 +188,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void executeAMultiInstanceWithMaxIteration() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceWithMaxIteration", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME);
-        builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
-        builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
-        final int loopMax = 3;
-        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(
-                true,
-                new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithMaxIteration", "a + b", Integer.class.getName(),
-                        new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
-                        new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
-
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        checkPendingTaskSequentially(loopMax, processInstance, true);
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    @Test
     public void executeAMultiInstanceWithLoopDataInputAndOutput() throws Exception {
         final List<?> outputList = executeAMultiInstanceWithLoopDataAs("[58,26,12]", "[1,2,3]");
         assertEquals(3, outputList.size());
@@ -223,7 +206,8 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final String loopDataInputName = "loopDataInput_";
         String loopDataOutputName = "loopDataOutput_";
         builder.addData(loopDataInputName, List.class.getName(),
-                new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithLoopDataInputAndOutput1", inputListScript, List.class.getName()));
+                new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithLoopDataInputAndOutput1", inputListScript,
+                        List.class.getName()));
         if (outputListScript != null) {
             builder.addData(
                     loopDataOutputName,
@@ -260,6 +244,26 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         waitForUserTask(process, "lastTask");
         disableAndDeleteProcess(processDefinition);
         return list;
+    }
+
+    @Test
+    public void executeAMultiInstanceWithMaxIteration() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceWithMaxIteration", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
+        builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
+        final int loopMax = 3;
+        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(
+                true,
+                new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithMaxIteration", "a + b", Integer.class.getName(),
+                        new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
+                        new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        checkPendingTaskSequentially(loopMax, processInstance, true);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -712,8 +716,8 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addAutomaticTask("step2").addTransition("step1", "step2");
 
-        final List<User> listUsers = new ArrayList<User>();
-        final List<String> listActors = new ArrayList<String>();
+        final List<User> listUsers = new ArrayList<>();
+        final List<String> listActors = new ArrayList<>();
         listUsers.add(john);
         listActors.add(ACTOR_NAME);
         listUsers.add(jack);
@@ -761,8 +765,8 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
         builder.addAutomaticTask("step2").addTransition("step1", "step2");
 
-        final List<User> listUsers = new ArrayList<User>();
-        final List<String> listActors = new ArrayList<String>();
+        final List<User> listUsers = new ArrayList<>();
+        final List<String> listActors = new ArrayList<>();
         listUsers.add(john);
         listActors.add(ACTOR_NAME);
         listUsers.add(jack);
@@ -884,7 +888,8 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         }
     }
 
-    private void checkPendingTaskInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance) throws Exception {
+    private void checkPendingTaskInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance)
+            throws Exception {
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), numberOfTask);
 
         for (int i = 0; i < numberOfTaskToCompleteMI; i++) {
@@ -942,7 +947,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         for (final BarResource barResource : impl) {
             businessArchiveBuilder.addUserFilters(barResource);
         }
-        final List<BarResource> generateFilterDependencies = new ArrayList<BarResource>(1);
+        final List<BarResource> generateFilterDependencies = new ArrayList<>(1);
         final byte[] data = IOUtil.generateJar(TestFilterWithAutoAssign.class);
         generateFilterDependencies.add(new BarResource("TestFilterWithAutoAssign.jar", data));
 
@@ -959,29 +964,12 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        final List<BarResource> resources = new ArrayList<>(1);
         final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
         final byte[] data = IOUtil.getAllContentFrom(inputStream);
         inputStream.close();
         resources.add(new BarResource(filterName + ".impl", data));
         return resources;
-    }
-
-    @Test
-    public void multiInstanceWithAnEmptyList_should_instantiate_once_the_task() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("multiInstanceWithAnEmptyList", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME);
-        builder.addData("list", List.class.getName(), new ExpressionBuilder().createGroovyScriptExpression("emptyList", "[]", List.class.getName()));
-        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
-        taskDefinitionBuilder.addData("listValue", String.class.getName(), null);
-        taskDefinitionBuilder.addMultiInstance(true, "list").addDataInputItemRef("listValue");
-
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(processInstance, "step1");
-
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -1000,4 +988,36 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Test
+    public void should_not_create_instance_when_multi_instantiated_on_empty_list() throws Exception {
+        //given
+        ProcessDefinitionBuilder p1 = new ProcessDefinitionBuilder().createNewInstance("p1", "1");
+        p1.addData("loop", List.class.getName(), new ExpressionBuilder().createGroovyScriptExpression("list", "[]", List.class.getName()));
+        p1.addUserTask("step1", "john").addMultiInstance(true, "loop");
+        p1.addUserTask("step3", "john").addMultiInstance(false, "loop");
+        p1.addActor("john");
+        p1.addUserTask("step2", "john");
+        p1.addUserTask("step4", "john");
+        p1.addTransition("step1", "step2");
+        p1.addTransition("step3", "step4");
+        ProcessDefinition deploy = getProcessAPI().deploy(p1.done());
+        List<ActorInstance> actors = getProcessAPI().getActors(deploy.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        getProcessAPI().addUserToActor(actors.get(0).getId(), getIdentityAPI().getUserByUserName("john").getId());
+        getProcessAPI().enableProcess(deploy.getId());
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(deploy.getId());
+        //no task step1
+        //then
+        waitForUserTask(processInstance.getId(), "step2");
+        waitForUserTask(processInstance.getId(), "step4");
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, processInstance.getId());
+        builder.leftParenthesis().filter(ArchivedHumanTaskInstanceSearchDescriptor.NAME, "step1").or()
+                .filter(ArchivedHumanTaskInstanceSearchDescriptor.NAME, "step3").rightParenthesis();
+        builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.COMPLETED_STATE);
+        SearchResult<ArchivedHumanTaskInstance> archivedHumanTaskInstanceSearchResult = getProcessAPI().searchArchivedHumanTasks(builder.done());
+        assertThat(archivedHumanTaskInstanceSearchResult.getResult()).isEmpty();
+        //clean up
+        disableAndDeleteProcess(deploy);
+    }
 }
