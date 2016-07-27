@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author Baptiste Mesta
  */
-public class ConnectorArchive {
+class ConnectorArchive {
 
     private Map<String, byte[]> dependencies = new HashMap<>();
     private String connectorImplName;
@@ -14,11 +14,6 @@ public class ConnectorArchive {
 
     public void addDependency(String entryName, byte[] fileContent) {
         dependencies.put(entryName, fileContent);
-    }
-
-    public void addConnectorFile(String entryName, byte[] fileContent) {
-        dependencies.put(entryName, fileContent);
-
     }
 
     public Map<String, byte[]> getDependencies() {

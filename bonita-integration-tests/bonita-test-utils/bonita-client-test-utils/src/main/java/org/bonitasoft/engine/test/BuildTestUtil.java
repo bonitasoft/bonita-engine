@@ -50,16 +50,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 
 public class BuildTestUtil {
 
-    public static final String SUPERVISOR_ID_KEY = "supervisorId";
-
-    public static final String ROLE_ID_KEY = "roleId";
-
-    public static final String GROUP_ID_KEY = "groupId";
-
-    public static final String PROCESS_DEFINITION_ID_KEY = "processDefinitionId";
-
-    public static final String DEFAULT_TENANT = "default";
-
     public static final String ACTOR_NAME = "Employee actor";
 
     public static final String PROCESS_VERSION = "1.0";
@@ -79,16 +69,22 @@ public class BuildTestUtil {
     public static final String ROLE_NAME = "Developper";
 
     public static byte[] buildConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
-            final String implementationVersion, final String implementationClassname) {
+            final String implementationVersion, final String implementationClassname, String... dependencies) {
         final StringBuilder stb = new StringBuilder();
-        stb.append("<connectorImplementation>");
-        stb.append("");
-        stb.append("<definitionId>" + definitionId + "</definitionId>");
-        stb.append("<definitionVersion>" + definitionVersion + "</definitionVersion>");
-        stb.append("<implementationClassname>" + implementationClassname + "</implementationClassname>");
-        stb.append("<implementationId>" + implementationId + "</implementationId>");
-        stb.append("<implementationVersion>" + implementationVersion + "</implementationVersion>");
-        stb.append("</connectorImplementation>");
+        stb.append("<connectorImplementation>\n");
+        stb.append("\t<definitionId>").append(definitionId).append("</definitionId>\n");
+        stb.append("\t<definitionVersion>").append(definitionVersion).append("</definitionVersion>\n");
+        stb.append("\t<implementationClassname>").append(implementationClassname).append("</implementationClassname>\n");
+        stb.append("\t<implementationId>").append(implementationId).append("</implementationId>\n");
+        stb.append("\t<implementationVersion>").append(implementationVersion).append("</implementationVersion>\n");
+        if (dependencies.length > 0) {
+            stb.append("\t<jarDependencies>\n");
+            for (String dependency : dependencies) {
+                stb.append("\t\t<jarDependency>").append(dependency).append("</jarDependency>\n");
+            }
+            stb.append("\t</jarDependencies>\n");
+        }
+        stb.append("</connectorImplementation>\n");
         return stb.toString().getBytes();
     }
 
@@ -181,7 +177,8 @@ public class BuildTestUtil {
         builder.addActor(ACTOR_NAME).addUserTask("StepBeforeFailedConnector", ACTOR_NAME);
         final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addAutomaticTask("AutomaticStep")
                 .addConnector("testConnectorThatThrowException",
-                        "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER).throwErrorEventWhenFailed("errorCode");
+                        "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
+                .throwErrorEventWhenFailed("errorCode");
         connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
         builder.addEndEvent("end");
         builder.addTransition("start", "StepBeforeFailedConnector").addTransition("StepBeforeFailedConnector", "AutomaticStep")
@@ -189,7 +186,8 @@ public class BuildTestUtil {
         return builder;
     }
 
-    public static ProcessDefinitionBuilder buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(final String processName, final String userTaskName)
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(final String processName,
+            final String userTaskName)
             throws InvalidExpressionException {
         final String errorCode = "mistake";
 
@@ -281,7 +279,7 @@ public class BuildTestUtil {
     }
 
     public static List<String> buildActorAndDescription(final ProcessDefinitionBuilder processBuilder, final int nbActor) {
-        final List<String> actorList = new ArrayList<String>();
+        final List<String> actorList = new ArrayList<>();
         for (int i = 1; i <= nbActor; i++) {
             final String actorName = ACTOR_NAME + i;
             processBuilder.addActor(actorName).addDescription(DESCRIPTION + i);
@@ -302,7 +300,7 @@ public class BuildTestUtil {
 
     public static List<DesignProcessDefinition> buildNbProcessDefinitionWithHumanAndAutomatic(final int nbProcess, final List<String> stepNames,
             final List<Boolean> isHuman) throws InvalidProcessDefinitionException {
-        final List<DesignProcessDefinition> processDefinitions = new ArrayList<DesignProcessDefinition>();
+        final List<DesignProcessDefinition> processDefinitions = new ArrayList<>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;
             if (i >= 0 && i < 10) {
@@ -332,7 +330,8 @@ public class BuildTestUtil {
     }
 
     public static DesignProcessDefinition buildProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
-            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator, final boolean parallelActivities)
+            final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator,
+            final boolean parallelActivities)
             throws InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, processVersion);
         if (!isHuman.isEmpty() && isHuman.contains(true)) {
