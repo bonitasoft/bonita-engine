@@ -29,9 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
-import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.connector.AbstractConnector;
@@ -57,6 +54,9 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -240,8 +240,8 @@ public class ConnectorServiceImplTest {
 
     private void checkGetConnectorImplementationUsesCache(final int givenCacheSizeToBeReturned, final int expectedNumberOfCacheStoreInvocations,
             final boolean shouldCacheContainsConnectorImplementation)
-                    throws BonitaHomeNotSetException, SXMLParseException,
-                    IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException, SBonitaReadException {
+            throws BonitaHomeNotSetException, SXMLParseException,
+            IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException, SBonitaReadException {
 
         final long processDefId = 17L;
         final SProcessDefinition sProcessDef;
@@ -313,5 +313,36 @@ public class ConnectorServiceImplTest {
         final Long numberOfConnectorImplementations = connectorService.getNumberOfConnectorImplementations(processDefinitionId);
 
         assertThat(numberOfConnectorImplementations).isEqualTo(expectedCount);
+    }
+
+    @Test
+    public void should_read_connector_archive_correctly() throws Exception {
+        //given
+        HashMap<String, byte[]> files = new HashMap<>();
+        String connectorImplFileName = "myConnector.impl";
+        byte[] connectorImplFileContent = ("<connectorImplementation>\n" +
+                "\n" +
+                "\t<definitionId>org.bonitasoft.connector.testConnectorWithOutput</definitionId>\n" +
+                "\t<definitionVersion>1.0</definitionVersion>\n" +
+                "\t<implementationClassname>org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput</implementationClassname>\n" +
+                "\t<implementationId>org.bonitasoft.connector.testConnectorWithModifiedOutput</implementationId>\n" +
+                "\t<implementationVersion>1.0</implementationVersion>\n" +
+                "\n" +
+                "\t<jarDependencies>\n" +
+                "\t\t<jarDependency>TestConnectorWithModifiedOutput.jar</jarDependency>\n" +
+                "\t</jarDependencies>\n" +
+                "</connectorImplementation>\n").getBytes();
+        files.put(connectorImplFileName, connectorImplFileContent);
+        files.put("classpath/jar1.jar", new byte[] { 1, 2, 3 });
+        files.put("classpath/jar2.jar", new byte[] { 1, 2, 4 });
+        byte[] zip = IOUtil.zip(files);
+        //when
+        ConnectorArchive connectorArchive = connectorService.extractConnectorImplementation(zip);
+        //then
+        assertThat(connectorArchive.getConnectorImplName()).isEqualTo(connectorImplFileName);
+        assertThat(connectorArchive.getConnectorImplContent()).isEqualTo(connectorImplFileContent);
+        assertThat(connectorArchive.getDependencies()).containsKeys("jar1.jar", "jar2.jar").hasSize(2);
+        assertThat(connectorArchive.getDependencies().get("jar1.jar")).isEqualTo(new byte[] { 1, 2, 3 });
+        assertThat(connectorArchive.getDependencies().get("jar2.jar")).isEqualTo(new byte[] { 1, 2, 4 });
     }
 }
