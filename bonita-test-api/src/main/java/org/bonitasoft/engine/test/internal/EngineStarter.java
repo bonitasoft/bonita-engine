@@ -144,7 +144,6 @@ public class EngineStarter {
     }
 
     protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-
         try {
             undeployCommands();
             deleteTenantAndPlatform();
@@ -162,40 +161,22 @@ public class EngineStarter {
 
     protected void deleteTenantAndPlatform() throws BonitaException {
         LOGGER.info("=========  CLEAN PLATFORM =======");
-        stopAndCleanPlatformAndTenant();
-        if (dropOnStop) {
-            deletePlatformStructure();
-        }
-    }
-
-    protected void deletePlatformStructure() throws BonitaException {
         final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        platformAPI.deletePlatform();
-        logoutOnPlatform(session);
-    }
-
-    protected static void cleanPlatform(final PlatformAPI platformAPI) throws BonitaException {
-        platformAPI.cleanPlatform();
-    }
-
-    protected void stopAndCleanPlatformAndTenant() throws BonitaException {
-        final PlatformSession session = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        stopAndCleanPlatformAndTenant(platformAPI);
-        logoutOnPlatform(session);
-    }
-
-    protected void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI) throws BonitaException {
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         if (platformAPI.isNodeStarted()) {
-            stopPlatformAndTenant(platformAPI);
+            platformAPI.stopNode();
             if (dropOnStop) {
-                cleanPlatform(platformAPI);
+                platformAPI.cleanPlatform();
             }
         }
+        logoutOnPlatform(session);
     }
 
-    private void checkThreadsAreStopped() throws InterruptedException {
+    protected PlatformAPI getPlatformAPI(PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return PlatformAPIAccessor.getPlatformAPI(session);
+    }
+
+    protected void checkThreadsAreStopped() throws InterruptedException {
         LOGGER.info("=========  CHECK ENGINE IS SHUTDOWN =======");
         final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
         List<Thread> expectedThreads = new ArrayList<>();
@@ -274,9 +255,9 @@ public class EngineStarter {
     }
 
     protected void initPlatformAndTenant() throws Exception {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
 
         if (!platformAPI.isPlatformInitialized()) {
             LOGGER.info("=========  INIT PLATFORM =======");
@@ -316,7 +297,7 @@ public class EngineStarter {
         return loginAPI.login(TestEngineImpl.TECHNICAL_USER_NAME, TestEngineImpl.TECHNICAL_USER_PASSWORD);
     }
 
-    private LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return TenantAPIAccessor.getLoginAPI();
     }
 
@@ -336,11 +317,6 @@ public class EngineStarter {
         return finalValue;
     }
 
-    protected void stopPlatformAndTenant(final PlatformAPI platformAPI) throws BonitaException {
-
-        platformAPI.stopNode();
-    }
-
     protected void undeployCommands() throws BonitaException {
         final LoginAPI loginAPI = getLoginAPI();
         final APISession session = login(loginAPI);
@@ -358,7 +334,7 @@ public class EngineStarter {
         checkThreadsAreStopped();
     }
 
-    private void checkTempFoldersAreCleaned() throws IOException {
+    protected void checkTempFoldersAreCleaned() throws IOException {
         final List<File> folders = getTemporaryFolders();
         removeLicensesFolderAndDeleteIt(folders);
         StringBuilder builder = new StringBuilder();
