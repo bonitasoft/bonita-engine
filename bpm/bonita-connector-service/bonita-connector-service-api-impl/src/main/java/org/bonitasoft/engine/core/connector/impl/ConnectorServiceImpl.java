@@ -264,14 +264,14 @@ public class ConnectorServiceImpl implements ConnectorService {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
-            final Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
+            Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
             return new ConnectorResult(connector, connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader));
         } catch (final ClassNotFoundException e) {
             throw new SConnectorException(implementationClassName + " can not be found.", e);
         } catch (final InstantiationException e) {
             throw new SConnectorException(implementationClassName + " can not be instantiated.", e);
-        } catch (final IllegalAccessException | org.bonitasoft.engine.connector.exception.SConnectorException e) {
+        } catch (Throwable e) {
             throw new SConnectorException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
