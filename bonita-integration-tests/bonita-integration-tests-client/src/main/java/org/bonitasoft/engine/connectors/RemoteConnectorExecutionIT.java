@@ -1124,6 +1124,12 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         connectorInstances = getProcessAPI().searchArchivedConnectorInstances(searchOptions);
         assertThat(connectorInstances.getResult(), nameAre("myConnectorOnProcess"));
 
+        // search for archived connector instances using SOURCE_OBJECT_ID
+        searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
+        searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.SOURCE_OBJECT_ID, connectorInstances.getResult().get(0).getSourceObjectId() );
+        searchOptions = searchOptionsBuilder.done();
+        Assertions.assertThat(getProcessAPI().searchArchivedConnectorInstances(searchOptions).getResult()).extracting("name").containsOnly("myConnectorOnProcess");
+
         // now also connector of process is archived
         searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.sort(ArchiveConnectorInstancesSearchDescriptor.NAME, Order.ASC);
