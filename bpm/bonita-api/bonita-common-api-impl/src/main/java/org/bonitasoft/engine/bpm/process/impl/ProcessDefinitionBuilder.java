@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -197,6 +198,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     protected void validateBusinessData() {
         final FlowElementContainerDefinition processContainer = process.getProcessContainer();
         final List<BusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
+        HashSet<String> names = new HashSet<>();
         for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
             final Expression defaultValueExpression = businessDataDefinition.getDefaultValueExpression();
             if (businessDataDefinition.isMultiple() && defaultValueExpression != null && !defaultValueExpression.getReturnType().equals(List.class.getName())) {
@@ -215,6 +217,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                     }
                 }
             }
+            if (!names.add(businessDataDefinition.getName())) {
+                addError("The process contains more than one business data with the name " + businessDataDefinition.getName());
+            }
+
         }
 
         for (final ActivityDefinition activity : processContainer.getActivities()) {
@@ -223,26 +229,32 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 final MultiInstanceLoopCharacteristics multiInstanceCharacteristics = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
                 final String loopDataInputRef = multiInstanceCharacteristics.getLoopDataInputRef();
                 if (!isReferenceValid(loopDataInputRef)) {
-                    addError("The activity " + activity.getName() + "contains a reference " + loopDataInputRef
+                    addError("The activity " + activity.getName() + " contains a reference " + loopDataInputRef
                             + " for the loop data input to an unknown data");
                 }
                 final String dataInputItemRef = multiInstanceCharacteristics.getDataInputItemRef();
                 if (!isReferenceValid(dataInputItemRef, activity)) {
-                    addError("The activity " + activity.getName() + "contains a reference " + dataInputItemRef
+                    addError("The activity " + activity.getName() + " contains a reference " + dataInputItemRef
                             + " for the data input item to an unknown data");
                 }
                 final String dataOutputItemRef = multiInstanceCharacteristics.getDataOutputItemRef();
                 if (!isReferenceValid(dataOutputItemRef, activity)) {
-                    addError("The activity " + activity.getName() + "contains a reference " + dataOutputItemRef
+                    addError("The activity " + activity.getName() + " contains a reference " + dataOutputItemRef
                             + " for the data output item to an unknown data");
                 }
                 final String loopDataOutputRef = multiInstanceCharacteristics.getLoopDataOutputRef();
                 if (!isReferenceValid(loopDataOutputRef)) {
-                    addError("The activity " + activity.getName() + "contains a reference " + loopDataOutputRef
-                            + " for the loop data input to an unknown data");
+                    addError("The activity " + activity.getName() + " contains a reference " + loopDataOutputRef
+                            + " for the loop data output to an unknown data");
                 }
             } else if (!dataDefinitions.isEmpty()) {
                 addError("The activity " + activity.getName() + " contains business data but this activity does not have the multiple instance behaviour");
+            }
+            names = new HashSet<>();
+            for (BusinessDataDefinition businessDataDefinition : activity.getBusinessDataDefinitions()) {
+                if (!names.add(businessDataDefinition.getName())) {
+                    addError("The activity " + activity.getName() + " contains more than one business data with the name " + businessDataDefinition.getName());
+                }
             }
         }
     }
