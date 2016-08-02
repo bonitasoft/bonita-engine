@@ -72,13 +72,13 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
                 } else if (miLoop.getLoopDataInputRef() != null) {
                     numberOfInstanceMax = stateBehaviors.getNumberOfInstancesToCreateFromInputRef(processDefinition, multiInstanceActivityInstance, miLoop,
                             numberOfInstanceMax);
-                    stateBehaviors.updateOutputData(processDefinition, multiInstanceActivityInstance, miLoop, numberOfInstanceMax);
                 }
                 if (numberOfInstanceMax < 0) {
                     throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
                             + processDefinition.getName() + " " + processDefinition.getVersion()
                             + " did not have loop cardinality nor loop data input ref set");
                 }
+                stateBehaviors.updateOutputData(processDefinition, multiInstanceActivityInstance, miLoop, numberOfInstanceMax);
                 if (numberOfInstanceMax > 0) {
                     stateBehaviors.createInnerInstances(processDefinition.getId(), activity, multiInstanceActivityInstance, miLoop.isSequential() ? 1
                             : numberOfInstanceMax);
