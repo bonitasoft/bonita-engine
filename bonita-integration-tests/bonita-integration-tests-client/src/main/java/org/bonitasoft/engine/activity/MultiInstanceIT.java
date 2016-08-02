@@ -64,6 +64,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.operation.impl.LeftOperandImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -1020,4 +1021,24 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         //clean up
         disableAndDeleteProcess(deploy);
     }
+    @Test
+    public void  multiInstance_with_a_define_instance_number_should_be_able_to_save_value_into_a_data_output_list() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("multiInstanceProcess", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addData("list", List.class.getName(), new ExpressionBuilder().createGroovyScriptExpression("EmptyList", "[]", List.class.getName()));
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
+        taskDefinitionBuilder.addData("listValue", String.class.getName(), null);
+        taskDefinitionBuilder.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(1)).addDataOutputItemRef("listValue").addLoopDataOutputRef("list");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        long step1 = waitForUserTask(processInstance.getId(), "step1");
+        getProcessAPI().assignUserTask(step1, john.getId());
+        getProcessAPI().executeUserTask(john.getId(), step1, null);
+        waitForProcessToFinish(processInstance);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+
 }
