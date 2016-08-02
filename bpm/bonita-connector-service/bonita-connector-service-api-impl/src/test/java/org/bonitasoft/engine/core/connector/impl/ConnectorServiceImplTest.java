@@ -62,7 +62,9 @@ import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.SXMLParseException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -105,6 +107,9 @@ public class ConnectorServiceImplTest {
     private ArgumentCaptor<SConnector> connectorArgumentCaptor;
 
     private ConnectorServiceImpl connectorService;
+    
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @SuppressWarnings("unchecked")
     @Before
@@ -344,5 +349,21 @@ public class ConnectorServiceImplTest {
         assertThat(connectorArchive.getDependencies()).containsKeys("jar1.jar", "jar2.jar").hasSize(2);
         assertThat(connectorArchive.getDependencies().get("jar1.jar")).isEqualTo(new byte[] { 1, 2, 3 });
         assertThat(connectorArchive.getDependencies().get("jar2.jar")).isEqualTo(new byte[] { 1, 2, 4 });
+    }
+    
+    @Test
+    public void should_throw_a_SConnectorException_if_a_Throwable_is_thrown_when_executing_a_connector() throws Exception {
+        //given
+        SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
+                "impplVersion", "defId", "defVersion", new JarDependencies(Collections.<String> emptyList()));
+        SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
+   
+        Map<String, Object> inputParameters = Collections.<String, Object> singletonMap("key", "value");
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        when(connectorExecutor.execute(notNull(SConnector.class), eq(inputParameters), eq(contextClassLoader))).thenThrow(new NoClassDefFoundError());
+        
+        expectedException.expect(SConnectorException.class);
+        
+        connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
     }
 }
