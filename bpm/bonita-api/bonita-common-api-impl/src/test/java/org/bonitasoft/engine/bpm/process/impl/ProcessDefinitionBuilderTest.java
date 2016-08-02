@@ -502,7 +502,7 @@ public class ProcessDefinitionBuilderTest {
     public void validate_contract_with_no_type_on_user_task() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
 
-        builder.addActor("john").addUserTask("step1","john").addContract().addComplexInput("name", "desc");
+        builder.addActor("john").addUserTask("step1", "john").addContract().addComplexInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
         expectedException.expectMessage("Type not set on the contract input <name> on the task-level contract for task <step1>");
@@ -518,6 +518,169 @@ public class ProcessDefinitionBuilderTest {
         expectedException.expect(InvalidProcessDefinitionException.class);
         expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
         builder.done();
+    }
+
+    @Test
+    public void validate_should_fail_when_business_data_for_loop_data_input_of_multi_instance_does_not_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        //when
+        step.addMultiInstance(false, "myData");
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The activity multi contains a reference myData for the loop data input to an unknown data");
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_not_fail_when_business_data_for_loop_data_input_of_multi_instance_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(true);
+        //when
+        step.addMultiInstance(false, "myData");
+        //then
+        builder.done();
+    }
+
+    @Test
+    public void should_not_be_able_to_set_as_loop_data_input_non_multiple_business_data() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(false);
+        //when
+        step.addMultiInstance(false, "myData");
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The business data myData used in the multi instance multi must be multiple");
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_fail_when_business_data_for_data_input_item_of_multi_instance_does_not_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(true);
+        //when
+        step.addMultiInstance(false, "myData").addDataInputItemRef("myDataInput");
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The activity multi contains a reference myDataInput for the data input item to an unknown data");
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_not_fail_when_business_data_for_data_input_item_of_multi_instance_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(true);
+        step.addBusinessData("myDataInput", String.class.getName());
+        //when
+        step.addMultiInstance(false, "myData").addDataInputItemRef("myDataInput");
+        //then
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_fail_when_business_data_for_data_output_item_of_multi_instance_does_not_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(true);
+        //when
+        step.addMultiInstance(false, "myData").addDataOutputItemRef("myDataOutput");
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The activity multi contains a reference myDataOutput for the data output item to an unknown data");
+        builder.done();
+    }
+
+    @Test
+    public void should_not_be_able_to_add_business_data_on_non_multi_instance_step() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        //when
+        step.addBusinessData("myData", String.class.getName());
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The activity multi contains business data but this activity does not have the multiple instance behaviour");
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_not_fail_when_business_data_for_data_output_item_of_multi_instance_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(true);
+        step.addBusinessData("myDataOutput", String.class.getName());
+        //when
+        step.addMultiInstance(false, "myData").addDataInputItemRef("myDataOutput");
+        //then
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_fail_when_business_data_for_loop_data_output_of_multi_instance_does_not_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        //when
+        MultiInstanceLoopCharacteristicsBuilder multi = step.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(12));
+        multi.addLoopDataOutputRef("myData");
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The activity multi contains a reference myData for the loop data output to an unknown data");
+        builder.done();
+    }
+
+    @Test
+    public void validate_should_not_fail_when_business_data_for_loop_data_output_of_multi_instance_exists() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+        AutomaticTaskDefinitionBuilder step = builder.addAutomaticTask("multi");
+        builder.addBusinessData("myData", String.class.getName(), null).setMultiple(true);
+        //when
+        MultiInstanceLoopCharacteristicsBuilder multi = step.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(12));
+        multi.addLoopDataOutputRef("myData");
+        //then
+        builder.done();
+    }
+
+    @Test
+    public void should_not_be_able_to_add_2_business_data_with_same_name() throws Exception {
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+
+        //when
+        processDefinitionBuilder.addBusinessData("toto", String.class.getName(), null);
+        processDefinitionBuilder.addBusinessData("toto", String.class.getName(), null);
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The process contains more than one business data with the name toto");
+        processDefinitionBuilder.done();
+    }
+
+    @Test
+    public void should_not_be_able_to_add_2_business_data_on_multi_instance_with_same_name() throws Exception {
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        processDefinitionBuilder.addBusinessData("listData", String.class.getName(), null).setMultiple(true);
+        //when
+        AutomaticTaskDefinitionBuilder step = processDefinitionBuilder.addAutomaticTask("step");
+        step.addBusinessData("toto", String.class.getName());
+        step.addBusinessData("toto", String.class.getName());
+        step.addMultiInstance(false, "listData").addDataInputItemRef("toto");
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("The activity step contains more than one business data with the name toto");
+        processDefinitionBuilder.done();
     }
 
 }

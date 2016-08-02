@@ -165,7 +165,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         updateRefBusinessDataInstance(refBusinessDataInstance, fields);
     }
 
-    public void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Map<String, Object> fields)
+    private void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Map<String, Object> fields)
             throws SRefBusinessDataInstanceModificationException {
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(refBusinessDataInstance, fields);
