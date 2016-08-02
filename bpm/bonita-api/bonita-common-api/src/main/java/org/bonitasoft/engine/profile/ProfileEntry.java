@@ -24,8 +24,19 @@ import org.bonitasoft.engine.page.Page;
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
  * @author Julien Mege
+ * @author Anthony Birembaut
  */
 public interface ProfileEntry extends NamedElement, BaseElement {
+	
+	/**
+	 * Constant for "folder" type of profile entries (used to create a group of menu link)
+	 */
+	static String FOLDER_TYPE = "folder";
+	
+	/**
+	 * Constant for "link" type of profile entries (used to create a link to a page in the menu)
+	 */
+	static String LINK_TYPE = "link";
 
     /**
      * Retrieves the identifier of the parent {@code ProfileEntry}.
