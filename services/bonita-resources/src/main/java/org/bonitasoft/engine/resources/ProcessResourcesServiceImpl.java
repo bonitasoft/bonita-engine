@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.resources;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 
 /**
  * @author Baptiste Mesta
@@ -45,6 +47,11 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
     public void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException {
         SBARResource resource = new SBARResource(name, type, processDefinitionId, content);
         recorder.recordInsert(new InsertRecord(resource), null);
+    }
+
+    @Override
+    public void update(SBARResourceLight resource, byte[] content) throws SRecorderException {
+        recorder.recordUpdate(UpdateRecord.buildSetFields(resource, Collections.<String, Object> singletonMap("content", content)), null);
     }
 
     @Override

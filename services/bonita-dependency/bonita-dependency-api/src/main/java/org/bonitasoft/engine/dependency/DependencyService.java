@@ -33,7 +33,6 @@ public interface DependencyService {
 
     String DEPENDENCYMAPPING = "DEPENDENCYMAPPING";
 
-
     /**
      * Delete the specific dependency
      * 
@@ -78,7 +77,6 @@ public interface DependencyService {
      */
     List<SDependency> getDependencies(Collection<Long> ids) throws SDependencyException;
 
-
     /**
      * Get all dependencyMappings for specific the queryOptions
      * 
@@ -91,7 +89,6 @@ public interface DependencyService {
 
     /**
      * Refresh classloader after a dependency update
-     *
      * difference with #refreshClassLoader is that this one is done on all nodes
      *
      * @param type
@@ -123,6 +120,7 @@ public interface DependencyService {
 
     /**
      * refresh classloader on this node only
+     * 
      * @param type
      * @param id
      * @throws SDependencyException
@@ -130,6 +128,8 @@ public interface DependencyService {
     void refreshClassLoader(ScopeType type, long id) throws SDependencyException;
 
     SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
+
+    SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
 
     SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
 }

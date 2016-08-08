@@ -57,7 +57,7 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
     private final ClassLoaderService classLoaderService;
 
     public PlatformDependencyServiceImpl(final PersistenceService platformPersistenceService, final ClassLoaderService classLoaderService,
-                                         BroadcastService broadcastService, UserTransactionService userTransactionService) {
+            BroadcastService broadcastService, UserTransactionService userTransactionService) {
         super(broadcastService, userTransactionService, platformPersistenceService);
         this.platformPersistenceService = platformPersistenceService;
         this.classLoaderService = classLoaderService;
@@ -89,7 +89,7 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
         List<SDependency> dependencies;
         try {
             dependencies = platformPersistenceService.selectList(new SelectListDescriptor<SDependency>("getPlatformDependencies",
-                    Collections.<String, Object>emptyMap(), SDependency.class, queryOptions));
+                    Collections.<String, Object> emptyMap(), SDependency.class, queryOptions));
         } catch (final SBonitaReadException bre) {
             throw new SDependencyException(bre);
         }
@@ -221,4 +221,9 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
         }
     }
 
+    @Override
+    public SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
+            throws SDependencyException {
+        throw new UnsupportedOperationException("NYI");
+    }
 }

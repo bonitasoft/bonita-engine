@@ -41,6 +41,7 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -61,6 +62,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -73,7 +75,6 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  */
 public class DependencyServiceImpl extends AbstractDependencyService {
 
-
     private final ReadPersistenceService persistenceService;
     private final Recorder recorder;
     private final EventService eventService;
@@ -83,8 +84,8 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     private ReadSessionAccessor readSessionAccessor;
 
     public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-                                 final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
-                                 BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
+            BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
         super(broadcastService, userTransactionService, persistenceService);
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -260,7 +261,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         }
     }
 
-
     @Override
     public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = getDependenciesResources(type, id);
@@ -276,7 +276,6 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         return readSessionAccessor.getTenantId();
     }
 
-
     public SDependency createMappedDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
             throws SDependencyException {
         final SDependency sDependency = createDependency(name, jarContent, fileName, artifactId, scopeType);
@@ -284,7 +283,27 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         return sDependency;
     }
 
-    private SDependency createDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyCreationException {
+    public SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
+            throws SDependencyException {
+        try {
+            final SDependency sDependency = getDependencyOfArtifact(artifactId, scopeType, fileName);
+            if (sDependency == null) {
+                throw new SDependencyNotFoundException("unable to find dependency " + fileName + " on artifact: " + artifactId + " with type " + scopeType);
+            }
+            UpdateRecord updateRecord = UpdateRecord.buildSetFields(sDependency, Collections.<String, Object> singletonMap("value_", jarContent));
+            SUpdateEvent updateEvent = null;
+            if (eventService.hasHandlers(DEPENDENCY, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCY).setObject(sDependency).done();
+            }
+            recorder.recordUpdate(updateRecord, updateEvent);
+            return sDependency;
+        } catch (SBonitaReadException | SRecorderException e) {
+            throw new SDependencyException(e);
+        }
+    }
+
+    private SDependency createDependency(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType)
+            throws SDependencyCreationException {
         final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId, scopeType, fileName, jarContent)
                 .done();
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency with name " + sDependency.getName());
