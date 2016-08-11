@@ -42,6 +42,21 @@ public class ActivityInstanceSearchDescriptor {
 
     public static final String DISPLAY_NAME = "displayName";
 
+    /**
+     * Use this field to match a specific type of flow node. <br>
+     * Activity type filter can only be used once per query. <br>
+     * Example of invalid query:<br>
+     *          <ul>
+     *              <li>
+     *                  .leftParenthesis()
+     *                  .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.USER_TASK)
+     *                  .or()
+     *                  .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.HUMAN_TASK)
+     *                  .rightParenthesis()
+     *                  .done();
+     *              </li>
+     *          </ul>
+     */
     public static final String ACTIVITY_TYPE = "activityType";
 
     public static final String LAST_MODIFICATION_DATE = "lastUpdateDate";

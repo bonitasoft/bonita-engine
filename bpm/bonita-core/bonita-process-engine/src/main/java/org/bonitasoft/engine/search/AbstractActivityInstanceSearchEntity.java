@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.search;
 
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
@@ -31,9 +29,12 @@ import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInst
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.service.ModelConvertor;
+
+import java.util.List;
 
 /**
  * @author Yanyan Liu
@@ -103,6 +104,19 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
             }
         }
         return entityClass;
+    }
+
+    @Override
+    protected void validateQuery(final SearchOptions searchOptions) throws SBonitaReadException {
+        validateActivityTypeFilterUnicity(searchOptions);
+    }
+
+    private void validateActivityTypeFilterUnicity(SearchOptions searchOptions) throws SBonitaReadException {
+        for (final SearchFilter searchFilter : searchOptions.getFilters()) {
+            if (ActivityInstanceSearchDescriptor.ACTIVITY_TYPE.equals(searchFilter.getField())) {
+                throw new SBonitaReadException("Invalid query, filtering several times on 'ActivityInstanceSearchDescriptor.ACTIVITY_TYPE' is not supported.");
+            }
+        }
     }
 
     protected Class<? extends PersistentObject> getEntityClass() {
