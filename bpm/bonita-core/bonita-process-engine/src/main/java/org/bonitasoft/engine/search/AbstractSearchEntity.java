@@ -13,11 +13,6 @@
  **/
 package org.bonitasoft.engine.search;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -30,6 +25,11 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Abstract class to allow to search server object and convert them to client object
  *
@@ -37,9 +37,9 @@ import org.bonitasoft.engine.search.impl.SearchResultImpl;
  * @author Baptiste Mesta
  * @author Celine Souchet
  * @param <C>
- *            The client object
+ *        The client object
  * @param <S>
- *            The server object
+ *        The server object
  */
 public abstract class AbstractSearchEntity<C extends Serializable, S extends PersistentObject> implements TransactionContentWithResult<SearchResult<C>> {
 
@@ -53,17 +53,25 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
 
     /**
      * @param searchDescriptor
-     *            The search descriptor of the searched entity
+     *        The search descriptor of the searched entity
      * @param options
-     *            The options of the search
+     *        The options of the search
      */
     public AbstractSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         this.searchDescriptor = searchDescriptor;
         this.options = options;
     }
 
+    protected void validateQuery(SearchOptions options) throws SBonitaException {
+        /*
+         * Used to validate the query before execution,
+         * in order to throw exceptions with meaningful message.
+         */
+    }
+
     @Override
     public void execute() throws SBonitaException {
+        validateQuery(options);
         List<S> serverObjects;
         if (options == null) {
             throw new SBonitaReadException("SearchOptions cannot be null");
@@ -104,7 +112,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * Execute the count here
      *
      * @param queryOptions
-     *            The query options to execute the count with
+     *        The query options to execute the count with
      * @return The number of result on the server
      * @throws SBonitaReadException
      */
@@ -114,7 +122,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * Execute the search here
      *
      * @param queryOptions
-     *            The query options to execute the search with
+     *        The query options to execute the search with
      * @return The list of searched server objects
      * @throws SBonitaReadException
      */
@@ -124,7 +132,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * Must convert server objects in client objects here
      *
      * @param serverObjects
-     *            The server object to convert
+     *        The server object to convert
      * @return The list of the client objects corresponding to the server objects
      */
     public abstract List<C> convertToClientObjects(List<S> serverObjects) throws SBonitaException;

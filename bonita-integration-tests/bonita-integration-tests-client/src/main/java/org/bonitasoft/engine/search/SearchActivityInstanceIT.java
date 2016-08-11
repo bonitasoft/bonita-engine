@@ -13,20 +13,6 @@
  **/
 package org.bonitasoft.engine.search;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -67,6 +53,21 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
+import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -769,7 +770,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedTasks", "Apostrophe" }, jira = "ENGINE-366")
+    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedTasks",
+            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchArchivedTasksWithApostrophe() throws Exception {
         final String taskName = "'Task";
@@ -1065,7 +1067,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         deleteUsers(john, jack, jules);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "Apostrophe" }, jira = "ENGINE-366")
+    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks",
+            "Apostrophe" }, jira = "ENGINE-366")
     public void searchPendingTasksWithApostrophe() throws Exception {
         searchPendingTasks("userTask'1", ACTOR_NAME);
         searchPendingTasks("userTask1", "ACTOR'NAME");
@@ -1142,19 +1145,18 @@ public class SearchActivityInstanceIT extends TestWithUser {
 
         // ********** all fields **********
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, activityInstance2.getType());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.DISPLAY_NAME, activityInstance2.getDisplayName());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.NAME, activityInstance2.getName());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, activityInstance2.getProcessDefinitionId());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, activityInstance2.getRootContainerId());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, activityInstance2.getParentProcessInstanceId());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.LAST_MODIFICATION_DATE, activityInstance2.getLastUpdateDate().getTime());
+        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, activityInstance2.getType())
+                .filter(ActivityInstanceSearchDescriptor.DISPLAY_NAME, activityInstance2.getDisplayName())
+                .filter(ActivityInstanceSearchDescriptor.NAME, activityInstance2.getName())
+                .filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, activityInstance2.getProcessDefinitionId())
+                .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, activityInstance2.getRootContainerId())
+                .filter(ActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, activityInstance2.getParentProcessInstanceId())
+                .filter(ActivityInstanceSearchDescriptor.LAST_MODIFICATION_DATE, activityInstance2.getLastUpdateDate().getTime());
         activityInstancesSearch = getProcessAPI().searchActivities(searchOptionsBuilder.done());
 
         assertEquals(1, activityInstancesSearch.getCount());
         final ActivityInstance activityInstance2Result = activityInstancesSearch.getResult().get(0);
-        assertEquals(activityInstance2,activityInstance2Result);
-
+        assertEquals(activityInstance2, activityInstance2Result);
 
         // ********* DIFFERENT FROM operator *********
         SearchOptionsBuilder sob = new SearchOptionsBuilder(0, 10);
@@ -1180,11 +1182,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         humanTasksSR = getProcessAPI().searchHumanTaskInstances(sob.done());
         assertEquals(2, humanTasksSR.getCount());
 
-
         disableAndDeleteProcess(processDef);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedActivities", "Apostrophe" }, jira = "ENGINE-366")
+    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedActivities",
+            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchActivityTaskInstancesWithApostrophe() throws Exception {
         // define a process containing one userTask.
@@ -1297,7 +1299,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
     @Test
     public void should_search_prevent_injection() throws Exception {
 
-        final SearchResult<FlowNodeInstance> result = getProcessAPI().searchFlowNodeInstances(new SearchOptionsBuilder(0, 10).filter("name", "d');DELETE * FROM TENANTS;select * from flow_node where name=toto").done());
+        final SearchResult<FlowNodeInstance> result = getProcessAPI().searchFlowNodeInstances(
+                new SearchOptionsBuilder(0, 10).filter("name", "d');DELETE * FROM TENANTS;select * from flow_node where name=toto").done());
 
         assertThat(result.getResult()).hasSize(0);
 
