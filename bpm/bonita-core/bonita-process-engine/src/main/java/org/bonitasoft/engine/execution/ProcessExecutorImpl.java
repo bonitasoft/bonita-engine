@@ -32,6 +32,7 @@ import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
@@ -57,6 +58,7 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
@@ -68,6 +70,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -782,6 +785,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            ensureProcessIsEnabled(sProcessDefinition);
             setProcessClassloader(sProcessDefinition);
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContextToEvaluateOperations,
@@ -802,6 +806,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throw new SProcessInstanceCreationException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    private void ensureProcessIsEnabled(final SProcessDefinition sProcessDefinition)
+            throws SProcessDefinitionNotFoundException, SBonitaReadException, SProcessDefinitionException {
+        final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(sProcessDefinition.getId());
+        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            throw new SProcessDefinitionException("The process " + deployInfo.getName() + " " + deployInfo.getVersion() + " is not enabled.",
+                    deployInfo.getProcessId(), deployInfo.getName(), deployInfo.getVersion());
         }
     }
 

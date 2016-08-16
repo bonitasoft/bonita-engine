@@ -40,6 +40,7 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -52,11 +53,13 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
@@ -65,6 +68,7 @@ import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -84,8 +88,12 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.work.WorkService;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
@@ -94,6 +102,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessExecutorImplTest {
+    
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Mock
     private ActivityInstanceService activityInstanceService;
@@ -183,27 +194,45 @@ public class ProcessExecutorImplTest {
     private ProcessExecutorImpl processExecutorImpl;
 
     @Test
-    public void startProcessShouldInitializeBusinessData() throws Exception {
+    public void should_not_start_disabled_process() throws Exception {
         final long starterId = 1L;
         final long starterSubstituteId = 9L;
-        final List<SOperation> operations = new ArrayList<SOperation>(1);
-        operations.add(mock(SOperation.class));
-        final Map<String, Object> context = new HashMap<String, Object>(1);
-        context.put("input", "value");
+        final List<SOperation> operations = new ArrayList<SOperation>();
+        final Map<String, Object> context = new HashMap<String, Object>();
 
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
-        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
-        when(mockedProcessExecutorImpl.start(starterId, starterSubstituteId, null, operations, context, null, -1, selector, null)).thenReturn(
-                sProcessInstance);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
+        long processId = 42L;
+        String processName = "processName";
+        String processVersion = "processVersion";
+        doReturn(processId).when(sProcessDefinitionDeployInfo).getProcessId();
+        doReturn(processName).when(sProcessDefinitionDeployInfo).getName();
+        doReturn(processVersion).when(sProcessDefinitionDeployInfo).getVersion();
+        doReturn(ActivationState.DISABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
 
         // Let's call it for real:
         doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context, null, selector, null);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations, context, null, selector, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, null, operations, context, null, -1, selector, null);
+        
+        exception.expect(SProcessInstanceCreationException.class);
+        final Throwable expectedCause = new SProcessDefinitionException("The process processName processVersion is not enabled.", processId, processName, processVersion);
+        exception.expectCause(new TypeSafeMatcher<Throwable>() {
+            @Override
+            protected boolean matchesSafely(Throwable item) {
+                return expectedCause.getClass().getName().equals(item.getClass().getName()) && expectedCause.getMessage().equals(item.getMessage());
+            }
 
-        Assert.assertNotNull(result);
-        Assert.assertEquals(sProcessInstance, result);
+            @Override
+            public void describeTo(Description description) {
+                description.appendValue(expectedCause);
+                
+            }
+        });
+        
+        mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations, context, null, selector, null);
     }
 
     @Test
@@ -219,11 +248,15 @@ public class ProcessExecutorImplTest {
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
-        when(mockedProcessExecutorImpl.start(starterId, starterSubstituteId, null, operations, context, null, -1, selector, null)).thenReturn(
-                sProcessInstance);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
+        doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
+        when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, -1)).thenReturn(sProcessInstance);
+        when(mockedProcessExecutorImpl.startElements(eq(sProcessInstance), eq(selector))).thenReturn(sProcessInstance);
 
         // Let's call it for real:
         doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, operations, context, null, selector, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, null, operations, context, null, -1, selector, null);
         final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterSubstituteId, operations, context, null, selector, null);
 
         Assert.assertNotNull(result);
@@ -252,6 +285,9 @@ public class ProcessExecutorImplTest {
         doReturn(subProcessDef).when(rootContainerDefinition).getFlowNode(subProcessDefinitionId);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null, subProcessDefinitionId);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
+        doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
         when(mockedProcessExecutorImpl.startElements(sProcessInstance, selector)).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, subProcessDefinitionId)).thenReturn(
                 sProcessInstance);
@@ -293,6 +329,9 @@ public class ProcessExecutorImplTest {
         doReturn(rootContainerDefinition).when(sProcessDefinition).getProcessContainer();
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
+        doReturn(ActivationState.ENABLED.name()).when(sProcessDefinitionDeployInfo).getActivationState();
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(anyLong());
         when(mockedProcessExecutorImpl.startElements(eq(sProcessInstance), eq(selector))).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, 1L)).thenReturn(
                 sProcessInstance);

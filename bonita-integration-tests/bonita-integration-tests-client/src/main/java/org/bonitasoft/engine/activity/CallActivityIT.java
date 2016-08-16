@@ -677,6 +677,21 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDef);
     }
 
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Disabled target" }, jira = "BS-10745")
+    @Test
+    public void callActivityUsingDisabledProcess() throws Exception {
+        final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
+        getProcessAPI().disableProcess(targetProcessDef.getId());
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
+
+        final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
+        assertThat(failedTask.getName()).isEqualTo("callActivity");
+
+        deleteProcess(targetProcessDef.getId());
+        disableAndDeleteProcess(callingProcessDef);
+    }
+
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
     @Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
