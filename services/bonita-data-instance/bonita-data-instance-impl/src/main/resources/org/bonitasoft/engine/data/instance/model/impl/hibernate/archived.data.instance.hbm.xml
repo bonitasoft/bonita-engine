@@ -48,21 +48,21 @@
 	</subclass>
 
 	<subclass name="SALongTextDataInstanceImpl" abstract="false" discriminator-value="SALongTextDataInstanceImpl" extends="SADataInstanceImpl">
-		<property name="value" column="clobValue" type="text" />
+		<property name="value" column="clobValue" type="materialized_clob" />
 	</subclass>
 
 	<subclass name="SAXMLDataInstanceImpl" abstract="false" discriminator-value="SAXMLDataInstanceImpl" extends="SADataInstanceImpl">
-		<property name="value" column="clobValue" type="text" />
+		<property name="value" column="clobValue" type="materialized_clob" />
 		<property name="namespace" column="namespace" type="string" />
 		<property name="element" column="element" type="string" />
 	</subclass>
 
 	<subclass name="SAXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SAXMLObjectDataInstanceImpl" extends="SADataInstanceImpl">
-		<property name="value" column="clobValue" type="text" />
+		<property name="value" column="clobValue" type="materialized_clob"  />
 	</subclass>
 
 	<subclass name="SABlobDataInstanceImpl" abstract="false" discriminator-value="SABlobDataInstanceImpl" extends="SADataInstanceImpl">
-		<property name="value" column="blobValue" />
+		<property name="value" column="blobValue" type="materialized_blob" />
 	</subclass>
 
 	<subclass name="SADateDataInstanceImpl" abstract="false" discriminator-value="SADateDataInstanceImpl" extends="SADataInstanceImpl">

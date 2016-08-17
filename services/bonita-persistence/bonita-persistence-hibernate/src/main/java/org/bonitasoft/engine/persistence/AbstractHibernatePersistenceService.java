@@ -15,18 +15,10 @@ package org.bonitasoft.engine.persistence;
 
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-
 import javax.sql.DataSource;
+import java.lang.InstantiationException;
+import java.util.*;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
@@ -36,13 +28,7 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.hibernate.AssertionFailure;
-import org.hibernate.HibernateException;
-import org.hibernate.Interceptor;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.StaleStateException;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.mapping.PersistentClass;
@@ -57,6 +43,7 @@ import org.hibernate.stat.Statistics;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  * @author Laurent Vaills
+ * @author Guillaume Rosinosky
  */
 public abstract class AbstractHibernatePersistenceService extends AbstractDBPersistenceService {
 
@@ -139,6 +126,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         if (dialect != null) {
             if (dialect.contains("PostgreSQL")) {
                 configuration.setInterceptor(new PostgresInterceptor());
+                configuration.registerTypeOverride(new PostgresMaterializedBlobType());
+                configuration.registerTypeOverride(new PostgresMaterializedClobType());
             } else if (dialect.contains("SQLServer")) {
                 configuration.setInterceptor(new SQLServerInterceptor());
             }

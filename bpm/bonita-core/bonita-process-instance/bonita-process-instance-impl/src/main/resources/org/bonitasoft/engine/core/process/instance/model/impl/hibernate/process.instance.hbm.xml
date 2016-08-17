@@ -186,7 +186,7 @@
         <property name="state" column="state" />
         <property name="executionOrder" column="executionOrder" />
         <property name="exceptionMessage" column="exceptionMessage" />
-        <property name="stackTrace" column="stackTrace" type="text" />
+        <property name="stackTrace" column="stackTrace" type="materialized_clob"  />
         <filter name="tenantFilter" />
     </class>
 
