@@ -36,7 +36,7 @@
             </type>
         </property>
         <property name="processDefinitionId" column="process_id" />
-        <property name="content" column="content" />
+        <property name="content" type="materialized_blob" column="content" />
         <filter name="tenantFilter" />
     </class>
 
@@ -68,7 +68,7 @@
                 </param>
             </type>
         </property>
-        <property name="content" column="content" />
+        <property name="content" type="materialized_blob" column="content" />
         <filter name="tenantFilter" />
     </class>
 

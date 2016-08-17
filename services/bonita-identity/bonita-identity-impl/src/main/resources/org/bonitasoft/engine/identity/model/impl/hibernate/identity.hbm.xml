@@ -135,7 +135,7 @@
             <key-property name="id" column="id" type="long" />
         </composite-id>
         <property name="mimeType" type="java.lang.String" column="mimetype" />
-        <property name="content" column="content" />
+        <property name="content" type="materialized_blob" column="content" />
         <filter name="tenantFilter" />
     </class>
 

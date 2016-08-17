@@ -13,7 +13,7 @@
 			<key-property name="tenantId" column="tenantid" type="long"/>
 			<key-property name="id" column="ID" type="long"/>
 		</composite-id>
-		<property name="value" column="blobValue" type="blob"/>
+		<property name="value" column="blobValue" type="materialized_blob"/>
 		<filter name="tenantFilter" />
 	</class>
 

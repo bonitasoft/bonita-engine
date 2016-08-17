@@ -27,7 +27,7 @@
         </composite-id>
         <property name="processDefinitionId" column="process_id" />
         <property name="name" column="name" />
-        <property name="value" column="value" />
+        <property name="value" type="materialized_clob" column="value" />
         <filter name="tenantFilter" />
     </class>
 
