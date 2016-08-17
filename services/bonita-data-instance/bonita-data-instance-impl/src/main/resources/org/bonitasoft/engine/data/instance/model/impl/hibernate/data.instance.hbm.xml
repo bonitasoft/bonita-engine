@@ -46,21 +46,21 @@
 	</subclass>
 
 	<subclass name="SLongTextDataInstanceImpl" abstract="false" discriminator-value="SLongTextDataInstanceImpl" extends="SDataInstanceImpl">
-		<property name="value" column="clobValue" type="text" />
+		<property name="value" column="clobValue" type="materialized_clob"  />
 	</subclass>
 
 	<subclass name="SXMLDataInstanceImpl" abstract="false" discriminator-value="SXMLDataInstanceImpl" extends="SDataInstanceImpl">
-		<property name="value" column="clobValue" type="text" />
+		<property name="value" column="clobValue" type="materialized_clob"  />
 		<property name="namespace" column="namespace" type="string" />
 		<property name="element" column="element" type="string" />
 	</subclass>
 
 	<subclass name="SBlobDataInstanceImpl" abstract="false" discriminator-value="SBlobDataInstanceImpl" extends="SDataInstanceImpl">
-		<property name="value" column="blobValue" />
+		<property name="value" column="blobValue" type="materialized_blob" />
 	</subclass>
 
 	<subclass name="SXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SXMLObjectDataInstanceImpl" extends="SDataInstanceImpl">
-		<property name="value" column="clobValue" type="text" />
+		<property name="value" column="clobValue" type="materialized_clob" />
 	</subclass>
 
 	<subclass name="SDateDataInstanceImpl" abstract="false" discriminator-value="SDateDataInstanceImpl" extends="SDataInstanceImpl">
