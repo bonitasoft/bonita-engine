@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Emmanuel Duchastenier
  */
 @Component
-@PropertySource("classpath:/database.properties")
+@PropertySource(value = { "classpath:/database.properties", "classpath:/internal.properties" })
 @Profile("default")
 public class GenericDataSourceConfig {
 

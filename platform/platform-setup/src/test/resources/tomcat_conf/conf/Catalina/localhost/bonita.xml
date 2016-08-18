@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+
+    <!--  To not persist the session after reboot tomcat -->
+    <Manager pathname="" />
+
+    <!-- ##################################################### -->
+    <!-- Configure Datasource for Bonita BPM standard database -->
+    <!-- ##################################################### -->
+    <Resource name="bonitaDS" auth="Container" type="javax.sql.DataSource" factory="bitronix.tm.resource.ResourceObjectFactory" uniqueName="jdbc/bonitaDSXA" />
+
+    <!-- Template for automatic configuration, leave it untouched: -->
+    <!-- @@Resource name="bonitaSequenceManagerDS" auth="Container" type="javax.sql.DataSource" factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="17" minIdle="5" maxWait="10000" initialSize="3" validationInterval="30000" removeAbandoned="true" logAbandoned="true" validationQuery="ds1.database_test_query" username="ds1.database_connection_user" password="ds1.database_connection_password" driverClassName="ds1.driver_class_name" url="ds1.database_connection_url"/@@-->
+
+    <!-- H2 Example -->
+    <Resource name="bonitaSequenceManagerDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="sa"
+              password=""
+              driverClassName="org.h2.Driver"
+              url="jdbc:h2:tcp://localhost:9091/bonita_journal.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;" />
+
+    <!-- Postgresql Example -->
+    <!-- Resource name="bonitaSequenceManagerDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/bonita"/ -->
+
+    <!-- Oracle Example -->
+    <!-- Resource name="bonitaSequenceManagerDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1 FROM dual"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="oracle.jdbc.OracleDriver"
+              url="jdbc:oracle:thin:@localhost:1521:XE"/ -->
+
+    <!-- SQL Server Example -->
+    <!-- Resource name="bonitaSequenceManagerDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+              url="jdbc:sqlserver://localhost:1433;database=journal"/ -->
+
+    <!-- MySQL Example -->
+    <!-- Resource name="bonitaSequenceManagerDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/bonita?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"/ -->
+
+    <!-- ##################################################### -->
+    <!-- Configure Business Data Datasource -->
+    <!-- ##################################################### -->
+    <Resource name="BusinessDataDS" auth="Container" type="javax.sql.DataSource" factory="bitronix.tm.resource.ResourceObjectFactory" uniqueName="jdbc/BusinessDataDSXA" />
+
+    <!-- For automatic configuration: -->
+    <!-- Resource name="NotManagedBizDataDS" auth="Container" type="javax.sql.DataSource" factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="17" minIdle="5" maxWait="10000" initialSize="3" validationInterval="30000" removeAbandoned="true" logAbandoned="true" validationQuery="ds2.database_test_query" username="ds2.database_connection_user" password="ds2.database_connection_password" driverClassName="ds2.driver_class_name" url="ds2.database_connection_url"/ -->
+
+    <!-- H2 Example -->
+    <Resource name="NotManagedBizDataDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="sa"
+              password=""
+              driverClassName="org.h2.Driver"
+              url="jdbc:h2:tcp://localhost:9091/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;" />
+
+    <!-- Postgresql Example -->
+    <!-- Resource name="NotManagedBizDataDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/business_data"/ -->
+
+    <!-- Oracle Example -->
+    <!-- Resource name="NotManagedBizDataDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1 FROM dual"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="business_data"
+              password="bpm"
+              driverClassName="oracle.jdbc.OracleDriver"
+              url="jdbc:oracle:thin:@localhost:1521:XE"/ -->
+
+    <!-- SQL Server Example -->
+    <!-- Resource name="NotManagedBizDataDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+              url="jdbc:sqlserver://localhost:1433;database=business_data"/ -->
+²
+    <!-- MySQL Example -->
+    <!-- Resource name="NotManagedBizDataDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxActive="17"
+              minIdle="5"
+              maxIdle="17"
+              maxWait="10000"
+              initialSize="3"
+              validationQuery="SELECT 1"
+              validationInterval="30000"
+              removeAbandoned="true"
+              logAbandoned="true"
+              username="bonita"
+              password="bpm"
+              driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/business_data?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"/ -->
+
+</Context>
