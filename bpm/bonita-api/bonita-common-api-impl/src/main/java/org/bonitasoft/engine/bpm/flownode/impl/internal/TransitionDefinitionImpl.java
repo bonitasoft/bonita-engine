@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import static org.bonitasoft.engine.expression.ExpressionBuilder.getNonNullCopy;
+import static org.bonitasoft.engine.expression.ExpressionBuilder.*;
 
 import java.util.Objects;
 
@@ -30,6 +30,8 @@ import org.bonitasoft.engine.bpm.internal.NamedDefinitionElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Baptiste Mesta
@@ -72,6 +74,7 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
     }
 
     @Override
+    @JsonIgnore
     public FlowNodeDefinition getSourceFlowNode() {
         return source;
     }
@@ -82,6 +85,7 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
     }
 
     @Override
+    @JsonIgnore
     public FlowNodeDefinition getTargetFlowNode() {
         return target;
     }
@@ -106,12 +110,15 @@ public class TransitionDefinitionImpl extends NamedDefinitionElementImpl impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        if (!super.equals(o))
+        }
+        if (!super.equals(o)) {
             return false;
+        }
         TransitionDefinitionImpl that = (TransitionDefinitionImpl) o;
         return Objects.equals(getSource(), that.getSource()) &&
                 Objects.equals(getTarget(), that.getTarget()) &&
