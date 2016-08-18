@@ -111,6 +111,7 @@ public class PlatformSetupTestUtils {
     private static Properties getDatabaseProperties(File distFolder) throws IOException {
         Properties properties = new Properties();
         properties.load(new FileInputStream(distFolder.toPath().resolve("database.properties").toFile()));
+        properties.load(new FileInputStream(distFolder.toPath().resolve("internal.properties").toFile()));
         return properties;
     }
 

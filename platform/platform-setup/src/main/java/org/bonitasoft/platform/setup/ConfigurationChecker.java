@@ -40,9 +40,10 @@ public class ConfigurationChecker {
         final Properties properties = new Properties();
         try {
             properties.load(this.getClass().getResourceAsStream("/database.properties"));
+            properties.load(this.getClass().getResourceAsStream("/internal.properties"));
         } catch (IOException e) {
-            throw new PlatformException("Error reading configuration file database.properties." +
-                    " Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted", e);
+            throw new PlatformException("Error reading configuration files 'database.properties' and 'internal.properties'." +
+                    " Please make sure the files are present at the root of the Platform Setup Tool folder, and that they have not been moved or deleted", e);
         }
         dbVendor = properties.getProperty("db.vendor");
         final String sysPropDbVendor = System.getProperty("sysprop.bonita.db.vendor");
@@ -50,11 +51,11 @@ public class ConfigurationChecker {
             LOGGER.debug("'sysprop.bonita.db.vendor' set to '" + sysPropDbVendor + "', overriding value from file database.properties.");
             dbVendor = sysPropDbVendor;
         }
-        driverClassName = properties.getProperty(dbVendor + ".driverClassName");
+        driverClassName = properties.getProperty(dbVendor + ".nonXaDriver");
         if (driverClassName == null) {
             throw new PlatformException("Driver class name not set for database " + dbVendor
-                    + " in file database.properties. In most cases, you should not edit the default driver class name value." +
-                    " Please ensure ");
+                    + " in file 'internal.properties'. In most cases, you should not edit the default driver class name value." +
+                    " Please ensure that the declared driver class name is present in you driver jar / zip file in the lib/ folder.");
         }
     }
 
@@ -72,7 +73,7 @@ public class ConfigurationChecker {
             Class.forName(driverClass);
         } catch (ClassNotFoundException e) {
             throw new PlatformException("The driver class named '" + driverClass
-                    + "' specified in 'database.properties' configuration file, to connect to your '" + dbVendor + "' database, cannot be found." +
+                    + "' specified in 'internal.properties' configuration file, to connect to your '" + dbVendor + "' database, cannot be found." +
                     " Either there is an error in the name of the class or the class is not available in the classpath." +
                     " Make sure the driver class name is correct and that the suitable driver is available in the lib/ folder and then try again.",
                     e);
