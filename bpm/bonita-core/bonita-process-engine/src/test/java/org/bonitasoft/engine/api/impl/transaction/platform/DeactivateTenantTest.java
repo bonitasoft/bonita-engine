@@ -14,8 +14,8 @@
 
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -56,4 +56,14 @@ public class DeactivateTenantTest {
         verify(schedulerService).pauseJobs(tenantId);
     }
 
+    @Test
+    public void should_not_delete_jobs_other_than_default_jobs() throws Exception {
+        doReturn(true).when(schedulerService).isStarted();
+
+        deactivateTenant.execute();
+
+        verify(schedulerService, times(2)).delete(anyString());
+        verify(schedulerService).delete(ActivateTenant.BPM_EVENT_HANDLING);
+        verify(schedulerService).delete(ActivateTenant.CLEAN_INVALID_SESSIONS);
+    }
 }
