@@ -28,11 +28,11 @@ psql postgresql://bonita:bpm@localhost:5432/bonita -q -f ${E2E_DIR}/platform_con
 
 echo "========================================"
 echo "configure postgres"
-sed -i s/db.vendor=h2/db.vendor=postgres/g ${E2E_DIR}/database.properties
-sed -i s/db.user=.*/db.user=bonita/g ${E2E_DIR}/database.properties
-sed -i s/db.password=.*/db.password=bpm/g ${E2E_DIR}/database.properties
-sed -i s/#db.server.port=.*/db.server.port=5432/g ${E2E_DIR}/database.properties
-sed -i s/db.database.name=.*/db.database.name=bonita/g ${E2E_DIR}/database.properties
+sed -i s/^db.vendor=h2/db.vendor=postgres/g ${E2E_DIR}/database.properties
+sed -i s/^db.user=.*/db.user=bonita/g ${E2E_DIR}/database.properties
+sed -i s/^db.password=.*/db.password=bpm/g ${E2E_DIR}/database.properties
+sed -i "s/^#[ ]*db.server.port=.*/db.server.port=5432/g" ${E2E_DIR}/database.properties
+sed -i s/^db.database.name=.*/db.database.name=bonita/g ${E2E_DIR}/database.properties
 cat ${E2E_DIR}/database.properties
 echo "========================================"
 
@@ -165,13 +165,13 @@ echo "========================================"
 echo "========================================"
 echo "should fail if driver class cannot be loaded:"
 echo "========================================"
-sed -i s/^postgres.driverClassName=.*$/postgres.driverClassName=org.UnknownClass/g ${E2E_DIR}/database.properties
+sed -i s/^postgres.nonXaDriver=.*$/postgres.nonXaDriver=org.UnknownClass/g ${E2E_DIR}/internal.properties
 ${E2E_DIR}/setup.sh push
 
 echo "========================================"
 echo "should fail if drivers not found:"
 echo "========================================"
-sed -i s/^postgres.driverClassName=org.UnknownClass*$/postgres.driverClassName=org.postgresql.Driver/g ${E2E_DIR}/database.properties
+sed -i s/^postgres.nonXaDriver=org.UnknownClass*$/postgres.nonXaDriver=org.postgresql.Driver/g ${E2E_DIR}/internal.properties
 rm ${E2E_DIR}/lib/postgres*.jar
 ${E2E_DIR}/setup.sh push
 

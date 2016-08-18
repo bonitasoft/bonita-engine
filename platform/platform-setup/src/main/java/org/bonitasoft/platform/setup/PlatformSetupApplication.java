@@ -27,7 +27,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author Emmanuel Duchastenier
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration", "org.bonitasoft.platform.version"})
+@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration", "org.bonitasoft.platform.version" })
 public class PlatformSetupApplication {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSetupApplication.class);
@@ -64,7 +64,13 @@ public class PlatformSetupApplication {
                 displayMessageAndExit("null");
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Unexpected error:", e);
+            } else {
+                LOGGER.error(e.getMessage());
+                LOGGER.error(
+                        "To get more detailed information about the error, set 'org.bonitasoft.platform.setup.PlatformSetupApplication' log level to 'DEBUG' and run again");
+            }
             // Exit code allows the calling script to catch an invalid execution:
             System.exit(1);
         }
@@ -89,6 +95,7 @@ public class PlatformSetupApplication {
     }
 
     private static void init(ConfigurableApplicationContext run) throws PlatformException {
+        new BundleConfigurator().configureApplicationServer();
         run.getBean(PlatformSetup.class).init();
     }
 }
