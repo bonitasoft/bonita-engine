@@ -1,0 +1,12 @@
+INSERT INTO sequence VALUES (-1, 1, 1)
+GO
+INSERT INTO sequence VALUES (-1, 2, 1)
+GO
+INSERT INTO sequence VALUES (-1, 3, 1)
+GO
+INSERT INTO sequence VALUES (-1, 4, 1)
+GO
+INSERT INTO sequence VALUES (-1, 30, 1)
+GO
+INSERT INTO sequence VALUES (-1, 31, 1)
+GO
