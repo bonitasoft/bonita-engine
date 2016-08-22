@@ -154,6 +154,7 @@
                         <phase>pre-integration-test</phase>
                         <inherited>false</inherited>
                         <configuration>
+                            <skip>${skipTests}</skip>
                             <target>
                                 <taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath" />
                                 <available property="tomcat.present" file="${tomcat.zip.folder}/${tomcat.name}.zip" />
@@ -262,6 +263,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>${skipTests}</skip>
                     <container>
                         <containerId>tomcat7x</containerId>
                         <type>installed</type>
