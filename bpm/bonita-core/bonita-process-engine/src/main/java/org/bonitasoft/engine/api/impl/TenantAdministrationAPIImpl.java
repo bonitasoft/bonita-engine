@@ -170,7 +170,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);
         } catch (STransactionNotFoundException e) {
-            throw new UpdateException("Unable to restart tenant handlers.", e);
+            throw new UpdateException("Unable to resume the tenant restart handlers.", e);
         }
     }
 
