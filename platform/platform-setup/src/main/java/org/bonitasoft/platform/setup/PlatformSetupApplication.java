@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.platform.setup;
 
+import java.util.Map;
+
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
 import org.slf4j.Logger;
@@ -27,7 +29,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author Emmanuel Duchastenier
  */
 @SpringBootApplication
-@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration", "org.bonitasoft.platform.version" })
+@ComponentScan(basePackages = {"org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration", "org.bonitasoft.platform.version"})
 public class PlatformSetupApplication {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSetupApplication.class);
@@ -43,6 +45,10 @@ public class PlatformSetupApplication {
     PlatformSetup platformSetup;
 
     public static void main(String[] args) throws Exception {
+
+        for (Map.Entry<Object, Object> objectObjectEntry : System.getProperties().entrySet()) {
+            System.out.println("prop " + objectObjectEntry.getKey() + " = " + objectObjectEntry.getValue());
+        }
         try {
             final String action = System.getProperty(PlatformSetup.BONITA_SETUP_ACTION);
 
