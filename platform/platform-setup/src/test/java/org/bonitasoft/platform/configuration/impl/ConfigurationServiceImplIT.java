@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
@@ -34,7 +33,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,8 +57,8 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 //keep order
 @SpringApplicationConfiguration(classes = {
-        PlatformSetupApplication.class })
-@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration" })
+        PlatformSetupApplication.class})
+@ComponentScan(basePackages = {"org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration"})
 @PropertySource("classpath:/application.properties")
 @Component
 public class ConfigurationServiceImplIT {
@@ -83,6 +84,9 @@ public class ConfigurationServiceImplIT {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule
+    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name=",
+            "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Before
     public void setUpDb() throws Exception {

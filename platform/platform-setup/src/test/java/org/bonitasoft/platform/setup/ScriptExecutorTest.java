@@ -16,7 +16,10 @@ package org.bonitasoft.platform.setup;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.ClearSystemProperties;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -31,6 +34,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
         PlatformSetupApplication.class
 })
 public class ScriptExecutorTest {
+    @Rule
+    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name=",
+            "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;

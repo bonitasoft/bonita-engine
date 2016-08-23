@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
@@ -30,7 +30,8 @@ import org.junit.rules.TestRule;
 public class ConfigurationCheckerTest {
 
     @Rule
-    public final TestRule restoreSystemProperties = new RestoreSystemProperties();
+    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name=",
+            "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

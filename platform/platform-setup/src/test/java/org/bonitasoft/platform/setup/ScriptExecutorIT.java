@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
         PlatformSetupApplication.class
 })
 public class ScriptExecutorIT {
+    @Rule
+    public TestRule clean = new ClearSystemProperties(BONITA_SETUP_FOLDER, "db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name=",
+            "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;
@@ -62,9 +66,6 @@ public class ScriptExecutorIT {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    @Rule
-    public ClearSystemProperties clearSystemProperties = new ClearSystemProperties(BONITA_SETUP_FOLDER);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
