@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.platform.setup;
 
-import java.util.Map;
-
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
 import org.slf4j.Logger;
@@ -45,10 +43,6 @@ public class PlatformSetupApplication {
     PlatformSetup platformSetup;
 
     public static void main(String[] args) throws Exception {
-
-        for (Map.Entry<Object, Object> objectObjectEntry : System.getProperties().entrySet()) {
-            System.out.println("prop " + objectObjectEntry.getKey() + " = " + objectObjectEntry.getValue());
-        }
         try {
             final String action = System.getProperty(PlatformSetup.BONITA_SETUP_ACTION);
 
