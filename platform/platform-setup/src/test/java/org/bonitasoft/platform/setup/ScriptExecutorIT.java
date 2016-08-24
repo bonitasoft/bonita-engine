@@ -49,8 +49,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 })
 public class ScriptExecutorIT {
     @Rule
-    public TestRule clean = new ClearSystemProperties(BONITA_SETUP_FOLDER, "db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name=",
-            "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
+    public TestRule clean = new ClearSystemProperties(BONITA_SETUP_FOLDER);
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;

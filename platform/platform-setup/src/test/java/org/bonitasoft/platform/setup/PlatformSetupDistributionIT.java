@@ -20,7 +20,6 @@ import java.io.File;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +56,6 @@ public class PlatformSetupDistributionIT {
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("init");
         DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
-        System.out.println(FileUtils.readFileToString(new File(distFolder, "database.properties")));
         //when
         int iExitValue = executor.execute(oCmdLine);
         //then
