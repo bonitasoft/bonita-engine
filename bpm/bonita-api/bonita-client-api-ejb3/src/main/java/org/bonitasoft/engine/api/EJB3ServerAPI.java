@@ -40,7 +40,7 @@ public class EJB3ServerAPI implements ServerAPI {
 
     protected volatile ServerAPI remoteServAPI;
 
-    protected static final String SERVER_API_BEAN_NAME_JBOSS7 = "ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI";
+    protected static final String SERVER_API_BEAN_NAME = "ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI";
 
     protected Map<String, String> parameters;
 
@@ -71,7 +71,7 @@ public class EJB3ServerAPI implements ServerAPI {
     protected void initServerAPIReference() throws ServerAPIException {
         String serverAPIBeanName;
         if (parameters == null || (serverAPIBeanName = parameters.get(EJB_NAMING_REFERENCE_PROPERTY)) == null) {
-            serverAPIBeanName = SERVER_API_BEAN_NAME_JBOSS7;
+            serverAPIBeanName = SERVER_API_BEAN_NAME;
         }
         try {
             remoteServAPI = lookup(serverAPIBeanName, new Hashtable<String, String>(
