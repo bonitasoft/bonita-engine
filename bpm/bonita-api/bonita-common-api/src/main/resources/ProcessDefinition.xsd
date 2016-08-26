@@ -965,6 +965,7 @@
       <xs:enumeration value="BYTE_ARRAY"/>
       <xs:enumeration value="DATE"/>
       <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="LONG"/>
     </xs:restriction>
   </xs:simpleType>
 

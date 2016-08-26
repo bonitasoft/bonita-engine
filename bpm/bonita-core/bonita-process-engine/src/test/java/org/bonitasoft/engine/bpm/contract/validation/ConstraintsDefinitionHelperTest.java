@@ -40,7 +40,7 @@ public class ConstraintsDefinitionHelperTest {
         final SContractDefinition contract = buildContract();
 
         //when
-        final String[] inputNames = { "user", "firstName", "lastName", "nature", "simple", "expenseLine", "date" };
+        final String[] inputNames = { "user", "firstName", "lastName", "userId", "nature", "simple", "expenseLine", "date" };
         for (final String inputName : inputNames) {
             //then
             checkDefinitionIsFound(contract, inputName);
@@ -60,7 +60,8 @@ public class ConstraintsDefinitionHelperTest {
         final SContractDefinition contract = aContract()
                 .withInput(
                         aComplexInput().withName("user").withInput(aSimpleInput(SType.TEXT).withName("firstName").build())
-                                .withInput(aSimpleInput(SType.TEXT).withName("lastName").build()))
+                                .withInput(aSimpleInput(SType.TEXT).withName("lastName").build())
+                                .withInput(aSimpleInput(SType.LONG).withName("userId").build()))
                 .withInput(
                         aComplexInput()
                                 .withName("expenseReport")
