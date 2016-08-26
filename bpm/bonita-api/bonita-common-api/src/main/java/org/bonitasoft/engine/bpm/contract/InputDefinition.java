@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.contract;
 
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**

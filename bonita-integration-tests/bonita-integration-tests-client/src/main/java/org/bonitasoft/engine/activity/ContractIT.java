@@ -93,12 +93,14 @@ public class ContractIT extends CommonAPIIT {
         // have a initial data value using process input, so that we ensure inputs are treated before data at process instantiation:
         builder.addData("nbDaysProcessData", Integer.class.getName(),
                 new ExpressionBuilder().createContractInputExpression(numberOfDaysProcessContractData, Integer.class.getName()));
+        builder.addData("idData", Long.class.getName(), new ExpressionBuilder().createContractInputExpression("id", Long.class.getName()));
         builder.addData("multipleTextData", List.class.getName(), new ExpressionBuilder().createContractInputExpression("multipleText", List.class.getName()));
         builder.addData("complexData", Map.class.getName(), new ExpressionBuilder().createContractInputExpression("complex", Map.class.getName()));
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME);
         final ContractDefinitionBuilder contract = builder.addContract();
         contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null);
+        contract.addInput("id", Type.LONG, null);
         contract.addInput("multipleText", Type.TEXT, "a multiple text", true);
         contract.addComplexInput("complex", "a complex input").addInput("text", Type.TEXT, "text in complex");
 
@@ -112,6 +114,7 @@ public class ContractIT extends CommonAPIIT {
         inputs.put(numberOfDaysProcessContractData, value);
         final ArrayList<String> multiples = new ArrayList<>(Arrays.asList("String1", "String2"));
         inputs.put("multipleText", multiples);
+        inputs.put("id", 1L);
         final HashMap<Object, Object> map = new HashMap<>();
         map.put("text", "textValue");
         inputs.put("complex", map);
@@ -119,17 +122,19 @@ public class ContractIT extends CommonAPIIT {
         try {
             getProcessAPI().startProcessWithInputs(processDefinition.getId(), Collections.<String, Serializable> emptyMap());
             fail("Should throw a contract violation exception");
-        } catch (ContractViolationException e) {
+        } catch (final ContractViolationException e) {
             assertThat(e.getMessage()).contains("multipleText", "complex");
         }
         //start with right inputs
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
-        final DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
+        final DataInstance processDataValueInitializedFromIntInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
+        final DataInstance processDataValueInitializedFromLongInput = getProcessAPI().getProcessDataInstance("idData", processInstance.getId());
         assertThat(getProcessAPI().getProcessDataInstance("multipleTextData", processInstance.getId()).getValue()).isEqualTo(multiples);
         assertThat(getProcessAPI().getProcessDataInstance("complexData", processInstance.getId()).getValue()).isEqualTo(map);
-        assertThat(processDataValueInitializedFromInput.getValue()).isEqualTo(value);
-
+        assertThat(processDataValueInitializedFromIntInput.getValue()).isEqualTo(value);
+        assertThat(processDataValueInitializedFromLongInput.getValue()).isEqualTo( 1L);
+        
         final Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
                 numberOfDaysProcessContractData);
         assertThat(processInstanciationInputValue).isEqualTo(value);
@@ -272,15 +277,19 @@ public class ContractIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_execute_a_contract_with_integer_in_decimal() throws Exception {
+    public void should_execute_a_contract_with_integer_in_decimal_or_long() throws Exception {
         //given
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTask = builder.addUserTask(TASK1, ACTOR_NAME);
         userTask.addContract().addInput("decimal", Type.DECIMAL, null);
-        userTask.addData("variable", Number.class.getName(), null);
-        userTask.addOperation(new OperationBuilder().createSetDataOperation("variable",
+        userTask.addContract().addInput("long", Type.LONG, null);
+        userTask.addData("decimalVariable", Number.class.getName(), null);
+        userTask.addData("longVariable", Number.class.getName(), null);
+        userTask.addOperation(new OperationBuilder().createSetDataOperation("decimalVariable",
                 new ExpressionBuilder().createContractInputExpression("decimal", Number.class.getName())));
+        userTask.addOperation(new OperationBuilder().createSetDataOperation("longVariable",
+                new ExpressionBuilder().createContractInputExpression("long", Number.class.getName())));
 
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -291,6 +300,7 @@ public class ContractIT extends CommonAPIIT {
         //then
         final Map<String, Serializable> map = new HashMap<>();
         map.put("decimal", 2);
+        map.put("long", 100);
         getProcessAPI().executeUserTask(task.getId(), map);
 
         //clean up
@@ -392,7 +402,7 @@ public class ContractIT extends CommonAPIIT {
         assertThat((List<Object>) getProcessAPI().getArchivedActivityDataInstance("receiptsData", userTask.getId()).getValue()).as("should have multiple file")
                 .containsExactly(receipt1, receipt2);
         final List<Document> receiptsAsDoc = getProcessAPI().getDocumentList(processInstance.getId(), "receiptsAsDoc", 0, 100);
-        Document reportAsDoc = getProcessAPI().getLastDocument(processInstance.getId(), "reportAsDoc");
+        final Document reportAsDoc = getProcessAPI().getLastDocument(processInstance.getId(), "reportAsDoc");
 
         assertThat(reportAsDoc.getContentFileName()).as("document file name").isEqualTo("report.pdf");
         assertThat(getProcessAPI().getDocumentContent(reportAsDoc.getContentStorageId())).as("document content").isEqualTo(new byte[] { 0, 1, 2, 3 });
@@ -425,7 +435,7 @@ public class ContractIT extends CommonAPIIT {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
                 .addInput("input", Type.TEXT, "multiple input", true);
-        final List<String> inputs = new ArrayList<String>();
+        final List<String> inputs = new ArrayList<>();
         userTaskDefinitionBuilder.addData("inputListData", inputs.getClass().getName(), null);
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("inputListData",
                 new ExpressionBuilder().createContractInputExpression("input", inputs.getClass().getName())));

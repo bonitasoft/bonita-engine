@@ -342,4 +342,28 @@ public class ContractTypeValidatorTest {
         assertThat(errorReporter.hasError()).isFalse();
     }
 
+    @Test
+    public void should_long_validate_accept_integer() throws Exception {
+        //given
+        final SInputDefinition definition = aSimpleInput(SType.LONG).build();
+
+        //when
+        contractTypeValidator.validate(definition, 2, errorReporter);
+
+        // then
+        assertThat(errorReporter.hasError()).overridingErrorMessage(errorReporter.getErrors().toString()).isFalse();
+    }
+    
+    @Test
+    public void should_validate_accept_long() throws Exception {
+        //given
+        final SInputDefinition definition = aSimpleInput(SType.LONG).build();
+
+        //when
+        contractTypeValidator.validate(definition, 10L, errorReporter);
+
+        // then
+        assertThat(errorReporter.hasError()).overridingErrorMessage(errorReporter.getErrors().toString()).isFalse();
+    }
+
 }

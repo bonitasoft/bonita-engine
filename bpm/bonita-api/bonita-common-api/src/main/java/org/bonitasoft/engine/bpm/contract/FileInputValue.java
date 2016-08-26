@@ -15,15 +15,8 @@
 package org.bonitasoft.engine.bpm.contract;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author Baptiste Mesta
@@ -79,7 +72,7 @@ public class FileInputValue implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FileInputValue that = (FileInputValue) o;
+        final FileInputValue that = (FileInputValue) o;
         return Objects.equals(fileName, that.fileName) &&
                 Arrays.equals(content, that.content);
     }
