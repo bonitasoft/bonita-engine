@@ -120,7 +120,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>JBoss AS installation</id>
+                        <id>Wildfly AS installation</id>
                         <goals>
                             <goal>run</goal>
                         </goals>
@@ -135,10 +135,10 @@
                                 <property name="wildfly.deploy.dir" value="${wildfly.home}/standalone/deployments"/>
 
                                 <!-- Download wildfly if needed -->
-                                <available property="jboss.present" file="${wildfly.zip.folder}/${wildfly.name}.zip" />
+                                <available property="wildfly.present" file="${wildfly.zip.folder}/${wildfly.name}.zip" />
                                 <if>
                                     <not>
-                                        <isset property="jboss.present" />
+                                        <isset property="wildfly.present" />
                                     </not>
                                     <then>
                                         <get src="${wildfly.url}" dest="${wildfly.zip.folder}/${wildfly.name}.zip" />
@@ -152,6 +152,8 @@
                                         <include name="${db.vendor}-ds.xml" />
                                     </fileset>
                                 </copy>
+                                <copy todir="${wildfly.home}/modules/system/layers/base/sun/jdk/main/"
+                                            file="${basedir}/src/main/resources/jdk/module.xml" />
 
                                 <if>
                                     <not>
@@ -172,10 +174,10 @@
                                         <replace file="${wildfly.deploy.dir}/${db.vendor}-ds.xml" token="#database.name#"
                                                  value="${database.name}" />
 
-                                        <mkdir dir="${wildfly.home}/modules/org/postgresql/main/" />
-                                        <copy todir="${wildfly.home}/modules/org/postgresql/main/"
+                                        <mkdir dir="${wildfly.home}/modules/system/layers/base/org/postgresql/main/" />
+                                        <copy todir="${wildfly.home}/modules/system/layers/base/org/postgresql/main/"
                                               file="${basedir}/src/main/resources/${db.vendor}/module.xml" />
-                                        <copy todir="${wildfly.home}/modules/org/postgresql/main/"
+                                        <copy todir="${wildfly.home}/modules/system/layers/base/org/postgresql/main/"
                                               file="${project.build.directory}/driver/postgresql.jar" />
                                         <replace file="${wildfly.conf.dir}/standalone.xml"
                                                  token="&lt;/drivers&gt;"
@@ -245,6 +247,7 @@
                             <cargo.jboss.configuration>standalone</cargo.jboss.configuration>
                             <cargo.servlet.port>${wildfly.web.port}</cargo.servlet.port>
                             <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
+                            <cargo.jboss.management-http.port>${wildfly.management.web.port}</cargo.jboss.management-http.port>
                         </properties>
                     </configuration>
                     <deployables>

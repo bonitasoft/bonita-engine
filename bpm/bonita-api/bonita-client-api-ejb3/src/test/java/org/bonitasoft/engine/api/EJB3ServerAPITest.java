@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.api;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -47,9 +47,9 @@ public class EJB3ServerAPITest {
 
     @Test
     public void testEJB3ServerAPI_calls_default_reference_on_init() throws Exception {
-        doReturn(mock(ServerAPI.class)).when(ejb3ServerAPI).lookup(eq(EJB3ServerAPI.SERVER_API_BEAN_NAME_JBOSS7), any(Hashtable.class));
+        doReturn(mock(ServerAPI.class)).when(ejb3ServerAPI).lookup(eq(EJB3ServerAPI.SERVER_API_BEAN_NAME), any(Hashtable.class));
         ejb3ServerAPI.initServerAPIReference();
-        verify(ejb3ServerAPI).lookup(eq(EJB3ServerAPI.SERVER_API_BEAN_NAME_JBOSS7), any(Hashtable.class));
+        verify(ejb3ServerAPI).lookup(eq(EJB3ServerAPI.SERVER_API_BEAN_NAME), any(Hashtable.class));
     }
 
     @Test
