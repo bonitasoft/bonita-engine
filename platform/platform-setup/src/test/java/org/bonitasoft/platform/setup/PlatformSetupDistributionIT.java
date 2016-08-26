@@ -17,6 +17,9 @@ package org.bonitasoft.platform.setup;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -60,12 +63,11 @@ public class PlatformSetupDistributionIT {
         int iExitValue = executor.execute(oCmdLine);
         //then
         assertThat(iExitValue).isEqualTo(0);
-        //not working now because spring boot get the db.vendor from the env and we do not here
-//        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(distFolder);
-//        Statement statement = jdbcConnection.createStatement();
-//        ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
-//        resultSet.next();
-//        assertThat(resultSet.getInt("nb")).isEqualTo(38);
+        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(distFolder);
+        Statement statement = jdbcConnection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
+        resultSet.next();
+        assertThat(resultSet.getInt("nb")).isEqualTo(38);
 
     }
 
