@@ -31,7 +31,7 @@ public enum SType {
     INTEGER(Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
     DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
     BYTE_ARRAY(byte[].class),
-    FILE(FileInputValue.class);
+    FILE(FileInputValue.class), LONG(Long.class, Integer.class, BigInteger.class, Short.class, Byte.class);
 
     private final List<Class<?>> assignableTypes;
 

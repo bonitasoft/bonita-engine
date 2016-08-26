@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bpm.contract;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.BonitaObject;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 
