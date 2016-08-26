@@ -48,7 +48,6 @@
                 <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
-                <module>bonita-integration-jboss7</module>
                 <module>bonita-integration-tomcat7</module>
                 <module>bonita-integration-wildfly9</module>
             </modules>
@@ -59,18 +58,8 @@
                 <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
-                <module>bonita-integration-jboss7</module>
                 <module>bonita-integration-tomcat7</module>
                 <module>bonita-integration-wildfly9</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>jboss</id>
-            <modules>
-                <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-war</module>
-                <module>bonita-deploy-ear3</module>
-                <module>bonita-integration-jboss7</module>
             </modules>
         </profile>
         <profile>
