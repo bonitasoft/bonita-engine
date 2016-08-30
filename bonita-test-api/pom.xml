@@ -3,7 +3,7 @@
     <parent>
         <artifactId>bonita-engine</artifactId>
         <groupId>org.bonitasoft.engine</groupId>
-        <version>7.3.2-SNAPSHOT</version>
+        <version>7.3.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
