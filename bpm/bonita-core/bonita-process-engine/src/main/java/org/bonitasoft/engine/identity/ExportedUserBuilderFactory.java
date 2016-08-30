@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.identity;
 
 
+import org.bonitasoft.engine.identity.xml.ExportedUser;
+
 /**
  * Import / export version of the client User model
  * 
@@ -24,7 +26,7 @@ package org.bonitasoft.engine.identity;
 public class ExportedUserBuilderFactory {
 
     public static ExportedUserBuilder createNewInstance(final String userName, final String password) {
-        final ExportedUserImpl user = new ExportedUserImpl();
+        final ExportedUser user = new ExportedUser();
         user.setUserName(userName);
         user.setPassword(password);
         user.setEnabled(false);
