@@ -233,7 +233,6 @@ import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
-import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -270,6 +269,11 @@ import org.bonitasoft.engine.identity.model.builder.SRoleBuilder;
 import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
+import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.xml.ExportedGroup;
+import org.bonitasoft.engine.identity.xml.ExportedRole;
+import org.bonitasoft.engine.identity.xml.ExportedUser;
+import org.bonitasoft.engine.identity.xml.ExportedUserMembership;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.job.impl.FailedJobImpl;
 import org.bonitasoft.engine.operation.Operation;
@@ -918,6 +922,16 @@ public class ModelConvertor {
         return Collections.unmodifiableList(clientGroups);
     }
 
+    public static List<ExportedGroup> toExportedGroups(final List<SGroup> sGroups) {
+        final List<ExportedGroup> clientGroups = new ArrayList<>();
+        if (sGroups != null) {
+            for (final SGroup sGroup : sGroups) {
+                clientGroups.add(toExportedGroup(sGroup));
+            }
+        }
+        return Collections.unmodifiableList(clientGroups);
+    }
+
     public static Group toGroup(final SGroup sGroup) {
         final GroupImpl group = new GroupImpl(sGroup.getId(), sGroup.getName());
         group.setParentPath(sGroup.getParentPath());
@@ -927,6 +941,15 @@ public class ModelConvertor {
         group.setDisplayName(sGroup.getDisplayName());
         group.setIconId(sGroup.getIconId());
         group.setLastUpdate(new Date(sGroup.getLastUpdate()));
+        return group;
+    }
+
+    private static ExportedGroup toExportedGroup(final SGroup sGroup) {
+        final ExportedGroup group = new ExportedGroup();
+        group.setName(sGroup.getName());
+        group.setParentPath(sGroup.getParentPath());
+        group.setDescription(sGroup.getDescription());
+        group.setDisplayName(sGroup.getDisplayName());
         return group;
     }
 
@@ -1001,11 +1024,29 @@ public class ModelConvertor {
         return role;
     }
 
+    private static ExportedRole toExportedRole(final SRole sRole) {
+        final ExportedRole role = new ExportedRole(sRole.getName());
+        role.setDisplayName(sRole.getDisplayName());
+        role.setDescription(sRole.getDescription());
+        return role;
+    }
+
     public static List<Role> toRoles(final List<SRole> sRoles) {
         final List<Role> lightRoles = new ArrayList<>();
         if (sRoles != null) {
             for (final SRole sRole : sRoles) {
                 final Role role = toRole(sRole);
+                lightRoles.add(role);
+            }
+        }
+        return Collections.unmodifiableList(lightRoles);
+    }
+
+    public static List<ExportedRole> toExportedRoles(final List<SRole> sRoles) {
+        final List<ExportedRole> lightRoles = new ArrayList<>();
+        if (sRoles != null) {
+            for (final SRole sRole : sRoles) {
+                final ExportedRole role = toExportedRole(sRole);
                 lightRoles.add(role);
             }
         }
@@ -1046,6 +1087,18 @@ public class ModelConvertor {
         return Collections.unmodifiableList(userMemberships);
     }
 
+    public static List<ExportedUserMembership> toExportedUserMembership(final List<SUserMembership> sUserMemberships, final Map<Long, String> userNames,
+            final Map<Long, String> groupIdToGroup) {
+        final List<ExportedUserMembership> userMemberships = new ArrayList<>();
+        if (sUserMemberships != null) {
+            for (final SUserMembership sMembership : sUserMemberships) {
+                final ExportedUserMembership userMembership = toExportedUserMembership(sMembership, userNames, groupIdToGroup);
+                userMemberships.add(userMembership);
+            }
+        }
+        return Collections.unmodifiableList(userMemberships);
+    }
+
     private static UserMembership toUserMembership(final SUserMembership sUserMembership, final Map<Long, String> userNames,
             final Map<Long, String> groupIdToGroup) {
         final UserMembershipImpl userMembership = new UserMembershipImpl(sUserMembership.getId(), sUserMembership.getUserId(), sUserMembership.getGroupId(),
@@ -1060,6 +1113,19 @@ public class ModelConvertor {
             userMembership.setAssignedByName(userNames.get(assignedBy));
         }
         userMembership.setAssignedDate(new Date(sUserMembership.getAssignedDate()));
+        return userMembership;
+    }
+
+    private static ExportedUserMembership toExportedUserMembership(final SUserMembership sUserMembership, final Map<Long, String> userNames,
+            final Map<Long, String> groupIdToGroup) {
+        final ExportedUserMembership userMembership = new ExportedUserMembership();
+        userMembership.setGroupName(sUserMembership.getGroupName());
+        userMembership.setGroupParentPath(groupIdToGroup.get(sUserMembership.getGroupId()));
+        userMembership.setRoleName(sUserMembership.getRoleName());
+        userMembership.setUserName(sUserMembership.getUsername());
+        final long assignedBy = sUserMembership.getAssignedBy();
+        userMembership.setAssignedBy(userNames.get(assignedBy));
+        userMembership.setAssignedDate(sUserMembership.getAssignedDate());
         return userMembership;
     }
 
@@ -1528,6 +1594,17 @@ public class ModelConvertor {
         return roleBuilder.done();
     }
 
+    public static SRole constructSRole(final ExportedRole exportedRole) {
+        final long now = System.currentTimeMillis();
+        final SRoleBuilder roleBuilder = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance();
+        roleBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
+        roleBuilder.setCreationDate(now).setLastUpdate(now);
+        roleBuilder.setName(exportedRole.getName());
+        roleBuilder.setDisplayName(exportedRole.getDisplayName());
+        roleBuilder.setDescription(exportedRole.getDescription());
+        return roleBuilder.done();
+    }
+
     public static SGroup constructSGroup(final GroupCreator creator) {
         final long now = System.currentTimeMillis();
         final SGroupBuilder groupBuilder = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance();
@@ -1547,6 +1624,18 @@ public class ModelConvertor {
         if (description != null) {
             groupBuilder.setDescription(description);
         }
+        return groupBuilder.done();
+    }
+
+    public static SGroup constructSGroup(final ExportedGroup exportedGroup) {
+        final long now = System.currentTimeMillis();
+        final SGroupBuilder groupBuilder = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance();
+        groupBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
+        groupBuilder.setCreationDate(now).setLastUpdate(now);
+        groupBuilder.setName(exportedGroup.getName());
+        groupBuilder.setParentPath(exportedGroup.getParentPath());
+        groupBuilder.setDisplayName(exportedGroup.getDisplayName());
+        groupBuilder.setDescription(exportedGroup.getDescription());
         return groupBuilder.done();
     }
 
@@ -2152,6 +2241,15 @@ public class ModelConvertor {
 
     public static PageURL toPageURL(final SPageURL sPageURL) {
         return new PageURL(sPageURL.getUrl(), sPageURL.getPageId());
+    }
+
+    public static List<ExportedCustomUserInfoDefinition> toExportedCustomUserInfoDefinition(List<SCustomUserInfoDefinition> customUserInfoDefinitions) {
+        ArrayList<ExportedCustomUserInfoDefinition> customUserInfoDefinitionCreators = new ArrayList<>(customUserInfoDefinitions.size());
+        for (SCustomUserInfoDefinition customUserInfoDefinition : customUserInfoDefinitions) {
+            customUserInfoDefinitionCreators
+                    .add(new ExportedCustomUserInfoDefinition(customUserInfoDefinition.getName(), customUserInfoDefinition.getDescription()));
+        }
+        return customUserInfoDefinitionCreators;
     }
 
     public static Icon toIcon(SIcon icon) {

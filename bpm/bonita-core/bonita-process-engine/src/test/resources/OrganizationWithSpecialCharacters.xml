@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization:Organization
+	xmlns:organization="http://documentation.bonitasoft.com/organization-xml-schema">
+	<users>
+		<user userName="ééééé">
+			<password encrypted="false">é</password>
+			<firstName>éé</firstName>
+			<lastName>ééééééééééééééééééééééééé</lastName>
+			<enabled>false</enabled>
+			<personalData />
+			<professionalData />
+		</user>
+	</users>
+	<roles>
+		<role name="éééééééé">
+			<displayName>ééé</displayName>
+			<description>éééé</description>
+		</role>
+	</roles>
+	<groups>
+		<group name="éééééééééééééééééééé" parentPath="ééééééééééééééé">
+			<displayName>ééééééééé</displayName>
+		</group>
+	</groups>
+	<memberships />
+</organization:Organization>

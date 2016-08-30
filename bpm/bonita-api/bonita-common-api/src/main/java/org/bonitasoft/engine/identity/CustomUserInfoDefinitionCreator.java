@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * represents a helper for creating a {@link CustomUserInfoDefinition}.
@@ -25,6 +26,7 @@ import java.io.Serializable;
 public class CustomUserInfoDefinitionCreator implements Serializable {
 
     private static final long serialVersionUID = 6929368716340973445L;
+
 
     private String name;
 
@@ -76,5 +78,27 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
      */
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomUserInfoDefinitionCreator that = (CustomUserInfoDefinitionCreator) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description);
+    }
+
+    @Override
+    public String toString() {
+        return "CustomUserInfoDefinitionCreator{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

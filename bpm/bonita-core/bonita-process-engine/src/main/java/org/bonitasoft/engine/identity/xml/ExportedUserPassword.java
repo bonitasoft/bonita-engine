@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2016 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,34 +11,38 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.xml;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.bonitasoft.engine.identity.xml;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
- * @author Elias Ricken de Medeiros
+ * @author Baptiste Mesta
  */
-@XmlRootElement(name = "applications")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ApplicationNodeContainer {
+public class ExportedUserPassword {
 
-    @XmlElement(name = "application")
-    private List<ApplicationNode> applications;
+    @XmlAttribute(name = "encrypted")
+    private boolean passwordEncrypted;
+    @XmlValue
+    private String password;
 
-    public ApplicationNodeContainer() {
-        this.applications = new ArrayList<>();
+    public boolean isPasswordEncrypted() {
+        return passwordEncrypted;
     }
 
-    public List<ApplicationNode> getApplications() {
-        return applications;
+    public void setPasswordEncrypted(boolean passwordEncrypted) {
+        this.passwordEncrypted = passwordEncrypted;
     }
 
-    public void addApplication(ApplicationNode application) {
-        applications.add(application);
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
