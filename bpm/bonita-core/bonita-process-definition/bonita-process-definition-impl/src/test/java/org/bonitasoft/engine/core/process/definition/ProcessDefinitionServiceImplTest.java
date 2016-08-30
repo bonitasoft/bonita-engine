@@ -81,7 +81,6 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
-import org.bonitasoft.engine.xml.XMLWriter;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -127,9 +126,6 @@ public class ProcessDefinitionServiceImplTest {
 
     @Mock
     private SessionService sessionService;
-
-    @Mock
-    private XMLWriter xmlWriter;
 
     @Mock
     private ProcessDefinitionBARContribution processDefinitionBARContribution;

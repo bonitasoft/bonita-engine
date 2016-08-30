@@ -13,55 +13,78 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import org.bonitasoft.engine.identity.ExportedUser;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * @author Elias Ricken de Medeiros
+ * @author Baptiste Mesta
+ * @author Frederic Bouquet
+ * @author Matthieu Chaffotte
  */
+
+@XmlRootElement(name = "Organization")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Organization {
 
-    private final List<SCustomUserInfoDefinition> customUserInfoDefinitions;
-    
+    @XmlElementWrapper(name = "customUserInfoDefinitions")
+    @XmlElement(name = "customUserInfoDefinition")
+    private final List<ExportedCustomUserInfoDefinition> customUserInfoDefinition;
+
+    @XmlElementWrapper(name = "users")
+    @XmlElement(name = "user")
     private final List<ExportedUser> users;
 
-    private final List<Role> roles;
+    @XmlElementWrapper(name = "roles")
+    @XmlElement(name = "role")
+    private final List<ExportedRole> roles;
 
-    private final List<Group> groups;
+    @XmlElementWrapper(name = "groups")
+    @XmlElement(name = "group")
+    private final List<ExportedGroup> groups;
 
-    private final List<UserMembership> memberships;
+    @XmlElementWrapper(name = "memberships")
+    @XmlElement(name = "membership")
+    private final List<ExportedUserMembership> memberships;
 
-    public Organization(final List<ExportedUser> users, final List<Role> roles, final List<Group> groups, final List<UserMembership> memberships,
-            List<SCustomUserInfoDefinition> customUserInfoDefinitions) {
+    public Organization() {
+        this.users = new ArrayList<>();
+        this.roles = new ArrayList<>();
+        this.groups = new ArrayList<>();
+        this.memberships = new ArrayList<>();
+        this.customUserInfoDefinition = new ArrayList<>();
+    }
+
+    public Organization(final List<ExportedUser> users, final List<ExportedRole> roles, final List<ExportedGroup> groups, final List<ExportedUserMembership> memberships,
+                        List<ExportedCustomUserInfoDefinition> customUserInfoDefinition) {
         this.users = users;
         this.roles = roles;
         this.groups = groups;
         this.memberships = memberships;
-        this.customUserInfoDefinitions = customUserInfoDefinitions;
+        this.customUserInfoDefinition = customUserInfoDefinition;
     }
-    
-    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions() {
-        return customUserInfoDefinitions;
+
+    public List<ExportedCustomUserInfoDefinition> getCustomUserInfoDefinition() {
+        return customUserInfoDefinition;
     }
 
     public List<ExportedUser> getUsers() {
         return users;
     }
 
-    public List<Role> getRole() {
+    public List<ExportedRole> getRoles() {
         return roles;
     }
 
-    public List<Group> getGroup() {
+    public List<ExportedGroup> getGroups() {
         return groups;
     }
 
-    public List<UserMembership> getMemberships() {
+    public List<ExportedUserMembership> getMemberships() {
         return memberships;
     }
 

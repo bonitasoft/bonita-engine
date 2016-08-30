@@ -122,8 +122,8 @@ import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactor
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.xml.ExportOrganization;
-import org.bonitasoft.engine.identity.xml.ImportOrganization;
+import org.bonitasoft.engine.identity.ExportOrganization;
+import org.bonitasoft.engine.identity.ImportOrganization;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -1443,7 +1443,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public String exportOrganization() throws OrganizationExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final int maxResults = 100;
-        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults);
+        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getIdentityService(), maxResults);
         try {
             exportOrganization.execute();
             return exportOrganization.getResult();
