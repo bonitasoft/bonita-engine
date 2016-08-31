@@ -1,14 +1,23 @@
 package org.bonitasoft.engine.home;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Charles Souillard
  * @author Emmanuel Duchastenier
  */
 class FolderMgr {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(FolderMgr.class);
+    public static final String TEMP_FOLDER_NAME_PREFIX = "bonita_engine_";
 
     private static Folder getFolder(final File baseFolder, final String subFolder) throws IOException {
         return new Folder(new Folder(baseFolder), subFolder);
@@ -18,12 +27,28 @@ class FolderMgr {
         return new Folder(baseFolder, subFolder);
     }
 
-    private static Folder getTempFolder() throws IOException {
-        final Folder tempFolder = getFolder(new File(System.getProperty("java.io.tmpdir")), "bonita_engine_" + getJvmName());
+    static Folder getTempFolder() throws IOException {
+        File systemTempFolder = new File(System.getProperty("java.io.tmpdir"));
+        final Folder tempFolder = getFolder(systemTempFolder, TEMP_FOLDER_NAME_PREFIX + getJvmName());
         if (!tempFolder.exists()) {
+            warnIfSomeTempFolderAlreadyExists(systemTempFolder);
             tempFolder.createAsTemporaryFolder();
         }
         return tempFolder;
+    }
+
+    private static void warnIfSomeTempFolderAlreadyExists(File systemTempFolder) {
+        File[] files = systemTempFolder.listFiles(new BonitaTempFolderFilter());
+        List<File> temporaryFolders = Arrays.asList(files != null ? files : new File[0]);
+        if (!temporaryFolders.isEmpty()) {
+            LOGGER.warn("The following temporary folders were not deleted on the previous shutdown. " +
+                    "This can happen when your JVM crashed or if you did not properly stop the platform.");
+            LOGGER.warn("Delete these folders to free up space:");
+            for (File temporaryFolder : temporaryFolders) {
+                LOGGER.warn(temporaryFolder.getAbsolutePath());
+            }
+        }
+
     }
 
     static Folder getPlatformTempFolder() throws IOException {
@@ -69,5 +94,12 @@ class FolderMgr {
         final Folder artifactIdFolder = getFolder(artifactTypeFolder, Long.toString(artifactId));
         artifactIdFolder.createIfNotExists();
         return artifactIdFolder;
+    }
+
+    private static class BonitaTempFolderFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            return dir.isDirectory() && name.startsWith(TEMP_FOLDER_NAME_PREFIX);
+        }
     }
 }

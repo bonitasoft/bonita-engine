@@ -15,7 +15,13 @@ package org.bonitasoft.engine.home;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Baptiste Mesta
@@ -23,10 +29,36 @@ import org.junit.Test;
  */
 public class FolderMgrTest {
 
+    @Rule
+    public RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Test
     public void getPlatformGlobalClassLoaderFolder_should_create_all_parents() throws Exception {
         final Folder platformGlobalClassLoaderFolder = FolderMgr.getPlatformGlobalClassLoaderFolder();
         assertThat(platformGlobalClassLoaderFolder.getFile()).exists().isDirectory();
+    }
+
+    @Test
+    public void getTempFolder_should_WARN_when_old_folder_still_exists() throws Exception {
+        //given
+        File tempFolder = temporaryFolder.newFolder();
+        System.setProperty("java.io.tmpdir", tempFolder.getAbsolutePath());
+        File bonita_engine_old1 = new File(tempFolder, "bonita_engine_old1");
+        File bonita_engine_old2 = new File(tempFolder, "bonita_engine_old2");
+        bonita_engine_old1.mkdir();
+        bonita_engine_old2.mkdir();
+        //when
+        Folder tempFolder1 = FolderMgr.getTempFolder();
+        //then
+        assertThat(systemOutRule.getLog()).contains("Delete these folders to free up space:");
+        assertThat(systemOutRule.getLog()).contains(bonita_engine_old1.getAbsolutePath());
+        assertThat(systemOutRule.getLog()).contains(bonita_engine_old2.getAbsolutePath());
+        assertThat(systemOutRule.getLog()).doesNotContain(tempFolder1.getFile().getName());
+
     }
 
 }
