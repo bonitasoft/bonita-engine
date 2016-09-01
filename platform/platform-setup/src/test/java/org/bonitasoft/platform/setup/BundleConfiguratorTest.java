@@ -195,7 +195,7 @@ public class BundleConfiguratorTest {
     @Test
     public void should_not_copy_drivers_again_if_same_dbVendor_for_bdm() throws Exception {
         final String bdmDbVendor = "postgres";
-        System.setProperty("sysprop.bonita.bdm.db.vendor", bdmDbVendor);
+        System.setProperty("bdm.db.vendor", bdmDbVendor);
 
         // when:
         spy.configureApplicationServer();
@@ -220,7 +220,7 @@ public class BundleConfiguratorTest {
     @Test
     public void configureApplicationServer_should_do_nothing_for_H2() throws Exception {
         // given:
-        System.setProperty("sysprop.bonita.db.vendor", "h2");
+        System.setProperty("db.vendor", "h2");
 
         // when:
         spy.configureApplicationServer();
@@ -233,7 +233,7 @@ public class BundleConfiguratorTest {
     public void configureApplicationServer_should_fail_if_drivers_not_found() throws Exception {
         // given:
         final String dbVendor = "sqlserver";
-        System.setProperty("sysprop.bonita.db.vendor", dbVendor);
+        System.setProperty("db.vendor", dbVendor);
 
         // then:
         expectedException.expect(PlatformException.class);

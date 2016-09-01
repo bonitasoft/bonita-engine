@@ -359,7 +359,7 @@ public class BundleConfigurator {
 
     /**
      * Constructs path relative to rootPath.
-     * 
+     *
      * @param partialPath path relative to rootPath
      * @param failIfNotExist should we fail if file does not exist?
      * @return the real path, constructed from rootPath, appending the partialPath
@@ -374,6 +374,13 @@ public class BundleConfigurator {
             throw new PlatformException("File " + build.getFileName() + " is mandatory but is not found");
         }
         return build;
+    }
+    public DatabaseConfiguration getStandardConfiguration() {
+        return standardConfiguration;
+    }
+
+    public DatabaseConfiguration getBdmConfiguration() {
+        return bdmConfiguration;
     }
 
 }
