@@ -30,7 +30,10 @@ IF NOT "%ACTION%" == "init" IF NOT "%ACTION%" == "pull" IF NOT "%ACTION%" == "pu
 echo using database %BONITA_DATABASE%
 echo action is %ACTION%
 
-java -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" -Dorg.bonitasoft.platform.setup.action=%ACTION% -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication
+REM get rid of first parameter (action parameter) and pass the rest of the command line to the java program through $@:
+SHIFT
+SHIFT
+java -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" %0 %1 %2 %3 %4 %5 %6 %7 %8 %9 -Dorg.bonitasoft.platform.setup.action=%ACTION% -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication
 
 if errorlevel 1 (
     echo ERROR 1 Executing platform setup
