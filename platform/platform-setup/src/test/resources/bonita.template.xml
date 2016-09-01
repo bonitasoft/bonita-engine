@@ -5,11 +5,13 @@
     <Manager pathname="" />
 
 
-    <!-- ################################################################################################################################################ -->
-    <!-- ###########################   BETWEEN THESE 2 SECTIONS IS A TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL   ####################################### -->
-    <!-- ###########################      DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOU ARE DOING        ####################################### -->
-    <!-- ###########################          YOU CAN ADD CUSTOM CONFIGURATION *ABOVE* THIS TEMPLATE              ####################################### -->
-    <!-- ################################################################################################################################################ -->
+    <!-- #################################################################################################################### -->
+    <!-- ##############   BETWEEN THESE 2 SECTIONS IS A TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL.          ################ -->
+    <!-- #######   BELOW VALUES SURROUNDED BY '@@' MUST NOT BE TOUCHED, AS THEY ARE USED INTERNALLY BY SETUP TOOL.   ######## -->
+    <!-- ##############      DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOU ARE DOING.              ################# -->
+    <!-- ##############          REFER TO FILE SETUP/DATABASE.PROPERTIES FOR MORE INFORMATION.              ################# -->
+    <!-- ##############          YOU CAN ADD CUSTOM CONFIGURATION ABOVE AND BELOW THIS TEMPLATE.            ################# -->
+    <!-- #################################################################################################################### -->
 
     <!-- ##################################################### -->
     <!-- Configure Datasource for Bonita BPM standard database -->
@@ -29,11 +31,11 @@
               validationInterval="30000"
               removeAbandoned="true"
               logAbandoned="true"
-              validationQuery="ds1.database_test_query"
-              username="ds1.database_connection_user"
-              password="ds1.database_connection_password"
-              driverClassName="ds1.driver_class_name"
-              url="ds1.database_connection_url" />
+              validationQuery="@@ds1.database_test_query@@"
+              username="@@ds1.database_connection_user@@"
+              password="@@ds1.database_connection_password@@"
+              driverClassName="@@ds1.driver_class_name@@"
+              url="@@ds1.database_connection_url@@" />
 
     <!-- ##################################################### -->
     <!-- Configure Business Data Datasource -->
@@ -53,37 +55,16 @@
               validationInterval="30000"
               removeAbandoned="true"
               logAbandoned="true"
-              validationQuery="ds2.database_test_query"
-              username="ds2.database_connection_user"
-              password="ds2.database_connection_password"
-              driverClassName="ds2.driver_class_name"
-              url="ds2.database_connection_url" />
+              validationQuery="@@ds2.database_test_query@@"
+              username="@@ds2.database_connection_user@@"
+              password="@@ds2.database_connection_password@@"
+              driverClassName="@@ds2.driver_class_name@@"
+              url="@@ds2.database_connection_url@@" />
 
-    <Resource name="BusinessDataDS2" auth="Container" type="javax.sql.DataSource"
-              factory="bitronix.tm.resource.ResourceObjectFactory" uniqueName="jdbc/BusinessDataDSXA2" />
-
-    <Resource name="NotManagedBizDataDS2"
-              auth="Container"
-              type="javax.sql.DataSource"
-              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-              maxActive="17"
-              minIdle="5"
-              maxIdle="17"
-              maxWait="10000"
-              initialSize="3"
-              validationInterval="30000"
-              removeAbandoned="true"
-              logAbandoned="true"
-              validationQuery="ds2.database_test_query"
-              username="ds2.database_connection_user"
-              password="ds2.database_connection_password"
-              driverClassName="ds2.driver_class_name"
-              url="ds2.database_connection_url" />
-
-    <!-- ################################################################################################################################################ -->
-    <!-- ###################################         END OF TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL         ########################################## -->
-    <!-- #############################            YOU CAN ADD CUSTOM CONFIGURATION *BELOW* THIS TEMPLATE              ################################### -->
-    <!-- ################################################################################################################################################ -->
+    <!-- #################################################################################################################### -->
+    <!-- ########################         END OF TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL         ######################### -->
+    <!-- ###################            YOU CAN ADD CUSTOM CONFIGURATION *BELOW* THIS TEMPLATE              ################# -->
+    <!-- #################################################################################################################### -->
 
 
 </Context>
