@@ -41,13 +41,7 @@ public class DatabaseConfiguration {
     private String testQuery;
 
     DatabaseConfiguration(String prefix, Properties properties) throws PlatformException {
-        dbVendor = properties.getProperty(prefix + "db.vendor");
-        final String systemProperty = "sysprop.bonita." + prefix + "db.vendor";
-        final String sysPropDbVendor = System.getProperty(systemProperty);
-        if (sysPropDbVendor != null) {
-            LOGGER.debug("'" + systemProperty + "' set to '" + sysPropDbVendor + "', overriding value from file database.properties.");
-            dbVendor = sysPropDbVendor;
-        }
+        dbVendor = getPropertyAndFailIfNull(properties, prefix + "db.vendor");
         // No need to configure anything for H2:
         if (H2_DB_VENDOR.equals(dbVendor)) {
             return;
@@ -115,6 +109,13 @@ public class DatabaseConfiguration {
     }
 
     private String getPropertyAndFailIfNull(Properties properties, String propertyName) throws PlatformException {
+        // Any property value can be overridden by system property with the same name:
+        final String sysPropValue = System.getProperty(propertyName);
+        if (sysPropValue != null) {
+            LOGGER.info("System property '" + propertyName + "' set to '" + sysPropValue + "', overriding value from file database.properties.");
+            return sysPropValue;
+        }
+
         final String property = properties.getProperty(propertyName);
         if (property == null) {
             throw new PlatformException(

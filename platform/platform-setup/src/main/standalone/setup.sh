@@ -44,7 +44,9 @@ echo "Action is ${ACTION}"
 echo "Using database ${BONITA_DATABASE}"
 export BONITA_DATABASE
 
-java -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}:${LIB_FOLDER}/*" -Dorg.bonitasoft.platform.setup.action=${ACTION} -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication
+# get rid of first parameter (action parameter) and pass the rest of the command line to the java program through $@:
+shift
+java -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}:${LIB_FOLDER}/*" $@ -Dorg.bonitasoft.platform.setup.action=${ACTION} -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication
 
 testReturnCode $? "Executing platform setup (Java command)"
 
