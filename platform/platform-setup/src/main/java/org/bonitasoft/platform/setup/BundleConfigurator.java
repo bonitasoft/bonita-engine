@@ -151,32 +151,32 @@ public class BundleConfigurator {
         copyTemplateToFile("/bitronix-resources.template.properties", bitronixFile);
 
         Map<String, String> replacements = new HashMap<>(14);
-        replacements.put("ds1_driver_class_name", standardConfiguration.getXaDriverClassName());
-        replacements.put("ds1_database_connection_user", standardConfiguration.getDatabaseUser());
-        replacements.put("ds1_database_connection_password", standardConfiguration.getDatabasePassword());
-        replacements.put("ds1_database_test_query", standardConfiguration.getTestQuery());
+        replacements.put("@@ds1_driver_class_name@@", standardConfiguration.getXaDriverClassName());
+        replacements.put("@@ds1_database_connection_user@@", standardConfiguration.getDatabaseUser());
+        replacements.put("@@ds1_database_connection_password@@", standardConfiguration.getDatabasePassword());
+        replacements.put("@@ds1_database_test_query@@", standardConfiguration.getTestQuery());
 
         // Let's uncomment and replace dbvendor-specific values for DS1:
         if (POSTGRES.equals(standardConfiguration.getDbVendor())) {
-            replacements.putAll(uncommentLineAndReplace("ds1_postgres_server_name", standardConfiguration.getServerName()));
-            replacements.putAll(uncommentLineAndReplace("ds1_postgres_port_number", standardConfiguration.getServerPort()));
-            replacements.putAll(uncommentLineAndReplace("ds1_postgres_database_name", standardConfiguration.getDatabaseName()));
+            replacements.putAll(uncommentLineAndReplace("@@ds1_postgres_server_name@@", standardConfiguration.getServerName()));
+            replacements.putAll(uncommentLineAndReplace("@@ds1_postgres_port_number@@", standardConfiguration.getServerPort()));
+            replacements.putAll(uncommentLineAndReplace("@@ds1_postgres_database_name@@", standardConfiguration.getDatabaseName()));
         } else {
-            replacements.putAll(uncommentLineAndReplace("ds1_database_connection_url", standardConfiguration.getUrl()));
+            replacements.putAll(uncommentLineAndReplace("@@ds1_database_connection_url@@", standardConfiguration.getUrl()));
         }
 
-        replacements.put("ds2_driver_class_name", bdmConfiguration.getXaDriverClassName());
-        replacements.put("ds2_database_connection_user", bdmConfiguration.getDatabaseUser());
-        replacements.put("ds2_database_connection_password", bdmConfiguration.getDatabasePassword());
-        replacements.put("ds2_database_test_query", bdmConfiguration.getTestQuery());
+        replacements.put("@@ds2_driver_class_name@@", bdmConfiguration.getXaDriverClassName());
+        replacements.put("@@ds2_database_connection_user@@", bdmConfiguration.getDatabaseUser());
+        replacements.put("@@ds2_database_connection_password@@", bdmConfiguration.getDatabasePassword());
+        replacements.put("@@ds2_database_test_query@@", bdmConfiguration.getTestQuery());
 
         // Let's uncomment and replace dbvendor-specific values for DS2:
         if (POSTGRES.equals(bdmConfiguration.getDbVendor())) {
-            replacements.putAll(uncommentLineAndReplace("ds2_postgres_server_name", bdmConfiguration.getServerName()));
-            replacements.putAll(uncommentLineAndReplace("ds2_postgres_port_number", bdmConfiguration.getServerPort()));
-            replacements.putAll(uncommentLineAndReplace("ds2_postgres_database_name", bdmConfiguration.getDatabaseName()));
+            replacements.putAll(uncommentLineAndReplace("@@ds2_postgres_server_name@@", bdmConfiguration.getServerName()));
+            replacements.putAll(uncommentLineAndReplace("@@ds2_postgres_port_number@@", bdmConfiguration.getServerPort()));
+            replacements.putAll(uncommentLineAndReplace("@@ds2_postgres_database_name@@", bdmConfiguration.getDatabaseName()));
         } else {
-            replacements.putAll(uncommentLineAndReplace("ds2_database_connection_url", bdmConfiguration.getUrl()));
+            replacements.putAll(uncommentLineAndReplace("@@ds2_database_connection_url@@", bdmConfiguration.getUrl()));
         }
 
         replaceContentInFile(bitronixFile, replacements);
@@ -191,17 +191,17 @@ public class BundleConfigurator {
         copyTemplateToFile("/bonita.template.xml", bonitaXmlFile);
 
         Map<String, String> replacements = new HashMap<>(10);
-        replacements.put("ds1.database_connection_user", standardConfiguration.getDatabaseUser());
-        replacements.put("ds1.database_connection_password", standardConfiguration.getDatabasePassword());
-        replacements.put("ds1.driver_class_name", standardConfiguration.getNonXaDriverClassName());
-        replacements.put("ds1.database_connection_url", standardConfiguration.getUrl());
-        replacements.put("ds1.database_test_query", standardConfiguration.getTestQuery());
+        replacements.put("@@ds1.database_connection_user@@", standardConfiguration.getDatabaseUser());
+        replacements.put("@@ds1.database_connection_password@@", standardConfiguration.getDatabasePassword());
+        replacements.put("@@ds1.driver_class_name@@", standardConfiguration.getNonXaDriverClassName());
+        replacements.put("@@ds1.database_connection_url@@", standardConfiguration.getUrl());
+        replacements.put("@@ds1.database_test_query@@", standardConfiguration.getTestQuery());
 
-        replacements.put("ds2.database_connection_user", bdmConfiguration.getDatabaseUser());
-        replacements.put("ds2.database_connection_password", bdmConfiguration.getDatabasePassword());
-        replacements.put("ds2.driver_class_name", bdmConfiguration.getNonXaDriverClassName());
-        replacements.put("ds2.database_connection_url", bdmConfiguration.getUrl());
-        replacements.put("ds2.database_test_query", bdmConfiguration.getTestQuery());
+        replacements.put("@@ds2.database_connection_user@@", bdmConfiguration.getDatabaseUser());
+        replacements.put("@@ds2.database_connection_password@@", bdmConfiguration.getDatabasePassword());
+        replacements.put("@@ds2.driver_class_name@@", bdmConfiguration.getNonXaDriverClassName());
+        replacements.put("@@ds2.database_connection_url@@", bdmConfiguration.getUrl());
+        replacements.put("@@ds2.database_test_query@@", bdmConfiguration.getTestQuery());
         replaceContentInFile(bonitaXmlFile, replacements);
 
         LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with the DB connection values you provided in file 'database.properties'");
