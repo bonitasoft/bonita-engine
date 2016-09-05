@@ -13,21 +13,13 @@
  **/
 package org.bonitasoft.engine;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.platform.PlatformNotFoundException;
+import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
@@ -41,97 +33,101 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class EngineInitializerTest {
 
-    @Mock
-    private PlatformTenantManager platformManager;
-    @Mock
-    private EngineInitializerProperties platformProperties;
     @Spy
     @InjectMocks
     private EngineInitializer engineInitializer;
     @Mock
+    private PlatformAPI platformAPI;
+    @Mock
+    private SessionAccessor sessionAccessor;
+    @Mock
     private ServiceAccessorFactory serviceAccessorFactory;
+    @Mock
+    private PlatformSessionService platformSessionService;
+    @Mock
+    private SPlatformSession sPlatformSession;
 
     @Before
     public void before() throws Exception {
-        // static mocks
-
-        final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
-        when(serviceAccessorFactory.createPlatformServiceAccessor()).thenReturn(platformServiceAccessor);
-
-        // services
-        when(serviceAccessorFactory.createSessionAccessor()).thenReturn(mock(SessionAccessor.class));
-        final PlatformSessionService platformSessionService = mock(PlatformSessionService.class);
-        when(platformServiceAccessor.getPlatformSessionService()).thenReturn(platformSessionService);
-
-        // sessions
-        when(platformSessionService.createSession(anyString())).thenReturn(mock(SPlatformSession.class));
-
+        doReturn(platformAPI).when(engineInitializer).getPlatformAPI();
+        doReturn(sessionAccessor).when(engineInitializer).getSessionAccessor();
+        doReturn(platformSessionService).when(engineInitializer).getPlatformSessionService();
         doReturn(serviceAccessorFactory).when(engineInitializer).getServiceAccessorFactory();
+        doReturn(sPlatformSession).when(platformSessionService).createSession(anyString());
     }
 
 
     @Test
     public void testInitializeEngine() throws Exception {
-        when(platformProperties.shouldCreatePlatform()).thenReturn(true);
-        when(platformProperties.shouldStartPlatform()).thenReturn(true);
+        doReturn(true).when(platformAPI).isPlatformCreated();
+
         engineInitializer.initializeEngine();
-        verify(platformManager, times(1)).initializePlatform(any(PlatformAPI.class));
-        verify(platformManager, times(1)).startPlatform(any(PlatformAPI.class));
+
+        verify(platformAPI).initializePlatform();
+        verify(platformAPI).startNode();
     }
 
     @Test
-    public void testDoNotCreatePlatform() throws Exception {
-        when(platformProperties.shouldCreatePlatform()).thenReturn(false);
-        when(platformProperties.shouldStartPlatform()).thenReturn(true);
+    public void should_not_start_node_when_platform_is_not_created() throws Exception {
+        //given
+        doReturn(false).when(platformAPI).isPlatformCreated();
+        //when
         engineInitializer.initializeEngine();
-        verify(platformManager, times(0)).initializePlatform(any(PlatformAPI.class));
-        verify(platformManager, times(1)).startPlatform(any(PlatformAPI.class));
+        //then
+        verify(platformAPI, never()).startNode();
     }
 
     @Test
-    public void testDoNotCreatePlatformNorStart() throws Exception {
-        when(platformProperties.shouldCreatePlatform()).thenReturn(false);
-        when(platformProperties.shouldStartPlatform()).thenReturn(false);
+    public void should_not_initialize_platform_when_platform_is_not_created() throws Exception {
+        //given
+        doReturn(false).when(platformAPI).isPlatformCreated();
+        //when
         engineInitializer.initializeEngine();
-        verify(platformManager, times(0)).initializePlatform(any(PlatformAPI.class));
-        verify(platformManager, times(0)).startPlatform(any(PlatformAPI.class));
+        //then
+        verify(platformAPI, never()).initializePlatform();
     }
+
+    @Test
+    public void should_not_initialize_platform_when_platform_is_already_initialized() throws Exception {
+        //given
+        doReturn(true).when(platformAPI).isPlatformCreated();
+        doReturn(true).when(platformAPI).isPlatformInitialized();
+        //when
+        engineInitializer.initializeEngine();
+        //then
+        verify(platformAPI, never()).initializePlatform();
+    }
+
 
     @Test
     public void testUnloadEngine() throws Exception {
-        when(platformProperties.shouldStopPlatform()).thenReturn(true);
+        doReturn(true).when(platformAPI).isNodeStarted();
+        doReturn(true).when(platformAPI).isPlatformCreated();
+
         engineInitializer.unloadEngine();
-        verify(platformManager, times(1)).stopPlatform(any(PlatformAPI.class));
+
+        verify(platformAPI).stopNode();
         verify(serviceAccessorFactory, times(1)).destroyAccessors();
     }
 
     @Test
-    public void testUnloadEnginWhenPlatformNotCreated() throws Exception {
-        when(platformProperties.shouldStopPlatform()).thenReturn(true);
-        doThrow(new PlatformNotFoundException("tada")).when(platformManager).stopPlatform(any(PlatformAPI.class));
-        engineInitializer.unloadEngine();
-        verify(serviceAccessorFactory, times(1)).destroyAccessors();
-    }
-
-    @Test
-    public void testUnloadEngineDoNotStopPlatform() throws Exception {
-        when(platformProperties.shouldStopPlatform()).thenReturn(false);
-        engineInitializer.unloadEngine();
-        verify(platformManager, times(0)).stopPlatform(any(PlatformAPI.class));
-    }
-
-    @Test
-    public void getPlatformAPI_should_reuse_the_previous_instance_in_the_second_call() {
+    public void should_not_stop_node_if_node_is_not_started() throws Exception {
         //given
-        final EngineInitializer initializer = new EngineInitializer(platformManager, platformProperties);
-        final PlatformAPI firstCall = initializer.getPlatformAPI();
-        assertThat(firstCall).isNotNull();
-
+        doReturn(false).when(platformAPI).isNodeStarted();
         //when
-        final PlatformAPI secondCall = initializer.getPlatformAPI();
-
+        engineInitializer.unloadEngine();
         //then
-        assertThat(secondCall).isSameAs(firstCall);
+        verify(platformAPI, never()).stopNode();
+    }
+
+    @Test
+    public void should_destroy_accessor_if_exception() throws Exception {
+        doReturn(true).when(platformAPI).isPlatformCreated();
+        doThrow(new StopNodeException("tada")).when(platformAPI).stopNode();
+
+        engineInitializer.unloadEngine();
+
+        verify(serviceAccessorFactory, times(1)).destroyAccessors();
     }
 
 }
