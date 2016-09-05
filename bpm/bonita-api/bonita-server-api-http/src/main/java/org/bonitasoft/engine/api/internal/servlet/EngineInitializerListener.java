@@ -15,13 +15,10 @@ package org.bonitasoft.engine.api.internal.servlet;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.bonitasoft.engine.EngineInitializer;
-import org.bonitasoft.engine.EngineInitializerProperties;
-import org.bonitasoft.engine.PlatformTenantManager;
 import org.bonitasoft.platform.setup.PlatformSetup;
 
 public class EngineInitializerListener implements ServletContextListener {
@@ -33,7 +30,7 @@ public class EngineInitializerListener implements ServletContextListener {
     public void contextInitialized(final ServletContextEvent arg0) {
         try {
             new PlatformSetup().init(); // init tables and default configuration
-            new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
+            new EngineInitializer().initializeEngine();
             initializationOk = true;
         } catch (final Throwable e) {
             throw new RuntimeException("Error while initializing the Engine", e);
@@ -44,7 +41,7 @@ public class EngineInitializerListener implements ServletContextListener {
     public void contextDestroyed(final ServletContextEvent arg0) {
         if (initializationOk) {
             try {
-                new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
+                new EngineInitializer().unloadEngine();
             } catch (final Throwable e) {
                 LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
             }
