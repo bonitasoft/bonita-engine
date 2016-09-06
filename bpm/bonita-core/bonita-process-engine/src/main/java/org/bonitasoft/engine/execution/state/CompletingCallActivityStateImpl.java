@@ -83,7 +83,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     }
 
     @Override
-    protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+    protected void beforeConnectors(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         executeDataOutputOperations(processDefinition, flowNodeInstance);
         stateBehaviors.executeOperations(processDefinition, (SActivityInstance) flowNodeInstance);

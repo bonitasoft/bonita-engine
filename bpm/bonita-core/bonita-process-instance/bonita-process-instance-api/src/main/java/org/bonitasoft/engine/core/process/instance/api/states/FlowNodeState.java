@@ -25,7 +25,6 @@ public interface FlowNodeState extends State<SFlowNodeInstance> {
 
     /**
      * @param processDefinition
-     *            TODO
      * @param flowNodeInstance
      * @return true the state must be executed, false if the execution must skip this state and go directly to the next one
      * @throws SActivityExecutionException

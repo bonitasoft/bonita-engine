@@ -17,23 +17,68 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.execution.StateBehaviors;
 
 /**
  * @author Baptiste Mesta
  */
-public class ExecutingThrowEventStateImpl extends ExecutingFlowNodeStateImpl {
+public class ExecutingThrowEventStateImpl extends OnEnterAndFinishConnectorState {
 
     private final StateBehaviors stateBehaviors;
 
     public ExecutingThrowEventStateImpl(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors, true, true);
+        super(stateBehaviors);
         this.stateBehaviors = stateBehaviors;
     }
 
     @Override
     public int getId() {
         return 26;
+    }
+    @Override
+    public boolean isInterrupting() {
+        return false;
+    }
+
+    @Override
+    public boolean isStable() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return "executing";
+    }
+
+    @Override
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+        return false;
+    }
+
+    @Override
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+        return true;
+    }
+
+    @Override
+    public SStateCategory getStateCategory() {
+        return SStateCategory.NORMAL;
+    }
+
+    @Override
+    public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
+        return false;
+    }
+
+    @Override
+    public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
+        return "";
     }
 
     @Override

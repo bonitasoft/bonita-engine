@@ -13,9 +13,7 @@
  */
 package org.bonitasoft.engine.activity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -333,6 +331,29 @@ public class ContractIT extends CommonAPIIT {
             assertThat(state).isEqualTo("ready");
             assertThat(e.getExplanations()).containsExactly("Expected input [numberOfDays] is missing");
         }
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_valid_contract_with_invalid_operation_do_not_throw_exception() throws Exception {
+        /*
+         * the operation should be executed asynchronously, not in the same call as the contract input
+         */
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        builder.addShortTextData("dataName", null);
+        UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
+        userTaskDefinitionBuilder.addContract().addInput("numberOfDays", Type.INTEGER, null);
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("dataName",
+                new ExpressionBuilder().createGroovyScriptExpression("script", "throw new java.lang.RuntimeException()", String.class.getName())));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
+
+        getProcessAPI().executeUserTask(userTask.getId(), Collections.<String, Serializable> singletonMap("numberOfDays", 123));
+        waitForFlowNodeInFailedState(processInstance, TASK1);
+        //no api method to check that the contract data are persisted (it only gets the archived version)
         disableAndDeleteProcess(processDefinition);
     }
 

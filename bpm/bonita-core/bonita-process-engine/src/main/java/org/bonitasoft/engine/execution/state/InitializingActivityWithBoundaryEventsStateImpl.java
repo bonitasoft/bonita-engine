@@ -23,12 +23,12 @@ import org.bonitasoft.engine.execution.StateBehaviors;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class InitializingActivityWithBoundaryEventsStateImpl extends FlowNodeStateWithConnectors {
+public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConnectorState {
 
     private final StateBehaviors stateBehaviors;
 
     public InitializingActivityWithBoundaryEventsStateImpl(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors, true, false);
+        super(stateBehaviors);
         this.stateBehaviors = stateBehaviors;
     }
 
@@ -83,7 +83,7 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends FlowNodeSta
     }
 
     @Override
-    protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         stateBehaviors.handleCatchEvents(processDefinition, flowNodeInstance);
         stateBehaviors.createData(processDefinition, flowNodeInstance);
         stateBehaviors.createAttachedBoundaryEvents(processDefinition, (SActivityInstance) flowNodeInstance);
@@ -91,14 +91,9 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends FlowNodeSta
     }
 
     @Override
-    protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SActivityStateExecutionException {
+    protected void afterConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
         stateBehaviors.addAssignmentSystemCommentIfTaskWasAutoAssign(flowNodeInstance);
         stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
-    }
-
-    @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
     }
 }

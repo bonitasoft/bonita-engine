@@ -151,7 +151,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
         final long executerSubstituteId = sessionInfos.getUserId();
         // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), executerUserId, executerSubstituteId);
+        processExecutor.executeFlowNode(flowNodeInstance.getId(), flowNodeInstance.getProcessDefinitionId(), executerUserId, executerSubstituteId);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
             final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, sessionInfos.getUsername(), executerUserId,
                     executerSubstituteId, null); // no inputs taken in this LEGACY command for old-version web form execution

@@ -14,12 +14,9 @@
 package org.bonitasoft.engine.execution;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -61,16 +58,14 @@ public class ContainerRegistry {
         return executors.get(containerType);
     }
 
-    public void executeFlowNode(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
-            final SExpressionContext contextDependency, final List<SOperation> operations) throws SWorkRegisterException {
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId, operations,
-                contextDependency));
+    public void executeFlowNode(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) throws SWorkRegisterException {
+        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId));
     }
 
-    public void executeFlowNodeInSameThread(final Long processInstanceId, final long flowNodeInstanceId, final SExpressionContext contextDependency,
-            final List<SOperation> operations, final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
+    public void executeFlowNodeInSameThread(final Long processInstanceId, final long flowNodeInstanceId,
+                                            final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
-        containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
+        containerExecutor.executeFlowNode(flowNodeInstanceId, processInstanceId, null, null);
     }
 
 }

@@ -128,7 +128,7 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
                         loopCounter + 1, SStateCategory.NORMAL, -1);
                 activityInstanceService.incrementLoopCounter(loopActivity);
                 activityInstanceService.setTokenCount(loopActivity, loopActivity.getTokenCount() + 1);
-                containerRegistry.executeFlowNode(processDefinition.getId(), parentProcessInstanceId, child.getId(), null, null);
+                containerRegistry.executeFlowNode(processDefinition.getId(), parentProcessInstanceId, child.getId());
             }
             return !loop;
         } catch (final SBonitaException e) {
@@ -142,8 +142,8 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
         try {
             childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), 0, 1);
             if (!childrenOfAnActivity.isEmpty()) {
-                containerRegistry.executeFlowNode(processDefinition.getId(), flowNodeInstance.getLogicalGroup(3), childrenOfAnActivity.get(0).getId(), null,
-                        null);
+                containerRegistry.executeFlowNode(processDefinition.getId(), flowNodeInstance.getLogicalGroup(3), childrenOfAnActivity.get(0).getId()
+                );
             }
             return !childrenOfAnActivity.isEmpty();
         } catch (final SBonitaException e) {

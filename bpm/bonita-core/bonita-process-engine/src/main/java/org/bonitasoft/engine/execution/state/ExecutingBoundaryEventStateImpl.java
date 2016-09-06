@@ -78,8 +78,8 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
                 if (relatedActivityInst.isStable() || relatedActivityInst.isStateExecuting()) {
                     containerRegistry
                             .executeFlowNode(relatedActivityInst.getProcessDefinitionId(),
-                                    boundaryEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()), relatedActivityInst.getId(),
-                                    null, null);
+                                    boundaryEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()), relatedActivityInst.getId()
+                            );
                 }
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);

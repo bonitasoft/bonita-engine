@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.List;
-
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -46,8 +42,6 @@ public interface ContainerExecutor {
      * 
      * @param flowNodeInstanceId
      *            The identifier of the flow node instance
-     * @param contextDependency
-     * @param operations
      * @param processInstanceId
      *            The identifier of the process instance
      * @param executerId
@@ -59,8 +53,8 @@ public interface ContainerExecutor {
      * @throws SFlowNodeExecutionException
      *             Throw if there is an error when execute the flow node
      */
-    FlowNodeState executeFlowNode(long flowNodeInstanceId, SExpressionContext contextDependency, List<SOperation> operations, long processInstanceId,
-            final Long executerId, final Long executerSubstituteId) throws SFlowNodeReadException, SFlowNodeExecutionException;
+    FlowNodeState executeFlowNode(long flowNodeInstanceId, long processInstanceId,
+                                  final Long executerId, final Long executerSubstituteId) throws SFlowNodeReadException, SFlowNodeExecutionException;
 
     /**
      * @return The handled type

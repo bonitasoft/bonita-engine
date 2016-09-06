@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -202,7 +201,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                 final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
                 if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
                     workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getProcessDefinitionId(),
-                            callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId(), null, null));
+                            callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId()));
                     logInfo(logger, "Restarting notification of finished process '" + processInstance.getName() + "' with id " + processInstance.getId()
                             + " in state " + getState(processInstance.getStateId()));
                 }

@@ -105,6 +105,7 @@
 		WHERE a.assigneeId = :assigneeId
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
+		AND a.stateExecuting = FALSE
 	</query>
 
 	<query name="getPendingUserTasks">
