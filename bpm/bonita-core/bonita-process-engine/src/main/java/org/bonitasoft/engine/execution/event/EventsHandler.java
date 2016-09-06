@@ -23,6 +23,8 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
+import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -59,6 +61,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
@@ -98,18 +101,22 @@ public class EventsHandler {
 
     private final TechnicalLoggerService logger;
 
+    private final OperationService operationService;
+
     private ProcessExecutor processExecutor;
 
+
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
-            final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger) {
+                         final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
+                         final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
+                         final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger, OperationService operationService) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.processInstanceService = processInstanceService;
         this.logger = logger;
+        this.operationService = operationService;
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
@@ -389,7 +396,14 @@ public class EventsHandler {
             throws SFlowNodeReadException, SFlowNodeExecutionException {
         // in same thread because we delete the message instance after triggering the catch event. The data is of the message
         // is deleted so we will be unable to execute the flow node instance
-        containerRegistry.executeFlowNodeInSameThread(processInstanceId, flowNodeInstanceId, operations.getContext(), operations.getOperations(),
+        if(operations.getOperations() != null && ! operations.getOperations().isEmpty()){
+            try {
+                operationService.execute(operations.getOperations(), flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), operations.getContext());
+            } catch (SOperationExecutionException e) {
+                throw new SFlowNodeExecutionException("Unable to execute operation before executing flow node " + flowNodeInstanceId, e);
+            }
+        }
+        containerRegistry.executeFlowNodeInSameThread(processInstanceId, flowNodeInstanceId,
                 operations.getContainerType());
     }
 

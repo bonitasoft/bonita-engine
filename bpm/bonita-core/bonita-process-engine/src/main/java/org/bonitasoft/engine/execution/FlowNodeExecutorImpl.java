@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.List;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -24,10 +22,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.contract.data.SContractDataDeletionException;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
-import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
@@ -50,7 +45,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -142,8 +136,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
+    public FlowNodeState stepForward(final long flowNodeInstanceId,
+                                     final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
         // retrieve the activity and execute its state
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -157,7 +151,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 archiveFlowNodeInstance(sFlowNodeInstance, false, processDefinitionId);
                 setExecutedBy(executerId, sFlowNodeInstance);
                 setExecutedBySubstitute(executerSubstituteId, sFlowNodeInstance);
-                executeOperations(expressionContext, operations, sFlowNodeInstance);
             }
 
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -202,7 +195,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
         if (!state.isStable() && !state.isInterrupting()) {
             // reschedule this work but without the operations
-            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, sFlowNodeInstance.getId(), null, null));
+            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, sFlowNodeInstance.getId()));
         } else {
             registerCreateNotifyChildFinishedWorkIfStateIsTerminal(processDefinitionId, state, sFlowNodeInstance);
         }
@@ -216,14 +209,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
         }
     }
-
-    private void executeOperations(final SExpressionContext expressionContext, final List<SOperation> operations, final SFlowNodeInstance sFlowNodeInstance)
-            throws SOperationExecutionException {
-        if (operations != null) {
-            operationService.execute(operations, sFlowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
-        }
-    }
-
     private void setExecutedBySubstitute(final Long executerSubstituteId, final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeModificationException {
         if (isNotNullOrEmptyAndDifferentOf(sFlowNodeInstance.getExecutedBySubstitute(), executerSubstituteId)) {
             activityInstanceService.setExecutedBySubstitute(sFlowNodeInstance, executerSubstituteId);
@@ -269,7 +254,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 sFlowNodeInstanceChild);
         if (hit) {// we continue parent if hit of the parent return true
             // in a new work?
-            stepForward(parentId, null, null, sFlowNodeInstanceChild.getParentProcessInstanceId(), null, null);
+            stepForward(parentId, sFlowNodeInstanceChild.getParentProcessInstanceId(), null, null);
         }
     }
 
@@ -295,7 +280,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         if (!hasActionsToExecute) {
             containerRegistry.executeFlowNode(callActivityInstance.getProcessDefinitionId(),
                     callActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
-                    callActivityInstance.getId(), null, null);
+                    callActivityInstance.getId());
         }
     }
 
@@ -310,9 +295,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        return stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerSubstituteId);
+    public FlowNodeState executeFlowNode(final long flowNodeInstanceId,
+                                         final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
+        return stepForward(flowNodeInstanceId, processInstanceId, executerId, executerSubstituteId);
     }
 
     @Override

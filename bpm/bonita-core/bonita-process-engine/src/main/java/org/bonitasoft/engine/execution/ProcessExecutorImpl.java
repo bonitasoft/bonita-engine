@@ -210,9 +210,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public FlowNodeState executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
+    public FlowNodeState executeFlowNode(final long flowNodeInstanceId,
             final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        return flowNodeExecutor.stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerSubstituteId);
+        return flowNodeExecutor.stepForward(flowNodeInstanceId, processInstanceId, executerId, executerSubstituteId);
     }
 
     private SConnectorInstance getNextConnectorInstance(final SProcessInstance processInstance, final ConnectorEvent event)
@@ -318,7 +318,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), null, null, parentProcessInstanceId, null, null);
+                executeFlowNode(gatewayToExecute.getId(), parentProcessInstanceId, null, null);
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
@@ -712,7 +712,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), null, null, gatewayToExecute.getParentProcessInstanceId(), null, null);
+                executeFlowNode(gatewayToExecute.getId(), gatewayToExecute.getParentProcessInstanceId(), null, null);
             }
 
         }
@@ -908,7 +908,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         for (final SFlowNodeInstance sFlowNodeInstance : flowNodeInstances) {
             try {
                 workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sProcessInstance.getProcessDefinitionId(), sProcessInstance.getId(),
-                        sFlowNodeInstance.getId(), null, null));
+                        sFlowNodeInstance.getId()));
             } catch (final SWorkRegisterException e) {
                 setExceptionContext(sProcessInstance, sFlowNodeInstance, e);
                 throw new SFlowNodeExecutionException("Unable to trigger execution of the flow node.", e);
@@ -935,7 +935,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-                    .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
+                    .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId()));
         }
     }
 

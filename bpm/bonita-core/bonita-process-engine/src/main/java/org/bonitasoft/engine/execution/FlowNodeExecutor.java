@@ -13,13 +13,9 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.List;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
@@ -40,8 +36,6 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     /**
      * 
      * @param flowNodeInstanceId
-     * @param expressionContext
-     * @param operations
      * @param processInstanceId
      * @param executerId
      * @param executerSubstituteId
@@ -49,8 +43,8 @@ public interface FlowNodeExecutor extends ContainerExecutor {
      * @throws SFlowNodeExecutionException
      * @since 6.0
      */
-    FlowNodeState stepForward(long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations, long processInstanceId,
-            Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException;
+    FlowNodeState stepForward(long flowNodeInstanceId, long processInstanceId,
+                              Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException;
 
     /**
      * 

@@ -24,22 +24,13 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class ExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
+public class ExecutingFlowNodeStateImpl extends OnFinishConnectorState {
 
     private StateBehaviors stateBehaviors;
 
     public ExecutingFlowNodeStateImpl(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors, false, true);
+        super(stateBehaviors);
         this.stateBehaviors = stateBehaviors;
-    }
-
-    /**
-     * @param stateBehaviors
-     * @param b
-     * @param c
-     */
-    public ExecutingFlowNodeStateImpl(final StateBehaviors stateBehaviors, final boolean executeOnEnter, final boolean executeOnFinish) {
-        super(stateBehaviors, executeOnEnter, executeOnFinish);
     }
 
     @Override
@@ -93,17 +84,13 @@ public class ExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
     }
 
     @Override
-    protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+
     }
 
     @Override
-    protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SActivityStateExecutionException {
-    }
-
-    @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void afterConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayDescriptionAfterCompletion(processDefinition, flowNodeInstance);
-    }
 
+    }
 }

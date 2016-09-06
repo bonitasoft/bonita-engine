@@ -128,7 +128,7 @@ public class ProcessStarter {
         final SProcessInstance startedSProcessInstance;
         try {
             final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
-            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
+            startedSProcessInstance =  processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
                     new FlowNodeSelector(sProcessDefinition, filter), instantiationInputs);
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);

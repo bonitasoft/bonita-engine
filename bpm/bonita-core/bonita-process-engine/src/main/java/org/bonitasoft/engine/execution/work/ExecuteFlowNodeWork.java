@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -35,24 +32,18 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     private static final long serialVersionUID = -5873526992671300038L;
 
-    public static enum Type {
+    public enum Type {
         PROCESS,
-        FLOWNODE;
+        FLOWNODE
     }
 
     private final long flowNodeInstanceId;
 
-    private final List<SOperation> operations;
-
-    private final SExpressionContext contextDependency;
-
     private final long processInstanceId;
 
-    ExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations, final SExpressionContext contextDependency,
-            final long processInstanceId) {
+    ExecuteFlowNodeWork(final long flowNodeInstanceId,
+                        final long processInstanceId) {
         this.flowNodeInstanceId = flowNodeInstanceId;
-        this.operations = operations;
-        this.contextDependency = contextDependency;
         this.processInstanceId = processInstanceId;
     }
 
@@ -69,7 +60,7 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     @Override
     public void work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
+        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, processInstanceId, null, null);
     }
 
     @Override
