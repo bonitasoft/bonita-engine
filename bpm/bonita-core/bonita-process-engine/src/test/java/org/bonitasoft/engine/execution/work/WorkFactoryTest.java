@@ -15,10 +15,7 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.mockito.Mockito.doReturn;
 
-import java.util.Collections;
-
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
@@ -71,7 +68,7 @@ public class WorkFactoryTest {
 
     @Test
     public void createExecuteFlowNode() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, 3, Collections.<SOperation> emptyList(), null);
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, 3);
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));

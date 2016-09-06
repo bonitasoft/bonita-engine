@@ -305,7 +305,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         final SelectListDescriptor<SConnectorInstanceWithFailureInfo> selectListDescriptor = new SelectListDescriptor<>(
                 "getConnectorInstancesWithFailureInfoInState",
                 inputParameters, SConnectorInstanceWithFailureInfo.class, new QueryOptions(from, maxResults, SConnectorInstanceWithFailureInfo.class, "id",
-                OrderByType.ASC));
+                        OrderByType.ASC));
         try {
             return persistenceService.selectList(selectListDescriptor);
         } catch (final SBonitaReadException e) {

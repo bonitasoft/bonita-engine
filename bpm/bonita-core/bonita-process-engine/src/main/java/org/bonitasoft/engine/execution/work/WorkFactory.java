@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
@@ -62,12 +58,11 @@ public class WorkFactory {
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
-    public static BonitaWork createExecuteFlowNodeWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
-            final List<SOperation> operations, final SExpressionContext contextDependency) {
+    public static BonitaWork createExecuteFlowNodeWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
-        BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId, operations, contextDependency, processInstanceId);
+        BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId, processInstanceId);
         wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
         wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);

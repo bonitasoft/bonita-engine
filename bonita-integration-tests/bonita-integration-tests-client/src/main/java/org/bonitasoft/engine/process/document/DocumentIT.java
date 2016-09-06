@@ -1264,6 +1264,9 @@ public class DocumentIT extends TestWithUser {
         waitForUserTaskAndExecuteIt("step1", user);
         waitForUserTaskAndExecuteIt("step1", user);
         waitForUserTaskAndExecuteIt("step1", user);
+        waitForUserTask("step2");
+        waitForUserTask("step2");
+        waitForUserTask("step2");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.sort(DocumentsSearchDescriptor.DOCUMENT_URL, Order.ASC);
@@ -1275,11 +1278,9 @@ public class DocumentIT extends TestWithUser {
         urls.add(documents.get(1).getUrl());
         urls.add(documents.get(2).getUrl());
 
+
         assertEquals(Arrays.asList("http://someurl", "http://someurl1", "http://someurl2"), urls);
 
-        waitForUserTask("step2");
-        waitForUserTask("step2");
-        waitForUserTask("step2");
         disableAndDeleteProcess(miDefinition);
         disableAndDeleteProcess(docDefinition);
     }

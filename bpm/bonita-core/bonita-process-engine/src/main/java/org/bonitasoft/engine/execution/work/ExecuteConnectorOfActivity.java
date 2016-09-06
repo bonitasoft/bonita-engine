@@ -81,7 +81,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
         final BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
-                flowNodeInstanceId, null, null);
+                flowNodeInstanceId);
         workService.registerWork(executeFlowNodeWork);
     }
 

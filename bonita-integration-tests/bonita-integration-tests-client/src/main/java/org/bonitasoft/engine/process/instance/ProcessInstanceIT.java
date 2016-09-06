@@ -58,7 +58,6 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -182,17 +181,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     @Test
-    @Ignore("ENGINE-915 - ArchivedProcessInstance.getStartDate() returns null")
     public void getArchivedProcessInstance() throws Exception {
-        getArchivedProcessInstances();
-    }
-
-    @Test
-    public void getArchivedProcessInstanceOrderByLastUpdate() throws Exception {
-        getArchivedProcessInstances(ProcessInstanceCriterion.LAST_UPDATE_ASC, 0, 1, 2, ProcessInstanceCriterion.LAST_UPDATE_DESC, 2, 1, 0);
-    }
-
-    private void getArchivedProcessInstances() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
                 Arrays.asList("step1", "step2"), Arrays.asList(false, false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
@@ -213,9 +202,9 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         System.out.println("process instances : " + processInstances);
 
         // We check that the retrieved processes are the good ones:
-        assertEquals(pi0.getId(), returnedPI0.getId());
-        assertEquals(pi1.getId(), returnedPI1.getId());
-        assertEquals(pi2.getId(), returnedPI2.getId());
+        assertEquals(pi0.getId(), returnedPI0.getSourceObjectId());
+        assertEquals(pi1.getId(), returnedPI1.getSourceObjectId());
+        assertEquals(pi2.getId(), returnedPI2.getSourceObjectId());
 
         // First creation date must be after second creation date:
         assertTrue(returnedPI0.getStartDate().before(returnedPI1.getStartDate()));
@@ -224,6 +213,11 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         disableAndDeleteProcess(processDefinition);
         assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
+    }
+
+    @Test
+    public void getArchivedProcessInstanceOrderByLastUpdate() throws Exception {
+        getArchivedProcessInstances(ProcessInstanceCriterion.LAST_UPDATE_ASC, 0, 1, 2, ProcessInstanceCriterion.LAST_UPDATE_DESC, 2, 1, 0);
     }
 
     private void getArchivedProcessInstances(final ProcessInstanceCriterion asc, final int asc1, final int asc2, final int asc3,

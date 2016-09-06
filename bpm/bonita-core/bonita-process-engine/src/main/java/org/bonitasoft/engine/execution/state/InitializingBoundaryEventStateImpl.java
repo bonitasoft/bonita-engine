@@ -23,12 +23,12 @@ import org.bonitasoft.engine.execution.StateBehaviors;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class InitializingBoundaryEventStateImpl extends FlowNodeStateWithConnectors {
+public class InitializingBoundaryEventStateImpl extends OnEnterConnectorState {
 
     private final StateBehaviors stateBehaviors;
 
     public InitializingBoundaryEventStateImpl(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors, true, false);
+        super(stateBehaviors);
         this.stateBehaviors = stateBehaviors;
     }
 
@@ -83,17 +83,12 @@ public class InitializingBoundaryEventStateImpl extends FlowNodeStateWithConnect
     }
 
     @Override
-    protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    protected void beforeConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         stateBehaviors.handleBoundaryEvent(processDefinition, (SBoundaryEventInstance) flowNodeInstance);
     }
 
     @Override
-    protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
-            throws SActivityStateExecutionException {
+    protected void afterConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
-    }
-
-    @Override
-    protected void afterOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
     }
 }

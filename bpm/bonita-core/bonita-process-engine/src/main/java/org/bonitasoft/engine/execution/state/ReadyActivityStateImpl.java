@@ -25,12 +25,12 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ReadyActivityStateImpl extends FlowNodeStateWithConnectors {
+public class ReadyActivityStateImpl extends OnEnterAndFinishConnectorState {
 
     private final StateBehaviors stateBehaviors;
 
     public ReadyActivityStateImpl(final StateBehaviors stateBehaviors) {
-        super(stateBehaviors, false, true);
+        super(stateBehaviors);
         this.stateBehaviors = stateBehaviors;
     }
 

@@ -94,7 +94,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
                 + "> in state = <" + sFlowNodeInstance.getStateName() + ">");
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(),
-                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), null, null));
+                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId()));
     }
 
     void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
