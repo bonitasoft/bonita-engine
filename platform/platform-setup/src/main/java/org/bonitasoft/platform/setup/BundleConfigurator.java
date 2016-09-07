@@ -13,12 +13,12 @@
  */
 package org.bonitasoft.platform.setup;
 
-import static org.bonitasoft.platform.setup.DatabaseConfiguration.H2_DB_VENDOR;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Emmanuel Duchastenier
  */
-public class BundleConfigurator {
+class BundleConfigurator {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
@@ -95,88 +95,95 @@ public class BundleConfigurator {
 
     void configureApplicationServer() throws PlatformException {
         loadProperties();
-        if (H2_DB_VENDOR.equals(standardConfiguration.getDbVendor())) {
-            LOGGER.info("H2 environment detected: no auto-configuration needed.");
-            return;
-        }
         if (!isTomcatEnvironment()) {
-            LOGGER.info("This Application Server needs manual configuration.");
+            LOGGER.info("No Application Server detected. You may need to manually configure the access to the database." +
+                    " Supported App Servers are: Tomcat 7"); //, Wildfly 9");
             return;
         }
-
-        final Path dbFile = getPath("setup/database.properties");
-        LOGGER.info("Tomcat environment detected. Auto-configuring using file " + dbFile.toAbsolutePath().toString() + "...");
-        configureTomcat();
-        LOGGER.info("Tomcat auto-configuration complete.");
+        try {
+            final Path dbFile = Paths.get(this.getClass().getResource("/database.properties").toURI());
+            LOGGER.info("Tomcat environment detected. Auto-configuring using file " + dbFile.toRealPath().toString() + "...");
+            configureTomcat();
+            LOGGER.info("Tomcat auto-configuration complete.");
+        } catch (URISyntaxException | IOException e) {
+            throw new PlatformException("Configuration file 'database.properties' not found");
+        }
     }
 
     void configureTomcat() throws PlatformException {
+        final String dbVendor = standardConfiguration.getDbVendor();
+        final String bdmDbVendor = bdmConfiguration.getDbVendor();
         final Path setEnvUnixFile = getPath("bin/setenv.sh", true);
         final Path setEnvWindowsFile = getPath("bin/setenv.bat", true);
         final Path bonitaXmlFile = getPath("conf/Catalina/localhost/bonita.xml", true);
         final Path bitronixFile = getPath("conf/bitronix-resources.properties", true);
-        final File bonitaDbDriverFile = getDriverFile(standardConfiguration.getDbVendor());
-        final File bdmDriverFile = getDriverFile(bdmConfiguration.getDbVendor());
-        final Path targetDriverDirectory = getPath("lib/bonita");
+        final File bonitaDbDriverFile = getDriverFile(dbVendor);
+        final File bdmDriverFile = getDriverFile(bdmDbVendor);
+
         try {
+            makeBackupOfFile(setEnvUnixFile, true);
+            makeBackupOfFile(setEnvWindowsFile, true);
+            makeBackupOfFile(bonitaXmlFile, false);
+            copyTemplateToFile("/bonita.template.xml", bonitaXmlFile);
+            makeBackupOfFile(bitronixFile, false);
+            copyTemplateToFile("/bitronix-resources.template.properties", bitronixFile);
+
+            ////////////////////////////
+            // STANDARD BONITA DATABASE:
+            ////////////////////////////
+
             // 1. update setenv(.sh|.bat):
-            updateSetEnvFile(setEnvUnixFile, setEnvWindowsFile);
+            updateSetEnvFile(setEnvUnixFile, setEnvWindowsFile, dbVendor, "sysprop.bonita.db.vendor");
 
             //2. update bonita.xml:
-            updateBonitaXmlFile(bonitaXmlFile);
+            updateBonitaXmlFile(bonitaXmlFile, standardConfiguration, "ds1");
 
             // 3. update bitronix-resources.properties
-            updateBitronixFile(bitronixFile);
+            updateBitronixFile(bitronixFile, standardConfiguration, "ds1");
 
             //4. copy the JDBC drivers:
-            copyDriversToTomcat(bonitaDbDriverFile, bdmDriverFile, targetDriverDirectory);
+            final Path srcDriverFile = bonitaDbDriverFile.toPath();
+            final Path targetBonitaDbDriverFile = getPath("lib/bonita").resolve(srcDriverFile.getFileName());
+            copyDatabaseDriversIfNecessary(srcDriverFile, targetBonitaDbDriverFile, dbVendor);
+
+            ////////////////
+            // BDM DATABASE:
+            ////////////////
+
+            // 1. update setenv(.sh|.bat):
+            updateSetEnvFile(setEnvUnixFile, setEnvWindowsFile, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
+
+            //2. update bonita.xml:
+            updateBonitaXmlFile(bonitaXmlFile, bdmConfiguration, "ds2");
+
+            // 3. update bitronix-resources.properties
+            updateBitronixFile(bitronixFile, bdmConfiguration, "ds2");
+
+            //4. copy the JDBC drivers:
+            final Path srcBdmDriverFile = bdmDriverFile.toPath();
+            final Path targetBdmDriverFile = getPath("lib/bonita").resolve(srcBdmDriverFile.getFileName());
+            copyDatabaseDriversIfNecessary(srcBdmDriverFile, targetBdmDriverFile, bdmDbVendor);
 
         } catch (PlatformException e) {
-            restorePreviousConfiguration(setEnvUnixFile, setEnvWindowsFile, bonitaXmlFile, bitronixFile, bdmDriverFile, targetDriverDirectory);
+            restorePreviousConfiguration(setEnvUnixFile, setEnvWindowsFile, bonitaXmlFile, bitronixFile);
             throw e;
         }
     }
 
-    private void copyDriversToTomcat(File bonitaDbDriverFile, File bdmDriverFile, Path targetDriverDirectory) throws PlatformException {
-        copyDatabaseDrivers(bonitaDbDriverFile, targetDriverDirectory.toFile(), standardConfiguration.getDbVendor());
-        if (!bonitaDbDriverFile.equals(bdmDriverFile)) {
-            copyDatabaseDrivers(bdmDriverFile, targetDriverDirectory.toFile(), bdmConfiguration.getDbVendor());
-        }
-    }
+    private void updateBitronixFile(Path bitronixFile, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
+        Map<String, String> replacements = new HashMap<>(7);
+        replacements.put("@@" + bitronixDatasourceAlias + "_driver_class_name@@", configuration.getXaDriverClassName());
+        replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_user@@", configuration.getDatabaseUser());
+        replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_password@@", configuration.getDatabasePassword());
+        replacements.put("@@" + bitronixDatasourceAlias + "_database_test_query@@", configuration.getTestQuery());
 
-    private void updateBitronixFile(Path bitronixFile) throws PlatformException {
-        // Backup the original file:
-        makeBackupOfFile(bitronixFile, false);
-
-        copyTemplateToFile("/bitronix-resources.template.properties", bitronixFile);
-
-        Map<String, String> replacements = new HashMap<>(14);
-        replacements.put("@@ds1_driver_class_name@@", standardConfiguration.getXaDriverClassName());
-        replacements.put("@@ds1_database_connection_user@@", standardConfiguration.getDatabaseUser());
-        replacements.put("@@ds1_database_connection_password@@", standardConfiguration.getDatabasePassword());
-        replacements.put("@@ds1_database_test_query@@", standardConfiguration.getTestQuery());
-
-        // Let's uncomment and replace dbvendor-specific values for DS1:
-        if (POSTGRES.equals(standardConfiguration.getDbVendor())) {
-            replacements.putAll(uncommentLineAndReplace("@@ds1_postgres_server_name@@", standardConfiguration.getServerName()));
-            replacements.putAll(uncommentLineAndReplace("@@ds1_postgres_port_number@@", standardConfiguration.getServerPort()));
-            replacements.putAll(uncommentLineAndReplace("@@ds1_postgres_database_name@@", standardConfiguration.getDatabaseName()));
+        // Let's uncomment and replace dbvendor-specific values:
+        if (POSTGRES.equals(configuration.getDbVendor())) {
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_server_name@@", configuration.getServerName()));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_port_number@@", configuration.getServerPort()));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_database_name@@", configuration.getDatabaseName()));
         } else {
-            replacements.putAll(uncommentLineAndReplace("@@ds1_database_connection_url@@", standardConfiguration.getUrl()));
-        }
-
-        replacements.put("@@ds2_driver_class_name@@", bdmConfiguration.getXaDriverClassName());
-        replacements.put("@@ds2_database_connection_user@@", bdmConfiguration.getDatabaseUser());
-        replacements.put("@@ds2_database_connection_password@@", bdmConfiguration.getDatabasePassword());
-        replacements.put("@@ds2_database_test_query@@", bdmConfiguration.getTestQuery());
-
-        // Let's uncomment and replace dbvendor-specific values for DS2:
-        if (POSTGRES.equals(bdmConfiguration.getDbVendor())) {
-            replacements.putAll(uncommentLineAndReplace("@@ds2_postgres_server_name@@", bdmConfiguration.getServerName()));
-            replacements.putAll(uncommentLineAndReplace("@@ds2_postgres_port_number@@", bdmConfiguration.getServerPort()));
-            replacements.putAll(uncommentLineAndReplace("@@ds2_postgres_database_name@@", bdmConfiguration.getDatabaseName()));
-        } else {
-            replacements.putAll(uncommentLineAndReplace("@@ds2_database_connection_url@@", bdmConfiguration.getUrl()));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_database_connection_url@@", configuration.getUrl()));
         }
 
         replaceContentInFile(bitronixFile, replacements);
@@ -184,38 +191,23 @@ public class BundleConfigurator {
         LOGGER.info("Configuring file 'conf/bitronix-resources.properties' with the DB connection values you provided in file 'database.properties'");
     }
 
-    private void updateBonitaXmlFile(Path bonitaXmlFile) throws PlatformException {
-        // Backup the original file:
-        makeBackupOfFile(bonitaXmlFile, false);
-
-        copyTemplateToFile("/bonita.template.xml", bonitaXmlFile);
-
-        Map<String, String> replacements = new HashMap<>(10);
-        replacements.put("@@ds1.database_connection_user@@", standardConfiguration.getDatabaseUser());
-        replacements.put("@@ds1.database_connection_password@@", standardConfiguration.getDatabasePassword());
-        replacements.put("@@ds1.driver_class_name@@", standardConfiguration.getNonXaDriverClassName());
-        replacements.put("@@ds1.database_connection_url@@", standardConfiguration.getUrl());
-        replacements.put("@@ds1.database_test_query@@", standardConfiguration.getTestQuery());
-
-        replacements.put("@@ds2.database_connection_user@@", bdmConfiguration.getDatabaseUser());
-        replacements.put("@@ds2.database_connection_password@@", bdmConfiguration.getDatabasePassword());
-        replacements.put("@@ds2.driver_class_name@@", bdmConfiguration.getNonXaDriverClassName());
-        replacements.put("@@ds2.database_connection_url@@", bdmConfiguration.getUrl());
-        replacements.put("@@ds2.database_test_query@@", bdmConfiguration.getTestQuery());
+    private void updateBonitaXmlFile(Path bonitaXmlFile, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
+        Map<String, String> replacements = new HashMap<>(5);
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_user@@", configuration.getDatabaseUser());
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_password@@", configuration.getDatabasePassword());
+        replacements.put("@@" + bitronixDatasourceAlias + ".driver_class_name@@", configuration.getNonXaDriverClassName());
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", configuration.getUrl());
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_test_query@@", configuration.getTestQuery());
         replaceContentInFile(bonitaXmlFile, replacements);
 
         LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with the DB connection values you provided in file 'database.properties'");
     }
 
-    private void updateSetEnvFile(Path setEnvUnixFile, Path setEnvWindowsFile) throws PlatformException {
-        Map<String, String> replacementMap = new HashMap<>(2);
-        replacementMap.put("-Dsysprop.bonita.db.vendor=.*\"", "-Dsysprop.bonita.db.vendor=" + standardConfiguration.getDbVendor() + "\"");
-        replacementMap.put("-Dsysprop.bonita.bdm.db.vendor=.*\"", "-Dsysprop.bonita.bdm.db.vendor=" + bdmConfiguration.getDbVendor() + "\"");
+    private void updateSetEnvFile(Path setEnvUnixFile, Path setEnvWindowsFile, String dbVendor, final String systemPropertyName) throws PlatformException {
+        final Map<String, String> replacementMap = Collections.singletonMap("-D" + systemPropertyName + "=.*\"",
+                "-D" + systemPropertyName + "=" + dbVendor + "\"");
 
-        makeBackupOfFile(setEnvUnixFile, true);
         replaceContentInFile(setEnvUnixFile, replacementMap);
-
-        makeBackupOfFile(setEnvWindowsFile, true);
         replaceContentInFile(setEnvWindowsFile, replacementMap);
     }
 
@@ -228,15 +220,22 @@ public class BundleConfigurator {
         }
     }
 
-    void copyDatabaseDrivers(File driverFile, File targetDriverDirectory, String dbVendor) throws PlatformException {
-        if (driverFile != null) {
-            try {
-                FileUtils.copyFileToDirectory(driverFile, targetDriverDirectory);
-                LOGGER.info("Copying your " + dbVendor + " driver file " + driverFile.getName() + " to tomcat lib folder 'lib/bonita'");
-            } catch (IOException e) {
-                throw new PlatformException("Fail to copy driver file " + driverFile.getName() + " to target directory "
-                        + targetDriverDirectory.getAbsolutePath() + ": " + e.getMessage(), e);
-            }
+    boolean copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor) throws PlatformException {
+        if (Files.exists(targetDriverFile)) {
+            LOGGER.info("Your " + dbVendor + " driver file " + targetDriverFile.toAbsolutePath() + " already exists. Skipping the copy.");
+            return false;
+        }
+        copyDriverFile(srcDriverFile, targetDriverFile, dbVendor);
+        return true;
+    }
+
+    void copyDriverFile(Path srcDriverFile, Path targetDriverFile, String dbVendor) throws PlatformException {
+        try {
+            Files.copy(srcDriverFile, targetDriverFile);
+            LOGGER.info("Copying your " + dbVendor + " driver file " + srcDriverFile.getFileName() + " to tomcat lib folder 'lib/bonita'");
+        } catch (IOException e) {
+            throw new PlatformException(
+                    "Fail to copy driver file lib/" + srcDriverFile.getFileName() + " to " + targetDriverFile.toAbsolutePath() + ": " + e.getMessage(), e);
         }
     }
 
@@ -260,20 +259,13 @@ public class BundleConfigurator {
         return new String(Files.readAllBytes(bonitaXmlFile), StandardCharsets.UTF_8);
     }
 
-    private void restorePreviousConfiguration(Path setEnvUnixFile, Path setEnvWindowsFile, Path bonitaXmlFile, Path bitronixFile, File driverFile,
-            Path targetDriverDirectory) throws PlatformException {
+    void restorePreviousConfiguration(Path setEnvUnixFile, Path setEnvWindowsFile, Path bonitaXmlFile, Path bitronixFile) throws PlatformException {
         LOGGER.warn("Problem encountered, restoring previous configuration");
         // undo file copies:
         restoreOriginalFile(bonitaXmlFile);
         restoreOriginalFile(bitronixFile);
         restoreOriginalFile(setEnvUnixFile);
         restoreOriginalFile(setEnvWindowsFile);
-        final String driverFileName = driverFile.getName();
-        try {
-            Files.deleteIfExists(targetDriverDirectory.resolve(driverFileName));
-        } catch (IOException e) {
-            throw new PlatformException("Fail to delete copied driver file " + driverFileName + ": " + e.getMessage(), e);
-        }
     }
 
     private void restoreOriginalFile(Path bonitaXmlFile) throws PlatformException {
@@ -312,20 +304,17 @@ public class BundleConfigurator {
             throw new PlatformException("Drivers folder not found: " + driverFolder.toString()
                     + ". Make sure it exists and put a jar or zip file containing drivers there.");
         }
-        if (!H2_DB_VENDOR.equals(dbVendor)) {
-            final Collection<File> driversFiles = FileUtils.listFiles(driverFolder.toFile(), getDriverFilter(dbVendor), null);
-            if (driversFiles.size() == 0) {
-                throw new PlatformException("No " + dbVendor + " drivers found in folder " + driverFolder.toString()
-                        + ". Make sure to put a jar or zip file containing drivers there.");
-            } else if (driversFiles.size() == 1) {
-                return (File) driversFiles.toArray()[0];
-            } else {
-                throw new PlatformException(
-                        "Found more than 1 file containing " + dbVendor + " drivers  in folder " + driverFolder.toString()
-                                + ". Make sure to put only 1 jar or zip file containing drivers there.");
-            }
+        final Collection<File> driversFiles = FileUtils.listFiles(driverFolder.toFile(), getDriverFilter(dbVendor), null);
+        if (driversFiles.size() == 0) {
+            throw new PlatformException("No " + dbVendor + " drivers found in folder " + driverFolder.toString()
+                    + ". Make sure to put a jar or zip file containing drivers there.");
+        } else if (driversFiles.size() == 1) {
+            return (File) driversFiles.toArray()[0];
+        } else {
+            throw new PlatformException(
+                    "Found more than 1 file containing " + dbVendor + " drivers  in folder " + driverFolder.toString()
+                            + ". Make sure to put only 1 jar or zip file containing drivers there.");
         }
-        return null;
     }
 
     RegexFileFilter getDriverFilter(String dbVendor) {
@@ -374,13 +363,6 @@ public class BundleConfigurator {
             throw new PlatformException("File " + build.getFileName() + " is mandatory but is not found");
         }
         return build;
-    }
-    public DatabaseConfiguration getStandardConfiguration() {
-        return standardConfiguration;
-    }
-
-    public DatabaseConfiguration getBdmConfiguration() {
-        return bdmConfiguration;
     }
 
 }
