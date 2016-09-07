@@ -13,6 +13,7 @@
  */
 package org.bonitasoft.platform.setup;
 
+import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.mockito.Mockito.*;
@@ -140,6 +141,64 @@ public class BundleConfiguratorTest {
         assertThat(bitronixFile.resolveSibling("bitronix-resources.properties.original").toFile()).exists();
     }
 
+    @Test
+    public void configureApplicationServer_should_support_H2_replacements_for_Bonita_database() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "h2");
+        System.setProperty("db.database.name", "internal_database.db");
+        System.setProperty("db.user", "myUser");
+        System.setProperty("db.password", "myPwd");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path bitronixFile = newFolderPath.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = newFolderPath.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+
+        checkFileContains(bitronixFile, "resource.ds1.className=org.h2.jdbcx.JdbcDataSource", "resource.ds1.driverProperties.user=myUser",
+                "resource.ds1.driverProperties.password=myPwd",
+                "resource.ds1.driverProperties.URL=jdbc:h2:file:../database/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
+                "resource.ds1.testQuery=SELECT 1");
+        checkFileContains(bitronixFile, "resource.ds2.className=oracle.jdbc.xa.client.OracleXADataSource",
+                "resource.ds2.driverProperties.user=bizUser", "resource.ds2.driverProperties.password=bizPwd",
+                "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL", "resource.ds2.testQuery=SELECT 1 FROM DUAL");
+
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"", "driverClassName=\"org.h2.Driver\"",
+                "url=\"jdbc:h2:file:../database/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+        checkFileContains(bonita_xml,
+                "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
+                "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL\"");
+    }
+
+    @Test
+    public void configureApplicationServer_should_support_H2_replacements_for_BDM() throws Exception {
+        // given:
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("bdm.db.database.name", "business_data.db");
+        System.setProperty("bdm.db.user", "sa");
+        System.setProperty("bdm.db.password", "");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path bitronixFile = newFolderPath.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = newFolderPath.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+
+        checkFileContains(bitronixFile, "resource.ds1.className=org.postgresql.xa.PGXADataSource", "resource.ds1.driverProperties.user=bonita",
+                "resource.ds1.driverProperties.password=bpm", "resource.ds1.driverProperties.serverName=localhost",
+                "resource.ds1.driverProperties.portNumber=5432", "resource.ds1.driverProperties.databaseName=bonita", "resource.ds1.testQuery=SELECT 1");
+
+        checkFileContains(bitronixFile, "resource.ds2.className=org.h2.jdbcx.JdbcDataSource", "resource.ds2.driverProperties.user=sa",
+                "resource.ds2.driverProperties.password=",
+                "resource.ds2.driverProperties.URL=jdbc:h2:file:../database/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
+                "resource.ds2.testQuery=SELECT 1");
+
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"sa\"", "password=\"\"", "driverClassName=\"org.h2.Driver\"",
+                "url=\"jdbc:h2:file:../database/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+    }
+
     private void checkFileContains(Path file, String... expectedTexts) throws IOException {
         final String content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
         for (String text : expectedTexts) {
@@ -193,6 +252,27 @@ public class BundleConfiguratorTest {
     }
 
     @Test
+    public void getDriverFilter_should_detect_H2_drivers() throws Exception {
+        // when:
+        final RegexFileFilter driverFilter = configurator.getDriverFilter("h2");
+
+        // then:
+        assertThat(driverFilter.accept(new File("h2-1.4.JAR"))).isTrue();
+        assertThat(driverFilter.accept(new File("drivers-H2.ZIP"))).isTrue();
+        assertThat(driverFilter.accept(new File("my-custom-h2_package.jar"))).isTrue();
+    }
+
+    @Test
+    public void should_copy_both_drivers_if_not_the_same_dbVendor_for_bdm() throws Exception {
+        // when:
+        spy.configureApplicationServer();
+
+        // then:
+        verify(spy).copyDriverFile(any(Path.class), any(Path.class), eq("postgres"));
+        verify(spy).copyDriverFile(any(Path.class), any(Path.class), eq("oracle"));
+    }
+
+    @Test
     public void should_not_copy_drivers_again_if_same_dbVendor_for_bdm() throws Exception {
         final String bdmDbVendor = "postgres";
         System.setProperty("bdm.db.vendor", bdmDbVendor);
@@ -201,7 +281,7 @@ public class BundleConfiguratorTest {
         spy.configureApplicationServer();
 
         // then:
-        verify(spy, times(1)).copyDatabaseDrivers(any(File.class), any(File.class), eq(bdmDbVendor));
+        verify(spy, times(1)).copyDriverFile(any(Path.class), any(Path.class), anyString());
     }
 
     @Test
@@ -211,22 +291,10 @@ public class BundleConfiguratorTest {
 
         // then:
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("is mandatory but is not found");
+        expectedException.expectMessage("File bitronix-resources.properties is mandatory but is not found");
 
         // when:
         configurator.configureApplicationServer();
-    }
-
-    @Test
-    public void configureApplicationServer_should_do_nothing_for_H2() throws Exception {
-        // given:
-        System.setProperty("db.vendor", "h2");
-
-        // when:
-        spy.configureApplicationServer();
-
-        // then:
-        verify(spy, times(0)).configureTomcat();
     }
 
     @Test
@@ -243,4 +311,18 @@ public class BundleConfiguratorTest {
         configurator.configureApplicationServer();
     }
 
+    @Test
+    public void exception_in_configure_should_restore_previous_configuration() throws Exception {
+        // given:
+        doThrow(PlatformException.class).when(spy).copyDatabaseDriversIfNecessary(any(Path.class), any(Path.class), eq("oracle"));
+
+        // when:
+        try {
+            spy.configureApplicationServer();
+            fail("Should have thrown exception");
+        } catch (PlatformException e) {
+            // then:
+            verify(spy).restorePreviousConfiguration(any(Path.class), any(Path.class), any(Path.class), any(Path.class));
+        }
+    }
 }
