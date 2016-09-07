@@ -27,7 +27,7 @@ public class DatabaseConfiguration {
     // Use BundleConfigurator logger for easier configuration (no need for a specific logger here):
     private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
-    static final String H2_DB_VENDOR = "h2";
+    private static final String H2_DB_VENDOR = "h2";
 
     private String dbVendor;
     private String nonXaDriverClassName;
@@ -42,18 +42,20 @@ public class DatabaseConfiguration {
 
     DatabaseConfiguration(String prefix, Properties properties) throws PlatformException {
         dbVendor = getPropertyAndFailIfNull(properties, prefix + "db.vendor");
-        // No need to configure anything for H2:
-        if (H2_DB_VENDOR.equals(dbVendor)) {
-            return;
-        }
+
         nonXaDriverClassName = getPropertyAndFailIfNull(properties, dbVendor + ".nonXaDriver");
         xaDriverClassName = getPropertyAndFailIfNull(properties, dbVendor + ".xaDriver");
-        serverName = getPropertyAndFailIfNull(properties, prefix + "db.server.name");
-        serverPort = getPropertyAndFailIfNull(properties, prefix + "db.server.port");
         databaseName = getPropertyAndFailIfNull(properties, prefix + "db.database.name");
         url = getPropertyAndFailIfNull(properties, dbVendor + "." + prefix + "url");
-        url = url.replace("${" + prefix + "db.server.name}", serverName);
-        url = url.replace("${" + prefix + "db.server.port}", serverPort);
+        // Configuration for H2 is a little different from other DB vendors:
+        if (H2_DB_VENDOR.equals(dbVendor)) {
+            url = url.replace("${h2.database.dir}", getPropertyAndFailIfNull(properties, "h2.database.dir"));
+        } else {
+            serverName = getPropertyAndFailIfNull(properties, prefix + "db.server.name");
+            url = url.replace("${" + prefix + "db.server.name}", serverName);
+            serverPort = getPropertyAndFailIfNull(properties, prefix + "db.server.port");
+            url = url.replace("${" + prefix + "db.server.port}", serverPort);
+        }
         url = url.replace("${" + prefix + "db.database.name}", databaseName);
         databaseUser = getPropertyAndFailIfNull(properties, prefix + "db.user");
         databasePassword = getPropertyAndFailIfNull(properties, prefix + "db.password");
