@@ -24,7 +24,7 @@ public interface SHumanTaskInstance extends STaskInstance {
 
     STaskPriority getPriority();
 
-    long getExpectedEndDate();
+    Long getExpectedEndDate();
 
     long getClaimedDate();
 }

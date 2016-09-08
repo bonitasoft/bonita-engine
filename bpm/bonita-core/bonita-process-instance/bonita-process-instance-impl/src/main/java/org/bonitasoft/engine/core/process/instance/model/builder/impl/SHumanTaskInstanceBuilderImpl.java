@@ -41,7 +41,7 @@ public abstract class SHumanTaskInstanceBuilderImpl extends SActivityInstanceBui
     }
 
     @Override
-    public SHumanTaskInstanceBuilder setExpectedEndDate(final long expectedEndDate) {
+    public SHumanTaskInstanceBuilder setExpectedEndDate(final Long expectedEndDate) {
         ((SHumanTaskInstanceImpl) this.entity).setExpectedEndDate(expectedEndDate);
         return this;
     }

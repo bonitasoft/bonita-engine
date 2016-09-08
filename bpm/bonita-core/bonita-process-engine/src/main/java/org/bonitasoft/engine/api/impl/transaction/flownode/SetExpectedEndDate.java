@@ -41,7 +41,14 @@ public class SetExpectedEndDate implements TransactionContent {
     @Override
     public void execute() throws SBonitaException {
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(userTaskId);
-        activityInstanceService.setExpectedEndDate(flowNodeInstance, dueDate.getTime());
+        activityInstanceService.setExpectedEndDate(flowNodeInstance, convertToLong());
+    }
+
+    public Long convertToLong() {
+        if (dueDate == null) {
+            return null;
+        }
+        return dueDate.getTime();
     }
 
 }

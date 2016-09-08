@@ -38,6 +38,7 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Adds a user filter on this user task.
+     * 
      * @param name filter name in this task.
      * @param userFilterId user filter identifier.
      * @param version user filter version.
@@ -49,6 +50,7 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the expected duration for this human task.
+     * 
      * @param time how long (in milliseconds) this task is expected to take.
      * @return
      */
@@ -59,6 +61,7 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     /**
      * Sets the task priority.
+     * 
      * @param priority task priority.
      * @return
      */

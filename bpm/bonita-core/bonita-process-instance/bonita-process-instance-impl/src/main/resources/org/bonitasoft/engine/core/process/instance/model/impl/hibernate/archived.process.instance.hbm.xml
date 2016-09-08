@@ -51,7 +51,6 @@
         <property name="stable" column="stable" />
         <property name="reachedStateDate" column="reachedStateDate" />
         <property name="lastUpdateDate" column="lastUpdateDate" />
-        <property name="expectedEndDate" column="expectedEndDate" />
         <property name="archiveDate" column="archiveDate" />
         <property name="sourceObjectId" column="sourceObjectId" type="long" />
         <property name="aborting" column="aborting" type="boolean" />
@@ -88,6 +87,7 @@
     <subclass name="SAHumanTaskInstanceImpl" extends="SAActivityInstanceImpl" abstract="true">
         <property name="actorId" column="actorId" type="long" />
         <property name="assigneeId" column="assigneeId" type="long" />
+        <property name="expectedEndDate" column="expectedEndDate" />
         <property name="claimedDate" column="claimedDate" />
         <property name="priority" column="priority">
             <type name="org.hibernate.type.EnumType">

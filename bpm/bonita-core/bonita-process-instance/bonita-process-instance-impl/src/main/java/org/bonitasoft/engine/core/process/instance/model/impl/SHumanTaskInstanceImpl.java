@@ -28,7 +28,7 @@ public abstract class SHumanTaskInstanceImpl extends SActivityInstanceImpl imple
 
     private long assigneeId;
 
-    private long expectedEndDate;
+    private Long expectedEndDate;
 
     private STaskPriority priority;
 
@@ -45,7 +45,7 @@ public abstract class SHumanTaskInstanceImpl extends SActivityInstanceImpl imple
         this.priority = priority;
     }
 
-    public void setExpectedEndDate(final long expectedEndDate) {
+    public void setExpectedEndDate(final Long expectedEndDate) {
         this.expectedEndDate = expectedEndDate;
     }
 
@@ -63,7 +63,7 @@ public abstract class SHumanTaskInstanceImpl extends SActivityInstanceImpl imple
     }
 
     @Override
-    public long getExpectedEndDate() {
+    public Long getExpectedEndDate() {
         return expectedEndDate;
     }
 
