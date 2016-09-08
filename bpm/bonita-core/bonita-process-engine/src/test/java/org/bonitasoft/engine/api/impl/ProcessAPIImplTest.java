@@ -64,6 +64,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
+import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -75,6 +76,8 @@ import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.filter.impl.FilterResultImpl;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -82,10 +85,10 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContextEntryImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SUserFilterDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -99,6 +102,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -234,12 +238,16 @@ public class ProcessAPIImplTest {
     private WorkService workService;
     @Mock
     private BusinessArchiveService businessArchiveService;
+    @Mock
+    private UserFilterService userFilterService;
     private SProcessDefinitionImpl processDefinition;
-    private SUserTaskDefinition userTaskDefinition;
+    private SUserTaskDefinitionImpl userTaskDefinition;
     @Captor
     private ArgumentCaptor<List<String>> argument;
     @Captor
     private ArgumentCaptor<BonitaWork> workArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<SPendingActivityMapping> pendingMappingArgumentCaptor;
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -271,6 +279,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(tenantAccessor.getFlowNodeExecutor()).thenReturn(flowNodeExecutor);
         when(tenantAccessor.getWorkService()).thenReturn(workService);
+        when(tenantAccessor.getUserFilterService()).thenReturn(userFilterService);
 
         sUserTaskInstance = new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID,
                 ACTOR_ID, STaskPriority.ABOVE_NORMAL, PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID);
@@ -294,6 +303,7 @@ public class ProcessAPIImplTest {
         value1.setId(ARCHIVED_PROCESS_INSTANCE_ID);
         when(processInstanceService.getArchivedProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(value1);
         doReturn(new SSessionImpl(12354L, TENANT_ID, "john", "", 5432L)).when(processAPI).getSession();
+        doReturn("john").when(processAPI).getUserNameFromSession();
 
     }
 
@@ -1337,5 +1347,80 @@ public class ProcessAPIImplTest {
         verify(contractDataService).addUserTaskData(1674, inputValues);
         verify(workService).registerWork(workArgumentCaptor.capture());
         assertThat(workArgumentCaptor.getValue().getDescription()).contains("flowNodeInstanceId: " + FLOW_NODE_INSTANCE_ID);
+    }
+
+    @Test
+    public void should_not_be_able_to_update_mapping_when_task_is_not_ready() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(3);
+        //when
+        expectedEx.expect(UpdateException.class);
+        expectedEx.expectMessage("Unable to update actors of the task 1674 because it is not in ready state");
+        processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
+    }
+
+    @Test
+    public void should_not_be_able_to_update_mapping_when_task_is_ready_but_with_executing_flag() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateExecuting(true);
+        //when
+        expectedEx.expect(UpdateException.class);
+        expectedEx.expectMessage("Unable to update actors of the task 1674 because it is not in ready state");
+        processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
+    }
+
+    @Test
+    public void should_update_mapping_when_task_is_ready() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateExecuting(false);
+        SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
+        userTaskDefinition.setUserFilter(sUserFilterDefinition);
+        doReturn(new FilterResultImpl(Arrays.asList(4L, 5L), true)).when(userFilterService).executeFilter(anyLong(), eq(sUserFilterDefinition),
+                anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class),
+                any(SExpressionContext.class), anyString());
+        //when
+        processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
+        //then
+        verify(activityInstanceService).deletePendingMappings(FLOW_NODE_INSTANCE_ID);
+        verify(activityInstanceService, times(2)).addPendingActivityMappings(pendingMappingArgumentCaptor.capture());
+        assertThat(pendingMappingArgumentCaptor.getAllValues()).hasSize(2).extracting("activityId", "userId").containsOnly(tuple(FLOW_NODE_INSTANCE_ID, 4L),
+                tuple(FLOW_NODE_INSTANCE_ID, 5L));
+    }
+
+    @Test
+    public void should_update_mapping_auto_assign_if_flag_is_set() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateExecuting(false);
+        SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
+        userTaskDefinition.setUserFilter(sUserFilterDefinition);
+        doReturn(new FilterResultImpl(Collections.singletonList(4L), true)).when(userFilterService).executeFilter(anyLong(), eq(sUserFilterDefinition),
+                anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class),
+                any(SExpressionContext.class), anyString());
+        //when
+        processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
+        //then
+        verify(activityInstanceService).assignHumanTask(FLOW_NODE_INSTANCE_ID, 4L);
+    }
+
+    @Test
+    public void should_update_mapping_not_auto_assign_if_flag_is_not_set() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateExecuting(false);
+        SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
+        userTaskDefinition.setUserFilter(sUserFilterDefinition);
+        doReturn(new FilterResultImpl(Collections.singletonList(4L), false)).when(userFilterService).executeFilter(anyLong(), eq(sUserFilterDefinition),
+                anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class),
+                any(SExpressionContext.class), anyString());
+        //when
+        processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
+        //then
+        verify(activityInstanceService, never()).assignHumanTask(eq(FLOW_NODE_INSTANCE_ID), anyLong());
     }
 }
