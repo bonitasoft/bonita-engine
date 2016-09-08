@@ -84,7 +84,7 @@ class BundleConfigurator {
     private boolean fileExists(Path filePath) {
         final boolean exists = Files.exists(filePath);
         if (!exists) {
-            LOGGER.info("File " + filePath.toString() + " does not exist.");
+            LOGGER.debug("File " + filePath.toString() + " does not exist.");
         }
         return exists;
     }
@@ -137,9 +137,11 @@ class BundleConfigurator {
 
             //2. update bonita.xml:
             updateBonitaXmlFile(bonitaXmlFile, standardConfiguration, "ds1");
+            LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita internal database");
 
             // 3. update bitronix-resources.properties
             updateBitronixFile(bitronixFile, standardConfiguration, "ds1");
+            LOGGER.info("Configuring file 'conf/bitronix-resources.properties' with your DB values for Bonita internal database");
 
             //4. copy the JDBC drivers:
             final Path srcDriverFile = bonitaDbDriverFile.toPath();
@@ -155,9 +157,11 @@ class BundleConfigurator {
 
             //2. update bonita.xml:
             updateBonitaXmlFile(bonitaXmlFile, bdmConfiguration, "ds2");
+            LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Business Data database");
 
             // 3. update bitronix-resources.properties
             updateBitronixFile(bitronixFile, bdmConfiguration, "ds2");
+            LOGGER.info("Configuring file 'conf/bitronix-resources.properties' with your DB values for Business Data database");
 
             //4. copy the JDBC drivers:
             final Path srcBdmDriverFile = bdmDriverFile.toPath();
@@ -187,8 +191,6 @@ class BundleConfigurator {
         }
 
         replaceContentInFile(bitronixFile, replacements);
-
-        LOGGER.info("Configuring file 'conf/bitronix-resources.properties' with the DB connection values you provided in file 'database.properties'");
     }
 
     private void updateBonitaXmlFile(Path bonitaXmlFile, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
@@ -199,8 +201,6 @@ class BundleConfigurator {
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", configuration.getUrl());
         replacements.put("@@" + bitronixDatasourceAlias + ".database_test_query@@", configuration.getTestQuery());
         replaceContentInFile(bonitaXmlFile, replacements);
-
-        LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with the DB connection values you provided in file 'database.properties'");
     }
 
     private void updateSetEnvFile(Path setEnvUnixFile, Path setEnvWindowsFile, String dbVendor, final String systemPropertyName) throws PlatformException {
@@ -333,6 +333,9 @@ class BundleConfigurator {
     }
 
     private String replace(String content, String originalValue, String replacement) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Replacing " + originalValue + " by " + replacement);
+        }
         return content.replaceAll(originalValue, replacement);
     }
 

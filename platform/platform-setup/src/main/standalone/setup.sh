@@ -9,12 +9,12 @@ INITIAL_CFG_FOLDER=$CFG_FOLDER/initial
 LIB_FOLDER=${BASEDIR}/lib
 
 testReturnCode() {
-  COD_RET=$1
-  if [ ${COD_RET} -ne 0 ]; then
-    echo "ERROR $1 $2"
-    cd - 1>/dev/null
-    exit ${COD_RET}
-  fi
+    COD_RET=$1
+    if [ ${COD_RET} -ne 0 ]; then
+        echo "ERROR $1 $2"
+        cd - 1>/dev/null
+        exit ${COD_RET}
+    fi
 }
 
 check_is_installed() {
@@ -35,8 +35,8 @@ if [ "$BONITA_DATABASE" != "h2" -a "$BONITA_DATABASE" != "postgres" -a "$BONITA_
 fi
 
 ACTION=${1:-""}
-if [ "${ACTION}" != "init" -a "${ACTION}" != "pull" -a "${ACTION}" != "push"  ]; then
-    echo "Missing action argument. Available values are: init, pull, push"
+if [ "${ACTION}" != "init" -a "${ACTION}" != "pull" -a "${ACTION}" != "push" -a "${ACTION}" != "configure" ]; then
+    echo "Missing action argument. Available values are: init, pull, push, configure"
     exit 1
 fi
 
