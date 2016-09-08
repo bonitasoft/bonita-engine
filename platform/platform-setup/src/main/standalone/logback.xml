@@ -9,6 +9,7 @@
 
     <logger name="org.bonitasoft" level="INFO" />
     <logger name="org.bonitasoft.platform" level="INFO" />
+    <logger name="org.bonitasoft.platform.setup" level="INFO" />
     <logger name="org.bonitasoft.platform.setup.PlatformSetupApplication" level="WARN" />
 
     <!--TRACE level displays all relevant jdbc transaction information-->

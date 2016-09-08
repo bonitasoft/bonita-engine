@@ -1,6 +1,7 @@
 package org.bonitasoft.platform.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.platform.setup.PlatformSetupApplication.ACTION_CONFIGURE;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class PlatformSetupApplicationTest {
     public ExpectedSystemExit systemExit = ExpectedSystemExit.none();
 
     @Test
-    public void should_accept_null_args() throws Exception {
+    public void should_gracefully_fail_with_error_message_when_null_action() throws Exception {
         //then
         systemExit.expectSystemExitWithStatus(1);
         systemExit.checkAssertionAfterwards(new Assertion() {
@@ -37,11 +38,10 @@ public class PlatformSetupApplicationTest {
 
         //when
         PlatformSetupApplication.main(null);
-
     }
 
     @Test
-    public void should_accept_empty_args() throws Exception {
+    public void should_gracefully_fail_with_error_message_when_action_unknown() throws Exception {
         //given
         System.setProperty(PlatformSetup.BONITA_SETUP_ACTION, "wrong value");
 
@@ -57,7 +57,17 @@ public class PlatformSetupApplicationTest {
 
         //when
         PlatformSetupApplication.main(null);
-
     }
 
+    @Test
+    public void main_should_accept_configure_action() throws Exception {
+        // given:
+        System.setProperty(PlatformSetup.BONITA_SETUP_ACTION, ACTION_CONFIGURE);
+
+        // when:
+        PlatformSetupApplication.main(null);
+
+        // then:
+        // Should not finish with System.exit()
+    }
 }
