@@ -13,12 +13,10 @@
  **/
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +30,8 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -118,8 +118,8 @@ public class ProcessExecutionIT extends TestWithUser {
             assertEquals(user.getId(), processInstance.getStartedBySubstitute());
 
             // Check system comment
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
-                    done();
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                    .done();
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
@@ -271,7 +271,8 @@ public class ProcessExecutionIT extends TestWithUser {
     }
 
     @Test
-    @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive", "process" }, jira = "ENGINE-507", story = "get a archived process instance by id")
+    @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive",
+            "process" }, jira = "ENGINE-507", story = "get a archived process instance by id")
     public void getArchivedProcessInstanceById() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
@@ -286,7 +287,8 @@ public class ProcessExecutionIT extends TestWithUser {
     }
 
     @Test(expected = ArchivedProcessInstanceNotFoundException.class)
-    @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive", "process" }, jira = "ENGINE-507", story = "get a archived process instance by an unknown id throw a not found exception")
+    @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive",
+            "process" }, jira = "ENGINE-507", story = "get a archived process instance by an unknown id throw a not found exception")
     public void getArchivedProcessInstanceByIdNotFound() throws Exception {
         getProcessAPI().getArchivedProcessInstance(123456789L);
     }
@@ -313,7 +315,8 @@ public class ProcessExecutionIT extends TestWithUser {
         assertNotNull(archivedActivityInstance);
         assertEquals(step1Id, archivedActivityInstance.getSourceObjectId());
         archiveDate = archivedActivityInstance.getArchiveDate().getTime();
-        assertTrue("The step1 must be archived between " + before + " and " + after + ", but was " + archiveDate, after >= archiveDate && archiveDate >= before);
+        assertTrue("The step1 must be archived between " + before + " and " + after + ", but was " + archiveDate,
+                after >= archiveDate && archiveDate >= before);
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -373,6 +376,42 @@ public class ProcessExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Test
+    public void should_update_due_date_to_null() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithNullDueDate", "7.4");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME).addExpectedDuration(3600L);
+        builder.addUserTask("step2", ACTOR_NAME).addExpectedDuration(3600L);
+        builder.addTransition("step1", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final UserTaskInstance step1 = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance, "step1", user);
+
+        //when
+        assertThat(step1.getExpectedEndDate()).isNotNull();
+        getProcessAPI().updateDueDateOfTask(step1.getId(), null);
+
+        //then
+        assertThat(((UserTaskInstance) getProcessAPI().getActivityInstance(step1.getId())).getExpectedEndDate()).isNull();
+        getProcessAPI().executeUserTask(step1.getId(), Collections.<String, Serializable> emptyMap());
+        final HumanTaskInstance step2 = waitForUserTaskAndAssignIt(processInstance, "step2", user);
+        final Date step2ExpectedEndDate = step2.getExpectedEndDate();
+        assertThat(step2ExpectedEndDate).as("should have a due date").isNotNull();
+        getProcessAPI().executeUserTask(step2.getId(), Collections.<String, Serializable> emptyMap());
+        waitForProcessToFinish(processInstance);
+
+        final ArchivedUserTaskInstance archivedStep1 = (ArchivedUserTaskInstance) getProcessAPI()
+                .getArchivedActivityInstance(step1.getId());
+        assertThat(archivedStep1.getExpectedEndDate()).as("should archive task with null due date").isNull();
+
+        final ArchivedUserTaskInstance archivedStep2 = (ArchivedUserTaskInstance) getProcessAPI()
+                .getArchivedActivityInstance(step2.getId());
+        assertThat(archivedStep2.getExpectedEndDate()).as("should archive task with original due date").isEqualTo(step2ExpectedEndDate);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
     @Test(expected = UpdateException.class)
     public void updateDueDateOfUnknownTask() throws Exception {
         getProcessAPI().updateDueDateOfTask(123456789L, new Date());
@@ -401,8 +440,8 @@ public class ProcessExecutionIT extends TestWithUser {
             assertEquals(user.getId(), step1Archived.getExecutedBySubstitute());
 
             // Check system comment
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
-                    done();
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                    .done();
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {

@@ -35,6 +35,7 @@ import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
@@ -623,6 +624,50 @@ public class ModelConvertorTest {
         sFlowNode.setPriority(STaskPriority.UNDER_NORMAL);
         assertThat(ModelConvertor.toFlowNodeInstance(sFlowNode, flowNodeStateManager).getLastUpdateDate()).isNotNull();
         assertThat(ModelConvertor.toFlowNodeInstance(new SGatewayInstanceImpl(), flowNodeStateManager).getLastUpdateDate()).isNotNull();
+    }
+
+    @Test
+    public void should_convert_expected_end_date() throws Exception {
+        //given
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SUserTaskInstanceImpl urgentSTask = new SUserTaskInstanceImpl();
+        urgentSTask.setExpectedEndDate(15L);
+        urgentSTask.setPriority(STaskPriority.UNDER_NORMAL);
+
+        final SUserTaskInstanceImpl takeYourTimeSTask = new SUserTaskInstanceImpl();
+        takeYourTimeSTask.setPriority(STaskPriority.UNDER_NORMAL);
+
+        //when
+        final UserTaskInstance urgentTask = ModelConvertor.toUserTaskInstance(urgentSTask, flowNodeStateManager);
+        final UserTaskInstance takeYourTimeTask = ModelConvertor.toUserTaskInstance(takeYourTimeSTask, flowNodeStateManager);
+
+        //then
+        assertThat(urgentTask.getExpectedEndDate()).isEqualTo(new Date(15L));
+        assertThat(takeYourTimeTask.getExpectedEndDate()).isNull();
+    }
+
+    @Test
+    public void should_convert_archived_expected_end_date() throws Exception {
+        //given
+        final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
+        doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
+
+        final SAUserTaskInstanceImpl urgentASTask = new SAUserTaskInstanceImpl();
+        urgentASTask.setExpectedEndDate(15L);
+        urgentASTask.setPriority(STaskPriority.UNDER_NORMAL);
+
+        final SAUserTaskInstanceImpl takeYourTimeASTask = new SAUserTaskInstanceImpl();
+        takeYourTimeASTask.setPriority(STaskPriority.UNDER_NORMAL);
+
+        //when
+        final ArchivedUserTaskInstance urgentATask = ModelConvertor.toArchivedUserTaskInstance(urgentASTask, flowNodeStateManager);
+        final ArchivedUserTaskInstance takeYourTimeATask = ModelConvertor.toArchivedUserTaskInstance(takeYourTimeASTask, flowNodeStateManager);
+
+        //then
+        assertThat(urgentATask.getExpectedEndDate()).isEqualTo(new Date(15L));
+        assertThat(takeYourTimeATask.getExpectedEndDate()).isNull();
     }
 
 }

@@ -30,7 +30,7 @@ public abstract class SAHumanTaskInstanceImpl extends SAActivityInstanceImpl imp
 
     private long claimedDate;
 
-    private long expectedEndDate;
+    private Long expectedEndDate;
 
     private STaskPriority priority;
 
@@ -79,12 +79,11 @@ public abstract class SAHumanTaskInstanceImpl extends SAActivityInstanceImpl imp
     }
 
     @Override
-    public long getExpectedEndDate() {
+    public Long getExpectedEndDate() {
         return expectedEndDate;
     }
 
-    @Override
-    public void setExpectedEndDate(final long expectedEndDate) {
+    public void setExpectedEndDate(final Long expectedEndDate) {
         this.expectedEndDate = expectedEndDate;
     }
 

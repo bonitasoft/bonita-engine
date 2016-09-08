@@ -22,10 +22,10 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -265,7 +265,7 @@ public interface FlowNodeInstanceService {
      * @param dueDate
      * @throws SFlowNodeModificationException
      */
-    void setExpectedEndDate(SFlowNodeInstance flowNodeInstance, long dueDate) throws SFlowNodeModificationException;
+    void setExpectedEndDate(SFlowNodeInstance flowNodeInstance, Long dueDate) throws SFlowNodeModificationException;
 
     /**
      * @param rootContainerId

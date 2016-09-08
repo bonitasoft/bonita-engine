@@ -14,11 +14,7 @@
 package org.bonitasoft.engine.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -304,7 +300,7 @@ public class ProcessManagementIT extends TestWithUser {
     }
 
     private void getArchivedActivityInstancesOrderByPagingCriterion(final ActivityInstanceCriterion criterionAsc, final int asc1, final int asc2,
-                                                                    final int asc3, final ActivityInstanceCriterion criterionDsc, final int desc1, final int desc2, final int desc3) throws Exception {
+            final int asc3, final ActivityInstanceCriterion criterionDsc, final int desc1, final int desc2, final int desc3) throws Exception {
 
         final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME
                 + criterionAsc, PROCESS_VERSION, Arrays.asList("task1", "task2", "task3"), Arrays.asList(false, false, false));
@@ -617,7 +613,8 @@ public class ProcessManagementIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, ActivityInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "ActivityInstance", "Pagination" }, jira = "ENGINE-680")
+    @Cover(classes = { ProcessAPI.class, ActivityInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "ActivityInstance",
+            "Pagination" }, jira = "ENGINE-680")
     @Test
     public void getActivityInstancePaginated() throws Exception {
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -1032,7 +1029,7 @@ public class ProcessManagementIT extends TestWithUser {
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         long userTask = waitForUserTask("step two");
-        assignAndExecuteStep(userTask,user);
+        assignAndExecuteStep(userTask, user);
         waitForProcessToFinish(startProcess);
         // look in archive
         assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.READY.getStateName()));
@@ -1173,11 +1170,10 @@ public class ProcessManagementIT extends TestWithUser {
         final User jack = createUser(username1, PASSWORD);
         final User john = createUser(username2, PASSWORD);
         final User lucy = createUser(username3, PASSWORD);
-        // default expectedDuration is null for HumanTaskDefinition, so the expectedEndDate is 0 by default, no need to set it in particular.
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addActor(ACTOR_NAME).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", ACTOR_NAME)
-                .addUserTask("userTask2", ACTOR_NAME)
-                .addUserTask("userTask3", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", ACTOR_NAME).addExpectedDuration(0L)
+                .addUserTask("userTask2", ACTOR_NAME).addExpectedDuration(0L)
+                .addUserTask("userTask3", ACTOR_NAME).addExpectedDuration(0L);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, jack);
@@ -1676,7 +1672,8 @@ public class ProcessManagementIT extends TestWithUser {
             }
             final DesignProcessDefinition processDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
                     PROCESS_VERSION
-                            + i, Arrays.asList("step1", "step2"), Arrays.asList(true, true));
+                            + i,
+                    Arrays.asList("step1", "step2"), Arrays.asList(true, true));
             ids.add(deployProcess(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done()).getId());
         }
         return ids;
