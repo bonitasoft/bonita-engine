@@ -755,7 +755,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ConfigurationService configurationService = new ConfigurationServiceImpl();
             final EnableProcess enableProcess = new EnableProcess(processDefinitionService, configurationService, processResourcesService, processDefinitionId,
                     eventsHandler,
-                    tenantAccessor.getTechnicalLoggerService(), SessionInfos.getUserNameFromSession(), getSession().getTenantId());
+                    tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession(), getSession().getTenantId());
             enableProcess.execute();
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
@@ -2043,6 +2043,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         try {
             final SHumanTaskInstance humanTaskInstance = getSHumanTaskInstance(userTaskId);
+            if (humanTaskInstance.getStateId() != 4 || humanTaskInstance.isStateExecuting()) {
+                throw new UpdateException("Unable to update actors of the task " + userTaskId + " because it is not in ready state");
+            }
             final long processDefinitionId = humanTaskInstance.getLogicalGroup(0);
             final SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processDefinitionId);
             final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
@@ -2063,17 +2066,16 @@ public class ProcessAPIImpl implements ProcessAPI {
                     createPendingMappingsAndAssignHumanTask(humanTaskInstanceId, result);
                 }
             }
-            final TechnicalLoggerService technicalLoggerService = tenantAccessor.getTechnicalLoggerService();
-            if (technicalLoggerService.isLoggable(ProcessAPIImpl.class, TechnicalLogSeverity.INFO)) {
-                final StringBuilder builder = new StringBuilder("User '");
-                builder.append(SessionInfos.getUserNameFromSession()).append("' has re-executed assignation on activity ").append(humanTaskInstanceId);
-                builder.append(" of process instance ").append(humanTaskInstance.getLogicalGroup(1)).append(" of process named '")
-                        .append(processDefinition.getName()).append("' in version ").append(processDefinition.getVersion());
-                technicalLoggerService.log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO, builder.toString());
-            }
+            tenantAccessor.getTechnicalLoggerService().log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO, "User '" + getUserNameFromSession() + "' has re-executed assignation on activity " + humanTaskInstanceId +
+                        " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
+                        processDefinition.getName() + "' in version " + processDefinition.getVersion());
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }
+    }
+
+    String getUserNameFromSession() {
+        return SessionInfos.getUserNameFromSession();
     }
 
     private void createPendingMappingsAndAssignHumanTask(final long humanTaskInstanceId, final FilterResult result) throws SBonitaException {
