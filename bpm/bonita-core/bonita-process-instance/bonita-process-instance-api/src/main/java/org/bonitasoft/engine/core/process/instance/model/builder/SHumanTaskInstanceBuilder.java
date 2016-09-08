@@ -26,7 +26,7 @@ public interface SHumanTaskInstanceBuilder extends SActivityInstanceBuilder {
 
     SHumanTaskInstanceBuilder setPriority(STaskPriority priority);
 
-    SHumanTaskInstanceBuilder setExpectedEndDate(long expectedEndDate);
+    SHumanTaskInstanceBuilder setExpectedEndDate(Long expectedEndDate);
 
     SHumanTaskInstanceBuilder setDisplayDescription(String displayDescription);
 

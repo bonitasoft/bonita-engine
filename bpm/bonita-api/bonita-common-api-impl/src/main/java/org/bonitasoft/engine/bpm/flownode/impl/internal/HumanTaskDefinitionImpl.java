@@ -75,7 +75,7 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
         this.userFilterDefinition = userFilterDefinition;
     }
 
-    public void setExpectedDuration(final long expectedDuration) {
+    public void setExpectedDuration(final Long expectedDuration) {
         this.expectedDuration = expectedDuration;
     }
 
@@ -95,9 +95,12 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         HumanTaskDefinitionImpl that = (HumanTaskDefinitionImpl) o;
         return Objects.equals(actorName, that.actorName) &&
                 Objects.equals(userFilterDefinition, that.userFilterDefinition) &&

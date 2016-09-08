@@ -348,7 +348,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final long dueDate) throws SFlowNodeModificationException {
+    public void setExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long dueDate) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getExpectedEndDateKey(), dueDate);
         updateFlowNode(flowNodeInstance, EXPECTED_END_DATE_MODIFIED, descriptor);

@@ -30,8 +30,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
@@ -4848,12 +4848,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateDueDateOfTask(final long userTaskId, final Date dueDate) throws UpdateException {
-        if (dueDate == null) {
-            throw new UpdateException("Unable to update a due date to null");
-        }
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
         try {
             final SetExpectedEndDate updateProcessInstance = new SetExpectedEndDate(activityInstanceService, userTaskId, dueDate);
             updateProcessInstance.execute();
@@ -5703,7 +5698,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         WorkService workService = tenantAccessor.getWorkService();
 
-
         SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
 
         if (flowNodeInstance instanceof SUserTaskInstance) {
@@ -5736,7 +5730,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
             //register work
-            BonitaWork work = WorkFactory.createExecuteFlowNodeWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(), flowNodeInstanceId);
+            BonitaWork work = WorkFactory.createExecuteFlowNodeWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
+                    flowNodeInstanceId);
             workService.registerWork(work);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,

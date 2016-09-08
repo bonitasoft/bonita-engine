@@ -28,6 +28,6 @@ public interface SAHumanTaskInstance extends SATaskInstance {
 
     STaskPriority getPriority();
 
-    long getExpectedEndDate();
+    Long getExpectedEndDate();
 
 }

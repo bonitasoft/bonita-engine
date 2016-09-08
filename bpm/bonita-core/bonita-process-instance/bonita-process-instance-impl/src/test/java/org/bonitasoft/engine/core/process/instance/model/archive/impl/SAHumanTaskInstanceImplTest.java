@@ -65,4 +65,16 @@ public class SAHumanTaskInstanceImplTest {
         assertThat(archivedTaskInstance.getLogicalGroup(1)).isEqualTo(8888L);
     }
 
+    @Test
+    public void should_allow_null_expected_date() {
+        //given
+        final SUserTaskInstanceImpl taskInstance = new SUserTaskInstanceImpl("taskName", 147L, 2565412L, 874555L, 7L, STaskPriority.UNDER_NORMAL, 7777L, 8888L);
+
+        //when
+        taskInstance.setExpectedEndDate(null);
+        final SAUserTaskInstanceImpl archivedTaskInstance = new SAUserTaskInstanceImpl(taskInstance);
+
+        //then
+        assertThat(archivedTaskInstance.getExpectedEndDate()).isNull();
+    }
 }

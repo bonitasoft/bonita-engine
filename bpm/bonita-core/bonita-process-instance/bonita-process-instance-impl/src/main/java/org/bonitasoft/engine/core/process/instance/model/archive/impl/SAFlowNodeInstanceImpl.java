@@ -37,8 +37,6 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
 
     private long lastUpdateDate;
 
-    private long expectedEndDate;
-
     private String displayDescription;
 
     private String displayName;
@@ -126,14 +124,6 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         this.lastUpdateDate = lastUpdateDate;
     }
 
-    public long getExpectedEndDate() {
-        return expectedEndDate;
-    }
-
-    public void setExpectedEndDate(long expectedEndDate) {
-        this.expectedEndDate = expectedEndDate;
-    }
-
     @Override
     public String getDisplayDescription() {
         return displayDescription;
@@ -206,7 +196,6 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
         result = prime * result + (int) (executedBySubstitute ^ executedBySubstitute >>> 32);
-        result = prime * result + (int) (expectedEndDate ^ expectedEndDate >>> 32);
         result = prime * result + (kind == null ? 0 : kind.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
         result = prime * result + (int) (reachedStateDate ^ reachedStateDate >>> 32);
@@ -257,9 +246,6 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
         if (executedBySubstitute != other.executedBySubstitute) {
             return false;
         }
-        if (expectedEndDate != other.expectedEndDate) {
-            return false;
-        }
         if (kind == null) {
             if (other.kind != null) {
                 return false;
@@ -298,8 +284,8 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
     @Override
     public String toString() {
         return "SAFlowNodeInstanceImpl [stateId=" + stateId + ", stateName=" + stateName + ", terminal=" + terminal + ", stable=" + stable
-                + ", reachedStateDate=" + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", expectedEndDate=" + expectedEndDate
-                + ", displayDescription=" + displayDescription + ", displayName=" + displayName + ", description=" + description + ", executedBy=" + executedBy
+                + ", reachedStateDate=" + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", displayDescription=" + displayDescription
+                + ", displayName=" + displayName + ", description=" + description + ", executedBy=" + executedBy
                 + ", kind=" + kind + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";
     }
 
