@@ -20,6 +20,11 @@ export ZIP=Bonita-BPM-platform-setup-${VERSION}.zip
 
 unzip -q -d ${E2E_DIR} target/${ZIP}
 
+echo "Setting 'org.bonitasoft.platform.setup' log level to DEBUG"
+# Activate in debug development phase:
+#sed -i "s/org.bonitasoft.platform.setup\" level=\"INFO/org.bonitasoft.platform.setup\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
+#sed -i "s/PlatformSetupApplication\" level=\"WARN/PlatformSetupApplication\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
+
 echo "========================================"
 echo "clean all tables"
 echo "========================================"
@@ -36,6 +41,30 @@ sed -i "s/^#[ ]*db.server.port=.*/db.server.port=5432/g" ${E2E_DIR}/database.pro
 sed -i s/^db.database.name=.*/db.database.name=bonita/g ${E2E_DIR}/database.properties
 cat ${E2E_DIR}/database.properties
 echo "========================================"
+
+echo "=================================================="
+echo "should skip non-tomcat environment for 'configure'"
+echo "=================================================="
+${E2E_DIR}/setup.sh configure
+
+testReturnCode $? "setup.sh configure"
+
+echo "========================================"
+echo "should configure tomcat environment"
+echo "========================================"
+cp -rf src/test/resources/tomcat_conf/* ${E2E_DIR}/..
+
+${E2E_DIR}/setup.sh configure
+testReturnCode $? "setup.sh configure"
+
+cat target/conf/bitronix-resources.properties | grep "^resource.ds1.className=org.postgresql.xa.PGXADataSource" > /dev/null
+testReturnCode $? "Configuring bitronix-resources file with Postgres"
+
+cat target/conf/Catalina/localhost/bonita.xml | grep "driverClassName=\"org.postgresql.Driver\"" > /dev/null
+testReturnCode $? "Configuring bonita.xml file with Postgres"
+
+cat target/bin/setenv.sh | grep "\-Dsysprop.bonita.db.vendor=postgres" > /dev/null
+testReturnCode $? "Configuring setenv.sh file with Postgres"
 
 echo "========================================"
 echo "should store to database "

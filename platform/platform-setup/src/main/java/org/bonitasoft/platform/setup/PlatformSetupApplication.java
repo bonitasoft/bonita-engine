@@ -35,6 +35,7 @@ public class PlatformSetupApplication {
     private static final String ACTION_INIT = "init";
     private static final String ACTION_PUSH = "push";
     private static final String ACTION_PULL = "pull";
+    static final String ACTION_CONFIGURE = "configure";
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;
@@ -56,6 +57,9 @@ public class PlatformSetupApplication {
                         break;
                     case ACTION_PULL:
                         pull(getConfigurableApplicationContext(args));
+                        break;
+                    case ACTION_CONFIGURE:
+                        configure();
                         break;
                     default:
                         displayMessageAndExit(action);
@@ -94,8 +98,11 @@ public class PlatformSetupApplication {
         run.getBean(PlatformSetup.class).push();
     }
 
-    private static void init(ConfigurableApplicationContext run) throws PlatformException {
+    private static void configure() throws PlatformException {
         new BundleConfigurator().configureApplicationServer();
+    }
+
+    private static void init(ConfigurableApplicationContext run) throws PlatformException {
         run.getBean(PlatformSetup.class).init();
     }
 }
