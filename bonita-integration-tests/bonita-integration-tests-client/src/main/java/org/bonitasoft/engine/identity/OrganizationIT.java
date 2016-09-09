@@ -1427,8 +1427,11 @@ public class OrganizationIT extends TestWithTechnicalUser {
         Document doc = docBuilder.parse(new InputSource(new StringReader(organization)));
         Node organizationNode = doc.getFirstChild();
         Node users = organizationNode.getChildNodes().item(3);
-        Node johnManager = users.getChildNodes().item(3);
-        users.removeChild(johnManager);
+        if (users.getChildNodes().item(3).getAttributes().item(0).getNodeValue().equals("johnManager")) {
+            users.removeChild(users.getChildNodes().item(3));
+        } else {
+            users.removeChild(users.getChildNodes().item(1));
+        }
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         DOMSource source = new DOMSource(doc);
