@@ -16,12 +16,12 @@ package org.bonitasoft.engine.process;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.comment.Comment;
@@ -30,8 +30,8 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -42,6 +42,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -357,59 +358,56 @@ public class ProcessExecutionIT extends TestWithUser {
     }
 
     @Test
-    public void updateDueDateOfTask() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processToUpdateDueDate", "1.0");
-        builder.addActor(ACTOR_NAME);
-        builder.addUserTask("step1", ACTOR_NAME).addExpectedDuration(10000000L);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
-        final Date expectedEndDate = ((UserTaskInstance) step1).getExpectedEndDate();
-        final Date now = new Date();
-        assertNotSame(now, expectedEndDate);
-        getProcessAPI().updateDueDateOfTask(step1.getId(), now);
-        final ActivityInstance activityInstance = getProcessAPI().getActivityInstance(step1.getId());
-        final Date expectedEndDate2 = ((UserTaskInstance) activityInstance).getExpectedEndDate();
-        assertEquals(now, expectedEndDate2);
-
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    @Test
-    public void should_update_due_date_to_null() throws Exception {
+    public void should_update_and_sort_due_date_with_null_values() throws Exception {
         //given
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithNullDueDate", "7.4");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME).addExpectedDuration(3600L);
-        builder.addUserTask("step2", ACTOR_NAME).addExpectedDuration(3600L);
-        builder.addTransition("step1", "step2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final UserTaskInstance step1 = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance, "step1", user);
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
+        final UserTaskInstance todayTask = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance1, "step1", user);
+        final UserTaskInstance nextWeekTask = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance2, "step1", user);
+        final UserTaskInstance nullDueDate = (UserTaskInstance) waitForUserTaskAndAssignIt(processInstance3, "step1", user);
 
         //when
-        assertThat(step1.getExpectedEndDate()).isNotNull();
-        getProcessAPI().updateDueDateOfTask(step1.getId(), null);
+        getProcessAPI().updateDueDateOfTask(nullDueDate.getId(), null);
+        final Date nextWeekDueDate = DateUtils.addDays(nextWeekTask.getExpectedEndDate(), 7);
+        getProcessAPI().updateDueDateOfTask(nextWeekTask.getId(), nextWeekDueDate);
+
+        //new business logic for sort to be used in portal
+        final SearchResult<HumanTaskInstance> ascNullsLast = getHumanTaskInstanceSearchResult(Order.ASC_NULLS_LAST);
+        final SearchResult<HumanTaskInstance> descNullsFirst = getHumanTaskInstanceSearchResult(Order.DESC_NULLS_FIRST);
+
+        //not required by business logic but tested to verify orderBy sql keyword are valid SQL
+        final SearchResult<HumanTaskInstance> ascNullsFirst = getHumanTaskInstanceSearchResult(Order.ASC_NULLS_FIRST);
+        final SearchResult<HumanTaskInstance> descNullsLast = getHumanTaskInstanceSearchResult(Order.DESC_NULLS_LAST);
 
         //then
-        assertThat(((UserTaskInstance) getProcessAPI().getActivityInstance(step1.getId())).getExpectedEndDate()).isNull();
-        getProcessAPI().executeUserTask(step1.getId(), Collections.<String, Serializable> emptyMap());
-        final HumanTaskInstance step2 = waitForUserTaskAndAssignIt(processInstance, "step2", user);
-        final Date step2ExpectedEndDate = step2.getExpectedEndDate();
-        assertThat(step2ExpectedEndDate).as("should have a due date").isNotNull();
-        getProcessAPI().executeUserTask(step2.getId(), Collections.<String, Serializable> emptyMap());
-        waitForProcessToFinish(processInstance);
+        assertThat(ascNullsLast.getResult()).extracting("id")
+                .as("should have null as last value")
+                .containsExactly(todayTask.getId(), nextWeekTask.getId(), nullDueDate.getId());
+        assertThat(ascNullsFirst.getResult()).extracting("id")
+                .as("should have null as first value")
+                .containsExactly(nullDueDate.getId(), todayTask.getId(), nextWeekTask.getId());
+        assertThat(descNullsFirst.getResult()).extracting("id")
+                .as("should have null as first value")
+                .containsExactly(nullDueDate.getId(), nextWeekTask.getId(), todayTask.getId());
+        assertThat(descNullsLast.getResult()).extracting("id")
+                .as("should have null as first value")
+                .containsExactly(nextWeekTask.getId(), todayTask.getId(), nullDueDate.getId());
 
-        final ArchivedUserTaskInstance archivedStep1 = (ArchivedUserTaskInstance) getProcessAPI()
-                .getArchivedActivityInstance(step1.getId());
-        assertThat(archivedStep1.getExpectedEndDate()).as("should archive task with null due date").isNull();
-
-        final ArchivedUserTaskInstance archivedStep2 = (ArchivedUserTaskInstance) getProcessAPI()
-                .getArchivedActivityInstance(step2.getId());
-        assertThat(archivedStep2.getExpectedEndDate()).as("should archive task with original due date").isEqualTo(step2ExpectedEndDate);
+        assertThat(getProcessAPI().getHumanTaskInstance(nullDueDate.getId()).getExpectedEndDate()).as("should have updated expected date to null").isNull();
+        assertThat(getProcessAPI().getHumanTaskInstance(nextWeekTask.getId()).getExpectedEndDate()).as("should have updated expected date to next week")
+                .isEqualTo(nextWeekDueDate);
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    public SearchResult<HumanTaskInstance> getHumanTaskInstanceSearchResult(Order order) throws SearchException {
+        return getProcessAPI()
+                .searchHumanTaskInstances(new SearchOptionsBuilder(0, 100).sort(HumanTaskInstanceSearchDescriptor.DUE_DATE, order).done());
     }
 
     @Test(expected = UpdateException.class)
