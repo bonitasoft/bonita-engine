@@ -17,14 +17,15 @@ import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -54,11 +55,15 @@ class BundleConfigurator {
 
     private static final String POSTGRES = "postgres";
     private static final String ORACLE = "oracle";
+    private static final String TOMCAT_BACKUP_FOLDER = "tomcat-backups";
+    private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
     private Path rootPath;
 
     private DatabaseConfiguration standardConfiguration;
     private DatabaseConfiguration bdmConfiguration;
+    private Path backupsFolder;
+    private String timestamp;
 
     private void loadProperties() throws PlatformException {
         final Properties properties = new Properties();
@@ -70,15 +75,16 @@ class BundleConfigurator {
                     " Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted", e);
         }
 
-        standardConfiguration = new DatabaseConfiguration("", properties);
-        bdmConfiguration = new DatabaseConfiguration("bdm.", properties);
-
         final String setupFolder = System.getProperty(BONITA_SETUP_FOLDER);
         if (setupFolder != null) {
             rootPath = Paths.get(setupFolder).getParent();
         } else {
             rootPath = Paths.get("..");
         }
+
+        standardConfiguration = new DatabaseConfiguration("", properties, rootPath);
+        bdmConfiguration = new DatabaseConfiguration("bdm.", properties, rootPath);
+        timestamp = new SimpleDateFormat("yyyy-MM-dd_HH'h'mm'm'ss's'").format(new Date());
     }
 
     private boolean fileExists(Path filePath) {
@@ -102,7 +108,8 @@ class BundleConfigurator {
         }
         try {
             final Path dbFile = Paths.get(this.getClass().getResource("/database.properties").toURI());
-            LOGGER.info("Tomcat environment detected. Auto-configuring using file " + dbFile.toRealPath().toString() + "...");
+            LOGGER.info("Tomcat environment detected with root " + rootPath.toRealPath());
+            LOGGER.info("Running auto-configuration using file " + dbFile.toRealPath().toString());
             configureTomcat();
             LOGGER.info("Tomcat auto-configuration complete.");
         } catch (URISyntaxException | IOException e) {
@@ -121,49 +128,43 @@ class BundleConfigurator {
         final File bdmDriverFile = getDriverFile(bdmDbVendor);
 
         try {
-            makeBackupOfFile(setEnvUnixFile, true);
-            makeBackupOfFile(setEnvWindowsFile, true);
-            makeBackupOfFile(bonitaXmlFile, false);
-            copyTemplateToFile("/bonita.template.xml", bonitaXmlFile);
-            makeBackupOfFile(bitronixFile, false);
-            copyTemplateToFile("/bitronix-resources.template.properties", bitronixFile);
-
-            ////////////////////////////
-            // STANDARD BONITA DATABASE:
-            ////////////////////////////
+            createBackupFolderIfNecessary("setup/" + TOMCAT_BACKUP_FOLDER);
 
             // 1. update setenv(.sh|.bat):
-            updateSetEnvFile(setEnvUnixFile, setEnvWindowsFile, dbVendor, "sysprop.bonita.db.vendor");
+            String newContent = readContentFromFile(getTemplateFolderPath("setenv.bat"));
+            newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
+            newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
+            backupAndReplaceContentIfNecessary(setEnvWindowsFile, newContent,
+                    "Setting Bonita BPM internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
+                            + "' in 'setenv.bat' file");
+
+            newContent = readContentFromFile(getTemplateFolderPath("setenv.sh"));
+            newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
+            newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
+            backupAndReplaceContentIfNecessary(setEnvUnixFile, newContent,
+                    "Setting Bonita BPM internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
+                            + "' in 'setenv.sh' file");
 
             //2. update bonita.xml:
-            updateBonitaXmlFile(bonitaXmlFile, standardConfiguration, "ds1");
-            LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita internal database");
+            newContent = readContentFromFile(getTemplateFolderPath("bonita.xml"));
+            newContent = updateBonitaXmlFile(newContent, standardConfiguration, "ds1");
+            newContent = updateBonitaXmlFile(newContent, bdmConfiguration, "ds2");
+            backupAndReplaceContentIfNecessary(bonitaXmlFile, newContent,
+                    "Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita BPM internal database on '" + dbVendor
+                            + "' and for Business Data database on '" + bdmDbVendor + "'");
 
             // 3. update bitronix-resources.properties
-            updateBitronixFile(bitronixFile, standardConfiguration, "ds1");
-            LOGGER.info("Configuring file 'conf/bitronix-resources.properties' with your DB values for Bonita internal database");
+            newContent = readContentFromFile(getTemplateFolderPath("bitronix-resources.properties"));
+            newContent = updateBitronixFile(newContent, standardConfiguration, "ds1");
+            newContent = updateBitronixFile(newContent, bdmConfiguration, "ds2");
+            backupAndReplaceContentIfNecessary(bitronixFile, newContent,
+                    "Configuring file 'conf/bitronix-resources.properties' with your DB values for Bonita BPM internal database on " + dbVendor
+                            + " and for Business Data database on " + bdmDbVendor);
 
             //4. copy the JDBC drivers:
             final Path srcDriverFile = bonitaDbDriverFile.toPath();
             final Path targetBonitaDbDriverFile = getPath("lib/bonita").resolve(srcDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcDriverFile, targetBonitaDbDriverFile, dbVendor);
-
-            ////////////////
-            // BDM DATABASE:
-            ////////////////
-
-            // 1. update setenv(.sh|.bat):
-            updateSetEnvFile(setEnvUnixFile, setEnvWindowsFile, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
-
-            //2. update bonita.xml:
-            updateBonitaXmlFile(bonitaXmlFile, bdmConfiguration, "ds2");
-            LOGGER.info("Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Business Data database");
-
-            // 3. update bitronix-resources.properties
-            updateBitronixFile(bitronixFile, bdmConfiguration, "ds2");
-            LOGGER.info("Configuring file 'conf/bitronix-resources.properties' with your DB values for Business Data database");
-
-            //4. copy the JDBC drivers:
             final Path srcBdmDriverFile = bdmDriverFile.toPath();
             final Path targetBdmDriverFile = getPath("lib/bonita").resolve(srcBdmDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcBdmDriverFile, targetBdmDriverFile, bdmDbVendor);
@@ -174,7 +175,33 @@ class BundleConfigurator {
         }
     }
 
-    private void updateBitronixFile(Path bitronixFile, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
+    private void createBackupFolderIfNecessary(String backupFolder) throws PlatformException {
+        backupsFolder = getPath(backupFolder);
+        if (Files.notExists(backupsFolder)) {
+            try {
+                Files.createDirectory(backupsFolder);
+            } catch (IOException e) {
+                throw new PlatformException("Could not create backup folder: " + backupFolder, e);
+            }
+        }
+    }
+
+    private Path getTemplateFolderPath(String templateFile) throws PlatformException {
+        return getPath("setup").resolve(TOMCAT_TEMPLATES_FOLDER).resolve(templateFile);
+    }
+
+    private void backupAndReplaceContentIfNecessary(Path path, String newContent, String message) throws PlatformException {
+        String previousContent = readContentFromFile(path);
+        if (!previousContent.equals(newContent)) {
+            makeBackupOfFile(path);
+            writeContentToFile(path, newContent);
+            LOGGER.info(message);
+        } else {
+            LOGGER.info("Same configuration detected for file '" + getRelativePath(path) + "'. No need to change it.");
+        }
+    }
+
+    private String updateBitronixFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
         Map<String, String> replacements = new HashMap<>(7);
         replacements.put("@@" + bitronixDatasourceAlias + "_driver_class_name@@", configuration.getXaDriverClassName());
         replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_user@@", configuration.getDatabaseUser());
@@ -190,73 +217,72 @@ class BundleConfigurator {
             replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_database_connection_url@@", configuration.getUrl()));
         }
 
-        replaceContentInFile(bitronixFile, replacements);
+        return replaceValues(content, replacements);
     }
 
-    private void updateBonitaXmlFile(Path bonitaXmlFile, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
+    private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
         Map<String, String> replacements = new HashMap<>(5);
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_user@@", configuration.getDatabaseUser());
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_password@@", configuration.getDatabasePassword());
         replacements.put("@@" + bitronixDatasourceAlias + ".driver_class_name@@", configuration.getNonXaDriverClassName());
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", configuration.getUrl());
         replacements.put("@@" + bitronixDatasourceAlias + ".database_test_query@@", configuration.getTestQuery());
-        replaceContentInFile(bonitaXmlFile, replacements);
+        return replaceValues(content, replacements);
     }
 
-    private void updateSetEnvFile(Path setEnvUnixFile, Path setEnvWindowsFile, String dbVendor, final String systemPropertyName) throws PlatformException {
+    private String updateSetEnvFile(String setEnvFileContent, String dbVendor, final String systemPropertyName) throws PlatformException {
         final Map<String, String> replacementMap = Collections.singletonMap("-D" + systemPropertyName + "=.*\"",
                 "-D" + systemPropertyName + "=" + dbVendor + "\"");
 
-        replaceContentInFile(setEnvUnixFile, replacementMap);
-        replaceContentInFile(setEnvWindowsFile, replacementMap);
+        return replaceValues(setEnvFileContent, replacementMap);
     }
 
-    private void copyTemplateToFile(String templateFile, Path destinationFilePath) throws PlatformException {
-        try (InputStream templateStream = this.getClass().getResourceAsStream(templateFile)) {
-            FileUtils.copyToFile(templateStream, destinationFilePath.toFile());
-        } catch (IOException e) {
-            throw new PlatformException("Fail to create file " + destinationFilePath.getFileName() + " from template " + templateFile + ": "
-                    + e.getMessage(), e);
+    void copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor) throws PlatformException {
+        if (srcDriverFile != null && targetDriverFile != null) {
+            if (Files.exists(targetDriverFile)) {
+                LOGGER.info(
+                        "Your " + dbVendor + " driver file '" + getRelativePath(targetDriverFile) + "' already exists. Skipping the copy.");
+                return;
+            }
+            copyDriverFile(srcDriverFile, targetDriverFile, dbVendor);
         }
     }
 
-    boolean copyDatabaseDriversIfNecessary(Path srcDriverFile, Path targetDriverFile, String dbVendor) throws PlatformException {
-        if (Files.exists(targetDriverFile)) {
-            LOGGER.info("Your " + dbVendor + " driver file " + targetDriverFile.toAbsolutePath() + " already exists. Skipping the copy.");
-            return false;
-        }
-        copyDriverFile(srcDriverFile, targetDriverFile, dbVendor);
-        return true;
+    private Path getRelativePath(Path pathToRelativize) {
+        return rootPath.toAbsolutePath().relativize(pathToRelativize.toAbsolutePath());
     }
 
     void copyDriverFile(Path srcDriverFile, Path targetDriverFile, String dbVendor) throws PlatformException {
         try {
             Files.copy(srcDriverFile, targetDriverFile);
-            LOGGER.info("Copying your " + dbVendor + " driver file " + srcDriverFile.getFileName() + " to tomcat lib folder 'lib/bonita'");
+            LOGGER.info("Copying your " + dbVendor + " driver file '" + getRelativePath(srcDriverFile) + "' to tomcat lib folder 'lib/bonita'");
         } catch (IOException e) {
             throw new PlatformException(
                     "Fail to copy driver file lib/" + srcDriverFile.getFileName() + " to " + targetDriverFile.toAbsolutePath() + ": " + e.getMessage(), e);
         }
     }
 
-    private void replaceContentInFile(Path setEnvUnixFile, Map<String, String> replacementMap) throws PlatformException {
+    private String replaceValues(String content, Map<String, String> replacementMap) throws PlatformException {
+        for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
+            content = replace(content, entry.getKey(), entry.getValue());
+        }
+        return content;
+    }
+
+    private void writeContentToFile(Path path, String content) throws PlatformException {
         try {
-            String content = readContentFromFile(setEnvUnixFile);
-            for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
-                content = replace(content, entry.getKey(), entry.getValue());
-            }
-            writeContentToFile(setEnvUnixFile, content);
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new PlatformException("Fail to replace content in file " + setEnvUnixFile + ": " + e.getMessage(), e);
+            throw new PlatformException("Fail to replace content in file " + path + ": " + e.getMessage(), e);
         }
     }
 
-    private void writeContentToFile(Path bonitaXmlFile, String content) throws IOException {
-        Files.write(bonitaXmlFile, content.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private String readContentFromFile(Path bonitaXmlFile) throws IOException {
-        return new String(Files.readAllBytes(bonitaXmlFile), StandardCharsets.UTF_8);
+    private String readContentFromFile(Path bonitaXmlFile) throws PlatformException {
+        try {
+            return new String(Files.readAllBytes(bonitaXmlFile), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new PlatformException("Cannot read content of text file " + bonitaXmlFile.toAbsolutePath().toString(), e);
+        }
     }
 
     void restorePreviousConfiguration(Path setEnvUnixFile, Path setEnvWindowsFile, Path bonitaXmlFile, Path bitronixFile) throws PlatformException {
@@ -273,7 +299,7 @@ class BundleConfigurator {
             if (Files.exists(bonitaXmlFile)) {
                 Files.delete(bonitaXmlFile);
             }
-            final Path backupFile = bonitaXmlFile.resolveSibling(bonitaXmlFile.getFileName() + ".original");
+            final Path backupFile = getBackupFile(bonitaXmlFile);
             if (Files.exists(backupFile)) {
                 Files.move(backupFile, bonitaXmlFile);
             }
@@ -282,20 +308,25 @@ class BundleConfigurator {
         }
     }
 
-    private void makeBackupOfFile(Path originalFile, boolean keepOriginal) throws PlatformException {
+    private Path makeBackupOfFile(Path originalFile) throws PlatformException {
         final Path originalFileName = originalFile.getFileName();
-        LOGGER.info("Creating a backup of configuration file '" + originalFile + "' => '" + originalFile.getFileName() + ".original'");
-        final Path backup = originalFile.resolveSibling(originalFileName + ".original");
+        final Path backup = getBackupFile(originalFile);
+        LOGGER.info(
+                "Creating a backup of configuration file '" + getRelativePath(originalFile).normalize() + "' to '" + getRelativePath(backup).normalize() + "'");
         try {
-            Files.deleteIfExists(backup);
-            if (keepOriginal) {
-                Files.copy(originalFile, backup);
-            } else {
-                Files.move(originalFile, backup);
-            }
+            Files.copy(originalFile, backup);
+            return backup;
         } catch (IOException e) {
             throw new PlatformException("Fail to make backup file for " + originalFileName + ": " + e.getMessage(), e);
         }
+    }
+
+    private Path getBackupFile(Path originalFile) {
+        return backupsFolder.resolve(originalFile.getFileName() + "." + getTimestamp());
+    }
+
+    private String getTimestamp() {
+        return timestamp;
     }
 
     private File getDriverFile(String dbVendor) throws PlatformException {
@@ -333,9 +364,6 @@ class BundleConfigurator {
     }
 
     private String replace(String content, String originalValue, String replacement) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Replacing " + originalValue + " by " + replacement);
-        }
         return content.replaceAll(originalValue, replacement);
     }
 
@@ -367,5 +395,4 @@ class BundleConfigurator {
         }
         return build;
     }
-
 }

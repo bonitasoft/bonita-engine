@@ -32,7 +32,7 @@ public class DatabaseConfigurationTest {
         System.setProperty("db.password", "secret");
 
         // when:
-        final DatabaseConfiguration bdmConfig = new DatabaseConfiguration("", properties);
+        final DatabaseConfiguration bdmConfig = new DatabaseConfiguration("", properties, null);
 
         // then:
         assertThat(bdmConfig.getDbVendor()).isEqualTo("mysql");
@@ -57,7 +57,7 @@ public class DatabaseConfigurationTest {
         System.setProperty("bdm.db.password", "_pwd_");
 
         // when:
-        final DatabaseConfiguration bdmConfig = new DatabaseConfiguration("bdm.", properties);
+        final DatabaseConfiguration bdmConfig = new DatabaseConfiguration("bdm.", properties, null);
 
         // then:
         assertThat(bdmConfig.getDbVendor()).isEqualTo("postgres");

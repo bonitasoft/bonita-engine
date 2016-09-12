@@ -60,6 +60,7 @@ public class BundleConfiguratorTest {
     BundleConfigurator spy;
 
     private Path newFolderPath;
+    private String databaseAbsolutePath;
 
     @Before
     public void setupTempConfFolder() throws IOException {
@@ -67,6 +68,8 @@ public class BundleConfiguratorTest {
         newFolderPath = temporaryFolderRoot.toPath();
         FileUtils.copyDirectory(Paths.get("src/test/resources/tomcat_conf").toFile(), temporaryFolderRoot);
         System.setProperty(BONITA_SETUP_FOLDER, newFolderPath.resolve("setup").toString());
+        databaseAbsolutePath = newFolderPath.resolve("database").normalize().toString();
+
     }
 
     @Test
@@ -87,10 +90,15 @@ public class BundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        assertThat(newFolderPath.resolve("bin").resolve("setenv.sh.original").toFile()).exists();
-        assertThat(newFolderPath.resolve("bin").resolve("setenv.bat.original").toFile()).exists();
+        assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
         checkFileContains(newFolderPath.resolve("bin").resolve("setenv.sh"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
         checkFileContains(newFolderPath.resolve("bin").resolve("setenv.bat"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
+    }
+
+    private int numberOfBackups(String file) {
+        final String[] backupFiles = newFolderPath.resolve("setup").resolve("tomcat-backups").toFile().list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
+        return backupFiles == null ? 0 : backupFiles.length;
     }
 
     @Test
@@ -121,7 +129,7 @@ public class BundleConfiguratorTest {
                 "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
                 "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL\"");
 
-        assertThat(bonita_xml.resolveSibling("bonita.xml.original").toFile()).exists();
+        assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
     }
 
     @Test
@@ -138,7 +146,7 @@ public class BundleConfiguratorTest {
                 "resource.ds2.driverProperties.user=bizUser", "resource.ds2.driverProperties.password=bizPwd",
                 "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL", "resource.ds2.testQuery=SELECT 1 FROM DUAL");
 
-        assertThat(bitronixFile.resolveSibling("bitronix-resources.properties.original").toFile()).exists();
+        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
     }
 
     @Test
@@ -157,18 +165,17 @@ public class BundleConfiguratorTest {
         final Path bonita_xml = newFolderPath.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
 
         checkFileContains(bitronixFile, "resource.ds1.className=org.h2.jdbcx.JdbcDataSource", "resource.ds1.driverProperties.user=myUser",
-                "resource.ds1.driverProperties.password=myPwd",
-                "resource.ds1.driverProperties.URL=jdbc:h2:file:../database/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
+                "resource.ds1.driverProperties.password=myPwd", "resource.ds1.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
+                        + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
                 "resource.ds1.testQuery=SELECT 1");
         checkFileContains(bitronixFile, "resource.ds2.className=oracle.jdbc.xa.client.OracleXADataSource",
                 "resource.ds2.driverProperties.user=bizUser", "resource.ds2.driverProperties.password=bizPwd",
                 "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL", "resource.ds2.testQuery=SELECT 1 FROM DUAL");
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"", "driverClassName=\"org.h2.Driver\"",
-                "url=\"jdbc:h2:file:../database/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
-        checkFileContains(bonita_xml,
-                "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL\"");
+                "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
+                "driverClassName=\"oracle.jdbc.OracleDriver\"", "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL\"");
     }
 
     @Test
@@ -191,12 +198,12 @@ public class BundleConfiguratorTest {
                 "resource.ds1.driverProperties.portNumber=5432", "resource.ds1.driverProperties.databaseName=bonita", "resource.ds1.testQuery=SELECT 1");
 
         checkFileContains(bitronixFile, "resource.ds2.className=org.h2.jdbcx.JdbcDataSource", "resource.ds2.driverProperties.user=sa",
-                "resource.ds2.driverProperties.password=",
-                "resource.ds2.driverProperties.URL=jdbc:h2:file:../database/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
+                "resource.ds2.driverProperties.password=", "resource.ds2.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
+                        + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;",
                 "resource.ds2.testQuery=SELECT 1");
 
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"sa\"", "password=\"\"", "driverClassName=\"org.h2.Driver\"",
-                "url=\"jdbc:h2:file:../database/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+                "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
     private void checkFileContains(Path file, String... expectedTexts) throws IOException {
@@ -325,4 +332,53 @@ public class BundleConfiguratorTest {
             verify(spy).restorePreviousConfiguration(any(Path.class), any(Path.class), any(Path.class), any(Path.class));
         }
     }
+
+    @Test
+    public void should_not_make_backup_if_content_is_the_same() throws Exception {
+        // given:
+        configurator.configureApplicationServer();
+
+        assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
+        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
+        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
+    }
+
+    @Test
+    public void should_make_new_backup_if_configuration_changes() throws Exception {
+        // given:
+        configurator.configureApplicationServer();
+
+        assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
+        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
+        assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
+
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("bdm.db.database.name", "business_data.db");
+        System.setProperty("bdm.db.user", "sa");
+        System.setProperty("bdm.db.password", "");
+
+        // so that horodated file has different
+        Thread.sleep(1020);
+
+        // when:
+        new BundleConfigurator().configureApplicationServer();
+
+        // then:
+        assertThat(numberOfBackups("bonita.xml")).isEqualTo(2);
+        assertThat(numberOfBackups("bitronix-resources.properties")).isEqualTo(2);
+        assertThat(numberOfBackups("setenv.bat")).isEqualTo(2);
+        assertThat(numberOfBackups("setenv.sh")).isEqualTo(2);
+    }
+
 }

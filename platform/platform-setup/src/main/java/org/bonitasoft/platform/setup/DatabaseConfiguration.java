@@ -13,19 +13,15 @@
  */
 package org.bonitasoft.platform.setup;
 
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.bonitasoft.platform.exception.PlatformException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class DatabaseConfiguration {
-
-    // Use BundleConfigurator logger for easier configuration (no need for a specific logger here):
-    private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
+class DatabaseConfiguration {
 
     private static final String H2_DB_VENDOR = "h2";
 
@@ -39,91 +35,75 @@ public class DatabaseConfiguration {
     private String serverPort;
     private String url;
     private String testQuery;
+    private PropertyReader propertyReader;
 
-    DatabaseConfiguration(String prefix, Properties properties) throws PlatformException {
-        dbVendor = getPropertyAndFailIfNull(properties, prefix + "db.vendor");
+    DatabaseConfiguration(String prefix, Properties properties, Path rootPath) throws PlatformException {
+        propertyReader = new PropertyReader(properties);
+        dbVendor = getMandatoryProperty(prefix + "db.vendor");
 
-        nonXaDriverClassName = getPropertyAndFailIfNull(properties, dbVendor + ".nonXaDriver");
-        xaDriverClassName = getPropertyAndFailIfNull(properties, dbVendor + ".xaDriver");
-        databaseName = getPropertyAndFailIfNull(properties, prefix + "db.database.name");
-        url = getPropertyAndFailIfNull(properties, dbVendor + "." + prefix + "url");
+        nonXaDriverClassName = getMandatoryProperty(dbVendor + ".nonXaDriver");
+        xaDriverClassName = getMandatoryProperty(dbVendor + ".xaDriver");
+        databaseName = getMandatoryProperty(prefix + "db.database.name");
+        url = getMandatoryProperty(dbVendor + "." + prefix + "url");
         // Configuration for H2 is a little different from other DB vendors:
         if (H2_DB_VENDOR.equals(dbVendor)) {
-            url = url.replace("${h2.database.dir}", getPropertyAndFailIfNull(properties, "h2.database.dir"));
+            final String h2DatabaseDir = getMandatoryProperty("h2.database.dir");
+            // generate absolute path:
+            url = url.replace("${h2.database.dir}", rootPath.resolve("setup").resolve(h2DatabaseDir).toAbsolutePath().normalize().toString());
         } else {
-            serverName = getPropertyAndFailIfNull(properties, prefix + "db.server.name");
+            serverName = getMandatoryProperty(prefix + "db.server.name");
             url = url.replace("${" + prefix + "db.server.name}", serverName);
-            serverPort = getPropertyAndFailIfNull(properties, prefix + "db.server.port");
+            serverPort = getMandatoryProperty(prefix + "db.server.port");
             url = url.replace("${" + prefix + "db.server.port}", serverPort);
         }
         url = url.replace("${" + prefix + "db.database.name}", databaseName);
-        databaseUser = getPropertyAndFailIfNull(properties, prefix + "db.user");
-        databasePassword = getPropertyAndFailIfNull(properties, prefix + "db.password");
-        testQuery = getPropertyAndFailIfNull(properties, dbVendor + "." + prefix + "testQuery");
+        databaseUser = getMandatoryProperty(prefix + "db.user");
+        databasePassword = getMandatoryProperty(prefix + "db.password");
+        testQuery = getMandatoryProperty(dbVendor + "." + prefix + "testQuery");
     }
 
     public String getDbVendor() {
         return dbVendor;
     }
 
-    public void setDbVendor(String dbVendor) {
-        this.dbVendor = dbVendor;
-    }
-
-    public String getNonXaDriverClassName() {
+    String getNonXaDriverClassName() {
         return nonXaDriverClassName;
     }
 
-    public String getXaDriverClassName() {
+    String getXaDriverClassName() {
         return xaDriverClassName;
     }
 
-    public String getDatabaseUser() {
+    String getDatabaseUser() {
         return databaseUser;
     }
 
-    public String getDatabasePassword() {
+    String getDatabasePassword() {
         return databasePassword;
     }
 
-    public String getDatabaseName() {
+    String getDatabaseName() {
         return databaseName;
     }
 
-    public String getServerName() {
+    String getServerName() {
         return serverName;
     }
 
-    public String getServerPort() {
+    String getServerPort() {
         return serverPort;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getTestQuery() {
+    String getTestQuery() {
         return testQuery;
     }
 
-    private String getPropertyAndFailIfNull(Properties properties, String propertyName) throws PlatformException {
-        // Any property value can be overridden by system property with the same name:
-        final String sysPropValue = System.getProperty(propertyName);
-        if (sysPropValue != null) {
-            LOGGER.info("System property '" + propertyName + "' set to '" + sysPropValue + "', overriding value from file database.properties.");
-            return sysPropValue;
-        }
-
-        final String property = properties.getProperty(propertyName);
-        if (property == null) {
-            throw new PlatformException(
-                    "Mandatory property '" + propertyName + "' is missing. Ensure you did not remove lines from file 'database.properties'");
-        }
-        return property;
+    private String getMandatoryProperty(String s) throws PlatformException {
+        return propertyReader.getPropertyAndFailIfNull(s);
     }
 
 }
