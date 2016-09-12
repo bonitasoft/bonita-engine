@@ -18,6 +18,22 @@ package org.bonitasoft.engine.persistence;
  */
 public enum OrderByType {
 
-    ASC, DESC;
+    ASC, DESC, ASC_NULLS_LAST, DESC_NULLS_FIRST, ASC_NULLS_FIRST, DESC_NULLS_LAST;
+
+    private String sqlKeyword;
+
+    static {
+        ASC.sqlKeyword = "ASC";
+        DESC.sqlKeyword = "DESC";
+        ASC_NULLS_LAST.sqlKeyword = "ASC NULLS LAST";
+        DESC_NULLS_FIRST.sqlKeyword = "DESC NULLS FIRST";
+        ASC_NULLS_FIRST.sqlKeyword = "ASC NULLS FIRST";
+        DESC_NULLS_LAST.sqlKeyword = "DESC NULLS LAST";
+
+    }
+
+    public String getSqlKeyword() {
+        return sqlKeyword;
+    }
 
 }
