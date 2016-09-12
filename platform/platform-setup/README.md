@@ -28,6 +28,6 @@ Running bonita-platform-setup
 To run the tool:
 
 * extract the Zip file
-* configure access to the database in root directory
+* configure access to the database in file `database.properties` at the root directory.
 * add drivers (specific to your database) in /lib folder (for Oracle and SqlServer only, as open-source drivers are already included) 
-* run ./setup.sh
+* run ./setup.sh [init | push | pull | configure]
