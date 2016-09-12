@@ -15,10 +15,18 @@ package org.bonitasoft.engine.persistence;
 
 import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
 
-import javax.sql.DataSource;
-import java.lang.InstantiationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.Map.Entry;
+
+import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
@@ -28,7 +36,13 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.hibernate.*;
+import org.hibernate.AssertionFailure;
+import org.hibernate.HibernateException;
+import org.hibernate.Interceptor;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.StaleStateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.mapping.PersistentClass;
@@ -634,7 +648,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             }
             builder.append(fieldName);
             builder.append(' ');
-            builder.append(orderByOption.getOrderByType().toString());
+            builder.append(orderByOption.getOrderByType().getSqlKeyword());
             startWithComma = true;
         }
         if (!sortedById) {

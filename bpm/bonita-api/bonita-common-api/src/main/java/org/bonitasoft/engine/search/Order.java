@@ -17,5 +17,5 @@ package org.bonitasoft.engine.search;
  * @author Matthieu Chaffotte
  */
 public enum Order {
-    DESC, ASC;
+    DESC, ASC, ASC_NULLS_LAST, DESC_NULLS_FIRST, ASC_NULLS_FIRST, DESC_NULLS_LAST
 }
