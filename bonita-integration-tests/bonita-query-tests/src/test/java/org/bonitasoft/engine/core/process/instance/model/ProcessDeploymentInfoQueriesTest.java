@@ -39,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/testContext.xml" })
+@ContextConfiguration(locations = {"/testContext.xml"})
 @Transactional
 public class ProcessDeploymentInfoQueriesTest {
 
@@ -704,4 +704,44 @@ public class ProcessDeploymentInfoQueriesTest {
         return repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true)
                 .withTerminal(true).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN_WITH_ONLY_KO_TASKS).build());
     }
+
+    protected void buildAndCreateProcessDefinition(final long id, long processDefinitionId, final String processName, String processVersion,
+                                                   String activationState) {
+        final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl = new SProcessDefinitionDeployInfoImpl();
+        sProcessDefinitionDeployInfoImpl.setId(id);
+        sProcessDefinitionDeployInfoImpl.setName(processName);
+        sProcessDefinitionDeployInfoImpl.setVersion(processVersion);
+        sProcessDefinitionDeployInfoImpl.setProcessId(processDefinitionId);
+        sProcessDefinitionDeployInfoImpl.setTenantId(1L);
+        sProcessDefinitionDeployInfoImpl.setActivationState(activationState);
+        repository.add(sProcessDefinitionDeployInfoImpl);
+    }
+
+    @Test
+    public void getProcessDefinitionDeployInfosByName_should_not_retrieve_disabled_processes() throws Exception {
+        // given:
+        buildAndCreateProcessDefinition(1L, 44657531564675L, "ChildProcess", "1.0", "DISABLED");
+
+        // when:
+        final List<SProcessDefinitionDeployInfo> processes = repository.getProcessDefinitionDeployInfosByName("ChildProcess");
+
+        // then:
+        assertThat(processes).hasSize(0);
+    }
+
+    @Test
+    public void getProcessDefinitionDeployInfosByName_should_retrieve_an_enabled_process_even_if_not_most_recent() throws Exception {
+        // given:
+        buildAndCreateProcessDefinition(2L, 4465753156777L, "ChildProcess", "1.0", "ENABLED");
+        Thread.sleep(20L);
+        buildAndCreateProcessDefinition(3L, 4465753158885L, "ChildProcess", "2.0", "DISABLED");
+
+        // when:
+        final List<SProcessDefinitionDeployInfo> processes = repository.getProcessDefinitionDeployInfosByName("ChildProcess");
+
+        // then:
+        assertThat(processes).hasSize(1);
+        assertThat(processes.get(0).getVersion()).isEqualTo("1.0");
+    }
+
 }
