@@ -70,4 +70,11 @@ public class ProcessDeploymentInfoRepository extends TestRepository {
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
 
+    public List<SProcessDefinitionDeployInfo> getProcessDefinitionDeployInfosByName(String processName) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("getProcessDefinitionDeployInfosByName");
+        namedQuery.setParameter("name", processName);
+        return namedQuery.list();
+    }
+
 }

@@ -559,19 +559,19 @@ public class ProcessManagementIT extends TestWithUser {
         final String processName = "getLatestProcessDefinitionId";
         final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName, "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition1 = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition1).done());
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition1).done(), ACTOR_NAME, user);
 
         final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName, "2.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
-        final ProcessDefinition processDefinition2 = deployProcess(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition2).done());
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition2).done(), ACTOR_NAME, user);
 
         // test and do assert
         final long latestProcessDefinitionId = getProcessAPI().getLatestProcessDefinitionId(processName);
         assertEquals(processDefinition2.getId(), latestProcessDefinitionId);
 
-        deleteProcess(processDefinition1, processDefinition2);
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
     @Test(expected = ProcessDefinitionNotFoundException.class)
