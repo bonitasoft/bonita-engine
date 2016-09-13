@@ -12,6 +12,7 @@
 		SELECT process_definition
 		FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition
 		WHERE process_definition.name = :name
+		AND process_definition.activationState = 'ENABLED'
 	</query>
 
 	<query name="getProcessesWithActorOnlyForUser">

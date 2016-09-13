@@ -19,14 +19,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -63,6 +57,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -86,6 +81,7 @@ import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -1721,6 +1717,23 @@ public class ProcessDefinitionServiceImplTest {
         }
     }
 
+    @Test
+    public void getLatestProcessDefinitionId_should_query_processes_order_by_deploymentDate_DESC() throws Exception {
+        // given:
+        final List<SProcessDefinitionDeployInfo> processes = Collections.<SProcessDefinitionDeployInfo> singletonList(new SProcessDefinitionDeployInfoImpl());
+        doReturn(processes).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProcessDefinitionDeployInfo>> any());
+
+        // when:
+        processDefinitionServiceImpl.getLatestProcessDefinitionId("MySimpleProcess");
+
+        // then:
+        final ArgumentCaptor<SelectListDescriptor> captor = ArgumentCaptor.forClass(SelectListDescriptor.class);
+        verify(persistenceService).selectList(captor.capture());
+        final OrderByOption orderByOption = captor.getValue().getQueryOptions().getOrderByOptions().get(0);
+        assertThat(orderByOption.getFieldName()).isEqualTo("deploymentDate");
+        assertThat(orderByOption.getOrderByType()).isEqualTo(OrderByType.DESC);
+    }
+
     private static class SQueriableLogMatcher extends BaseMatcher<SQueriableLog> {
 
         private String anObject;
@@ -1731,7 +1744,7 @@ public class ProcessDefinitionServiceImplTest {
 
         @Override
         public void describeTo(Description description) {
-            description.appendText("expected <"+anObject+"> as raw message");
+            description.appendText("expected <" + anObject + "> as raw message");
         }
 
         @Override
