@@ -22,8 +22,8 @@ IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" IF N
 )
 
 IF NOT (%1) == () set ACTION=%1
-IF NOT "%ACTION%" == "init" IF NOT "%ACTION%" == "pull" IF NOT "%ACTION%" == "push" (
-    echo Missing action argument. Available values are: init, pull, push
+IF NOT "%ACTION%" == "init" IF NOT "%ACTION%" == "pull" IF NOT "%ACTION%" == "push" IF NOT "%ACTION%" == "configure" (
+    echo Missing action argument. Available values are: init, pull, push, configure
     exit /b 1
 )
 

@@ -264,9 +264,14 @@ class BundleConfigurator {
 
     private String replaceValues(String content, Map<String, String> replacementMap) throws PlatformException {
         for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
-            content = replace(content, entry.getKey(), entry.getValue());
+            content = replace(content, entry.getKey(), convertWindowsBackslashes(entry.getValue()));
         }
         return content;
+    }
+
+    String convertWindowsBackslashes(String value) {
+        // forward slashes is valid in database connection URLs on Windows, and and easier and more homogeneous to manage in
+        return value.replaceAll("\\\\", "/");
     }
 
     private void writeContentToFile(Path path, String content) throws PlatformException {

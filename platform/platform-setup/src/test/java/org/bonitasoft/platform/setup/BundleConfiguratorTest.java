@@ -381,4 +381,12 @@ public class BundleConfiguratorTest {
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(2);
     }
 
+    @Test
+    public void escapeWindowsBackslashesIfAny_should_double_backslashes() throws Exception {
+        // when:
+        final String windowsValue = configurator.convertWindowsBackslashes("C:\\Windows");
+
+        // then:
+        assertThat(windowsValue).isEqualTo("C:/Windows");
+    }
 }
