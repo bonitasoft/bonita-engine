@@ -683,4 +683,17 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
+    @Test
+    public void should_fail_when_subprocess_does_not_have_element() throws Exception {
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        processDefinitionBuilder.addAutomaticTask("auto1");
+        processDefinitionBuilder.addSubProcess("sub", true);
+
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage(
+                "The subprocess sub does not have any element, add at least one element using the builder that " +
+                        "can be retrieved on the subprocess activity");
+        processDefinitionBuilder.done();
+    }
+
 }
