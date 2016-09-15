@@ -45,11 +45,14 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +63,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 /**
  * @author Matthieu Chaffotte
@@ -71,6 +76,7 @@ public class IdentityServiceImplForUserTest {
 
     public static final long USER_ID = 6543L;
     public static final long ICON_ID = 5247890L;
+    public static final long NEW_ICON_ID = 4328976L;
     @Mock
     private CredentialsEncrypter encrypter;
     @Mock
@@ -98,9 +104,29 @@ public class IdentityServiceImplForUserTest {
     private QueriableLoggerService queriableLoggerService;
 
     @Before
-    public void setUp() {
+    public void setUp() throws SRecorderException {
         doReturn(sUserLogBuilder).when(identityServiceImpl).getUserLog(any(ActionType.class), anyString());
         doReturn(log).when(sUserLogBuilder).done();
+        SIconImpl newIcon = new SIconImpl("", null);
+        newIcon.setId(NEW_ICON_ID);
+        doAnswer(new Answer() {
+
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                ((InsertRecord) invocation.getArguments()[0]).getEntity().setId(NEW_ICON_ID);
+                return null;
+            }
+        }).when(recorder).recordInsert(argThat(new BaseMatcher<InsertRecord>() {
+
+            @Override
+            public void describeTo(Description description) {
+            }
+
+            @Override
+            public boolean matches(Object item) {
+                return item instanceof InsertRecord && ((InsertRecord) item).getEntity() instanceof SIconImpl;
+            }
+        }), any(SInsertEvent.class));
     }
 
     /**
@@ -318,9 +344,11 @@ public class IdentityServiceImplForUserTest {
         SUser user = identityServiceImpl.createUser(sUser, null, null, "test.jpg", "iconContent".getBytes());
         //then
         verify(recorder, times(3)).recordInsert(insertRecordArgumentCaptor.capture(), any(SInsertEvent.class));
+        SIconImpl sIcon = new SIconImpl("image/jpeg", "iconContent".getBytes());
+        sIcon.setId(NEW_ICON_ID);
         assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
                 .hasSize(3)
-                .contains(new SIconImpl("image/jpeg", "iconContent".getBytes()));
+                .contains(sIcon);
     }
 
     @Test
@@ -335,26 +363,50 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
         verify(recorder, times(1)).recordInsert(insertRecordArgumentCaptor.capture(), any(SInsertEvent.class));
+        SIconImpl newIcon = new SIconImpl("image/gif", "theContent".getBytes());
+        newIcon.setId(NEW_ICON_ID);
         assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
                 .hasSize(1)
-                .contains(new SIconImpl("image/gif", "theContent".getBytes()));
+                .contains(newIcon);
     }
 
     @Test
-    public void should_updateUser_update_the_icon_if_it_exists() throws Exception {
+    public void should_updateUser_create_new_icon_if_it_exists() throws Exception {
         //given
         SUserImpl sUser = haveUser();
-        haveIcon(sUser);
+        SIconImpl sIcon = haveIcon(sUser);
         //when
         EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
         iconUpdateDescriptor.addField("filename", "theNewIcon.jpg");
         iconUpdateDescriptor.addField("content", "updated content".getBytes());
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
-        verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), any(SUpdateEvent.class));
-        assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("mimeType", "image/jpeg"),
-                entry("content", "updated content".getBytes()));
+        verify(recorder).recordInsert(insertRecordArgumentCaptor.capture(), any(SInsertEvent.class));
+        verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), any(SDeleteEvent.class));
+        assertThat(updateRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sUser);
+        assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("iconId", NEW_ICON_ID));
+        assertThat(insertRecordArgumentCaptor.getValue().getEntity()).isEqualToIgnoringGivenFields(new SIconImpl("image/jpeg", "updated content".getBytes()),
+                "id");
+        assertThat(deleteRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sIcon);
+    }
+
+    @Test
+    public void should_update_user_with_null_content_remove_the_icon() throws Exception {
+        //given
+        SUserImpl sUser = haveUser();
+        SIconImpl sIcon = haveIcon(sUser);
+        //when
+        EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
+        iconUpdateDescriptor.addField("content", null);
+        identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
+        //then
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), any(SDeleteEvent.class));
+        assertThat(updateRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sUser);
+        assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("iconId", null));
+        assertThat(deleteRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sIcon);
     }
 
     private SUserImpl haveUser() throws SUserNotFoundException {
@@ -390,6 +442,7 @@ public class IdentityServiceImplForUserTest {
     private SIconImpl haveIcon(SUserImpl sUser) throws SBonitaReadException {
         sUser.setIconId(ICON_ID);
         SIconImpl icon = new SIconImpl("image/gif", "theContent".getBytes());
+        icon.setId(ICON_ID);
         doReturn(icon).when(identityServiceImpl).getIcon(ICON_ID);
         return icon;
     }

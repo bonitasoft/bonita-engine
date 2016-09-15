@@ -111,6 +111,11 @@ public interface UserAPI {
 
     /**
      * Updates the user according to the updater values.
+     * <p>
+     * This method also allow to update the icon of the user.
+     * When you update it, the iconId will be set on the user and you can later get it using {@link IdentityAPI#getIcon(long)}.
+     * Changing the content of the icon will create a new icon and change the iconId of the user.
+     * </p>
      *
      * @param userId
      *        The identifier of the user
