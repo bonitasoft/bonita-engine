@@ -335,7 +335,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             }
             if (flowNode instanceof SubProcessDefinition) {
                 final SubProcessDefinition subProcess = (SubProcessDefinition) flowNode;
-                validateFlowNodeUnique(subProcess.getSubProcessContainer(), names);
+                org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = subProcess.getSubProcessContainer();
+                if (subProcessContainer != null) {
+                    validateFlowNodeUnique(subProcessContainer, names);
+                }
             }
         }
     }
@@ -395,7 +398,12 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         for (final ActivityDefinition activity : processContainer.getActivities()) {
             if (activity instanceof SubProcessDefinition) {
                 final FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity).getSubProcessContainer();
-
+                if (subProcessContainer == null) {
+                    designErrors.add("The subprocess " + activity.getName() + " does not have any element," +
+                            " add at least one element using the builder that can be retrieved on the subprocess activity:" +
+                            " org.bonitasoft.engine.bpm.process.impl.SubProcessActivityDefinitionBuilder.getSubProcessBuilder()");
+                    return;
+                }
                 if (((SubProcessDefinition) activity).isTriggeredByEvent()) {
                     if (subProcessContainer.getStartEvents().size() != 1) {
                         designErrors.add("An event sub process must have one and only one start events, but " + subProcessContainer.getStartEvents().size()
