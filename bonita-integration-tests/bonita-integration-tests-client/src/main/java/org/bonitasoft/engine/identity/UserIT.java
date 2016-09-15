@@ -1213,15 +1213,16 @@ public class UserIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void should_update_user_update_icon() throws Exception {
+    public void should_update_user_with_new_icon_create_a_new_icon() throws Exception {
         //given
         User user = getIdentityAPI().createUser(new UserCreator("userWithIcon", "thePassword").setIcon("myAvatar.png", "avatarContent".getBytes()));
-        Icon icon = getIdentityAPI().getIcon(user.getIconId());
         //when
         User updatedUser = getIdentityAPI().updateUser(user.getId(), new UserUpdater().setIcon("myFile.jpg", "content".getBytes()));
         //then
         Icon newIcon = getIdentityAPI().getIcon(updatedUser.getIconId());
-        assertThat(newIcon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", "content".getBytes()));
+        assertThat(newIcon.getId()).isNotEqualTo(user.getIconId());
+        assertThat(newIcon.getMimeType()).isEqualTo("image/jpeg");
+        assertThat(newIcon.getContent()).isEqualTo("content".getBytes());
         //cleanup
         getIdentityAPI().deleteUser("userWithIcon");
     }

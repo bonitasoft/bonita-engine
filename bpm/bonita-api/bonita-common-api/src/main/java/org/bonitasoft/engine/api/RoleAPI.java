@@ -46,14 +46,14 @@ public interface RoleAPI {
      * Creates a role.
      * 
      * @param roleName
-     *            the name of the role
+     *        the name of the role
      * @return the created role
      * @throws AlreadyExistsException
-     *             If the name is already taken by an existing role
+     *         If the name is already taken by an existing role
      * @throws CreationException
-     *             If an exception occurs during the role creation
+     *         If an exception occurs during the role creation
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Role createRole(String roleName) throws AlreadyExistsException, CreationException;
@@ -63,33 +63,39 @@ public interface RoleAPI {
      * <p>
      * It takes the values of the creator in order to create the role.
      * </p>
+     * 
      * @param creator
-     *            the role creator
+     *        the role creator
      * @return the created role.
      * @throws AlreadyExistsException
-     *             If the name is already taken by an existing role
+     *         If the name is already taken by an existing role
      * @throws CreationException
-     *             If an exception occurs during the role creation
+     *         If an exception occurs during the role creation
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Role createRole(RoleCreator creator) throws AlreadyExistsException, CreationException;
 
     /**
      * Updates the group according to the updater values.
+     * <p>
+     * This method also allow to update the icon of the role.
+     * When you update it, the iconId will be set on the role and you can later get it using {@link IdentityAPI#getIcon(long)}.
+     * Changing the content of the icon will create a new icon and change the iconId of the role.
+     * </p>
      * 
      * @param roleId
-     *            the identifier of the role
+     *        the identifier of the role
      * @param updater
-     *            the role updater
+     *        the role updater
      * @return the updated role
      * @throws RoleNotFoundException
-     *             If the role identifier does not refer to an existing role
+     *         If the role identifier does not refer to an existing role
      * @throws UpdateException
-     *             If an exception occurs during the role update
+     *         If an exception occurs during the role update
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Role updateRole(long roleId, RoleUpdater updater) throws RoleNotFoundException, UpdateException;
@@ -98,11 +104,11 @@ public interface RoleAPI {
      * Deletes the role.
      * 
      * @param roleId
-     *            the role identifier
+     *        the role identifier
      * @throws DeletionException
-     *             If an exception occurs during the role deletion
+     *         If an exception occurs during the role deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteRole(long roleId) throws DeletionException;
@@ -111,11 +117,11 @@ public interface RoleAPI {
      * Deletes the roles.
      * 
      * @param roleIds
-     *            the list of role identifiers
+     *        the list of role identifiers
      * @throws DeletionException
-     *             If an exception occurs during the role deletion
+     *         If an exception occurs during the role deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteRoles(List<Long> roleIds) throws DeletionException;
@@ -124,14 +130,14 @@ public interface RoleAPI {
      * Retrieves the role.
      * 
      * @param roleId
-     *            the identifier of the role
+     *        the identifier of the role
      * @return the role
      * @throws RoleNotFoundException
-     *             If the role identifier does not refer to an existing role
+     *         If the role identifier does not refer to an existing role
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Role getRole(long roleId) throws RoleNotFoundException;
@@ -140,14 +146,14 @@ public interface RoleAPI {
      * Retrieves the role.
      * 
      * @param roleName
-     *            the name of the role.
+     *        the name of the role.
      * @return the role.
      * @throws RoleNotFoundException
-     *             If the role name does not refer to an existing role
+     *         If the role name does not refer to an existing role
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Role getRoleByName(String roleName) throws RoleNotFoundException;
@@ -157,9 +163,9 @@ public interface RoleAPI {
      * 
      * @return the total number of roles
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the count retrieving
+     *         If an exception occurs during the count retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     long getNumberOfRoles();
@@ -171,16 +177,16 @@ public interface RoleAPI {
      * </p>
      * 
      * @param startIndex
-     *            the start index
+     *        the start index
      * @param maxResults
-     *            the max number of roles
+     *        the max number of roles
      * @param criterion
-     *            the sorting criterion
+     *        the sorting criterion
      * @return the paginated list of roles
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     List<Role> getRoles(int startIndex, int maxResults, RoleCriterion criterion);
@@ -192,12 +198,12 @@ public interface RoleAPI {
      * </p>
      *
      * @param roleIds
-     *            the identifiers of the roles
+     *        the identifiers of the roles
      * @return the roles
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the role retrieving
+     *         If an exception occurs during the role retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Map<Long, Role> getRoles(List<Long> roleIds);
@@ -206,12 +212,12 @@ public interface RoleAPI {
      * Searches roles according to the criteria containing in the options.
      * 
      * @param options
-     *            the search criteria
+     *        the search criteria
      * @return the search result
      * @throws SearchException
-     *             If an exception occurs during the role searching
+     *         If an exception occurs during the role searching
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     SearchResult<Role> searchRoles(SearchOptions options) throws SearchException;

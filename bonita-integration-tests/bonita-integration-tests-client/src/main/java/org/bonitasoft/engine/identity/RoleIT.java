@@ -529,14 +529,16 @@ public class RoleIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void should_updateRole_with_icon_update_the_icon() throws Exception {
+    public void should_updateRole_with_new_icon_create_a_new_icon() throws Exception {
         //given
         Role aRole = getIdentityAPI().createRole(new RoleCreator("aRole").setIcon("main.png", new byte[] { 1, 2, 3 }));
         //when
         Role role = getIdentityAPI().updateRole(aRole.getId(), new RoleUpdater().setIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
         //then
         Icon icon = getIdentityAPI().getIcon(role.getIconId());
-        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", new byte[] { 3, 4, 5 }));
+        assertThat(icon.getId()).isNotEqualTo(aRole.getIconId());
+        assertThat(icon.getMimeType()).isEqualTo("image/jpeg");
+        assertThat(icon.getContent()).isEqualTo(new byte[] { 3, 4, 5 });
         //clean up
         deleteRoles(aRole);
     }
