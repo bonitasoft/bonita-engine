@@ -604,14 +604,16 @@ public class GroupIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void should_updateGroup_with_icon_update_the_icon() throws Exception {
+    public void should_updateGroup_with_new_icon_create_a_new_icon() throws Exception {
         //given
         Group mainGroup = getIdentityAPI().createGroup(new GroupCreator("mainGroup").setIcon("main.png", new byte[] { 1, 2, 3 }));
         //when
         Group group = getIdentityAPI().updateGroup(mainGroup.getId(), new GroupUpdater().updateIcon("newIcon.jpg", new byte[] { 3, 4, 5 }));
         //then
         Icon icon = getIdentityAPI().getIcon(group.getIconId());
-        assertThat(icon).isEqualTo(new IconImpl(icon.getId(), "image/jpeg", new byte[] { 3, 4, 5 }));
+        assertThat(icon.getId()).isNotEqualTo(mainGroup.getIconId());
+        assertThat(icon.getMimeType()).isEqualTo("image/jpeg");
+        assertThat(icon.getContent()).isEqualTo(new byte[] { 3, 4, 5 });
         //clean up
         deleteGroups(getIdentityAPI().getGroupByPath("/mainGroup"));
     }

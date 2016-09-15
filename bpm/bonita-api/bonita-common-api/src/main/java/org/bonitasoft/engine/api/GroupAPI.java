@@ -48,16 +48,16 @@ public interface GroupAPI {
      * </p>
      * 
      * @param name
-     *            the name of the group
+     *        the name of the group
      * @param parentPath
-     *            the parent path of the group (null means no parent)
+     *        the parent path of the group (null means no parent)
      * @return the created group
      * @throws AlreadyExistsException
-     *             If the couple name/parentPath is already taken by an existing group
+     *         If the couple name/parentPath is already taken by an existing group
      * @throws CreationException
-     *             If an exception occurs during the group creation
+     *         If an exception occurs during the group creation
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Group createGroup(String name, String parentPath) throws AlreadyExistsException, CreationException;
@@ -69,32 +69,37 @@ public interface GroupAPI {
      * </p>
      * 
      * @param creator
-     *            the group creator
+     *        the group creator
      * @return the created group
      * @throws AlreadyExistsException
-     *             If the couple name/parentPath is already taken by an existing group
+     *         If the couple name/parentPath is already taken by an existing group
      * @throws CreationException
-     *             If an exception occurs during group creation
+     *         If an exception occurs during group creation
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Group createGroup(GroupCreator creator) throws AlreadyExistsException, CreationException;
 
     /**
      * Updates the group according to the updater values.
+     * <p>
+     * This method also allow to update the icon of the group.
+     * When you update it, the iconId will be set on the group and you can later get it using {@link IdentityAPI#getIcon(long)}.
+     * Changing the content of the icon will create a new icon and change the iconId of the group.
+     * </p>
      * 
      * @param groupId
-     *            the identifier of the group
+     *        the identifier of the group
      * @param updater
-     *            the group updater
+     *        the group updater
      * @return the updated group
      * @throws GroupNotFoundException
-     *             If the group identifier does not refer to an existing group
+     *         If the group identifier does not refer to an existing group
      * @throws UpdateException
-     *             If an exception occurs during the group update
+     *         If an exception occurs during the group update
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Group updateGroup(long groupId, GroupUpdater updater) throws GroupNotFoundException, UpdateException;
@@ -103,11 +108,11 @@ public interface GroupAPI {
      * Deletes the group.
      * 
      * @param groupId
-     *            the identifier of the group
+     *        the identifier of the group
      * @throws DeletionException
-     *             If an exception occurs during the group deletion
+     *         If an exception occurs during the group deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteGroup(long groupId) throws DeletionException;
@@ -116,11 +121,11 @@ public interface GroupAPI {
      * Deletes the groups.
      * 
      * @param groupIds
-     *            the list of group identifiers
+     *        the list of group identifiers
      * @throws DeletionException
-     *             If an exception occurs during the group deletion
+     *         If an exception occurs during the group deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void deleteGroups(List<Long> groupIds) throws DeletionException;
@@ -129,14 +134,14 @@ public interface GroupAPI {
      * Retrieves the group.
      * 
      * @param groupId
-     *            the group identifier
+     *        the group identifier
      * @return the group
      * @throws GroupNotFoundException
-     *             If the group identifier does not refer to an existing group
+     *         If the group identifier does not refer to an existing group
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the group retrieving
+     *         If an exception occurs during the group retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Group getGroup(long groupId) throws GroupNotFoundException;
@@ -145,14 +150,14 @@ public interface GroupAPI {
      * Retrieves the group according to its full path.
      * 
      * @param groupPath
-     *            the full path of the group (parentPath/name)
+     *        the full path of the group (parentPath/name)
      * @return the group
      * @throws GroupNotFoundException
-     *             If the group path does not refer to an existing group
+     *         If the group path does not refer to an existing group
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the group retrieving
+     *         If an exception occurs during the group retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Group getGroupByPath(final String groupPath) throws GroupNotFoundException;
@@ -162,9 +167,9 @@ public interface GroupAPI {
      * 
      * @return the total number of groups
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the count retrieving
+     *         If an exception occurs during the count retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     long getNumberOfGroups();
@@ -174,17 +179,18 @@ public interface GroupAPI {
      * <p>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * </p>
+     * 
      * @param startIndex
-     *            the start index
+     *        the start index
      * @param maxResults
-     *            the max number of groups
+     *        the max number of groups
      * @param criterion
-     *            the sorting criterion
+     *        the sorting criterion
      * @return the list of groups
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the group retrieving
+     *         If an exception occurs during the group retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     List<Group> getGroups(int startIndex, int maxResults, GroupCriterion criterion);
@@ -197,12 +203,12 @@ public interface GroupAPI {
      * </p>
      * 
      * @param groupIds
-     *            the identifiers of the groups
+     *        the identifiers of the groups
      * @return the groups
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *             If an exception occurs during the group retrieving
+     *         If an exception occurs during the group retrieving
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     Map<Long, Group> getGroups(List<Long> groupIds);
@@ -211,12 +217,12 @@ public interface GroupAPI {
      * Searches groups according to the criteria containing in the options.
      * 
      * @param options
-     *            the search criteria
+     *        the search criteria
      * @return the search result
      * @throws SearchException
-     *             If an exception occurs during the group searching
+     *         If an exception occurs during the group searching
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     SearchResult<Group> searchGroups(SearchOptions options) throws SearchException;
