@@ -36,14 +36,13 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier
  */
 @RunWith(MockitoJUnitRunner.class)
-public class BundleConfiguratorTest {
+public class TomcatBundleConfiguratorTest {
 
     @Rule
     public final TestRule restoreSystemProperties = new RestoreSystemProperties();
@@ -54,34 +53,25 @@ public class BundleConfiguratorTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private BundleConfigurator configurator = new BundleConfigurator();
+    private TomcatBundleConfigurator configurator;
 
-    @Spy
-    BundleConfigurator spy;
+    private TomcatBundleConfigurator spy;
 
     private Path newFolderPath;
     private String databaseAbsolutePath;
 
+    public TomcatBundleConfiguratorTest() throws PlatformException {
+    }
+
     @Before
-    public void setupTempConfFolder() throws IOException {
+    public void setupTempConfFolder() throws Exception {
         final File temporaryFolderRoot = temporaryFolder.getRoot();
         newFolderPath = temporaryFolderRoot.toPath();
         FileUtils.copyDirectory(Paths.get("src/test/resources/tomcat_conf").toFile(), temporaryFolderRoot);
         System.setProperty(BONITA_SETUP_FOLDER, newFolderPath.resolve("setup").toString());
         databaseAbsolutePath = newFolderPath.resolve("database").normalize().toString();
-
-    }
-
-    @Test
-    public void configureApplicationServer_should_detect_tomcat() throws Exception {
-        // given:
-        doNothing().when(spy).configureTomcat();
-
-        // when:
-        spy.configureApplicationServer();
-
-        // then:
-        verify(spy).configureTomcat();
+        configurator = new TomcatBundleConfigurator(newFolderPath);
+        spy = spy(configurator);
     }
 
     @Test
@@ -372,7 +362,7 @@ public class BundleConfiguratorTest {
         Thread.sleep(1020);
 
         // when:
-        new BundleConfigurator().configureApplicationServer();
+        new TomcatBundleConfigurator(newFolderPath).configureApplicationServer();
 
         // then:
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(2);
