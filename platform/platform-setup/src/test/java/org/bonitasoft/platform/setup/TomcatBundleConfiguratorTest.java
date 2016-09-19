@@ -57,7 +57,7 @@ public class TomcatBundleConfiguratorTest {
 
     private TomcatBundleConfigurator spy;
 
-    private Path newFolderPath;
+    private Path bundleFolder;
     private String databaseAbsolutePath;
 
     public TomcatBundleConfiguratorTest() throws PlatformException {
@@ -65,12 +65,12 @@ public class TomcatBundleConfiguratorTest {
 
     @Before
     public void setupTempConfFolder() throws Exception {
-        final File temporaryFolderRoot = temporaryFolder.getRoot();
-        newFolderPath = temporaryFolderRoot.toPath();
+        final File temporaryFolderRoot = temporaryFolder.newFolder();
+        bundleFolder = temporaryFolderRoot.toPath().toRealPath();
         FileUtils.copyDirectory(Paths.get("src/test/resources/tomcat_conf").toFile(), temporaryFolderRoot);
-        System.setProperty(BONITA_SETUP_FOLDER, newFolderPath.resolve("setup").toString());
-        databaseAbsolutePath = newFolderPath.resolve("database").normalize().toString();
-        configurator = new TomcatBundleConfigurator(newFolderPath);
+        System.setProperty(BONITA_SETUP_FOLDER, bundleFolder.resolve("setup").toString());
+        databaseAbsolutePath = bundleFolder.resolve("database").normalize().toString();
+        configurator = new TomcatBundleConfigurator(bundleFolder);
         spy = spy(configurator);
     }
 
@@ -82,19 +82,19 @@ public class TomcatBundleConfiguratorTest {
         // then:
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(1);
         assertThat(numberOfBackups("setenv.bat")).isEqualTo(1);
-        checkFileContains(newFolderPath.resolve("bin").resolve("setenv.sh"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
-        checkFileContains(newFolderPath.resolve("bin").resolve("setenv.bat"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
+        checkFileContains(bundleFolder.resolve("bin").resolve("setenv.sh"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
+        checkFileContains(bundleFolder.resolve("bin").resolve("setenv.bat"), "-Dsysprop.bonita.db.vendor=postgres", "-Dsysprop.bonita.bdm.db.vendor=oracle");
     }
 
     private int numberOfBackups(String file) {
-        final String[] backupFiles = newFolderPath.resolve("setup").resolve("tomcat-backups").toFile().list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
+        final String[] backupFiles = bundleFolder.resolve("setup").resolve("tomcat-backups").toFile().list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
         return backupFiles == null ? 0 : backupFiles.length;
     }
 
     @Test
     public void configureApplicationServer_should_fail_if_no_driver_folder() throws Exception {
         // given:
-        final Path driverFolder = newFolderPath.resolve("setup").resolve("lib");
+        final Path driverFolder = bundleFolder.resolve("setup").resolve("lib");
         FileUtils.deleteDirectory(driverFolder.toFile());
 
         // then:
@@ -111,7 +111,7 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bonita_xml = newFolderPath.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bonita_xml = bundleFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1\"", "username=\"bonita\"", "password=\"bpm\"", "driverClassName=\"org.postgresql.Driver\"",
                 "url=\"jdbc:postgresql://localhost:5432/bonita\"");
@@ -128,7 +128,7 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = newFolderPath.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bitronixFile = bundleFolder.resolve("conf").resolve("bitronix-resources.properties");
         checkFileContains(bitronixFile, "resource.ds1.className=org.postgresql.xa.PGXADataSource", "resource.ds1.driverProperties.user=bonita",
                 "resource.ds1.driverProperties.password=bpm", "resource.ds1.driverProperties.serverName=localhost",
                 "resource.ds1.driverProperties.portNumber=5432", "resource.ds1.driverProperties.databaseName=bonita", "resource.ds1.testQuery=SELECT 1");
@@ -151,8 +151,8 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = newFolderPath.resolve("conf").resolve("bitronix-resources.properties");
-        final Path bonita_xml = newFolderPath.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bitronixFile = bundleFolder.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = bundleFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
 
         checkFileContains(bitronixFile, "resource.ds1.className=org.h2.jdbcx.JdbcDataSource", "resource.ds1.driverProperties.user=myUser",
                 "resource.ds1.driverProperties.password=myPwd", "resource.ds1.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
@@ -180,8 +180,8 @@ public class TomcatBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path bitronixFile = newFolderPath.resolve("conf").resolve("bitronix-resources.properties");
-        final Path bonita_xml = newFolderPath.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+        final Path bitronixFile = bundleFolder.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = bundleFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
 
         checkFileContains(bitronixFile, "resource.ds1.className=org.postgresql.xa.PGXADataSource", "resource.ds1.driverProperties.user=bonita",
                 "resource.ds1.driverProperties.password=bpm", "resource.ds1.driverProperties.serverName=localhost",
@@ -283,7 +283,7 @@ public class TomcatBundleConfiguratorTest {
 
     @Test
     public void should_fail_if_tomcat_mandatory_file_not_present() throws Exception {
-        final Path confFile = newFolderPath.resolve("conf").resolve("bitronix-resources.properties");
+        final Path confFile = bundleFolder.resolve("conf").resolve("bitronix-resources.properties");
         FileUtils.deleteQuietly(confFile.toFile());
 
         // then:
@@ -362,7 +362,7 @@ public class TomcatBundleConfiguratorTest {
         Thread.sleep(1020);
 
         // when:
-        new TomcatBundleConfigurator(newFolderPath).configureApplicationServer();
+        new TomcatBundleConfigurator(bundleFolder).configureApplicationServer();
 
         // then:
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(2);
