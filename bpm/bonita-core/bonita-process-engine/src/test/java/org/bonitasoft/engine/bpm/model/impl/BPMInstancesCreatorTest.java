@@ -14,18 +14,19 @@
 package org.bonitasoft.engine.bpm.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.core.process.definition.model.SFlowNodeType.USER_TASK;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -36,18 +37,22 @@ import org.bonitasoft.engine.core.operation.model.impl.SOperationImpl;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,9 +82,18 @@ public class BPMInstancesCreatorTest {
     @Mock
     private FlowNodeStateManager flowNodeStateManager;
 
+    @Mock
+    ActorMappingService actorMappingService;
+
     @Spy
     @InjectMocks
     private BPMInstancesCreator bpmInstancesCreator;
+
+    @Mock
+    private SHumanTaskDefinition sHumanTaskDefinition;
+
+    @Mock
+    private SActor actor;
 
     @Before
     public void setupClass() {
@@ -151,5 +165,28 @@ public class BPMInstancesCreatorTest {
 
         assertThat(gatewayInstance.getReachedStateDate()).isNotEqualTo(0L);
         assertThat(gatewayInstance.getLastUpdateDate()).isNotEqualTo(0L);
+    }
+
+    @Test
+    public void create_user_task_should_not_evaluate_setExpectedEndDate_expression() throws Exception {
+        //given
+        doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.USER_TASK);
+        doReturn(USER_TASK).when(sHumanTaskDefinition).getType();
+        doReturn("actor").when(sHumanTaskDefinition).getActorName();
+        doReturn(actor).when(actorMappingService).getActor(anyString(), anyLong());
+
+        ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+        expressionBuilder.createConstantLongExpression(3600L);
+
+        doReturn(ModelConvertor.constructSExpression(expressionBuilder.done())).when(sHumanTaskDefinition).getExpectedDuration();
+
+        //when
+        final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) bpmInstancesCreator.createFlowNodeInstance(2345L, 456L, 987L,
+                SFlowElementsContainerType.FLOWNODE,
+                sHumanTaskDefinition, 964854854L, 547, false, 0, SStateCategory.NORMAL, 0);
+
+        //then
+        assertThat(sHumanTaskInstance.getExpectedEndDate()).as("should not compute end date on creation").isNull();
+
     }
 }

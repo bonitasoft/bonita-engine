@@ -16,6 +16,10 @@ package org.bonitasoft.engine.bpm.process.impl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ManualTaskDefinitionImpl;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 
 /**
  * @author Baptiste Mesta
@@ -51,9 +55,26 @@ public class ManualTaskDefinitionBuilder extends ActivityDefinitionBuilder {
      * 
      * @param time how long (in milliseconds) this task is expected to take.
      * @return
-     */
+     * @deprecated use
+     *             {@link org.bonitasoft.engine.bpm.process.impl.ManualTaskDefinitionBuilder#addExpectedDuration(org.bonitasoft.engine.expression.Expression)}
+     **/
     public ManualTaskDefinitionBuilder addExpectedDuration(final long time) {
-        ((ManualTaskDefinitionImpl) getActivity()).setExpectedDuration(time);
+        try {
+            final Expression expression = new ExpressionBuilder().createConstantLongExpression(time);
+            return addExpectedDuration(expression);
+        } catch (InvalidExpressionException e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
+
+    /**
+     * Sets the expected duration for this human task.
+     *
+     * @param expression how long (in milliseconds) this task is expected to take.
+     * @return
+     */
+    public ManualTaskDefinitionBuilder addExpectedDuration(final Expression expression) {
+        ((ManualTaskDefinitionImpl) getActivity()).setExpectedDuration(expression.copy());
         return this;
     }
 

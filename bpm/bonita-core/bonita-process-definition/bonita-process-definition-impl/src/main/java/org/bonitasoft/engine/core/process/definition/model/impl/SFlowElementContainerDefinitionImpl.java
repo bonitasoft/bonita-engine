@@ -248,7 +248,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
                     sHumanTaskDefinitionImpl.setUserFilter(new SUserFilterDefinitionImpl(userFilter));
                 }
                 sHumanTaskDefinitionImpl.setPriority(humanTaskDefinitionImpl.getPriority());
-                sHumanTaskDefinitionImpl.setExpectedDuration(humanTaskDefinitionImpl.getExpectedDuration());
+                sHumanTaskDefinitionImpl.setExpectedDuration(ServerModelConvertor.convertExpression(humanTaskDefinitionImpl.getExpectedDuration()));
             } else if (activityDefinition instanceof ReceiveTaskDefinitionImpl) {
                 activity = new SReceiveTaskDefinitionImpl((ReceiveTaskDefinitionImpl) activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof SendTaskDefinitionImpl) {
@@ -355,7 +355,6 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         allElementsMap.put(gateway.getId(), gateway);
         allElementsMapString.put(gateway.getName(), gateway);
     }
-
 
     public void addBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
         sBusinessDataDefinitions.add(businessDataDefinition);
@@ -593,6 +592,5 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     public List<SDocumentListDefinition> getDocumentListDefinitions() {
         return sDocumentListDefinitions;
     }
-
 
 }
