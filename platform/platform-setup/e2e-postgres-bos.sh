@@ -43,7 +43,7 @@ cat ${E2E_DIR}/database.properties
 echo "========================================"
 
 echo "=================================================="
-echo "should skip non-tomcat environment for 'configure'"
+echo "should skip non-supported environment for 'configure'"
 echo "=================================================="
 ${E2E_DIR}/setup.sh configure
 
@@ -65,6 +65,22 @@ testReturnCode $? "Configuring bonita.xml file with Postgres"
 
 cat target/bin/setenv.sh | grep "\-Dsysprop.bonita.db.vendor=postgres" > /dev/null
 testReturnCode $? "Configuring setenv.sh file with Postgres"
+
+echo "========================================"
+echo "should configure wildfly environment"
+echo "========================================"
+# clean-up tomcat file and replace by wildfly:
+rm -rf ${E2E_DIR}/../bin ${E2E_DIR}/../conf ${E2E_DIR}/../lib ${E2E_DIR}/../setup
+cp -rf src/test/resources/wildfly_conf/* ${E2E_DIR}/..
+
+${E2E_DIR}/setup.sh configure
+testReturnCode $? "setup.sh configure"
+
+cat target/standalone/configuration/standalone.xml | grep "<connection-url>jdbc:postgresql://localhost:5432/bonita</connection-url>" > /dev/null
+testReturnCode $? "Configuring standalone.xml file with Postgres for non-XA datasource"
+
+cat target/standalone/configuration/standalone.xml | grep "<xa-datasource-property name=\"DatabaseName\">bonita</xa-datasource-property>" > /dev/null
+testReturnCode $? "Configuring standalone.xml file with Postgres for XA datasource"
 
 echo "========================================"
 echo "should store to database "

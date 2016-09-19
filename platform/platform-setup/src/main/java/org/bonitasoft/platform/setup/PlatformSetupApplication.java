@@ -99,7 +99,10 @@ public class PlatformSetupApplication {
     }
 
     private static void configure() throws PlatformException {
-        new BundleConfigurator().configureApplicationServer();
+        BundleConfigurator bundleConfigurator = new BundleResolver().getConfigurator();
+        if (bundleConfigurator != null) {
+            bundleConfigurator.configureApplicationServer();
+        }
     }
 
     private static void init(ConfigurableApplicationContext run) throws PlatformException {
