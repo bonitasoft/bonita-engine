@@ -64,8 +64,8 @@ public class WildflyBundleConfiguratorTest {
 
     @Before
     public void setupTempConfFolder() throws Exception {
-        final File temporaryFolderRoot = temporaryFolder.getRoot();
-        newFolderPath = temporaryFolderRoot.toPath();
+        final File temporaryFolderRoot = temporaryFolder.newFolder();
+        newFolderPath = temporaryFolderRoot.toPath().toRealPath();
         FileUtils.copyDirectory(Paths.get("src/test/resources/wildfly_conf").toFile(), temporaryFolderRoot);
         System.setProperty(BONITA_SETUP_FOLDER, newFolderPath.resolve("setup").toString());
         configurator = new WildflyBundleConfigurator(newFolderPath);
