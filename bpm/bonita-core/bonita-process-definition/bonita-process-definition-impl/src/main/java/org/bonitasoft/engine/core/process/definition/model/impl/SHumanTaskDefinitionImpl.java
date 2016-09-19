@@ -19,6 +19,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
+import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Baptiste Mesta
@@ -34,7 +35,7 @@ public abstract class SHumanTaskDefinitionImpl extends SActivityDefinitionImpl i
 
     private String priority;
 
-    private Long expectedDuration;
+    private SExpression expectedDuration;
 
     public SHumanTaskDefinitionImpl(final HumanTaskDefinition userTaskDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
@@ -62,7 +63,7 @@ public abstract class SHumanTaskDefinitionImpl extends SActivityDefinitionImpl i
     }
 
     @Override
-    public Long getExpectedDuration() {
+    public SExpression getExpectedDuration() {
         return expectedDuration;
     }
 
@@ -75,7 +76,7 @@ public abstract class SHumanTaskDefinitionImpl extends SActivityDefinitionImpl i
         this.priority = priority;
     }
 
-    public void setExpectedDuration(final Long expectedDuration) {
+    public void setExpectedDuration(final SExpression expectedDuration) {
         this.expectedDuration = expectedDuration;
     }
 

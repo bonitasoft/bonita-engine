@@ -93,6 +93,7 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends OnEnterConn
     @Override
     protected void afterConnectors(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
+        stateBehaviors.updateExpectedDuration(processDefinition, flowNodeInstance);
         stateBehaviors.addAssignmentSystemCommentIfTaskWasAutoAssign(flowNodeInstance);
         stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
     }

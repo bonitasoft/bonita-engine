@@ -33,7 +33,7 @@
             </operations>
             <boundaryEvents />
         </automaticTask>
-        <manualTask id="_7906409025814023985" name="manual1" actorName="Truck Driver" expectedDuration="5000000" priority="urgent">
+        <manualTask id="_7906409025814023985" name="manual1" actorName="Truck Driver" priority="urgent">
             <description>description of manual task1</description>
             <displayDescription id="_6505846811508252493" name="this is an urgent task that will take more than one hour to be done" expressionType="TYPE_CONSTANT" returnType="java.lang.String">
                 <content>this is an urgent task that will take more than one hour to be done</content>
@@ -48,6 +48,9 @@
             <businessDataDefinitions />
             <operations />
             <boundaryEvents />
+            <expectedDuration expressionType="TYPE_CONSTANT" id="_184917553923271783" returnType="java.lang.Long" name="expectedDuration expression">
+                <content>5000000</content>
+            </expectedDuration>
         </manualTask>
         <userTask id="_5361783563515456019" name="user1" actorName="Truck Driver">
             <incomingTransition>_5250914942072233494</incomingTransition>
@@ -78,6 +81,9 @@
                 <inputs />
             </userFilter>
             <context />
+            <expectedDuration expressionType="TYPE_CONSTANT" id="_284917553923271783" returnType="java.lang.Long" name="expectedDuration expression">
+                <content>5000000</content>
+            </expectedDuration>
         </userTask>
         <transitions>
             <transition id="_8462225665688055895" name="6961061175944951501_-&gt;_5361783563515456019" source="_6961061175944951501" target="_5361783563515456019" />

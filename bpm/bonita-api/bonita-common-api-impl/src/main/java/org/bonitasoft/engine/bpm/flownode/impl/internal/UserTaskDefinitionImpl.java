@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
@@ -36,6 +37,9 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = { "incomings", "outgoings", "connectors", "description", "displayDescription", "displayName", "displayDescriptionAfterCompletion",
+        "defaultTransition", "dataDefinitions", "businessDataDefinitions", "operations", "loopCharacteristics", "boundaryEventDefinitions",
+        "userFilterDefinition", "contract", "context", "expectedDuration" })
 public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements UserTaskDefinition {
 
     private static final long serialVersionUID = -8168685139931497082L;
@@ -82,9 +86,12 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         UserTaskDefinitionImpl that = (UserTaskDefinitionImpl) o;
         return Objects.equals(contract, that.contract) &&
                 Objects.equals(context, that.context);

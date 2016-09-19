@@ -26,6 +26,8 @@ import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author Baptiste Mesta
@@ -37,12 +39,16 @@ import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl implements HumanTaskDefinition {
 
     private static final long serialVersionUID = -7657152341382296289L;
+
     @XmlAttribute
     private final String actorName;
+
     @XmlElement(type = UserFilterDefinitionImpl.class, name = "userFilter")
     private UserFilterDefinition userFilterDefinition;
-    @XmlAttribute
-    private Long expectedDuration;
+
+    @XmlElement(type = ExpressionImpl.class, name = "expectedDuration")
+    private Expression expectedDuration;
+
     @XmlAttribute
     private String priority;
 
@@ -75,7 +81,7 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
         this.userFilterDefinition = userFilterDefinition;
     }
 
-    public void setExpectedDuration(final Long expectedDuration) {
+    public void setExpectedDuration(final Expression expectedDuration) {
         this.expectedDuration = expectedDuration;
     }
 
@@ -84,7 +90,7 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
     }
 
     @Override
-    public Long getExpectedDuration() {
+    public Expression getExpectedDuration() {
         return expectedDuration;
     }
 

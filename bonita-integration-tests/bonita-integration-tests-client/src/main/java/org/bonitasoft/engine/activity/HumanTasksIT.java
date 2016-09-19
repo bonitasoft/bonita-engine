@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.activity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +62,7 @@ public class HumanTasksIT extends TestWithUser {
     }
 
     @Cover(classes = { FlowNodeInstance.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-6831", keywords = { "Non-ASCII characters", "Oracle",
-    "Column too short" })
+            "Column too short" })
     @Test
     public void can_creatte_FlowNodeInstance_with_several_non_ascii_characters() throws Exception {
         final String taskDisplayName = "àéò€çhahaאת ארץ בדפים מוסיקה לעברית. בקר גם טיפול פיסיקה, דת מתן בישול רומנית תחבורה. אל בידור מדויקים ואלקטרוניקה זאת נפלו.أملاً النزاع الصعداء بل الى. ان اتفاقية بالمطالبة ويكيبيديا، جُل. في كان بالجانب والديون الإتفاقية. لها المسرح وبولندا وبلجيكا، أي.";
@@ -72,8 +71,8 @@ public class HumanTasksIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask(taskName, ACTOR_NAME)
-        .addDisplayName(new ExpressionBuilder().createConstantStringExpression(taskDisplayName))
-        .addDescription("description");
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression(taskDisplayName))
+                .addDescription("description");
 
         final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         getProcessAPI().startProcess(processDef1.getId());
@@ -83,7 +82,8 @@ public class HumanTasksIT extends TestWithUser {
         disableAndDeleteProcess(processDef1);
     }
 
-    @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human", "Task Instance" }, jira = "ENGINE-772")
+    @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human",
+            "Task Instance" }, jira = "ENGINE-772")
     @Test
     public void getLastHumanTaskInstance() throws Exception {
         // First process def with 2 instances:
@@ -144,7 +144,8 @@ public class HumanTasksIT extends TestWithUser {
         disableAndDeleteProcess(processDef);
     }
 
-    @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human", "Task Instance" }, jira = "ENGINE-772", exceptions = { NotFoundException.class })
+    @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human",
+            "Task Instance" }, jira = "ENGINE-772", exceptions = { NotFoundException.class })
     @Test(expected = NotFoundException.class)
     public void cannotGetLastHumanTaskInstance() throws Exception {
         // First process def with 2 instances:
@@ -384,6 +385,60 @@ public class HumanTasksIT extends TestWithUser {
         getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.SKIPPED_STATE);
         // will skip task and finish process
         waitForProcessToFinish(processInstance.getId());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_use_expression_to_compute_human_task_due_date() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+
+        ExpressionBuilder oneHourExpressionBuilder = new ExpressionBuilder();
+        oneHourExpressionBuilder.createGroovyScriptExpression("dueDate expression", "3600000L", Long.class.getName());
+
+        ExpressionBuilder nullExpressionBuilder = new ExpressionBuilder();
+        nullExpressionBuilder.createGroovyScriptExpression("dueDate expression", "null", Long.class.getName());
+
+        ExpressionBuilder failExpressionBuilder = new ExpressionBuilder();
+        failExpressionBuilder.createGroovyScriptExpression("dueDate expression", "not a Long", Long.class.getName());
+
+        builder.addUserTask("userTask", ACTOR_NAME).addExpectedDuration(oneHourExpressionBuilder.done());
+        builder.addManualTask("manualTask", ACTOR_NAME).addExpectedDuration(oneHourExpressionBuilder.done());
+        builder.addUserTask("userTaskNullExpression", ACTOR_NAME).addExpectedDuration(nullExpressionBuilder.done());
+        builder.addManualTask("manualTaskNullExpression", ACTOR_NAME).addExpectedDuration(nullExpressionBuilder.done());
+        builder.addUserTask("failUserTask", ACTOR_NAME).addExpectedDuration(failExpressionBuilder.done());
+
+        builder.addTransition("userTask", "userTaskNullExpression");
+        builder.addTransition("userTaskNullExpression", "manualTask");
+        builder.addTransition("manualTask", "manualTaskNullExpression");
+        builder.addTransition("manualTaskNullExpression", "failUserTask");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        //when
+        final HumanTaskInstance userTask = waitForUserTaskAndAssignIt(processInstance, "userTask", user);
+        getProcessAPI().executeUserTask(userTask.getId(), null);
+
+        final HumanTaskInstance userTaskNullDueDate = waitForUserTaskAndAssignIt(processInstance, "userTaskNullExpression", user);
+        getProcessAPI().executeUserTask(userTaskNullDueDate.getId(), null);
+
+        final HumanTaskInstance manualTask = waitForUserTaskAndAssignIt(processInstance, "manualTask", user);
+        getProcessAPI().executeUserTask(manualTask.getId(), null);
+
+        final HumanTaskInstance manualTaskNullDueDate = waitForUserTaskAndAssignIt(processInstance, "manualTaskNullExpression", user);
+        getProcessAPI().executeUserTask(manualTaskNullDueDate.getId(), null);
+
+        final ActivityInstance taskToFail = waitForTaskToFail(processInstance);
+
+        //then
+        assertThat(userTask.getExpectedEndDate()).as("should expression set expected end date").isNotNull();
+        assertThat(userTaskNullDueDate.getExpectedEndDate()).as("should have no due date").isNull();
+        assertThat(manualTask.getExpectedEndDate()).as("should expression set expected end date").isNotNull();
+        assertThat(manualTaskNullDueDate.getExpectedEndDate()).as("should have no due date").isNull();
+        assertThat(taskToFail.getState()).isEqualTo(ActivityStates.FAILED_STATE);
 
         disableAndDeleteProcess(processDefinition);
     }

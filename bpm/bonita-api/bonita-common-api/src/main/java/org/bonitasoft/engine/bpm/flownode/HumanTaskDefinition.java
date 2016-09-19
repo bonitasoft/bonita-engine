@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * A Human task is a task having an actor and that can be assigned.
@@ -30,7 +31,7 @@ public interface HumanTaskDefinition extends TaskDefinition, Visitable {
 
     UserFilterDefinition getUserFilter();
 
-    Long getExpectedDuration();
+    Expression getExpectedDuration();
 
     String getPriority();
 }
