@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.bpm.flownode;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -166,9 +165,8 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         boolean taskPendingForUser = activityInstanceService.isTaskPendingForUser(step1.getId(), userId);
         getTransactionService().complete();
         //then
-        assertTrue("task should be pending",taskPendingForUser);
+        assertTrue("task should be pending", taskPendingForUser);
 
     }
-
 
 }

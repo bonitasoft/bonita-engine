@@ -127,14 +127,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                             flowNodeInstance.getId(), flowNodeInstance.getStateId(), state.getId(), state.getClass().getSimpleName()));
         }
 
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE)
-                .setObject(flowNodeInstance).done();
-        try {
-            recorder.recordUpdate(updateRecord, updateEvent);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
     @Override
@@ -151,14 +144,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
                             flowNodeInstance.getId()));
         }
 
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE)
-                .setObject(flowNodeInstance).done();
-        try {
-            recorder.recordUpdate(updateRecord, updateEvent);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
     @Override
@@ -166,8 +152,13 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         if (displayName != null && !displayName.equals(flowNodeInstance.getDisplayName())) {
             final String key = activityInstanceKeyProvider.getDisplayNameKey();
             final String event = ACTIVITYINSTANCE_DISPLAY_NAME;
-            updateOneField(flowNodeInstance, displayName, event, key, 255);
+            updateOneField(flowNodeInstance, key, displayName, 255, event);
         }
+    }
+
+    @Override
+    public void updateExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long expectedEndDate) throws SFlowNodeModificationException {
+        updateOneField(flowNodeInstance, activityInstanceKeyProvider.getExpectedEndDateKey(), expectedEndDate, ACTIVITYINSTANCE_EXPECTED_END_DATE);
     }
 
     private String getTruncated(final String value, final int maxLengh, final SFlowNodeInstance flowNodeInstance, final String key) {
@@ -205,12 +196,23 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
-    protected void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey,
-            final int maxLength) throws SFlowNodeModificationException {
+    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeKey, final String attributeValue, final int maxLength,
+            final String event) throws SFlowNodeModificationException {
         final String truncatedValue = getTruncated(attributeValue, maxLength, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(attributeKey, truncatedValue);
 
+        updateOneField(flowNodeInstance, event, descriptor);
+    }
+
+    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeKey, final Long attributeValue, final String event)
+            throws SFlowNodeModificationException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(attributeKey, attributeValue);
+        updateOneField(flowNodeInstance, event, descriptor);
+    }
+
+    private void updateOneField(SFlowNodeInstance flowNodeInstance, String event, EntityUpdateDescriptor descriptor) throws SFlowNodeModificationException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(event).setObject(flowNodeInstance)
                 .done();
@@ -226,7 +228,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         if (displayDescription != null && !displayDescription.equals(flowNodeInstance.getDisplayDescription())) {
             final String event = ACTIVITYINSTANCE_DISPLAY_DESCRIPTION;
             final String key = activityInstanceKeyProvider.getDisplayDescriptionKey();
-            updateOneField(flowNodeInstance, displayDescription, event, key, 255);
+            updateOneField(flowNodeInstance, key, displayDescription, 255, event);
         }
     }
 
@@ -234,15 +236,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     public void setTaskPriority(final SFlowNodeInstance flowNodeInstance, final STaskPriority priority) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
-
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE)
-                .setObject(flowNodeInstance).done();
-        try {
-            recorder.recordUpdate(updateRecord, updateEvent);
-        } catch (final SRecorderException e) {
-            throw new SFlowNodeModificationException(e);
-        }
+        updateOneField(flowNodeInstance, ACTIVITYINSTANCE_STATE, descriptor);
     }
 
     @Override

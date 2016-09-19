@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -25,7 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -40,7 +43,9 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -52,6 +57,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ActivityInstanceServiceImplTest {
 
     final static String DISPLAY_NAME_255 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345000000000000000000000000000000";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private PersistenceService persistenceService;
@@ -66,6 +74,9 @@ public class ActivityInstanceServiceImplTest {
     private ActivityInstanceServiceImpl activityInstanceServiceImpl;
 
     private final SFlowNodeInstanceBuilderFactory keyProvider = new SUserTaskInstanceBuilderFactoryImpl();
+
+    @Mock
+    private SFlowNodeInstance sFlowNodeInstance;
 
     @Test
     public void getPossibleUserIdsOfPendingTasks() throws Exception {
@@ -320,6 +331,36 @@ public class ActivityInstanceServiceImplTest {
 
         final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
+    }
+
+    @Test
+    public void should_updateExpectedEndDate_update_due_date_on_right_flownode_with_right_update_event_message() throws Exception {
+        //when
+        activityInstanceServiceImpl.updateExpectedEndDate(sFlowNodeInstance, 123L);
+
+        ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        ArgumentCaptor<SUpdateEvent> sUpdateEventArgumentCaptor = ArgumentCaptor.forClass(SUpdateEvent.class);
+
+        //then
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), sUpdateEventArgumentCaptor.capture());
+        assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity").isEqualTo(sFlowNodeInstance);
+        assertThat(updateRecordArgumentCaptor.getValue().getFields()).as("should only update expectedEndDate field with new value")
+                .containsExactly(entry("expectedEndDate", 123L));
+        assertThat(sUpdateEventArgumentCaptor.getValue().getType())
+                .isEqualTo(FlowNodeInstanceService.ACTIVITYINSTANCE_EXPECTED_END_DATE + SUpdateEvent.UPDATED);
+
+    }
+
+    @Test
+    public void should_updateExpectedEndDate_throw_SFlowNodeModificationException_when_recorder_fails() throws Exception {
+        //given
+        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        //expect
+        expectedException.expect(SFlowNodeModificationException.class);
+
+        //when
+        activityInstanceServiceImpl.updateExpectedEndDate(sFlowNodeInstance, 123L);
     }
 
 }

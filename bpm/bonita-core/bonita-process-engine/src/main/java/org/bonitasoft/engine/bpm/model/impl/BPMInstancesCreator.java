@@ -190,8 +190,8 @@ public class BPMInstancesCreator {
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
-                                                           final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
-                                                           final SStateCategory stateCategory) throws SBonitaException {
+            final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
+            final SStateCategory stateCategory) throws SBonitaException {
         final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<SFlowNodeInstance>(flowNodeDefinitions.size());
         for (final SFlowNodeDefinition sFlowNodeDefinition : flowNodeDefinitions) {
             flownNodeInstances.add(createFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
@@ -201,9 +201,9 @@ public class BPMInstancesCreator {
     }
 
     public SFlowNodeInstance createFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-                                                    final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
-                                                    final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
-                                                    final long relatedActivityInstanceId) throws SBonitaException {
+            final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
+            final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
+            final long relatedActivityInstanceId) throws SBonitaException {
         final SFlowNodeInstance flownNodeInstance = toFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, parentContainerType,
                 sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, createInnerActivity, loopCounter, stateCategory,
                 relatedActivityInstanceId);
@@ -219,9 +219,9 @@ public class BPMInstancesCreator {
     }
 
     public SFlowNodeInstance toFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-                                                final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
-                                                final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
-                                                final long relatedActivityInstanceId) throws SActorNotFoundException, SActivityReadException {
+            final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
+            final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
+            final long relatedActivityInstanceId) throws SActorNotFoundException, SActivityReadException {
         if (!createInnerActivity && sFlowNodeDefinition instanceof SActivityDefinition) {
             final SActivityDefinition activityDefinition = (SActivityDefinition) sFlowNodeDefinition;
             final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
@@ -513,7 +513,8 @@ public class BPMInstancesCreator {
     }
 
     private SHumanTaskInstanceBuilder createHumanTaskInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-            final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId, final long parentProcessInstanceId) throws SActorNotFoundException {
+            final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId, final long parentProcessInstanceId)
+            throws SActorNotFoundException {
         final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) sFlowNodeDefinition;
         final String actorName = humanTaskDefinition.getActorName();
 
@@ -528,10 +529,6 @@ public class BPMInstancesCreator {
     private void fillHumanTask(final SHumanTaskDefinition humanTaskDefinition, final SHumanTaskInstanceBuilder builder) {
         // Creation date:
         builder.setReachedStateDate(System.currentTimeMillis());
-        final Long expectedDuration = humanTaskDefinition.getExpectedDuration();
-        if (expectedDuration != null) {
-            builder.setExpectedEndDate(System.currentTimeMillis() + expectedDuration);
-        }
         final String priority = humanTaskDefinition.getPriority();
         if (priority != null) {
             // FIXME: use enum STaskPriority in client definition model:
@@ -552,23 +549,26 @@ public class BPMInstancesCreator {
         transaction.execute();
     }
 
-    SConnectorInstance createConnectorInstanceObject(PersistentObject container, String containerType, SConnectorDefinition sConnectorDefinition, int executionOrder) {
+    SConnectorInstance createConnectorInstanceObject(PersistentObject container, String containerType, SConnectorDefinition sConnectorDefinition,
+            int executionOrder) {
         return BuilderFactory
-                        .get(SConnectorInstanceBuilderFactory.class)
-                        .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
-                                sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
-                                executionOrder)
-                        .done();
+                .get(SConnectorInstanceBuilderFactory.class)
+                .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
+                        sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
+                        executionOrder)
+                .done();
     }
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
-                                    final SProcessDefinition processDefinition, final SExpressionContext expressionContext, final List<SOperation> operations,
-                                    final Map<String, Object> context, SExpressionContext expressionContextToEvaluateOperations) throws SDataInstanceNotWellFormedException, SExpressionTypeUnknownException, SExpressionEvaluationException,
+            final SProcessDefinition processDefinition, final SExpressionContext expressionContext, final List<SOperation> operations,
+            final Map<String, Object> context, SExpressionContext expressionContextToEvaluateOperations)
+            throws SDataInstanceNotWellFormedException, SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException, SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         final List<SDataDefinition> sDataDefinitions = processContainer.getDataDefinitions();
         final List<SDataInstance> sDataInstances = new ArrayList<>(sDataDefinitions.size());
         for (final SDataDefinition sDataDefinition : sDataDefinitions) {
-            sDataInstances.add(createDataInstance(processInstance, expressionContext, operations, context, expressionContextToEvaluateOperations, sDataDefinition));
+            sDataInstances
+                    .add(createDataInstance(processInstance, expressionContext, operations, context, expressionContextToEvaluateOperations, sDataDefinition));
 
         }
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
@@ -578,7 +578,10 @@ public class BPMInstancesCreator {
         debugLogVariableInitialized(processInstance, processDefinition);
     }
 
-    SDataInstance createDataInstance(SProcessInstance processInstance, SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context, SExpressionContext expressionContextToEvaluateOperations, SDataDefinition sDataDefinition) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SDataInstanceNotWellFormedException {
+    SDataInstance createDataInstance(SProcessInstance processInstance, SExpressionContext expressionContext, List<SOperation> operations,
+            Map<String, Object> context, SExpressionContext expressionContextToEvaluateOperations, SDataDefinition sDataDefinition)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
+            SDataInstanceNotWellFormedException {
         SExpression expression;
         SExpressionContext currentExpressionContext;
         final SOperation operation;
@@ -594,7 +597,8 @@ public class BPMInstancesCreator {
         return createDataInstanceObject(processInstance, sDataDefinition, evaluateExpression(sDataDefinition, expression, currentExpressionContext));
     }
 
-    private Serializable evaluateExpression(SDataDefinition sDataDefinition, SExpression expression, SExpressionContext currentExpressionContext) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+    private Serializable evaluateExpression(SDataDefinition sDataDefinition, SExpression expression, SExpressionContext currentExpressionContext)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
         if (expression != null) {
             return (Serializable) expressionResolverService.evaluate(expression, currentExpressionContext);
         } else if (sDataDefinition.isTransientData()) {
@@ -754,7 +758,7 @@ public class BPMInstancesCreator {
         try {
             if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
                     && (((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataInputItemRef() != null
-                    || ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataOutputItemRef() != null)) {
+                            || ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataOutputItemRef() != null)) {
                 createDataInstancesForMultiInstance(activityDefinition, flowNodeInstance, expressionContext);
             } else {
                 createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);

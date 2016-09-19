@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import org.bonitasoft.engine.expression.model.SExpression;
+
 /**
  * @author Baptiste Mesta
  */
@@ -22,7 +24,7 @@ public interface SHumanTaskDefinition extends STaskDefinition {
 
     SUserFilterDefinition getSUserFilterDefinition();
 
-    Long getExpectedDuration();
+    SExpression getExpectedDuration();
 
     String getPriority();
 

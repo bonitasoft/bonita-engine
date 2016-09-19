@@ -303,8 +303,8 @@ public class StateBehaviors {
 
     void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws SClassLoaderException, SUserFilterExecutionException,
-                    SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException,
-                    SActivityModificationException {
+            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException,
+            SActivityModificationException {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));
@@ -427,7 +427,7 @@ public class StateBehaviors {
 
     protected void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
             final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SProcessInstanceCreationException,
-                    SContractViolationException, SExpressionException {
+            SContractViolationException, SExpressionException {
         final long callerProcessDefinitionId = callerProcessDefinition.getId();
         final long callerId = callActivityInstance.getId();
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
@@ -492,6 +492,29 @@ public class StateBehaviors {
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException("error while updating display name and description", e);
+        }
+    }
+
+    public void updateExpectedDuration(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
+            throws SActivityStateExecutionException {
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+        if (flowNodeDefinition instanceof SHumanTaskDefinition) {
+            SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) flowNodeDefinition;
+            final SExpression expectedDurationExpression = humanTaskDefinition.getExpectedDuration();
+            final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    processDefinition.getId());
+            try {
+                final Long duration = (Long) expressionResolverService.evaluate(expectedDurationExpression, sExpressionContext);
+                if (duration == null) {
+                    activityInstanceService.updateExpectedEndDate(flowNodeInstance, null);
+                } else {
+                    activityInstanceService.updateExpectedEndDate(flowNodeInstance, System.currentTimeMillis() + duration);
+                }
+
+            } catch (final SBonitaException e) {
+                throw new SActivityStateExecutionException("error while updating expected end date", e);
+            }
         }
     }
 
@@ -593,7 +616,7 @@ public class StateBehaviors {
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
@@ -638,7 +661,7 @@ public class StateBehaviors {
 
     private void createBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance, final long rootProcessInstanceId,
             final long parentProcessInstanceId, final SFlowElementsContainerType containerType, final SBoundaryEventDefinition boundaryEventDefinition)
-                    throws SBonitaException {
+            throws SBonitaException {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId());
@@ -885,13 +908,13 @@ public class StateBehaviors {
     }
 
     public boolean noConnectorHasStartedInCurrentList(List<SConnectorDefinition> connectorDefinitions,
-                                                      SConnectorInstance connectorInstance) throws SBonitaReadException {
+            SConnectorInstance connectorInstance) throws SBonitaReadException {
         return /* there is no connector defined, it means that no connector could have been started here */
         connectorDefinitions.isEmpty() ||
-                /*
-                 * if there is some connector defined the only way to have not started the phase is that there is a connector to execute and it is the first
-                 * connector of the list and it was never executed
-                 */
+        /*
+         * if there is some connector defined the only way to have not started the phase is that there is a connector to execute and it is the first
+         * connector of the list and it was never executed
+         */
                 connectorInstance != null && isFirst(connectorDefinitions, connectorInstance) && isNotExecutedYet(connectorInstance);
     }
 }
