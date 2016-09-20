@@ -544,8 +544,14 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
 
     /**
+     * <p>
      * Executes a flow node that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
+     * </p>
+     * <p>
+     * Use this method only if you need to manually control the execution of a flownode.
+     * <b>DO NOT USE THIS TO EXECUTE HUMAN TASKS.</b> Use {@link #executeUserTask(long, Map)} instead.
+     * </p>
      *
      * @param flownodeInstanceId
      *        The identifier of the flow node to execute.
@@ -556,11 +562,17 @@ public interface ProcessRuntimeAPI {
     void executeFlowNode(long flownodeInstanceId) throws FlowNodeExecutionException;
 
     /**
+     * <p>
      * Executes a flow node that is in a stable state on behalf of a given user
      * Will make the flow node go in the next stable state and then continue the execution of the process
      * If userId equals 0, the logged-in user is declared as the executer of the flow node.
      * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
-     *
+     * </p>
+     * <p>
+     * Use this method only if you need to manually control the execution of a flownode.
+     * <b>DO NOT USE THIS TO EXECUTE HUMAN TASKS.</b> Use {@link #executeUserTask(long, long, Map)} instead.
+     * </p>
+     * 
      * @param userId
      *        The identifier of the user for which you want to execute the flow node
      * @param flownodeInstanceId
