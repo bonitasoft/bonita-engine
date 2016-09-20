@@ -55,6 +55,7 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -1339,7 +1340,7 @@ public class ProcessAPIImplTest {
         Map<String, Serializable> inputValues = new HashMap<>();
         inputValues.put("input1", 456);
         inputValues.put("input2", "value");
-        sUserTaskInstance.setStateId(0);
+        sUserTaskInstance.setStateId(4);
         sUserTaskInstance.setAssigneeId(543L);
         //when
         processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, inputValues);
@@ -1347,6 +1348,31 @@ public class ProcessAPIImplTest {
         verify(contractDataService).addUserTaskData(1674, inputValues);
         verify(workService).registerWork(workArgumentCaptor.capture());
         assertThat(workArgumentCaptor.getValue().getDescription()).contains("flowNodeInstanceId: " + FLOW_NODE_INSTANCE_ID);
+    }
+
+    @Test
+    public void executeUserTask_should_throw_exception_if_user_task_not_in_ready() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(1);
+        sUserTaskInstance.setAssigneeId(543L);
+        //when
+        expectedEx.expect(FlowNodeExecutionException.class);
+        expectedEx.expectMessage("Unable to execute flow node 1674 because it is in an incompatible state");
+        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.<String, Serializable> emptyMap());
+        //then exception
+    }
+
+    @Test
+    public void executeUserTask_should_throw_exception_if_user_task_is_ready_but_executing() throws Exception {
+        //given
+        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateExecuting(true);
+        sUserTaskInstance.setAssigneeId(543L);
+        //when
+        expectedEx.expect(FlowNodeExecutionException.class);
+        expectedEx.expectMessage("Unable to execute flow node 1674 because it is in an incompatible state");
+        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.<String, Serializable> emptyMap());
+        //then exception
     }
 
     @Test
