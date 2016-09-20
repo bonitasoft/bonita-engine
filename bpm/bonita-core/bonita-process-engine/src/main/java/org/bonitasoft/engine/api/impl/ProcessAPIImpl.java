@@ -30,8 +30,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
@@ -770,21 +770,13 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(0, flownodeInstanceId, true);
+        executeFlowNode(0, flownodeInstanceId);
     }
 
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Serializable>());
-        } catch (final ContractViolationException | SBonitaException e) {
-            throw new FlowNodeExecutionException(e);
-        }
-    }
-
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws FlowNodeExecutionException {
-        try {
-            executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Serializable>());
+            executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Serializable>(), false);
         } catch (final ContractViolationException | SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
@@ -2066,9 +2058,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                     createPendingMappingsAndAssignHumanTask(humanTaskInstanceId, result);
                 }
             }
-            tenantAccessor.getTechnicalLoggerService().log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO, "User '" + getUserNameFromSession() + "' has re-executed assignation on activity " + humanTaskInstanceId +
-                        " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
-                        processDefinition.getName() + "' in version " + processDefinition.getVersion());
+            tenantAccessor.getTechnicalLoggerService().log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO,
+                    "User '" + getUserNameFromSession() + "' has re-executed assignation on activity " + humanTaskInstanceId +
+                            " of process instance " + humanTaskInstance.getLogicalGroup(1) + " of process named '" +
+                            processDefinition.getName() + "' in version " + processDefinition.getVersion());
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
         }
@@ -5681,7 +5674,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void executeUserTask(final long userId, final long flownodeInstanceId, final Map<String, Serializable> inputs) throws FlowNodeExecutionException,
             ContractViolationException, UserTaskNotFoundException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, inputs);
+            executeFlowNode(userId, flownodeInstanceId, inputs, true);
         } catch (final SFlowNodeNotFoundException e) {
             throw new UserTaskNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -5689,7 +5682,32 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flowNodeInstanceId, final Map<String, Serializable> inputs)
+    private void checkIsHumanTaskInReadyState(SFlowNodeInstance flowNodeInstance) throws SFlowNodeExecutionException {
+        if (!(flowNodeInstance instanceof SHumanTaskInstance)) {
+            throw new SFlowNodeExecutionException(
+                    "Unable to execute flownode " + flowNodeInstance.getId() + " because is not a user task");
+        }
+        if (flowNodeInstance.getStateId() != 4 || flowNodeInstance.isStateExecuting()) {
+            throw new SFlowNodeExecutionException(
+                    "Unable to execute flow node " + flowNodeInstance.getId()
+                            + " because it is in an incompatible state (" + (flowNodeInstance.isStateExecuting() ? "transitioning from state " : "on state ")
+                            + flowNodeInstance.getStateName() + "). Someone probably already called execute on it.");
+        }
+    }
+
+    /**
+     * Execute a flow node. All methods that executes flow nodes and human tasks uses this one.
+     *
+     * @param userId
+     *        the id of the user executing the task
+     * @param flowNodeInstanceId
+     * @param inputs
+     * @param shouldBeReadyTask
+     *        if true the method will only accept to execute human task in ready state
+     * @throws ContractViolationException
+     * @throws SBonitaException
+     */
+    protected void executeFlowNode(final long userId, final long flowNodeInstanceId, final Map<String, Serializable> inputs, boolean shouldBeReadyTask)
             throws ContractViolationException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -5701,7 +5719,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         WorkService workService = tenantAccessor.getWorkService();
 
         SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-
+        if (shouldBeReadyTask) {
+            /*
+             * this is to protect from concurrent execution of the task when 2 users call execute user task at the same time
+             * it still might have concurrency issue but:
+             * - if the second client call execute with contract inputs, on commit there will be a constraint violation + rollback
+             * - if there is no contract input, the work will check that the activity is in ready state before calling execute.
+             * The only left issue is that on this last case the executor will change to the last one.
+             */
+            checkIsHumanTaskInReadyState(flowNodeInstance);
+        }
         if (flowNodeInstance instanceof SUserTaskInstance) {
             try {
                 throwContractViolationExceptionIfContractIsInvalid(inputs, tenantAccessor, flowNodeInstance);
@@ -5731,9 +5758,14 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecuting(flowNodeInstance);
             activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
-            //register work
-            BonitaWork work = WorkFactory.createExecuteFlowNodeWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
-                    flowNodeInstanceId);
+            BonitaWork work;
+            if (shouldBeReadyTask) {
+                work = WorkFactory.createExecuteReadyHumanTaskWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
+                        flowNodeInstanceId);
+            } else {
+                work = WorkFactory.createExecuteFlowNodeWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
+                        flowNodeInstanceId);
+            }
             workService.registerWork(work);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,

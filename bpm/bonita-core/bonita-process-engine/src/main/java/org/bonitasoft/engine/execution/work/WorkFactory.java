@@ -42,20 +42,29 @@ public class WorkFactory {
         BonitaWork wrappedWork = new ExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId, flowNodeInstanceId,
                 connectorInstanceId, connectorDefinitionName);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(wrappedWork, connectorDefinitionName, connectorInstanceId);
-        wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
-        return new FailureHandlingBonitaWork(wrappedWork);
+        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        return withFailureHandling(wrappedWork);
     }
 
     public static BonitaWork createExecuteConnectorOfProcess(final long processDefinitionId, final long processInstanceId, final long rootProcessInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName, final ConnectorEvent activationEvent,
             final FlowNodeSelector flowNodeSelector) {
-        BonitaWork wrappedWork = new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
-                rootProcessInstanceId, activationEvent, flowNodeSelector);
-        final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId, rootProcessInstanceId,
-                wrappedWork);
-        wrappedWork = new ConnectorDefinitionAndInstanceContextWork(processInstanceContextWork, connectorDefinitionName, connectorInstanceId,
-                activationEvent);
+        BonitaWork wrappedWork = withConnectorContext(connectorInstanceId, connectorDefinitionName, activationEvent,
+                withProcessContext(processDefinitionId, processInstanceId,
+                        rootProcessInstanceId,
+                        new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
+                                rootProcessInstanceId, activationEvent, flowNodeSelector)));
+        return withFailureHandling(wrappedWork);
+    }
+
+    static FailureHandlingBonitaWork withFailureHandling(BonitaWork wrappedWork) {
         return new FailureHandlingBonitaWork(wrappedWork);
+    }
+
+    private static BonitaWork withConnectorContext(long connectorInstanceId, String connectorDefinitionName, ConnectorEvent activationEvent,
+            ProcessInstanceContextWork processInstanceContextWork) {
+        return new ConnectorDefinitionAndInstanceContextWork(processInstanceContextWork, connectorDefinitionName, connectorInstanceId,
+                activationEvent);
     }
 
     public static BonitaWork createExecuteFlowNodeWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) {
@@ -63,46 +72,66 @@ public class WorkFactory {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
         BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId, processInstanceId);
-        wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
-        wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
-        return new FailureHandlingBonitaWork(wrappedWork);
+        wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
+        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        return withFailureHandling(wrappedWork);
+    }
+
+    public static BonitaWork createExecuteReadyHumanTaskWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) {
+        if (processInstanceId <= 0) {
+            throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
+        }
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(flowNodeInstanceId, processInstanceId);
+        executeFlowNodeWork.setReadyHumanTask(true);
+        BonitaWork wrappedWork = executeFlowNodeWork;
+        wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
+        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        return withFailureHandling(wrappedWork);
     }
 
     public static BonitaWork createExecuteMessageCoupleWork(final SMessageInstance messageInstance, final SWaitingMessageEvent waitingMessage) {
         // no target process: we do not wrap in a LockProcessInstanceWork
-        BonitaWork wrappedWork = new TxBonitaWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
+        BonitaWork wrappedWork = withTx(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
         if (waitingMessage.getParentProcessInstanceId() > 0) {
-            wrappedWork = new LockProcessInstanceWork(wrappedWork, waitingMessage.getParentProcessInstanceId());
+            wrappedWork = withLock(waitingMessage.getParentProcessInstanceId(), wrappedWork);
         }
         wrappedWork = new MessageInstanceContextWork(wrappedWork, messageInstance, waitingMessage);
-        wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(waitingMessage.getProcessDefinitionId(), waitingMessage.getParentProcessInstanceId(),
+        wrappedWork = withProcessContext(waitingMessage.getProcessDefinitionId(), waitingMessage.getParentProcessInstanceId(),
                 waitingMessage.getRootProcessInstanceId(), waitingMessage.getFlowNodeInstanceId(), wrappedWork);
-        return new FailureHandlingBonitaWork(wrappedWork);
+        return withFailureHandling(wrappedWork);
     }
 
     public static BonitaWork createNotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
             final long parentId, final String parentType) {
         BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId, parentId, parentType);
-        wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
-        wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
-        return new FailureHandlingBonitaWork(wrappedWork);
+        wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
+        wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        return withFailureHandling(wrappedWork);
     }
 
-    private static BonitaWork buildFlowNodeDefinitionAndInstanceContextWork(final long processDefinitionId, final long processInstanceId,
+    private static BonitaWork withLock(long processInstanceId, BonitaWork work) {
+        return new LockProcessInstanceWork(work, processInstanceId);
+    }
+
+    private static BonitaWork withTx(BonitaWork wrappedWork) {
+        return new TxBonitaWork(wrappedWork);
+    }
+
+    private static BonitaWork withFlowNodeContext(final long processDefinitionId, final long processInstanceId,
             final long flowNodeInstanceId, final BonitaWork wrappedWork) {
         final ProcessDefinitionContextWork processDefinitionContextWork = new ProcessDefinitionContextWork(wrappedWork, processDefinitionId);
         final ProcessInstanceContextWork processInstanceContextWork = new ProcessInstanceContextWork(processDefinitionContextWork, processInstanceId);
         return new FlowNodeDefinitionAndInstanceContextWork(processInstanceContextWork, flowNodeInstanceId);
     }
 
-    private static BonitaWork buildFlowNodeDefinitionAndInstanceContextWork(final long processDefinitionId, final long processInstanceId,
+    private static BonitaWork withProcessContext(final long processDefinitionId, final long processInstanceId,
             final long rootProcessInstanceId, final long flowNodeInstanceId, final BonitaWork wrappedWork) {
-        final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId,
+        final ProcessInstanceContextWork processInstanceContextWork = withProcessContext(processDefinitionId, processInstanceId,
                 rootProcessInstanceId, wrappedWork);
         return new FlowNodeDefinitionAndInstanceContextWork(processInstanceContextWork, flowNodeInstanceId);
     }
 
-    private static ProcessInstanceContextWork buildProcessInstanceContextWork(final long processDefinitionId, final long processInstanceId,
+    private static ProcessInstanceContextWork withProcessContext(final long processDefinitionId, final long processInstanceId,
             final long rootProcessInstanceId, final BonitaWork wrappedWork) {
         final ProcessDefinitionContextWork processDefinitionContextWork = new ProcessDefinitionContextWork(wrappedWork, processDefinitionId);
         return new ProcessInstanceContextWork(processDefinitionContextWork, processInstanceId, rootProcessInstanceId);

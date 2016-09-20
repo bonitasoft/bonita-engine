@@ -15,6 +15,8 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -33,18 +35,23 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     private static final long serialVersionUID = -5873526992671300038L;
 
     public enum Type {
-        PROCESS,
-        FLOWNODE
+        PROCESS, FLOWNODE
     }
 
     private final long flowNodeInstanceId;
 
     private final long processInstanceId;
 
+    private boolean isReadyHumanTask = false;
+
     ExecuteFlowNodeWork(final long flowNodeInstanceId,
-                        final long processInstanceId) {
+            final long processInstanceId) {
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.processInstanceId = processInstanceId;
+    }
+
+    public void setReadyHumanTask(boolean readyHumanTask) {
+        isReadyHumanTask = readyHumanTask;
     }
 
     @Override
@@ -60,6 +67,25 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     @Override
     public void work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+        if (isReadyHumanTask) {
+            SHumanTaskInstance humanTaskInstance = tenantAccessor.getActivityInstanceService().getHumanTaskInstance(flowNodeInstanceId);
+            /*
+             * the stateExecuting flag must be set to true by the API
+             * however this do not completely avoid concurrency issue:
+             * if user a and user b call execute at the same time on a flow node with no contract input
+             * it can happen that both transactions are committed successfully so 2 works are registered
+             * the first work will find the task in state 4 with flag executing
+             * and the second will find it in the next state (so it is ok) unless there is an on-finish connector.
+             * In this last case it will try to execute that and may execute twice the same connector (not verified)
+             */
+            if (humanTaskInstance.getStateId() != 4 || !humanTaskInstance.isStateExecuting()) {
+                throw new SFlowNodeExecutionException(
+                        "Unable to execute flow node " + humanTaskInstance.getId()
+                                + " because it is in an incompatible state ("
+                                + (humanTaskInstance.isStateExecuting() ? "transitioning from state " : "on state ")
+                                + humanTaskInstance.getStateName() + "). Someone probably already called execute on it.");
+            }
+        }
         tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, processInstanceId, null, null);
     }
 
