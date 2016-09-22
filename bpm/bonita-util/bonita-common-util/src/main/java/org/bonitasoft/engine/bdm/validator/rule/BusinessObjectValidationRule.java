@@ -91,12 +91,18 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
     private void validateConstraints(final BusinessObject bo, final ValidationStatus status) {
         final Set<String> constraintNames = new HashSet<String>();
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
-            if (constraintNames.contains(uc.getName())) {
-                status.addError("The constraint named \"" + uc.getName() + "\" already exists for " + bo.getQualifiedName());
+            String name = uc.getName();
+            if (constraintNames.contains(name)) {
+                status.addError("The constraint named \"" + name + "\" already exists for " + bo.getQualifiedName());
             } else {
-                constraintNames.add(uc.getName());
+                constraintNames.add(name);
             }
-            for (final String fName : uc.getFieldNames()) {
+            List<String> fieldNames = uc.getFieldNames();
+            if (fieldNames == null || fieldNames.isEmpty()) {
+                status.addError(name + " constraint must have at least one field declared");
+                return;
+            }
+            for (final String fName : fieldNames) {
                 final Field field = getField(bo, fName);
                 if (field == null) {
                     status.addError("The field named " + fName + " does not exist in " + bo.getQualifiedName());

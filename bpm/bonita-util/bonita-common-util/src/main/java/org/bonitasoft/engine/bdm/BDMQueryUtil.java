@@ -100,7 +100,9 @@ public class BDMQueryUtil {
             }
 
             for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
-                queryNames.add(queryGenerator.createQueryNameForUniqueConstraint(uc));
+                if(uc.getFieldNames() != null){
+                    queryNames.add(queryGenerator.createQueryNameForUniqueConstraint(uc));
+                }
             }
             for (final Field f : businessObject.getFields()) {
                 if (f instanceof SimpleField) {
