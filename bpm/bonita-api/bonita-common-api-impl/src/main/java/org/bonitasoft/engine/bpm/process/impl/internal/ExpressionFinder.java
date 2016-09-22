@@ -88,7 +88,7 @@ public class ExpressionFinder implements ModelFinderVisitor {
     @Override
     public void find(DesignProcessDefinition designProcessDefinition, long expressionDefinitionId) {
         final List<Expression> expressions = designProcessDefinition.getStringIndexValues();
-        for (Expression expression: expressions) {
+        for (Expression expression : expressions) {
             findExpressionFromNotNullContainer(expression, expressionDefinitionId);
         }
         for (ContextEntry contextEntry : designProcessDefinition.getContext()) {
@@ -186,6 +186,8 @@ public class ExpressionFinder implements ModelFinderVisitor {
         if (humanTaskDefinition != null) {
             findExpressionFromNotNullContainer(humanTaskDefinition.getUserFilter(), expressionDefinitionId);
         }
+        findExpressionFromNotNullContainer(humanTaskDefinition.getExpectedDuration(), expressionDefinitionId);
+
     }
 
     @Override
