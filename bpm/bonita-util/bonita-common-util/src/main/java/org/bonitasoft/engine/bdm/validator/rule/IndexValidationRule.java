@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import java.util.List;
+
 import org.bonitasoft.engine.bdm.model.Index;
 import org.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -41,7 +43,8 @@ public class IndexValidationRule extends ValidationRule<Index> {
             status.addError(name + " is not a valid SQL identifier");
         }
 
-        if (index.getFieldNames().isEmpty()) {
+        List<String> fieldNames = index.getFieldNames();
+        if (fieldNames == null || fieldNames.isEmpty()) {
             status.addError(name + " index must have at least one field declared");
         }
 
