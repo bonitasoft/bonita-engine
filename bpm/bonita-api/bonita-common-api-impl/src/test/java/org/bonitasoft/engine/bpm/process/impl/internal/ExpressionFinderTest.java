@@ -45,6 +45,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 import org.junit.Test;
@@ -71,6 +72,7 @@ public class ExpressionFinderTest {
         final UserTaskDefinitionImpl userTask = new UserTaskDefinitionImpl("task", "actor");
         final ContextEntryImpl taskContextEntry = new ContextEntryImpl();
         userTask.addContextEntry(taskContextEntry);
+        userTask.setExpectedDuration(new ExpressionBuilder().createConstantLongExpression(3600));
         userTask.setDisplayDescription(new ExpressionImpl());
         userTask.setDisplayDescriptionAfterCompletion(new ExpressionImpl());
         final TransitionDefinitionImpl userTaskDefaultTransition = new TransitionDefinitionImpl("default");
@@ -155,6 +157,7 @@ public class ExpressionFinderTest {
         verify(expressionFinder).find(userTask.getDisplayDescription(), 999L);
         verify(expressionFinder).find(userTask.getDisplayDescriptionAfterCompletion(), 999L);
         verify(expressionFinder).find(userTaskDefaultTransition.getCondition(), 999L);
+        verify(expressionFinder).find(userTask.getExpectedDuration(), 999L);
     }
 
     @Test
