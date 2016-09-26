@@ -379,4 +379,17 @@ public class TomcatBundleConfiguratorTest {
         // then:
         assertThat(windowsValue).isEqualTo("C:/Windows");
     }
+
+    @Test
+    public void xml_chars_in_URLs_should_be_escaped_before_replacing() throws Exception {
+        // given:
+        String url = "jdbc:mysql://${bdm.db.server.name}:${bdm.db.server.port}/${bdm.db.database.name}?useUnicode=true&characterEncoding=UTF-8";
+
+        // when:
+        final String escapedXmlCharacters = configurator.escapeXmlCharacters(url);
+
+        // then:
+        assertThat(escapedXmlCharacters)
+                .isEqualTo("jdbc:mysql://${bdm.db.server.name}:${bdm.db.server.port}/${bdm.db.database.name}?useUnicode=true&amp;characterEncoding=UTF-8");
+    }
 }

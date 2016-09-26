@@ -121,7 +121,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
         replacements.put("@@" + databasePrefix + "USERNAME@@", configuration.getDatabaseUser());
         replacements.put("@@" + databasePrefix + "PASSWORD@@", configuration.getDatabasePassword());
         replacements.put("@@" + databasePrefix + "TESTQUERY@@", configuration.getTestQuery());
-        replacements.put("<connection-url>@@" + databasePrefix + "DB_URL@@", "<connection-url>" + configuration.getUrl());
+        replacements.put("<connection-url>@@" + databasePrefix + "DB_URL@@", "<connection-url>" + escapeXmlCharacters(configuration.getUrl()));
 
         // Let's uncomment and replace dbvendor-specific values:
         if (POSTGRES.equals(configuration.getDbVendor())) {
@@ -129,7 +129,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_SERVER_PORT@@", configuration.getServerPort()));
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_DATABASE_NAME@@", configuration.getDatabaseName()));
         } else {
-            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", configuration.getUrl()));
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", escapeXmlCharacters(configuration.getUrl())));
         }
 
         return replaceValues(content, replacements);
