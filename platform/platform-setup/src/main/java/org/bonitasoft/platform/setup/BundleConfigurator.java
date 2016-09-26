@@ -29,6 +29,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,5 +275,9 @@ abstract class BundleConfigurator {
             throw new PlatformException("File " + build.getFileName() + " is mandatory but is not found");
         }
         return build;
+    }
+
+    String escapeXmlCharacters(String url) throws PlatformException {
+        return StringEscapeUtils.escapeXml11(url);
     }
 }

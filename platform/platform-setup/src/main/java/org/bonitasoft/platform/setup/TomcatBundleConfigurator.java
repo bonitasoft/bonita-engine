@@ -113,7 +113,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_user@@", configuration.getDatabaseUser());
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_password@@", configuration.getDatabasePassword());
         replacements.put("@@" + bitronixDatasourceAlias + ".driver_class_name@@", configuration.getNonXaDriverClassName());
-        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", configuration.getUrl());
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", escapeXmlCharacters(configuration.getUrl()));
         replacements.put("@@" + bitronixDatasourceAlias + ".database_test_query@@", configuration.getTestQuery());
         return replaceValues(content, replacements);
     }
