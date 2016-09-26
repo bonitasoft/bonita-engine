@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.recorder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,20 +122,23 @@ public class RecorderTest extends CommonBPMServicesTest {
     }
 
     private SUserImpl getUserByUsername(final String firstName) throws SBonitaReadException {
-        return getPersistenceService().selectOne(new SelectOneDescriptor<SUserImpl>("getUserByUserName", Collections.singletonMap("userName", (Object) firstName), SUserImpl.class));
+        return getPersistenceService()
+                .selectOne(new SelectOneDescriptor<SUserImpl>("getUserByUserName", Collections.singletonMap("userName", (Object) firstName), SUserImpl.class));
     }
 
     @Test
     public void testNotLogOnInsertRecordWhenBTXRolledBack() throws Exception {
         System.out.println(getTransactionService());
         getTransactionService().begin();
-        final SelectOneDescriptor<SUserImpl> selectDescriptor = new SelectOneDescriptor<>("getUserByUserName", (Map<String, Object>) Collections.singletonMap("userName", (Object) "firstName"), SUserImpl.class);
+        final SelectOneDescriptor<SUserImpl> selectDescriptor = new SelectOneDescriptor<>("getUserByUserName",
+                (Map<String, Object>) Collections.singletonMap("userName", (Object) "firstName"), SUserImpl.class);
         SUserImpl retrievedSUserImpl = getPersistenceService().selectOne(selectDescriptor);
         assertNull("Should not have any SUSER_IMPL in DB before test", retrievedSUserImpl);
 
         final String firstName = "Laurent";
         final SUserImpl sUserImpl = buildSUserImpl(firstName, "Vaills");
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUSER_IMPL).setObject(sUserImpl).done();
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUSER_IMPL).setObject(sUserImpl)
+                .done();
         recorder.recordInsert(new InsertRecord(sUserImpl), insertEvent);
 
         // set rollback
@@ -172,8 +173,9 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         final SUserImpl sUserImplToUpdate = getUserByUsername("firstName");
         assertNotNull(sUserImplToUpdate);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(SUSER_IMPL).setObject(sUserImpl).done();
-        final Map<String, Object> stringObjectMap = Collections.<String, Object>singletonMap("userName", "firstName");
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(SUSER_IMPL).setObject(sUserImpl)
+                .done();
+        final Map<String, Object> stringObjectMap = Collections.<String, Object> singletonMap("userName", "firstName");
         recorder.recordUpdate(UpdateRecord.buildSetFields(sUserImplToUpdate, stringObjectMap), updateEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
@@ -209,7 +211,8 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         final SUserImpl sUserImplToDelete = getUserByUsername("firstName");
         assertNotNull(sUserImplToDelete);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUSER_IMPL).setObject(sUserImpl).done();
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUSER_IMPL).setObject(sUserImpl)
+                .done();
         recorder.recordDelete(new DeleteRecord(sUserImplToDelete), deleteEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
@@ -243,6 +246,5 @@ public class RecorderTest extends CommonBPMServicesTest {
         }
         return logModelBuilderFactory;
     }
-
 
 }

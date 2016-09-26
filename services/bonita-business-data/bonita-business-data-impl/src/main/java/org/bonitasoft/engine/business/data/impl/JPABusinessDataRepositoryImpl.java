@@ -47,7 +47,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SRetryableException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -70,9 +70,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     private final ClassLoaderService classLoaderService;
     private final long tenantId;
 
-    private final TransactionService transactionService;
+    private final UserTransactionService transactionService;
 
-    public JPABusinessDataRepositoryImpl(final TransactionService transactionService, final BusinessDataModelRepository businessDataModelRepository,
+    public JPABusinessDataRepositoryImpl(final UserTransactionService transactionService, final BusinessDataModelRepository businessDataModelRepository,
             TechnicalLoggerService loggerService,
             final Map<String, Object> configuration, ClassLoaderService classLoaderService, long tenantId) {
         this.transactionService = transactionService;
@@ -153,7 +153,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         }
         final EntityManager em = getEntityManager();
         final Set<EntityType<?>> entities = em.getMetamodel().getEntities();
-        final Set<String> entityClassNames = new HashSet<String>();
+        final Set<String> entityClassNames = new HashSet<>();
         for (final EntityType<?> entity : entities) {
             entityClassNames.add(entity.getJavaType().getName());
         }
@@ -201,7 +201,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     @Override
     public <T extends Entity> List<T> findByIds(final Class<T> entityClass, final List<Long> primaryKeys) {
         if (primaryKeys == null || primaryKeys.isEmpty()) {
-            return new ArrayList<T>();
+            return new ArrayList<>();
         }
         final EntityManager em = getEntityManager();
         try {
@@ -219,7 +219,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     @Override
     public <T extends Entity> List<T> findByIdentifiers(final Class<T> entityClass, final List<Long> primaryKeys) {
         if (primaryKeys == null || primaryKeys.isEmpty()) {
-            return new ArrayList<T>();
+            return new ArrayList<>();
         }
         final List<T> entities = new ArrayList<>();
         for (final Long primaryKey : primaryKeys) {

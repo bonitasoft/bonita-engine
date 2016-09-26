@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.engine.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 
@@ -24,38 +21,19 @@ import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.After;
-import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class PlatformSessionServiceTest extends CommonBPMServicesTest {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSessionServiceTest.class);
-
-    private static TransactionService txService;
-
     private static PlatformSessionService sessionService;
 
-    public PlatformSessionServiceTest() {
-        txService = getTransactionService();
+    @Before
+    public void before() throws Exception {
         sessionService = getPlatformAccessor().getPlatformSessionService();
-    }
-
-    @AfterClass
-    public static void tearDownPersistence() throws Exception {
-        TestUtil.closeTransactionIfOpen(txService);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        TestUtil.closeTransactionIfOpen(txService);
     }
 
     @Test
@@ -76,7 +54,7 @@ public class PlatformSessionServiceTest extends CommonBPMServicesTest {
     public void testIsValid() throws Exception {
         final String username = "platformAdmin";
         long sessionsDuration = sessionService.getSessionsDuration();
-        try{
+        try {
             sessionService.setSessionDuration(1000);
             final SPlatformSession session = sessionService.createSession(username);
             assertNotNull(session);
@@ -112,24 +90,18 @@ public class PlatformSessionServiceTest extends CommonBPMServicesTest {
         assertEquals(session, retrievedSession);
 
         sessionService.deleteSession(session.getId());
-        retrievedSession = sessionService.getSession(session.getId());
+        sessionService.getSession(session.getId());
     }
 
     @Test
     public void testrenewSession() throws Exception {
         final String username = "matti";
-        // txService.begin();
         final SPlatformSession session = sessionService.createSession(username);
-        // txService.complete();
         Thread.sleep(100);
 
-        // txService.begin();
         sessionService.renewSession(session.getId());
-        // txService.complete();
 
-        // txService.begin();
         final SPlatformSession session2 = sessionService.getSession(session.getId());
-        // txService.complete();
         assertTrue(session2.getExpirationDate().after(session.getExpirationDate()));
         assertTrue(session2.getLastRenewDate().after(session.getLastRenewDate()));
         assertEquals(session2.getLastRenewDate().getTime() + session2.getDuration(), session2.getExpirationDate().getTime());

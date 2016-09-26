@@ -30,7 +30,7 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -39,7 +39,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class ArchiveServiceImpl implements ArchiveService {
 
-    private final TransactionService transactionService;
+    private final UserTransactionService transactionService;
 
     private final PersistenceService definitiveArchivePersistenceService;
 
@@ -48,7 +48,7 @@ public class ArchiveServiceImpl implements ArchiveService {
     private ArchivingStrategy archivingStrategy;
 
     public ArchiveServiceImpl(final PersistenceService definitiveArchivePersistenceService,
-            final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy, final TransactionService transactionService) {
+            final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy, final UserTransactionService transactionService) {
         super();
         this.definitiveArchivePersistenceService = definitiveArchivePersistenceService;
         this.archivingStrategy = archivingStrategy;

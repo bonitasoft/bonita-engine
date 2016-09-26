@@ -22,19 +22,13 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -45,16 +39,14 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.service.InjectedService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
-import org.bonitasoft.engine.service.ServicesResolver;
-import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.service.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -74,7 +66,7 @@ public class SchedulerServiceImplTest {
 
     private static final long TENANT_ID = 1L;
 
-    SchedulerServiceImpl schedulerService;
+    private SchedulerServiceImpl schedulerService;
 
     @Mock
     private SchedulerExecutor schedulerExecutor;
@@ -192,7 +184,7 @@ public class SchedulerServiceImplTest {
     @Test(expected = SSchedulerException.class)
     public void cannot_execute_a_job_with_a_null_trigger() throws Exception {
         final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+        final List<SJobParameter> parameters = new ArrayList<>();
 
         schedulerService.schedule(jobDescriptor, parameters, null);
     }

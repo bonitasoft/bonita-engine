@@ -22,7 +22,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -33,7 +33,7 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
 
     private final SessionAccessor sessionAccessor;
 
-    private final TransactionService transactionService;
+    private final UserTransactionService transactionService;
 
     private final TechnicalLoggerService logger;
 
@@ -42,7 +42,7 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
     private final String groupName;
 
     public TenantQuartzJobListener(final List<AbstractBonitaTenantJobListener> bonitaJobListeners, final String groupName,
-            final SessionAccessor sessionAccessor, final TransactionService transactionService, final TechnicalLoggerService logger) {
+            final SessionAccessor sessionAccessor, final UserTransactionService transactionService, final TechnicalLoggerService logger) {
         this.logger = logger;
         this.bonitaJobListeners = bonitaJobListeners;
         this.groupName = groupName;

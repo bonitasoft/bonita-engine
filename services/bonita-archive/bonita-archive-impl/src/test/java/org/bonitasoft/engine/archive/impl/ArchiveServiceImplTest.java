@@ -15,18 +15,14 @@ package org.bonitasoft.engine.archive.impl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
 public class ArchiveServiceImplTest {
@@ -37,7 +33,7 @@ public class ArchiveServiceImplTest {
         final PersistenceService definitiveArchivePersistenceService = null;
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final ArchivingStrategy archivingStrategy = null;
-        final TransactionService transactionService = mock(TransactionService.class);
+        final UserTransactionService transactionService = mock(UserTransactionService.class);
 
         ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(definitiveArchivePersistenceService, logger, archivingStrategy, transactionService));
 
@@ -54,12 +50,12 @@ public class ArchiveServiceImplTest {
         verify(transactionService, times(1)).registerBeforeCommitCallable(eq(mockBatchArchiveCallable));
     }
 
-
     // Test with exception on TxService
 
     // Seen with Nicolas C. for this "interface extension" :)
     // Needed as the implementation calls setArchiveDate through reflection.
     interface ArchivedPersistentObjectWithSetter extends ArchivedPersistentObject {
+
         void setArchiveDate(long archiveDate);
     }
 

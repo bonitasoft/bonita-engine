@@ -18,13 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -46,7 +40,7 @@ import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +63,7 @@ public class JDBCJobListenerTest {
 
     private final SSchedulerException exeption1 = new SSchedulerException(new Exception("generic exception"));
 
-    private final Map<String, Serializable> context = new HashMap<String, Serializable>();
+    private final Map<String, Serializable> context = new HashMap<>();
 
     @Mock
     private JobService jobService;
@@ -84,14 +78,13 @@ public class JDBCJobListenerTest {
     private SessionAccessor sessionAccessor;
 
     @Mock
-    private TransactionService transactionService;
+    private UserTransactionService transactionService;
 
     @Mock
     private SchedulerExecutor schedulerExecutor;
 
     @Mock
     private IncidentService incidentService;
-
 
     @InjectMocks
     private JDBCJobListener jdbcJobListener;
@@ -105,7 +98,6 @@ public class JDBCJobListenerTest {
         context.put(AbstractBonitaJobListener.JOB_NAME, JOB_NAME);
         context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
     }
-
 
     @Test
     public void jobWasExecuted_should_log_if_can_log_when_no_job_descriptor_id() throws Exception {
