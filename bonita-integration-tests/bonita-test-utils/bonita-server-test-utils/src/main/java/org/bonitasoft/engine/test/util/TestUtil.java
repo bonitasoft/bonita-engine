@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.test.util;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -53,15 +54,14 @@ public class TestUtil {
     public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService) throws Exception {
         if (scheduler.isStarted() && !scheduler.isStopped()) {
             try {
-                try {// FIXME will only delete jobs of the current tenant
-                    txService.begin();
-                    scheduler.deleteJobs();
-                } catch (final Exception t) {
-                    txService.setRollbackOnly();
-                    t.printStackTrace();
-                } finally {
-                    txService.complete();
-                }
+                txService.executeInTransaction(new Callable<Void>() {
+
+                    @Override
+                    public Void call() throws Exception {
+                        scheduler.deleteJobs();
+                        return null;
+                    }
+                });
             } catch (final STransactionException txException) {
                 throw new SSchedulerException(txException);
             }
@@ -77,39 +77,12 @@ public class TestUtil {
         }
     }
 
-    public static long createPlatformAndDefaultTenant(final TransactionService txService, final PlatformService platformService,
-            final SessionAccessor sessionAccessor,
-            final SessionService sessionService) throws Exception {
-        PlatformUtil.createPlatform();
-        final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService);
-        final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
-        sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
-        return defaultTenantId;
-    }
-
-    private static SSession createSession(final TransactionService txService, final SessionService sessionService, final long defaultTenantId,
-            final String username) throws SBonitaException {
-        txService.begin();
-        final SSession session = sessionService.createSession(defaultTenantId, username);
-        txService.complete();
-        return session;
-    }
-
-    public static void deleteDefaultTenantAndPlatForm(final TransactionService txService, final PlatformService platformService,
-            final SessionAccessor sessionAccessor, final SessionService sessionService) throws Exception {
-        sessionAccessor.deleteSessionId();
-        PlatformUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
-        PlatformUtil.deletePlatform();
-        sessionAccessor.deleteSessionId();
-    }
-
-    public static void createSessionOn(final SessionAccessor sessionAccessor, final SessionService sessionService, final long tenantId) throws SBonitaException {
+    public static void createSessionOn(final SessionAccessor sessionAccessor, final SessionService sessionService, final long tenantId)
+            throws SBonitaException {
         try {
             sessionService.deleteSession(sessionAccessor.getSessionId());
             sessionAccessor.deleteSessionId();
-        } catch (final SessionIdNotSetException e) {
-            // do nothing
-        } catch (final SSessionNotFoundException e) {
+        } catch (final SessionIdNotSetException | SSessionNotFoundException e) {
             // do nothing
         }
         final SSession session = sessionService.createSession(tenantId, DEFAULT_USER_NAME);

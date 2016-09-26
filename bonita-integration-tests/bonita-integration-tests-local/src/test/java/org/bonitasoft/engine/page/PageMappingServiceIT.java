@@ -37,12 +37,12 @@ import org.junit.rules.ExpectedException;
  */
 public class PageMappingServiceIT extends CommonBPMServicesTest {
 
-    public static final long PAGE_ID = 12345L;
-    public static final long NEW_PAGE_ID = 88854L;
+    private static final long PAGE_ID = 12345L;
+    private static final long NEW_PAGE_ID = 88854L;
     private TransactionService transactionService;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    public PageMappingService pageMappingService;
+    private PageMappingService pageMappingService;
 
     @Before
     public void setUp() throws Exception {

@@ -30,10 +30,8 @@ import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.junit.BonitaEngineRule;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -48,12 +46,12 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private static TransactionService transactionService;
 
-    private static long processInstanceId = 123l;
+    private static long processInstanceId = 123L;
 
     private static String documentNameKey;
 
     @Before
-    public void before(){
+    public void before() {
         documentService = getTenantAccessor().getDocumentService();
         transactionService = getTransactionService();
         documentNameKey = BuilderFactory.get(SDocumentBuilderFactory.class).getNameKey();
@@ -230,7 +228,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private List<SMappedDocument> createDocumentMappings() throws SBonitaException {
         transactionService.begin();
-        final List<SMappedDocument> list = new ArrayList<SMappedDocument>(10);
+        final List<SMappedDocument> list = new ArrayList<>(10);
         for (int i = 0; i < NUMBER_OF_DOCUMENT; i++) {
             final SDocument document = buildProcessDocumentWithContent(i, "content".getBytes());
             list.add(documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description"));
@@ -357,7 +355,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private List<SMappedDocument> createAndAttachDocumentToProcessInstancesWithContent(final byte[] documentContent) throws SBonitaException {
         transactionService.begin();
-        final List<SMappedDocument> list = new ArrayList<SMappedDocument>(10);
+        final List<SMappedDocument> list = new ArrayList<>(10);
         for (int i = 0; i < NUMBER_OF_DOCUMENT; i++) {
             final SDocument document = buildProcessDocumentWithContent(i, documentContent);
             final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
@@ -369,7 +367,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private List<SMappedDocument> createAndAttachDocumentToProcessInstances() throws SBonitaException {
         transactionService.begin();
-        final List<SMappedDocument> list = new ArrayList<SMappedDocument>(10);
+        final List<SMappedDocument> list = new ArrayList<>(10);
         for (int i = 0; i < NUMBER_OF_DOCUMENT; i++) {
             final SDocument document = buildProcessDocumentWithUrl(i);
             final SMappedDocument doc = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
