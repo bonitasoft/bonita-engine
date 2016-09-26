@@ -105,7 +105,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     protected APISession loginInternal(final String userName, final String password, final Long tenantId) throws Exception {
         checkUsernameAndPassword(userName, password);
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<>();
         credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         return loginInternal(tenantId, credentials);
@@ -123,7 +123,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         final IdentityService identityService = serviceAccessor.getIdentityService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
 
-        final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<String, Serializable>(credentials);
+        final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
         credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
         final SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService,
                 credentialsWithResolvedTenantId));

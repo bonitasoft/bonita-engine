@@ -14,13 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,7 +68,8 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         dependencyService.deleteDependencies(ID1, TYPE2);
         dependencyService.deleteDependencies(ID2, TYPE1);
         dependencyService.deleteDependencies(ID2, TYPE2);
-        platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+        platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
+                ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
         getTransactionService().complete();
         classLoaderService = null;
         dependencyService = null;
@@ -99,14 +94,17 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
 
     private void addNotInPathDependencies() throws Exception {
         getTransactionService().begin();
-        createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar", IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar")));
-        createPlatformDependency("NotInPathShared", "NotInPathShared.jar", IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathShared.jar")));
-        createDependency(ID1, TYPE1, "NotInPathLocal", "NotInPathLocal.jar", IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar")));
+        createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar",
+                IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar")));
+        createPlatformDependency("NotInPathShared", "NotInPathShared.jar",
+                IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathShared.jar")));
+        createDependency(ID1, TYPE1, "NotInPathLocal", "NotInPathLocal.jar",
+                IOUtil.getAllContentFrom(ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar")));
         getTransactionService().complete();
     }
 
     private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
-                                  final byte[] value) throws SDependencyException {
+            final byte[] value) throws SDependencyException {
         long id = dependencyService.createMappedDependency(name, value, fileName, artifactId, artifactType).getId();
         dependencyService.refreshClassLoaderAfterUpdate(artifactType, artifactId);
         return id;
@@ -116,8 +114,10 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
                 .createNewInstance(name, fileName, value);
         final SDependency dependency = builder.done();
-        platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
+        platformDependencyService.createMappedDependency(name, value, fileName, classLoaderService.getGlobalClassLoaderId(),
+                ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+                classLoaderService.getGlobalClassLoaderId());
         return dependency.getId();
     }
 
@@ -343,8 +343,10 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         checkGlobalClassLoader(classLoader);
         assertSameClassloader(globalClassLoader, classLoader);
 
-        platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
-        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
+        platformDependencyService.deleteDependencies(classLoaderService.getGlobalClassLoaderId(),
+                ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()));
+        platformDependencyService.refreshClassLoaderAfterUpdate(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+                classLoaderService.getGlobalClassLoaderId());
 
         globalClassLoader = classLoaderService.getGlobalClassLoader();
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");

@@ -16,14 +16,7 @@ package org.bonitasoft.engine.business.data.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -47,7 +40,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SRetryableException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +55,7 @@ public class JPABusinessDataRepositoryImplTest {
     private JPABusinessDataRepositoryImpl repository;
 
     @Mock
-    private TransactionService transactionService;
+    private UserTransactionService transactionService;
 
     @Mock
     private BusinessDataModelRepository businessDataModelRepository;
@@ -158,11 +151,12 @@ public class JPABusinessDataRepositoryImplTest {
     @Test(expected = SRetryableException.class)
     public void should_findById_throw_retryable_when_persistenceException() throws Exception {
         //given
-        doThrow(PersistenceException.class).when(manager).find(Address.class,PRIMARY_KEY_1);
+        doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
         //when
-        repository.findById(Address.class,PRIMARY_KEY_1);
+        repository.findById(Address.class, PRIMARY_KEY_1);
         //then exception
     }
+
     @Test(expected = SRetryableException.class)
     public void should_findByIds_throw_retryable_when_persistenceException() throws Exception {
         //given
@@ -175,9 +169,9 @@ public class JPABusinessDataRepositoryImplTest {
     @Test(expected = SRetryableException.class)
     public void should_findByIdentifiers_throw_retryable_when_persistenceException() throws Exception {
         //given
-        doThrow(PersistenceException.class).when(manager).find(Address.class,PRIMARY_KEY_1);
+        doThrow(PersistenceException.class).when(manager).find(Address.class, PRIMARY_KEY_1);
         //when
-        repository.findByIdentifiers(Address.class,Collections.singletonList(PRIMARY_KEY_1));
+        repository.findByIdentifiers(Address.class, Collections.singletonList(PRIMARY_KEY_1));
         //then exception
     }
 
@@ -186,19 +180,20 @@ public class JPABusinessDataRepositoryImplTest {
         //given
         TypedQuery typedQuery = mock(TypedQuery.class);
         doThrow(PersistenceException.class).when(typedQuery).getSingleResult();
-        doReturn(typedQuery).when(manager).createNamedQuery(anyString(),any(Class.class));
+        doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
         //when
-        repository.findByNamedQuery("queryName",Address.class,Collections.<String, Serializable>emptyMap());
+        repository.findByNamedQuery("queryName", Address.class, Collections.<String, Serializable> emptyMap());
         //then exception
     }
+
     @Test(expected = SRetryableException.class)
     public void should_findListByNamedQuery_throw_retryable_when_persistenceException() throws Exception {
         //given
         TypedQuery typedQuery = mock(TypedQuery.class);
         doThrow(PersistenceException.class).when(typedQuery).getResultList();
-        doReturn(typedQuery).when(manager).createNamedQuery(anyString(),any(Class.class));
+        doReturn(typedQuery).when(manager).createNamedQuery(anyString(), any(Class.class));
         //when
-        repository.findListByNamedQuery("queryName",Address.class,Collections.<String, Serializable>emptyMap(),0,10);
+        repository.findListByNamedQuery("queryName", Address.class, Collections.<String, Serializable> emptyMap(), 0, 10);
         //then exception
     }
 
@@ -207,19 +202,20 @@ public class JPABusinessDataRepositoryImplTest {
         //given
         TypedQuery typedQuery = mock(TypedQuery.class);
         doThrow(PersistenceException.class).when(typedQuery).getSingleResult();
-        doReturn(typedQuery).when(manager).createQuery(anyString(),any(Class.class));
+        doReturn(typedQuery).when(manager).createQuery(anyString(), any(Class.class));
         //when
-        repository.find(Address.class,"the query as string",Collections.<String, Serializable>emptyMap());
+        repository.find(Address.class, "the query as string", Collections.<String, Serializable> emptyMap());
         //then exception
     }
+
     @Test(expected = SRetryableException.class)
     public void should_findList_throw_retryable_when_persistenceException() throws Exception {
         //given
         TypedQuery typedQuery = mock(TypedQuery.class);
         doThrow(PersistenceException.class).when(typedQuery).getResultList();
-        doReturn(typedQuery).when(manager).createQuery(anyString(),any(Class.class));
+        doReturn(typedQuery).when(manager).createQuery(anyString(), any(Class.class));
         //when
-        repository.findList(Address.class,"the query as string",Collections.<String, Serializable>emptyMap(),0,10);
+        repository.findList(Address.class, "the query as string", Collections.<String, Serializable> emptyMap(), 0, 10);
         //then exception
     }
 

@@ -27,7 +27,7 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Celine Souchet
@@ -48,11 +48,11 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     private final SessionAccessor sessionAccessor;
 
-    private final TransactionService transactionService;
+    private final UserTransactionService transactionService;
 
     public JDBCJobListener(final SchedulerService schedulerService, final JobService jobService, final SchedulerExecutor schedulerExecutor,
-                           final SessionAccessor sessionAccessor, final TransactionService transactionService,
-                           final TechnicalLoggerService logger) {
+            final SessionAccessor sessionAccessor, final UserTransactionService transactionService,
+            final TechnicalLoggerService logger) {
         super();
         this.schedulerService = schedulerService;
         this.jobService = jobService;

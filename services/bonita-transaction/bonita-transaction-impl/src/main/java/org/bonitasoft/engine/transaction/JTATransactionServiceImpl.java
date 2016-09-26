@@ -78,11 +78,12 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     @Override
     public void begin() throws STransactionCreationException {
+
         final TransactionServiceContext txContext = txContextThreadLocal.get();
         try {
-            checkForNestedTransaction(txContext);
+            checkForNestedBonitaTransaction(txContext);
             txContext.setExternallyManaged(txManager.getStatus() == Status.STATUS_ACTIVE);
-            txContext.setTxActive(true);
+            txContext.setInScopeOfBonitaTransaction(true);
 
             //always clear before commit callables on begin
             beforeCommitCallables.remove();
@@ -103,8 +104,8 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-    void checkForNestedTransaction(TransactionServiceContext txContext) throws STransactionCreationException {
-        if (txContext.isTxActive()) {
+    void checkForNestedBonitaTransaction(TransactionServiceContext txContext) throws STransactionCreationException {
+        if (txContext.isInScopeOfBonitaTransaction()) {
             TransactionState txState = null;
             try {
                 txState = getState();
@@ -202,7 +203,7 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
     protected void resetTxContext(TransactionServiceContext txContext) {
-        txContext.setTxActive(false);
+        txContext.setInScopeOfBonitaTransaction(false);
         txContext.setExternallyManaged(false);
     }
 
@@ -237,7 +238,6 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-    @Override
     public TransactionState getState() throws STransactionException {
         try {
             return convert(txManager.getStatus());
@@ -357,15 +357,21 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     static class TransactionServiceContext {
 
-        private boolean txActive = false;
+        /*
+         * this flag means that we already called begin on the bonita transaction service whether or not the transaction is managed externally
+         */
+        private boolean isInScopeOfBonitaTransaction = false;
+        /*
+         * true when the transaction was open outside of bonita
+         */
         private boolean externallyManaged = false;
 
-        public boolean isTxActive() {
-            return txActive;
+        public boolean isInScopeOfBonitaTransaction() {
+            return isInScopeOfBonitaTransaction;
         }
 
-        public void setTxActive(boolean txActive) {
-            this.txActive = txActive;
+        public void setInScopeOfBonitaTransaction(boolean inScopeOfBonitaTransaction) {
+            this.isInScopeOfBonitaTransaction = inScopeOfBonitaTransaction;
         }
 
         public boolean isExternallyManaged() {
@@ -377,8 +383,8 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-
     private static class TransactionServiceContextThreadLocal extends ThreadLocal<TransactionServiceContext> {
+
         @Override
         protected TransactionServiceContext initialValue() {
             return new TransactionServiceContext();

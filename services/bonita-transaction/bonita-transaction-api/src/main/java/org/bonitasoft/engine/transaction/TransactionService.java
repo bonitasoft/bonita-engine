@@ -19,13 +19,6 @@ package org.bonitasoft.engine.transaction;
  */
 public interface TransactionService extends UserTransactionService {
 
-    // EVENTS
-    String TRANSACTION_ACTIVE_EVT = "TRANSACTION_ACTIVE";
-
-    String TRANSACTION_COMMITED_EVT = "TRANSACTION_COMMITED";
-
-    String TRANSACTION_ROLLEDBACK_EVT = "TRANSACTION_ROLLEDBACK";
-
     /**
      * Create a new transaction and associate it with the current thread.
      *
@@ -47,9 +40,8 @@ public interface TransactionService extends UserTransactionService {
      * @return The transaction status. If no transaction is associated with
      *         the current thread, this method returns the Status.NoTransaction
      *         value.
-     * @exception STransactionException
-     *                Thrown if the transaction manager
-     *                encounters an unexpected error condition.
+     * @throws STransactionException Thrown if the transaction manager
+     *         encounters an unexpected error condition.
      */
     TransactionState getState() throws STransactionException;
 
@@ -61,12 +53,10 @@ public interface TransactionService extends UserTransactionService {
      * the only possible outcome of the transaction is to roll back the
      * transaction.
      *
-     * @exception IllegalStateException
-     *                Thrown if the current thread is
-     *                not associated with a transaction.
-     * @exception STransactionException
-     *                Thrown if the transaction manager
-     *                encounters an unexpected error condition.
+     * @throws IllegalStateException Thrown if the current thread is
+     *         not associated with a transaction.
+     * @throws STransactionException Thrown if the transaction manager
+     *         encounters an unexpected error condition.
      */
     void setRollbackOnly() throws STransactionException;
 
@@ -75,6 +65,7 @@ public interface TransactionService extends UserTransactionService {
     /**
      * Get the number of active transactions (i.e. transactions that opened but not yet completed or rolledback).
      * A transaction that was just mark as "rollbackOnly" is considered as an active one.
+     *
      * @return the number of active transactions
      */
     long getNumberOfActiveTransactions();

@@ -14,11 +14,10 @@
 package org.bonitasoft.engine.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
@@ -84,18 +83,19 @@ public class LocalTimerEventIT extends CommonAPILocalIT {
         setSessionInfo(getSession());
         final SchedulerService schedulerService = getPlatformAccessor().getSchedulerService();
         final TransactionService transactionService = getPlatformAccessor().getTransactionService();
-        transactionService.begin();
-        try {
-            final List<String> jobs = schedulerService.getJobs();
-            for (final String serverJobName : jobs) {
-                if (serverJobName.contains(jobName)) {
-                    return true;
+        return transactionService.executeInTransaction(new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws Exception {
+                final List<String> jobs = schedulerService.getJobs();
+                for (final String serverJobName : jobs) {
+                    if (serverJobName.contains(jobName)) {
+                        return true;
+                    }
                 }
+                return false;
             }
-        } finally {
-            transactionService.complete();
-        }
-        return false;
+        });
     }
 
     private String getJobName(final ProcessDefinition processDefinition, final String timerEventName) {

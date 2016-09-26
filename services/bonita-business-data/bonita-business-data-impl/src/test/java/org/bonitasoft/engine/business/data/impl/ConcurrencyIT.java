@@ -34,7 +34,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -47,9 +47,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import bitronix.tm.TransactionManagerServices;
-
 import com.company.pojo.Employee;
+
+import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -96,7 +96,7 @@ public class ConcurrencyIT {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
-        final TransactionService transactionService = mock(TransactionService.class);
+        final UserTransactionService transactionService = mock(UserTransactionService.class);
         final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, mock(TenantResourcesService.class), TENANT_ID));

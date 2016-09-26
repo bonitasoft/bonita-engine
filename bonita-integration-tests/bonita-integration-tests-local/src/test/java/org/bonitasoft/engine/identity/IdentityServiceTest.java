@@ -55,6 +55,7 @@ import org.bonitasoft.engine.persistence.SearchFields;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -65,7 +66,8 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
 
     private static IdentityService identityService;
 
-    public IdentityServiceTest() {
+    @Before
+    public void before() throws Exception {
         identityService = getTenantAccessor().getIdentityService();
     }
 
@@ -302,7 +304,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
         identityService.createUser(lauri);
         identityService.createUser(mika);
-        final List<SUser> retrievedUsers = identityService.getUsers(Collections.<Long> emptyList());
+        final List<SUser> retrievedUsers = identityService.getUsers(Collections.<Long>emptyList());
         getTransactionService().complete();
 
         assertEquals(0, retrievedUsers.size());
@@ -318,7 +320,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
         identityService.createRole(role2, null, null);
 
-        final List<SRole> retrievedUsers = identityService.getRoles(Arrays.asList(new Long[] { id1, id2 }));
+        final List<SRole> retrievedUsers = identityService.getRoles(Arrays.asList(new Long[]{id1, id2}));
         getTransactionService().complete();
 
         assertNotNull("can't find the roles after adding them", retrievedUsers);
@@ -353,7 +355,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final SRole role2 = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance().setName("testGetRoles2").setId(id2).done();
         identityService.createRole(role2, null, null);
 
-        final List<SRole> retrievedUsers = identityService.getRoles(Collections.<Long> emptyList());
+        final List<SRole> retrievedUsers = identityService.getRoles(Collections.<Long>emptyList());
         getTransactionService().complete();
 
         assertEquals(0, retrievedUsers.size());
@@ -369,7 +371,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
         identityService.createGroup(group2, null, null);
 
-        final List<SGroup> retrievedGroups = identityService.getGroups(Arrays.asList(new Long[] { id1, id2 }));
+        final List<SGroup> retrievedGroups = identityService.getGroups(Arrays.asList(new Long[]{id1, id2}));
         getTransactionService().complete();
 
         assertNotNull("can't find the groups after adding them", retrievedGroups);
@@ -404,7 +406,7 @@ public class IdentityServiceTest extends CommonBPMServicesTest {
         final SGroup group2 = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName("testGetGroups2").setId(id2).done();
         identityService.createGroup(group2, null, null);
 
-        final List<SGroup> retrievedGroups = identityService.getGroups(Collections.<Long> emptyList());
+        final List<SGroup> retrievedGroups = identityService.getGroups(Collections.<Long>emptyList());
         getTransactionService().complete();
 
         assertEquals(0, retrievedGroups.size());

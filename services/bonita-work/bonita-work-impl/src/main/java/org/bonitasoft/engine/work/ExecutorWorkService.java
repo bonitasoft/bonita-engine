@@ -20,7 +20,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * Execute works using an ExecutorService
@@ -33,11 +33,11 @@ public class ExecutorWorkService implements WorkService {
 
     private final Object getSynchroLock = new Object();
 
-    private final TransactionService transactionService;
+    private final UserTransactionService transactionService;
 
     private final WorkSynchronizationFactory workSynchronizationFactory;
 
-    private final ThreadLocal<AbstractWorkSynchronization> synchronizations = new ThreadLocal<AbstractWorkSynchronization>();
+    private final ThreadLocal<AbstractWorkSynchronization> synchronizations = new ThreadLocal<>();
 
     private final TechnicalLoggerService loggerService;
 
@@ -55,10 +55,9 @@ public class ExecutorWorkService implements WorkService {
      * @param loggerService
      * @param sessionAccessor
      * @param bonitaExecutorServiceFactory
-     * @param workTerminationTimeout
-     *        time in secondes to wait for works to finish
+     * @param workTerminationTimeout time in secondes to wait for works to finish
      */
-    public ExecutorWorkService(final TransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
+    public ExecutorWorkService(final UserTransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
             final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
             final int workTerminationTimeout) {
         this.transactionService = transactionService;

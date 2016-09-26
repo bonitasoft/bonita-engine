@@ -19,14 +19,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Map;
 import java.util.Queue;
@@ -37,7 +30,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -46,7 +39,7 @@ public class ExecutorWorkServiceTest {
 
     private ExecutorWorkService workService;
 
-    private TransactionService transactionService;
+    private UserTransactionService transactionService;
 
     private WorkSynchronizationFactory workSynchronizationFactory;
 
@@ -65,7 +58,7 @@ public class ExecutorWorkServiceTest {
     @SuppressWarnings("unchecked")
     @Before
     public void before() throws Exception {
-        transactionService = mock(TransactionService.class);
+        transactionService = mock(UserTransactionService.class);
         workSynchronizationFactory = mock(WorkSynchronizationFactory.class);
         loggerService = mock(TechnicalLoggerService.class);
         sessionAccessor = mock(SessionAccessor.class);

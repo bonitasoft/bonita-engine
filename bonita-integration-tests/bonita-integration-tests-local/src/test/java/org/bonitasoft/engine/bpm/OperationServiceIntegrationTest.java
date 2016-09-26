@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -36,7 +37,6 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
@@ -45,10 +45,7 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
-import org.bonitasoft.engine.transaction.STransactionRollbackException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +55,7 @@ import org.junit.Test;
  */
 public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
 
-    private TransactionService transactionService;
+    private UserTransactionService transactionService;
 
     private OperationService operationService;
 
@@ -78,6 +75,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     public void after() throws Exception {
         parentContainerResolver.setAllowUnknownContainer(false);
     }
+
     /**
      * Assign a new value to a String Variable. Using an expression which is a constant.
      * variableName = "afterUpdate"
@@ -96,7 +94,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         assertEquals(defaultValue, dataInstance.getValue());
 
         final SOperation operation;
-        final Map<String, Serializable> expressionContexts = new HashMap<String, Serializable>();
+        final Map<String, Serializable> expressionContexts = new HashMap<>();
         expressionContexts.put("containerId", containerId);
         expressionContexts.put("containerType", containerType);
         operation = buildAssignmentOperation(dataInstanceName, newConstantValue);
@@ -126,7 +124,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         assertTrue(dataInstance.getValue() instanceof ArrayList<?>);
 
         final SOperation operation;
-        final Map<String, Serializable> expressionContexts = new HashMap<String, Serializable>();
+        final Map<String, Serializable> expressionContexts = new HashMap<>();
         expressionContexts.put("containerId", containerId);
         expressionContexts.put("containerType", containerType);
         operation = buildJavaMethodOperation(dataInstanceName, newConstantValue);
@@ -142,7 +140,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private void createListDataInstance(final String dataInstanceName, final long containerId, final String containerType,
-                                        final String defaultValueExpressionConstant, final Serializable defaultValue) throws SBonitaException {
+            final String defaultValueExpressionConstant, final Serializable defaultValue) throws Exception {
         final String description = null;
         final SDataInstance dataInstance = buildDataInstance(dataInstanceName, ArrayList.class.getName(), description, defaultValueExpressionConstant,
                 containerId, containerType, false, SExpression.TYPE_READ_ONLY_SCRIPT, SExpression.GROOVY, defaultValue);
@@ -167,33 +165,41 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private void executeOperation(final SOperation operation, final long containerId, final String containerType,
-                                  final Map<String, Serializable> expressionContexts) throws IllegalArgumentException, SecurityException, SBonitaException {
-        transactionService.begin();
-        final SExpressionContext sExpressionContext = new SExpressionContext();
-        sExpressionContext.setSerializableInputValues(expressionContexts);
-        sExpressionContext.setContainerId(containerId);
-        sExpressionContext.setContainerType(containerType);
-        operationService.execute(operation, containerId, containerType, sExpressionContext);
-        transactionService.complete();
+            final Map<String, Serializable> expressionContexts) throws Exception {
+        transactionService.executeInTransaction(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                final SExpressionContext sExpressionContext = new SExpressionContext();
+                sExpressionContext.setSerializableInputValues(expressionContexts);
+                sExpressionContext.setContainerId(containerId);
+                sExpressionContext.setContainerType(containerType);
+                operationService.execute(operation, containerId, containerType, sExpressionContext);
+                return null;
+            }
+        });
     }
 
-    private SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SBonitaException {
-        transactionService.begin();
-        final SDataInstance dataInstance = dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
-        transactionService.complete();
-        return dataInstance;
+    private SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws Exception {
+        return transactionService.executeInTransaction(new Callable<SDataInstance>() {
+
+            @Override
+            public SDataInstance call() throws Exception {
+                return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
+            }
+        });
     }
 
     private void createStringDataInstance(final String instanceName, final long containerId, final String containerType,
-                                          final String defaultValueExpressionContent, final Serializable currentDataInstanceValue) throws SBonitaException {
+            final String defaultValueExpressionContent, final Serializable currentDataInstanceValue) throws Exception {
         final SDataInstance dataInstance = buildDataInstance(instanceName, String.class.getName(), "testUpdate", defaultValueExpressionContent, containerId,
                 containerType, false, SExpression.TYPE_CONSTANT, null, currentDataInstanceValue);
         insertDataInstance(dataInstance);
     }
 
     private SDataInstance buildDataInstance(final String instanceName, final String className, final String description,
-                                            final String defaultValueExpressionContent, final long containerId, final String containerType, final boolean isTransient,
-                                            final String expressionType, final String expressionInterpreter, final Serializable currentDataInstanceValue) throws SBonitaException {
+            final String defaultValueExpressionContent, final long containerId, final String containerType, final boolean isTransient,
+            final String expressionType, final String expressionInterpreter, final Serializable currentDataInstanceValue) throws SBonitaException {
         // create definition
         final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
         initializeBuilder(dataDefinitionBuilder, description, defaultValueExpressionContent, className, isTransient, expressionType, expressionInterpreter);
@@ -203,14 +209,19 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).setValue(currentDataInstanceValue).done();
     }
 
-    private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
-        transactionService.begin();
-        dataInstanceService.createDataInstance(dataInstance);
-        transactionService.complete();
+    private void insertDataInstance(final SDataInstance dataInstance) throws Exception {
+        transactionService.executeInTransaction(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                dataInstanceService.createDataInstance(dataInstance);
+                return null;
+            }
+        });
     }
 
     private void initializeBuilder(final SDataDefinitionBuilder dataDefinitionBuilder, final String description, final String defaultValueExpressionContent,
-                                   final String defaultValueExprReturnType, final boolean isTransient, final String expressionType, final String interpreter)
+            final String defaultValueExprReturnType, final boolean isTransient, final String expressionType, final String interpreter)
             throws SInvalidExpressionException {
         SExpression expression = null;
         if (defaultValueExpressionContent != null) {
@@ -228,11 +239,15 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         dataDefinitionBuilder.setDefaultValue(expression);
     }
 
-    private void deleteDataInstance(final SDataInstance dataInstance) throws STransactionCommitException, STransactionCreationException,
-            SDataInstanceException, STransactionRollbackException {
-        transactionService.begin();
-        dataInstanceService.deleteDataInstance(dataInstance);
-        transactionService.complete();
+    private void deleteDataInstance(final SDataInstance dataInstance) throws Exception {
+        transactionService.executeInTransaction(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                dataInstanceService.deleteDataInstance(dataInstance);
+                return null;
+            }
+        });
     }
 
 }
