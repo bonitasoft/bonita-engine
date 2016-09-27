@@ -16,30 +16,23 @@ package org.bonitasoft.engine.profile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.contentOf;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.xml.Parser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,13 +56,11 @@ public class DefaultProfilesUpdaterTest {
     @Mock
     public ProfileService profileService;
     @Mock
-    public Parser profileParser;
-    @Mock
     public TechnicalLoggerService technicalLoggerService;
     @Mock
     public ProfilesImporter profilesImporter;
     @Mock
-    public List<ExportedProfile> defaultProfiles;
+    public ExportedProfiles defaultProfiles;
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private File md5File;
@@ -83,9 +74,8 @@ public class DefaultProfilesUpdaterTest {
 
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
         doReturn(profileService).when(tenantServiceAccessor).getProfileService();
-        doReturn(profileParser).when(tenantServiceAccessor).getProfileParser();
         doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
-        doReturn(profilesImporter).when(defaultProfilesUpdater).createProfilesImporter(anyListOf(ExportedProfile.class));
+        doReturn(profilesImporter).when(defaultProfilesUpdater).createProfilesImporter(any(ExportedProfiles.class));
         doReturn(null).when(profilesImporter).importProfiles(anyLong());
     }
 
@@ -103,7 +93,7 @@ public class DefaultProfilesUpdaterTest {
     public void execute_should_update_when_shouldUpdateProfiles_returns_true() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(List.class), any(File.class), anyString());
+        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
         // When
         boolean hasUpdated = defaultProfilesUpdater.execute(false);
         // Then
@@ -115,25 +105,25 @@ public class DefaultProfilesUpdaterTest {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
         Callable<Object> callable = Mockito.mock(Callable.class);
-        doReturn(callable).when(defaultProfilesUpdater).getUpdateProfilesCallable(any(File.class), anyString(), any(List.class));
+        doReturn(callable).when(defaultProfilesUpdater).getUpdateProfilesCallable(any(File.class), anyString(), any(ExportedProfiles.class));
         doReturn(null).when(transactionService).executeInTransaction(callable);
         // When
         defaultProfilesUpdater.execute(true);
         // Then
         verify(transactionService).executeInTransaction(callable);
-        verify(defaultProfilesUpdater, never()).doUpdateProfiles(any(List.class), any(File.class), anyString());
+        verify(defaultProfilesUpdater, never()).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
     }
 
     @Test
     public void execute_should_not_create_transaction_when_called_with_shouldCreateTransaction_set_to_false() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(List.class), any(File.class), anyString());
+        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
         // When
         defaultProfilesUpdater.execute(false);
         // Then
         verify(transactionService, never()).executeInTransaction(any(Callable.class));
-        verify(defaultProfilesUpdater).doUpdateProfiles(any(List.class), any(File.class), anyString());
+        verify(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
     }
 
     @Test
@@ -160,7 +150,7 @@ public class DefaultProfilesUpdaterTest {
     @Test
     public void doUpdateProfiles_should_not_write_MD5_if_import_fails() throws IOException, ExecutionException, NoSuchAlgorithmException {
         // Given
-        IOUtil.writeFile(md5File,"oldHash");
+        IOUtil.writeFile(md5File, "oldHash");
         doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(anyLong());
         // When
         defaultProfilesUpdater.doUpdateProfiles(defaultProfiles, md5File, "content of profiles");
@@ -171,7 +161,7 @@ public class DefaultProfilesUpdaterTest {
     @Test
     public void doUpdate_call_importer() throws IOException, NoSuchAlgorithmException, ExecutionException {
         // Given
-        ArrayList<ExportedProfile> profilesFromXML = new ArrayList<ExportedProfile>();
+        ExportedProfiles profilesFromXML = new ExportedProfiles();
         // When
         defaultProfilesUpdater.doUpdateProfiles(profilesFromXML, md5File, "content of profiles");
         // Then
@@ -182,7 +172,7 @@ public class DefaultProfilesUpdaterTest {
 
     @Test
     public void shouldUpdateProfiles_should_return_false_when_md5_matches() throws Exception {
-         // Given
+        // Given
         String defaultProfilesXml = "the content";
         IOUtil.writeMD5(md5File, defaultProfilesXml.getBytes());
         // When

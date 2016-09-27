@@ -15,7 +15,6 @@ package org.bonitasoft.engine.external.web.profile.command;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
@@ -27,9 +26,8 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.xml.Parser;
 
 /**
  * Specific Command to import profiles xml content as byte[].
@@ -60,15 +58,12 @@ public class ImportProfilesCommand extends TenantCommand {
             throw new SCommandParameterizationException("Parameters map must contain an entry  xmlContent with a byte array value.", e);
         }
 
-        final Parser parser = serviceAccessor.getProfileParser();
         try {
-            final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
+            final ExportedProfiles profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent));
 
             return (Serializable) ProfilesImporter.toWarnings(new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.DELETE_EXISTING)
                     .importProfiles(SessionInfos.getUserIdFromSession()));
-        } catch (ExecutionException e) {
-            throw new SCommandExecutionException(e);
-        } catch (IOException e) {
+        } catch (ExecutionException | IOException e) {
             throw new SCommandExecutionException(e);
         }
     }

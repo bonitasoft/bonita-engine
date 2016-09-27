@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 
@@ -20,21 +25,26 @@ import org.bonitasoft.engine.api.ImportError.Type;
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ExportedProfileEntry {
 
-    private final String name;
-
+    @XmlAttribute
+    private String name;
+    @XmlAttribute
     private boolean isCustom;
-
-    private String description;
-
-    private String type;
-
+    @XmlElement
     private String parentName;
-
-    private long index;
-
+    @XmlElement
+    private Long index = 0L;
+    @XmlElement
+    private String description;
+    @XmlElement
+    private String type;
+    @XmlElement
     private String page;
+
+    public ExportedProfileEntry() {
+    }
 
     public ExportedProfileEntry(final String name) {
         this.name = name;
@@ -168,10 +178,7 @@ public class ExportedProfileEntry {
     }
 
     public boolean hasError() {
-        if (getError() == null) {
-            return false;
-        }
-        return true;
+        return getError() != null;
     }
 
     public ImportError getError() {

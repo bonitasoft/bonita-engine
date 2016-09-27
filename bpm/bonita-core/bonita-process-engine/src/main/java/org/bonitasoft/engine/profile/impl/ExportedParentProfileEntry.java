@@ -15,6 +15,10 @@ package org.bonitasoft.engine.profile.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
@@ -23,9 +27,16 @@ import org.bonitasoft.engine.api.ImportError.Type;
  * @author Zhao Na
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ExportedParentProfileEntry extends ExportedProfileEntry {
 
+    @XmlElementWrapper(name = "childrenEntries")
+    @XmlElement(name = "profileEntry")
     private List<ExportedProfileEntry> childProfileEntries;
+
+    public ExportedParentProfileEntry() {
+        childProfileEntries = new ArrayList<>();
+    }
 
     public List<ExportedProfileEntry> getChildProfileEntries() {
         return childProfileEntries;
@@ -67,7 +78,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
     }
 
     public List<ImportError> getErrors() {
-        final List<ImportError> errors = new ArrayList<ImportError>();
+        final List<ImportError> errors = new ArrayList<>();
         if (hasError()) {
             errors.add(getError());
         }
