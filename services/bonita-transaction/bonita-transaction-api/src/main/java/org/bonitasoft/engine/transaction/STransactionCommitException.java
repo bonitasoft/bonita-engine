@@ -31,4 +31,7 @@ public class STransactionCommitException extends STransactionException {
         super(cause);
     }
 
+    public STransactionCommitException(String message) {
+        super(message);
+    }
 }
