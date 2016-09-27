@@ -84,7 +84,6 @@ import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.XMLWriter;
 
@@ -182,8 +181,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     ContainerRegistry getContainerRegistry();
 
     LockService getLockService();
-
-    Parser getProfileParser();
 
     EventsHandler getEventsHandler();
 

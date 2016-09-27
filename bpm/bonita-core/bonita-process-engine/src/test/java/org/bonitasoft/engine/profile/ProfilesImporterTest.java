@@ -18,23 +18,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
@@ -48,10 +41,12 @@ import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
+import org.bonitasoft.engine.profile.impl.ExportedMembership;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
+import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -296,7 +291,7 @@ public class ProfilesImporterTest {
 
     private void createImporter(final ProfileImportStrategy importStrategy, final ExportedProfile... exportedProfile) throws SProfileUpdateException,
             SProfileCreationException, SProfileEntryCreationException {
-        profilesImporter = spy(new ProfilesImporter(profileService, identityService, Arrays.asList(exportedProfile), importStrategy));
+        profilesImporter = spy(new ProfilesImporter(profileService, identityService, new ExportedProfiles(Arrays.asList(exportedProfile)), importStrategy));
         doReturn(mock(SProfile.class)).when(profilesImporter).createSProfile(any(ExportedProfile.class), anyLong());
         doReturn(mock(SProfileEntry.class)).when(profilesImporter).createProfileEntry(any(ExportedParentProfileEntry.class), anyLong(), anyLong());
         doReturn(mock(SProfileEntry.class)).when(profilesImporter).createProfileEntry(any(ExportedParentProfileEntry.class), anyLong(), anyLong());
@@ -434,7 +429,7 @@ public class ProfilesImporterTest {
         // given
         createImporter(new IgnoreDuplicateImportStrategy(profileService));
         final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Arrays.asList(new Pair<String, String>("group", "role")));
+        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
         final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
@@ -449,7 +444,7 @@ public class ProfilesImporterTest {
         // given
         createImporter(new IgnoreDuplicateImportStrategy(profileService));
         final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Arrays.asList(new Pair<String, String>("group", "role")));
+        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         // when
         final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
@@ -464,7 +459,7 @@ public class ProfilesImporterTest {
         // given
         createImporter(new IgnoreDuplicateImportStrategy(profileService));
         final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Arrays.asList(new Pair<String, String>("group", "role")));
+        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
@@ -481,7 +476,7 @@ public class ProfilesImporterTest {
         // given
         createImporter(new IgnoreDuplicateImportStrategy(profileService));
         final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Arrays.asList(new Pair<String, String>("group", "role")));
+        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
         final SRole role = mock(SRole.class);
         when(role.getId()).thenReturn(456l);
         when(role.getName()).thenReturn("role");

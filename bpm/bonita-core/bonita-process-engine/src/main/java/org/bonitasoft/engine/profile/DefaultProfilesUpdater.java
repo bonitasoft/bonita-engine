@@ -24,7 +24,7 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -62,7 +62,7 @@ public class DefaultProfilesUpdater {
                 // Default profiles do not exist or are different
                 tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                         "Default profiles not up to date, updating them...");
-                final List<ExportedProfile> defaultProfiles = getProfilesFromXML(defaultProfilesXml);
+                final ExportedProfiles defaultProfiles = getProfilesFromXML(defaultProfilesXml);
                 if (shouldCreateTransaction) {
                     final TransactionService transactionService = platformServiceAccessor.getTransactionService();
                     transactionService.executeInTransaction(getUpdateProfilesCallable(md5File, defaultProfilesXml, defaultProfiles));
@@ -87,7 +87,7 @@ public class DefaultProfilesUpdater {
         return false;
     }
 
-    Callable<Object> getUpdateProfilesCallable(final File md5File, final String defaultProfilesXml, final List<ExportedProfile> defaultProfiles) {
+    Callable<Object> getUpdateProfilesCallable(final File md5File, final String defaultProfilesXml, final ExportedProfiles defaultProfiles) {
         return new Callable<Object>() {
 
             @Override
@@ -98,7 +98,7 @@ public class DefaultProfilesUpdater {
         };
     }
 
-    Object doUpdateProfiles(final List<ExportedProfile> defaultProfiles, final File md5File, final String defaultProfilesXml)
+    Object doUpdateProfiles(final ExportedProfiles defaultProfiles, final File md5File, final String defaultProfilesXml)
             throws NoSuchAlgorithmException, IOException {
         try {
             final ProfilesImporter profilesImporter = createProfilesImporter(defaultProfiles);
@@ -115,7 +115,7 @@ public class DefaultProfilesUpdater {
         return null;
     }
 
-    protected ProfilesImporter createProfilesImporter(final List<ExportedProfile> profilesFromXML) {
+    protected ProfilesImporter createProfilesImporter(final ExportedProfiles profilesFromXML) {
         return new ProfilesImporter(tenantServiceAccessor.getProfileService(), tenantServiceAccessor
                 .getIdentityService(), profilesFromXML, ImportPolicy.UPDATE_DEFAULTS);
     }
@@ -144,7 +144,7 @@ public class DefaultProfilesUpdater {
         return IOUtil.readResource(DEFAULT_PROFILES_FILE);
     }
 
-    List<ExportedProfile> getProfilesFromXML(final String defaultProfilesXml) throws IOException {
-        return ProfilesImporter.getProfilesFromXML(defaultProfilesXml, tenantServiceAccessor.getProfileParser());
+    ExportedProfiles getProfilesFromXML(final String defaultProfilesXml) throws IOException {
+        return ProfilesImporter.getProfilesFromXML(defaultProfilesXml);
     }
 }

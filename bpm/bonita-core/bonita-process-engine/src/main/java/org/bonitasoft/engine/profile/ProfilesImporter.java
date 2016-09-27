@@ -15,16 +15,16 @@ package org.bonitasoft.engine.profile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.ImportStatus.Status;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -45,15 +45,14 @@ import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreatio
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
+import org.bonitasoft.engine.profile.impl.ExportedMembership;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
+import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.SValidationException;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * Import profiles with mapping and entries using Policy
@@ -66,11 +65,11 @@ public class ProfilesImporter {
 
     private final IdentityService identityService;
 
-    private final List<ExportedProfile> exportedProfiles;
+    private final ExportedProfiles exportedProfiles;
 
     private final ProfileImportStrategy importStrategy;
 
-    public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
+    public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final ExportedProfiles exportedProfiles,
             final ImportPolicy policy) {
         this(profileService, identityService, exportedProfiles, getStrategy(profileService, policy));
     }
@@ -93,7 +92,7 @@ public class ProfilesImporter {
         }
     }
 
-    ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
+    ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final ExportedProfiles exportedProfiles,
             final ProfileImportStrategy importStrategy) {
         this.profileService = profileService;
         this.identityService = identityService;
@@ -104,8 +103,8 @@ public class ProfilesImporter {
     public List<ImportStatus> importProfiles(final long importerId) throws ExecutionException {
         importStrategy.beforeImport();
         try {
-            final List<ImportStatus> importStatus = new ArrayList<>(exportedProfiles.size());
-            for (final ExportedProfile exportedProfile : exportedProfiles) {
+            final List<ImportStatus> importStatus = new ArrayList<>(exportedProfiles.getExportedProfiles().size());
+            for (final ExportedProfile exportedProfile : exportedProfiles.getExportedProfiles()) {
                 if (exportedProfile.getName() == null || exportedProfile.getName().isEmpty()) {
                     continue;
                 }
@@ -142,7 +141,10 @@ public class ProfilesImporter {
                 /*
                  * Import mapping with organization
                  */
-                currentStatus.getErrors().addAll(importProfileMapping(profileService, identityService, profileId, exportedProfile.getProfileMapping()));
+                ExportedProfileMapping profileMapping = exportedProfile.getProfileMapping();
+                if (profileMapping != null) {
+                    currentStatus.getErrors().addAll(importProfileMapping(profileService, identityService, profileId, profileMapping));
+                }
             }
             return importStatus;
 
@@ -153,7 +155,7 @@ public class ProfilesImporter {
 
     protected List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
             final long profileId)
-                    throws SProfileEntryCreationException {
+            throws SProfileEntryCreationException {
         final ArrayList<ImportError> errors = new ArrayList<>();
         for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
             if (parentProfileEntry.hasErrors()) {
@@ -212,18 +214,18 @@ public class ProfilesImporter {
             profileService.addRoleToProfile(profileId, role.getId(), role.getName());
         }
 
-        for (final Pair<String, String> membership : exportedProfileMapping.getMemberships()) {
+        for (final ExportedMembership membership : exportedProfileMapping.getMemberships()) {
             SGroup group = null;
             try {
-                group = identityService.getGroupByPath(membership.getKey());
+                group = identityService.getGroupByPath(membership.getGroup());
             } catch (final SGroupNotFoundException e) {
-                errors.add(new ImportError(membership.getKey(), Type.GROUP));
+                errors.add(new ImportError(membership.getGroup(), Type.GROUP));
             }
             SRole role = null;
             try {
-                role = identityService.getRoleByName(membership.getValue());
+                role = identityService.getRoleByName(membership.getRole());
             } catch (final SRoleNotFoundException e) {
-                errors.add(new ImportError(membership.getValue(), Type.ROLE));
+                errors.add(new ImportError(membership.getRole(), Type.ROLE));
             }
             if (group == null || role == null) {
                 continue;
@@ -236,8 +238,8 @@ public class ProfilesImporter {
     protected SProfile importTheProfile(final long importerId,
             final ExportedProfile exportedProfile,
             final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
-                    SProfileUpdateException,
-                    SProfileCreationException {
+            SProfileUpdateException,
+            SProfileCreationException {
         final SProfile newProfile;
         if (existingProfile != null) {
             newProfile = importStrategy.whenProfileExists(importerId, exportedProfile, existingProfile);
@@ -279,21 +281,15 @@ public class ProfilesImporter {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws IOException {
-        StringReader reader = new StringReader(xmlContent);
+    public static ExportedProfiles getProfilesFromXML(final String xmlContent) throws IOException {
         try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            return (List<ExportedProfile>) parser.getObjectFromXML(reader);
-        } catch (final SValidationException | SXMLParseException e) {
+            return new ProfilesParser().convert(xmlContent);
+        } catch (JAXBException e) {
             throw new IOException(e);
-        } finally {
-            reader.close();
         }
     }
 
-    public static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
+    static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
         return BonitaHomeServer.getInstance().getTenantStorage().getProfileMD5(tenantId);
     }
 }

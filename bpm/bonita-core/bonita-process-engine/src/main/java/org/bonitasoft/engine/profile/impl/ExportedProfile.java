@@ -15,27 +15,41 @@ package org.bonitasoft.engine.profile.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Zhao Na
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {})
 public class ExportedProfile {
 
-    private final String name;
-
+    @XmlAttribute
+    private String name;
+    @XmlAttribute
     private boolean isDefault;
-
+    @XmlElement
     private String description;
-
+    @XmlElementWrapper(name = "profileEntries")
+    @XmlElement(name = "parentProfileEntry")
     private List<ExportedParentProfileEntry> parentProfileEntries;
-
+    @XmlElement(name = "profileMapping")
     private ExportedProfileMapping profileMapping;
+
+    public ExportedProfile() {
+        parentProfileEntries = new ArrayList<>();
+    }
 
     public ExportedProfile(final String name, final boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
-        parentProfileEntries = new ArrayList<ExportedParentProfileEntry>();
+        parentProfileEntries = new ArrayList<>();
         profileMapping = new ExportedProfileMapping();
     }
 

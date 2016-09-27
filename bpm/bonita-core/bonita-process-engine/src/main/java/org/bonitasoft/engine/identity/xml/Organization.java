@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -59,8 +60,9 @@ public class Organization {
         this.customUserInfoDefinition = new ArrayList<>();
     }
 
-    public Organization(final List<ExportedUser> users, final List<ExportedRole> roles, final List<ExportedGroup> groups, final List<ExportedUserMembership> memberships,
-                        List<ExportedCustomUserInfoDefinition> customUserInfoDefinition) {
+    public Organization(final List<ExportedUser> users, final List<ExportedRole> roles, final List<ExportedGroup> groups,
+            final List<ExportedUserMembership> memberships,
+            List<ExportedCustomUserInfoDefinition> customUserInfoDefinition) {
         this.users = users;
         this.roles = roles;
         this.groups = groups;

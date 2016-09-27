@@ -538,6 +538,19 @@
                             <outputDirectory>${project.build.directory}/organization-schemas</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>profiles-schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <includes>
+                                <include>org/bonitasoft/engine/profile/impl/**/*.java</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/profiles-schemas</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -556,6 +569,8 @@
                                       toFile="${project.build.directory}/schemas/applications.xsd" />
                                 <copy file="${project.build.directory}/organization-schemas/schema1.xsd"
                                       toFile="${project.build.directory}/schemas/organization.xsd" />
+                                <copy file="${project.build.directory}/profiles-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/profiles.xsd" />
                             </target>
                         </configuration>
                     </execution>

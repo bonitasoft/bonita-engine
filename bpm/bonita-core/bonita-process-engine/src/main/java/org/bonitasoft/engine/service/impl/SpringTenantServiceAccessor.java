@@ -14,11 +14,6 @@
 
 package org.bonitasoft.engine.service.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
@@ -58,7 +53,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
@@ -76,18 +70,6 @@ import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
-import org.bonitasoft.engine.profile.xml.GroupPathsBinding;
-import org.bonitasoft.engine.profile.xml.MembershipBinding;
-import org.bonitasoft.engine.profile.xml.MembershipsBinding;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryBinding;
-import org.bonitasoft.engine.profile.xml.ProfileBinding;
-import org.bonitasoft.engine.profile.xml.ProfileEntriesBinding;
-import org.bonitasoft.engine.profile.xml.ProfileEntryBinding;
-import org.bonitasoft.engine.profile.xml.ProfileMappingBinding;
-import org.bonitasoft.engine.profile.xml.ProfilesBinding;
-import org.bonitasoft.engine.profile.xml.RoleNamesBinding;
-import org.bonitasoft.engine.profile.xml.UserNamesBinding;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
@@ -106,10 +88,7 @@ import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
-import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -583,30 +562,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             lockService = beanAccessor.getService(LockService.class);
         }
         return lockService;
-    }
-
-    @Override
-    public Parser getProfileParser() {
-        final List<Class<? extends ElementBinding>> bindings = new ArrayList<>();
-        bindings.add(ProfileBinding.class);
-        bindings.add(ProfilesBinding.class);
-        bindings.add(ProfileEntryBinding.class);
-        bindings.add(ParentProfileEntryBinding.class);
-        bindings.add(ChildrenEntriesBinding.class);
-        bindings.add(ProfileEntriesBinding.class);
-        bindings.add(ProfileMappingBinding.class);
-        bindings.add(MembershipsBinding.class);
-        bindings.add(MembershipBinding.class);
-        bindings.add(UserNamesBinding.class);
-        bindings.add(RoleNamesBinding.class);
-        bindings.add(GroupPathsBinding.class);
-        final Parser parser = getParserFactgory().createParser(bindings);
-        try (InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd")) {
-            parser.setSchema(resource);
-            return parser;
-        } catch (final SInvalidSchemaException | IOException e) {
-            throw new BonitaRuntimeException(e);
-        }
     }
 
     @Override
