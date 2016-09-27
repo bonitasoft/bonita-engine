@@ -25,4 +25,7 @@ public class STransactionCreationException extends STransactionException {
         super(message);
     }
 
+    public STransactionCreationException(String message, Exception exception) {
+        super(message, exception);
+    }
 }
