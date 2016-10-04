@@ -108,6 +108,7 @@
 									<doctitle>Bonita BPM Engine ${project.version} client API</doctitle>
 									<windowtitle>Bonita BPM Engine ${project.version} client API</windowtitle>
 									<includeDependencySources>true</includeDependencySources>
+                                                                        <additionalparam>-Xdoclint:none</additionalparam>
 								</configuration>
 							</execution>
 						</executions>
