@@ -16,10 +16,8 @@ package org.bonitasoft.engine.bdm.validator.rule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
-import static org.bonitasoft.engine.bdm.builder.UniqueConstraintBuilder.aUniqueConstraint;
 import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -171,19 +169,4 @@ public class BusinessObjectValidationRuleTest {
         assertThat(validationStatus).isNotOk();
     }
     
-    @Test
-    public void should_add_an_error_message_when_constraint_fields_are_null() throws Exception {
-        final UniqueConstraint uc = aUniqueConstraint().withName("c1").build();
-
-        final BusinessObject bo = new BusinessObject();
-        bo.setQualifiedName("org.bonita.Bo2");
-        final SimpleField field = new SimpleField();
-        field.setName("firstName");
-        bo.addField(field);
-        bo.setUniqueConstraints(Arrays.asList(uc));
-        
-        ValidationStatus status = businessObjectValidationRule.validate(bo);
-        
-        assertThat(status.getErrors()).contains("c1 constraint must have at least one field declared");
-    }
 }
