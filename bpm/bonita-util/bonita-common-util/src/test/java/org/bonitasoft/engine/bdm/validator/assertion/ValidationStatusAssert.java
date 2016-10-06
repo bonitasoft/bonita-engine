@@ -47,4 +47,9 @@ public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAsser
         Assertions.assertThat(actual.isOk()).as(description).isFalse();
         return this;
     }
+    
+    public ValidationStatusAssert hasError(String errorMessage) {
+        Assertions.assertThat(actual.getErrors()).contains(errorMessage);
+        return this;
+    }
 }

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import java.util.List;
+
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -40,11 +42,11 @@ public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstra
         if (!isValid) {
             status.addError(name + " is not a valid SQL identifier");
         }
-
-        if (uc.getFieldNames().isEmpty()) {
+        
+        List<String> fieldNames = uc.getFieldNames();
+        if (fieldNames == null || fieldNames.isEmpty()) {
             status.addError(name + " unique constraint must have at least one field declared");
         }
-
         return status;
     }
 

@@ -13,20 +13,18 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
-import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
 
 import java.util.Arrays;
-import java.util.Collections;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Romain Bioteau
@@ -54,7 +52,7 @@ public class UniqueConstraintValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_valid_status() {
+    public void should_return_a_valid_status() {
         UniqueConstraint uc = new UniqueConstraint();
         uc.setName("MY_CONSTRAINT_");
         uc.setFieldNames(Arrays.asList("f1"));
@@ -63,26 +61,47 @@ public class UniqueConstraintValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_error_status() {
+    public void should_add_an_error_message_when_constraint_name_is_null() throws Exception {
         UniqueConstraint uc = new UniqueConstraint();
-        uc.setName("MY_CONSTRAINT_");
-        uc.setFieldNames(Collections.<String> emptyList());
-        ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
-        assertThat(validationStatus).isNotOk();
+        uc.setName(null);
+        uc.setFieldNames(Arrays.asList("f1"));
 
-        uc = new UniqueConstraint();
+        ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
+        
+        assertThat(validationStatus).isNotOk().hasError("A unique constraint must have name");
+    }
+    
+    @Test
+    public void should_add_an_error_message_when_constraint_name_contains_whitespaces() throws Exception {
+        UniqueConstraint uc = new UniqueConstraint();
+        uc.setName("with whitespaces");
+        uc.setFieldNames(Arrays.asList("f1"));
+
+        ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
+        
+        assertThat(validationStatus).isNotOk().hasError("with whitespaces is not a valid SQL identifier");
+    }
+    
+    @Test
+    public void should_add_an_error_message_when_constraint_name_is_empty() throws Exception {
+        UniqueConstraint uc = new UniqueConstraint();
         uc.setName("");
         uc.setFieldNames(Arrays.asList("f1"));
-        validationStatus = uniqueConstraintValidationRule.validate(uc);
-        assertThat(validationStatus).isNotOk();
 
-        uc.setName(null);
-        validationStatus = uniqueConstraintValidationRule.validate(uc);
-        assertThat(validationStatus).isNotOk();
-
-        uc.setName("with whitespaces ");
-        validationStatus = uniqueConstraintValidationRule.validate(uc);
-        assertThat(validationStatus).isNotOk();
+        ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
+        
+        assertThat(validationStatus).isNotOk().hasError("A unique constraint must have name");
+    }
+    
+    @Test
+    public void should_add_an_error_message_when_constraint_fields_are_null() throws Exception {
+        UniqueConstraint uc = new UniqueConstraint();
+        uc.setName("MY_CONSTRAINT_");
+        uc.setFieldNames(null);
+        
+        ValidationStatus validationStatus = uniqueConstraintValidationRule.validate(uc);
+        
+        assertThat(validationStatus).isNotOk().hasError("MY_CONSTRAINT_ unique constraint must have at least one field declared");
     }
 
 }

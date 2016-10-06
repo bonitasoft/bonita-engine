@@ -54,7 +54,8 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
 
         for (String reservedPrefix : RESERVED_PACKAGE_PREFIX) {
             if (qualifiedName.startsWith(reservedPrefix)) {
-                status.addError(new StringBuilder().append("Package ").append(reservedPrefix).append(" is reserved. Please choose another package name").toString());
+                status.addError(
+                        new StringBuilder().append("Package ").append(reservedPrefix).append(" is reserved. Please choose another package name").toString());
             }
         }
 
@@ -98,14 +99,12 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
                 constraintNames.add(name);
             }
             List<String> fieldNames = uc.getFieldNames();
-            if (fieldNames == null || fieldNames.isEmpty()) {
-                status.addError(name + " constraint must have at least one field declared");
-                return;
-            }
-            for (final String fName : fieldNames) {
-                final Field field = getField(bo, fName);
-                if (field == null) {
-                    status.addError("The field named " + fName + " does not exist in " + bo.getQualifiedName());
+            if (fieldNames != null) {
+                for (final String fName : fieldNames) {
+                    final Field field = getField(bo, fName);
+                    if (field == null) {
+                        status.addError("The field named " + fName + " does not exist in " + bo.getQualifiedName());
+                    }
                 }
             }
         }
