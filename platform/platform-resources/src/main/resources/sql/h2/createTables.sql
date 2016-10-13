@@ -138,7 +138,7 @@ CREATE TABLE arch_document_mapping (
   documentid BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   description TEXT,
-  version VARCHAR(10) NOT NULL,
+  version VARCHAR(50) NOT NULL,
   index_ INT NOT NULL,
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -163,7 +163,7 @@ CREATE TABLE document_mapping (
   documentid BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   description TEXT,
-  version VARCHAR(10) NOT NULL,
+  version VARCHAR(50) NOT NULL,
   index_ INT NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
@@ -254,7 +254,7 @@ CREATE TABLE arch_connector_instance (
   containerId BIGINT NOT NULL,
   containerType VARCHAR(10) NOT NULL,
   connectorId VARCHAR(255) NOT NULL,
-  version VARCHAR(10) NOT NULL,
+  version VARCHAR(50) NOT NULL,
   name VARCHAR(255) NOT NULL,
   activationEvent VARCHAR(30),
   state VARCHAR(50),
@@ -353,7 +353,7 @@ CREATE TABLE connector_instance (
   containerId BIGINT NOT NULL,
   containerType VARCHAR(10) NOT NULL,
   connectorId VARCHAR(255) NOT NULL,
-  version VARCHAR(10) NOT NULL,
+  version VARCHAR(50) NOT NULL,
   name VARCHAR(255) NOT NULL,
   activationEvent VARCHAR(30),
   state VARCHAR(50),
