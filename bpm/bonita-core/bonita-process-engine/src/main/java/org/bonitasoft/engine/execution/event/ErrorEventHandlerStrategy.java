@@ -63,7 +63,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -112,10 +112,10 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Error event is thrown, error code = "
                     + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = " + eventInstance.getRootContainerId());
         }
-        final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
+        final ProcessInstanceInterruptor processInstanceInterruptor = new ProcessInstanceInterruptor(
                 processInstanceService, getEventInstanceService(), containerRegistry, logger);
         updateInterruptorErrorEvent(eventInstance);
-        processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
+        processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
     }
 
     private void updateInterruptorErrorEvent(final SThrowEventInstance eventInstance) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
@@ -148,20 +148,20 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             eventsHandler.triggerCatchEvent(waitingErrorEvent, sThrowEventInstance.getId());
             hasActionToExecute = true;
         } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                final StringBuilder logBuilder = new StringBuilder();
-                logBuilder.append("No catch error event was defined to handle the error code '");
-                logBuilder.append(errorTrigger.getErrorCode());
-                logBuilder.append("' defined in the process [name: ");
-                logBuilder.append(processDefinition.getName());
-                logBuilder.append(", version: ");
-                logBuilder.append(processDefinition.getVersion());
-                logBuilder.append("]");
-                if (sEventDefinition != null) {
-                    logBuilder.append(", throw event: ");
-                    logBuilder.append(sEventDefinition.getName());
-                }
-                logBuilder.append(". This throw error event will act as a Terminate Event.");
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, logBuilder.toString());
+            final StringBuilder logBuilder = new StringBuilder();
+            logBuilder.append("No catch error event was defined to handle the error code '");
+            logBuilder.append(errorTrigger.getErrorCode());
+            logBuilder.append("' defined in the process [name: ");
+            logBuilder.append(processDefinition.getName());
+            logBuilder.append(", version: ");
+            logBuilder.append(processDefinition.getVersion());
+            logBuilder.append("]");
+            if (sEventDefinition != null) {
+                logBuilder.append(", throw event: ");
+                logBuilder.append(sEventDefinition.getName());
+            }
+            logBuilder.append(". This throw error event will act as a Terminate Event.");
+            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, logBuilder.toString());
         }
         return hasActionToExecute;
     }
@@ -267,7 +267,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             final SWaitingErrorEventBuilderFactory waitingErrorEventKeyProvider = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
             final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, waitingErrorEventKeyProvider.getFlowNodeNameKey(), OrderByType.ASC);
 
-            final List<FilterOption> filters = new ArrayList<FilterOption>(3);
+            final List<FilterOption> filters = new ArrayList<>(3);
             filters.add(new FilterOption(SWaitingErrorEvent.class, waitingErrorEventKeyProvider.getErrorCodeKey(), catchingErrorCode));
             filters.add(new FilterOption(SWaitingErrorEvent.class, waitingErrorEventKeyProvider.getEventTypeKey(), SBPMEventType.EVENT_SUB_PROCESS.name()));
             filters.add(new FilterOption(SWaitingErrorEvent.class, waitingErrorEventKeyProvider.getParentProcessInstanceIdKey(), parentProcessInstanceId));

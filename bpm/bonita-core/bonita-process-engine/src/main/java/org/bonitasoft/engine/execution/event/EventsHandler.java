@@ -63,8 +63,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
-import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -111,7 +110,7 @@ public class EventsHandler {
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.processInstanceService = processInstanceService;
         this.logger = logger;
-        handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
+        handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
                 bpmInstancesCreator, dataInstanceService, processDefinitionService));
@@ -358,15 +357,14 @@ public class EventsHandler {
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
-            final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
+            final ProcessInstanceInterruptor interruptor = new ProcessInstanceInterruptor(
                     processInstanceService, eventInstanceService, containerRegistry, logger);
-            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
+            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
-            final TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(processInstanceService,
-                    eventInstanceService,
-                    processExecutor, logger);
-            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
+            final ProcessInstanceInterruptor interruptor = new ProcessInstanceInterruptor(processInstanceService,
+                    eventInstanceService, containerRegistry, logger);
+            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
                 subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.

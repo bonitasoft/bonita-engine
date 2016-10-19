@@ -26,7 +26,6 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
 import org.bonitasoft.engine.bar.BusinessArchiveService;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -64,7 +63,6 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -91,6 +89,7 @@ import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.profile.xml.RoleNamesBinding;
 import org.bonitasoft.engine.profile.xml.UserNamesBinding;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -188,8 +187,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private WorkService workService;
 
     private SessionService sessionService;
-
-    private TransactionalProcessInstanceInterruptor transactionalProcessInstanceInterruptor;
 
     private SessionAccessor sessionAccessor;
 
@@ -367,14 +364,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             processExecutor = beanAccessor.getService(ProcessExecutor.class);
         }
         return processExecutor;
-    }
-
-    @Override
-    public TransactionalProcessInstanceInterruptor getTransactionalProcessInstanceInterruptor() {
-        if (transactionalProcessInstanceInterruptor == null) {
-            transactionalProcessInstanceInterruptor = beanAccessor.getService(TransactionalProcessInstanceInterruptor.class);
-        }
-        return transactionalProcessInstanceInterruptor;
     }
 
     @Override
@@ -735,10 +724,10 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public <T> T lookup(final String serviceName) throws NotFoundException {
-        try{
+        try {
 
-        return beanAccessor.getService(serviceName);
-        }catch (NoSuchBeanDefinitionException e){
+            return beanAccessor.getService(serviceName);
+        } catch (NoSuchBeanDefinitionException e) {
             throw new NotFoundException(e);
         }
     }
