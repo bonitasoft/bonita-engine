@@ -27,7 +27,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -59,9 +59,9 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
+        final ProcessInstanceInterruptor processInstanceInterruptor = new ProcessInstanceInterruptor(
                 processInstanceService, activityInstanceService, containerRegistry, logger);
-        processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
+        processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
         // Parent should always be process for event (but must change that id it's not the case anymore
     }
 

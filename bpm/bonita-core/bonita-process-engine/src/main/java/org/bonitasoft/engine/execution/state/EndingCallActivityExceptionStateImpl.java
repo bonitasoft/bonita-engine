@@ -34,7 +34,7 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -90,9 +90,9 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
             final boolean hasActiveChild = callActivity.getTokenCount() > 0;
             if (hasActiveChild) {
                 final SProcessInstance targetProcessInstance = processInstanceService.getChildOfActivity(flowNodeInstance.getId());
-                final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
+                final ProcessInstanceInterruptor processInstanceInterruptor = new ProcessInstanceInterruptor(
                         processInstanceService, activityInstanceService, containerRegistry, logger);
-                processInstanceInterruptor.interruptProcessInstance(targetProcessInstance.getId(), getStateCategory(), -1);
+                processInstanceInterruptor.interruptProcessInstance(targetProcessInstance.getId(), getStateCategory());
             } else {
                 archiveChildProcessInstance(flowNodeInstance);
             }
@@ -113,7 +113,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         return StateCode.DONE;
     }
 
-    protected void archiveChildProcessInstance(final SFlowNodeInstance instance) throws SProcessInstanceNotFoundException, SArchivingException,
+    private void archiveChildProcessInstance(final SFlowNodeInstance instance) throws SProcessInstanceNotFoundException, SArchivingException,
             SBonitaReadException {
         final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
         new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
