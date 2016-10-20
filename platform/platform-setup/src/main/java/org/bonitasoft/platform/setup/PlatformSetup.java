@@ -13,6 +13,7 @@
  */
 package org.bonitasoft.platform.setup;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -200,7 +201,22 @@ public class PlatformSetup {
             if (Files.isDirectory(licensesFolder)) {
                 FileUtils.cleanDirectory(licensesFolder.toFile());
             }
-            configurationService.writeAllConfigurationToFolder(configurationFolder.toFile(), licensesFolder.toFile());
+            List<File> licenses = new ArrayList<>();
+            List<File> files = configurationService.writeAllConfigurationToFolder(configurationFolder.toFile(), licensesFolder.toFile());
+            LOGGER.info("Retrieved following files in " + configurationFolder);
+            for (File file : files) {
+                if (file.toPath().getParent().equals(licensesFolder)) {
+                    licenses.add(file);
+                } else {
+                    LOGGER.info(configurationFolder.relativize(file.toPath()).toString());
+                }
+            }
+            if (!licenses.isEmpty()) {
+                LOGGER.info("Retrieved following licenses in " + licensesFolder);
+                for (File license : licenses) {
+                    LOGGER.info(licensesFolder.relativize(license.toPath()).toString());
+                }
+            }
         } catch (IOException e) {
             throw new PlatformException(e);
         }
