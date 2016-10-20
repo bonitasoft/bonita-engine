@@ -212,7 +212,7 @@ public interface ConfigurationService {
      * @param licenseFolder
      * @throws PlatformException
      */
-    void writeAllConfigurationToFolder(File configurationFolder, File licenseFolder) throws PlatformException;
+    List<File> writeAllConfigurationToFolder(File configurationFolder, File licenseFolder) throws PlatformException;
 
     /**
      * read licensesFolder for license files
