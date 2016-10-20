@@ -212,11 +212,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public void writeAllConfigurationToFolder(File configurationFolder, File licenseFolder) throws PlatformException {
+    public List<File> writeAllConfigurationToFolder(File configurationFolder, File licenseFolder) throws PlatformException {
         FolderResolver folderResolver = new FolderResolver(configurationFolder.toPath(), licenseFolder.toPath());
-
+        List<File> writtenFiles = new ArrayList<>();
         for (FullBonitaConfiguration fullBonitaConfiguration : getAllConfiguration()) {
             File confFile = new File(folderResolver.getFolder(fullBonitaConfiguration), fullBonitaConfiguration.getResourceName());
+            writtenFiles.add(confFile);
             LOGGER.debug(String.format("writing file %s to folder %s", confFile.getName(), confFile.getParentFile().getAbsolutePath()));
             try {
                 IOUtils.write(fullBonitaConfiguration.getResourceContent(), new FileOutputStream(confFile));
@@ -224,6 +225,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 throw new PlatformException(e);
             }
         }
+        return writtenFiles;
     }
 
     protected List<FullBonitaConfiguration> getAllConfiguration() {
