@@ -8,16 +8,17 @@
         <version>7.4.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bonita-integration-wildfly9</artifactId>
+    <artifactId>bonita-integration-wildfly10</artifactId>
 
-    <name>Bonita - Integration Tests on Wildfly 9</name>
+    <name>Bonita - Integration Tests on WildFly 10</name>
 
     <properties>
-        <wildfly.name>wildfly-9.0.2.Final</wildfly.name>
+        <wildfly.name>wildfly-10.1.0.Final</wildfly.name>
         <wildfly.web.port>7080</wildfly.web.port>
+        <wildfly.web.port.https>7480</wildfly.web.port.https>
         <wildfly.management.web.port>9991</wildfly.management.web.port>
         <wildfly.ajp.port>8011</wildfly.ajp.port>
-        <wildfly.url>http://download.jboss.org/wildfly/9.0.2.Final/wildfly-9.0.2.Final.zip</wildfly.url>
+        <wildfly.url>http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip</wildfly.url>
         <wildfly.zip.folder>${user.home}</wildfly.zip.folder>
         <wildfly.home>${project.build.directory}/${wildfly.name}</wildfly.home>
 
@@ -216,7 +217,7 @@
                 <configuration>
                     <skip>${skipTests}</skip>
                     <container>
-                        <containerId>wildfly9x</containerId>
+                        <containerId>wildfly10x</containerId>
                         <type>installed</type>
                         <home>${wildfly.home}</home>
                         <systemProperties>
@@ -235,6 +236,7 @@
                             <jboss.server.log.threshold>WARN</jboss.server.log.threshold>
 
                             <jboss.http.port>${wildfly.web.port}</jboss.http.port>
+                            <jboss.https.port>${wildfly.web.port.https}</jboss.https.port>
                             <jboss.management.http.port>${wildfly.management.web.port}</jboss.management.http.port>
                             <jboss.ajp.port>${wildfly.ajp.port}</jboss.ajp.port>
                         </systemProperties>

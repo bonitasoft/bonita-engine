@@ -74,7 +74,7 @@ class BundleResolver {
             return new WildflyBundleConfigurator(rootPath);
         } else {
             LOGGER.info(
-                    "No Application Server detected. You may need to manually configure the access to the database. Supported App Servers are: Tomcat 7, Wildfly 9");
+                    "No Application Server detected. You may need to manually configure the access to the database. Supported App Servers are: Tomcat 7, Wildfly 10");
             return null;
         }
     }
