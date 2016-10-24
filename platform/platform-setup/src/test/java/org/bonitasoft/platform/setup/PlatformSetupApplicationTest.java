@@ -1,14 +1,13 @@
 package org.bonitasoft.platform.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.platform.setup.PlatformSetupApplication.ACTION_CONFIGURE;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
-import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
+import org.junit.contrib.java.lang.system.SystemOutRule;
 
 /**
  * @author Laurent Leseigneur
@@ -16,10 +15,9 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 public class PlatformSetupApplicationTest {
 
     @Rule
-    public ClearSystemProperties clearSystemProperties = new ClearSystemProperties(PlatformSetup.BONITA_SETUP_ACTION);
-
-    @Rule
     public SystemErrRule systemErrRule = new SystemErrRule().enableLog().muteForSuccessfulTests();
+    @Rule
+    public SystemOutRule systemOutRule = new SystemOutRule().enableLog().muteForSuccessfulTests();
 
     @Rule
     public ExpectedSystemExit systemExit = ExpectedSystemExit.none();
@@ -28,13 +26,6 @@ public class PlatformSetupApplicationTest {
     public void should_gracefully_fail_with_error_message_when_null_action() throws Exception {
         //then
         systemExit.expectSystemExitWithStatus(1);
-        systemExit.checkAssertionAfterwards(new Assertion() {
-
-            @Override
-            public void checkAssertion() throws Exception {
-                assertThat(systemErrRule.getLog().trim()).isEqualTo("ERROR: unknown argument value for 'action': null");
-            }
-        });
 
         //when
         PlatformSetupApplication.main(null);
@@ -42,32 +33,54 @@ public class PlatformSetupApplicationTest {
 
     @Test
     public void should_gracefully_fail_with_error_message_when_action_unknown() throws Exception {
-        //given
-        System.setProperty(PlatformSetup.BONITA_SETUP_ACTION, "wrong value");
+        systemExit.expectSystemExitWithStatus(1);
+        systemExit.checkAssertionAfterwards(new Assertion() {
 
+            @Override
+            public void checkAssertion() throws Exception {
+                assertThat(systemOutRule.getLog()).contains("no command named: wrong value");
+            }
+        });
+
+        PlatformSetupApplication.main(new String[] { "wrong value" });
+    }
+
+    @Test
+    public void main_should_accept_configure_action() throws Exception {
+        systemExit.expectSystemExitWithStatus(0);
+
+        PlatformSetupApplication.main(new String[] { "configure" });
+    }
+
+    @Test
+    public void should_show_error_if_no_command_specified() throws Exception {
         //then
         systemExit.expectSystemExitWithStatus(1);
         systemExit.checkAssertionAfterwards(new Assertion() {
 
             @Override
             public void checkAssertion() throws Exception {
-                assertThat(systemErrRule.getLog().trim()).isEqualTo("ERROR: unknown argument value for 'action': wrong value");
+                assertThat(systemOutRule.getLog()).contains("Need to specify a command, see usage above.");
+                assertThat(systemOutRule.getLog()).contains("usage: setup ( init | pull | push | configure ) [-D <property=value>]");
             }
         });
-
         //when
-        PlatformSetupApplication.main(null);
+        PlatformSetupApplication.main(new String[] {});
     }
 
     @Test
-    public void main_should_accept_configure_action() throws Exception {
-        // given:
-        System.setProperty(PlatformSetup.BONITA_SETUP_ACTION, ACTION_CONFIGURE);
+    public void should_show_help_of_a_command() throws Exception {
+        //then
+        systemExit.expectSystemExitWithStatus(0);
+        systemExit.checkAssertionAfterwards(new Assertion() {
 
-        // when:
-        PlatformSetupApplication.main(null);
-
-        // then:
-        // Should not finish with System.exit()
+            @Override
+            public void checkAssertion() throws Exception {
+                assertThat(systemOutRule.getLog()).contains("Run this init command once to create database structure");
+            }
+        });
+        //when
+        PlatformSetupApplication.main(new String[] { "help", "init" });
     }
+
 }

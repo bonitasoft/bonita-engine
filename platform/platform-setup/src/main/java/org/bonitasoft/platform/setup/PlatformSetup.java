@@ -60,8 +60,6 @@ public class PlatformSetup {
 
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
 
-    static final String BONITA_SETUP_ACTION = "org.bonitasoft.platform.setup.action";
-
     private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSetup.class);
 
     public static final String PLATFORM_CONF_FOLDER_NAME = "platform_conf";
@@ -184,7 +182,7 @@ public class PlatformSetup {
      *
      * @throws PlatformException
      */
-    void pull() throws PlatformException {
+    public void pull() throws PlatformException {
         initPlatformSetup();
         checkPlatformVersion();
         LOGGER.info("Pulling configuration into folder: " + currentConfigurationFolder);
