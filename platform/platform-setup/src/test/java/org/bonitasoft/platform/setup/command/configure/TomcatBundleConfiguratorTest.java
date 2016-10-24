@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2016 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,8 +10,8 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
-package org.bonitasoft.platform.setup;
+ **/
+package org.bonitasoft.platform.setup.command.configure;
 
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.exception.PlatformException;
+import org.bonitasoft.platform.setup.command.configure.TomcatBundleConfigurator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

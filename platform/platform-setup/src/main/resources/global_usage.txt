@@ -1,0 +1,25 @@
+All commands here will interact with the database configured in the file database.properties.
+
+By default the configured database is h2.
+To configure another database change values in the file database.properties or use system properties.
+
+You can specify system properties directly from the command line using -Dparam=value.
+For example use this to change the database name while executing the init command:
+
+  setup init -Ddb.database.name=myDatabase
+
+these properties can be used:
+ * db.vendor
+ * db.server.name
+ * db.server.port
+ * db.database.name
+ * db.user
+ * db.password
+ * bdm.db.vendor
+ * bdm.db.server.name
+ * bdm.db.server.port
+ * bdm.db.database.name
+ * bdm.db.user
+ * bdm.db.password
+
+For more documentation on the setup tool, refer to the documentation : http://documentation.bonitasoft.com/?page=BonitaBPM_platform_setup

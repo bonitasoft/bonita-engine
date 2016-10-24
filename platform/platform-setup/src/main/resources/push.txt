@@ -1,0 +1,6 @@
+Once current configuration has been pulled and locally modified, use push to update configuration in database.
+Those modifications will be applied only after Bonita BPM restart.
+
+* All configuration files under `platform_conf/current` will be written in database.
+* License files in the folder `platform_conf/licenses` will be written in database (Subscription editions only).
+* Any previous configuration in database will be overwritten.

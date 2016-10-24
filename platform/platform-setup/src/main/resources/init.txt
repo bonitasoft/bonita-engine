@@ -1,0 +1,5 @@
+If you use the bonita-start script of Bonita BPM bundles, you don't need to run this command.
+
+Run this init command once to create database structure before launching Bonita BPM.
+ * Database structure (tables) will be created on target database.
+ * All configuration files under `platform_conf/initial` and licenses under `platform_conf/licenses` will be written in database.
