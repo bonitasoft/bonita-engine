@@ -1,0 +1,33 @@
+If you use the bonita-start script of Bonita BPM bundles, you don't need to run this command.
+Use this command to configure the Application Server without the need for a manual configuration.
+
+It only works on bundles provided by Bonitasoft.
+
+The setup tool will verify if the parent folder is a bundle. If it is it will configure required files to use the datasource
+of the setup tool.
+For Tomcat:
+   sets db vendor + bdm db vendor in file setenv.sh / .bat
+   sets all database configuration in file conf/bitronix-resources.properties
+   sets all database configuration in file conf/Catalina/localhost/bonita.xml
+   copies the required drivers from setup/lib/ to lib/bonita/
+
+For Wildfly:
+   sets all database configuration in file standalone/configuration/standalone.xml
+   create module.xml file in modules/**/main/ folder, according to your database vendor
+   copies the required drivers from setup/lib/ to modules/**/main/
+
+ADVANCED USER WARNING:
+You do not need to configure Tomcat files directly anymore. This tool does it for you.
+If you decide to do it anyway, the tool will overwrite your custom values.
+If you need to finely tune the configuration, modify the following template files:
+
+For Tomcat:
+    setup/tomcat-templates/bitronix-resources.properties
+    setup/tomcat-templates/bonita.xml
+    setup/tomcat-templates/setenv.sh
+    setup/tomcat-templates/setenv.bat
+They are used as a basis for Tomcat configuration.
+
+For Wildfly:
+    setup/wildfly-templates/standalone.xml
+It is used as a basis for Wildfly configuration.

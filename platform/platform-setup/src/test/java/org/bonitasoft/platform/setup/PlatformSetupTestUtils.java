@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -100,12 +101,15 @@ public class PlatformSetupTestUtils {
     }
 
     public static Connection getJdbcConnection(File distFolder) throws Exception {
+        return getJdbcConnection(distFolder, null);
+    }
+
+    public static Connection getJdbcConnection(File distFolder, String dbUser) throws IOException, SQLException {
         Properties properties = getDatabaseProperties(distFolder);
         properties.put("h2.database.dir", distFolder.toPath().resolve(properties.getProperty("h2.database.dir")).toString());
         StrSubstitutor strSubstitutor = new StrSubstitutor(new HashMap(properties));
-        Connection conn = DriverManager.getConnection(strSubstitutor.replace(properties.getProperty("h2.url")),
-                properties.getProperty("db.user"), properties.getProperty("db.password"));
-        return conn;
+        return DriverManager.getConnection(strSubstitutor.replace(properties.getProperty("h2.url")),
+                dbUser != null ? dbUser : properties.getProperty("db.user"), properties.getProperty("db.password"));
     }
 
     private static Properties getDatabaseProperties(File distFolder) throws IOException {

@@ -1,0 +1,7 @@
+This step is mandatory before updating the configuration to ensure database consistency.
+For example, when a new tenant is created by Bonita BPM, related configuration files need to be extracted before any modification of the configuration.
+
+When executed:
+ * The configuration currently in database will be written in the folder `platform_conf/current`.
+ * License files in database will be written in the folder `platform_conf/licenses` (Subscription editions only).
+ * Any previous configuration and license files in `platform_conf/current` folder will be overwritten.

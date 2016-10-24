@@ -16,13 +16,19 @@ package org.bonitasoft.platform.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.h2.tools.Server;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,7 +74,23 @@ public class PlatformSetupDistributionIT {
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
         assertThat(resultSet.getInt("nb")).isEqualTo(38);
+    }
 
+    @Test
+    public void setupSh_should_work_with_init_on_h2_with_overridden_system_property() throws Exception {
+        //given
+        CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
+        oCmdLine.addArguments("init -Ddb.user=myUser");
+        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+        //when
+        int iExitValue = executor.execute(oCmdLine);
+        //then
+        assertThat(iExitValue).isEqualTo(0);
+        Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(distFolder, "myUser");
+        Statement statement = jdbcConnection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
+        resultSet.next();
+        assertThat(resultSet.getInt("nb")).isEqualTo(38);
     }
 
     @Test
@@ -83,4 +105,31 @@ public class PlatformSetupDistributionIT {
         assertThat(iExitValue).isEqualTo(1);
     }
 
+    @Test
+    public void setupSh_should_work_on_postgres_database() throws Exception {
+        //given
+        Server pgServer = Server.createPgServer("-baseDir", "./target");
+        CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
+        oCmdLine.addArguments("init");
+        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+        //when
+        Path databaseProperties = distFolder.toPath().resolve("database.properties");
+        Properties properties = new Properties();
+        properties.load(new ByteArrayInputStream(Files.readAllBytes(databaseProperties)));
+        properties.setProperty("db.vendor", "postgres");
+        properties.setProperty("db.server.name", "localhost");
+        properties.setProperty("db.server.port", String.valueOf(pgServer.getPort()));
+        properties.setProperty("db.database.name", "bonita");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        properties.store(out, "");
+        Files.write(databaseProperties, out.toByteArray());
+        try {
+            pgServer.start();
+            int iExitValue = executor.execute(oCmdLine);
+            //then
+            assertThat(iExitValue).isEqualTo(0);
+        } finally {
+            pgServer.shutdown();
+        }
+    }
 }
