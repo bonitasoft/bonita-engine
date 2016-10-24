@@ -46,7 +46,7 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * </li>
  * <li>EJB3
  * <p>
- * connect to the server using EJB3, must specify<br> For Wildfly 9 :
+ * connect to the server using EJB3, must specify<br> For Wildfly 10 :
  * <ul>
  * <li>java.naming.factory.url.pkgs, e.g. org.jboss.ejb.client.naming</li>
  * <li>org.bonitasoft.engine.ejb.naming.reference, e.g. ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI</li>
