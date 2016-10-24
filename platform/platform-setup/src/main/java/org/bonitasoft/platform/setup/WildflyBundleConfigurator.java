@@ -110,7 +110,6 @@ class WildflyBundleConfigurator extends BundleConfigurator {
 
         replacements.put("@@" + databasePrefix + "MODULE_NAME@@", wildflyModules.get(configuration.getDbVendor()).replaceAll("/", "."));
         replacements.put("@@" + databasePrefix + "XA_DRIVER_CLASSNAME@@", configuration.getXaDriverClassName());
-        replacements.put("@@" + databasePrefix + "NON_XA_DRIVER_CLASSNAME@@", configuration.getNonXaDriverClassName());
 
         // We can have only once a driver declaration for each DB Vendor:
         if (!standardConfiguration.getDbVendor().equals(bdmConfiguration.getDbVendor())) {

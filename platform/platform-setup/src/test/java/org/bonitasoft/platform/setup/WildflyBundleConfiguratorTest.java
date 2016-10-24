@@ -109,8 +109,7 @@ public class WildflyBundleConfiguratorTest {
 
         // Bonita internal Drivers part:
         checkFileContains(configFile, "<driver name=\"postgres\" module=\"org.postgresql\">",
-                "<xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>",
-                "<datasource-class>org.postgresql.Driver</datasource-class>");
+                "<xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>");
 
         checkFileContains(configFile,
                 "<driver>oracle</driver>", "<user-name>bizUser</user-name>", "<password>bizPwd</password>",
@@ -123,8 +122,7 @@ public class WildflyBundleConfiguratorTest {
 
         // BDM Drivers part:
         checkFileContains(configFile, "<driver name=\"oracle\" module=\"com.oracle\">",
-                "<xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>",
-                "<datasource-class>oracle.jdbc.OracleDriver</datasource-class>");
+                "<xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>");
         checkFileDoesNotContain(configFile, "BDM_DRIVER_TEMPLATE"); // both dbVendors are different, so we should have replace both declarations
 
         assertThat(numberOfBackups("standalone.xml")).isEqualTo(1);

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:3.0">
+<server xmlns="urn:jboss:domain:4.2">
 
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
@@ -23,7 +23,7 @@
         <extension module="org.jboss.as.transactions"/>
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
-        <extension module="org.wildfly.extension.batch"/>
+        <extension module="org.wildfly.extension.batch.jberet"/>
         <extension module="org.wildfly.extension.bean-validation"/>
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.request-controller"/>
@@ -32,19 +32,16 @@
     </extensions>
 
     <system-properties>
-        <property name="org.apache.catalina.connector.URI_ENCODING" value="UTF-8"/>
-        <property name="org.apache.catalina.connector.USE_BODY_ENCODING_FOR_QUERY_STRING" value="false"/>
         <property name="sysprop.bonita.db.vendor" value="h2"/>
         <property name="sysprop.bonita.bdm.db.vendor" value="h2"/>
-        <property name="bonita.h2.port" value="1234"/>
-        <property name="sysprop.bonita.businessdata.datasource.jndi" value="java:jboss/datasources/BusinessDataDS"/>
-        <property name="sysprop.bonita.businessdata.notmanageddatasource.jndi" value="java:jboss/datasources/NotManagedBizDataDS"/>
-        <property name="sysprop.bonita.database.journal.datasource.name" value="java:jboss/datasources/bonitaDS"/>
-        <property name="sysprop.bonita.database.sequence.manager.datasource.name" value="java:jboss/datasources/bonitaSequenceManagerDS"/>
-        <property name="sysprop.bonita.hibernate.transaction.jta_platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
-        <property name="sysprop.bonita.hibernate.transaction.manager_lookup_class" value="org.bonitasoft.JBoss7TransactionManagerLookup"/>
-        <property name="sysprop.bonita.transaction.manager" value="java:jboss/TransactionManager"/>
-        <property name="sysprop.bonita.userTransaction" value="java:jboss/UserTransaction"/>
+        <property name="sysprop.bonita.businessdata.datasource.jndi" value="java:jboss/datasources/BusinessDataDS" />
+        <property name="sysprop.bonita.businessdata.notmanageddatasource.jndi" value="java:jboss/datasources/NotManagedBizDataDS" />
+        <property name="sysprop.bonita.database.journal.datasource.name" value="java:jboss/datasources/bonitaDS" />
+        <property name="sysprop.bonita.database.sequence.manager.datasource.name" value="java:jboss/datasources/bonitaSequenceManagerDS" />
+        <property name="sysprop.bonita.hibernate.transaction.jta_platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+        <property name="sysprop.bonita.hibernate.transaction.manager_lookup_class" value="org.bonitasoft.JBoss7TransactionManagerLookup" />
+        <property name="sysprop.bonita.transaction.manager" value="java:jboss/TransactionManager" />
+        <property name="sysprop.bonita.userTransaction" value="java:jboss/UserTransaction" />
     </system-properties>
 
 
@@ -60,6 +57,11 @@
                 </authorization>
             </security-realm>
             <security-realm name="ApplicationRealm">
+                <server-identities>
+                    <ssl>
+                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
+                    </ssl>
+                </server-identities>
                 <authentication>
                     <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
                     <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
@@ -117,30 +119,17 @@
             <logger category="com.arjuna">
                 <level name="WARN"/>
             </logger>
-            <logger category="org.apache.tomcat.util.modeler">
-                <level name="WARN"/>
-            </logger>
             <logger category="org.jboss.as.config">
                 <level name="DEBUG"/>
             </logger>
             <logger category="sun.rmi">
                 <level name="WARN"/>
             </logger>
-            <logger category="jacorb">
-                <level name="WARN"/>
-            </logger>
-            <logger category="jacorb.config">
-                <level name="ERROR"/>
-            </logger>
             <!-- By default for development it's a good idea to set the default level
                 for all Bonita component to INFO. In production WARN is a good choice. -->
             <logger category="org.bonitasoft">
                 <level name="WARN" />
             </logger>
-            <logger category="com.bonitasoft">
-                <level name="WARN" />
-            </logger>
-
             <logger category="org.bonitasoft.engine.EngineInitializer">
                 <level name="INFO" />
             </logger>
@@ -161,10 +150,6 @@
             <!-- <logger category="org.bonitasoft.engine.expression">
                 <level name="FINE" />
             </logger>
-            <logger category="com.bonitasoft.engine.expression">
-                <level name="FINE" />
-            </logger>
-
             <logger category="org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy">
                 <level name="FINE" />
             </logger> -->
@@ -172,11 +157,7 @@
             <!-- If you want to have more log on input/output of API calls, you can activate and modify the following line -->
             <!-- <logger category="org.bonitasoft.engine.api">
                 <level name="FINE" />
-            </logger>
-            <logger category="com.bonitasoft.engine.api">
-                <level name="FINE" />
-            </logger>
-            -->
+            </logger> -->
 
             <!-- If you want to have more log on Asynchronous executions (Work/Job),
                 you can activate and modify the following lines -->
@@ -211,7 +192,6 @@
             <logger category="org.springframework">
                 <level name="WARN" />
             </logger>
-
             <logger category="org.hibernate">
                 <level name="WARN" />
             </logger>
@@ -236,17 +216,19 @@
                 <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
             </formatter>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:batch:1.0">
-            <job-repository>
+        <subsystem xmlns="urn:jboss:domain:batch-jberet:1.0">
+            <default-job-repository name="in-memory"/>
+            <default-thread-pool name="batch"/>
+            <job-repository name="in-memory">
                 <in-memory/>
             </job-repository>
-            <thread-pool>
+            <thread-pool name="batch">
                 <max-threads count="10"/>
                 <keepalive-time time="30" unit="seconds"/>
             </thread-pool>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:datasources:3.0">
+        <subsystem xmlns="urn:jboss:domain:datasources:4.0">
             <datasources>
                 <!--
                 #######################################################################################################
@@ -258,14 +240,12 @@
                     <!-- H2 -->
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
-                        <datasource-class>org.h2.Driver</datasource-class>
                     </driver>
 
                     <!-- PostgreSQL example -->
                     <!--
                     <driver name="postgres" module="org.postgresql">
                         <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
-                        <datasource-class>org.postgresql.Driver</datasource-class>
                     </driver>
                     -->
 
@@ -273,7 +253,6 @@
                     <!--
                     <driver name="oracle" module="com.oracle">
                         <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
-                        <datasource-class>oracle.jdbc.OracleDriver</datasource-class>
                     </driver>
                     -->
 
@@ -281,7 +260,6 @@
                     <!--
                     <driver name="mysql" module="com.mysql">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-                        <datasource-class>com.mysql.jdbc.Driver</datasource-class>
                     </driver>
                     -->
 
@@ -289,7 +267,6 @@
                     <!--
                     <driver name="sqlserver" module="com.sqlserver">
                         <xa-datasource-class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</xa-datasource-class>
-                        <datasource-class>com.microsoft.sqlserver.jdbc.SQLServerDriver</datasource-class>
                     </driver>
                     -->
 
@@ -341,11 +318,11 @@
                     </validation>
                     <timeout>
                         <idle-timeout-minutes>0</idle-timeout-minutes>
-                    </timeout>
-                    <statement>
+                     </timeout>
+                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
-                    </statement>
-                </datasource>
+                     </statement>
+                 </datasource>
 
                 <!-- PostgreSQL Example -->
                 <!-- <xa-datasource jndi-name="java:jboss/datasources/bonitaDS" pool-name="bonitaDS" enabled="true" use-ccm="false" use-java-context="false">
@@ -530,12 +507,11 @@
                 <xa-datasource jndi-name="java:jboss/datasources/BusinessDataDS"
                                pool-name="BusinessDataDS" enabled="true" use-ccm="false"
                                use-java-context="false">
-                    <driver>h2</driver>
+                  <driver>h2</driver>
                     <xa-datasource-property name="URL">jdbc:h2:../database/business_data.db;MVCC=TRUE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
                     <xa-pool>
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>50</max-pool-size>
-                        <prefill>true</prefill>
                     </xa-pool>
                     <security>
                         <user-name>sa</user-name>
@@ -548,7 +524,7 @@
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
-                </xa-datasource>
+                 </xa-datasource>
 
                 <datasource jta="false"
                             jndi-name="java:jboss/datasources/NotManagedBizDataDS"
@@ -570,7 +546,7 @@
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
-                </datasource>
+                 </datasource>
 
                 <!-- PostgreSQL Example -->
                 <!-- <xa-datasource jndi-name="java:jboss/datasources/BusinessDataDS" pool-name="BusinessDataDS" enabled="true" use-ccm="false" use-java-context="false">
@@ -744,14 +720,12 @@
                         </statement>
                     </datasource>
                 -->
-
             </datasources>
-
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" auto-deploy-zipped="true" auto-deploy-exploded="false" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:3.0">
+        <subsystem xmlns="urn:jboss:domain:ee:4.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
@@ -761,23 +735,25 @@
                     <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
                 </managed-thread-factories>
                 <managed-executor-services>
-                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" core-threads="5" max-threads="25" keepalive-time="5000"/>
+                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
                 </managed-executor-services>
                 <managed-scheduled-executor-services>
-                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" core-threads="2" keepalive-time="3000"/>
+                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
                 </managed-scheduled-executor-services>
             </concurrent>
-            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/bonitaDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ejb3:3.0">
+        <subsystem xmlns="urn:jboss:domain:ejb3:4.0">
             <session-bean>
+                <stateless>
+                    <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
+                </stateless>
                 <stateful default-access-timeout="5000" cache-ref="simple" passivation-disabled-cache-ref="simple"/>
                 <singleton default-access-timeout="5000"/>
             </session-bean>
             <pools>
                 <bean-instance-pools>
-                    <strict-max-pool name="slsb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
-                    <strict-max-pool name="mdb-strict-max-pool" max-pool-size="20" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="slsb-strict-max-pool" derive-size="from-worker-pools" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
+                    <strict-max-pool name="mdb-strict-max-pool" derive-size="from-cpu-count" instance-acquisition-timeout="5" instance-acquisition-timeout-unit="MINUTES"/>
                 </bean-instance-pools>
             </pools>
             <caches>
@@ -808,7 +784,7 @@
             <worker name="default"/>
             <buffer-pool name="default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:3.0">
+        <subsystem xmlns="urn:jboss:domain:infinispan:4.0">
             <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
                 <local-cache name="default">
                     <transaction mode="BATCH"/>
@@ -825,8 +801,11 @@
                     <transaction mode="BATCH"/>
                     <file-store passivation="false" purge="false"/>
                 </local-cache>
+                <local-cache name="concurrent">
+                    <file-store passivation="true" purge="false"/>
+                </local-cache>
             </cache-container>
-            <cache-container name="ejb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan" aliases="sfsb">
+            <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                 <local-cache name="passivation">
                     <locking isolation="REPEATABLE_READ"/>
                     <transaction mode="BATCH"/>
@@ -839,12 +818,12 @@
                 </local-cache>
             </cache-container>
             <cache-container name="hibernate" default-cache="local-query" module="org.hibernate.infinispan">
-                <local-cache name="local-query">
+                <local-cache name="entity">
+                    <transaction mode="NON_XA"/>
                     <eviction strategy="LRU" max-entries="10000"/>
                     <expiration max-idle="100000"/>
                 </local-cache>
-                <local-cache name="entity">
-                    <transaction mode="NON_XA"/>
+                <local-cache name="local-query">
                     <eviction strategy="LRU" max-entries="10000"/>
                     <expiration max-idle="100000"/>
                 </local-cache>
@@ -852,7 +831,7 @@
             </cache-container>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:jca:3.0">
+        <subsystem xmlns="urn:jboss:domain:jca:4.0">
             <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
             <bean-validation enabled="true"/>
             <default-workmanager>
@@ -891,10 +870,10 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
         <subsystem xmlns="urn:jboss:domain:remoting:3.0">
-            <endpoint worker="default"/>
+            <endpoint/>
             <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:resource-adapters:3.0"/>
+        <subsystem xmlns="urn:jboss:domain:resource-adapters:4.0"/>
         <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
         <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
         <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
@@ -926,37 +905,41 @@
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
                 </security-domain>
+                <security-domain name="jaspitest" cache-type="default">
+                    <authentication-jaspi>
+                        <login-module-stack name="dummy">
+                            <login-module code="Dummy" flag="optional"/>
+                        </login-module-stack>
+                        <auth-module code="Dummy"/>
+                    </authentication-jaspi>
+                </security-domain>
             </security-domains>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:3.0">
-            <core-environment>
+            <core-environment node-identifier="bonita">
                 <process-id>
                     <uuid/>
                 </process-id>
             </core-environment>
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:2.0">
+        <subsystem xmlns="urn:jboss:domain:undertow:3.1">
             <buffer-cache name="default"/>
             <server name="default-server">
-                <http-listener name="default" socket-binding="http" redirect-socket="https" max-post-size="104857600"/>
+                <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true" max-post-size="104857600"/>
+                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
-                    <filter-ref name="server-header"/>
-                    <filter-ref name="x-powered-by-header"/>
                 </host>
             </server>
             <servlet-container name="default">
                 <jsp-config/>
                 <websockets/>
+                <session-cookie name="SESSIONID" />
             </servlet-container>
             <handlers>
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
             </handlers>
-            <filters>
-                <response-header name="server-header" header-name="Server" header-value="WildFly/9"/>
-                <response-header name="x-powered-by-header" header-name="X-Powered-By" header-value="Undertow/1"/>
-            </filters>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:webservices:2.0">
             <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
@@ -968,7 +951,7 @@
             </endpoint-config>
             <client-config name="Standard-Client-Config"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:weld:2.0"/>
+        <subsystem xmlns="urn:jboss:domain:weld:3.0"/>
     </profile>
 
     <interfaces>
@@ -977,9 +960,6 @@
         </interface>
         <interface name="public">
             <inet-address value="${jboss.bind.address:127.0.0.1}"/>
-        </interface>
-        <interface name="unsecure">
-            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
 
@@ -995,5 +975,4 @@
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
-
 </server>
