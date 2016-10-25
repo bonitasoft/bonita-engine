@@ -44,10 +44,10 @@ class TomcatBundleConfigurator extends BundleConfigurator {
 
         final String dbVendor = standardConfiguration.getDbVendor();
         final String bdmDbVendor = bdmConfiguration.getDbVendor();
-        final Path setEnvUnixFile = getPath("bin/setenv.sh", true);
-        final Path setEnvWindowsFile = getPath("bin/setenv.bat", true);
-        final Path bonitaXmlFile = getPath("conf/Catalina/localhost/bonita.xml", true);
-        final Path bitronixFile = getPath("conf/bitronix-resources.properties", true);
+        final Path setEnvUnixFile = getPathUnderAppServer("bin/setenv.sh", true);
+        final Path setEnvWindowsFile = getPathUnderAppServer("bin/setenv.bat", true);
+        final Path bonitaXmlFile = getPathUnderAppServer("conf/Catalina/localhost/bonita.xml", true);
+        final Path bitronixFile = getPathUnderAppServer("conf/bitronix-resources.properties", true);
         final File bonitaDbDriverFile = getDriverFile(dbVendor);
         final File bdmDriverFile = getDriverFile(bdmDbVendor);
 
@@ -87,10 +87,10 @@ class TomcatBundleConfigurator extends BundleConfigurator {
 
             //4. copy the JDBC drivers:
             final Path srcDriverFile = bonitaDbDriverFile.toPath();
-            final Path targetBonitaDbDriverFile = getPath("lib/bonita").resolve(srcDriverFile.getFileName());
+            final Path targetBonitaDbDriverFile = getPathUnderAppServer("lib/bonita", true).resolve(srcDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcDriverFile, targetBonitaDbDriverFile, dbVendor);
             final Path srcBdmDriverFile = bdmDriverFile.toPath();
-            final Path targetBdmDriverFile = getPath("lib/bonita").resolve(srcBdmDriverFile.getFileName());
+            final Path targetBdmDriverFile = getPathUnderAppServer("lib/bonita", true).resolve(srcBdmDriverFile.getFileName());
             copyDatabaseDriversIfNecessary(srcBdmDriverFile, targetBdmDriverFile, bdmDbVendor);
             LOGGER.info("Tomcat auto-configuration complete.");
         } catch (PlatformException e) {
@@ -147,4 +147,5 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         restoreOriginalFile(setEnvUnixFile);
         restoreOriginalFile(setEnvWindowsFile);
     }
+
 }

@@ -57,29 +57,29 @@ cp -rf src/test/resources/tomcat_conf/* ${E2E_DIR}/..
 ${E2E_DIR}/setup.sh configure
 testReturnCode $? "setup.sh configure"
 
-cat target/conf/bitronix-resources.properties | grep "^resource.ds1.className=org.postgresql.xa.PGXADataSource" > /dev/null
+cat target/server/conf/bitronix-resources.properties | grep "^resource.ds1.className=org.postgresql.xa.PGXADataSource" > /dev/null
 testReturnCode $? "Configuring bitronix-resources file with Postgres"
 
-cat target/conf/Catalina/localhost/bonita.xml | grep "driverClassName=\"org.postgresql.Driver\"" > /dev/null
+cat target/server/conf/Catalina/localhost/bonita.xml | grep "driverClassName=\"org.postgresql.Driver\"" > /dev/null
 testReturnCode $? "Configuring bonita.xml file with Postgres"
 
-cat target/bin/setenv.sh | grep "\-Dsysprop.bonita.db.vendor=postgres" > /dev/null
+cat target/server/bin/setenv.sh | grep "\-Dsysprop.bonita.db.vendor=postgres" > /dev/null
 testReturnCode $? "Configuring setenv.sh file with Postgres"
 
 echo "========================================"
 echo "should configure wildfly environment"
 echo "========================================"
 # clean-up tomcat file and replace by wildfly:
-rm -rf ${E2E_DIR}/../bin ${E2E_DIR}/../conf ${E2E_DIR}/../lib ${E2E_DIR}/../setup
+rm -rf ${E2E_DIR}/../server ${E2E_DIR}/../setup
 cp -rf src/test/resources/wildfly_conf/* ${E2E_DIR}/..
 
 ${E2E_DIR}/setup.sh configure
 testReturnCode $? "setup.sh configure"
 
-cat target/standalone/configuration/standalone.xml | grep "<connection-url>jdbc:postgresql://localhost:5432/bonita</connection-url>" > /dev/null
+cat target/server/standalone/configuration/standalone.xml | grep "<connection-url>jdbc:postgresql://localhost:5432/bonita</connection-url>" > /dev/null
 testReturnCode $? "Configuring standalone.xml file with Postgres for non-XA datasource"
 
-cat target/standalone/configuration/standalone.xml | grep "<xa-datasource-property name=\"DatabaseName\">bonita</xa-datasource-property>" > /dev/null
+cat target/server/standalone/configuration/standalone.xml | grep "<xa-datasource-property name=\"DatabaseName\">bonita</xa-datasource-property>" > /dev/null
 testReturnCode $? "Configuring standalone.xml file with Postgres for XA datasource"
 
 echo "========================================"

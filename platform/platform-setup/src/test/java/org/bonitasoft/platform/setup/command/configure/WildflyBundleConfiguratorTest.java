@@ -58,7 +58,8 @@ public class WildflyBundleConfiguratorTest {
 
     private WildflyBundleConfigurator spy;
 
-    private Path newFolderPath;
+    private Path bundleFolder;
+    private Path wildflyFolder;
 
     public WildflyBundleConfiguratorTest() throws PlatformException {
     }
@@ -66,22 +67,23 @@ public class WildflyBundleConfiguratorTest {
     @Before
     public void setupTempConfFolder() throws Exception {
         final File temporaryFolderRoot = temporaryFolder.newFolder();
-        newFolderPath = temporaryFolderRoot.toPath().toRealPath();
+        bundleFolder = temporaryFolderRoot.toPath().toRealPath();
+        wildflyFolder = bundleFolder.resolve("server");
         FileUtils.copyDirectory(Paths.get("src/test/resources/wildfly_conf").toFile(), temporaryFolderRoot);
-        System.setProperty(BONITA_SETUP_FOLDER, newFolderPath.resolve("setup").toString());
-        configurator = new WildflyBundleConfigurator(newFolderPath);
+        System.setProperty(BONITA_SETUP_FOLDER, bundleFolder.resolve("setup").toString());
+        configurator = new WildflyBundleConfigurator(bundleFolder);
         spy = spy(configurator);
     }
 
     private int numberOfBackups(String file) {
-        final String[] backupFiles = newFolderPath.resolve("setup").resolve("wildfly-backups").toFile().list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
+        final String[] backupFiles = bundleFolder.resolve("setup").resolve("wildfly-backups").toFile().list(new RegexFileFilter(file + "\\.[0-9-_hms]*"));
         return backupFiles == null ? 0 : backupFiles.length;
     }
 
     @Test
     public void configureApplicationServer_should_fail_if_no_driver_folder() throws Exception {
         // given:
-        final Path driverFolder = newFolderPath.resolve("setup").resolve("lib");
+        final Path driverFolder = bundleFolder.resolve("setup").resolve("lib");
         FileUtils.deleteDirectory(driverFolder.toFile());
 
         // then:
@@ -98,7 +100,7 @@ public class WildflyBundleConfiguratorTest {
         configurator.configureApplicationServer();
 
         // then:
-        final Path configFile = newFolderPath.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
         checkFileContains(configFile,
                 "<driver>postgres</driver>", "<user-name>bonita</user-name>", "<password>bpm</password>",
                 "<xa-datasource-property name=\"ServerName\">localhost</xa-datasource-property>",
@@ -132,8 +134,8 @@ public class WildflyBundleConfiguratorTest {
     @Test
     public void configureWildfly_should_copy_module_file_in_right_folder() throws Exception {
         // given:
-        final Path postgresModule = newFolderPath.resolve("modules").resolve("org").resolve("postgresql").resolve("main").resolve("module.xml");
-        final Path oracleModule = newFolderPath.resolve("modules").resolve("com").resolve("oracle").resolve("main").resolve("module.xml");
+        final Path postgresModule = wildflyFolder.resolve("modules").resolve("org").resolve("postgresql").resolve("main").resolve("module.xml");
+        final Path oracleModule = wildflyFolder.resolve("modules").resolve("com").resolve("oracle").resolve("main").resolve("module.xml");
 
         // when:
         configurator.configureApplicationServer();
@@ -155,7 +157,7 @@ public class WildflyBundleConfiguratorTest {
         System.setProperty("bdm.db.database.name", "business_data.db");
         System.setProperty("bdm.db.user", "sa");
         System.setProperty("bdm.db.password", "");
-        final Path moduleFolder = newFolderPath.resolve("modules").resolve("com").resolve("h2database").resolve("h2").resolve("main");
+        final Path moduleFolder = wildflyFolder.resolve("modules").resolve("com").resolve("h2database").resolve("h2").resolve("main");
         final Path h2Module = moduleFolder.resolve("module.xml");
         final Path h2JarFile = moduleFolder.resolve("drivers-h2-2.12.117.jar");
 
@@ -183,7 +185,7 @@ public class WildflyBundleConfiguratorTest {
 
     @Test
     public void should_fail_if_wildfly_mandatory_file_not_present() throws Exception {
-        final Path confFile = newFolderPath.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        final Path confFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
         FileUtils.deleteQuietly(confFile.toFile());
 
         // then:
@@ -238,7 +240,7 @@ public class WildflyBundleConfiguratorTest {
         Thread.sleep(1020);
 
         // when:
-        new WildflyBundleConfigurator(newFolderPath).configureApplicationServer();
+        new WildflyBundleConfigurator(bundleFolder).configureApplicationServer();
 
         // then:
         assertThat(numberOfBackups("standalone.xml")).isEqualTo(2);

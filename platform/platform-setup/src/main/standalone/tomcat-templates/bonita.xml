@@ -8,8 +8,7 @@
     <!-- #################################################################################################################### -->
     <!-- ##############   BETWEEN THESE 2 SECTIONS IS A TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL.          ################ -->
     <!-- #######   BELOW VALUES SURROUNDED BY '@@' MUST NOT BE TOUCHED, AS THEY ARE USED INTERNALLY BY SETUP TOOL.   ######## -->
-    <!-- ##############      DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOU ARE DOING.              ################# -->
-    <!-- ##############          REFER TO FILE SETUP/DATABASE.PROPERTIES FOR MORE INFORMATION.              ################# -->
+    <!-- #########      FOR OTHER VALUES, DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOU ARE DOING.      ############ -->
     <!-- ##############          YOU CAN ADD CUSTOM CONFIGURATION ABOVE AND BELOW THIS TEMPLATE.            ################# -->
     <!-- #################################################################################################################### -->
 

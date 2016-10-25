@@ -15,6 +15,7 @@
 package org.bonitasoft.platform.setup.command.configure;
 
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
+import static org.bonitasoft.platform.setup.command.configure.BundleConfigurator.APPSERVER_FOLDERNAME;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,11 +62,11 @@ class BundleResolver {
     }
 
     private boolean isTomcatEnvironment() throws PlatformException {
-        return fileExists(getPath("bin/catalina.sh")) || fileExists(getPath("bin/catalina.bat"));
+        return fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.sh")) || fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/catalina.bat"));
     }
 
     private boolean isWildflyEnvironment() throws PlatformException {
-        return fileExists(getPath("bin/standalone.conf")) || fileExists(getPath("bin/standalone.conf.bat"));
+        return fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/standalone.conf")) || fileExists(getPath(APPSERVER_FOLDERNAME + "/bin/standalone.conf.bat"));
     }
 
     BundleConfigurator getConfigurator() throws PlatformException {
