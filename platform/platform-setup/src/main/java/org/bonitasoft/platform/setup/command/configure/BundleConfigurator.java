@@ -54,6 +54,7 @@ abstract class BundleConfigurator {
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
     static final String POSTGRES = "postgres";
+    public static final String APPSERVER_FOLDERNAME = "server";
 
     private Path rootPath;
 
@@ -279,5 +280,13 @@ abstract class BundleConfigurator {
 
     String escapeXmlCharacters(String url) throws PlatformException {
         return StringEscapeUtils.escapeXml11(url);
+    }
+
+    protected Path getOptionalPathUnderAppServer(String path) throws PlatformException {
+        return getPath(APPSERVER_FOLDERNAME + "/" + path, false);
+    }
+
+    protected Path getPathUnderAppServer(String path, boolean failIfNotExist) throws PlatformException {
+        return getPath(APPSERVER_FOLDERNAME + "/" + path, failIfNotExist);
     }
 }
