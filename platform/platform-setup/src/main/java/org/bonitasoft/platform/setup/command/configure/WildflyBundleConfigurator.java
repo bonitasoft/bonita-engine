@@ -56,7 +56,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
 
         final String dbVendor = standardConfiguration.getDbVendor();
         final String bdmDbVendor = bdmConfiguration.getDbVendor();
-        final Path standaloneXmlFile = getPath("standalone/configuration/standalone.xml", true);
+        final Path standaloneXmlFile = getPathUnderAppServer("standalone/configuration/standalone.xml", true);
         final File bonitaDbDriverFile = getDriverFile(dbVendor);
         final File bdmDriverFile = getDriverFile(bdmDbVendor);
 
@@ -74,7 +74,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
             //2. copy the JDBC drivers:
             if (!dbVendor.equals(H2)) {
                 final Path srcDriverFile = bonitaDbDriverFile.toPath();
-                final Path moduleFolder = getPath("modules").resolve(wildflyModules.get(dbVendor)).resolve("main");
+                final Path moduleFolder = getOptionalPathUnderAppServer("modules").resolve(wildflyModules.get(dbVendor)).resolve("main");
                 final Path targetBonitaDbDriverFile = moduleFolder.resolve(srcDriverFile.getFileName());
                 final boolean driversCopied = copyDatabaseDriversIfNecessary(srcDriverFile, targetBonitaDbDriverFile, dbVendor);
                 //3. copy the module files:
@@ -83,7 +83,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
 
             if (!bdmDbVendor.equals(H2)) {
                 final Path srcBdmDriverFile = bdmDriverFile.toPath();
-                final Path bdmModuleFolder = getPath("modules").resolve(wildflyModules.get(bdmDbVendor)).resolve("main");
+                final Path bdmModuleFolder = getOptionalPathUnderAppServer("modules").resolve(wildflyModules.get(bdmDbVendor)).resolve("main");
                 final Path targetBdmDriverFile = bdmModuleFolder.resolve(srcBdmDriverFile.getFileName());
                 final boolean bdmDriversCopied = copyDatabaseDriversIfNecessary(srcBdmDriverFile, targetBdmDriverFile, bdmDbVendor);
                 //3. copy the module files:
