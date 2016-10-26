@@ -26,7 +26,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
-import org.bonitasoft.engine.jobs.BPMEventHandlingJob;
 import org.bonitasoft.engine.jobs.CleanInvalidSessionsJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -51,8 +50,6 @@ public final class ActivateTenant implements TransactionContent {
 
     public static final String CLEAN_INVALID_SESSIONS = "CleanInvalidSessions";
 
-    public static final String BPM_EVENT_HANDLING = "BPMEventHandling";
-
     private final long tenantId;
 
     private final PlatformService platformService;
@@ -70,9 +67,9 @@ public final class ActivateTenant implements TransactionContent {
     private final NodeConfiguration nodeConfiguration;
 
     public ActivateTenant(final long tenantId, final PlatformService platformService, final SchedulerService schedulerService,
-            final TechnicalLoggerService logger, final WorkService workService, final ConnectorExecutor connectorExecutor,
-            final NodeConfiguration plaformConfiguration,
-            final TenantConfiguration tenantConfiguration) {
+                          final TechnicalLoggerService logger, final WorkService workService, final ConnectorExecutor connectorExecutor,
+                          final NodeConfiguration plaformConfiguration,
+                          final TenantConfiguration tenantConfiguration) {
         this.tenantId = tenantId;
         this.platformService = platformService;
         this.schedulerService = schedulerService;
@@ -90,7 +87,6 @@ public final class ActivateTenant implements TransactionContent {
         if (tenantWasActivated) {
             workService.start();
             connectorExecutor.start();
-            startEventHandling();
             startCleanInvalidSessionsJob();
             final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
             for (final JobRegister jobRegister : jobsToRegister) {
@@ -109,7 +105,7 @@ public final class ActivateTenant implements TransactionContent {
                 }
                 final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                         .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
-                final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+                final ArrayList<SJobParameter> jobParameters = new ArrayList<>();
                 for (final Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
                     jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
                 }
@@ -127,29 +123,6 @@ public final class ActivateTenant implements TransactionContent {
         }
     }
 
-    private void startEventHandling() throws SSchedulerException {
-        final String jobClassName = BPMEventHandlingJob.class.getName();
-        if (schedulerService.isStarted()) {
-            if (nodeConfiguration.shouldStartEventHandlingJob()) {
-                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                        .createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
-                        .done();
-                final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                final String cron = tenantConfiguration.getEventHandlingJobCron(); //
-                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
-                        MisfireRestartPolicy.NONE);
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting event handling job with frequency : " + cron);
-                }
-                schedulerService.schedule(jobDescriptor, jobParameters, trigger);
-            }
-        } else {
-            if (logger.isLoggable(ActivateTenant.class, TechnicalLogSeverity.WARNING)) {
-                logger.log(ActivateTenant.class, TechnicalLogSeverity.WARNING, "The scheduler is not started: impossible to schedule job " + jobClassName);
-            }
-        }
-    }
-
     private void startCleanInvalidSessionsJob() throws SSchedulerException {
         final String jobClassName = CleanInvalidSessionsJob.class.getName();
         if (schedulerService.isStarted()) {
@@ -158,7 +131,7 @@ public final class ActivateTenant implements TransactionContent {
                 final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                         .createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
                         .done();
-                final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+                final ArrayList<SJobParameter> jobParameters = new ArrayList<>();
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
                         MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {

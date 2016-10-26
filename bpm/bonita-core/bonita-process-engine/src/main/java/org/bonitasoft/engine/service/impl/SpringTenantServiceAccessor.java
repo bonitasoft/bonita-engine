@@ -65,6 +65,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.parameter.ParameterService;
@@ -215,6 +216,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BusinessArchiveService businessArchiveService;
     private ProcessResourcesService processResourcesService;
     private TenantResourcesService tenantResourceService;
+    private MessagesHandlingService messagesHandlingService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = BeanAccessorFactory.getTenantBeanAccessor(tenantId);
@@ -822,5 +824,12 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             tenantResourceService = beanAccessor.getService(TenantResourcesService.class);
         }
         return tenantResourceService;
+    }
+
+    public MessagesHandlingService getMessagesHandlingService() {
+        if (messagesHandlingService == null) {
+            messagesHandlingService = beanAccessor.getService(MessagesHandlingService.class);
+        }
+        return messagesHandlingService;
     }
 }

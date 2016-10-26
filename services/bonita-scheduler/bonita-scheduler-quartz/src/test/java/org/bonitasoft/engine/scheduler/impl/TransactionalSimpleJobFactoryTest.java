@@ -100,7 +100,7 @@ public class TransactionalSimpleJobFactoryTest {
     @Test
     public void newJob_should_return_quatzJob_with_null_job_if_getJogDescriptor_throws_Exception_and_it_is_a_bonita_job() throws Exception {
         //given
-        final String jobName = "BPMEventHandling";
+        final String jobName = "CleanInvalidSessions";
         given(jobDataMap.get("jobName")).willReturn(jobName);
         given(schedulerService.getPersistedJob(new JobIdentifier(2, 1, jobName))).willThrow(new SSchedulerException(""));
 

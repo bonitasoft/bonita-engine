@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -26,7 +28,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  *
  * @author Emmanuel Duchastenier
  */
-public class BPMEventWorksHandler implements TenantRestartHandler {
+public class MessagesRestartHandler implements TenantRestartHandler {
 
     @Override
     public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
@@ -36,12 +38,12 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
 
         try {
             // Reset of all SMessageInstance:
-            logInfo(technicalLoggerService, "Reinitializing message instances in non-stable state to make them reworked by BPMEventHandlingJob");
+            logInfo(technicalLoggerService, "Reinitializing message instances in non-stable state to make them reworked by MessagesHandlingService");
             final int nbMessagesReset = eventInstanceService.resetProgressMessageInstances();
             logInfo(technicalLoggerService, nbMessagesReset + " message instances found and reset.");
 
             // Reset of all SWaitingMessageEvent:
-            logInfo(technicalLoggerService, "Reinitializing waiting message events in non-stable state to make them reworked by BPMEventHandlingJob");
+            logInfo(technicalLoggerService, "Reinitializing waiting message events in non-stable state to make them reworked by MessagesHandlingService");
             final int nbWaitingEventsReset = eventInstanceService.resetInProgressWaitingEvents();
             logInfo(technicalLoggerService, nbWaitingEventsReset + " waiting message events found and reset.");
 
@@ -50,8 +52,8 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
         }
     }
 
-    protected void logInfo(final TechnicalLoggerService technicalLoggerService, final String msg) {
-        technicalLoggerService.log(BPMEventWorksHandler.class, TechnicalLogSeverity.INFO, msg);
+    void logInfo(final TechnicalLoggerService technicalLoggerService, final String msg) {
+        technicalLoggerService.log(MessagesRestartHandler.class, TechnicalLogSeverity.INFO, msg);
     }
 
     private void handleException(final String message, final Exception e) throws RestartException {
@@ -60,5 +62,18 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
 
     @Override
     public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) {
+        try {
+            tenantServiceAccessor.getUserTransactionService().executeInTransaction(new Callable<Object>() {
+
+                @Override
+                public Object call() throws Exception {
+                    tenantServiceAccessor.getMessagesHandlingService().triggerMatchingOfMessages();
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            tenantServiceAccessor.getTechnicalLoggerService().log(MessagesRestartHandler.class, TechnicalLogSeverity.ERROR,
+                    "Unable to register work to handle message events on startup, work will be triggered on next message event update", e);
+        }
     }
 }

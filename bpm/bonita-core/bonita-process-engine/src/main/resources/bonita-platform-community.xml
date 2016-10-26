@@ -136,7 +136,7 @@
             <list merge="true">
                 <bean class="org.bonitasoft.engine.execution.work.RestartFlowNodesHandler" />
                 <bean class="org.bonitasoft.engine.execution.work.RestartProcessHandler" />
-                <bean class="org.bonitasoft.engine.execution.work.BPMEventWorksHandler" />
+                <bean class="org.bonitasoft.engine.execution.work.MessagesRestartHandler" />
             </list>
         </property>
     </bean>

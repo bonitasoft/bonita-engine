@@ -28,8 +28,6 @@ import org.bonitasoft.engine.scheduler.JobRegister;
  */
 public class TenantConfiguration {
 
-    private String eventHandlingJobCron = "*/5 * * * * ?";
-
     private String cleanInvalidSessionsJobCron = "0 0 */2 * * ?";
 
     private List<JobRegister> jobsToRegister;
@@ -37,19 +35,6 @@ public class TenantConfiguration {
     private List<TenantLifecycleService> lifecycleServices;
 
     private List<AbstractBonitaTenantJobListener> jobListeners;
-
-    /**
-     * Specify how often we look for matching matching event couple
-     * 
-     * @return a String representing a Unix Cron
-     */
-    public String getEventHandlingJobCron() {
-        return eventHandlingJobCron;
-    }
-
-    public void setEventHandlingJobCron(final String eventHandlingJobCron) {
-        this.eventHandlingJobCron = eventHandlingJobCron;
-    }
 
     public void setJobsToRegister(final List<JobRegister> jobsToRegister) {
         this.jobsToRegister = jobsToRegister;
