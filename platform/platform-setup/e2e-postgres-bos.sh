@@ -25,6 +25,24 @@ echo "Setting 'org.bonitasoft.platform.setup' log level to DEBUG"
 #sed -i "s/org.bonitasoft.platform.setup\" level=\"INFO/org.bonitasoft.platform.setup\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
 #sed -i "s/PlatformSetupApplication\" level=\"WARN/PlatformSetupApplication\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
 
+
+echo "============================================================="
+echo "Default H2 configuration detected should ask for confirmation"
+echo "============================================================="
+${E2E_DIR}/setup.sh init <<EOF
+y
+EOF
+testReturnCode $? "setup.sh init with default H2 configuration confirmed"
+
+${E2E_DIR}/setup.sh init <<EOF
+n
+EOF
+
+if [ $? -eq 0 ]; then
+    echo "setup should have exited with code != 0"
+    exit 12
+fi
+
 echo "========================================"
 echo "clean all tables"
 echo "========================================"

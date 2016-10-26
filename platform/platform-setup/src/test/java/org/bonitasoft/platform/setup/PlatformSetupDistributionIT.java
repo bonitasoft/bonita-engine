@@ -65,6 +65,7 @@ public class PlatformSetupDistributionIT {
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("init");
         DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+        executor.setStreamHandler(PlatformSetupTestUtils.getExecuteStreamHandler("yes"));
         //when
         int iExitValue = executor.execute(oCmdLine);
         //then
@@ -82,6 +83,7 @@ public class PlatformSetupDistributionIT {
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArguments("init -Ddb.user=myUser");
         DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+        executor.setStreamHandler(PlatformSetupTestUtils.getExecuteStreamHandler("Y"));
         //when
         int iExitValue = executor.execute(oCmdLine);
         //then

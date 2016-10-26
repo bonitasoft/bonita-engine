@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,6 +33,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.OS;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 /**
@@ -55,6 +57,10 @@ public class PlatformSetupTestUtils {
             outputFile.delete();
             throw ioe;
         }
+    }
+
+    public static PumpStreamHandler getExecuteStreamHandler(String answer) {
+        return new PumpStreamHandler(System.out, System.err, new ByteArrayInputStream(answer.getBytes()));
     }
 
     private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws IOException {
