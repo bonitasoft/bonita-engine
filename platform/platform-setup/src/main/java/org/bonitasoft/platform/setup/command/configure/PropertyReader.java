@@ -22,18 +22,18 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Emmanuel Duchastenier
  */
-class PropertyReader {
+public class PropertyReader {
 
     // Use BundleConfigurator logger for easier configuration (no need for a specific logger here):
     private final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private final Properties properties;
 
-    PropertyReader(Properties properties) {
+    public PropertyReader(Properties properties) {
         this.properties = properties;
     }
 
-    String getPropertyAndFailIfNull(String propertyName) throws PlatformException {
+    public String getPropertyAndFailIfNull(String propertyName) throws PlatformException {
         // Any property value can be overridden by system property with the same name:
         final String sysPropValue = System.getProperty(propertyName);
         if (sysPropValue != null) {
