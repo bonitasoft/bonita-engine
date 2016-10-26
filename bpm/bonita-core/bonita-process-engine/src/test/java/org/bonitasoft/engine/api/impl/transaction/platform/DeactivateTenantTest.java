@@ -15,7 +15,8 @@
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -62,8 +63,7 @@ public class DeactivateTenantTest {
 
         deactivateTenant.execute();
 
-        verify(schedulerService, times(2)).delete(anyString());
-        verify(schedulerService).delete(ActivateTenant.BPM_EVENT_HANDLING);
+        verify(schedulerService).delete(anyString());
         verify(schedulerService).delete(ActivateTenant.CLEAN_INVALID_SESSIONS);
     }
 }

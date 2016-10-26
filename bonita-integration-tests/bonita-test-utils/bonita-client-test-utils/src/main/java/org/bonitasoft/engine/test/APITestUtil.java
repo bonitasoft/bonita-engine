@@ -1343,7 +1343,6 @@ public class APITestUtil extends PlatformTestUtil {
         final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
-        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.EXECUTE_EVENTS_COMMAND);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.ADD_HANDLER_COMMAND);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.WAIT_SERVER_COMMAND);
         final SearchResult<CommandDescriptor> searchCommands = getCommandAPI().searchCommands(searchOptionsBuilder.done());
@@ -1430,17 +1429,6 @@ public class APITestUtil extends PlatformTestUtil {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertTrue(processInstance != null);
         return processInstance;
-    }
-
-    /**
-     * tell the engine to run BPMEventHandlingJob now
-     *
-     * @throws CommandParameterizationException
-     * @throws CommandExecutionException
-     * @throws CommandNotFoundException
-     */
-    protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
-        getCommandAPI().execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
     }
 
     public ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances, final String dataName) {
