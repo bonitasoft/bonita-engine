@@ -14,6 +14,8 @@
 
 package org.bonitasoft.platform.setup.command.configure;
 
+import static org.bonitasoft.platform.setup.command.configure.DatabaseConfiguration.H2_DB_VENDOR;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -27,7 +29,6 @@ import org.bonitasoft.platform.exception.PlatformException;
  */
 class WildflyBundleConfigurator extends BundleConfigurator {
 
-    private static final String H2 = "h2";
     private static final String WILDFLY_BACKUP_FOLDER = "wildfly-backups";
     private static final String WILDFLY_TEMPLATES_FOLDER = "wildfly-templates";
 
@@ -72,7 +73,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
                             + "' and for Business Data database on '" + bdmDbVendor + "'");
 
             //2. copy the JDBC drivers:
-            if (!dbVendor.equals(H2)) {
+            if (!dbVendor.equals(H2_DB_VENDOR)) {
                 final Path srcDriverFile = bonitaDbDriverFile.toPath();
                 final Path moduleFolder = getOptionalPathUnderAppServer("modules").resolve(wildflyModules.get(dbVendor)).resolve("main");
                 final Path targetBonitaDbDriverFile = moduleFolder.resolve(srcDriverFile.getFileName());
@@ -81,7 +82,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
                 copyDriverModuleFileIfNecessary(targetBonitaDbDriverFile, driversCopied, standardConfiguration, moduleFolder);
             }
 
-            if (!bdmDbVendor.equals(H2)) {
+            if (!bdmDbVendor.equals(H2_DB_VENDOR)) {
                 final Path srcBdmDriverFile = bdmDriverFile.toPath();
                 final Path bdmModuleFolder = getOptionalPathUnderAppServer("modules").resolve(wildflyModules.get(bdmDbVendor)).resolve("main");
                 final Path targetBdmDriverFile = bdmModuleFolder.resolve(srcBdmDriverFile.getFileName());

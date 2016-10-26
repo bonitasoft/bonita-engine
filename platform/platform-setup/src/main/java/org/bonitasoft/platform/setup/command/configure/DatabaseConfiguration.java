@@ -21,9 +21,9 @@ import org.bonitasoft.platform.exception.PlatformException;
 /**
  * @author Emmanuel Duchastenier
  */
-class DatabaseConfiguration {
+public class DatabaseConfiguration {
 
-    private static final String H2_DB_VENDOR = "h2";
+    public static final String H2_DB_VENDOR = "h2";
 
     private String dbVendor;
     private String nonXaDriverClassName;
