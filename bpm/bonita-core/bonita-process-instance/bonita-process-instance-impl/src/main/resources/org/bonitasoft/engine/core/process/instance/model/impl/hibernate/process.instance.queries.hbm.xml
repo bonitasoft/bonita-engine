@@ -449,7 +449,6 @@
 		AND s.correlation3 = m.correlation3
 		AND s.correlation4 = m.correlation4
 		AND s.correlation5 = m.correlation5
-        ORDER BY s.id ASC, m.id ASC
 	</query>
 
 	<query name="getListeningSignals">
