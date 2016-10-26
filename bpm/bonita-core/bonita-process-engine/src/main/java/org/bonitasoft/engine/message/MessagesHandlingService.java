@@ -69,7 +69,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
     private SessionAccessor sessionAccessor;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
-                                   LockService lockService, Long tenantId, UserTransactionService userTransactionService, SessionAccessor sessionAccessor) {
+            LockService lockService, Long tenantId, UserTransactionService userTransactionService, SessionAccessor sessionAccessor) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.loggerService = loggerService;
@@ -104,7 +104,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
             return;
         }
         log(TechnicalLogSeverity.INFO, "Stopping thread that handle messages...");
-        threadPoolExecutor.shutdownNow();
+        threadPoolExecutor.shutdown();
         try {
             boolean termination = threadPoolExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS);
             if (!termination) {
