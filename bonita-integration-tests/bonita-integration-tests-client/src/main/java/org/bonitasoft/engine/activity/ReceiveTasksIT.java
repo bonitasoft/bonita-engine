@@ -94,12 +94,11 @@ public class ReceiveTasksIT extends TestWithUser {
         waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         // we check after that that the waiting event is still here
-        forceMatchingOfEvents();
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         final SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
@@ -129,7 +128,7 @@ public class ReceiveTasksIT extends TestWithUser {
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
@@ -137,7 +136,6 @@ public class ReceiveTasksIT extends TestWithUser {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
-        forceMatchingOfEvents();
         waitForUserTask(receiveMessageProcessInstance, "userTask1");
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
@@ -174,7 +172,6 @@ public class ReceiveTasksIT extends TestWithUser {
                 "delivery", user, "m3", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        forceMatchingOfEvents();
         waitForUserTask(receiveMessageProcessInstance, "userTask1");
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -207,11 +204,9 @@ public class ReceiveTasksIT extends TestWithUser {
                     "delivery", user, "m4", null, null, null);
             final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
             waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING);
-            forceMatchingOfEvents();
             waitForUserTask(receiveMessageProcessInstance, "userTask1");
             final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
             waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", TestStates.WAITING);
-            forceMatchingOfEvents();
             waitForUserTask(receiveMessageProcessInstance2, "userTask1");
         } finally {
             disableAndDeleteProcess(sendMessageProcess1);
@@ -245,7 +240,6 @@ public class ReceiveTasksIT extends TestWithUser {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance);
-        forceMatchingOfEvents();
         final HumanTaskInstance step1 = waitForUserTaskAndGetIt(receiveMessageProcessInstance, "userTask1");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", step1.getRootContainerId());
@@ -273,7 +267,7 @@ public class ReceiveTasksIT extends TestWithUser {
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> parameters = new HashMap<>(1);
         parameters.put(SEARCH_OPTIONS_KEY, searchOptionsBuilder.done());
 
         SearchResult<WaitingEvent> searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
@@ -389,7 +383,8 @@ public class ReceiveTasksIT extends TestWithUser {
         }
     }
 
-    private void addCorrelations(final List<BEntry<Expression, Expression>> correlations, final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder) {
+    private void addCorrelations(final List<BEntry<Expression, Expression>> correlations,
+            final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder) {
         if (correlations != null) {
             for (final Entry<Expression, Expression> entry : correlations) {
                 throwMessageEventTriggerBuilder.addCorrelation(entry.getKey(), entry.getValue());

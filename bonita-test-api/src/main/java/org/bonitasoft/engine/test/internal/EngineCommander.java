@@ -107,7 +107,6 @@ public class EngineCommander {
         setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
     }
 
-
     public void setBusinessDataAPI(final BusinessDataAPI businessDataAPI) {
         this.businessDataAPI = businessDataAPI;
     }
@@ -212,10 +211,9 @@ public class EngineCommander {
         this.tenantManagementCommunityAPI = tenantManagementCommunityAPI;
     }
 
-
     public void clearData() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         messages.addAll(checkNoCommands());
         messages.addAll(checkNoFlowNodes());
         messages.addAll(checkNoArchivedFlowNodes());
@@ -341,7 +339,7 @@ public class EngineCommander {
             for (final WaitingEvent waitingEvent : waitingEvents) {
                 messageBuilder.append("[process instance:").append(waitingEvent.getProcessName()).append(", flow node instance:")
                         .append(waitingEvent.getFlowNodeInstanceId()).append("]").append(
-                        ", ");
+                                ", ");
             }
             messages.add(messageBuilder.toString());
         }
@@ -442,7 +440,6 @@ public class EngineCommander {
         final List<String> messages = new ArrayList<>();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
-        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.EXECUTE_EVENTS_COMMAND);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.ADD_HANDLER_COMMAND);
         searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.WAIT_SERVER_COMMAND);
         final SearchResult<CommandDescriptor> searchCommands = getCommandAPI().searchCommands(searchOptionsBuilder.done());

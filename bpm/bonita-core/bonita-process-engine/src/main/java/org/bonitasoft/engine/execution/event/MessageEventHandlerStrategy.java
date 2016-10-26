@@ -55,10 +55,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -68,6 +66,9 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.message.MessagesHandlingService;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 
 /**
  * @author Baptiste Mesta
@@ -82,18 +83,17 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final BPMInstancesCreator bpmInstancesCreator;
 
-    private final DataInstanceService dataInstanceService;
-
     private final ProcessDefinitionService processDefinitionService;
+    private final MessagesHandlingService messagesHandlingService;
 
     public MessageEventHandlerStrategy(final ExpressionResolverService expressionResolverService,
-            final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService) {
+            final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
+            final ProcessDefinitionService processDefinitionService, MessagesHandlingService messagesHandlingService) {
         super(eventInstanceService);
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
-        this.dataInstanceService = dataInstanceService;
         this.processDefinitionService = processDefinitionService;
+        this.messagesHandlingService = messagesHandlingService;
     }
 
     @Override
@@ -133,6 +133,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         }
         fillCorrelation(builder, messageTrigger.getCorrelations(), expressionContext);
         getEventInstanceService().createWaitingEvent(builder.done());
+        messagesHandlingService.triggerMatchingOfMessages();
 
     }
 
@@ -153,7 +154,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
         fillCorrelation(builder, messageTrigger.getCorrelations(), expressionContext);
         getEventInstanceService().createWaitingEvent(builder.done());
-
+        messagesHandlingService.triggerMatchingOfMessages();
     }
 
     @Override
@@ -168,7 +169,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
             final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException,
-            SDataInstanceException, SExpressionException {
+            SDataInstanceException, SExpressionException, SWorkRegisterException, STransactionNotFoundException {
         final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinition.getId());
         handleThrowMessage(messageTrigger, sendTaskInstance.getId(), sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
@@ -176,7 +177,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final long eventInstanceId, final String eventInstanceName,
             final Long processDefinitionId, final SExpressionContext expressionContext) throws SEventTriggerInstanceCreationException,
-            SMessageInstanceCreationException, SDataInstanceException, SExpressionException {
+            SMessageInstanceCreationException, SDataInstanceException, SExpressionException, SWorkRegisterException, STransactionNotFoundException {
         final SThrowMessageEventTriggerDefinition messageTrigger = (SThrowMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
         final SExpression targetProcess = messageTrigger.getTargetProcess();
@@ -198,6 +199,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SMessageInstance messageInstance = builder.done();
         // evaluate and add correlations
         getEventInstanceService().createMessageInstance(messageInstance);
+        messagesHandlingService.triggerMatchingOfMessages();
 
         // create data
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
@@ -220,7 +222,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
             final SExpressionContext expressionContext) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         final int size = Math.min(5, correlations.size());
-        final List<SExpression> toEval = new ArrayList<SExpression>(size * 2);
+        final List<SExpression> toEval = new ArrayList<>(size * 2);
         if (size > 0) {
             for (int i = 0; i < size; i++) {
                 final SCorrelationDefinition sCorrelationDefinition = correlations.get(i);
@@ -229,13 +231,13 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
             }
             final List<Object> res = expressionResolverService.evaluate(toEval, expressionContext);
 
-            final List<String> keys = new ArrayList<String>(size);
-            final List<String> values = new ArrayList<String>(size);
+            final List<String> keys = new ArrayList<>(size);
+            final List<String> values = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 keys.add(String.valueOf(res.get(i * 2)));
                 values.add(String.valueOf(res.get(i * 2 + 1)));
             }
-            final List<String> sortedKeys = new ArrayList<String>(keys);
+            final List<String> sortedKeys = new ArrayList<>(keys);
             Collections.sort(sortedKeys);
             for (int i = 0; i < size; i++) {
                 final String key = sortedKeys.get(i);
@@ -289,8 +291,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SExpressionContext expressionContext = new SExpressionContext(parentProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 processDefinition.getId());
         fillCorrelation(builder, messageEventTriggerDefinition.getCorrelations(), expressionContext);
-        final SWaitingMessageEvent event = builder.done();
-        getEventInstanceService().createWaitingEvent(event);
+        getEventInstanceService().createWaitingEvent(builder.done());
+        messagesHandlingService.triggerMatchingOfMessages();
     }
 
     @Override

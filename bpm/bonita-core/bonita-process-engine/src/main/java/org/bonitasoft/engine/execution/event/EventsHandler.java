@@ -62,14 +62,16 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 
 /**
  * Handle event depending on its type
@@ -105,11 +107,12 @@ public class EventsHandler {
 
     private ProcessExecutor processExecutor;
 
-
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
-                         final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-                         final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-                         final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger, OperationService operationService) {
+            final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
+            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
+            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger,
+            OperationService operationService,
+            MessagesHandlingService messagesHandlingService) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -120,7 +123,7 @@ public class EventsHandler {
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
-                bpmInstancesCreator, dataInstanceService, processDefinitionService));
+                bpmInstancesCreator, processDefinitionService, messagesHandlingService));
         handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
@@ -235,7 +238,7 @@ public class EventsHandler {
 
     public void handleThrowMessage(final SProcessDefinition processDefinition, final SSendTaskDefinition sendTaskDefinition,
             final SSendTaskInstance sendTaskInstance) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException, SDataInstanceException,
-            SExpressionException {
+            SExpressionException, SWorkRegisterException, STransactionNotFoundException {
         final SThrowMessageEventTriggerDefinition eventTrigger = sendTaskDefinition.getMessageTrigger();
         final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers.get(SEventTriggerType.MESSAGE);
         messageEventHandlerStrategy.handleThrowEvent(processDefinition, sendTaskInstance, eventTrigger);
@@ -396,9 +399,10 @@ public class EventsHandler {
             throws SFlowNodeReadException, SFlowNodeExecutionException {
         // in same thread because we delete the message instance after triggering the catch event. The data is of the message
         // is deleted so we will be unable to execute the flow node instance
-        if(operations.getOperations() != null && ! operations.getOperations().isEmpty()){
+        if (operations.getOperations() != null && !operations.getOperations().isEmpty()) {
             try {
-                operationService.execute(operations.getOperations(), flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), operations.getContext());
+                operationService.execute(operations.getOperations(), flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                        operations.getContext());
             } catch (SOperationExecutionException e) {
                 throw new SFlowNodeExecutionException("Unable to execute operation before executing flow node " + flowNodeInstanceId, e);
             }

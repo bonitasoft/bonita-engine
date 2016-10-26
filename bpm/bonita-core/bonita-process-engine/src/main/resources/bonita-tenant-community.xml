@@ -123,13 +123,24 @@
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="containerRegistry" ref="containerRegistry" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="messagesHandlingService" ref="messagesHandlingService" />
+    </bean>
+
+
+    <bean id="messagesHandlingService" class="org.bonitasoft.engine.message.MessagesHandlingService">
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="lockService" ref="lockService" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
+        <constructor-arg name="userTransactionService" ref="transactionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="transitionConditionEvaluator"
@@ -1151,7 +1162,6 @@
 
 
     <bean id="tenantConfiguration" class="org.bonitasoft.engine.api.impl.TenantConfiguration" autowire="byType">
-        <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
         <property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
         <property name="jobListeners">
             <list>

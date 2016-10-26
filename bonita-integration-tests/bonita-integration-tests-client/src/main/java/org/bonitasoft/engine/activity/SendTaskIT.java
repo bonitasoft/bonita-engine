@@ -182,7 +182,6 @@ public class SendTaskIT extends AbstractEventIT {
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(sendMessageProcessInstance.getId(), 0,
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);
         assertThat(archivedActivityInstances.get(0)).isInstanceOf(ArchivedSendTaskInstance.class);
-        forceMatchingOfEvents();
         waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
@@ -223,7 +222,6 @@ public class SendTaskIT extends AbstractEventIT {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance);
-        forceMatchingOfEvents();
         waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
@@ -258,7 +256,6 @@ public class SendTaskIT extends AbstractEventIT {
 
         //then
         waitForProcessToFinish(sendMessageProcessInstance);
-        forceMatchingOfEvents();
 
         //two instances should be created
         //step of first instance

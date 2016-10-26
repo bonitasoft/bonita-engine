@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientEventUtil {
 
-    public static final String EXECUTE_EVENTS_COMMAND = "executeEventsCommand";
-
     public static final String ADD_HANDLER_COMMAND = "addHandlerCommand";
 
     public static final String WAIT_SERVER_COMMAND = "waitServerCommand";
@@ -69,7 +67,6 @@ public class ClientEventUtil {
         try {
             commandAPI.unregister(WAIT_SERVER_COMMAND);
             commandAPI.unregister(ADD_HANDLER_COMMAND);
-            commandAPI.unregister(EXECUTE_EVENTS_COMMAND);
             LOGGER.debug("commands undeployed");
         } catch (final BonitaException e) {
             // ok
@@ -91,10 +88,8 @@ public class ClientEventUtil {
         }
         final CommandDescriptor addHandlerCommand = commandAPI.register(ADD_HANDLER_COMMAND, ADD_HANDLER_COMMAND,
                 "org.bonitasoft.engine.synchro.AddHandlerCommand");
-        final CommandDescriptor executeEventsCommand = commandAPI.register(EXECUTE_EVENTS_COMMAND, EXECUTE_EVENTS_COMMAND,
-                "org.bonitasoft.engine.jobs.ExecuteEventHandlingNow");
 
-        parameters.put("commands", (Serializable) Arrays.asList(waitServerCommand.getId(), addHandlerCommand.getId(), executeEventsCommand.getId()));
+        parameters.put("commands", (Serializable) Arrays.asList(waitServerCommand.getId(), addHandlerCommand.getId()));
         commandAPI.execute(ADD_HANDLER_COMMAND, parameters);
         LOGGER.debug("commands deployed");
     }

@@ -29,7 +29,7 @@ import org.quartz.spi.TriggerFiredBundle;
 /**
  * Job factory that inject the transaction service
  * Must modify this to inject the configuration service instead
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -86,7 +86,7 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
     }
 
     private boolean isInternalCronJob(final String jobName) {
-        final List<String> internalCronJobs = Arrays.asList("BPMEventHandling", "CleanInvalidSessions", "InsertBatchLogsJob");
+        final List<String> internalCronJobs = Arrays.asList("CleanInvalidSessions", "InsertBatchLogsJob");
         return internalCronJobs.contains(jobName);
     }
 
