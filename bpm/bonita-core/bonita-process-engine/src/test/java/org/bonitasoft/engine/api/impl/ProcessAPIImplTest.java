@@ -124,6 +124,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExceptionContext;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -139,6 +140,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
@@ -161,6 +163,7 @@ import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -229,6 +232,8 @@ public class ProcessAPIImplTest {
     private ConnectorService connectorService;
     @Mock
     private ContractDataService contractDataService;
+    @Mock
+    private MessagesHandlingService messageHandlingService;
     @Mock
     private ExpressionResolverService expressionResolverService;
     @Mock
@@ -306,6 +311,7 @@ public class ProcessAPIImplTest {
         doReturn(new SSessionImpl(12354L, TENANT_ID, "john", "", 5432L)).when(processAPI).getSession();
         doReturn("john").when(processAPI).getUserNameFromSession();
 
+        when(tenantAccessor.getMessagesHandlingService()).thenReturn(messageHandlingService);
     }
 
     @Test
@@ -1448,5 +1454,50 @@ public class ProcessAPIImplTest {
         processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
         //then
         verify(activityInstanceService, never()).assignHumanTask(eq(FLOW_NODE_INSTANCE_ID), anyLong());
+    }
+
+    @Test
+    public void executeMessageCouple_should_reset_couple() throws Exception {
+        // given:
+        final long messageInstanceId = 123L;
+        final long waitingMessageId = 999L;
+
+        // when:
+        processAPI.executeMessageCouple(messageInstanceId, waitingMessageId);
+
+        // then:
+        verify(messageHandlingService).resetMessageCouple(messageInstanceId, waitingMessageId);
+    }
+
+    @Test
+    public void executeMessageCouple_should_execute_couple_on_messageHandlingService() throws Exception {
+        // given:
+        final long messageInstanceId = 456L;
+        final long waitingMessageId = 888L;
+
+        // when:
+        processAPI.executeMessageCouple(messageInstanceId, waitingMessageId);
+
+        // then:
+        verify(messageHandlingService).triggerMatchingOfMessages();
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void executeMessageCouple_should_throw_ExecutionException_with_details_in_case_of_error() throws Exception {
+        // given:
+        final long messageInstanceId = 456L;
+        final long waitingMessageId = 888L;
+        doThrow(STransactionNotFoundException.class).when(messageHandlingService).triggerMatchingOfMessages();
+
+        // then:
+        expectedException.expect(ExecutionException.class);
+        expectedException.expectMessage("messageInstanceId=" + messageInstanceId);
+        expectedException.expectMessage("waitingMessageId=" + waitingMessageId);
+
+        // when:
+        processAPI.executeMessageCouple(456L, 888L);
     }
 }
