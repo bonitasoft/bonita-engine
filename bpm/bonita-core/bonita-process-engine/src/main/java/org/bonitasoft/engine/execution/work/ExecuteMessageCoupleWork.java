@@ -71,9 +71,7 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
 
     @Override
     public String getRecoveryProcedure() {
-        return "Change the 'progress' field of the waiting message having id " + waitingMessageId + " to "
-                + SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY + " and " + "the 'handled' field of the message instance  having id "
-                + messageInstanceId + " to false";
+        return "call processApi.executeMessageCouple(" + messageInstanceId + ", " + waitingMessageId + "); to re-launch the execution of the message.";
     }
 
     @Override

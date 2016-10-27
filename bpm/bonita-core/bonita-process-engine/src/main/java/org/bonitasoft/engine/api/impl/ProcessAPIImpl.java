@@ -345,6 +345,7 @@ import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -4753,8 +4754,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ArchivedDocument getArchivedVersionOfProcessDocument(final long sourceObjectId) throws ArchivedDocumentNotFoundException {
+    public void executeMessageCouple(final long messageInstanceId, final long waitingMessageId) throws ExecutionException {
+        MessagesHandlingService messagesHandlingService = getTenantAccessor().getMessagesHandlingService();
+        try {
+            messagesHandlingService.resetMessageCouple(messageInstanceId, waitingMessageId);
+            messagesHandlingService.triggerMatchingOfMessages();
+        } catch (SBonitaException e) {
+            throw new ExecutionException(
+                    "Failed to execute Event Message couple: messageInstanceId=" + messageInstanceId + ", waitingMessageId=" + waitingMessageId, e);
+        }
+    }
 
+    @Override
+    public ArchivedDocument getArchivedVersionOfProcessDocument(final long sourceObjectId) throws ArchivedDocumentNotFoundException {
         return documentAPI.getArchivedVersionOfProcessDocument(sourceObjectId);
     }
 
@@ -5773,7 +5785,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, message);
             }
             if (executerUserId != executerSubstituteUserId) {
-        try {
+                try {
                     final SUser executerUser = identityService.getUser(executerUserId);
                     String stb = "The user " + session.getUserName() + " " +
                             "acting as delegate of the user " + executerUser.getUserName() + " " +
