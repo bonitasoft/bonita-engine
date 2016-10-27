@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.exception.PlatformException;
-import org.bonitasoft.platform.setup.command.configure.WildflyBundleConfigurator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -92,6 +91,27 @@ public class WildflyBundleConfiguratorTest {
 
         // when:
         configurator.configureApplicationServer();
+    }
+
+    @Test
+    public void configureApplicationServer_should_escape_xml_special_char_on_mysql() throws Exception {
+        // when:
+        System.setProperty("db.vendor", "mysql");
+        System.setProperty("db.database.name", "mysql_database");
+        System.setProperty("db.server.name", "mysql_servidor");
+        System.setProperty("db.server.port", "9876");
+
+        System.setProperty("bdm.db.vendor", "mysql");
+        System.setProperty("bdm.db.database.name", "mysql_database_bdm");
+        System.setProperty("bdm.db.server.name", "mysql_servidor_bdm");
+        System.setProperty("bdm.db.server.port", "4321");
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        checkFileContains(configFile,
+                "<connection-url>jdbc:mysql://mysql_servidor:9876/mysql_database?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>",
+                "<connection-url>jdbc:mysql://mysql_servidor_bdm:4321/mysql_database_bdm?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>");
     }
 
     @Test
