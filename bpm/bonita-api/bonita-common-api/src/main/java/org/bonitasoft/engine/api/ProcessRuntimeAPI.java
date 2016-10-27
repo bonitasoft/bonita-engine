@@ -1424,6 +1424,16 @@ public interface ProcessRuntimeAPI {
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
     /**
+     * When a matching BPM event couple messageInstance / waitingMessageEvent fails to execute and no failure handling has been successful, a log message
+     * indicates that this method can be called to try again the execution. The necessary parameters are also indicated.
+     * 
+     * @param messageInstanceId the ID of the message instance to try to trigger again.
+     * @param waitingMessageEventId the ID of the waiting message event to try to trigger again.
+     * @throws ExecutionException if the execution failed. A more precise cause is given in the getCause() method.
+     */
+    void executeMessageCouple(long messageInstanceId, long waitingMessageEventId) throws ExecutionException;
+
+    /**
      * Evaluate an expression in the context of the specified process.
      * Some context values can also be provided
      *
