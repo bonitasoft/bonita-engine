@@ -22,10 +22,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -75,6 +74,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     protected final List<String> mappingExclusions;
 
+    private final OrderByBuilder orderByBuilder;
+
     Statistics statistics;
 
     int stat_display_count;
@@ -102,6 +103,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         cacheQueries = Collections.emptyMap();
         interfaceToClassMapping = Collections.emptyMap();
         mappingExclusions = Collections.emptyList();
+        this.orderByBuilder = new DefaultOrderByBuilder();
     }
 
     // Setter for session
@@ -136,16 +138,23 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         } catch (final ConfigurationException e) {
             throw new SPersistenceException(e);
         }
+
         final String dialect = configuration.getProperty("hibernate.dialect");
+        OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
+
         if (dialect != null) {
+
             if (dialect.contains("PostgreSQL")) {
                 configuration.setInterceptor(new PostgresInterceptor());
                 configuration.registerTypeOverride(new PostgresMaterializedBlobType());
                 configuration.registerTypeOverride(new PostgresMaterializedClobType());
             } else if (dialect.contains("SQLServer")) {
-                configuration.setInterceptor(new SQLServerInterceptor());
+                SQLServerInterceptor sqlServerInterceptor = new SQLServerInterceptor();
+                configuration.setInterceptor(sqlServerInterceptor);
+                orderByBuilder = new SQLServerOrderByBuilder();
             }
         }
+        this.orderByBuilder = orderByBuilder;
         final String className = configuration.getProperty("hibernate.interceptor");
         if (className != null && !className.isEmpty()) {
             try {
@@ -638,17 +647,17 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             if (startWithComma) {
                 builder.append(',');
             }
+            StringBuilder fieldNameBuilder = new StringBuilder();
             final Class<? extends PersistentObject> clazz = orderByOption.getClazz();
             if (clazz != null) {
-                appendClassAlias(builder, clazz);
+                appendClassAlias(fieldNameBuilder, clazz);
             }
             final String fieldName = orderByOption.getFieldName();
             if ("id".equalsIgnoreCase(fieldName) || "sourceObjectId".equalsIgnoreCase(fieldName)) {
                 sortedById = true;
             }
-            builder.append(fieldName);
-            builder.append(' ');
-            builder.append(orderByOption.getOrderByType().getSqlKeyword());
+            fieldNameBuilder.append(fieldName);
+            orderByBuilder.appendOrderBy(builder, fieldNameBuilder.toString(), orderByOption.getOrderByType());
             startWithComma = true;
         }
         if (!sortedById) {
