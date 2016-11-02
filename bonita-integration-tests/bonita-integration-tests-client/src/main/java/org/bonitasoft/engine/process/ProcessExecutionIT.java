@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
 public class ProcessExecutionIT extends TestWithUser {
 
     @Rule
-    public ExpectedException expectdException = ExpectedException.none();
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessExecutionIT.class);
 
@@ -149,7 +149,7 @@ public class ProcessExecutionIT extends TestWithUser {
 
     @Test
     public void deleteUnknownProcess() throws Exception {
-        expectdException.expect(DeletionException.class);
+        expectedException.expect(DeletionException.class);
         getProcessAPI().deleteProcessDefinition(123456789);
     }
 

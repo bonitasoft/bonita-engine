@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2016 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,17 +13,14 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import org.hibernate.EmptyInterceptor;
-
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
-public class SQLServerInterceptor extends EmptyInterceptor {
-
-    private static final long serialVersionUID = -6720122264417020259L;
+public class DefaultOrderByBuilder implements OrderByBuilder {
 
     @Override
-    public String onPrepareStatement(final String sql) {
-        return sql.replaceAll("like '", "like N'").replaceAll("LIKE '", "like N'");
+    public void appendOrderBy(StringBuilder builder, String fieldName, OrderByType orderByType) {
+        builder.append(fieldName).append(" ").append(orderByType.getSqlKeyword());
+
     }
 }
