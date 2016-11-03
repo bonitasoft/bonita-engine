@@ -329,7 +329,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete all archived process instance (different states) of the source identifier list.
-     * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      *
      * @param sourceProcessInstanceIds
      *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
@@ -343,7 +342,6 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete all archived process instance (different states) corresponding to the source identifier.
-     * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      *
      * @param sourceProcessInstanceId
      *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
