@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.exception.PlatformException;
-import org.bonitasoft.platform.setup.command.configure.TomcatBundleConfigurator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -238,6 +237,10 @@ public class TomcatBundleConfiguratorTest {
         assertThat(driverFilter.accept(new File("sqlserver.JAR"))).isTrue();
         assertThat(driverFilter.accept(new File("SQLSERVER-5.jar"))).isTrue();
         assertThat(driverFilter.accept(new File("drivers_SQLServer.zip"))).isTrue();
+        assertThat(driverFilter.accept(new File("sqljdbc.jar"))).isTrue();
+        assertThat(driverFilter.accept(new File("sqljdbc4.jar"))).isTrue();
+        assertThat(driverFilter.accept(new File("sqljdbc41.jar"))).isTrue();
+        assertThat(driverFilter.accept(new File("sqljdbc42.jar"))).isTrue();
     }
 
     @Test

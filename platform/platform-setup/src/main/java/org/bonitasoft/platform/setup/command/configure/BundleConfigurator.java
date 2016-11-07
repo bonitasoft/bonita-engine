@@ -51,6 +51,7 @@ abstract class BundleConfigurator {
     protected final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
     private static final String ORACLE = "oracle";
+    private static final String SQLSERVER = "sqlserver";
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
     static final String POSTGRES = "postgres";
@@ -241,6 +242,9 @@ abstract class BundleConfigurator {
     private String getDriverPattern(String dbVendor) {
         if (ORACLE.equals(dbVendor)) {
             return ".*(ojdbc|oracle).*\\.(jar|zip)";
+        }
+        if (SQLSERVER.equals(dbVendor)) {
+            return ".*" + dbVendor + ".*|sqljdbc.*\\.jar";
         }
         return ".*" + dbVendor + ".*";
     }
