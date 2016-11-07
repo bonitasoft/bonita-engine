@@ -213,6 +213,12 @@
             <logger category="org.tuckey">
                 <level name="WARN" />
             </logger>
+            <logger category="org.hibernate.dialect.H2Dialect">
+                <level name="ERROR" />
+            </logger>
+            <logger category="org.hibernate.type.TypeFactory">
+                <level name="ERROR" />
+            </logger>
 
             <root-logger>
                 <level name="INFO" />
