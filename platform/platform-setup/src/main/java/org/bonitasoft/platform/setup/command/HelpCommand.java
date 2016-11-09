@@ -38,7 +38,7 @@ public class HelpCommand extends PlatformSetupCommand {
     @Override
     public void execute(Options options, String... args) throws PlatformException, CommandException {
         if (args.length == 0) {
-            printCommonHelp(options);
+            printUsage(options);
             throw new CommandException("Need to specify a command, see usage above.");
         } else if (getName().equals(args[0])) {
             if (args.length > 1) {
@@ -47,7 +47,7 @@ public class HelpCommand extends PlatformSetupCommand {
                 printCommonHelp(options);
             }
         } else {
-            printCommonHelp(options);
+            printUsage(options);
             throw new CommandException("ERROR: no command named: " + args[0]);
         }
     }
@@ -59,11 +59,6 @@ public class HelpCommand extends PlatformSetupCommand {
             throw new CommandException("ERROR: no command named: " + commandNameForHelp);
         }
         printHelpFor(options, platformSetupCommand);
-    }
-
-    @Override
-    public boolean isDisplayed() {
-        return false;
     }
 
     public void setCommands(List<PlatformSetupCommand> commands) {
@@ -82,9 +77,21 @@ public class HelpCommand extends PlatformSetupCommand {
     }
 
     private void printCommonHelp(Options options) {
-        printUsage("setup " + getCommandNames(), options, "use `setup help <command>` for more details on a command" + lineSeparator());
+        printUsage(options);
         printGlobalHelp();
         printCommandsUsage();
+    }
+
+    private void printUsage(Options options) {
+        List<String> names = new ArrayList<>(commands.size());
+        for (PlatformSetupCommand command : commands) {
+            if (!command.equals(this)) {
+                names.add(command.getName());
+            }
+        }
+        String footer = "use `setup help` or `setup help <command>` for more details" + lineSeparator();
+        printUsageFor(options, "( " + StringUtils.join(names.iterator(), " | ") + " )",
+                footer);
     }
 
     private void printCommandsUsage() {
@@ -92,28 +99,20 @@ public class HelpCommand extends PlatformSetupCommand {
         usage.append(lineSeparator());
         usage.append("Available commands:").append(lineSeparator()).append(lineSeparator());
         for (PlatformSetupCommand command : commands) {
-            if (!command.isDisplayed()) {
-                continue;
-            }
             usage.append(" ").append(command.getName()).append("  --  ").append(command.getSummary()).append(lineSeparator());
             usage.append(lineSeparator());
         }
         System.out.println(usage.toString());
     }
 
-    private String getCommandNames() {
-        List<String> names = new ArrayList<>(commands.size());
-        for (PlatformSetupCommand command : commands) {
-            if (command.isDisplayed()) {
-                names.add(command.getName());
-            }
-        }
-        return "( " + StringUtils.join(names.iterator(), " | ") + " )";
+    private void printHelpFor(Options options, PlatformSetupCommand command) {
+        printUsageFor(options, command.getName(), lineSeparator());
+        printCommandUsage(command);
     }
 
-    private void printHelpFor(Options options, PlatformSetupCommand command) {
-        printUsage("setup " + command.getName(), options, lineSeparator());
-        printCommandUsage(command);
+    private void printUsageFor(Options options, String commandName, String footer) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("setup " + commandName, lineSeparator() + "Available options:", options, footer, true);
     }
 
     private void printCommandUsage(PlatformSetupCommand command) {
@@ -128,8 +127,4 @@ public class HelpCommand extends PlatformSetupCommand {
         System.out.println(CommandUtils.getFileContentFromClassPath("global_usage.txt"));
     }
 
-    private void printUsage(String cmdLineSyntax, Options options, String footer) {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(cmdLineSyntax, lineSeparator() + "Available options:", options, footer, true);
-    }
 }
