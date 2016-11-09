@@ -57,7 +57,7 @@ public class HelpCommandTest {
     }
 
     @Test
-    public void should_print_common_help_when_no_command_is_given() throws Exception {
+    public void should_print_only_usage_when_no_command_is_given() throws Exception {
         //when
         try {
             helpCommand.execute(new Options());
@@ -67,8 +67,8 @@ public class HelpCommandTest {
         }
         //then
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup ( command1 | command2 )");
-        assertThat(systemOutRule.getLog()).as("contains the first command").contains("command1  --  summary1");
-        assertThat(systemOutRule.getLog()).as("contains the second command").contains("command2  --  summary2");
+        assertThat(systemOutRule.getLog()).as("do not contains other help").doesNotContain("command1  --  summary1");
+        assertThat(systemOutRule.getLog()).as("contains how to run help").contains("use `setup help` or `setup help <command>` for more details");
     }
 
     @Test
@@ -80,10 +80,11 @@ public class HelpCommandTest {
             assertThat(e.getMessage()).isEqualTo("ERROR: no command named: thisIsAnUnknownCommand");
         }
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup ( command1 | command2 )");
+        assertThat(systemOutRule.getLog()).as("contains how to run help").contains("use `setup help` or `setup help <command>` for more details");
     }
 
     @Test
-    public void should_print_common_help_when_called_with_unknown_command() throws Exception {
+    public void should_print_only_usage_when_called_with_unknown_command() throws Exception {
         try {
             helpCommand.execute(new Options(), "thisIsAnUnknownCommand");
             fail("should throw exception");
@@ -91,6 +92,8 @@ public class HelpCommandTest {
             assertThat(e.getMessage()).isEqualTo("ERROR: no command named: thisIsAnUnknownCommand");
         }
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup ( command1 | command2 )");
+        assertThat(systemOutRule.getLog()).as("do not contains other help").doesNotContain("command1  --  summary1");
+        assertThat(systemOutRule.getLog()).as("contains how to run help").contains("use `setup help` or `setup help <command>` for more details");
     }
 
     @Test
