@@ -476,7 +476,7 @@ public class PlatformSetupIT {
 
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita BPM Platform subscription edition"
-                + " to start normally.\nPlace your license file in " + licenseFolder.toString() + " and then try again.");
+                + " to start normally.\nPlace your license file");
 
         platformSetup.initProperties();
         platformSetup.preventFromPushingZeroLicense();
@@ -494,7 +494,7 @@ public class PlatformSetupIT {
 
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita BPM Platform subscription edition"
-                + " to start normally.\nPlace your license file in " + licenseFolder.toString() + " and then try again.");
+                + " to start normally.\nPlace your license file");
 
         platformSetup.initProperties();
         platformSetup.preventFromPushingZeroLicense();
