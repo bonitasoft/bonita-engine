@@ -36,13 +36,6 @@ public abstract class PlatformSetupCommand {
 
     public abstract void execute(Options options, String... args) throws PlatformException, CommandException;
 
-    /**
-     * @return true if shown in the command list
-     */
-    public boolean isDisplayed() {
-        return true;
-    }
-
     public String getName() {
         return name;
     }
