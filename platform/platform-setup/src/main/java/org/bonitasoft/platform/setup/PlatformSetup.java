@@ -426,7 +426,7 @@ public class PlatformSetup {
             if (licenseFiles.length == 0) {
                 throw new PlatformException("No license (.lic file) found.\n"
                         + "This would prevent Bonita BPM Platform subscription edition to start normally.\n" +
-                        "Place your license file in " + licensesFolder.toString() + " and then try again.");
+                        "Place your license file in '" + licensesFolder.toAbsolutePath().toString() + "' and then try again.");
             }
         }
     }
