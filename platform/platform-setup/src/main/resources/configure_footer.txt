@@ -1,0 +1,28 @@
+Remember that this command only works on bundles provided by Bonitasoft.
+During the `configure` script execution, the setup tool verifies that the parent folder is a bundle.
+If it is so:
+
+For Tomcat, it:
+   - sets db vendor + bdm db vendor in file server/bin/setenv (.sh|.bat)
+   - sets all database configuration in file server/conf/bitronix-resources.properties
+   - sets all database configuration in file server/conf/Catalina/localhost/bonita.xml
+   - copies the required drivers from setup/lib/ to server/lib/bonita/
+
+For Wildfly, it:
+   - sets all database configuration in file standalone/configuration/standalone.xml
+   - creates a module.xml file in server/modules/**/main/ folder, according to your database vendor
+   - copies the required drivers from setup/lib/ to server/modules/**/main/
+
+
+ADVANCED CONFIGURATION WARNING:
+If you need to edit the server configuration, do not directly edit Tomcat files anymore, as they will be overwritten by the templates used by the setup tool.
+Therefore, if you need to finely tune the server configuration, modify the following templates:
+
+For Tomcat:
+    - setup/tomcat-templates/bitronix-resources.properties
+    - setup/tomcat-templates/bonita.xml
+    - setup/tomcat-templates/setenv.sh
+    - setup/tomcat-templates/setenv.bat
+
+For Wildfly:
+    - setup/wildfly-templates/standalone.xml

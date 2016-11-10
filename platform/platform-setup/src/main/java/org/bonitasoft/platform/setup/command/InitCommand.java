@@ -34,7 +34,7 @@ public class InitCommand extends PlatformSetupCommand {
 
     public InitCommand() {
         super("init", "Initialise the database so that Bonita BPM is ready to run with this database",
-                CommandUtils.getFileContentFromClassPath("init.txt"));
+                CommandUtils.getFileContentFromClassPath("init_header.txt"), CommandUtils.getFileContentFromClassPath("init_footer.txt"));
     }
 
     @Override

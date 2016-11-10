@@ -26,12 +26,15 @@ public abstract class PlatformSetupCommand {
 
     private String name;
     private String summary;
-    private String description;
+    private String descriptionHeader;
 
-    public PlatformSetupCommand(String name, String summary, String description) {
+    private String descriptionFooter;
+
+    public PlatformSetupCommand(String name, String summary, String descriptionHeader, String descriptionFooter) {
         this.name = name;
         this.summary = summary;
-        this.description = description;
+        this.descriptionHeader = descriptionHeader;
+        this.descriptionFooter = descriptionFooter;
     }
 
     public abstract void execute(Options options, String... args) throws PlatformException, CommandException;
@@ -44,8 +47,12 @@ public abstract class PlatformSetupCommand {
         return summary;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionHeader() {
+        return descriptionHeader;
+    }
+
+    public String getDescriptionFooter() {
+        return descriptionFooter;
     }
 
     PlatformSetup getPlatformSetup(String[] args) throws PlatformException {
