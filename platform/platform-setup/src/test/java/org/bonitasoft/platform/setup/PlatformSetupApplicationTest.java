@@ -61,7 +61,7 @@ public class PlatformSetupApplicationTest {
             @Override
             public void checkAssertion() throws Exception {
                 assertThat(systemOutRule.getLog()).contains("Need to specify a command, see usage above.");
-                assertThat(systemOutRule.getLog()).contains("usage: setup ( init | pull | push | configure ) [-D <property=value>]");
+                assertThat(systemOutRule.getLog()).contains("usage: setup ( init | configure | pull | push ) [-D <property=value>]");
             }
         });
         //when

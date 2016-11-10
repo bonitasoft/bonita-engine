@@ -23,7 +23,7 @@ import org.bonitasoft.platform.exception.PlatformException;
 public class PullCommand extends PlatformSetupCommand {
 
     public PullCommand() {
-        super("pull", "Pull configuration from the database", CommandUtils.getFileContentFromClassPath("pull.txt"));
+        super("pull", "Pull configuration from the database", null, CommandUtils.getFileContentFromClassPath("pull.txt"));
     }
 
     @Override

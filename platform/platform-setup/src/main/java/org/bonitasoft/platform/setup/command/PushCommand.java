@@ -23,8 +23,7 @@ import org.bonitasoft.platform.exception.PlatformException;
 public class PushCommand extends PlatformSetupCommand {
 
     public PushCommand() {
-        super("push", "Push configuration to the database",
-                CommandUtils.getFileContentFromClassPath("push.txt"));
+        super("push", "Push configuration to the database", null, CommandUtils.getFileContentFromClassPath("push.txt"));
     }
 
     @Override
