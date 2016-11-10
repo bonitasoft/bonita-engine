@@ -134,9 +134,9 @@ public class PlatformSetupApplication {
     private List<PlatformSetupCommand> createCommands() {
         List<PlatformSetupCommand> commandList = new ArrayList<>();
         commandList.add(new InitCommand());
+        commandList.add(new ConfigureCommand());
         commandList.add(new PullCommand());
         commandList.add(new PushCommand());
-        commandList.add(new ConfigureCommand());
         helpCommand = new HelpCommand();
         commandList.add(helpCommand);
         return commandList;

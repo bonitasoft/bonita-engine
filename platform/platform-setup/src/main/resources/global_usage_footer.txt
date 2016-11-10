@@ -1,0 +1,22 @@
+All commands here interact with the database configured in the file database.properties.
+By default, the bundle is configured with an embedded H2 database, suitable for development and testing, not suitable for production purposes.
+To switch to another database vendor, change values in the file database.properties or use system properties.
+You can specify system properties directly from the command line, using `-Dproperty=value`.
+For example, to change the database name and initialize the database, use:
+  `setup.bat init -Ddb.database.name=myDatabase`
+
+Here is the list of available properties:
+ * db.vendor
+ * db.server.name
+ * db.server.port
+ * db.database.name
+ * db.user
+ * db.password
+ * bdm.db.vendor
+ * bdm.db.server.name
+ * bdm.db.server.port
+ * bdm.db.database.name
+ * bdm.db.user
+ * bdm.db.password
+
+To know more about the setup tool, go to the Documentation web site, and search with the keywords "platform setup"

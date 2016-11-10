@@ -32,7 +32,7 @@ public class HelpCommand extends PlatformSetupCommand {
     private List<PlatformSetupCommand> commands;
 
     public HelpCommand() {
-        super("help", "Display the help", "Display the help");
+        super("help", "Display the help", "Display the help", null);
     }
 
     @Override
@@ -78,8 +78,9 @@ public class HelpCommand extends PlatformSetupCommand {
 
     private void printCommonHelp(Options options) {
         printUsage(options);
-        printGlobalHelp();
+        printGlobalHelpHeader();
         printCommandsUsage();
+        printGlobalHelpFooter();
     }
 
     private void printUsage(Options options) {
@@ -90,8 +91,7 @@ public class HelpCommand extends PlatformSetupCommand {
             }
         }
         String footer = "use `setup help` or `setup help <command>` for more details" + lineSeparator();
-        printUsageFor(options, "( " + StringUtils.join(names.iterator(), " | ") + " )",
-                footer);
+        printUsageFor(options, "( " + StringUtils.join(names.iterator(), " | ") + " )", footer);
     }
 
     private void printCommandsUsage() {
@@ -100,14 +100,27 @@ public class HelpCommand extends PlatformSetupCommand {
         usage.append("Available commands:").append(lineSeparator()).append(lineSeparator());
         for (PlatformSetupCommand command : commands) {
             usage.append(" ").append(command.getName()).append("  --  ").append(command.getSummary()).append(lineSeparator());
-            usage.append(lineSeparator());
         }
         System.out.println(usage.toString());
     }
 
     private void printHelpFor(Options options, PlatformSetupCommand command) {
         printUsageFor(options, command.getName(), lineSeparator());
+        printCommandDescriptionHeader(command);
         printCommandUsage(command);
+        printCommandDescriptionFooter(command);
+    }
+
+    private void printCommandDescriptionHeader(PlatformSetupCommand command) {
+        if (command.getDescriptionHeader() != null) {
+            System.out.println("  " + command.getDescriptionHeader().replace(lineSeparator(), lineSeparator() + "  "));
+        }
+    }
+
+    private void printCommandDescriptionFooter(PlatformSetupCommand command) {
+        if (command.getDescriptionFooter() != null) {
+            System.out.println("  " + command.getDescriptionFooter().replace(lineSeparator(), lineSeparator() + "  "));
+        }
     }
 
     private void printUsageFor(Options options, String commandName, String footer) {
@@ -116,15 +129,16 @@ public class HelpCommand extends PlatformSetupCommand {
     }
 
     private void printCommandUsage(PlatformSetupCommand command) {
-        System.out.println(System.lineSeparator() +
-                " " + command.getName() + "  --  " + command.getSummary() + System.lineSeparator() +
-                System.lineSeparator() +
-                "  " + command.getDescription().replace(System.lineSeparator(), System.lineSeparator() + "  ") + System.lineSeparator() +
-                System.lineSeparator());
+        System.out.println(lineSeparator() +
+                " " + command.getName() + "  --  " + command.getSummary() + lineSeparator());
     }
 
-    private void printGlobalHelp() {
-        System.out.println(CommandUtils.getFileContentFromClassPath("global_usage.txt"));
+    private void printGlobalHelpHeader() {
+        System.out.println(CommandUtils.getFileContentFromClassPath("global_usage_header.txt"));
+    }
+
+    private void printGlobalHelpFooter() {
+        System.out.println(CommandUtils.getFileContentFromClassPath("global_usage_footer.txt"));
     }
 
 }

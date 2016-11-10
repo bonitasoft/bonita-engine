@@ -41,13 +41,13 @@ public class HelpCommandTest {
     @Before
     public void before() throws Exception {
         helpCommand = new HelpCommand();
-        helpCommand.setCommands(Arrays.asList(new PlatformSetupCommand("command1", "summary1", "description of command 1") {
+        helpCommand.setCommands(Arrays.asList(new PlatformSetupCommand("command1", "summary1", "description of command 1", null) {
 
             @Override
             public void execute(Options options, String... args) throws PlatformException {
 
             }
-        }, new PlatformSetupCommand("command2", "summary2", "description of command 2") {
+        }, new PlatformSetupCommand("command2", "summary2", "description of command 2", null) {
 
             @Override
             public void execute(Options options, String... args) throws PlatformException {

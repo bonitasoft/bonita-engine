@@ -1,6 +1,8 @@
-Once current configuration has been pulled and locally modified, use push to update configuration in database.
-Those modifications will be applied only after Bonita BPM restart.
+At execution, it:
+* writes all configuration files found in platform_conf/current in database.
+* writes license files found in platform_conf/licenses folder in database (Subscription editions only).
+* overwrites any previous configuration in the database.
 
-* All configuration files under `platform_conf/current` will be written in database.
-* License files in the folder `platform_conf/licenses` will be written in database (Subscription editions only).
-* Any previous configuration in database will be overwritten.
+Important:
+- Only use this command once the current configuration has been pulled from the database with `setup.(bat|sh) pull` script and modified locally.
+- Those modifications will be applied only after you restart Bonita BPM.
