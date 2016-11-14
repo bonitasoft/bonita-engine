@@ -295,9 +295,13 @@
                         <password>@@PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
+                    <timeout>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
+                    </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
@@ -309,6 +313,11 @@
                             use-java-context="false">
                     <driver>@@DB_VENDOR@@</driver>
                     <connection-url>@@DB_URL@@</connection-url>
+                    <pool>
+                        <min-pool-size>3</min-pool-size>
+                        <max-pool-size>12</max-pool-size>
+                        <prefill>true</prefill>
+                    </pool>
                     <security>
                         <user-name>@@USERNAME@@</user-name>
                         <password>@@PASSWORD@@</password>
@@ -316,9 +325,10 @@
                     <validation>
                         <background-validation-millis>30000</background-validation-millis>
                         <check-valid-connection-sql>@@TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
                     <timeout>
-                        <idle-timeout-minutes>0</idle-timeout-minutes>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
                     </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
@@ -354,9 +364,13 @@
                         <password>@@BDM_PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@BDM_TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
+                    <timeout>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
+                    </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
@@ -368,16 +382,22 @@
                             use-java-context="false">
                     <driver>@@BDM_DB_VENDOR@@</driver>
                     <connection-url>@@BDM_DB_URL@@</connection-url>
+                    <pool>
+                        <min-pool-size>3</min-pool-size>
+                        <max-pool-size>12</max-pool-size>
+                        <prefill>true</prefill>
+                    </pool>
                     <security>
                         <user-name>@@BDM_USERNAME@@</user-name>
                         <password>@@BDM_PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@BDM_TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
                     <timeout>
-                        <idle-timeout-minutes>0</idle-timeout-minutes>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
                     </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
@@ -393,7 +413,8 @@
 
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}" />
+            <!-- 'deployment-timeout' value can be increased if your startup is too long to fit, because there are too many BPM elements to restart -->
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" deployment-timeout="600" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}" />
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:4.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
