@@ -16,7 +16,10 @@ package org.bonitasoft.platform.setup;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.util.Properties;
+
 import org.bonitasoft.platform.exception.PlatformException;
+import org.bonitasoft.platform.setup.command.configure.PropertyLoader;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ClearSystemProperties;
@@ -40,38 +43,53 @@ public class ConfigurationCheckerTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void tryToLoadDriverClass_should_load_class_if_present() throws Exception {
+    public void validate_should_load_class_if_present() throws Exception {
         // Default org.h2.Driver should be found:
-        new ConfigurationChecker().validate();
+        new ConfigurationChecker(new PropertyLoader().loadProperties()).validate();
     }
 
     @Test
-    public void tryToLoadDriverClass_should_fail_to_load_class_if_not_found() throws Exception {
-        final String wrongDriverClass = "org.404.NonExistent";
+    public void validate_should_fail_to_load_class_if_not_found() throws Exception {
+        final ConfigurationChecker configurationChecker = new ConfigurationChecker(
+                new PropertyLoader("/database.properties", "/missingDriverClass_internal.properties").loadProperties());
+        configurationChecker.loadProperties();
+
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("The driver class named '" + wrongDriverClass);
+        expectedException.expectMessage("The driver class named 'org.404.NonExistent'");
 
-        new ConfigurationChecker().tryToLoadDriverClass(wrongDriverClass);
+        configurationChecker.validate();
     }
 
     @Test
-    public void tryToLoadDriverClass_should_fail_if_class_to_load_is_not_set() throws Exception {
+    public void validate_should_fail_mandatory_property_is_not_set() throws Exception {
         final String dbVendor = "dbVendor";
         System.setProperty("sysprop.bonita.db.vendor", dbVendor);
+        final Properties propertiesWithMissingServerName = new PropertyLoader("/incomplete_database.properties").loadProperties();
 
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("Driver class name not set for database " + dbVendor);
+        expectedException.expectMessage("Mandatory property");
 
-        new ConfigurationChecker().validate();
+        new ConfigurationChecker(propertiesWithMissingServerName).validate();
+    }
+
+    @Test
+    public void validate_should_fail_if_class_to_load_is_not_set() throws Exception {
+        final ConfigurationChecker configurationChecker = new ConfigurationChecker(
+                new PropertyLoader("/database.properties", "/incomplete_internal.properties").loadProperties());
+
+        expectedException.expect(PlatformException.class);
+        expectedException.expectMessage("Mandatory property 'postgres.nonXaDriver'");
+
+        configurationChecker.validate();
     }
 
     @Test
     public void validate_should_check_driver_loadability() throws Exception {
-        final ConfigurationChecker checker = spy(new ConfigurationChecker());
+        final ConfigurationChecker checker = spy(new ConfigurationChecker(new PropertyLoader().loadProperties()));
 
         checker.validate();
 
-        verify(checker).validateDriverClass();
+        verify(checker).tryToLoadDriverClass();
     }
 
 }

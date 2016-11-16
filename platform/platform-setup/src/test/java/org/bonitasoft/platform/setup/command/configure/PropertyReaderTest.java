@@ -18,9 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Properties;
 
+import org.bonitasoft.platform.exception.PlatformException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 
 /**
@@ -30,6 +32,9 @@ public class PropertyReaderTest {
 
     @Rule
     public TestRule clean = new RestoreSystemProperties();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void properties_file_values_can_be_overridden_by_system_properties() throws Exception {
@@ -45,5 +50,19 @@ public class PropertyReaderTest {
 
         // then:
         assertThat(bdmConfig.getPropertyAndFailIfNull("bdm.db.vendor")).isEqualTo("otherValue");
+    }
+
+    @Test
+    public void should_fail_if_mandatory_property_is_not_set() throws Exception {
+        // given:
+        final PropertyReader reader = new PropertyReader(new Properties());
+
+        // then:
+        expectedException.expect(PlatformException.class);
+        expectedException.expectMessage("Mandatory property");
+
+        // when:
+        reader.getPropertyAndFailIfNull("db.server.name");
+
     }
 }

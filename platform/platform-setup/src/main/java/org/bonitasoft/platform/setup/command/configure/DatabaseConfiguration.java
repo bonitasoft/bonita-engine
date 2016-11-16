@@ -37,7 +37,7 @@ public class DatabaseConfiguration {
     private String testQuery;
     private PropertyReader propertyReader;
 
-    DatabaseConfiguration(String prefix, Properties properties, Path rootPath) throws PlatformException {
+    public DatabaseConfiguration(String prefix, Properties properties, Path rootPath) throws PlatformException {
         propertyReader = new PropertyReader(properties);
         dbVendor = getMandatoryProperty(prefix + "db.vendor");
 
@@ -66,7 +66,7 @@ public class DatabaseConfiguration {
         return dbVendor;
     }
 
-    String getNonXaDriverClassName() {
+    public String getNonXaDriverClassName() {
         return nonXaDriverClassName;
     }
 

@@ -32,6 +32,7 @@ import org.bonitasoft.platform.setup.command.PlatformSetupCommand;
 import org.bonitasoft.platform.setup.command.PullCommand;
 import org.bonitasoft.platform.setup.command.PushCommand;
 import org.bonitasoft.platform.setup.command.configure.ConfigureCommand;
+import org.bonitasoft.platform.setup.command.configure.PropertyLoader;
 import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class PlatformSetupApplication {
     }
 
     public static PlatformSetup getPlatformSetup(String[] args) throws PlatformException {
-        new ConfigurationChecker().validate();
+        new ConfigurationChecker(new PropertyLoader().loadProperties()).validate();
         return SpringApplication.run(PlatformSetupApplication.class, args).getBean(PlatformSetup.class);
     }
 
@@ -112,7 +113,7 @@ public class PlatformSetupApplication {
             } else {
                 LOGGER.error(e.getMessage());
                 LOGGER.error(
-                        "To get more detailed information about the error, set 'org.bonitasoft.platform.setup.PlatformSetupApplication' log level to 'DEBUG' and run again");
+                        "You might get more detailed information about the error by setting 'org.bonitasoft.platform.setup.PlatformSetupApplication' log level to 'DEBUG' in file 'logback.xml' and run again");
             }
             // Exit code allows the calling script to catch an invalid execution:
             System.exit(1);
