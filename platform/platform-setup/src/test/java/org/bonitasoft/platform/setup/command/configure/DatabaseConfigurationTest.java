@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Properties;
 
-import org.bonitasoft.platform.setup.command.configure.DatabaseConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -35,9 +34,7 @@ public class DatabaseConfigurationTest {
     @Test
     public void bonita_database_values_can_be_overridden_by_system_properties() throws Exception {
         // given:
-        final Properties properties = new Properties();
-        properties.load(this.getClass().getResourceAsStream("/database.properties"));
-        properties.load(this.getClass().getResourceAsStream("/internal.properties"));
+        final Properties properties = new PropertyLoader().loadProperties();
 
         System.setProperty("db.vendor", "mysql");
         System.setProperty("db.server.name", "postgresServer");
