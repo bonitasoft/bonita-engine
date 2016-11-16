@@ -54,8 +54,8 @@ echo "configure postgres"
 sed -i s/^db.vendor=h2/db.vendor=postgres/g ${E2E_DIR}/database.properties
 sed -i s/^db.user=.*/db.user=bonita/g ${E2E_DIR}/database.properties
 sed -i s/^db.password=.*/db.password=bpm/g ${E2E_DIR}/database.properties
-sed -i "s/^#[ ]*db.server.name=.*/db.server.name=localhost/g" ${E2E_DIR}/database.properties
-sed -i "s/^#[ ]*db.server.port=.*/db.server.port=5432/g" ${E2E_DIR}/database.properties
+sed -i "s/^[# ]*db.server.name=.*/db.server.name=localhost/g" ${E2E_DIR}/database.properties
+sed -i "s/^[# ]*db.server.port=.*/db.server.port=5432/g" ${E2E_DIR}/database.properties
 sed -i s/^db.database.name=.*/db.database.name=bonita/g ${E2E_DIR}/database.properties
 cat ${E2E_DIR}/database.properties
 echo "========================================"

@@ -55,7 +55,7 @@ abstract class BundleConfigurator {
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
     static final String POSTGRES = "postgres";
-    public static final String APPSERVER_FOLDERNAME = "server";
+    static final String APPSERVER_FOLDERNAME = "server";
 
     private Path rootPath;
 
@@ -74,14 +74,7 @@ abstract class BundleConfigurator {
     }
 
     void loadProperties() throws PlatformException {
-        final Properties properties = new Properties();
-        try {
-            properties.load(this.getClass().getResourceAsStream("/database.properties"));
-            properties.load(this.getClass().getResourceAsStream("/internal.properties"));
-        } catch (IOException e) {
-            throw new PlatformException("Error reading configuration file database.properties." +
-                    " Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted", e);
-        }
+        final Properties properties = new PropertyLoader().loadProperties();
 
         standardConfiguration = new DatabaseConfiguration("", properties, rootPath);
         bdmConfiguration = new DatabaseConfiguration("bdm.", properties, rootPath);

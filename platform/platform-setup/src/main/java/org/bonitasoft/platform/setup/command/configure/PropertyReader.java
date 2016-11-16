@@ -44,7 +44,9 @@ public class PropertyReader {
         final String property = properties.getProperty(propertyName);
         if (property == null) {
             throw new PlatformException(
-                    "Mandatory property '" + propertyName + "' is missing. Ensure you did not remove lines from file 'database.properties'");
+                    "Mandatory property '" + propertyName + "' is missing." +
+                            " Ensure you did not remove lines from file 'database.properties' (neither from file 'internal.properties')"
+                            + " and that the line is NOT commented out with a '#' character at start of line.");
         }
         return property;
     }
