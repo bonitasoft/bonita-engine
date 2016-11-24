@@ -13,18 +13,14 @@
  **/
 package org.bonitasoft.engine.search;
 
-import static org.bonitasoft.engine.matchers.ListElementMatcher.versionAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -35,8 +31,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,8 +48,8 @@ public class SearchProcessDefinitionIT extends TestWithUser {
     @Before
     public void before() throws Exception {
         super.before();
-        enabledProcessDefinitions = new ArrayList<ProcessDefinition>(2);
-        disabledProcessDefinitions = new ArrayList<ProcessDefinition>(2);
+        enabledProcessDefinitions = new ArrayList<>(2);
+        disabledProcessDefinitions = new ArrayList<>(2);
     }
 
     @Override
@@ -165,12 +159,12 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.ASC);
         SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(5, searchRes0.getCount());
-        assertThat(searchRes0.getResult(), versionAre("1.00", "1.01", "1.02", "1.03", "1.04"));
+        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.00", "1.01", "1.02", "1.03", "1.04");
         optsBuilder = new SearchOptionsBuilder(0, 10);
         optsBuilder.sort(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.DESC);
         searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(5, searchRes0.getCount());
-        assertThat(searchRes0.getResult(), versionAre("1.04", "1.03", "1.02", "1.01", "1.00"));
+        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.04", "1.03", "1.02", "1.01", "1.00");
     }
 
     @Test
@@ -189,7 +183,7 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         optsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.VERSION, "1.03");
         SearchResult<ProcessDeploymentInfo> searchResult = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(1, searchResult.getCount());
-        assertThat(searchResult.getResult(), versionAre("1.03"));
+        assertThat(searchResult.getResult()).extracting("version").containsExactly("1.03");
 
         // Filter on activation state
         optsBuilder = new SearchOptionsBuilder(0, 10);
@@ -200,13 +194,11 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         assertFalse("Don't have to contain the process definition \"plop\" !!", searchResult.getResult().contains(enabledProcessDefinitions.get(4)));
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchProcessDefinitionsWithApostropheOnProcessName() throws Exception {
         searchProcessDefinitions("process'Name", PROCESS_VERSION);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchProcessDefinitionsWithApostropheOnProcessVersion() throws Exception {
         searchProcessDefinitions(PROCESS_NAME, "process'VERSION");
@@ -236,7 +228,7 @@ public class SearchProcessDefinitionIT extends TestWithUser {
         optsBuilder.searchTerm("1.03");
         final SearchResult<ProcessDeploymentInfo> searchRes0 = getProcessAPI().searchProcessDeploymentInfos(optsBuilder.done());
         assertEquals(1, searchRes0.getCount());
-        assertThat(searchRes0.getResult(), versionAre("1.03"));
+        assertThat(searchRes0.getResult()).extracting("version").containsExactly("1.03");
     }
 
     private void createNbProcessDefinitionWithTwoHumanStepsAndDeployWithActor(final int nbProcess, final User user) throws BonitaException {

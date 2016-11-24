@@ -26,21 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
-import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventInstance;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
-import org.bonitasoft.engine.bpm.flownode.ThrowEventInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
@@ -59,8 +53,6 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.Test;
@@ -73,7 +65,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * check receiveProcess has started and halt on the user task.
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )", jira = "")
     @Test
     public void messageStartEventMessageSentAfterEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
@@ -93,7 +84,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * check receiveProcess has started and halt on the user task.
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )", jira = "")
     @Test
     public void messageStartEventMessageSentAfterEnableWithNoTargetFlowNode() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, null);
@@ -112,7 +102,6 @@ public class MessageEventIT extends AbstractEventIT {
      * Differs only by the dynamic with messageStartEventMessageSentAfterEnable (Before instead of After)
      * dynamic -> deployAndEnable(sendProcess), startProcess(sendProcess), deployAndEnable(receiveProcess)
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> start send process -> deploy receive process)", jira = "")
     @Test
     public void messageStartEventMessageSentBeforeEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
@@ -133,8 +122,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess), startProcess(sendProcess)
      * checks : receiveProcess stop on catchEvent, sendProcess is finished, receiveProcess continue and reaches user task.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process, and receive it in an intermediate event of an other process. Start Sender after Receiver", jira = "ENGINE-1652")
     @Test
     public void messageIntermediateCatchEventMessageSentAfterCatch() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -151,8 +138,6 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process, and receive it in an intermediate event of an other process. Start Sender before Receiver", jira = "ENGINE-1652")
     @Test
     public void messageIntermediateCatchEventMessageSentBeforeCatch() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -173,18 +158,16 @@ public class MessageEventIT extends AbstractEventIT {
      * 2 receiveProcess, 2 sendProcess, sendProcess1[1, Doe] -> receiveProcess1[1], sendProcess2[2,Doe Doe] -> receiveProcess2[2]
      * checks : receiveProcesses stop on catchEvent, sendProcess1 is finished.
      */
-    @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive", "Several messages", "Correlation" }, story = "Check correlation, to determine the target process when sending a message, works well.", jira = "")
     @Test
     public void messageIntermediateCatchEventWithCorrelations() throws Exception {
-        final Map<String, String> data = new HashMap<String, String>();
+        final Map<String, String> data = new HashMap<>();
         data.put("docNumber", Integer.class.getName());
         data.put("lastName", String.class.getName());
 
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(1);
+        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<>(1);
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
         final Expression docCorrelationValue = new ExpressionBuilder().createDataExpression("docNumber", Integer.class.getName());
-        correlations.add(new BEntry<Expression, Expression>(docCorrelationKey, docCorrelationValue));
+        correlations.add(new BEntry<>(docCorrelationKey, docCorrelationValue));
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, correlations,
                 data, null, null);
@@ -214,7 +197,8 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "2", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
-                        buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
+                        buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)),
+                null);
         waitForProcessToFinish(sendMessageProcessInstance2);
 
         assertNotNull(waitForUserTask(receiveMessageProcessInstance2.getId(), CATCH_MESSAGE_STEP1_NAME));
@@ -230,8 +214,6 @@ public class MessageEventIT extends AbstractEventIT {
      * 2 receiveProcess, 1 sendProcess, sendProcess1 -> receiveProcess1, sendProcess2 -> receiveProcess2[2]
      * checks : receiveProcesses stop on catchEvent, sendProcess1 is finished.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that if a send process has for targets two instances of the same ProcessDefinition and no correlation key is defined (equivalent to matching keys), exactly one of the receive process catches the message.", jira = "")
     @Test
     public void messageIntermediateCatchEventWithoutCorrelations() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -263,23 +245,21 @@ public class MessageEventIT extends AbstractEventIT {
      * 1 receiveProcess [value1,value2], 1 sendProcesss[value1,value2], message goes from endEvent to intermediateEvent
      * checks : receiveProcess stop on catchEvent , sendProcess is finished, receiveProcess continues and reaches user task.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Send", "Receive", "Correlation" }, story = "Verify that even if matching correlations keys are not in the same order in the receiveProcess and sendProcess, the message is transmitted.", jira = "")
     @Test
     public void correlationKeyInWrongOrderShouldWork() throws Exception {
-        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(2);
-        correlations.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
+        final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<>(2);
+        correlations.add(new BEntry<>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
                 .createConstantStringExpression("value1")));
-        correlations.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
+        correlations.add(new BEntry<>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
                 .createConstantStringExpression("value2")));
 
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME,
                 correlations, null, null, null);
 
-        final ArrayList<BEntry<Expression, Expression>> correlationsReceive = new ArrayList<BEntry<Expression, Expression>>(2);
-        correlationsReceive.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
+        final ArrayList<BEntry<Expression, Expression>> correlationsReceive = new ArrayList<>(2);
+        correlationsReceive.add(new BEntry<>(new ExpressionBuilder().createConstantStringExpression("bKey"), new ExpressionBuilder()
                 .createConstantStringExpression("value2")));
-        correlationsReceive.add(new BEntry<Expression, Expression>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
+        correlationsReceive.add(new BEntry<>(new ExpressionBuilder().createConstantStringExpression("aKey"), new ExpressionBuilder()
                 .createConstantStringExpression("value1")));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(correlationsReceive, null, null);
@@ -307,8 +287,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * checks : sendProcess is finished, , receiveProcess start and stop on user task, data is transmitted to the receiveProcess
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that a send process must have at least all correlation keys of the receive process for the message to be transmitted.", jira = "")
     @Test
     public void multipleCorrelationsKeys() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEventAndCorrelation();
@@ -318,7 +296,8 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(
                 receiveMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docRef", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
-                        buildAssignOperation("name", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
+                        buildAssignOperation("name", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)),
+                null);
 
         // wait the event node instance
         waitForEvent(receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.WAITING);
@@ -364,8 +343,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * checks : sendProcess is finished, receiveProcess start and stop on user task.
      */
-    @Cover(classes = { EventInstance.class, ThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.", jira = "")
     @Test
     public void messageIntermediateThrowEventMessageSentAfterEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
@@ -380,17 +357,15 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    @Cover(classes = { EventInstance.class, ThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.", jira = "")
     @Test
     public void messageIntermediateThrow2EventMessages() throws Exception {
-        final List<String> messages = new ArrayList<String>();
+        final List<String> messages = new ArrayList<>();
         messages.add("catchMessage");
         messages.add("startMessage");
-        final List<String> targetProcesses = new ArrayList<String>();
+        final List<String> targetProcesses = new ArrayList<>();
         targetProcesses.add(CATCH_MESSAGE_PROCESS_NAME);
         targetProcesses.add(START_WITH_MESSAGE_PROCESS_NAME);
-        final List<String> targetFlowNodes = new ArrayList<String>();
+        final List<String> targetFlowNodes = new ArrayList<>();
         targetFlowNodes.add(CATCH_EVENT_NAME);
         targetFlowNodes.add("startEvent");
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(messages, targetProcesses, targetFlowNodes);
@@ -423,8 +398,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * checks : sendProcess is finished, , receiveProcess start and stop on user task, data is transmitted to the receiveProcess
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", " Message data",
-            "Send", "Receive" }, story = "Send a message with data from an end event of a process to a start event of an other process.", jira = "")
     @Test
     public void dataTransferFromMessageEndEventToStartMessageEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null,
@@ -455,8 +428,6 @@ public class MessageEventIT extends AbstractEventIT {
      * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and reaches user task , data is transmitted to
      * the receiveProcess.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.", jira = "")
     @Test
     public void dataTransferFromMessageEndEventToMessageIntermediateCatchEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null,
@@ -495,8 +466,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), startProcess(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess)
      * checks : sendProcess is finished, receiveProcess reaches catchEvent and continue (found message sent by sendProcess) and reaches user task.
      */
-    @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate throw event", "Send", "Receive" }, story = "Verify receive process receive message targeting it, even if the message is sent before its existence.", jira = "")
     @Test
     public void messageSentProcessFinishBeforeReceiveProcessIsEnabled() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -517,8 +486,6 @@ public class MessageEventIT extends AbstractEventIT {
      * Test where the message goes from a throwEvent to a catchEvent belonging to the same process hence the same pool (forbidden by BPMN 2.0)
      * But the studio forbid this case, so this should never happen in the Engine.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = {
-            "Event", "Message event", "Throw event", "Catch event", "Send", "Receive" }, story = "Message goes from a throw event to a catch event belonging to the same process hence the same pool (forbidden by BPMN 2.0).", jira = "")
     @Test
     public void messageEventIntraProcess() throws Exception {
         final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
@@ -537,8 +504,6 @@ public class MessageEventIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess), startProcess(receiveProcess)
      * checks : sendProcess is finished, receiveProcess reaches catchEvent and continue (found message sent by sendProcess) and reaches user task.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message from an end event to an intermediate event. Check send process is finished, receive process reaches catch event and continue.", jira = "")
     @Test
     public void messageIntermediateCatchEventMessageMultiSend() throws Exception {
         final ProcessDefinition sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", MESSAGE_NAME,
@@ -560,8 +525,6 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Delete" }, story = "Check that delete process instance should delete waiting events.", jira = "")
     @Test
     public void deleteProcessInstanceShouldDeleteWaitingEvents() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithIntermediateCatchMessageEvent(null, null, null);
@@ -578,8 +541,6 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "throw event", "send message",
-            "start event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageViaAPIToStartMessageEvent() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
@@ -606,8 +567,6 @@ public class MessageEventIT extends AbstractEventIT {
         getProcessAPI().sendMessage(messageName, targetProcessExpression, targetFlowNodeExpression, messageContent, correlations);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "throw event", "send message",
-            "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageViaAPIToIntermediateMessageEvent() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(null, null, null);
@@ -624,8 +583,6 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "message content", "throw event", "send message",
-            "start event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageWithDataViaAPIToStartMessageEvent() throws Exception {
         final Expression lastNameDisplay = new ExpressionBuilder().createConstantStringExpression("lName");
@@ -670,8 +627,6 @@ public class MessageEventIT extends AbstractEventIT {
         assertEquals(0, taskInstances.size());
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "correlation", "throw event", "send message",
-            "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageWithCorrelationViaAPIToIntermediateMessageEvent() throws Exception {
         final Expression docCorrelationKey = new ExpressionBuilder().createConstantStringExpression("docKey");
@@ -680,11 +635,11 @@ public class MessageEventIT extends AbstractEventIT {
         final Expression nameCorrelationValue1 = new ExpressionBuilder().createConstantStringExpression("Doe 2");
         final Expression nameCorrelationValue2 = new ExpressionBuilder().createConstantStringExpression("Doe Doe");
 
-        final Map<Expression, Expression> correlations1 = new HashMap<Expression, Expression>(2);
+        final Map<Expression, Expression> correlations1 = new HashMap<>(2);
         correlations1.put(docCorrelationKey, docCorrelationValue);
         correlations1.put(nameCorrelationKey, nameCorrelationValue1); // don't match
 
-        final Map<Expression, Expression> correlations2 = new HashMap<Expression, Expression>(2);
+        final Map<Expression, Expression> correlations2 = new HashMap<>(2);
         correlations2.put(docCorrelationKey, docCorrelationValue);
         correlations2.put(nameCorrelationKey, nameCorrelationValue2);
 
@@ -711,8 +666,6 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "correlation", "throw event", "send message",
-            "intermediate catch event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageWithDataViaAPIToIntermediateCatchMessageEvent() throws Exception {
         final List<Operation> catchMessageOperations = Collections.singletonList(buildAssignOperation("name", "lName", String.class.getName(),
@@ -740,10 +693,9 @@ public class MessageEventIT extends AbstractEventIT {
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "too many correlation" }, jira = "ENGINE-447")
     @Test(expected = SendEventException.class)
     public void sendMessageWithTooManyCorrelations() throws Exception {
-        final Map<Expression, Expression> correlations = new HashMap<Expression, Expression>(6);
+        final Map<Expression, Expression> correlations = new HashMap<>(6);
         correlations.put(new ExpressionBuilder().createConstantStringExpression("key1"), new ExpressionBuilder().createConstantIntegerExpression(1));
         correlations.put(new ExpressionBuilder().createConstantStringExpression("key2"), new ExpressionBuilder().createConstantStringExpression("label"));
         correlations.put(new ExpressionBuilder().createConstantStringExpression("key3"), new ExpressionBuilder().createConstantStringExpression("2"));
@@ -757,7 +709,6 @@ public class MessageEventIT extends AbstractEventIT {
         getProcessAPI().sendMessage(MESSAGE_NAME, targetProcessExpression, targetFlowNodeExpression, null, correlations);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Loop", "Terminate", "Process" }, jira = "ENGINE-1723")
     @Test
     public void sendMessageToTerminateProcessWithLoop() throws Exception {
         ProcessDefinition processToKillDefinition = null;
@@ -777,11 +728,11 @@ public class MessageEventIT extends AbstractEventIT {
             // Catch Message Event
             final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processToKillDefinitionBuilder
                     .addIntermediateCatchEvent(CATCH_EVENT_NAME).addMessageEventTrigger("msgKiller");
-            final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(1);
+            final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<>(1);
             final Expression correlationKey = new ExpressionBuilder().createConstantStringExpression("key");
             final Expression correlationValue = new ExpressionBuilder().createGroovyScriptExpression("getId", "processInstanceId", Long.class.getName(),
                     new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID));
-            correlations.add(new BEntry<Expression, Expression>(correlationKey, correlationValue));
+            correlations.add(new BEntry<>(correlationKey, correlationValue));
             addCorrelations(catchMessageEventTriggerDefinitionBuilder, correlations);
             // Transitions
             processToKillDefinitionBuilder.addTransition("ToKillStart", "Gateway");
@@ -804,10 +755,10 @@ public class MessageEventIT extends AbstractEventIT {
             final Expression targetFlowNode = new ExpressionBuilder().createConstantStringExpression(CATCH_EVENT_NAME);
             final ThrowMessageEventTriggerBuilder throwMessageEventTriggerBuilder = killerProcessDefinitionBuilder.addEndEvent("KillerEnd")
                     .addMessageEventTrigger("msgKiller", targetProcess, targetFlowNode);
-            final ArrayList<BEntry<Expression, Expression>> endCorrelations = new ArrayList<BEntry<Expression, Expression>>(1);
+            final ArrayList<BEntry<Expression, Expression>> endCorrelations = new ArrayList<>(1);
             final Expression endCorrelationKey = new ExpressionBuilder().createConstantStringExpression("key");
             final Expression endCorrelationValue = new ExpressionBuilder().createConstantLongExpression(processToKillInstance.getId());
-            endCorrelations.add(new BEntry<Expression, Expression>(endCorrelationKey, endCorrelationValue));
+            endCorrelations.add(new BEntry<>(endCorrelationKey, endCorrelationValue));
             addCorrelations(throwMessageEventTriggerBuilder, endCorrelations);
             // Transitions
             killerProcessDefinitionBuilder.addTransition("KillerStart", "Step3");
@@ -828,7 +779,6 @@ public class MessageEventIT extends AbstractEventIT {
         }
     }
 
-    @Cover(classes = { EventInstance.class }, concept = Cover.BPMNConcept.EVENTS, jira = "BS-12124", keywords = { "Message", "Target defined by a variable" })
     @Test
     public void can_use_a_variable_to_define_target_process() throws Exception {
         //given

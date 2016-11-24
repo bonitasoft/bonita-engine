@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.connectors;
 
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -47,8 +42,6 @@ import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -64,7 +57,6 @@ import org.bonitasoft.engine.bpm.process.impl.ReceiveTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SendTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -83,8 +75,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -132,7 +122,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Automatic activity", "Data output" }, story = "Test connector on finish of an automatic activity with data output.", jira = "")
     @Test
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -168,7 +157,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Multi-instance", "activitity data" }, story = "Test connector on finish of an Multi-instance activity with local data expression.", jira = "")
     @Test
     public void executeConnectorOnFinishOfMultiInstancedActivity() throws Exception {
         // deploy the process
@@ -245,7 +233,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         builder.addTransition(multiTaskName, userTaskName);
         builder.addTransition(userTaskName, "end");
 
-        final List<BarResource> resources = new ArrayList<BarResource>();
+        final List<BarResource> resources = new ArrayList<>();
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorInJar.impl", "TestConnectorInJar.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/connector-in-jar.jar.bak", "connector-in-jar.jar");
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -256,7 +244,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         return deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multiple", "On activity" }, story = "Test multiple connectors on one activity.", jira = "")
     @Test
     public void executeConnectorMultipleConnectorsOnOneActivity() throws Exception {
         final String defaultValue = "a";
@@ -303,7 +290,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "No connector implementation", "Redeploy process" }, story = "Test process redeployment with no connector implementation.", jira = "")
     @Test
     public void redeployProcessWithNoConnectorImplem() throws Exception {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
@@ -324,7 +310,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition2);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process definition" }, story = "Execute connector on process definition.", jira = "")
     @Test
     public void executeConnectorOnProcessDefinition() throws Exception {
         final String valueOfInput1 = "Lily";
@@ -363,14 +348,14 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     private Map<String, Expression> getConnectorInputParameters(final String mainName, final Expression mainExp) {
-        final Map<String, Expression> connectorInputParameters = new HashMap<String, Expression>();
+        final Map<String, Expression> connectorInputParameters = new HashMap<>();
         connectorInputParameters.put(mainName, mainExp);
         return connectorInputParameters;
     }
 
     private Map<String, Map<String, Serializable>> getInputValues(final String mainName, final List<String> names, final List<String> vars) {
-        final Map<String, Map<String, Serializable>> inputValues = new HashMap<String, Map<String, Serializable>>();
-        final Map<String, Serializable> values = new HashMap<String, Serializable>();
+        final Map<String, Map<String, Serializable>> inputValues = new HashMap<>();
+        final Map<String, Serializable> values = new HashMap<>();
         if (names != null && !names.isEmpty() && vars != null && !vars.isEmpty() && names.size() == vars.size()) {
             for (int i = 0; i < names.size(); i++) {
                 values.put(names.get(i), vars.get(i));
@@ -380,14 +365,13 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         return inputValues;
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "")
     @Test
     public void executeConnectorInJar() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
 
-        final List<BarResource> resources = new ArrayList<BarResource>();
+        final List<BarResource> resources = new ArrayList<>();
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorInJar.impl", "TestConnectorInJar.impl");
         addResource(resources, "/org/bonitasoft/engine/connectors/connector-in-jar.jar.bak", "connector-in-jar.jar");
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
@@ -485,7 +469,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "Automatic task" }, jira = "ENGINE-936")
     @Test
     public void executeConnectorThatThrowExceptionFailAutomaticTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnAutomaticTaskOnEnter("normal", FailAction.FAIL, false);
@@ -496,7 +479,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On finish", "Failed", "Automatic task" }, jira = "ENGINE-936")
     @Test
     public void executeConnectorThatThrowExceptionFailAutomaticTaskOnFinish() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnAutomaticTaskOnFinish("normal", FailAction.FAIL, false);
@@ -507,7 +489,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the activity fails as well.", jira = "ENGINE-885")
     @Test
     public void connectorThatThrowExceptionFailPolicyOnTaskInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -533,7 +514,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, ignore the connector and continue.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionIgnorePolicyOnTaskInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -558,7 +538,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the activity fails as well.", jira = "ENGINE-885")
     @Test
     public void connectorThatThrowExceptionFailPolicyOnProcessInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -584,7 +563,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the activity throw error event.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskInput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -609,7 +587,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Automatic task" }, story = "When a connector fails during inputs' setting, the automatic activity throw error event.", jira = "ENGINE-1304")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnAutomaticTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -634,7 +611,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Receive task" }, story = "When a connector fails during inputs' setting, the receive task throw error event.", jira = "ENGINE-1304")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnReceiveTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -660,7 +636,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Send task" }, story = "When a connector fails during inputs' setting, the send task throw error event.", jira = "ENGINE-1304")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnSendTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -686,7 +661,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during outputs' setting, the activity throw error event.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskOutput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -712,7 +686,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the error is ignored.", jira = "ENGINE-987")
     @Test
     public void ignoreErrorConnectorOnBoundaryWhenInputFail() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -733,7 +706,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during outputs' setting, the activity throw error event.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionIgnorePolicyOnTaskOutput() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -755,7 +727,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during outputs' setting, the activity fails as well.", jira = "ENGINE-885")
     @Test
     public void connectorThatThrowExceptionFailPolicyOnTaskOutput() throws Exception {
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantStringExpression("NaN");
@@ -789,7 +760,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         return searchOptionsBuilder;
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" }, jira = "")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionFailUserTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("runtime", FailAction.FAIL, false);
@@ -800,7 +770,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" }, jira = "")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionInConnectFailUserTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("connect", FailAction.FAIL, false);
@@ -811,7 +780,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" }, jira = "")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionInDisconnectFailUserTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("disconnect", FailAction.FAIL, false);
@@ -822,7 +790,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "Automatic task" }, jira = "ENGINE-936")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionFailAutomaticTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnAutomaticTaskOnEnter("runtime", FailAction.FAIL, false);
@@ -833,7 +800,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On finish", "Failed", "Automatic task" }, jira = "ENGINE-936")
     @Test
     public void connectorThatThrowRuntimeExceptionFailTask() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnAutomaticTaskOnFinish("runtime", FailAction.FAIL, false);
@@ -969,8 +935,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "throw", "event", "human task", "connector", "aborted" }, jira = "ENGINE-767, ENGINE-1226", story = "throw error event connector should be catch by boundary event")
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskShouldAbortCurrentTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
@@ -999,8 +963,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event", "call activity", "connector" }, jira = "ENGINE-767", story = "throw error event connector is not catch, activity should fail")
     public void connectorThatThrowExceptionErrorEventPolicyNotCatchOnTask() throws Exception {
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
@@ -1022,8 +984,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event", "call activity", "connector" }, jira = "ENGINE-767", story = "throw error event connector should be catch by boundary event")
     public void connectorThatThrowExceptionErrorEventPolicyCallActivityOnTask() throws Exception {
         // create the process with connector throwing error
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
@@ -1061,7 +1021,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(callingProcess, calledProcess);
     }
 
-    @Cover(classes = ConnectorInstance.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Search" }, story = "Search connector instances", jira = "")
     @Test
     public void searchConnectorInstances() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("searchConnector", "1.0");
@@ -1077,19 +1036,18 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS).done();
         SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(2, connectorInstances.getCount());
-        assertThat(connectorInstances.getResult(), nameAre("onEnterConnector", "onFinishConnector"));
+        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("onEnterConnector", "onFinishConnector");
 
         final SearchOptionsBuilder searchOptionsBuilder = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS);
         searchOptionsBuilder.searchTerm("onEnter");
         searchOptions = searchOptionsBuilder.done();
         connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
-        assertThat(connectorInstances.getResult(), nameAre("onEnterConnector"));
+        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("onEnterConnector");
 
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance" }, story = "search for archived connector instances and check they are deleted at the deletion of the definition", jira = "ENGINE-651")
     @Test
     public void searchArchivedConnectorInstance() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
@@ -1109,7 +1067,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         searchOptionsBuilder.sort(ArchiveConnectorInstancesSearchDescriptor.NAME, Order.ASC);
         SearchOptions searchOptions = searchOptionsBuilder.done();
         SearchResult<ArchivedConnectorInstance> connectorInstances = getProcessAPI().searchArchivedConnectorInstances(searchOptions);
-        assertThat(connectorInstances.getResult(), nameAre("myConnectorOnStep"));
+        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("myConnectorOnStep");
 
         // finish process
         assignAndExecuteStep(step2Id, userId);
@@ -1122,20 +1080,21 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         searchOptionsBuilder.sort(ArchiveConnectorInstancesSearchDescriptor.NAME, Order.ASC);
         searchOptions = searchOptionsBuilder.done();
         connectorInstances = getProcessAPI().searchArchivedConnectorInstances(searchOptions);
-        assertThat(connectorInstances.getResult(), nameAre("myConnectorOnProcess"));
+        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("myConnectorOnProcess");
 
         // search for archived connector instances using SOURCE_OBJECT_ID
         searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.SOURCE_OBJECT_ID, connectorInstances.getResult().get(0).getSourceObjectId() );
+        searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.SOURCE_OBJECT_ID, connectorInstances.getResult().get(0).getSourceObjectId());
         searchOptions = searchOptionsBuilder.done();
-        Assertions.assertThat(getProcessAPI().searchArchivedConnectorInstances(searchOptions).getResult()).extracting("name").containsOnly("myConnectorOnProcess");
+        Assertions.assertThat(getProcessAPI().searchArchivedConnectorInstances(searchOptions).getResult()).extracting("name")
+                .containsOnly("myConnectorOnProcess");
 
         // now also connector of process is archived
         searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.sort(ArchiveConnectorInstancesSearchDescriptor.NAME, Order.ASC);
         searchOptions = searchOptionsBuilder.done();
         connectorInstances = getProcessAPI().searchArchivedConnectorInstances(searchOptions);
-        assertThat(connectorInstances.getResult(), nameAre("myConnectorOnProcess", "myConnectorOnStep"));
+        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("myConnectorOnProcess", "myConnectorOnStep");
 
         disableAndDeleteProcess(processDefinition);
 
@@ -1146,7 +1105,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         assertTrue("there should be no archived connector anymore", connectorInstances.getResult().isEmpty());
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation", "Classpath" }, story = "execution of input expression and output operations of connector must be done in the process classpath", jira = "ENGINE-1022")
     @Test
     public void connectorWithExternalLibraryInInputAndOutput() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
@@ -1173,7 +1131,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation" }, story = "execute connector on activity instance and execute operations", jira = "ENGINE-1037")
     @Test
     public void executeConnectorOnProcessDefinitionWithOperations() throws Exception {
         final Expression input1Expression = new ExpressionBuilder().createInputExpression("valueOfInput1", String.class.getName());
@@ -1191,9 +1148,9 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         // connector return param1="welcome Lily and Lucy and Mett"
         // operations: put "Jack" in data valueOfInput3, param1 in "externalData" and "John" in "externalDataConst"
         // Create Operation map:
-        final List<Operation> operations = new ArrayList<Operation>(2);
+        final List<Operation> operations = new ArrayList<>(2);
         // set valueOfInput3
-        final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
+        final Map<String, Serializable> contexts = new HashMap<>();
         operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalData", true)
                 .setRightOperand(new ExpressionBuilder().createInputExpression("param1", String.class.getName())).setType(OperatorType.ASSIGNMENT).done());
         operations.add(new OperationBuilder().createNewInstance().setLeftOperand("externalDataConst", true)
@@ -1211,7 +1168,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "connected resources" }, story = "Test connector with connected resources.", jira = "")
     @Test
     // The connector output is list to which an element is added when the method connect or disconnect is called.
     // when the output operations are executed only the method is connect is supposed to be called, that is, the list must contain only one element.
@@ -1246,7 +1202,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         return deployProcessWithActorAndTestConnectorWithConnectedResource(processDefinitionBuilder, ACTOR_NAME, user);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "User filter", "Connector", "On enter" }, jira = "ENGINE-1305")
     @Test
     public void executeConnectorOnEnterAfterUserFilter() throws Exception {
         final String dataName = "taskAssignee";
@@ -1270,7 +1225,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final List<User> userIds = new ArrayList<User>();
+        final List<User> userIds = new ArrayList<>();
         userIds.add(user);
         userIds.add(jack);
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorEngineExecutionContextAndFilterWithAutoAssign(
@@ -1286,7 +1241,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         deleteUser(jack);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Engine Execution Context", }, story = "Access the connector execution context from a connector.", jira = "")
     @Test
     public void getEngineExecutionContext() throws Exception {
         final String dataName = "taskAssignee";
@@ -1366,7 +1320,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
 
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector failure" }, jira = "BS-11877")
     @Test
     public void getConnectorWithFailureInformationOnConnectorExecution() throws Exception {
         //given
@@ -1406,12 +1359,13 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(designProcessDefinition, ACTOR_NAME,
+                user);
         return processDefinition;
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder,
-                                                                                               final String actor, final User user) throws BonitaException, IOException {
+            final String actor, final User user) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actor, user, null,
                 "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }

@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessRuntimeAPI;
-import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -47,8 +45,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -64,8 +60,6 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         return deployAndEnableProcess(done);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Compare two objects with operator GREATER_THAN.", jira = "ENGINE-562")
     @Test
     public void evaluateObjectComparisonWithGreaterThan() throws Exception {
         final Employee emp1 = new Employee("Doe", "John", 4);
@@ -73,7 +67,7 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         final Expression exprOperand1 = new ExpressionBuilder().createDataExpression("emp1", Employee.class.getName());
         final Expression exprOperand2 = new ExpressionBuilder().createDataExpression("emp2", Employee.class.getName());
 
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> inputValues = new HashMap<>(2);
         inputValues.put("emp1", emp1);
         inputValues.put("emp2", emp2);
 
@@ -88,8 +82,6 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Compare two objects with operator EQUALS.", jira = "ENGINE-562")
     @Test
     public void evaluateObjectComparisonWithEquals() throws Exception {
         final Employee emp1 = new Employee("Doe", "John", 3);
@@ -99,7 +91,7 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         final Expression exprOperand2 = new ExpressionBuilder().createDataExpression("emp2", Employee.class.getName());
         final Expression exprOperand3 = new ExpressionBuilder().createDataExpression("emp3", Employee.class.getName());
 
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(3);
+        final Map<String, Serializable> inputValues = new HashMap<>(3);
         inputValues.put("emp1", emp1);
         inputValues.put("emp2", emp2);
         inputValues.put("emp3", emp3);
@@ -113,8 +105,6 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Compare object and parent object with operator EQUALS.", jira = "ENGINE-562")
     @Test
     public void evaluateComparisonExpressionWithObjectAndParentObject() throws Exception {
         final Employee employee = new Employee("Smith", "Ashley", 2);
@@ -122,7 +112,7 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         final Expression exprOperand1 = new ExpressionBuilder().createDataExpression("emp1", Employee.class.getName());
         final Expression exprOperand2 = new ExpressionBuilder().createDataExpression("emp2", Secretary.class.getName());
 
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> inputValues = new HashMap<>(2);
         inputValues.put("emp1", employee);
         inputValues.put("emp2", secretary);
 
@@ -133,7 +123,6 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { DataInstance.class }, concept = BPMNConcept.OPERATION, keywords = { "Expression", "Transient data" }, story = "Compare two objects with operator GREATER_THAN.", jira = "BS-1379")
     @Test
     public void should_operation_with_transient_data_reevaluate_the_definition_if_lost() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithTransientData",
@@ -178,7 +167,7 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
 
     private Map<String, Serializable> evaluateTransientDataWithExpression(final HumanTaskInstance step1) throws ExpressionEvaluationException,
             InvalidExpressionException {
-        final Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<Expression, Map<String, Serializable>>();
+        final Map<Expression, Map<String, Serializable>> expressionMap = new HashMap<>();
         expressionMap
                 .put(new ExpressionBuilder().createTransientDataExpression("tData", String.class.getName()), Collections.<String, Serializable> emptyMap());
         return getProcessAPI().evaluateExpressionsOnActivityInstance(step1.getId(), expressionMap);

@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
@@ -41,8 +40,6 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,8 +62,8 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
     @Before
     public void before() throws Exception {
         super.before();
-        categories = new ArrayList<Category>();
-        processDefinitions = new ArrayList<ProcessDefinition>();
+        categories = new ArrayList<>();
+        processDefinitions = new ArrayList<>();
     }
 
     @Override
@@ -81,7 +78,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         super.after();
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category" }, jira = "")
     @Test
     public void createCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -94,7 +90,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(name, rCategory.getName());
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class, User.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category", "Creator" }, jira = "ENGINE-619")
     @Test
     public void createCategoryWithCreatorAsAnID() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
@@ -110,8 +105,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         deleteUser(user);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class, AlreadyExistsException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",
-            "Exception" }, jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void createCategoryWithCategoryAlreadyExistException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -121,14 +114,11 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().createCategory(name, description);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class, CreationException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",
-            "Exception" }, jira = "")
     @Test(expected = CreationException.class)
     public void createCategoryWithCategoryCreationException() throws Exception {
         getProcessAPI().createCategory(null, description);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Number", "Category" }, jira = "")
     @Test
     public void getNumberOfCategories() throws Exception {
         final Category category1 = getProcessAPI().createCategory(name + 1, description);
@@ -140,7 +130,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(2, categoriesCount);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed" }, jira = "")
     @Test
     public void getCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -155,7 +144,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(description, rCategory.getDescription());
     }
 
-    @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception" }, jira = "")
     @Test(expected = CategoryNotFoundException.class)
     public void getCategoryWithCategoryNotFoundException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -165,7 +153,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().getCategory(category.getId() + 1);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed", "Several" }, jira = "")
     @Test
     public void getCategories() throws Exception {
         final Category category1 = getProcessAPI().createCategory("category1", description);
@@ -197,7 +184,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(0, categoriesNameAsc.size());
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Update" }, jira = "")
     @Test
     public void updateCategory() throws Exception {
         final Category oldCategory = getProcessAPI().createCategory(name, description);
@@ -215,8 +201,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(newDescription, categoryUpdated.getDescription());
     }
 
-    @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception",
-            "Update" }, jira = "")
     @Test(expected = CategoryNotFoundException.class)
     public void updateCategoryWithCategoryNotFoundException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -226,13 +210,11 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().updateCategory(category.getId() + 1, updater);
     }
 
-    @Cover(classes = { ProcessAPI.class, UpdateException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Update" }, jira = "")
     @Test(expected = UpdateException.class)
     public void updateCategoryWithCategoryUpdateException() throws Exception {
         getProcessAPI().updateCategory(0, null);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Delete" }, jira = "")
     @Test(expected = CategoryNotFoundException.class)
     public void deleteCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -240,14 +222,11 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         getProcessAPI().getCategory(category.getId());
     }
 
-    @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception",
-            "Delete" }, jira = "")
     @Test(expected = DeletionException.class)
     public void deleteCategoryWithCategoryNotFoundException() throws Exception {
         getProcessAPI().deleteCategory(Long.MAX_VALUE);
     }
 
-    @Cover(classes = { ProcessAPI.class, DeletionException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Delete" }, jira = "")
     @Test(expected = DeletionException.class)
     public void deleteCategoryWithCategoryDeletionException() throws Exception {
         getProcessAPI().deleteCategory(0);
@@ -349,7 +328,7 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         final long categoryId = category.getId();
         // generate process definition id
         processDefinitions = generateProcessDefinition(3, "process", "version");
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
+        final List<Long> processDefinitionIds = new ArrayList<>();
         for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
@@ -412,7 +391,7 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         final long categoryId = category.getId();
         // generate process definitions
         processDefinitions = generateProcessDefinition(3, "process", "version");
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
+        final List<Long> processDefinitionIds = new ArrayList<>();
         for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
@@ -472,7 +451,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(0, outOfRangeCategories.size());
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "Category", "ProcessDefinition" }, jira = "")
     @Test
     public void getCategoriesUnrelatedToProcessDefinition() throws Exception {
         // generate categories
@@ -536,7 +514,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         assertEquals(0, outOfRangeCategories.size());
     }
 
-
     @Test
     public void removeProcessDefinitionsOfCategory() throws Exception {
         // generate category
@@ -544,7 +521,7 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         categories.add(category);
         // generate process definitions
         processDefinitions = generateProcessDefinition(3, "process", "version");
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
+        final List<Long> processDefinitionIds = new ArrayList<>();
         for (final ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionIds.add(processDefinition.getId());
         }
@@ -629,7 +606,7 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
 
     private List<Category> generateCategory(final int count, final String categoryName, final String description) throws AlreadyExistsException,
             CreationException {
-        final List<Category> categoryList = new ArrayList<Category>();
+        final List<Category> categoryList = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             categoryList.add(getProcessAPI().createCategory(categoryName + i, description + i));
         }
@@ -638,7 +615,7 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
 
     private List<ProcessDefinition> generateProcessDefinition(final int count, final String processName, final String version)
             throws InvalidBusinessArchiveFormatException, ProcessDeployException, InvalidProcessDefinitionException, AlreadyExistsException {
-        final List<ProcessDefinition> processDefinitionList = new ArrayList<ProcessDefinition>();
+        final List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(processName + i,
                     version + i, Arrays.asList("step1"), Arrays.asList(true));
@@ -677,7 +654,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         fail("It is not allowed to add twice the same category to a process");
     }
 
-    @Cover(classes = { Category.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-1047", keywords = { "Category", "Process" })
     @Test(expected = AlreadyExistsException.class)
     public void cannotAssociateTheSameCategoryTwiceWitAProcess() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();

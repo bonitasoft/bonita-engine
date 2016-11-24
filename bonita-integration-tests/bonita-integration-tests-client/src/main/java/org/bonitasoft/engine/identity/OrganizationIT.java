@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -38,8 +39,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -51,8 +50,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -101,8 +98,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
     @Rule
     public final SystemOutRule systemOutRule = new SystemOutRule();
 
-
-    @Cover(classes = {IdentityAPI.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "Number of users"}, jira = "")
     @Test
     public void importOrganization() throws Exception {
         // when
@@ -168,7 +163,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     private void checkCustomUserInfo(final CustomUserInfoValue customUserInfoValue, final String expectedName, final String expectedValue,
-                                     final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) {
+            final Map<String, CustomUserInfoDefinition> userInfoDefinitonsMap) {
         assertThat(customUserInfoValue.getDefinitionId()).isEqualTo(userInfoDefinitonsMap.get(expectedName).getId());
         assertThat(customUserInfoValue.getValue()).isEqualTo(expectedValue);
     }
@@ -206,12 +201,11 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     private void checkCustomUserInfoDefinition(final String expectedName, final String expectedDescription,
-                                               final CustomUserInfoDefinition customUserInfoDefinition) {
+            final CustomUserInfoDefinition customUserInfoDefinition) {
         assertThat(customUserInfoDefinition.getName()).isEqualTo(expectedName);
         assertThat(customUserInfoDefinition.getDescription()).isEqualTo(expectedDescription);
     }
 
-    @Cover(classes = {IdentityAPI.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "UserMembership", "Deleted"}, jira = "ENGINE-1363")
     @Test
     public void reImportUserMembershipDeleted() throws Exception {
         final String userName = ANTHONY_USERNAME;
@@ -247,8 +241,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = {IdentityAPI.class, User.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "Organization", "Enabled", "Disabled",
-            "User"}, jira = "ENGINE-577")
     @Test
     public void importOrganizationWithEnabledAndDisabledUsers() throws Exception {
         // create XML file
@@ -353,8 +345,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Cover(classes = {IdentityAPI.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import",
-            "Organization"}, story = "import same organization twice work", jira = "")
     @Test
     public void importACMEOrganizationTwiceWithDefaultProfile() throws Exception {
         // create XML file
@@ -372,8 +362,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Cover(classes = {IdentityAPI.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import",
-            "Organization"}, story = "import same organization twice work even if some elements are removed", jira = "ENGINE-916")
     @Test
     public void importACMEOrganizationTwiceButRemoveGroupsAndRole() throws Exception {
         // create XML file
@@ -424,8 +412,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = {IdentityAPI.class, User.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "Organization",
-            "User"}, story = "check that import fail restore to previous state the organization", jira = "")
     @Test(expected = OrganizationImportException.class)
     public void importOrganizationFailRollBackToOldOrganization() throws Exception {
         InputStream xmlStream = OrganizationIT.class.getResourceAsStream("organizationFailOnDuplicates.xml");
@@ -496,10 +482,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Cover(classes = {ActorMember.class, Group.class, Role.class,
-            User.class}, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-808, ENGINE-1635", keywords = {
-            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Supervisor",
-            "External identity mapping", "Pending mapping "})
     @Test
     public void deleteOrganization() throws Exception {
         // Create records for user role, group and membership
@@ -555,9 +537,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = {ActorMember.class, Group.class, Role.class, User.class}, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-1635", keywords = {
-            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Supervisor",
-            "External identity mapping", "Pending mapping "})
     @Test(expected = DeletionException.class)
     public void cantDeleteOrganizationWhenProcessInstanceIsActive() throws Exception {
         // Create records for user role, group and membership
@@ -605,8 +584,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = {IdentityAPI.class, ImportPolicy.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Organization", "Import",
-            "Policy"}, story = "Import a new organization keep the old, if duplicates elements fail import", jira = "ENGINE-428")
     @Test(expected = OrganizationImportException.class)
     public void importOrganizationFailOnDuplicates() throws Exception {
         // create XML file
@@ -688,8 +665,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         fail("This statement shouldn't be reached.");
     }
 
-    @Cover(classes = {IdentityAPI.class, ImportPolicy.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Organization", "Import",
-            "Policy"}, story = "Import a new organization keep the old, no duplicates elements", jira = "ENGINE-428")
     @Test
     public void importOrganizationFailOnDuplicatesNoDuplicates() throws Exception {
         // create XML file
@@ -774,8 +749,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
     }
 
-    @Cover(classes = {IdentityAPI.class, ImportPolicy.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Organization", "Import",
-            "Policy"}, story = "Import a new organization keep the old, if duplicates elements replace existing ones, add new elements", jira = "ENGINE-428")
     @Test
     public void importOrganizationMergeDuplicates() throws Exception {
         // given
@@ -869,8 +842,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         assertNotNull(persistedUser2);
     }
 
-    @Cover(classes = {IdentityAPI.class, ImportPolicy.class, User.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "Organization",
-            "Enabled", "Disabled", "User"}, jira = "ENGINE-577")
     @Test
     public void importOrganizationMergeDuplicatesWithEnabledAndDisabledUsers() throws Exception {
         // create XML file
@@ -904,8 +875,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(getIdentityAPI().getGroupByPath(WEB_GROUP_NAME).getId());
     }
 
-    @Cover(classes = {IdentityAPI.class, ImportPolicy.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Organization", "Import",
-            "Policy"}, story = "Import a new organization keep the old, if duplicates elements keep existing ones, add new elements", jira = "ENGINE-428")
     @Test
     public void importOrganizationIgnoreDuplicates() throws Exception {
         // create XML file
@@ -999,8 +968,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(persistedGroup2.getId());
     }
 
-    @Cover(classes = {IdentityAPI.class, ImportPolicy.class, User.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "Organization",
-            "Enabled", "Disabled", "User"}, jira = "ENGINE-577")
     @Test
     public void importOrganizationIgnoreDuplicatesWithEnabledAndDisabledUsers() throws Exception {
         // create XML file
@@ -1108,7 +1075,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
         // roles
         final RoleCreator rc1 = new RoleCreator(DEVELOPER);
         rc1.setDisplayName("Bonita developer");
-        rc1.setIcon("myIcon.jpg", new byte[]{1, 2, 3});
+        rc1.setIcon("myIcon.jpg", new byte[] { 1, 2, 3 });
         final Role persistedRole1 = getIdentityAPI().createRole(rc1);
         final RoleCreator rc2 = new RoleCreator(MANAGER);
         rc2.setDisplayName(BONITA_MANAGER);
@@ -1156,8 +1123,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Cover(classes = {IdentityAPI.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Export", "Organization",
-            "Special characters"}, jira = "ENGINE-1517")
     @Test
     public void exportOrganizationWithSpecialCharacters() throws Exception {
         // create records for user role, group and membership
@@ -1225,8 +1190,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(group.getId());
     }
 
-    @Cover(classes = {IdentityAPI.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Import", "Export", "Organization",
-            "Special characters"}, jira = "ENGINE-1517")
     @Test
     public void importAndExportOrganizationWithSpecialCharacters() throws Exception {
         importOrganization("OrganizationWithSpecialCharacters.xml");
@@ -1327,8 +1290,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = {IdentityAPI.class, User.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Export", "Organization", "Disabled",
-            "User"}, jira = "ENGINE-577")
     @Test
     public void exportOrganizationWithDisabledUsers() throws Exception {
         // create records for user
@@ -1345,8 +1306,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser(persistedUser.getId());
     }
 
-    @Cover(classes = {IdentityAPI.class, User.class}, concept = BPMNConcept.ORGANIZATION, keywords = {"Export", "Organization", "Enabled",
-            "User"}, jira = "ENGINE-577")
     @Test
     public void exportOrganizationWithEnabledUsers() throws Exception {
         // create records for user
@@ -1400,7 +1359,6 @@ public class OrganizationIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteOrganization();
     }
 
-
     @Test
     public void should_import_user_even_if_manager_is_unkown() throws Exception {
         //given
@@ -1416,7 +1374,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
         //then
         assertThat(getIdentityAPI().getUserByUserName("john").getManagerUserId())
                 .as("manager id of john").isEqualTo(0);
-        assertThat(systemOutRule.getLog()).contains("The user john has a manager with username johnManager, but this one does not exist. Please set it manually.");
+        assertThat(systemOutRule.getLog())
+                .contains("The user john has a manager with username johnManager, but this one does not exist. Please set it manually.");
         //clean
         getIdentityAPI().deleteOrganization();
     }

@@ -18,14 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.CustomUserInfoAPI;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Test;
 
@@ -48,8 +45,6 @@ public class CustomUserInfoIT extends TestWithUser {
         super.after();
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
-            "Custom user info definition", "Creation" })
     @Test
     public void createCustomUserInfoDefinition_should_return_the_new_created_object() throws Exception {
         // given
@@ -63,8 +58,6 @@ public class CustomUserInfoIT extends TestWithUser {
         assertThat(info.getDescription()).isEqualTo("The user skills.");
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
-            "Custom user info definition", "get list" })
     @Test
     public void getCustomUserInfoDefinitions_return_objects_according_to_pagination_size_and_ordered_by_name_asc() throws Exception {
         // given
@@ -86,8 +79,6 @@ public class CustomUserInfoIT extends TestWithUser {
         assertThat(definitions).containsExactly(skills);
     }
 
-    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info",
-            "get list" })
     @Test
     public void getCustomUserInfo_should_return_all_info_even_when_value_is_null() throws Exception {
         // given
@@ -106,8 +97,6 @@ public class CustomUserInfoIT extends TestWithUser {
         assertThat(infoPage2.get(0).getValue()).isEqualTo("java");
     }
 
-    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info",
-            "set value" })
     @Test
     public void setCustomUserInfoValue_should_delete_CustomUserInfoValue_when_set_to_null() throws Exception {
         // given
@@ -126,8 +115,6 @@ public class CustomUserInfoIT extends TestWithUser {
         assertThat(values.get(0).getValue()).isEqualTo("code slayer");
     }
 
-    @Cover(classes = { CustomUserInfo.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info",
-            "set value" })
     @Test
     public void setCustomUserInfoValue_should_update_CustomUserInfoValue_when_one_already_exist() throws Exception {
         // given
@@ -150,8 +137,6 @@ public class CustomUserInfoIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
-            "Custom user info definition", "Deletion" })
     @Test
     public void deleteCustomUserInfoDefinition_should_delete_definition_and_values_from_database() throws Exception {
         // given
@@ -171,8 +156,6 @@ public class CustomUserInfoIT extends TestWithUser {
         assertThat(values.getCount()).isEqualTo(0);
     }
 
-    @Cover(classes = { CustomUserInfoValue.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = {
-            "Custom user info value", "User deletion" })
     @Test
     public void deleteUser_should_delete_related_custom_user_info_value_from_database() throws Exception {
         // given
@@ -198,8 +181,6 @@ public class CustomUserInfoIT extends TestWithUser {
         return getIdentityAPI().createCustomUserInfoDefinition(creator);
     }
 
-    @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoValue.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-8842", keywords = {
-            "Custom user info value", "Users" })
     @Test
     public void getUserIdsWithCustomUserInfo_should_return_only_users_with_the_given_user_info() throws Exception {
         //given

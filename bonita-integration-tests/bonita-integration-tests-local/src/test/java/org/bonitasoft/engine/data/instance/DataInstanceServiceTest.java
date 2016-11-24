@@ -13,21 +13,16 @@
  **/
 package org.bonitasoft.engine.data.instance;
 
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -78,7 +73,6 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
     protected DataInstanceService dataInstanceService;
 
     protected ParentContainerResolverImpl parentContainerResolver;
-
 
     @Before
     public void setupDataInstanceService() {
@@ -386,8 +380,7 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
         final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType, parentContainerResolver);
         getTransactionService().complete();
         assertEquals(2, dataInstances.size());
-        assertThat("Not all data instances have been found", Arrays.asList(dataInstances.get(0), dataInstances.get(1)),
-                namesContain(instance1Name, instance2Name));
+        Assertions.assertThat(dataInstances).extracting("name").containsOnly(instance1Name, instance2Name);
     }
 
     @Test
@@ -799,7 +792,7 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
 
     private void verifyUpdateLongTextDataInstance(final String name, final String classType, final String description, final String content,
             final Long containerId, final String containerType, final Boolean isTransient, final String updateDescription, final Serializable updateValue)
-                    throws Exception {
+            throws Exception {
         final SDataInstance dataInstance = buildLongTextDataInstance(name, description, content, containerId, containerType, isTransient);
         insertDataInstance(dataInstance);
 

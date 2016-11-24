@@ -16,15 +16,12 @@ package org.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -32,7 +29,6 @@ import org.junit.Test;
  */
 public class ApplicationIT extends TestWithApplication {
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create" })
     @Test
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
@@ -65,7 +61,6 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile" })
     @Test
     public void createApplication_without_profile_should_have_null_profileId() throws Exception {
         //given
@@ -79,7 +74,6 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getProfileId()).isNull();
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update" })
     @Test
     public void updateApplication_should_return_application_up_to_date() throws Exception {
         //given
@@ -113,7 +107,6 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "get" })
     @Test
     public void getApplication_returns_application_with_the_given_id() throws Exception {
         //given
@@ -128,7 +121,6 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(retrievedApp).isEqualTo(createdApp);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "get" })
     @Test
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
@@ -148,8 +140,6 @@ public class ApplicationIT extends TestWithApplication {
         }
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
-            "no search term" })
     @Test
     public void searchApplications_without_filter_return_all_elements_based_on_pagination() throws Exception {
         //given
@@ -178,8 +168,6 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(secondPage.getResult()).containsExactly(marketing);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on name",
-            "no search term" })
     @Test
     public void searchApplications_can_filter_on_name() throws Exception {
         //given
@@ -201,9 +189,6 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(applications.getResult()).containsExactly(engineering);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search",
-            "filter on display name",
-            "no search term" })
     @Test
     public void searchApplications_can_filter_on_display_name() throws Exception {
         //given
@@ -225,8 +210,6 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(applications.getResult()).containsExactly(hr);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on version",
-            "no search term" })
     @Test
     public void searchApplications_can_filter_on_version() throws Exception {
         //given
@@ -249,8 +232,6 @@ public class ApplicationIT extends TestWithApplication {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search",
-            "filter on profileId", "no search term" })
     @Test
     public void searchApplications_can_filter_on_profileId() throws Exception {
         //given
@@ -278,8 +259,6 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(marketing.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
-            "search term" })
     @Test
     public void searchApplications_can_use_search_term() throws Exception {
         //given

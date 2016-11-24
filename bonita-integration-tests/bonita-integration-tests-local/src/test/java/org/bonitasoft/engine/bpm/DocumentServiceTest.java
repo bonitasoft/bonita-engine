@@ -28,8 +28,6 @@ import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +55,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         documentNameKey = BuilderFactory.get(SDocumentBuilderFactory.class).getNameKey();
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Create", "DocumentMapping" }, jira = "")
     @Test
     public void attachDocumentToProcessInstanceWithContentTest() throws SBonitaException {
         transactionService.begin();
@@ -79,7 +76,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(result);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document" }, jira = "")
     @Test
     public void attachDocumentToProcessInstanceWithUrlTest() throws SBonitaException {
         transactionService.begin();
@@ -100,7 +96,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(result);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document" }, jira = "")
     @Test
     public void attachDocumentToProcessInList() throws SBonitaException {
         transactionService.begin();
@@ -125,7 +120,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(result1);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "DocumentMapping", "Id" }, jira = "")
     @Test
     public void getDocumentByIdTest() throws SBonitaException {
         final SMappedDocument sDocument = createDocumentMapping();
@@ -136,7 +130,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(result);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "DocumentMapping", "ProcessId", "Name" }, jira = "")
     @Test
     public void getDocumentByNameAndProcessIdTest() throws SBonitaException {
         final SMappedDocument sDocument = createDocumentMapping();
@@ -153,7 +146,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(result);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "DocumentMapping", "Number", "ProcessInstance" }, jira = "")
     @Test
     public void getNumberOfDocumentMappingsForProcessInstanceTest() throws SBonitaException {
         final List<SMappedDocument> list = createDocumentMappings();
@@ -168,7 +160,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(list);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "DocumentMapping", "Number", "ProcessInstance" }, jira = "")
     @Test
     public void getDocumentMappingsForProcessInstanceTest() throws SBonitaException {
         final List<SMappedDocument> list = createDocumentMappings();
@@ -259,7 +250,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         transactionService.complete();
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Contents", "Document" }, jira = "")
     @Test
     public void getDocumentContentTest() throws SBonitaException {
         final byte[] documentContent = "this is the content of the document".getBytes();
@@ -272,7 +262,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(sProcessDocument);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Number", "ProcessInstance" }, jira = "")
     @Test
     public void getNumberOfDocumentsOfProcessInstanceTest() throws SBonitaException {
         final List<SMappedDocument> list = createAndAttachDocumentToProcessInstances();
@@ -287,7 +276,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(list);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Number", "ProcessInstance" }, jira = "")
     @Test
     public void getDocumentsOfProcessInstanceTest() throws SBonitaException {
         final List<SMappedDocument> list = createAndAttachDocumentToProcessInstances();
@@ -323,7 +311,6 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(list);
     }
 
-    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Remove", "Document" }, jira = "ENGINE-594")
     @Test
     public void removeDocumentsTest() throws SBonitaException {
         final byte[] documentContent = "this is the content of the document".getBytes();

@@ -13,15 +13,8 @@
  **/
 package org.bonitasoft.engine.event;
 
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
-import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -29,8 +22,6 @@ import org.junit.Test;
  */
 public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary event", "Timer",
-            "Non-interrupting" }, story = "Execute non-interrupting timer boundary event triggered.", jira = "ENGINE-1042")
     @Test
     public void nonInterruptTimerBoundaryEventTriggered() throws Exception {
         // deploy process with non-interrupting boundary event
@@ -58,8 +49,6 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupting",
-            "Timer", "Call Activity" }, story = "Execute timer boundary event triggered on call activity.", jira = "ENGINE-1042")
     @Test
     public void nonInterruptTimerBoundaryEventTriggeredOnCallActivity() throws Exception {
         final long timerDuration = 2000;
@@ -94,8 +83,6 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(targetProcessDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
-            "Non-interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute non-interrupting timer boundary event triggered on sequential multi-instance.", jira = "ENGINE-1042")
     @Test
     public void nonInterruptTimerBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         // deploy a process with a non-interrupting timer boundary event attached to a sequential multi-instance
@@ -130,8 +117,6 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
-            "Non-interrupting", "Timer", "MultiInstance", "Parallel" }, story = "Non-interrupting timer boundary event attached to parallel multi-instance.", jira = "ENGINE-1042")
     @Test
     public void nonInterruptTimerBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final long timerDuration = 1000;
@@ -162,8 +147,6 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Non-interrupging",
-            "Timer", "Loop activity", "Exception flow" }, story = "Non-interrupting timer boundary event triggered on loop activity", jira = "ENGINE-1042")
     @Test
     public void nonInterruptTimerBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final long timerDuration = 1000;

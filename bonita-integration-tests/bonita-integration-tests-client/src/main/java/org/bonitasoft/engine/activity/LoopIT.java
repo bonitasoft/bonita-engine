@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
@@ -44,8 +43,6 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Test;
 
@@ -97,7 +94,6 @@ public class LoopIT extends TestWithUser {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "expression context", "flow node container hierarchy" }, jira = "ENGINE-1848")
     public void evaluateExpressionsOnLoopUserTask() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("evaluateExpressionsOnLoopUserTask", "1.0");
         builder.addActor(ACTOR_NAME).addDescription("For Golf players only");
@@ -110,7 +106,7 @@ public class LoopIT extends TestWithUser {
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
             final long userTaskId = waitForUserTask(processInstance, activityName);
-            final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+            final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
             expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
             getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskId, expressions);
         } finally {
@@ -166,7 +162,9 @@ public class LoopIT extends TestWithUser {
     @Test
     public void executeAStandardLoopWithConditionUsingDataUsingLoopCounter() throws Exception {
         final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingLoopCounter",
-                "pData + loopCounter < 6", Boolean.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("pData",Integer.class.getName()),new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+                "pData + loopCounter < 6", Boolean.class.getName(),
+                Arrays.asList(new ExpressionBuilder().createDataExpression("pData", Integer.class.getName()),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask", "1.0");
         builder.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
@@ -174,7 +172,8 @@ public class LoopIT extends TestWithUser {
         UserTaskDefinitionBuilder step1 = builder.addUserTask("step1", ACTOR_NAME);
         step1.addLoop(false, condition);
         step1.addData("theData", Integer.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER));
-        step1.addOperation(new OperationBuilder().createSetDataOperation("pData",new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+        step1.addOperation(
+                new OperationBuilder().createSetDataOperation("pData", new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
         builder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
@@ -188,7 +187,6 @@ public class LoopIT extends TestWithUser {
 
         disableAndDeleteProcess(processDefinition);
     }
-
 
     private long waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
             throws Exception {

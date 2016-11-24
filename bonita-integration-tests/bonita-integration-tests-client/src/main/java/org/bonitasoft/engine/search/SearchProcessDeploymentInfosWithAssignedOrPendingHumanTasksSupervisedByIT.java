@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -28,8 +27,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,18 +56,17 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervis
     public void before() throws Exception {
         super.before();
         // create users
-        users = new ArrayList<User>(2);
+        users = new ArrayList<>(2);
         users.add(createUser("chicobento", "bpm"));
         users.add(createUser("cebolinha", "bpm"));
 
         // create processes
-        enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
+        enabledProcessDefinitions = new ArrayList<>(4);
         createProcessesDefinitions();
 
         supervisor = getProcessAPI().createProcessSupervisorForUser(enabledProcessDefinitions.get(0).getId(), users.get(0).getId());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Supervisor", "Assignee", "Pending", "Task", "Process definition" }, jira = "BS-1635")
     @Test
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
@@ -83,7 +79,6 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervis
         assertEquals(0, searchRes.getCount());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Supervisor", "Assignee", "Pending", "Task", "Process definition" }, jira = "BS-1635")
     @Test
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByWithFilter() throws Exception {
         // test filter on process name

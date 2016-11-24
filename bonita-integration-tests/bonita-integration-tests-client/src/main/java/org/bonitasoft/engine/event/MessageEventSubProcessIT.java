@@ -29,7 +29,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
@@ -38,8 +37,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -49,7 +46,6 @@ import org.junit.Test;
  */
 public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-1841", story = "transmit data to start message event of eventsubprocess")
     @Test
     public void messageEventSubProcessTransmitData() throws Exception {
         // create a process with a user step and an event subprocess that start with a start message event having an operation updating the data
@@ -63,7 +59,8 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                 .addStartEvent("start")
                 .addMessageEventTrigger("msg")
                 .addOperation(
-                        new OperationBuilder().createSetDataOperation("aData", new ExpressionBuilder().createDataExpression("msgData", String.class.getName())));
+                        new OperationBuilder().createSetDataOperation("aData",
+                                new ExpressionBuilder().createDataExpression("msgData", String.class.getName())));
         subProcessBuilder.addTransition("start", "stepInSubProcess");
         final ProcessDefinition receiveProcess = deployAndEnableProcessWithActor(receiveProcessBuilder.done(), ACTOR_NAME, user);
 
@@ -87,7 +84,6 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(sendProcess, receiveProcess);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
     @Test
     public void messageEventSubProcessTriggered() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcess();
@@ -119,8 +115,6 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process.getId());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message",
-            "intermediateThrowEvent" }, jira = "ENGINE-1406")
     @Test
     public void messageEventSubProcessTriggeredWithIntermediateThrowEvent() throws Exception {
         final String receiverProcessName = "ReceiverEndMessageEvent";
@@ -174,7 +168,6 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(receiverProcessDefinition.getId());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
     @Test
     public void messageEventSubProcessNotTriggered() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcess();
@@ -195,13 +188,12 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
     @Test
     public void messageEventSubProcessTriggeredWithCorrelation() throws Exception {
         final Expression correlationKey = new ExpressionBuilder().createConstantStringExpression("productName");
         final Expression catchCorrelationValue = new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName());
 
-        final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(Collections.singletonList(new BEntry<Expression, Expression>(
+        final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(Collections.singletonList(new BEntry<>(
                 correlationKey, catchCorrelationValue)));
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
         waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
@@ -217,8 +209,6 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process.getId());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message",
-            "intermediate throw event" }, jira = "BS-11096")
     @Test
     public void messageEventSubProcessTriggeredWithCorrelationAndIntermediateThrowEvent() throws Exception {
         // Correlation
@@ -235,7 +225,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
 
         // Receiver
         final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithMessageEventSubProcessAndData(Collections
-                .singletonList(new BEntry<Expression, Expression>(correlationKey, correlationValue)));
+                .singletonList(new BEntry<>(correlationKey, correlationValue)));
         final ProcessInstance receiverProcessInstance = getProcessAPI().startProcess(receiverProcessDefinition.getId());
         waitForUserTask(receiverProcessInstance, PARENT_PROCESS_USER_TASK_NAME);
 
@@ -246,7 +236,6 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(senderProcessDefinition, receiverProcessDefinition);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
     @Test
     public void createSeveralInstances() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcess();
@@ -266,7 +255,6 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process.getId());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message", "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(null);
@@ -297,13 +285,13 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+            throws DataNotFoundException {
         final DataInstance activityDataInstance;
         activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message", "call activity" }, jira = "ENGINE-536")
     @Test
     public void messageEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithMessageEventSubProcess();

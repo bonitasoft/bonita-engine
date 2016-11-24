@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
@@ -53,8 +52,6 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Test;
 
@@ -405,8 +402,6 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
         };
     }
 
-    @Cover(classes = { CommandAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "AdvancedStartProcessCommand",
-            "Connector", "Enter" }, jira = "BS-9188")
     @Test
     public void advancedStartProcessCommandWithConnectorOnEnterOnProcess() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);

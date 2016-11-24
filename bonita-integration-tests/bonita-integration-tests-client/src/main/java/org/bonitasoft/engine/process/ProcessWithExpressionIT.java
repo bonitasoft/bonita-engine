@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,14 +27,10 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.AutomaticTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -51,8 +44,6 @@ import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.XPathReturnType;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -73,13 +64,13 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void executeProcessWithListOfListOfExpression() throws Exception {
         final Serializable result = executeProcessAndGetResultOfExpression(
                 new ExpressionBuilder().createListOfListExpression("myMap",
-                        Collections.singletonList(Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("test")))), "java.util.List");
+                        Collections.singletonList(Collections.singletonList(new ExpressionBuilder().createConstantStringExpression("test")))),
+                "java.util.List");
         assertTrue(result instanceof List);
         assertEquals(1, ((List<?>) result).size());
         assertEquals("test", ((List<?>) ((List<?>) result).get(0)).get(0));
     }
 
-    @Cover(classes = { AutomaticTaskInstance.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Groovy", "API" }, story = "Evaluate a script that use the API", jira = "ENGINE-903")
     @Test
     public void executeProcessWithScriptUsingApi() throws Exception {
         final Serializable result = executeProcessAndGetResultOfExpression(new ExpressionBuilder().createGroovyScriptExpression("scriptAPI",
@@ -203,7 +194,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void evaluateConstantExpressionFromApi() throws Exception {
         final ProcessDefinition processDefinition = deployEmptyProcess();
         Expression expression = new ExpressionBuilder().createConstantBooleanExpression(true);
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(0);
+        final Map<String, Serializable> inputValues = new HashMap<>(0);
         assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
 
         expression = new ExpressionBuilder().createConstantStringExpression("test");
@@ -224,7 +215,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void evaluateInputExpressionFromApi() throws Exception {
         final ProcessDefinition processDefinition = deployEmptyProcess();
         final Expression expression = new ExpressionBuilder().createInputExpression("test", Boolean.class.getName());
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>();
+        final Map<String, Serializable> inputValues = new HashMap<>();
         inputValues.put("test", true);
         assertEquals(true, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
@@ -235,7 +226,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployEmptyProcess();
         final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("evaluateGroovyExpressionFromApi", "input1 + 12",
                 Integer.class.getName(), new ExpressionBuilder().createInputExpression("input1", Integer.class.getName()));
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> inputValues = new HashMap<>(1);
         inputValues.put("input1", 8);
         assertEquals(20, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
@@ -247,7 +238,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("evaluateGroovyWithDataProvidedExpressionFromApi",
                 "input1 + data1 + 12", Integer.class.getName(), new ExpressionBuilder().createInputExpression("input1", Integer.class.getName()),
                 new ExpressionBuilder().createDataExpression("data1", Integer.class.getName()));
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> inputValues = new HashMap<>(2);
         inputValues.put("input1", 6);
         inputValues.put("data1", 2);
         assertEquals(20, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
@@ -265,7 +256,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final Expression felixConstExp = new ExpressionBuilder().createConstantStringExpression("FELIX");
         final Expression listExpression2 = new ExpressionBuilder().createListExpression("manuList2", Arrays.asList(listExpression1, felixConstExp));
 
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> inputValues = new HashMap<>(1);
         inputValues.put(data1Content, "dataValue");
         final List<Serializable> result = (List<Serializable>) getProcessAPI().evaluateExpressionOnProcessDefinition(listExpression2, inputValues,
                 processDefinition.getId());
@@ -288,7 +279,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
         final Expression listExpression = new ExpressionBuilder().createListExpression("ManuList1", Arrays.asList(groovyExpr, constantExpr, data1Expr));
 
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> inputValues = new HashMap<>(1);
         inputValues.put(data1Content, "EXPRESSION");
         @SuppressWarnings("unchecked")
         final List<Serializable> result = (List<Serializable>) getProcessAPI().evaluateExpressionOnProcessDefinition(listExpression, inputValues,
@@ -304,7 +295,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
     public void evaluateDataExpressionFromApiOnUnknownData() throws Exception {
         final ProcessDefinition processDefinition = deployEmptyProcess();
         final Expression expression = new ExpressionBuilder().createDataExpression("data", Boolean.class.getName());
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(0);
+        final Map<String, Serializable> inputValues = new HashMap<>(0);
         try {
             getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId());
         } finally {
@@ -312,8 +303,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.OTHERS, keywords = { "Expression", "Condition Expression",
-            "Compararison expression" }, jira = "ENGINE-380")
     @Test
     public void evaluateGreaterThanComparationExpression() throws Exception {
         final Expression dependExpr1 = new ExpressionBuilder().createConstantDoubleExpression(5.1);
@@ -334,8 +323,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.OTHERS, keywords = { "Expression", "Condition Expression",
-            "Logical complement expression" }, jira = "ENGINE-380")
     @Test
     public void evaluateLogicalComplementExpression() throws Exception {
         final Expression dependExpr1 = new ExpressionBuilder().createConstantBooleanExpression(true);
@@ -352,8 +339,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertTrue((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Test operator GREATER_THAN_OR_EQUALS", jira = "ENGINE-562")
     @Test
     public void evaluateGreaterThanOrEqualsComparisonExpression() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantIntegerExpression(7);
@@ -380,8 +365,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertTrue((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Test operator LESS_THAN", jira = "ENGINE-562")
     @Test
     public void evaluateLessThanComparisonExpression() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantIntegerExpression(7);
@@ -408,8 +391,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Test operator LESS_THAN_OR_EQUALS", jira = "ENGINE-562")
     @Test
     public void evaluateLessThanOrEqualsComparisonExpression() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantIntegerExpression(7);
@@ -436,8 +417,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Execute comparison with boolean values.", jira = "ENGINE-562")
     @Test
     public void evaluateComparisonExpressionWithBoolean() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantBooleanExpression(false);
@@ -455,8 +434,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertTrue((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Execute comparison with double values.", jira = "ENGINE-562")
     @Test
     public void evaluateComparisonExpressionWithDouble() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantDoubleExpression(1.0);
@@ -475,8 +452,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Execute comparison with long values.", jira = "ENGINE-562")
     @Test
     public void evaluateComparisonExpressionWithLong() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantLongExpression(145);
@@ -495,8 +470,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Execute comparison with lowercase string values.", jira = "ENGINE-562")
     @Test
     public void evaluateComparisonExpressionWithLowerCaseString() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantStringExpression("john");
@@ -515,8 +488,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "Condition expression", "Comparison expression" }, story = "Execute comparison with lowercase and uppercase string values.", jira = "ENGINE-562")
     @Test
     public void evaluateComparisonExpressionWithLowerCaseAndUpperCaseString() throws Exception {
         final Expression exprOperand1 = new ExpressionBuilder().createConstantStringExpression("john");
@@ -547,7 +518,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         assertFalse((Boolean) result);
     }
 
-    @Cover(classes = { AutomaticTaskInstance.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Groovy", "Fail" }, story = "Eecute task that fail because of the groovy script.", jira = "ENGINE-672")
     @Test
     public void runProcessWithScriptThatThrowExceptionFailTheTask() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithGroovy", "1.0");
@@ -562,7 +532,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "XPathReadExpressionExecutorStrategy" }, jira = "ENGINE-1044")
     @Test
     public void processWithXPathExpression() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("XPathExpression", "1.0");
@@ -578,8 +547,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, AutomaticTaskInstance.class, ActivityStates.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "UserTask",
-            "Transition", "State", "Failed" }, jira = "ENGINE-796")
     @Test
     public void executeProcessWithAutomaticTasksAndTransitionFailed() throws Exception {
         // Build condition
@@ -606,7 +573,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ExpressionBuilder.class, ProcessRuntimeAPI.class }, concept = BPMNConcept.OTHERS, keywords = { "Expression", "Java method call", }, jira = "ENGINE-1128")
     @Test
     public void evaluateJavaMethodCallExpression() throws Exception {
         final String extraDataName = "myValues";
@@ -620,7 +586,6 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
     }
 
-    @Cover(classes = { Expression.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "custom type", "java expression", "classloader" }, jira = "ENGINE-1249", story = "can't call 2 times a same java operation after a redeploy")
     @Test
     public void evaluateJavaMethodCallExpressionTwice() throws Exception {
         // the cache on ClassReflector made impossible to call the same expression on the same class if it was loaded by 2 different process

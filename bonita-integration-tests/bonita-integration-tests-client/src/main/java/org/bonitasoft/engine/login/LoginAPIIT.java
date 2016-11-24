@@ -42,8 +42,6 @@ import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,16 +100,12 @@ public class LoginAPIIT extends CommonAPIIT {
         loginTenant.login("", null);
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login",
-            "Password" }, story = "Try to login with null password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithNullPassword() throws BonitaException {
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         loginTenant.login("matti", null);
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login",
-            "Password" }, story = "Try to login with wrong password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
@@ -127,8 +121,6 @@ public class LoginAPIIT extends CommonAPIIT {
         }
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login",
-            "Password" }, story = "Try to login with empty password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithEmptyPassword() throws BonitaException {
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
@@ -191,7 +183,6 @@ public class LoginAPIIT extends CommonAPIIT {
         logoutOnTenant();
     }
 
-    @Cover(jira = "ENGINE-1653", classes = { User.class, LoginAPI.class }, concept = BPMNConcept.NONE, keywords = { "disable user", "login" })
     @Test(expected = LoginException.class)
     public void unableToLoginWhenTheUserIsDisable() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();

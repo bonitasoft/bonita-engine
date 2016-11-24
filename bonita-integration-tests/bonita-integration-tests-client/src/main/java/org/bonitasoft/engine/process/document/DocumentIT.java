@@ -15,7 +15,6 @@ package org.bonitasoft.engine.process.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.*;
 
 import java.io.Serializable;
@@ -26,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -44,7 +43,6 @@ import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -74,9 +72,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -546,8 +541,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchDocuments",
-            "Apostrophe" }, jira = "ENGINE-366, ENGINE-594")
     @Test
     public void searchDocumentsWithApostrophe() throws Exception {
         searchDocumentsWithApostrophe("'documentName", "fileName");
@@ -628,8 +621,6 @@ public class DocumentIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedDocuments",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchArchivedDocumentsWithApostropheInTheDocumentName() throws Exception {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
@@ -658,8 +649,6 @@ public class DocumentIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedDocuments",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchArchivedDocumentsWithApostropheInTheFileName() throws Exception {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
@@ -761,8 +750,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
 
-    @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-631", keywords = { "document", "operation",
-            "update" }, story = "update an existing document using operation")
     @Test
     public void updateExistingDocumentWithOperation() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("procWithStringIndexes", "1.0");
@@ -812,8 +799,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-978", keywords = { "document", "operation",
-            "update" }, story = "update an existing document using operation")
     @Test
     public void updateExistingDocumentWithNullOperation() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("procWithStringIndexes", "1.0");
@@ -855,8 +840,6 @@ public class DocumentIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-631", keywords = { "document", "operation",
-            "update" }, story = "update an existing document url using operation")
     @Test
     public void updateExistingDocumentUrlWithOperation() throws Exception {
 
@@ -898,8 +881,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-631", keywords = { "document", "operation",
-            "update" }, story = "create a document document using operation")
     @Test
     public void createDocumentWithOperationAndInitialValue() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("procWithStringIndexes", "1.0");
@@ -973,7 +954,7 @@ public class DocumentIT extends TestWithUser {
         final Operation docContentOperation = new OperationBuilder().createSetDocument(docName,
                 new ExpressionBuilder().createInputExpression("documentValue", DocumentValue.class.getName()));
 
-        final Map<String, Serializable> expressionContext = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> expressionContext = new HashMap<>(2);
         final String documentFileName = "updatedContent.txt";
         expressionContext.put("documentValue", new DocumentValue("Binary content of the document".getBytes(), "plain/text", documentFileName));
         expressionContext.put("documentReference", new DocumentValue(docUrl));
@@ -991,8 +972,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-975", keywords = { "document", "operation", "create",
-            "URL" }, story = "create a document using operation and URL")
     @Test
     public void createDocumentWithOperationUsingURL() throws Exception {
         // deploy and instantiate process
@@ -1036,8 +1015,6 @@ public class DocumentIT extends TestWithUser {
         return deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
     }
 
-    @Cover(classes = Document.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-652", keywords = { "document",
-            "sort" }, story = "get last version of document, sorted")
     @Test
     public void getLastVersionOfDocumentsOfAProcess() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("procWithStringIndexes", "1.0");
@@ -1100,8 +1077,6 @@ public class DocumentIT extends TestWithUser {
         deleteUser(john);
     }
 
-    @Cover(classes = Document.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-929", keywords = { "document",
-            "name" }, story = "Start a process with a long name (number of characters > 255)")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void startProcessWithLongSizeDocumentName() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentWithLongName", "1.0");
@@ -1122,8 +1097,6 @@ public class DocumentIT extends TestWithUser {
         processBuilder.getProcess();
     }
 
-    @Cover(classes = Document.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-929", keywords = { "document",
-            "name" }, story = "Start a process with file name with maximum number of characters authorized.")
     @Test
     public void startProcessWithMaxSizeDocumentName() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentWithLongName", "1.0");
@@ -1150,8 +1123,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = Document.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-929", keywords = { "document",
-            "url" }, story = "Start a process with a long url (number of characters > 255)")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void startProcessWithLongSizeDocumentURL() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentWithLongName", "1.0");
@@ -1173,8 +1144,6 @@ public class DocumentIT extends TestWithUser {
         processBuilder.getProcess();
     }
 
-    @Cover(classes = Document.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-929", keywords = { "document",
-            "url" }, story = "Start a process with url with maximum number of characters authorized.")
     @Test
     public void startProcessWithMaxSizeDocumentURL() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentWithLongName", "1.0");
@@ -1225,12 +1194,10 @@ public class DocumentIT extends TestWithUser {
     private void check(final ProcessInstance processInstance, final int one, final int two, final int three, final int four, final int five,
             final DocumentCriterion documentCriterion) throws ProcessInstanceNotFoundException, DocumentException {
         final List<Document> lastVersionOfDocuments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 10, documentCriterion);
-        Assert.assertThat("the order was not respected for " + documentCriterion, lastVersionOfDocuments,
-                nameAre("textFile" + one, "textFile" + two, "textFile" + three, "textFile" + four, "textFile" + five));
+        Assertions.assertThat(lastVersionOfDocuments).as("the order was not respected for " + documentCriterion)
+                .extracting("name").containsExactly("textFile" + one, "textFile" + two, "textFile" + three, "textFile" + four, "textFile" + five);
     }
 
-    @Cover(jira = "ENGINE-1898", classes = { Document.class, CallActivityInstance.class }, concept = BPMNConcept.DOCUMENT, keywords = { "document",
-            "call activity", "multi instance" })
     @Test
     public void getMIDocumentOnProcess() throws Exception {
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
@@ -1273,11 +1240,10 @@ public class DocumentIT extends TestWithUser {
         final SearchResult<Document> searchDocuments = getProcessAPI().searchDocuments(searchOptionsBuilder.done());
         assertEquals(3, searchDocuments.getCount());
         final List<Document> documents = searchDocuments.getResult();
-        final List<String> urls = new ArrayList<String>();
+        final List<String> urls = new ArrayList<>();
         urls.add(documents.get(0).getUrl());
         urls.add(documents.get(1).getUrl());
         urls.add(documents.get(2).getUrl());
-
 
         assertEquals(Arrays.asList("http://someurl", "http://someurl1", "http://someurl2"), urls);
 
@@ -1285,8 +1251,6 @@ public class DocumentIT extends TestWithUser {
         disableAndDeleteProcess(docDefinition);
     }
 
-    @Cover(jira = "BS-507", classes = { Document.class, CallActivityInstance.class }, concept = BPMNConcept.DOCUMENT, keywords = { "document reference",
-            "call activity" })
     @Test
     public void getDocumentOnACallActivityOfAProcess() throws Exception {
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
@@ -1309,7 +1273,7 @@ public class DocumentIT extends TestWithUser {
         final long step1Id = waitForUserTask("step1");
 
         final Expression expression = expressionBuilder.createDocumentReferenceExpression("document1");
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(5);
         expressions.put(expression, new HashMap<String, Serializable>());
 
         final Map<String, Serializable> docsMap = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
@@ -1623,7 +1587,7 @@ public class DocumentIT extends TestWithUser {
         final SearchResult<Document> list1_search = getProcessAPI().searchDocuments(
                 new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
                         .filter(DocumentsSearchDescriptor.DOCUMENT_NAME, "list1").sort(DocumentsSearchDescriptor.LIST_INDEX, Order.DESC).done());
-        final ArrayList<Document> reversedList1 = new ArrayList<Document>(list1);
+        final ArrayList<Document> reversedList1 = new ArrayList<>(list1);
         Collections.reverse(reversedList1);
         assertThat(list1_search.getResult()).isEqualTo(reversedList1);
         assertThat(list1).hasSize(7);
@@ -1637,7 +1601,7 @@ public class DocumentIT extends TestWithUser {
         assertThat(updated.getIndex()).isEqualTo(document.getIndex());
         assertThat(updated.getUrl()).isEqualTo("The new value");
 
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
         expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable> emptyMap());
         final List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions)
                 .get("list1");

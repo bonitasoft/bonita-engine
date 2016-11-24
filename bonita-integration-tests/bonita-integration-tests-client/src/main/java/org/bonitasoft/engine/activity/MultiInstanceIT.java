@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BarResource;
@@ -64,12 +63,9 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.operation.impl.LeftOperandImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -901,8 +897,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         checkNbOfArchivedActivities(processInstance, nbAbortedActivities);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.MULTIINSTANCE, jira = "ENGINE-1967", keywords = { "MultiInstance", "Several actors",
-            "User filter", "Comments" })
     @Test
     public void multiInstanceVoteUseCase() throws Exception {
         // Build process definition
@@ -1021,14 +1015,16 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         //clean up
         disableAndDeleteProcess(deploy);
     }
+
     @Test
-    public void  multiInstance_with_a_define_instance_number_should_be_able_to_save_value_into_a_data_output_list() throws Exception {
+    public void multiInstance_with_a_define_instance_number_should_be_able_to_save_value_into_a_data_output_list() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("multiInstanceProcess", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
         builder.addData("list", List.class.getName(), new ExpressionBuilder().createGroovyScriptExpression("EmptyList", "[]", List.class.getName()));
         final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
         taskDefinitionBuilder.addData("listValue", String.class.getName(), null);
-        taskDefinitionBuilder.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(1)).addDataOutputItemRef("listValue").addLoopDataOutputRef("list");
+        taskDefinitionBuilder.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(1)).addDataOutputItemRef("listValue")
+                .addLoopDataOutputRef("list");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -1039,6 +1035,5 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         disableAndDeleteProcess(processDefinition);
     }
-
 
 }

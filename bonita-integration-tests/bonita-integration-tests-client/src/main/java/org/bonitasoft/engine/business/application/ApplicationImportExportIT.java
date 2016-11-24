@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
-import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.page.Page;
@@ -27,7 +26,6 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
 import org.junit.Test;
 
 /**
@@ -39,7 +37,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
         return getAppSearchBuilderOrderById(startIndex, maxResults).done();
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "export" })
     @Test
     public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
         //given
@@ -87,7 +84,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
         getPageAPI().deletePage(myPage.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
     @Test
     public void importApplications_should_create_all_applications_contained_by_xml_file_and_return_status_ok_() throws Exception {
         //given
@@ -141,8 +137,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import",
-            "profile does not exist", "custom page does not exists" })
     @Test
     public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_if_there_is_unavailable_info() throws Exception {
         //given
@@ -203,7 +197,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
     @Test
     public void export_after_import_should_return_the_same_xml_file() throws Exception {
         //given
