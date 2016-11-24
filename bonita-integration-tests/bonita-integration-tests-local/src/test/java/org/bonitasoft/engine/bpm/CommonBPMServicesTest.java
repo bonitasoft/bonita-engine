@@ -113,10 +113,12 @@ public class CommonBPMServicesTest {
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
 
         @Override
-        public List<String> clean() throws Exception {
-            return CommonBPMServicesTest.this.clean();
+        public void clean() throws Exception {
+            CommonBPMServicesTest.this.clean();
         }
+
     };
+
     private APISession apiSession = null;
 
     protected ServiceAccessorFactory getServiceAccessorFactory() {
@@ -127,7 +129,7 @@ public class CommonBPMServicesTest {
         return tenantId;
     }
 
-    protected APISession getAPISession() {
+    APISession getAPISession() {
         return this.apiSession;
     }
 
@@ -198,19 +200,17 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private List<String> clean() throws Exception {
+    private void clean() throws Exception {
         try {
             final APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
             openTx();
-            final List<String> messages = new ArrayList<>();
-            cleanProcessesDefinitions(messages);
+            cleanProcessesDefinitions();
             cleanProcessInstance();
             cleanMemberships();
             cleaRoles();
             cleanUsers();
             cleanGroups();
             getTenantAccessor().getLoginService().logout(apiSession.getId());
-            return messages;
         } finally {
             if (platformServiceAccessor.getTransactionService().isTransactionActive()) {
                 closeTx();
@@ -218,21 +218,18 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private void cleanProcessesDefinitions(List<String> messages) throws SBonitaReadException, SProcessDefinitionNotFoundException,
+    private void cleanProcessesDefinitions() throws SBonitaReadException, SProcessDefinitionNotFoundException,
             SProcessDeletionException, SDeletingEnabledProcessException {
         final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name", OrderByType.ASC);
         final List<SProcessDefinitionDeployInfo> processes = getTenantAccessor().getProcessDefinitionService().getProcessDeploymentInfos(queryOptions);
         if (processes.size() > 0) {
-            final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
             for (final SProcessDefinitionDeployInfo process : processes) {
-                processBuilder.append(process.getProcessId()).append(":").append(process.getName()).append(", ");
                 try {
                     getTenantAccessor().getProcessDefinitionService().disableProcessDeploymentInfo(process.getProcessId());
                 } catch (final Throwable ignored) {
                 }
                 getTenantAccessor().getProcessDefinitionService().delete(process.getProcessId());
             }
-            messages.add(processBuilder.toString());
         }
     }
 
