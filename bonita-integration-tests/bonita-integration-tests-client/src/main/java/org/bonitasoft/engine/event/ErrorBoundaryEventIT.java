@@ -18,19 +18,13 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -39,15 +33,11 @@ import org.junit.Test;
 public class ErrorBoundaryEventIT extends AbstractEventIT {
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event", "call activity" }, jira = "ENGINE-501")
     public void errorBoundaryEventTriggeredNamedError() throws Exception {
         executionWitherrorEventTriggered("error1");
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event", "call activity" }, jira = "ENGINE-501")
     public void errorBoundaryEventTriggeredCatchAllError() throws Exception {
         executionWitherrorEventTriggered(null);
     }
@@ -87,8 +77,6 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event", "call activity" }, jira = "ENGINE-501")
     public void errorBoundaryEventNotTriggered() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1");
         final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
@@ -111,8 +99,6 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
     public void uncaughtThrowErrorEvent() throws Exception {
         final ProcessDefinition calledProcDef = deployAndEnableProcessWithEndThrowErrorEvent("calledProcess", "error1");
         // catch a different error
@@ -136,8 +122,6 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
     public void errorEventCaughtAtParentLevel2() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
@@ -169,8 +153,6 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
-            "event" }, jira = "ENGINE-501")
     public void errorEventTwoCatchErrorMatching() throws Exception {
         final ProcessDefinition procDefLevel0 = deployAndEnableProcessWithEndThrowErrorEvent("procDefLevel0", "error1");
         final ProcessDefinition procDefLevel1 = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("procDefLevel1", "procDefLevel0", "callStepL1",
@@ -205,8 +187,6 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class, MultiInstanceActivityInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = {
-            "error", "boundary", "event", "call activity", "mutliple instance" }, jira = "ENGINE-9023")
     public void errorCodeThrownBySubProcessShouldBeCatchByMainProcess() throws Exception {
         final ProcessDefinition subProcess = deployAndEnableSubProcessWhichThrowsAnErrorEvent("SubProcess", "Mistake");
         final ProcessDefinition midProcess = deployAndEnableMidProcessWhichContainsACallActivity("MidProcess", "SubProcess");
@@ -219,7 +199,6 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(mainProcess, midProcess, subProcess);
     }
 
-    @Cover(jira = "BS-9484", classes = { MultiInstanceActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "error event", "multi instance" })
     @Test
     public void processWithMIUserTaskWithErrorEvent_should_take_the_error_flow() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = BuildTestUtil.buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(PROCESS_NAME,

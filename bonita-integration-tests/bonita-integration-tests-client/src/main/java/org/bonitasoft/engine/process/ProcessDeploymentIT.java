@@ -47,8 +47,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
@@ -204,8 +202,6 @@ public class ProcessDeploymentIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, keywords = { "ProcessDefinition",
-            "deploy" }, jira = "ENGINE-655", exceptions = { AlreadyExistsException.class })
     @Test(expected = AlreadyExistsException.class)
     public void deployProcess2Times() throws Exception {
         // First process def with 2 instances:

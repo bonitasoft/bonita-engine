@@ -17,26 +17,19 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
-import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class SignalEventIT extends AbstractEventIT {
 
-    @Cover(classes = { EventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal Event", "Start event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to a start event of an other process.", jira = "")
     @Test
     public void sendSignal() throws Exception {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -81,8 +74,6 @@ public class SignalEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinitionWithStartSignal, processDefinitionWithEndSignal);
     }
 
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
-            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to an intermediate catch event of an other process.", jira = "")
     @Test
     public void sendIntermediateCatchSignal() throws Exception {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -112,8 +103,6 @@ public class SignalEventIT extends AbstractEventIT {
         disableAndDeleteProcess(startSignal, endSignal);
     }
 
-    @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
-            "Intermediate catch event", "Start event", "Send", "Receive" }, story = "Send a sigal from an intermediate throw event of a process to a start event of an other process.", jira = "")
     @Test
     public void sendIntermadiateThrowSignal() throws Exception {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -143,7 +132,6 @@ public class SignalEventIT extends AbstractEventIT {
         disableAndDeleteProcess(startSignal, endSignal);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "throw event", "send signal", "start event" }, jira = "ENGINE-455")
     @Test
     public void sendSignalViaAPIToStartSignalEvent() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
@@ -161,7 +149,6 @@ public class SignalEventIT extends AbstractEventIT {
         disableAndDeleteProcess(startSignal);
     }
 
-    @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "throw event", "send signal", "intermediate catch event" }, jira = "ENGINE-455")
     @Test
     public void sendSignalViaAPIToIntermediateSignalEvent() throws Exception {
 

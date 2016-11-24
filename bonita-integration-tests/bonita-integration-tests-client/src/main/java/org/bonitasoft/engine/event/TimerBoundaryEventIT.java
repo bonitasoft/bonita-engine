@@ -13,13 +13,9 @@
  **/
 package org.bonitasoft.engine.event;
 
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -27,9 +23,6 @@ import org.junit.Test;
  */
 public class TimerBoundaryEventIT extends AbstractEventIT {
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "interrupting", "Non-interrupting" }, story = "A non-interrupting timer event is not triggered if an interrupting timer event is triggered before in the same task.",
-            jira = "ENGINE-1731")
     @Test
     public void nonInterruptingNotTrigerAfterInterruptingTriggering() throws Exception {
         // deploy process
@@ -57,9 +50,6 @@ public class TimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "interrupting", "Non-interrupting" }, story = "An interrupting timer event is triggered after that a non-interrupting timer event is triggered in the same task.",
-            jira = "ENGINE-1731")
     @Test
     public void interruptingTrigerAfterNonInterruptingTriggering() throws Exception {
         // deploy process

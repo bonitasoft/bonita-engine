@@ -15,13 +15,7 @@ package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
-import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -29,14 +23,10 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "Interrupting" }, story = "Execute timer boundary event triggerd.", jira = "ENGINE-500")
     @Test
     public void timerBoundaryEventTriggered() throws Exception {
         final int timerDuration = 1000;
@@ -71,8 +61,6 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupting",
-            "Timer", "Call Activity" }, story = "Execute timer boundary event triggered on call activity.", jira = "ENGINE-547")
     @Test
     public void timerBoundaryEventTriggeredOnCallActivity() throws Exception {
         final int timerDuration = 2000;
@@ -102,8 +90,6 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(targetProcessDefinition);
     }
 
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
-            "Interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute interrupting timer boundary event triggered on sequential multi-instance.", jira = "ENGINE-547")
     @Test
     public void timerBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         // deploy a process with a interrupting timer boundary event attached to a sequential multi-instance
@@ -126,8 +112,6 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "MultiInstance", "Parallel" }, story = "Execute timer boundary event triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
     public void timerBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final int timerDuration = 1000;
@@ -153,8 +137,6 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupging",
-            "Timer", "Loop activity" }, story = "Interrupting timer boundary event triggered on loop activity", jira = "ENGINE-547")
     @Test
     public void timerBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final long timerDuration = 1000;
@@ -181,8 +163,6 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Timer boundary event", "Data", "Long", "On process", "Human task",
-            "Exception" }, story = "Execute a process with a long data and a human task with a timer boundary event that throw a exception", jira = "ENGINE-1383")
     @Test
     public void timerBoundaryEventTriggeredAndLongData() throws Exception {
         final int timerDuration = 1000;

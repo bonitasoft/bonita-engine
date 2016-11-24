@@ -13,8 +13,15 @@
  **/
 package org.bonitasoft.engine.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -33,7 +40,6 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.SendTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -49,25 +55,8 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -738,11 +727,13 @@ public class SearchActivityInstanceIT extends TestWithUser {
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedHumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, Order.DESC);
         taskInstanceSearchResult = getProcessAPI().searchArchivedHumanTasks(builder.done());
-        assertThat(taskInstanceSearchResult.getResult(), match(stateAre("skipped", "skipped")).and(nameAre("userTask2", "userTask1")));
+        assertThat(taskInstanceSearchResult.getResult()).extracting("state", "name").containsExactly(tuple("skipped", "userTask2"),
+                tuple("skipped", "userTask1"));
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedHumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, Order.ASC);
         taskInstanceSearchResult = getProcessAPI().searchArchivedHumanTasks(builder.done());
-        assertThat(taskInstanceSearchResult.getResult(), match(stateAre("skipped", "skipped")).and(nameAre("userTask1", "userTask2")));
+        assertThat(taskInstanceSearchResult.getResult()).extracting("state", "name").containsExactly(tuple("skipped", "userTask1"),
+                tuple("skipped", "userTask2"));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -770,8 +761,6 @@ public class SearchActivityInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedTasks",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchArchivedTasksWithApostrophe() throws Exception {
         final String taskName = "'Task";
@@ -1067,8 +1056,6 @@ public class SearchActivityInstanceIT extends TestWithUser {
         deleteUsers(john, jack, jules);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks",
-            "Apostrophe" }, jira = "ENGINE-366")
     public void searchPendingTasksWithApostrophe() throws Exception {
         searchPendingTasks("userTask'1", ACTOR_NAME);
         searchPendingTasks("userTask1", "ACTOR'NAME");
@@ -1097,7 +1084,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstances = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(3, searchHumanTaskInstances.getCount());
         final List<HumanTaskInstance> tasks = searchHumanTaskInstances.getResult();
-        assertThat(tasks, nameAre("etape1", "step1", "userTask"));
+        assertThat(tasks).extracting("name").containsExactly("etape1", "step1", "userTask");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -1185,8 +1172,6 @@ public class SearchActivityInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDef);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedActivities",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchActivityTaskInstancesWithApostrophe() throws Exception {
         // define a process containing one userTask.
@@ -1232,7 +1217,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithEscapeCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(3, searchHumanTaskInstancesWithEscapeCharacter.getCount());
         List<HumanTaskInstance> tasks = searchHumanTaskInstancesWithEscapeCharacter.getResult();
-        assertThat(tasks, namesContain("step#1_b", "step#1_c", "step#1a"));
+        assertThat(tasks).extracting("name").containsExactly("step#1_b", "step#1_c", "step#1a");
 
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
@@ -1240,7 +1225,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithUnderscoreCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(2, searchHumanTaskInstancesWithUnderscoreCharacter.getCount());
         tasks = searchHumanTaskInstancesWithUnderscoreCharacter.getResult();
-        assertThat(tasks, nameAre("step#1_b", "step#1_c"));
+        assertThat(tasks).extracting("name").containsExactly("step#1_b", "step#1_c");
 
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
@@ -1248,7 +1233,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithPercentageCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(2, searchHumanTaskInstancesWithPercentageCharacter.getCount());
         tasks = searchHumanTaskInstancesWithPercentageCharacter.getResult();
-        assertThat(tasks, nameAre("%step#2", "%step#4_a"));
+        assertThat(tasks).extracting("name").containsExactly("%step#2", "%step#4_a");
 
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
@@ -1256,12 +1241,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithColonCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(1, searchHumanTaskInstancesWithColonCharacter.getCount());
         tasks = searchHumanTaskInstancesWithColonCharacter.getResult();
-        assertThat(tasks, nameAre("step:5"));
+        assertThat(tasks).extracting("name").containsExactly("step:5");
 
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { SendTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-1404", keywords = { "send task", "search" })
     @Test
     public void searchSendTask() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);

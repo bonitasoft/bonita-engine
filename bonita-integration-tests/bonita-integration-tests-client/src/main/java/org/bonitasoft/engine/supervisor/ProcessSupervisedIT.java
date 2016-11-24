@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
@@ -63,8 +60,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +108,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         processBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
         processBuilder.addShortTextData("Application", null);
         definition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
-        processDefinitions = new ArrayList<ProcessDefinition>();
+        processDefinitions = new ArrayList<>();
         processDefinitions.add(definition);
 
         // Create supervisors
@@ -131,13 +126,13 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         // add supervisor membership
         membership = getIdentityAPI().addUserMembership(john.getId(), group.getId(), role.getId());
 
-        supervisors = new ArrayList<ProcessSupervisor>();
+        supervisors = new ArrayList<>();
         supervisors.add(supervisorForGroup);
         supervisors.add(supervisorForRole);
         supervisors.add(supervisorForUser);
 
         // Three tasks
-        processInstances = new ArrayList<ProcessInstance>();
+        processInstances = new ArrayList<>();
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
@@ -185,13 +180,13 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         // one archive tasks
         final long activityInstanceId = humanTaskInstance.getId();
 
-        final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>(1);
+        final Map<String, Serializable> fieldValues = new HashMap<>(1);
         fieldValues.put("field_fieldId1", "Excel");
         final Expression rightOperand = new ExpressionBuilder().createInputExpression("field_fieldId1", String.class.getName());
         final Operation operation = BuildTestUtil.buildOperation("Application", false, OperatorType.ASSIGNMENT, "=", rightOperand);
-        final List<Operation> operationsMap = new ArrayList<Operation>(1);
+        final List<Operation> operationsMap = new ArrayList<>(1);
         operationsMap.add(operation);
-        final Map<String, Serializable> executeParameters = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> executeParameters = new HashMap<>(2);
         executeParameters.put("ACTIVITY_INSTANCE_ID_KEY", activityInstanceId);
         executeParameters.put("OPERATIONS_LIST_KEY", (Serializable) operationsMap);
         executeParameters.put("OPERATIONS_INPUT_KEY", (Serializable) fieldValues);
@@ -212,7 +207,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
     @Test
     public void searchProcessDefinitionsSupervisedBy() throws Exception {
         // create processDefintions
-        final List<Long> proDefIds = new ArrayList<Long>();
+        final List<Long> proDefIds = new ArrayList<>();
         final int num = 5;
         for (int i = 0; i < num; i++) {
             final String actorName = "actorManu" + i;
@@ -240,9 +235,9 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         final Category category2 = getProcessAPI().createCategory(categoryName2, categoryDescription2);
 
         // three processDefinitions for HR
-        getProcessAPI().addProcessDefinitionsToCategory(category1.getId(), new ArrayList<Long>(proDefIds.subList(0, 3)));
+        getProcessAPI().addProcessDefinitionsToCategory(category1.getId(), new ArrayList<>(proDefIds.subList(0, 3)));
         // two processDefinitions for sales
-        getProcessAPI().addProcessDefinitionsToCategory(category2.getId(), new ArrayList<Long>(proDefIds.subList(3, proDefIds.size())));
+        getProcessAPI().addProcessDefinitionsToCategory(category2.getId(), new ArrayList<>(proDefIds.subList(3, proDefIds.size())));
 
         // test get all process Definitions without filter
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -307,13 +302,13 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         supervisors.add(supervisor);
         assertEquals(definition2.getId(), supervisor.getProcessDefinitionId());
 
-        final Map<String, Serializable> parameters1 = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters1 = new HashMap<>();
         parameters1.put(SUPERVISOR_ID_CMD_KEY, matti.getId());
         parameters1.put("SEARCH_OPTIONS_KEY", new SearchOptionsBuilder(0, 10).done());
         final SearchResult<Serializable> searchResult1 = (SearchResult<Serializable>) getCommandAPI().execute(SEARCH_S_COMMENT_SUPERVISED_BY, parameters1);
         assertEquals(3, searchResult1.getCount());
 
-        final Map<String, Serializable> parameters2 = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters2 = new HashMap<>();
         parameters2.put(SUPERVISOR_ID_CMD_KEY, john.getId());
         parameters2.put("SEARCH_OPTIONS_KEY", new SearchOptionsBuilder(0, 10).done());
         final SearchResult<Serializable> searchResult2 = (SearchResult<Serializable>) getCommandAPI().execute(SEARCH_S_COMMENT_SUPERVISED_BY, parameters2);
@@ -381,7 +376,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         supervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(2).getId(), matti.getId()));
 
         // add categories to processDefinition1
-        final ArrayList<Long> categoryIds = new ArrayList<Long>();
+        final ArrayList<Long> categoryIds = new ArrayList<>();
         final Category c1 = getProcessAPI().createCategory("category1", "categoryDescription1");
         final Category c2 = getProcessAPI().createCategory("category2", "categoryDescription2");
         final Category c3 = getProcessAPI().createCategory("category3", "categoryDescription3");
@@ -428,8 +423,6 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         assertEquals(instance.getId(), processInstanceList.get(2).getId());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, jira = "BS-8387", keywords = { "Process instance", "Started for", "Search",
-            "Involving user", "Open", "Archived" })
     @Test
     public void searchProcessInstancesInvolvingUserWithSupervisorStartedProcess() throws Exception {
         final long processDefinitionId = processDefinitions.get(0).getId();

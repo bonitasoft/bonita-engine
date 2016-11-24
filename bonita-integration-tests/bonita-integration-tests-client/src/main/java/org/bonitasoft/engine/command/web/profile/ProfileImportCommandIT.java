@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.command.web.profile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
@@ -41,8 +37,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class ProfileImportCommandIT extends AbstractCommandProfileIT {
@@ -56,7 +50,6 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         return Arrays.asList(user1, user2, user3, user4, user5);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Profile", "Import" }, story = "Import profiles and delete existing.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void importProfilesCommand() throws BonitaException, IOException {
@@ -65,7 +58,7 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         final byte[] xmlContent1 = IOUtils.toByteArray(xmlStream1);
         xmlStream1.close();
 
-        final Map<String, Serializable> importParameters1 = new HashMap<String, Serializable>();
+        final Map<String, Serializable> importParameters1 = new HashMap<>();
         importParameters1.put("xmlContent", xmlContent1);
         final List<String> warningMsgs1 = (List<String>) getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters1);
         assertEquals(0, warningMsgs1.size());
@@ -101,7 +94,7 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         xmlStream.close();
 
-        final Map<String, Serializable> importParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> importParameters = new HashMap<>();
         importParameters.put("xmlContent", xmlContent);
         final List<String> warningMsgs = (List<String>) getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
         assertEquals(0, warningMsgs.size());
@@ -159,16 +152,14 @@ public class ProfileImportCommandIT extends AbstractCommandProfileIT {
         }
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Profile", "Import", "Wrong parameter" }, story = "Execute profile import command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = CommandParameterizationException.class)
     public void importProfilesCommandWithWrongParameter() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("BAD_KEY", "bad_value");
 
         getCommandAPI().execute(IMPORT_PROFILES_CMD, parameters);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.", jira = "")
     @Test
     public void defaultProfileCreation() throws BonitaException {
         Profile getProfileResult = getProfileAPI().getProfile(adminProfileId);

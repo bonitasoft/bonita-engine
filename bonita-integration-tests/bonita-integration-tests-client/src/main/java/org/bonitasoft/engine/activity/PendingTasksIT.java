@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -42,7 +39,6 @@ import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -52,8 +48,6 @@ import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -392,8 +386,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         return processDefinition;
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
     @Test
     public void searchPossibleUsersOfTaskUserActor() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -423,8 +415,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
     @Test
     public void searchPossibleUsersOfTaskUserActorWithoutMembership() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -456,8 +446,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
     @Test
     public void searchPossibleUsersOfTaskRoleActor() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -489,8 +477,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
     @Test
     public void searchPossibleUsersOfTaskGroupActor() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -522,14 +508,13 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-6798", classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "possible users", "pagination" })
     @Test
     public void searchPossibleUsersOfTaskShouldReturnAllUsersInThePaginationRange() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final Group group = createGroup("group");
         final Role role = createRole("role");
         final int USER_LIST_SIZE = 21;
-        final List<User> users = new ArrayList<User>(USER_LIST_SIZE);
+        final List<User> users = new ArrayList<>(USER_LIST_SIZE);
         for (int i = 0; i < USER_LIST_SIZE; i++) {
             final User newUser = createUser("user_" + i, "pwd");
             users.add(newUser);
@@ -559,8 +544,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
     @Test
     public void searchPossibleUsersOfTaskSubGroupActor() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -605,8 +588,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
-            "possible users", "human task" })
     @Test
     public void searchPossibleUsersOfFilteredTask() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -648,8 +629,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
-            "possible users", "human task" })
     @Test
     public void searchPossibleUsersShouldReturnThoseStartingWithSearchedNamed() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -695,8 +674,6 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8392", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
-            "human task" })
     @Test
     public void getPossibleUsersOfUnknownTask() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);

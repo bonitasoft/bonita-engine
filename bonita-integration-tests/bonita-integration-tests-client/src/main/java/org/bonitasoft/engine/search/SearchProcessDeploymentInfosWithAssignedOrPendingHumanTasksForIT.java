@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
@@ -30,8 +29,6 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,33 +64,32 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForIT ex
     public void before() throws Exception {
         super.before();
         // create users
-        users = new ArrayList<User>(2);
+        users = new ArrayList<>(2);
         users.add(createUser("chicobento", "bpm"));
         users.add(createUser("cebolinha", "bpm"));
         users.add(createUser("cascao", "bpm"));
 
         // create groups
-        groups = new ArrayList<Group>(2);
+        groups = new ArrayList<>(2);
         groups.add(createGroup("group1"));
         groups.add(createGroup("group2"));
 
         // create roles
-        roles = new ArrayList<Role>(2);
+        roles = new ArrayList<>(2);
         roles.add(createRole("role1"));
         roles.add(createRole("role2"));
 
         // create user memberships
-        userMemberships = new ArrayList<UserMembership>(3);
+        userMemberships = new ArrayList<>(3);
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(2).getId(), groups.get(0).getId(), roles.get(0).getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(0).getId(), groups.get(0).getId(), roles.get(1).getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(users.get(1).getId(), groups.get(1).getId(), roles.get(0).getId()));
 
         // create processes
-        enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
+        enabledProcessDefinitions = new ArrayList<>(4);
         createProcessesDefinitions();
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "For user", "Assignee", "Pending", "Task", "Process definition" }, jira = "BS-1635")
     @Test
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
@@ -108,7 +104,6 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForIT ex
         assertEquals(enabledProcessDefinitions.get(2).getName(), searchRes.getResult().get(1).getName());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "For user", "Assignee", "Pending", "Task", "Process definition" }, jira = "BS-1635")
     @Test
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForWithFilter() throws Exception {
         // test filter on process name

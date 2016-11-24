@@ -70,8 +70,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
@@ -332,8 +330,6 @@ public class BPMLocalIT extends CommonAPILocalIT {
     }
 
     @Test
-    @Cover(classes = {}, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-469", keywords = { "node", "restart", "transition",
-            "flownode" }, story = "elements must be restarted when they were not completed when the node was shut down")
     public void restartHandlerTests() throws Exception {
         /*
          * process with blocking connector
@@ -472,8 +468,6 @@ public class BPMLocalIT extends CommonAPILocalIT {
         System.out.println("release semaphore2");
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = {
-            "Platform" }, story = "The platform version must be the same than the project version.", jira = "")
     @Test
     public void getPlatformVersion() throws BonitaException, IOException {
         logoutOnTenant();

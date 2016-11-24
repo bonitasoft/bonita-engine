@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,12 +23,10 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -39,8 +35,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,9 +47,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
     private ActorMappingService actorMappingService;
 
-
     @Before
-    public void before(){
+    public void before() {
         processDefinitionService = getTenantAccessor().getProcessDefinitionService();
         actorMappingService = getTenantAccessor().getActorMappingService();
     }
@@ -97,7 +90,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
         getTransactionService().begin();
         // update processDefinitionDeployInfo
-        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance().updateDisplayName(updatedDisplayName)
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
+                .updateDisplayName(updatedDisplayName)
                 .updateActivationState(ActivationState.ENABLED).done();
         processDefinitionService.updateProcessDefinitionDeployInfo(processId, updateDescriptor);
 
@@ -124,7 +118,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         getTransactionService().begin();
         // update processDefinitionDeployInfo with wrong processId
 
-        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance().updateDisplayName(updatedDisplayName).done();
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
+                .updateDisplayName(updatedDisplayName).done();
         try {
             processDefinitionService.updateProcessDefinitionDeployInfo(sProcessDefinition.getId() + 1, updateDescriptor);
         } finally {
@@ -153,7 +148,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         getTransactionService().complete();
     }
 
-    @Cover(classes = { ProcessDefinitionServiceImpl.class }, concept = BPMNConcept.PROCESS, keywords = { "Pagination" }, story = "Implementation of the pagination for getProcessDefinitionIds", jira = "ENGINE-448")
     @Test
     public void getProcessDefIds() throws Exception {
         final List<SProcessDefinition> sProcessDefinitions = createSProcessDefinitions(25, "testGetProcessDefIds", "0.0");
@@ -171,7 +165,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         deleteSProcessDefinitions(sProcessDefinitions);
     }
 
-    @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ACTOR, keywords = { "Get number", "User", "Can start process", "Actor  initiator" }, jira = "ENGINE-815")
     @Test
     public void getNumberOfUsersWhoCanStartProcessWithActorInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
@@ -189,7 +182,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         deleteSUsers(sUser1, sUser2);
     }
 
-    @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ACTOR, keywords = { "Get number", "User", "Can start process", "Actor not initiator" }, jira = "ENGINE-815")
     @Test
     public void getNumberOfUsersWhoCanStartProcessWithActorNotInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
@@ -207,8 +199,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         deleteSUsers(sUser1, sUser2);
     }
 
-    @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ACTOR, keywords = { "Get number", "User", "Can start process", "Actor initiator",
-            "Managed by" }, jira = "ENGINE-815")
     @Test
     public void getNumberOfUsersWhoCanStartProcessWithActorInitiatorAndFilterManagedBy() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
@@ -230,7 +220,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         deleteSUsers(sUser1, sUser2);
     }
 
-    @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ACTOR, keywords = { "Search", "User", "Can start process", "Actor initiator" }, jira = "ENGINE-815")
     @Test
     public void searchUsersWhoCanStartProcessWithActorInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
@@ -249,7 +238,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         deleteSUsers(sUser1, sUser2);
     }
 
-    @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ACTOR, keywords = { "Search", "User", "Can start process", "Actor not initiator" }, jira = "ENGINE-815")
     @Test
     public void searchUsersWhoCanStartProcessWithActorNotInitiator() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");
@@ -267,8 +255,6 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         deleteSUsers(sUser1, sUser2);
     }
 
-    @Cover(classes = { IdentityService.class }, concept = BPMNConcept.ACTOR, keywords = { "Search", "User", "Can start process", "Actor initiator",
-            "Managed by" }, jira = "ENGINE-815")
     @Test
     public void searchUsersWhoCanStartProcessWithActorInitiatorAndFilterManagedBy() throws Exception {
         final SUser sUser1 = createEnabledSUser("firstname1", "lastname1", "pwd1");

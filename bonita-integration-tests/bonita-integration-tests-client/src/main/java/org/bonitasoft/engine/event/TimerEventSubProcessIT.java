@@ -35,8 +35,6 @@ import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -45,7 +43,6 @@ import org.junit.Test;
  */
 public class TimerEventSubProcessIT extends AbstractEventIT {
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
     public void timerEventSubProcessTriggered() throws Exception {
         // given
@@ -74,7 +71,6 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         return dt.format(date);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
     public void timerEventSubProcessNotTriggered() throws Exception {
         final int timerDuration = 6000;
@@ -88,7 +84,6 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
     }
 
     // added after problems with job name
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
     public void testCreateSeveralInstances() throws Exception {
         final int timerDuration = 500;
@@ -101,8 +96,6 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         disableAndDeleteProcess(process.getId());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer",
-            "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
         final int timerDuration = 2000;
@@ -137,8 +130,6 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer",
-            "call activity" }, jira = "ENGINE-536")
     @Test
     public void timerEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(2000);

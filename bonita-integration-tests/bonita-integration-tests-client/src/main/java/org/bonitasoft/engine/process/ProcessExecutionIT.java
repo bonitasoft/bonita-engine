@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -40,7 +39,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -53,8 +51,6 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -222,8 +218,6 @@ public class ProcessExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, jira = "BS-11970", keywords = { "Archive", "Process instance", "Start event",
-            "End event" })
     @Test
     public void checkProcessIsArchived() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -272,8 +266,6 @@ public class ProcessExecutionIT extends TestWithUser {
     }
 
     @Test
-    @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive",
-            "process" }, jira = "ENGINE-507", story = "get a archived process instance by id")
     public void getArchivedProcessInstanceById() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("ProcessToArchive", "1.0",
                 Arrays.asList("step1"), Arrays.asList(true));
@@ -288,8 +280,6 @@ public class ProcessExecutionIT extends TestWithUser {
     }
 
     @Test(expected = ArchivedProcessInstanceNotFoundException.class)
-    @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive",
-            "process" }, jira = "ENGINE-507", story = "get a archived process instance by an unknown id throw a not found exception")
     public void getArchivedProcessInstanceByIdNotFound() throws Exception {
         getProcessAPI().getArchivedProcessInstance(123456789L);
     }

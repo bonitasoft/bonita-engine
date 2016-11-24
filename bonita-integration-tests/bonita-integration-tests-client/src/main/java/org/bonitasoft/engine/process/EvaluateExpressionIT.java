@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -43,8 +42,6 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -196,8 +193,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         return deployAndEnableProcessWithActor(processDef, "Actor1", user);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Process instantiation" }, story = "Evaluate an expression at process instantiation.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsAtProcessInstantiation() throws Exception {
         waitForPendingTasks(getSession().getUserId(), 1);
@@ -212,15 +207,11 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("4plop", result.get("IntegerScript"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Wrong process instance id" }, jira = "ENGINE-1160")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsAtProcessInstantiationWithWrongProcessInstanceId() throws Exception {
         getProcessAPI().evaluateExpressionsAtProcessInstanciation(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
         final long step1Id = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
@@ -235,8 +226,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstanceWithArchivedProcess() throws Exception {
         final long step1Id = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
@@ -253,8 +242,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstanceInSubProcess() throws Exception {
         ProcessDefinitionBuilder caller = new ProcessDefinitionBuilder().createNewInstance("Caller", "1");
@@ -278,15 +265,11 @@ public class EvaluateExpressionIT extends TestWithUser {
         disableAndDeleteProcess(callerProcess);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate",
-            "Wrong activity instance id" }, story = "Execute form expression command with wrong activity instance id", jira = "ENGINE-1160")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnCompletedActivityInstanceWithWrongActivityInstanceId() throws Exception {
         getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Completed process instance" }, story = "Evaluate an expression on completed process instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstance() throws Exception {
         waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
@@ -304,8 +287,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance",
-            "Updated data" }, story = "Evaluate an expression on completed process instance with variable update.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstanceAfterVariableUpdate() throws Exception {
         waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
@@ -326,8 +307,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Activity instance" }, story = "Evaluate expression on activity instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnActivityInstance() throws Exception {
         final long step1Id = waitForUserTask(processInstance, STEP1_NAME);
@@ -343,15 +322,11 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Wrong activity instance id" }, story = "Execute form expression command with wrong activity instance id", jira = "ENGINE-1160")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnActivityInstanceWithWrongActivityInstanceId() throws Exception {
         getProcessAPI().evaluateExpressionsOnActivityInstance(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression",
-            "taskAssigneeId" }, story = "Evaluate engine constant expression taskAssigneeID.", jira = "ENGINE-1256")
     @Test
     public void evaluateAssigneeId() throws Exception {
         final ActivityInstance userTaskInstance = waitForUserTaskAndAssignIt(processInstance, STEP1_NAME, user);
@@ -367,8 +342,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(user.getId(), ((EngineExecutionContext) result.get(engineExecContextExpr.getContent())).getTaskAssigneeId());
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance",
-            "Initial value" }, story = "Evalute an expression on process intance with initial values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithInitialValues() throws Exception {
         waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
@@ -386,8 +359,6 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance",
-            "Current value" }, story = "Evalute an expression on process intance with current values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithCurrentValues() throws Exception {
         waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
@@ -404,22 +375,16 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Wrong process instance id" }, jira = "ENGINE-1160")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnProcessInstanceWithWrongProcessInstanceId() throws Exception {
         getProcessAPI().evaluateExpressionsOnProcessInstance(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "No parameter" }, story = "Test expression command with no parameter.", jira = "ENGINE-548")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnProcessInstanceWithNoExpressions() throws Exception {
         getProcessAPI().evaluateExpressionsOnProcessInstance(1, null);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Process definition" }, story = "Evaluate expressions on process definition.", jira = "ENGINE-1160")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnProcessDefinition() throws Exception {
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
@@ -434,14 +399,11 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("processData", result.get("processData"));
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Wrong process definition id" }, jira = "ENGINE-1160")
     @Test(expected = ExpressionEvaluationException.class)
     public void evaluateExpressionsOnProcessDefinitionWithWrongProcessDefinitionId() throws Exception {
         getProcessAPI().evaluateExpressionsOnProcessDefinition(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate",
-            "Pattern expression" }, story = "Evaluate a pattern expression.", jira = "")
     @Test
     public void evaluatePatternExpression() throws Exception {
         final String dataName = "birthYear";

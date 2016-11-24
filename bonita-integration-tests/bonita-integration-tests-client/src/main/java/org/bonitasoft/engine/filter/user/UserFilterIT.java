@@ -44,8 +44,6 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
@@ -245,7 +243,6 @@ public class UserFilterIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void updateUserFilterAfterAUserDeletion() throws Exception {
         final Group group = createGroup("group1");
@@ -281,7 +278,6 @@ public class UserFilterIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test(expected = UpdateException.class)
     public void unableToUpdateActorsOnAGateway() throws Exception {
         final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("mycondition", "fzdfsdfsdfsdfsdf", Boolean.class.getName());
@@ -304,7 +300,6 @@ public class UserFilterIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void doNotUpateAHumanTaskIfNoUserFilterIsDefined() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("doNotUpateAHumanTaskIfNoUserFilterIsDefined", "1.0");
@@ -328,7 +323,6 @@ public class UserFilterIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })
     @Test
     public void updateUserFilterAfterAUserAdd() throws Exception {
         final Group group = createGroup("group1");

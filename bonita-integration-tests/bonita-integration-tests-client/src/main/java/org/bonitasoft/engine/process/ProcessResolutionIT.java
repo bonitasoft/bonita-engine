@@ -33,25 +33,20 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ProcessResolutionIT extends TestWithTechnicalUser {
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" }, exceptions = { ProcessDefinitionNotFoundException.class })
     @Test(expected = ProcessDefinitionNotFoundException.class)
     public void processNotFoundWhenGettingResolutionProblems() throws BonitaException {
         getProcessAPI().getProcessResolutionProblems(-458);
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, ActorInstance.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
     public void noActorMapping() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
@@ -72,7 +67,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteProcess(definition.getId());
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, ActorInstance.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
     public void resolveActorMapping() throws BonitaException, InterruptedException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
@@ -129,7 +123,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteProcess(definition.getId());
     }
 
-    @Cover(classes = { ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-988", keywords = { "dependency" })
     @Test
     public void deploy2ProcessWithSameDependency() throws BonitaException {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
@@ -152,7 +145,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteProcess(definition2.getId());
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, ActorInstance.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-791", keywords = { "process resolution update" })
     @Test
     public void removeLastUserFromActorUnresolvesProcess() throws BonitaException {
         final User piouPiou = getIdentityAPI().createUser("Piou-piou", "s3cR3t");
@@ -177,7 +169,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteUser(piouPiou);
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, ActorInstance.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-791", keywords = { "process resolution update" })
     @Test
     public void deleteUserFromActorUnresolvesProcess() throws BonitaException {
         final User piouPiou = getIdentityAPI().createUser("Piou-piou", "s3cR3t");
@@ -200,7 +191,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteProcess(definition.getId());
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, ActorInstance.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-791", keywords = { "process resolution update" })
     @Test
     public void deleteRoleFromActorUnresolvesProcess() throws BonitaException {
         final Role role = getIdentityAPI().createRole("Tester");
@@ -223,7 +213,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteProcess(definition.getId());
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, ActorInstance.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-791", keywords = { "process resolution update" })
     @Test
     public void deleteGroupFromActorUnresolvesProcess() throws BonitaException {
         final Group group = getIdentityAPI().createGroup("Tester", null);
@@ -246,7 +235,6 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deleteProcess(definition.getId());
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class, Connector.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
     @Test
     public void noConnectorImplementation() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();

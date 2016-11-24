@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,12 +29,10 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescript
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
-import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -54,8 +50,6 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.Test;
 
@@ -523,7 +517,8 @@ public class GatewayExecutionIT extends TestWithUser {
                         "gateway1",
                         "step2",
                         new ExpressionBuilder().createGroovyScriptExpression("inclusiveSplit2WithDataAsCondition", "!trueData", Boolean.class.getName(),
-                                Arrays.asList(trueData))).addTransition("gateway1", "step3", trueData).addDefaultTransition("gateway1", "step4").getProcess();
+                                Arrays.asList(trueData)))
+                .addTransition("gateway1", "step3", trueData).addDefaultTransition("gateway1", "step4").getProcess();
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step3");
     }
 
@@ -1012,7 +1007,6 @@ public class GatewayExecutionIT extends TestWithUser {
         falseExpression = new ExpressionBuilder().createConstantBooleanExpression(false);
     }
 
-    @Cover(jira = "ENGINE-1520", classes = { GatewayInstance.class }, concept = BPMNConcept.GATEWAY, keywords = { "Gateway", "hitBy", "too many transitions" })
     @Test
     public void manyTransitionsToGateway() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
@@ -1180,7 +1174,6 @@ public class GatewayExecutionIT extends TestWithUser {
     }
 
     @Test
-    @Cover(classes = {}, concept = BPMNConcept.GATEWAY, keywords = { "restart", "Gateway", "Failed" }, jira = "BS-9367")
     public void restartNodeShouldNotRestartGatewaysWithNotFullfilledMergingCondition() throws Exception {
         final ProcessDefinitionBuilder processDesignBuilder = new ProcessDefinitionBuilder().createNewInstance("process_with_join_gateway", PROCESS_VERSION);
         processDesignBuilder.addStartEvent("goForIt");
@@ -1215,8 +1208,6 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { GatewayDefinition.class, TransitionDefinition.class }, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {
-            "transition", "condition", "logical complement", "null variable" })
     @Test
     public void can_evaluate_transitions_with_logical_complement_expression_using_null_variable() throws Exception {
         //given
@@ -1251,8 +1242,6 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { GatewayDefinition.class, TransitionDefinition.class }, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {
-            "transition", "condition", "comparison", "null variable" })
     @Test
     public void can_evaluate_transitions_with_comparison_expression_using_null_variable() throws Exception {
         //given

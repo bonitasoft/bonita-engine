@@ -28,7 +28,6 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -36,8 +35,6 @@ import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +51,7 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
     @Before
     public void before() throws Exception {
         super.before();
-        processDefinitions = new ArrayList<ProcessDefinition>();
+        processDefinitions = new ArrayList<>();
     }
 
     @Override
@@ -64,13 +61,11 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         super.after();
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error" }, jira = "ENGINE-536")
     @Test
     public void errorEventSubProcessTriggeredNamedError() throws Exception {
         executeProcessTriggeringEventSubProcess("e1", "e1");
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error" }, jira = "ENGINE-536")
     @Test
     public void errorEventSubProcessTriggeredCachAllErrors() throws Exception {
         executeProcessTriggeringEventSubProcess(null, "e1");
@@ -108,7 +103,6 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         checkWasntExecuted(processInstance, "end");
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error" }, jira = "ENGINE-536")
     @Test
     public void errorEventSubProcessNotTriggered() throws Exception {
         final String subProcStartEventName = "errorStart";
@@ -132,7 +126,6 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         checkNumberOfWaitingEvents(subProcStartEventName, 0);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error" }, jira = "ENGINE-536")
     @Test
     public void createSeveralInstances() throws Exception {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("e2", "e2", "errorStart"));
@@ -150,7 +143,6 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         waitForUserTask(processInstance2.getId(), "subStep");
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndData("error1", "error1", "errorStart"));
@@ -168,7 +160,6 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-1397")
     @Test
     public void subProcessCanAccessParentDataEvenIfItDoesntHaveLocalData() throws Exception {
         final String rootUserTaskName = "step1";
@@ -192,7 +183,6 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "parent process data" }, jira = "ENGINE-1397")
     @Test
     public void eventSubProcesWithDataAndRootProcessWithNoData() throws Exception {
         final String rootUserTaskName = "step1";
@@ -217,7 +207,7 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
 
     private void checkEvaluateExpression(final ActivityInstance subStep, final String dataName, final Class<?> expressionType, final Serializable expectedValue)
             throws InvalidExpressionException, ExpressionEvaluationException {
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(1);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(1);
         final Expression contVarExpr = new ExpressionBuilder().createDataExpression(dataName, expressionType.getName());
         expressions.put(contVarExpr, null);
 
@@ -239,12 +229,12 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+            throws DataNotFoundException {
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "call activity" }, jira = "ENGINE-536")
     @Test
     public void errorEventSubProcInsideTargetCallActivity() throws Exception {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("e1", "e1", "errorStart"));
@@ -266,10 +256,6 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
         waitForProcessToFinish(processInstance);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "error", "call activity",
-            "archived" }, story = "The process A have a call activity (calling the process B) and an event sub process. "
-            + "The process B have a automatic task with a failed connector. "
-            + "When the process B failed and execute the event sub process of the process A, the process A must be aborted.", jira = "BS-8754")
     @Test
     public void processWithErrorEventSubProcAndCallActivity_must_be_finished_when_subProcess_is_finished() throws Exception {
         // Create the target process

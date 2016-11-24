@@ -20,14 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -36,7 +33,6 @@ import org.junit.Test;
  */
 public class ApplicationPageIT extends TestWithCustomPage {
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page", "create" })
     @Test
     public void createApplicationPage_returns_applicationPage_based_on_the_given_parameters() throws Exception {
         //given
@@ -55,8 +51,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-            "set home page" })
     @Test
     public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
         //given
@@ -74,7 +68,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update", "home page" })
     @Test
     public void updateApplication_should_update_home_page() throws Exception {
         //given
@@ -95,8 +88,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "get by name and application name" })
     @Test
     public void getApplicationPage_byNameAndAppName_returns_the_applicationPage_corresponding_to_the_given_parameters() throws Exception {
         //given
@@ -111,8 +102,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "get by id" })
     @Test
     public void getApplicationPage_byId_returns_the_applicationPage_corresponding_to_the_given_Id() throws Exception {
         //given
@@ -127,8 +116,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-            "delete" })
     @Test
     public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
         //given
@@ -154,8 +141,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         }
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "delete" })
     @Test
     public void deleteApplicationPage_should_delete_applicationPage_with_the_given_id() throws Exception {
         //given
@@ -174,8 +159,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         }
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-            "set home page" })
     @Test
     public void getApplicationHomePage_should_return_application_homePage() throws Exception {
         //given
@@ -193,8 +176,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "search", "no filters", "no search term" })
     @Test
     public void searchApplicationPages_without_filters_and_search_term_should_return_all_applicationPages_pagged() throws Exception {
         //given
@@ -219,8 +200,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "search", "filter on name" })
     @Test
     public void searchApplicationPages_can_filter_on_name() throws Exception {
         //given
@@ -242,8 +221,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "search", "filter on application id" })
     @Test
     public void searchApplicationPages_can_filter_on_applicationId() throws Exception {
         //given
@@ -266,8 +243,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().deleteApplication(application1.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "search", "filter on page id" })
     @Test
     public void searchApplicationPages_can_filter_on_pageId() throws Exception {
         //given
@@ -292,8 +267,6 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getPageAPI().deletePage(page2.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-            "search", "filter on id" })
     @Test
     public void searchApplicationPages_can_filter_on_id() throws Exception {
         //given
@@ -349,7 +322,8 @@ public class ApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page1", "custompage_page2", "custompage_page3"));
+        assertThat(allPagesForProfile1).isEqualTo(
+                Arrays.asList("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page1", "custompage_page2", "custompage_page3"));
         assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_bootstrapdefaulttheme", "custompage_defaultlayout", "custompage_page4"));
 
         //clean

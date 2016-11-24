@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.util.Lists;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
@@ -55,8 +54,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -505,7 +502,6 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, ProcessInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Process Instance", "start", "2 times" }, jira = "ENGINE-1094")
     @Test
     public void startProcess2Times() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
@@ -525,7 +521,6 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-8397", classes = { DataInstance.class, ProcessInstance.class }, concept = BPMNConcept.DATA, keywords = { "initilize process data behalf" })
     @Test
     public void startProcessUsingInitialVariableValuesFor() throws Exception {
         final String otherUserName = "other";
@@ -539,7 +534,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         try {
-            final Map<String, Serializable> variables = new HashMap<String, Serializable>();
+            final Map<String, Serializable> variables = new HashMap<>();
             variables.put("bigD", new BigDecimal("3.141592653589793"));
             final ProcessInstance instance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(), variables);
             final ProcessInstance processInstance2 = getProcessAPI().getProcessInstance(instance.getId());
@@ -585,8 +580,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         try {
             // create Operation keyed map
             final Operation integerOperation = BuildTestUtil.buildIntegerOperation(dataName, 2);
-            final List<Operation> operations = new ArrayList<Operation>();
-            final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
+            final List<Operation> operations = new ArrayList<>();
+            final Map<String, Serializable> contexts = new HashMap<>();
             contexts.put("page", "1");
             operations.add(integerOperation);
             final long processDefinitionId = processDefinition.getId();
@@ -596,8 +591,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
             assertEquals(user.getId(), processInstance2.getStartedBySubstitute());
 
             // Check system comment
-            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).
-                    done();
+            final SearchOptions searchOptions = new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                    .done();
             final List<Comment> comments = getProcessAPI().searchComments(searchOptions).getResult();
             boolean haveCommentForDelegate = false;
             for (final Comment comment : comments) {
@@ -614,7 +609,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     private List<ProcessInstance> startNbProcess(final List<ProcessDefinition> processDefinitions) throws Exception {
-        final List<ProcessInstance> process = new ArrayList<ProcessInstance>();
+        final List<ProcessInstance> process = new ArrayList<>();
         for (final ProcessDefinition processDefinition : processDefinitions) {
             process.add(getProcessAPI().startProcess(processDefinition.getId()));
             Thread.sleep(5);// avoid two instances with the same date
@@ -675,8 +670,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     @Test
     public void runProcessInstanceWithDefaultFlownode_and_another_evaluated_to_false_transition_should_passto_step2() throws Exception {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION).addActor(ACTOR_NAME)
-                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME).
-                addTransition("step1", "step3", new ExpressionBuilder().createConstantBooleanExpression(false)).addDefaultTransition("step1", "step2")
+                .addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", ACTOR_NAME)
+                .addTransition("step1", "step3", new ExpressionBuilder().createConstantBooleanExpression(false)).addDefaultTransition("step1", "step2")
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(user));

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -40,8 +39,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -54,8 +51,6 @@ public class UserIT extends TestWithTechnicalUser {
     /**
      * This test is here for arbitrary reason: it has to be tested on ANY API call.
      */
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform",
-            "Node" }, story = "Get exception when calling a platform method on node not started", jira = "ENGINE-1780")
     @Test(expected = NodeNotStartedException.class)
     public void unableToCallPlatformMethodOnStoppedNode() throws Exception {
         logoutOnTenant();
@@ -112,8 +107,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
-            "Create" }, jira = "ENGINE-577")
     @Test
     public void createEnabledUserByUsernameAndPassword() throws BonitaException {
         final User userCreated = getIdentityAPI().createUser("bonitasoft", "123456");
@@ -169,8 +162,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser(userName);
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
-            "Create" }, jira = "ENGINE-577")
     @Test
     public void createEnabledUserByAUser() throws BonitaException {
         final User user = getIdentityAPI().createUser("bonitasoft", "bpm");
@@ -180,8 +171,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
-            "Create" }, jira = "ENGINE-577")
     @Test
     public void createDisabledUserByAUser() throws BonitaException {
         final UserCreator creator = new UserCreator("bonitasoft", "bpm");
@@ -339,7 +328,6 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
     }
 
-    @Cover(classes = { User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-1055", keywords = { "contact info", "user" })
     @Test
     public void testUserContactInfos() throws BonitaException {
         final UserCreator creator = new UserCreator("john", "bpm");
@@ -523,8 +511,6 @@ public class UserIT extends TestWithTechnicalUser {
         assertEquals("69000", persoData.getZipCode());
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Enabled", "User",
-            "Update" }, jira = "ENGINE-577")
     @Test
     public void updateUserToBeEnabled() throws BonitaException {
         // Create user, and updateDescriptor
@@ -543,8 +529,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Disabled", "User",
-            "Update" }, jira = "ENGINE-577")
     @Test
     public void updateUserToBeDisabled() throws BonitaException {
         // Create user, and updateDescriptor
@@ -595,8 +579,6 @@ public class UserIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { IdentityAPI.class, ContactDataUpdater.class, User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "update",
-            "user", "contact data" }, jira = "")
     @Test
     public void updateUserWithOnlyDataChanging() throws BonitaException {
         final User user = getIdentityAPI().createUser("james", "mbp");
@@ -691,8 +673,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().searchUsers(builder.done());
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "Users", "Filter", "Order", "Pagination",
-            "Column not unique" }, jira = "ENGINE-1557")
     @Test
     public void searchUser() throws BonitaException {
         final List<User> users = new ArrayList<>();
@@ -759,8 +739,6 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(users);
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Enabled",
-            "Disabled" }, story = "Search enabled/disabled users", jira = "ENGINE-821")
     @Test
     public void searchEnabledDisabledUsers() throws BonitaException {
         // Create users
@@ -813,8 +791,6 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(john1, john2, jack);
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchUser",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchUserWithApostrophe() throws BonitaException {
         final User user1 = getIdentityAPI().createUser("'john'002", "bpm", "John", "A");
@@ -954,8 +930,6 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(john, manager, jack);
     }
 
-    @Cover(classes = { IdentityAPI.class, SearchOptionsBuilder.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Manager",
-            "Not in team" }, jira = "ENGINE-569")
     @Test
     public void searchUsersNotInTeam() throws BonitaException {
         // Manager
@@ -1020,7 +994,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
-    @Cover(jira = "ENGINE-1818", classes = { User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "User identifiers" })
     @Test
     public void getUserIds() throws BonitaException {
         final User matti = getIdentityAPI().createUser("matti", "bpm");
@@ -1039,7 +1012,6 @@ public class UserIT extends TestWithTechnicalUser {
         deleteUsers(matti, jani);
     }
 
-    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
     @Test
     public void getUserWithProContactData() throws BonitaException {
         final String james = "james";
@@ -1055,7 +1027,6 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser(updatedUser.getId());
     }
 
-    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
     @Test
     public void getUserWithoutProContactData() throws BonitaException {
         final String james = "james";
@@ -1070,19 +1041,16 @@ public class UserIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteUser(updatedUser.getId());
     }
 
-    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
     @Test(expected = UserNotFoundException.class)
     public void throwExceptionWhenGettingUnknownUserWithProContactData() throws BonitaException {
         getIdentityAPI().getUserWithProfessionalDetails(-45L);
     }
 
-    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
     @Test(expected = UserNotFoundException.class)
     public void throwExceptionWhenGettingTechnicalUserWithProContactData() throws BonitaException {
         getIdentityAPI().getUserWithProfessionalDetails(-1L);
     }
 
-    @Cover(classes = { User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-8991", keywords = { "user", "255 characters" })
     @Test
     public void can_create_user_with_255_char_in_fields() throws Exception {
         final UserCreator creator = new UserCreator(completeWithZeros("user"), "bpm");

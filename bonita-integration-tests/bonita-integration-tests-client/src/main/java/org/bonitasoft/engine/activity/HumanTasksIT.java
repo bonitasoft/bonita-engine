@@ -21,12 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -41,8 +39,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class HumanTasksIT extends TestWithUser {
@@ -61,8 +57,6 @@ public class HumanTasksIT extends TestWithUser {
         disableAndDeleteProcess(processDef1);
     }
 
-    @Cover(classes = { FlowNodeInstance.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-6831", keywords = { "Non-ASCII characters", "Oracle",
-            "Column too short" })
     @Test
     public void can_creatte_FlowNodeInstance_with_several_non_ascii_characters() throws Exception {
         final String taskDisplayName = "àéò€çhahaאת ארץ בדפים מוסיקה לעברית. בקר גם טיפול פיסיקה, דת מתן בישול רומנית תחבורה. אל בידור מדויקים ואלקטרוניקה זאת נפלו.أملاً النزاع الصعداء بل الى. ان اتفاقية بالمطالبة ويكيبيديا، جُل. في كان بالجانب والديون الإتفاقية. لها المسرح وبولندا وبلجيكا، أي.";
@@ -82,8 +76,6 @@ public class HumanTasksIT extends TestWithUser {
         disableAndDeleteProcess(processDef1);
     }
 
-    @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human",
-            "Task Instance" }, jira = "ENGINE-772")
     @Test
     public void getLastHumanTaskInstance() throws Exception {
         // First process def with 2 instances:
@@ -120,7 +112,6 @@ public class HumanTasksIT extends TestWithUser {
         disableAndDeleteProcess(processDef2);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Task failure", "FlowNodeExecutor" }, jira = "ENGINE-1134")
     @Test
     public void taskExecutionFailureLogsPrettyMessage() throws Exception {
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance("taskExecutionFailureLogsPrettyMessage", "1.01");
@@ -144,8 +135,6 @@ public class HumanTasksIT extends TestWithUser {
         disableAndDeleteProcess(processDef);
     }
 
-    @Cover(classes = { ProcessAPI.class, HumanTaskInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Last", "Human",
-            "Task Instance" }, jira = "ENGINE-772", exceptions = { NotFoundException.class })
     @Test(expected = NotFoundException.class)
     public void cannotGetLastHumanTaskInstance() throws Exception {
         // First process def with 2 instances:
@@ -332,7 +321,7 @@ public class HumanTasksIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         waitForUserTask(processInstance, "step1");
 
-        final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
+        final List<ActivityInstance> activityInstances = new ArrayList<>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
         final ActivityInstance activityInstance = activityInstances.get(activityInstances.size() - 1);
 
         assertEquals("ready", activityInstance.getState());

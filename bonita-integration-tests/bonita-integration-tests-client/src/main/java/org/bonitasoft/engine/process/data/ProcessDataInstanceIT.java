@@ -15,11 +15,7 @@ package org.bonitasoft.engine.process.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -28,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
@@ -47,8 +42,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class ProcessDataInstanceIT extends TestWithUser {
@@ -123,7 +116,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, DataInstance.class }, concept = BPMNConcept.PROCESS, keywords = { "Float", "DataInstance" }, jira = "ENGINE-563")
     @Test
     public void getFloatDataInstanceFromProcess() throws Exception {
         final String className = Float.class.getName();
@@ -156,7 +148,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { Date.class, DataInstance.class, ProcessAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Date", "Data", "Expression" }, jira = "ENGINE-1559, ENGINE-1099")
     @Test
     public void getDateDataInstanceFromProcess() throws Exception {
         final ProcessDefinition processDefinition = operateProcess(user, "var1",
@@ -217,7 +208,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.DATA, jira = "BS-1984", keywords = { "update", "process data", "wrong type" })
     @Test
     public void cantUpdateProcessDataInstanceWithWrongValue() throws Exception {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(ACTOR_NAME)
@@ -354,8 +344,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         return processDefinition;
     }
 
-    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
     @Test
     public void getArchivedProcessDataInstance() throws Exception {
         final String dataName = "title";
@@ -373,8 +361,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
     @Test
     public void getArchivedProcessDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
@@ -391,8 +377,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1820, ENGINE-1946", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = {
-            "Not archived", "transient data", "process instance" })
     @Test
     public void dontArchivedTransientProcessDataInstance() throws Exception {
         final String dataName = "test";
@@ -414,8 +398,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         }
     }
 
-    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
     @Test
     public void getUnknownArchivedProcessDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -435,8 +417,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         }
     }
 
-    @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
     @Test
     public void getArchivedProcessDataInstances() throws Exception {
         final String dataName = "title";
@@ -487,8 +467,6 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
     @Test
     public void getEmptyArchivedProcessDataInstances() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -504,30 +482,35 @@ public class ProcessDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-
     @Test
     public void getCustomTypeDataInstance() throws Exception {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithPlopp", "1.0");
-        processDefinitionBuilder.addActor("user").addUserTask("step1", "user").addData("myStepData", "org.bonitasoft.plop.Plopp", new ExpressionBuilder().createGroovyScriptExpression("theScript", "new org.bonitasoft.plop.Plopp()", "org.bonitasoft.plop.Plopp"));;
-        processDefinitionBuilder.addData("myData", "org.bonitasoft.plop.Plopp", new ExpressionBuilder().createGroovyScriptExpression("theScript", "new org.bonitasoft.plop.Plopp()", "org.bonitasoft.plop.Plopp"));
+        processDefinitionBuilder.addActor("user").addUserTask("step1", "user").addData("myStepData", "org.bonitasoft.plop.Plopp",
+                new ExpressionBuilder().createGroovyScriptExpression("theScript", "new org.bonitasoft.plop.Plopp()", "org.bonitasoft.plop.Plopp"));
+        processDefinitionBuilder.addData("myData", "org.bonitasoft.plop.Plopp",
+                new ExpressionBuilder().createGroovyScriptExpression("theScript", "new org.bonitasoft.plop.Plopp()", "org.bonitasoft.plop.Plopp"));
         final User user = getIdentityAPI().createUser("custDataUser", "bpm");
         businessArchiveBuilder.setProcessDefinition(processDefinitionBuilder.done());
-        businessArchiveBuilder.addClasspathResource(new BarResource("org.bonitasoft.plop.jar", IOUtil.getAllContentFrom(this.getClass().getResourceAsStream("/org.bonitasoft.plop.bak"))));
+        businessArchiveBuilder.addClasspathResource(
+                new BarResource("org.bonitasoft.plop.jar", IOUtil.getAllContentFrom(this.getClass().getResourceAsStream("/org.bonitasoft.plop.bak"))));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), "user", user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1 = waitForUserTask("step1");
 
-        assertThat(getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10)).extracting("name", "className").containsOnly(tuple("myData","org.bonitasoft.plop.Plopp"));
-        assertThat(getProcessAPI().getProcessDataInstance("myData",processInstance.getId())).isNotNull();
-        assertThat(getProcessAPI().getActivityDataInstances(step1, 0, 10)).extracting("name", "className").contains(tuple("myStepData", "org.bonitasoft.plop.Plopp"));
-        assertThat(getProcessAPI().getActivityDataInstance("myStepData",step1)).isNotNull();
-        assertThat(getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10)).extracting("name", "className").containsOnly(tuple("myData","org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10)).extracting("name", "className")
+                .containsOnly(tuple("myData", "org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getProcessDataInstance("myData", processInstance.getId())).isNotNull();
+        assertThat(getProcessAPI().getActivityDataInstances(step1, 0, 10)).extracting("name", "className")
+                .contains(tuple("myStepData", "org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getActivityDataInstance("myStepData", step1)).isNotNull();
+        assertThat(getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10)).extracting("name", "className")
+                .containsOnly(tuple("myData", "org.bonitasoft.plop.Plopp"));
         assertThat(getProcessAPI().getArchivedProcessDataInstance("myData", processInstance.getId())).isNotNull();
-        assertThat(getProcessAPI().getArchivedActivityDataInstances(step1,0,10)).extracting("name", "className").contains(tuple("myStepData","org.bonitasoft.plop.Plopp"));
-        assertThat(getProcessAPI().getArchivedActivityDataInstance("myStepData",step1)).isNotNull();
-
+        assertThat(getProcessAPI().getArchivedActivityDataInstances(step1, 0, 10)).extracting("name", "className")
+                .contains(tuple("myStepData", "org.bonitasoft.plop.Plopp"));
+        assertThat(getProcessAPI().getArchivedActivityDataInstance("myStepData", step1)).isNotNull();
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);

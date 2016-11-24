@@ -14,10 +14,7 @@
 
 package org.bonitasoft.engine.process.actor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
@@ -56,10 +52,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Test;
 
@@ -88,7 +81,6 @@ public class ProcessActorIT extends TestWithUser {
     }
 
     @Test
-    @Cover(classes = { Group.class, ActorMember.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "ActorMappingService" }, jira = "ENGINE-952")
     public void mapActorToAlreadyMappedParentGroupShouldBeHandledSilently() throws Exception {
         final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
         final ActorInstance actor = checkActors(ACTOR_NAME, definition);
@@ -122,7 +114,8 @@ public class ProcessActorIT extends TestWithUser {
             final ActorMember addGroupToActor = getProcessAPI().addGroupToActor(actor.getId(), ergo.getId());
             final ActorMember addRoleAndGroupToActor = getProcessAPI().addRoleAndGroupToActor(actor.getId(), role.getId(), ergo.getId());
             final List<ActorMember> actorMembers = getProcessAPI().getActorMembers(actor.getId(), 0, 50);
-            assertTrue("All group / actor mapping should have been retrieved", actorMembers.containsAll(Arrays.asList(addGroupToActor, addRoleAndGroupToActor)));
+            assertTrue("All group / actor mapping should have been retrieved",
+                    actorMembers.containsAll(Arrays.asList(addGroupToActor, addRoleAndGroupToActor)));
         } finally {
             deleteGroups(ergo);
             deleteRoles(role);
@@ -259,7 +252,6 @@ public class ProcessActorIT extends TestWithUser {
     }
 
     @Test
-    @Cover(classes = { ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Description" }, jira = "ENGINE-1065")
     public void getActor() throws Exception {
         final ProcessDefinition definition = preparationBeforeTest(ACTOR_NAME);
 
@@ -320,7 +312,7 @@ public class ProcessActorIT extends TestWithUser {
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 5, null);
         assertNotNull(actors);
         assertEquals(2, actors.size());
-        final List<Long> actorIds = new ArrayList<Long>();
+        final List<Long> actorIds = new ArrayList<>();
         for (final ActorInstance actorInstance : actors) {
             actorIds.add(actorInstance.getId());
         }
@@ -495,7 +487,6 @@ public class ProcessActorIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = { User.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Users", "Actor" }, jira = "ENGINE-681")
     @Test
     public void getNumberOfUsersOfActor() throws Exception {
         final User user1 = createUser("user1", "bpm");
@@ -533,7 +524,6 @@ public class ProcessActorIT extends TestWithUser {
         deleteUser(user3);
     }
 
-    @Cover(classes = { Role.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Roles", "Actor" }, jira = "ENGINE-683")
     @Test
     public void getNumberOfRolesOfActor() throws Exception {
         final Role role1 = createRole("role1");
@@ -569,7 +559,6 @@ public class ProcessActorIT extends TestWithUser {
         deleteRoles(role1, role2, role3);
     }
 
-    @Cover(classes = { Group.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Groups", "Actor" }, jira = "ENGINE-682")
     @Test
     public void getNumberOfGroupsOfActor() throws Exception {
         final Group group1 = createGroup("group1");
@@ -600,8 +589,6 @@ public class ProcessActorIT extends TestWithUser {
         deleteGroups(group1, group2, group3);
     }
 
-    @Cover(classes = { UserMembership.class, User.class, Group.class, Role.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = {
-            "Number", "Group", "Role", "Actor" }, jira = "ENGINE-684")
     @Test
     public void getNumberOfMembershipsOfActor() throws Exception {
         final User user1 = createUser("user1", "bpm");
@@ -652,7 +639,7 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
-        final Set<Long> actorIds = new HashSet<Long>();
+        final Set<Long> actorIds = new HashSet<>();
         actorIds.add(actorInstance.getId());
 
         final List<ProcessDeploymentInfo> processDeploymentInfos = getProcessAPI().getStartableProcessDeploymentInfosForActors(actorIds, 0, 10,
@@ -672,7 +659,7 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
-        final Set<Long> actorIds = new HashSet<Long>();
+        final Set<Long> actorIds = new HashSet<>();
         actorIds.add(actorInstance.getId());
 
         final boolean isAllowedToStartProcess = getProcessAPI().isAllowedToStartProcess(processDefinition.getId(), actorIds);
@@ -875,7 +862,6 @@ public class ProcessActorIT extends TestWithUser {
         getIdentityAPI().deleteRole(role.getId());
     }
 
-    @Cover(classes = { ProcessDeploymentInfo.class }, concept = BPMNConcept.PROCESS, keywords = { "Pagination", "process definition" }, jira = "ENGINE-1375")
     @Test
     public void getPaginatedStartableProcessesForActors() throws Exception {
         final ProcessDefinition firstDefinition = getProcessDefinition(PROCESS_NAME);
@@ -883,7 +869,7 @@ public class ProcessActorIT extends TestWithUser {
 
         final ActorInstance firstActorInstance = getProcessAPI().getActorInitiator(firstDefinition.getId());
         final ActorInstance secondActorInstance = getProcessAPI().getActorInitiator(secondDefinition.getId());
-        final Set<Long> actorIds = new HashSet<Long>();
+        final Set<Long> actorIds = new HashSet<>();
         actorIds.add(firstActorInstance.getId());
         actorIds.add(secondActorInstance.getId());
 
