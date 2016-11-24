@@ -13,13 +13,7 @@
  **/
 package org.bonitasoft.engine.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Collections;
-import java.util.List;
+import static org.junit.Assert.*;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.PrintTestsStatusRule;
@@ -55,7 +49,7 @@ public class PlatformIT extends CommonAPIIT {
 
     @After
     public void after() throws BonitaException {
-        if(!platformAPI.isPlatformInitialized()){
+        if (!platformAPI.isPlatformInitialized()) {
             platformAPI.initializePlatform();
         }
         if (!platformAPI.isNodeStarted()) {
@@ -76,16 +70,16 @@ public class PlatformIT extends CommonAPIIT {
         if (!platformAPI.isPlatformCreated()) {
             platformAPI.createAndInitializePlatform();
         }
-        if(!platformAPI.isNodeStarted()){
+        if (!platformAPI.isNodeStarted()) {
             platformAPI.startNode();
         }
     }
 
     @Rule
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
+
         @Override
-        public List<String> clean() throws Exception {
-            return Collections.emptyList();
+        public void clean() throws Exception {
         }
     };
 
@@ -93,10 +87,12 @@ public class PlatformIT extends CommonAPIIT {
     public void isPlatformCreated() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
     }
+
     @Test
     public void isPlatformInitialized() throws BonitaException {
         assertTrue(platformAPI.isPlatformInitialized());
     }
+
     @Test
     public void should_cleanPlatform_remove_tenant() throws BonitaException {
         platformAPI.cleanPlatform();
