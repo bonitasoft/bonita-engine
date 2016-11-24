@@ -49,37 +49,29 @@ public abstract class CommonAPIIT extends APITestUtil {
 
     @Rule
     public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
+
         @Override
-        public List<String> clean() throws Exception {
-            return CommonAPIIT.this.clean();
+        public void clean() throws Exception {
+            CommonAPIIT.this.clean();
         }
     };
-
 
     /**
      * @return warning list of unclean elements
      * @throws BonitaException
      */
-    private List<String> clean() throws BonitaException {
+    private void clean() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-
-        final List<String> messages = new ArrayList<String>();
-        messages.addAll(checkNoCommands());
-        messages.addAll(checkNoFlowNodes());
-        messages.addAll(checkNoArchivedFlowNodes());
-        messages.addAll(checkNoComments());
-        messages.addAll(checkNoArchivedComments());
-        messages.addAll(checkNoWaitingEvent());
-        messages.addAll(checkNoProcessIntances());
-        messages.addAll(checkNoArchivedProcessIntances());
-        messages.addAll(checkNoProcessDefinitions());
-        messages.addAll(checkNoCategories());
-        messages.addAll(checkNoUsers());
-        messages.addAll(checkNoGroups());
-        messages.addAll(checkNoRoles());
-        messages.addAll(checkNoSupervisors());
+        cleanCommands();
+        cleanProcessInstances();
+        cleanArchiveProcessInstances();
+        cleanProcessDefinitions();
+        cleanCategories();
+        cleanUsers();
+        cleanGroups();
+        cleanRoles();
+        cleanSupervisors();
         logoutOnTenant();
-        return messages;
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {
@@ -92,14 +84,14 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     protected ProcessDefinition deployProcessWithTestFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user,
-                                                            final String filterName) throws BonitaException, IOException {
+            final String filterName) throws BonitaException, IOException {
         final List<BarResource> userFilters = generateFilterImplementations(filterName);
         final List<BarResource> generateFilterDependencies = generateFilterDependencies();
         return deployAndEnableProcessWithActorAndUserFilter(processDefinitionBuilder, actorName, user, generateFilterDependencies, userFilters);
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        final List<BarResource> resources = new ArrayList<>(1);
         final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
         final byte[] data = IOUtil.getAllContentFrom(inputStream);
         inputStream.close();
@@ -108,7 +100,7 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     private List<BarResource> generateFilterDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        final List<BarResource> resources = new ArrayList<>(1);
         byte[] data = IOUtil.generateJar(TestFilterThatThrowException.class);
         resources.add(new BarResource("TestFilterThatThrowException.jar", data));
         data = IOUtil.generateJar(TestFilter.class);

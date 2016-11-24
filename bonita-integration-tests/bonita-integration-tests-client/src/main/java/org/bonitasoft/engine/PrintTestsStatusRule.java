@@ -14,8 +14,6 @@
 
 package org.bonitasoft.engine;
 
-import java.util.List;
-
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -53,20 +51,16 @@ public abstract class PrintTestsStatusRule extends TestWatcher {
     @Override
     public void succeeded(final Description d) {
         try {
-            List<String> clean;
             try {
-                clean = clean();
+                clean();
             } catch (final Exception e) {
                 throw new BonitaRuntimeException(e);
             }
             logger.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            if (!clean.isEmpty()) {
-                throw new BonitaRuntimeException(clean.toString());
-            }
         } finally {
             logger.warn("-----------------------------------------------------------------------------------------------");
         }
     }
 
-    public abstract List<String> clean() throws Exception;
+    public abstract void clean() throws Exception;
 }
