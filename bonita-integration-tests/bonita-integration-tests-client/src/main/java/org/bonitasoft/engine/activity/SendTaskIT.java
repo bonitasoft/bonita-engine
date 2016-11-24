@@ -25,11 +25,7 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedSendTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
-import org.bonitasoft.engine.bpm.flownode.SendTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.StartEventInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -48,8 +44,6 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -154,8 +148,6 @@ public class SendTaskIT extends AbstractEventIT {
      * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and reaches user task , data is transmitted to
      * the receiveProcess.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.", jira = "")
     @Test
     public void dataTransferFromSendTaskToMessageIntermediateCatchEventWithTargetFlowNode() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithSendTask("sendMessageProcess", "m14", "receiveMessageProcess",
@@ -197,8 +189,6 @@ public class SendTaskIT extends AbstractEventIT {
      * checks : receiveProcess start and stop on catchEvent, sendProcess is finished, , receiveProcess continues and reaches user task , data is transmitted to
      * the receiveProcess.
      */
-    @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.", jira = "")
     @Test
     public void dataTransferFromSendTaskToMessageIntermediateCatchEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithSendTask("sendMessageProcess", "m14", "receiveMessageProcess",
@@ -236,9 +226,6 @@ public class SendTaskIT extends AbstractEventIT {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * checks : receiveProcess start and reaches user task , data is transmitted to the receiveProcess.
      */
-    @Cover(classes = { EventInstance.class, SendTaskInstance.class, StartEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event",
-            "Message event",
-            "Start event", "Send", "multi-instance", "Receive" }, story = "Send a message with data from a send of a process  to a start event of an other process.", jira = "BS-12292")
     @Test
     public void can_transfer_taskData_from_multi_instance_sendTask_to_messageStartEvent() throws Exception {
         //given

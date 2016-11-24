@@ -19,9 +19,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Date;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ThemeAPI;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -29,7 +26,6 @@ import org.junit.Test;
  */
 public class ThemeIT extends TestWithTechnicalUser {
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get default", "Mobile" }, jira = "BS-2396, BS-2397")
     @Test
     public void getMobileTheme() {
         final ThemeType type = ThemeType.MOBILE;
@@ -45,7 +41,6 @@ public class ThemeIT extends TestWithTechnicalUser {
         assertEquals(defaultTheme.getLastUpdatedDate(), lastUpdateDate);
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get default", "Portal" }, jira = "BS-2396, BS-2397")
     @Test
     public void getPortalTheme() {
         final ThemeType type = ThemeType.PORTAL;
@@ -59,20 +54,16 @@ public class ThemeIT extends TestWithTechnicalUser {
         assertEquals(defaultTheme.getLastUpdatedDate(), lastUpdateDate);
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get default", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = RuntimeException.class)
     public void cantGetDefaultThemeWithoutType() {
         getThemeAPI().getDefaultTheme(null);
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get current", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = RuntimeException.class)
     public void cantGetCurrentThemeWithoutType() {
         getThemeAPI().getCurrentTheme(null);
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get last update date", "Wrong parameter" }, jira =
-            "BS-2396, BS-2397")
     @Test(expected = RuntimeException.class)
     public void cantGetLastUpdateDateWithoutType() {
         getThemeAPI().getLastUpdateDate(null);

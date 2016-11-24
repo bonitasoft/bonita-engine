@@ -16,7 +16,6 @@ package org.bonitasoft.engine.profile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -26,8 +25,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -36,7 +33,6 @@ import org.junit.Test;
  */
 public class ProfileIT extends AbstractProfileIT {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.", jira = "")
     @Test
     public void searchProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -47,7 +43,6 @@ public class ProfileIT extends AbstractProfileIT {
         assertEquals("User", searchedProfiles.getResult().get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.", jira = "")
     @Test
     public void searchProfileWithSearchTerm() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -59,13 +54,11 @@ public class ProfileIT extends AbstractProfileIT {
         assertEquals("Administrator", searchedProfiles.getResult().get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search", "Wrong parameter" }, jira = "ENGINE-548")
     @Test(expected = SearchException.class)
     public void searchProfileWithWrongParameter() throws Exception {
         getProfileAPI().searchProfiles(null);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")
     @Test(expected = ProfileNotFoundException.class)
     public void getProfileWithWrongParameter() throws Exception {
         getProfileAPI().getProfile(855);

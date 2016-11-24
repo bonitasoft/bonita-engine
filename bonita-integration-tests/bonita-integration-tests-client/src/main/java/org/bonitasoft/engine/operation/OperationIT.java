@@ -37,8 +37,6 @@ import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.xml.DocumentManager;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -112,13 +110,19 @@ public class OperationIT extends TestWithUser {
     public void executeMultipleOperations() throws Exception {
         createAndExecuteProcessWithOperations("executeMultipleOperations", Arrays.asList("myData1", "myData2", "myData3"), Arrays.asList(
                 String.class.getName(), Boolean.class.getName(), Long.class.getName()), Arrays.asList(
-                new LeftOperandBuilder().createNewInstance().setName("myData1").done(), new LeftOperandBuilder().createNewInstance().setName("myData2").done(),
-                new LeftOperandBuilder().createNewInstance().setName("myData3").done()), Arrays.asList(OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT,
-                OperatorType.ASSIGNMENT), Arrays.asList("=", "=", "="), Arrays.asList(new ExpressionBuilder().createConstantStringExpression("test1"),
-                new ExpressionBuilder().createConstantBooleanExpression(false), new ExpressionBuilder().createConstantLongExpression(1234567891234567891L)),
+                        new LeftOperandBuilder().createNewInstance().setName("myData1").done(),
+                        new LeftOperandBuilder().createNewInstance().setName("myData2").done(),
+                        new LeftOperandBuilder().createNewInstance().setName("myData3").done()),
+                Arrays.asList(OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT,
+                        OperatorType.ASSIGNMENT),
+                Arrays.asList("=", "=", "="), Arrays.asList(new ExpressionBuilder().createConstantStringExpression("test1"),
+                        new ExpressionBuilder().createConstantBooleanExpression(false),
+                        new ExpressionBuilder().createConstantLongExpression(1234567891234567891L)),
                 Arrays.asList(new ExpressionBuilder().createConstantStringExpression("test2"), new ExpressionBuilder().createConstantBooleanExpression(true),
-                        new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)), Arrays.asList((Object) "test1", (Object) false,
-                        (Object) 1234567891234567891L), Arrays.asList((Object) "test2", (Object) true, (Object) 1234567891234567892L));
+                        new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)),
+                Arrays.asList((Object) "test1", (Object) false,
+                        (Object) 1234567891234567891L),
+                Arrays.asList((Object) "test2", (Object) true, (Object) 1234567891234567892L));
     }
 
     @Test
@@ -126,16 +130,22 @@ public class OperationIT extends TestWithUser {
         createAndExecuteProcessWithOperations("executeMultipleOperationsWithSameData", Arrays.asList("myData1", "myData2", "myData3", "myData1"),
                 Arrays.asList(String.class.getName(), Boolean.class.getName(), Long.class.getName(), String.class.getName()), Arrays.asList(
                         new LeftOperandBuilder().createNewInstance().setName("myData1").done(), new LeftOperandBuilder().createNewInstance().setName("myData2")
-                                .done(), new LeftOperandBuilder().createNewInstance().setName("myData3").done(), new LeftOperandBuilder().createNewInstance()
-                                .setName("myData1").done()), Arrays.asList(OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT,
-                        OperatorType.ASSIGNMENT), Arrays.asList("=", "=", "=", "="), Arrays.asList(
+                                .done(),
+                        new LeftOperandBuilder().createNewInstance().setName("myData3").done(), new LeftOperandBuilder().createNewInstance()
+                                .setName("myData1").done()),
+                Arrays.asList(OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT,
+                        OperatorType.ASSIGNMENT),
+                Arrays.asList("=", "=", "=", "="), Arrays.asList(
                         new ExpressionBuilder().createConstantStringExpression("test1"), new ExpressionBuilder().createConstantBooleanExpression(false),
                         new ExpressionBuilder().createConstantLongExpression(1234567891234567891L),
-                        new ExpressionBuilder().createConstantStringExpression("test1")), Arrays.asList(
+                        new ExpressionBuilder().createConstantStringExpression("test1")),
+                Arrays.asList(
                         new ExpressionBuilder().createConstantStringExpression("test2"), new ExpressionBuilder().createConstantBooleanExpression(true),
                         new ExpressionBuilder().createConstantLongExpression(1234567891234567892L),
-                        new ExpressionBuilder().createConstantStringExpression("test3")), Arrays.asList((Object) "test1", (Object) false,
-                        (Object) 1234567891234567891L, (Object) "test1"), Arrays.asList((Object) "test3", (Object) true, (Object) 1234567891234567892L,
+                        new ExpressionBuilder().createConstantStringExpression("test3")),
+                Arrays.asList((Object) "test1", (Object) false,
+                        (Object) 1234567891234567891L, (Object) "test1"),
+                Arrays.asList((Object) "test3", (Object) true, (Object) 1234567891234567892L,
                         (Object) "test3"));
     }
 
@@ -144,7 +154,7 @@ public class OperationIT extends TestWithUser {
             final List<Expression> expression, final List<Object> valueBefore, final List<Object> valueAfter) throws Exception {
         final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(procName, "1.0");
-        final HashSet<String> dataSet = new HashSet<String>(dataName.size());
+        final HashSet<String> dataSet = new HashSet<>(dataName.size());
         for (int i = 0; i < dataName.size(); i++) {
             final String name = dataName.get(i);
             if (!dataSet.contains(name)) {
@@ -166,7 +176,7 @@ public class OperationIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), delivery, user);
 
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final HashMap<String, Integer> inverDataOrder = new HashMap<String, Integer>(dataName.size());
+        final HashMap<String, Integer> inverDataOrder = new HashMap<>(dataName.size());
         for (int i = dataName.size() - 1; i >= 0; i--) {
             final String name = dataName.get(i);
             if (!inverDataOrder.containsKey(name)) {
@@ -332,7 +342,7 @@ public class OperationIT extends TestWithUser {
     public void initializeAVariableUsingAPIAccessor() throws Exception {
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         final Expression apiAccessor = expressionBuilder.createAPIAccessorExpression();
-        final List<Expression> dependencies = new ArrayList<Expression>(1);
+        final List<Expression> dependencies = new ArrayList<>(1);
         dependencies.add(apiAccessor);
         final Expression defaultExpression = expressionBuilder.createGroovyScriptExpression("initializeAVariableUsingAPIAccessor",
                 "apiAccessor.getIdentityAPI().getNumberOfUsers()", Long.class.getName(), dependencies);
@@ -381,7 +391,7 @@ public class OperationIT extends TestWithUser {
 
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         final Expression apiAccessor = expressionBuilder.createAPIAccessorExpression();
-        final List<Expression> dependencies = new ArrayList<Expression>(1);
+        final List<Expression> dependencies = new ArrayList<>(1);
         dependencies.add(apiAccessor);
         final Expression defaultExpression = expressionBuilder.createGroovyScriptExpression("updateAVariableUsingAPIAccessor",
                 "apiAccessor.getIdentityAPI().getNumberOfUsers()", Long.class.getName(), dependencies);
@@ -407,7 +417,7 @@ public class OperationIT extends TestWithUser {
     public void takeTransitionUsingAPIAccessor() throws Exception {
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         final Expression apiAccessor = expressionBuilder.createAPIAccessorExpression();
-        final List<Expression> dependencies = new ArrayList<Expression>(1);
+        final List<Expression> dependencies = new ArrayList<>(1);
         dependencies.add(apiAccessor);
         final Expression defaultExpression = expressionBuilder.createGroovyScriptExpression("takeTransitionUsingAPIAccessor",
                 "apiAccessor.getIdentityAPI().getNumberOfUsers() < 100", Boolean.class.getName(), dependencies);
@@ -424,7 +434,6 @@ public class OperationIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Operation.class, concept = BPMNConcept.CONNECTOR, keywords = { "Operation", "JavaMethodOperationExecutorStrategy", "primitive type" }, story = "execution of an JavaMethod operation with primitive parameters", jira = "ENGINE-1067")
     @Test
     public void javaMethodOperationWithPrimitiveParameters() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
@@ -436,7 +445,8 @@ public class OperationIT extends TestWithUser {
                         "myDatum",
                         "java.lang.StringBuilder",
                         new ExpressionBuilder().createGroovyScriptExpression("myInitGroovyScript", "new java.lang.StringBuilder(\"_\")",
-                                "java.lang.StringBuilder")).addAutomaticTask("step1");
+                                "java.lang.StringBuilder"))
+                .addAutomaticTask("step1");
         task1Def.addOperation(new OperationBuilder().createJavaMethodOperation("myDatum", "append", "int",
                 new ExpressionBuilder().createConstantIntegerExpression(55)));
         task1Def.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
@@ -451,7 +461,6 @@ public class OperationIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "custom type", "java operation", "classloader" }, jira = "ENGINE-1067", story = "update a custom variable using a java operation")
     @Test
     public void executeJavaOperationWithCustomType() throws Exception {
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive();

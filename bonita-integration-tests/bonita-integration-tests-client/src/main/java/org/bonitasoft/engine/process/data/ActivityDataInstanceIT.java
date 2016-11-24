@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.process.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -47,8 +44,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class ActivityDataInstanceIT extends TestWithUser {
@@ -162,7 +157,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final long activityInstanceId = waitForUserTask(processInstance, "step1");
 
         final String updatedValue = "afterUpdate";
-        final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> variables = new HashMap<>(2);
         variables.put("dataName", updatedValue);
         getProcessAPI().updateActivityInstanceVariables(activityInstanceId, variables);
 
@@ -180,7 +175,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         final long activityInstanceId = waitForUserTask(processInstance, "step1");
 
-        final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> variables = new HashMap<>(2);
         variables.put("dataName1", "afterUpdate");
         try {
             getProcessAPI().updateActivityInstanceVariables(activityInstanceId, variables);
@@ -229,8 +224,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         }
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "3 Process instances", "Data", "Boolean", "Transition", "Condition",
-            "Default", "Update" }, jira = "ENGINE-1459")
     @Test
     public void executeProcess3TimesWithNotInitializedData() throws Exception {
         final Expression dataExpr = new ExpressionBuilder().createDataExpression("booleanData", Boolean.class.getName());
@@ -288,7 +281,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = DataInstance.class, concept = BPMNConcept.DATA, jira = "ENGINE-679", keywords = { "data", "container" }, story = "process with data having same name in different container")
     @Test
     public void processWithDataHavingSameNameInTwoContainer() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -325,7 +317,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         return processDefinitionBuilder;
     }
 
-    @Cover(classes = { DataInstance.class }, concept = BPMNConcept.DATA, keywords = { "data instance", "transient data", "persisted data" }, jira = "ENGINE-1447", story = "It's possible to evaluate a data expression in a task containing transient data and persisted data")
     @Test
     public void canGetDataInstanceWhenThereAreTransientData() throws Exception {
         final String userTaskName = "task1";
@@ -333,7 +324,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final Long userTaskId = waitForUserTask(processInstance, userTaskName);
 
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
         final Expression transientVariableExpression = new ExpressionBuilder().createTransientDataExpression("transientVariable", String.class.getName());
         expressions.put(persistedVariableExpression, (Map<String, Serializable>) null);
@@ -346,8 +337,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
     @Test
     public void getArchivedActivityDataInstance() throws Exception {
         final String dataName = "title";
@@ -365,8 +354,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
     @Test
     public void getArchivedActivityDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
@@ -386,8 +373,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
     @Test
     public void getArchivedActivityDataInstances() throws Exception {
         final String dataName = "title";
@@ -430,8 +415,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
     @Test
     public void getUnknownArchivedActivityDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -470,7 +453,6 @@ public class ActivityDataInstanceIT extends TestWithUser {
         return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.DATA, jira = "BS-1984", keywords = { "update", "activity data", "wrong type" })
     @Test
     public void cantUpdateActivityDataInstanceWithWrongValue() throws Exception {
         final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(ACTOR_NAME)

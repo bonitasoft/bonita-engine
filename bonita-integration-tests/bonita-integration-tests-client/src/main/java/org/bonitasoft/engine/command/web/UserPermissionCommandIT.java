@@ -23,13 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,13 +59,12 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         super.after();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Command", "User", "Team" }, jira = "BS-8961")
     @Test
     public void canStartProcessDefinitionCommand() throws Exception {
         final String actor11 = "killer";
         final String actor12 = "Slayer";
         final String actor13 = "Drawer";
-        final Map<String, List<User>> actorUsers1 = new HashMap<String, List<User>>();
+        final Map<String, List<User>> actorUsers1 = new HashMap<>();
         actorUsers1.put(actor11, Arrays.asList(d1, d2));
         actorUsers1.put(actor12, Arrays.asList(d2));
         actorUsers1.put(actor13, Arrays.asList(d1));
@@ -83,7 +78,7 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
 
         final String actor21 = "UPS";
         final String actor22 = "FedEx";
-        final Map<String, List<User>> actorUsers2 = new HashMap<String, List<User>>();
+        final Map<String, List<User>> actorUsers2 = new HashMap<>();
         actorUsers2.put(actor21, Arrays.asList(manager));
         actorUsers2.put(actor22, Arrays.asList(x3));
 
@@ -93,7 +88,7 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         processBuilder2.addActor(actor22).addDescription("deliveryService2").addUserTask("userTask22", actor22);
         final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(processBuilder2.done(), actorUsers2);
 
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("USER_ID_KEY", d1.getId());
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDef1.getId());
         Boolean canStartProcessDefinition = (Boolean) getCommandAPI().execute("canStartProcessDefinition", parameters);

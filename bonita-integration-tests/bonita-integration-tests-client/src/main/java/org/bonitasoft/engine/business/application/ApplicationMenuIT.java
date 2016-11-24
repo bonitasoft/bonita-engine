@@ -16,13 +16,10 @@ package org.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,8 +50,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         super.tearDown();
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "create",
-            "no application page" })
     @Test
     public void createApplicationMenu_ApplicationPage_should_return_applicationMenu_based_on_creator_and_should_manage_indexes() throws Exception {
         //given
@@ -82,8 +77,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "create",
-            "related application page" })
     @Test
     public void createApplicationMenu_with_applicationPage_should_return_ApplicationMenu_with_applicationPageId() throws Exception {
         //given
@@ -97,8 +90,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(createdAppMenu.getApplicationPageId()).isEqualTo(appPage.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "create",
-            "parent menu" })
     @Test
     public void createApplicationMenu_with_parent_menu_should_return_ApplicationMenu_with_parentId_and_should_manage_indexes() throws Exception {
         //given
@@ -128,7 +119,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update" })
     @Test
     public void updateApplicationMenu_should_update_application_menu_based_on_updater() throws Exception {
         //given
@@ -177,7 +167,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update", "index" })
     @Test
     public void updateApplicationMenu_index_should_organize_indexes_for_elements_having_the_same_parent() throws Exception {
         //given
@@ -222,7 +211,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "get by id" })
     @Test
     public void getApplicationMenu_should_return_the_applicationMenu_identified_by_the_given_id() throws Exception {
         //given
@@ -238,7 +226,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "delete" })
     @Test(expected = ApplicationMenuNotFoundException.class)
     public void deleteApplicationMenu_should_remove_the_applicationMenu_identified_by_the_given_id() throws Exception {
         //given
@@ -252,8 +239,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         getApplicationAPI().getApplicationMenu(createdAppMenu.getId()); //throws exception
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application, Application menu",
-            "delete cascade" })
     @Test
     public void deleteApplication_also_deletes_application_pages_and_applicationMenu() throws Exception {
         //given
@@ -274,8 +259,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application page, Application menu",
-            "delete cascade" })
     @Test
     public void deleteApplicationPage_also_deletes_related_applicationMenu() throws Exception {
         //given
@@ -322,8 +305,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         }
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "all" })
     @Test
     public void searchApplicationMenus_without_filters_without_search_term_should_return_all_applicationMenues_pagged() throws Exception {
         //given
@@ -344,8 +325,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(secondPage.getResult()).containsExactly(menu3);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "filter on display name" })
     @Test
     public void searchApplicationMenus_can_filter_on_displayname() throws Exception {
         //given
@@ -364,8 +343,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(searchResult.getResult()).containsExactly(menu2);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "filter on index" })
     @Test
     public void searchApplicationMenus_can_filter_on_index() throws Exception {
         //given
@@ -384,8 +361,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(searchResult.getResult()).containsExactly(menu3);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "filter on application page id" })
     @Test
     public void searchApplicationMenus_can_filter_on_applicationPageId() throws Exception {
         //given
@@ -405,8 +380,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(searchResult.getResult()).containsExactly(menu1, menu3);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "filter on application id" })
     @Test
     public void searchApplicationMenus_can_filter_on_applicationId() throws Exception {
         //given
@@ -428,8 +401,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(searchResult.getResult()).containsExactly(menu1, menu3);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "filter on parent id" })
     @Test
     public void searchApplicationMenus_can_filter_on_parentId() throws Exception {
         //given
@@ -452,8 +423,6 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         assertThat(searchResult.getResult()).containsExactly(childMenu);
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
-            "search", "search term" })
     @Test
     public void searchApplicationMenus_can_use_searchTerm() throws Exception {
         //given

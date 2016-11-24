@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -85,8 +83,6 @@ import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -613,8 +609,6 @@ public class ProcessManagementIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, ActivityInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "ActivityInstance",
-            "Pagination" }, jira = "ENGINE-680")
     @Test
     public void getActivityInstancePaginated() throws Exception {
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -691,7 +685,7 @@ public class ProcessManagementIT extends TestWithUser {
         final String newConstantValue2 = "GOLDORAK";
         dataInstance = getProcessAPI().getActivityDataInstance(dataName2, activityInstanceId);
         final Operation stringOperation2 = BuildTestUtil.buildStringOperation(dataInstance.getName(), newConstantValue2, false);
-        final List<Operation> operations = new ArrayList<Operation>();
+        final List<Operation> operations = new ArrayList<>();
         operations.add(stringOperation);
         operations.add(stringOperation2);
         getProcessAPI().updateActivityInstanceVariables(operations, activityInstanceId, null);
@@ -728,15 +722,15 @@ public class ProcessManagementIT extends TestWithUser {
 
         List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
         assertThat(dataInstances).hasSize(6);
-        final ArrayList<String> names = new ArrayList<String>(6);
-        ArrayList<String> values = new ArrayList<String>(6);
+        final ArrayList<String> names = new ArrayList<>(6);
+        ArrayList<String> values = new ArrayList<>(6);
         for (final DataInstance dataInstance2 : dataInstances) {
             names.add(dataInstance2.getName());
             values.add((String) dataInstance2.getValue());
         }
         assertThat(names).contains("a", "b", "c", "d", "e", "f");
         assertThat(values).contains("aacti", "bprocess", "cprocess", "dprocess", "eprocess", "facti");
-        final List<Operation> operations = new ArrayList<Operation>();
+        final List<Operation> operations = new ArrayList<>();
         for (final DataInstance dataInstance2 : dataInstances) {
             final Operation stringOperation = BuildTestUtil.buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up", false);
             operations.add(stringOperation);
@@ -745,7 +739,7 @@ public class ProcessManagementIT extends TestWithUser {
 
         dataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
         assertThat(dataInstances).hasSize(6);
-        values = new ArrayList<String>(6);
+        values = new ArrayList<>(6);
         for (final DataInstance dataInstance2 : dataInstances) {
             values.add((String) dataInstance2.getValue());
         }
@@ -766,7 +760,7 @@ public class ProcessManagementIT extends TestWithUser {
         final long activityInstanceId = activityInstances.get(0).getId();
         final String updatedValue = "afterUpdate";
 
-        final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> variables = new HashMap<>(2);
         variables.put("dataName", updatedValue);
         getProcessAPI().updateActivityInstanceVariables(activityInstanceId, variables);
 
@@ -789,7 +783,7 @@ public class ProcessManagementIT extends TestWithUser {
         final long activityInstanceId = activityInstances.get(0).getId();
         final String updatedValue = "afterUpdate";
 
-        final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
+        final Map<String, Serializable> variables = new HashMap<>(2);
         variables.put("dataName1", updatedValue);
         try {
             getProcessAPI().updateActivityInstanceVariables(activityInstanceId, variables);
@@ -847,7 +841,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         waitForUserTask(processInstance, "step1");
 
-        final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
+        final List<ActivityInstance> activityInstances = new ArrayList<>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
         final ActivityInstance activityInstance = activityInstances.get(activityInstances.size() - 1);
 
         assertEquals("ready", activityInstance.getState());
@@ -1001,7 +995,7 @@ public class ProcessManagementIT extends TestWithUser {
 
         // create Operation keyed map
         final Operation integerOperation = BuildTestUtil.buildIntegerOperation(dataName, 2);
-        final Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, Serializable> context = new HashMap<>();
         context.put("page", "1");
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId, Arrays.asList(integerOperation), context);
@@ -1146,7 +1140,7 @@ public class ProcessManagementIT extends TestWithUser {
         getProcessAPI().assignUserTask(step2Id, john.getId());
 
         // check
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(jack.getId());
         userIds.add(john.getId());
         userIds.add(lucy.getId());
@@ -1191,7 +1185,7 @@ public class ProcessManagementIT extends TestWithUser {
         getProcessAPI().assignUserTask(step2Id, john.getId());
 
         // check
-        final List<Long> userIds = new ArrayList<Long>();
+        final List<Long> userIds = new ArrayList<>();
         userIds.add(jack.getId());
         userIds.add(john.getId());
         userIds.add(lucy.getId());
@@ -1260,7 +1254,7 @@ public class ProcessManagementIT extends TestWithUser {
         final long processDefinitionIdB = processDefinition2.getId();
         final long processDefinitionIdC = processDefinition3.getId();
         final long processDefinitionIdD = processDefinition4.getId();
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
+        final List<Long> processDefinitionIds = new ArrayList<>();
         processDefinitionIds.add(processDefinitionIdA);
         processDefinitionIds.add(processDefinitionIdB);
         processDefinitionIds.add(processDefinitionIdC);
@@ -1320,7 +1314,7 @@ public class ProcessManagementIT extends TestWithUser {
         final long processInstantsIdB = pi2.getId();
         final long processInstantsIdC = pi3.getId();
         final long processInstantsIdD = pi4.getId();
-        final List<Long> processInstantsIds = new ArrayList<Long>();
+        final List<Long> processInstantsIds = new ArrayList<>();
         processInstantsIds.add(processInstantsIdA);
         processInstantsIds.add(processInstantsIdB);
         processInstantsIds.add(processInstantsIdC);
@@ -1371,8 +1365,6 @@ public class ProcessManagementIT extends TestWithUser {
      * 8 -> fix issue + retryTask
      * 9 -> task is finally completed
      */
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = { "retry task", "failed connector",
-            "failed operations" })
     @Test
     public void retryTask_should_retry_failed_connectors_and_operations() throws Exception {
         //given
@@ -1485,7 +1477,6 @@ public class ProcessManagementIT extends TestWithUser {
                 .addInput("kind", new ExpressionBuilder().createDataExpression(watchingOnFinishVar, String.class.getName()));
     }
 
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = "retry task, failed connector")
     @Test
     public void can_retryTask_twice() throws Exception {
         //given
@@ -1559,7 +1550,7 @@ public class ProcessManagementIT extends TestWithUser {
         assertEquals(pi1.getId(), archivedProcessInstance1.getSourceObjectId());
 
         // put processInstantsId to a list as parameter
-        final List<Long> archivedProcessInstantsIds = new ArrayList<Long>();
+        final List<Long> archivedProcessInstantsIds = new ArrayList<>();
         archivedProcessInstantsIds.add(archivedProcessInstance1.getId());
 
         // do search and assert
@@ -1604,7 +1595,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         final Operation stringOperation = BuildTestUtil.buildStringOperation("aData", "15", false);
-        final Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, Serializable> context = new HashMap<>();
         context.put("page", "1");
 
         try {
@@ -1626,7 +1617,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         final Operation stringOperation = BuildTestUtil.buildStringOperation("aData", "15", false);
-        final Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, Serializable> context = new HashMap<>();
         context.put("page", "1");
 
         try {
@@ -1648,9 +1639,9 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
         final Operation stringOperation = BuildTestUtil.buildStringOperation("aData", "15", false);
-        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
+        final ArrayList<Operation> operations = new ArrayList<>(1);
         operations.add(stringOperation);
-        final Map<String, Serializable> context = new HashMap<String, Serializable>();
+        final Map<String, Serializable> context = new HashMap<>();
         context.put("page", "1");
 
         try {
@@ -1664,7 +1655,7 @@ public class ProcessManagementIT extends TestWithUser {
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws BonitaException {
-        final List<Long> ids = new ArrayList<Long>();
+        final List<Long> ids = new ArrayList<>();
         for (int i = 0; i < nbProcess; i++) {
             String processName = PROCESS_NAME;
             if (i >= 0 && i < 10) {
@@ -1685,7 +1676,6 @@ public class ProcessManagementIT extends TestWithUser {
                 .addShortTextData("dataName", new ExpressionBuilder().createConstantStringExpression("beforeUpdate")).getProcess();
     }
 
-    @Cover(jira = "ENGINE-1601", classes = { DataInstance.class, ProcessInstance.class }, concept = BPMNConcept.DATA, keywords = { "initilize process data" })
     @Test
     public void startProcessUsingInitialVariableValues() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
@@ -1695,7 +1685,7 @@ public class ProcessManagementIT extends TestWithUser {
         processBuilder.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
 
-        final Map<String, Serializable> variables = new HashMap<String, Serializable>();
+        final Map<String, Serializable> variables = new HashMap<>();
         variables.put("bigD", new BigDecimal("3.141592653589793"));
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId(), variables);
 
@@ -1707,8 +1697,6 @@ public class ProcessManagementIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "BS-10584", classes = { ClassLoader.class, ProcessDefinition.class, ProcessInstance.class }, concept = BPMNConcept.PROCESS, keywords = {
-            "clean classlaoder", "disable process" })
     @Test
     public void purgeClassLoader_should_clean_the_classloader_of_the_process_definition_when_it_is_disabled_without_a_running_instance() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");

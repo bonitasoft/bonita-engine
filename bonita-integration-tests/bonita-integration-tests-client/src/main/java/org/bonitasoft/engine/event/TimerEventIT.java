@@ -36,13 +36,10 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class TimerEventIT extends TestWithUser {
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer duration type.", jira = "")
     @Test
     public void timerIntermediateCatchEventDuration() throws Exception {
         final String step1Name = "step1";
@@ -75,7 +72,6 @@ public class TimerEventIT extends TestWithUser {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer date type.", jira = "")
     @Test
     public void timerIntermediateCatchEventDate() throws Exception {
         final String step1Name = "step1";
@@ -101,7 +97,6 @@ public class TimerEventIT extends TestWithUser {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer date type.", jira = "")
     @Test
     public void timerStartEventDate() throws Exception {
         final String stepName = "step1";
@@ -120,7 +115,6 @@ public class TimerEventIT extends TestWithUser {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer duration type.", jira = "")
     @Test
     public void timerStartEventDuration() throws Exception {
         final String stepName = "step1";

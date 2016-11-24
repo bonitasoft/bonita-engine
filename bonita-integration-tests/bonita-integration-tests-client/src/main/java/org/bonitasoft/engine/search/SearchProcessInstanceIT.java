@@ -14,15 +14,12 @@
 package org.bonitasoft.engine.search;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
@@ -47,8 +44,6 @@ import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -117,8 +112,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessInstance.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, jira = "BS-11031", keywords = { "Failed task",
-            "Failed process" })
     @Test
     public void searchFailedProcessInstances() throws Exception {
         // Build a process with a failed connector on enter
@@ -449,8 +442,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-            "User Performed Task" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserPerformedTask() throws Exception {
         // create user
@@ -507,8 +498,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         deleteUsers(john, jack, paul);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-            "User Performed Task", "Multiple Instances" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserPerformedTaskOnMultipleInstances() throws Exception {
         // create user
@@ -551,8 +540,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         deleteUsers(john, jack, paul);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-            "User Started It", "Multiple Instances" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserStartedItOnMultipleInstances() throws Exception {
         // create user
@@ -595,8 +582,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         deleteUsers(john, jack, paul, pierre);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Managed By", "Process instance", "Open", "Involving User",
-            "User Started Process" }, jira = "ENGINE-715")
     @Test
     public void searchOpenProcessInstancesInvolvingUsersManagedByWithUserStartedProcess() throws Exception {
         // create user
@@ -711,8 +696,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class, ArchivedProcessInstancesSearchDescriptor.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Archived",
-            "Process Instances" }, jira = "ENGINE-998")
     @Test
     public void searchArchivedProcessInstances() throws Exception {
         final User user1 = createUser("john1", "bpm");
@@ -867,7 +850,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         deleteUsers(user1, user2, user3, user4);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "API, Search" }, story = "Search process instance should return 1 when there's a subprocess and parent process active", jira = "ENGINE-964")
     @Test
     public void twoPoolsWithOneWithACallActivityCaseTest() throws Exception {
         final ProcessDefinitionBuilder process2DefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process2", "1.0");
@@ -908,8 +890,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         return designProcessDefinition;
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchArchivedProcessInstances",
-            "Apostrophe" }, jira = "ENGINE-366, ENGINE-589")
     @Test
     public void searchArchivedProcessInstancesWithApostrophe() throws Exception {
         // Create process
@@ -940,7 +920,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Process instance", "terminal state" }, story = "Search archived process instances retrieve only instances in terminal state", jira = "ENGINE-1084")
     @Test
     public void searchArchivedProcessInstancesRetrieveOnlyTerminalStates() throws Exception {
         // create a process instance in state completed and a process instance in the state canceled
@@ -972,7 +951,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         disableAndDeleteProcess(procWithEventSubProcess.getId());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Disabled", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
     @Test
     public void searchUsersWhoCanStartProcess() throws Exception {
         final User jack = createUser("jack", PASSWORD);
@@ -1000,7 +978,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Group", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
     @Test
     public void searchUsersWhoCanStartProcessInAGroup() throws Exception {
         final Group group = createGroup(GROUP_NAME);
@@ -1026,7 +1003,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         deleteRoles(role);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Group", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
     @Test
     public void searchUsersWhoCanStartProcessInARole() throws Exception {
         final Group group = createGroup(GROUP_NAME);
@@ -1052,7 +1028,6 @@ public class SearchProcessInstanceIT extends TestWithUser {
         deleteRoles(role);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "User", "Enabled", "Group", "Who can start process" }, story = "Search enabled/disabled users who can start process", jira = "ENGINE-821")
     @Test
     public void searchUsersWhoCanStartProcessInARoleAndAGroup() throws Exception {
         final Group group = createGroup(GROUP_NAME);

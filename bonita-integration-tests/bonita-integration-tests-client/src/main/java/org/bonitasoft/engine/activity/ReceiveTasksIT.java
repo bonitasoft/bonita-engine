@@ -35,10 +35,8 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedReceiveTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.ReceiveTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -64,8 +62,6 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -83,8 +79,6 @@ public class ReceiveTasksIT extends TestWithUser {
      * checks : receiveProcess wait on receive task and don't and halt on the user task.
      */
     @SuppressWarnings("unchecked")
-    @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
-            "Send", "Receive" }, jira = "")
     @Test
     public void noMessageSentSoReceiveProcessIsWaiting() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
@@ -113,8 +107,6 @@ public class ReceiveTasksIT extends TestWithUser {
      * checks : receiveProcess wait on receive task, sendProcess is finished, receiveProcess continue and halt on the user task, receive task is archived
      */
     @SuppressWarnings("unchecked")
-    @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
-            "Send", "Receive" }, jira = "")
     @Test
     public void receiveMessageSentAfterReceiveProcessIsWaiting() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m2", "receiveMessageProcess",
@@ -158,8 +150,6 @@ public class ReceiveTasksIT extends TestWithUser {
      * dynamic -> deployAndEnable(sendProcess), startProcess(sendProcess), deployAndEnable(receiveProcess), startProcess(receiveProcess)
      * checks : sendProcess is finished, receiveProcess goes through receive task (found message sent by sendProcess) and reaches user task.
      */
-    @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
-            "Send", "Receive" }, jira = "")
     @Test
     public void receiveMessageSentBeforeReceiveProcessIsEnabled() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m3", "receiveMessageProcess",
@@ -183,8 +173,6 @@ public class ReceiveTasksIT extends TestWithUser {
      * dynamic -> deployAndEnable(sendProcesses), startProcess(sendProcesses), deployAndEnable(receiveProcess), startProcess(receiveProcess)
      * checks : sendProcesses are finished, receiveProcess goes through receive task (found one message sent by sendProcess) and reaches user task.
      */
-    @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
-            "Send", "Receive" }, jira = "")
     @Test
     public void receiveMessageSentTwice() throws Exception {
         ProcessDefinition sendMessageProcess1 = null;
@@ -222,8 +210,6 @@ public class ReceiveTasksIT extends TestWithUser {
      * sendProcess) and reaches user task, data is transmitted to
      * the receiveProcess.
      */
-    @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
-            "Send", "Receive" }, jira = "")
     @Test
     public void receiveMessageWithData() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m5", "receiveMessageProcess",
@@ -254,8 +240,6 @@ public class ReceiveTasksIT extends TestWithUser {
      * checks : receiveProcess wait on receive task, 1 waiting event, receiveProcess is cancelled, receiveProcess is archived, no more waiting event
      */
     @SuppressWarnings("unchecked")
-    @Cover(classes = { EventInstance.class, ReceiveTaskInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Receive task",
-            "Send", "Receive" }, jira = "")
     @Test
     public void cancelInstanceShouldDeleteWaitingEvents() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -47,10 +46,7 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class GetProcessDefinitionIT extends TestWithTechnicalUser {
@@ -69,7 +65,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
 
     private List<UserMembership> userMemberships = null;
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Category" }, jira = "")
     @Test
     public void getProcessDefinitionsUnrelatedToCategoryUserCanStart() throws Exception {
         beforeSearchProcessDefinitionsUserCanStart();
@@ -102,7 +97,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
 
     private void beforeSearchProcessDefinitionsUserCanStart() throws BonitaException {
         // create users
-        users = new ArrayList<User>(2);
+        users = new ArrayList<>(2);
         final User chico = createUser("chicobento", "bpm");
         final User cebolinha = createUser("cebolinha", "bpm");
         final User cascao = createUser("cascao", "bpm");
@@ -117,21 +112,21 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         users.add(dorinha);
 
         // create groups
-        groups = new ArrayList<Group>(2);
+        groups = new ArrayList<>(2);
         final Group group1 = createGroup("group1");
         groups.add(group1);
         final Group group2 = createGroup("group2");
         groups.add(group2);
 
         // create roles
-        roles = new ArrayList<Role>(2);
+        roles = new ArrayList<>(2);
         final Role role1 = createRole("role1");
         final Role role2 = createRole("role2");
         roles.add(role1);
         roles.add(role2);
 
         // create user memberships
-        userMemberships = new ArrayList<UserMembership>(3);
+        userMemberships = new ArrayList<>(3);
         userMemberships.add(getIdentityAPI().addUserMembership(magali.getId(), group1.getId(), role1.getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(monica.getId(), group1.getId(), role2.getId()));
         userMemberships.add(getIdentityAPI().addUserMembership(dorinha.getId(), group2.getId(), role1.getId()));
@@ -139,7 +134,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         // create processes
         createProcessesDefForSearchProcessUserCanStart();
 
-        categories = new ArrayList<Category>(3);
+        categories = new ArrayList<>(3);
         final Category category1 = getProcessAPI().createCategory("category1", "the first known category");
         final Category category2 = getProcessAPI().createCategory("category2", "the second known category");
         final Category category3 = getProcessAPI().createCategory("category3", "the third known category");
@@ -153,7 +148,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
     }
 
     private void createProcessesDefForSearchProcessUserCanStart() throws BonitaException {
-        enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
+        enabledProcessDefinitions = new ArrayList<>(4);
         final String actor1 = ACTOR_NAME;
         final DesignProcessDefinition designProcessDefinition1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process1", "1.0",
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true), actor1, true);
@@ -214,7 +209,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "User", "Process" }, jira = "ENGINE-575", story = "Tests the method returning the list of processes that a removal of the user passed in parameters would cause to pass in unresolved.")
     public void getProcessesWithActorOnlyForUser() throws Exception {
         final String actorName1 = "ITAccountCreator";
         final String actorName2 = "ITAccountValidator";
@@ -255,7 +249,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "User", "Process" }, jira = "ENGINE-576", story = "Tests the method returning the list of processes that a removal of the users passed in parameters would cause to pass in unresolved.")
     public void getProcessesWithActorOnlyForUsers() throws Exception {
         final String actorName1 = "ITAccountCreator";
         final String actorName2 = "ITAccountValidator";
@@ -311,7 +304,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         deleteUser(user3);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Role", "Process" }, jira = "ENGINE-566", story = "Tests the method returning the list of processes that a removal of the role passed in parameters would cause to pass in unresolved.")
     @Test
     public void getProcessesWithActorOnlyRole() throws Exception {
         final String actorName = "actor";
@@ -355,7 +347,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition2);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Role", "Process" }, jira = "ENGINE-574", story = "Tests the method returning the list of processes that a removal of the roles passed in parameters would cause to pass in unresolved.")
     @Test
     public void getProcessesWithActorOnlyRoles() throws Exception {
         final String actorName = "actor";
@@ -420,7 +411,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition11, processDefinition12, processDefinition21, processDefinition22);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, jira = "ENGINE-565", story = "Tests the method returning the list of processes that a removal of the group passed in parameters would cause to pass in unresolved.")
     @Test
     public void getProcessesWithActorOnlyGroup() throws Exception {
         final String actorName = "actor";
@@ -479,7 +469,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition3);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, jira = "ENGINE-564", story = "Tests the method returning the list of processes that a removal of the groups passed in parameters would cause to pass in unresolved.")
     @Test
     public void getProcessesWithActorOnlyForGroups() throws Exception {
         final String actorName = "actor";
@@ -533,7 +522,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDefinition1, processDefinition2, processDefinition3);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, story = "Tests the cases were the 2roles-2users-2groups removed separately would'nt cause the process to pass in unresolved but would altoger. The list of prrocesses returned must reflect that.", jira = "")
     @Test
     public void getProcessesWithActorWithParticularCases() throws Exception {
         final String actorName = "actor";
@@ -652,7 +640,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "User", "Process" }, jira = "ENGINE-1375")
     public void getPaginatedProcessesWithActorOnlyForUser() throws Exception {
         final String actorName1 = "ITAccountCreator";
         final String actorName2 = "ITAccountValidator";
@@ -679,7 +666,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         deleteUser(user2);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "DesignProcessDefinition", "Existing" }, jira = "ENGINE-1817")
     @Test
     public void getExistingDesignProcessDefinition() throws Exception {
         final User user = createUser("any", "contrasena");
@@ -717,7 +703,6 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         deleteUser(user);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "DesignProcessDefinition", "Not Existing" }, jira = "ENGINE-1817")
     @Test(expected = ProcessDefinitionNotFoundException.class)
     public void getNotExistingDesignProcessDefinition() throws Exception {
         getProcessAPI().getDesignProcessDefinition(16548654L);
@@ -731,7 +716,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
         for (final BarResource barResource : impl) {
             businessArchiveBuilder.addUserFilters(barResource);
         }
-        final List<BarResource> generateFilterDependencies = new ArrayList<BarResource>(1);
+        final List<BarResource> generateFilterDependencies = new ArrayList<>(1);
         final byte[] data = IOUtil.generateJar(TestFilter.class);
         generateFilterDependencies.add(new BarResource("TestFilter.jar", data));
         for (final BarResource barResource : generateFilterDependencies) {
@@ -753,7 +738,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
     }
 
     private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        final List<BarResource> resources = new ArrayList<>(1);
         final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
         final byte[] data = IOUtil.getAllContentFrom(inputStream);
         inputStream.close();

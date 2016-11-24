@@ -20,7 +20,6 @@ import java.io.IOException;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -33,8 +32,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.process.Employee;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +73,6 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Custom data on activity" }, jira = "ENGINE-1498")
     @Test
     public void callActivityWith2CustomDatasOnActivityUsingSameExternalLibrairy() throws Exception {
         final String targetProcessName = "targetProcess";
@@ -122,8 +118,6 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Custom data on process",
-            "Sub process with terminate end event" }, jira = "ENGINE-1719")
     @Test
     public void callActivityWithMappingAnd2CustomDatasOnProcessUsingSameExternalLibrairy() throws Exception {
         // getCommandAPI().addDependency("Employee.jar", IOUtil.generateJar(Employee.class));

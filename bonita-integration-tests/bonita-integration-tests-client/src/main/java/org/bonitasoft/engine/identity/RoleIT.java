@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -32,8 +31,6 @@ import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class RoleIT extends TestWithTechnicalUser {
@@ -444,8 +441,6 @@ public class RoleIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteRole(dev.getId());
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchRole",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchRoleWithApostrophe() throws BonitaException {
         final RoleCreator roleCreator1 = new RoleCreator("mana'ger");

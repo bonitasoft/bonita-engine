@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,8 +37,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +61,7 @@ public class SupervisorIT extends TestWithTechnicalUser {
         createGroups();
         createRoles();
         createProcessDefinitions();
-        supervisors = new ArrayList<ProcessSupervisor>();
+        supervisors = new ArrayList<>();
         createUserSupervisors();
         createGroupSupervisors();
         createRoleSupervisors();
@@ -86,7 +80,7 @@ public class SupervisorIT extends TestWithTechnicalUser {
     }
 
     private void createProcessDefinitions() throws BonitaException {
-        processDefinitions = new ArrayList<ProcessDefinition>();
+        processDefinitions = new ArrayList<>();
         processDefinitions.add(createProcessDefinition("myProcess1"));
         processDefinitions.add(createProcessDefinition("myProcess2"));
     }
@@ -98,7 +92,7 @@ public class SupervisorIT extends TestWithTechnicalUser {
     }
 
     private void createUsers() throws BonitaException {
-        users = new ArrayList<User>();
+        users = new ArrayList<>();
         users.add(getIdentityAPI().createUser(USERNAME, PASSWORD));
         users.add(createUser("user2", "bpm", "FirstName2", "LastName2"));
         users.add(createUser("user3", "bpm", "FirstName3", "LastName3"));
@@ -107,13 +101,13 @@ public class SupervisorIT extends TestWithTechnicalUser {
     }
 
     private void createGroups() throws BonitaException {
-        groups = new ArrayList<Group>();
+        groups = new ArrayList<>();
         groups.add(getIdentityAPI().createGroup("Engine", null));
         groups.add(createGroup("group2", "level2"));
     }
 
     private void createRoles() throws BonitaException {
-        roles = new ArrayList<Role>();
+        roles = new ArrayList<>();
         roles.add(getIdentityAPI().createRole("Developer"));
         roles.add(createRole("role2"));
     }
@@ -150,7 +144,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         supervisors.add(getProcessAPI().createProcessSupervisorForMembership(processDefinitions.get(1).getId(), group2.getId(), role1.getId()));
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Process" }, story = "Test if a user is supervisor of a process.", jira = "")
     @Test
     public void isUserProcessSupervisor() throws Exception {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -174,7 +167,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Get", "Delete" }, story = "Get and delete supervisor.", jira = "")
     @Test
     public void getAndDeleteSupervisor() throws BonitaException {
         final long userId = users.get(0).getId();
@@ -190,7 +182,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisors.get(0).getProcessDefinitionId(), getSupervisorResult.getProcessDefinitionId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameUserSupervisor() throws BonitaException {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -207,7 +198,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameGroupSupervisor() throws BonitaException {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -224,7 +214,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameRoleSupervisor() throws BonitaException {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -241,7 +230,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Membership", "Create" }, story = "Can't create twice the same process supervisor.", jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void cantCreateTwiceSameMembershipSupervisor() throws BonitaException {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -259,7 +247,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Delete" }, story = "Delete supervisors corresponding to criteria", jira = "ENGINE-766")
     @Test
     public void deleteSupervisors() throws BonitaException {
         final ProcessDefinition processDefinition1 = processDefinitions.get(0);
@@ -306,7 +293,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(9, result.getCount());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group" }, story = "Add group to supervisor.", jira = "")
     @Test
     public void addGroupToSupervisor() throws Exception {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -334,7 +320,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Membership" }, story = "Add membership to supervisor.", jira = "")
     @Test
     public void addMembershipToSupervisor() throws Exception {
         final long processDefinitionId = processDefinitions.get(0).getId();
@@ -367,7 +352,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Search", "Process" }, story = "Search process supervisors for user.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUser() throws Exception {
         final ProcessSupervisor supervisor4 = supervisors.get(3);
@@ -404,7 +388,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisor4.getUserId(), supervisorsResult.get(1).getUserId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Search", "Process", "Filter" }, story = "Search process supervisors for user with filter on process def id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserWithFilter() throws Exception {
         // filter on process
@@ -426,7 +409,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisors.get(0).getUserId(), supervisorsResult.get(0).getUserId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group", "Search", "Process" }, story = "Search process supervisors for group.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForGroup() throws Exception {
         final SearchOptionsBuilder builder = buildSearchOptions(null, 8, 2, ProcessSupervisorSearchDescriptor.GROUP_ID, Order.ASC);
@@ -438,7 +420,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(groups.get(1).getId(), supervisors.get(1).getGroupId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group", "Search", "Process", "Filter" }, story = "Search process supervisors for group with filter on group id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForGroupWithFilter() throws Exception {
         final Group group1 = groups.get(0);
@@ -452,7 +433,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(group1.getId(), supervisors.get(0).getGroupId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Search", "Process" }, story = "Search process supervisors for role.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRole() throws Exception {
         final SearchOptionsBuilder builder = buildSearchOptions(null, 9, 11, ProcessSupervisorSearchDescriptor.ROLE_ID, Order.ASC);
@@ -463,7 +443,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(roles.get(1).getId(), supervisors.get(1).getRoleId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Search", "Process", "Filter" }, story = "Search process supervisors for role with filter on role id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRoleWithFilter() throws Exception {
         final Role role1 = roles.get(0);
@@ -476,7 +455,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(role1.getId(), supervisors.get(0).getRoleId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Group", "Search", "Process" }, story = "Search process supervisors for role and group.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRoleAndGroup() throws Exception {
         final Role role1 = roles.get(0);
@@ -497,7 +475,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(group2.getId(), supervisorsResult.get(3).getGroupId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "Group", "Search", "Process", "Filter" }, story = "Search process supervisors for role and group with filter on role id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForRoleAndGroupWithFilter() throws Exception {
         final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.ROLE_ID, (Serializable) roles.get(0).getId());
@@ -511,7 +488,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisors.get(11).getSupervisorId(), supervisorsResult.get(1).getSupervisorId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "User", "Search", "Process" }, story = "Search process supervisors for role and user.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndRole() throws Exception {
         final Role role1 = roles.get(0);
@@ -529,7 +505,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(users.get(1).getId(), supervisors.get(5).getUserId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Role", "User", "Search", "Process", "Filter" }, story = "Search process supervisors for role and user with filter on role id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndRoleWithFilter() throws Exception {
         final Role role1 = roles.get(0);
@@ -545,7 +520,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(role1.getId(), supervisors.get(1).getRoleId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Search", "Process" }, story = "Search process supervisors for user and group.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroup() throws Exception {
         final Group group2 = groups.get(1);
@@ -564,7 +538,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(users.get(1).getId(), supervisors.get(5).getUserId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Search", "Process", "Filter" }, story = "Search process supervisors for user and group with filter on user id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroupWithFilter() throws Exception {
         final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());
@@ -577,7 +550,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(supervisors.get(0).getSupervisorId(), supervisors.get(0).getSupervisorId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Search", "Process" }, story = "Search process supervisors for user, group and role.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroupAndRole() throws Exception {
         final Role role1 = roles.get(0);
@@ -602,8 +574,6 @@ public class SupervisorIT extends TestWithTechnicalUser {
         assertEquals(users.get(1).getId(), supervisors.get(5).getUserId());
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Group", "Role", "Search", "Process",
-            "Filter" }, story = "Search process supervisors for user and group with filter on user id.", jira = "ENGINE-766")
     @Test
     public void searchProcessSupervisorsForUserAndGroupAndRoleWithFilter() throws Exception {
         final Map<String, Serializable> filters = Collections.singletonMap(ProcessSupervisorSearchDescriptor.USER_ID, (Serializable) users.get(0).getId());

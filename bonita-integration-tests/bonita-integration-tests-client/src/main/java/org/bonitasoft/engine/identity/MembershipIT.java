@@ -13,20 +13,15 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -144,7 +139,6 @@ public class MembershipIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { IdentityAPI.class, UserMembership.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Create", "User membership", "Twice" }, jira = "ENGINE-920")
     @Test(expected = AlreadyExistsException.class)
     public void addTwiceSameUserMembership() throws BonitaException {
         final User userM = getIdentityAPI().createUser("userM", "engine");

@@ -35,8 +35,6 @@ import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -47,8 +45,6 @@ import org.junit.Test;
 public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "expression context",
-            "flow node container hierarchy" }, jira = "ENGINE-1848")
     public void evaluateExpressionsOnLoopUserTaskInSupProcess() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
@@ -69,7 +65,6 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
     @Test
     public void signalEventSubProcessTriggered() throws Exception {
         // given
@@ -109,8 +104,6 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
-            "intermediateThrowEvent" }, jira = "ENGINE-1408")
     @Test
     public void signalEventSubProcessTriggeredWithIntermediateThrowEvent() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(true, false);
@@ -125,7 +118,6 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
     @Test
     public void signalEventSubProcessNotTriggered() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, false);
@@ -146,7 +138,6 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
     @Test
     public void createSeveralInstances() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, false);
@@ -166,8 +157,6 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
-            "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
@@ -204,8 +193,6 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
-            "call activity" }, jira = "ENGINE-536")
     @Test
     public void signalEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithSignalEventSubProcess(false, false);

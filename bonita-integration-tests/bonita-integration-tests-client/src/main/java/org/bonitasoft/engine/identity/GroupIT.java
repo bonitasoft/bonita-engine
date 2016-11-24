@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -31,8 +30,6 @@ import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -326,8 +323,6 @@ public class GroupIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(newRootGroup.getId());
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7115", keywords = { "update", "group", "parent path", "empty",
-            "null" })
     @Test
     public void when_update_group_with_empty_parent_path_it_is_set_to_null() throws BonitaException {
         final String parentGroupPath = "/parentPath";
@@ -345,8 +340,6 @@ public class GroupIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(group.getId());
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7115", keywords = { "create", "group", "parent path", "empty",
-            "null" })
     @Test
     public void when_create_group_with_empty_parent_path_it_is_set_to_null() throws BonitaException {
         final Group group = createGroup("BonitaSoft", "");
@@ -540,8 +533,6 @@ public class GroupIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(groupD.getId());
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchGroup",
-            "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchGroupWithApostrophe() throws BonitaException {
         final Group groupA = createGroup("test'A", "labelA", "desc");
@@ -574,8 +565,6 @@ public class GroupIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { Group.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-2423", keywords = {
-            "group" }, story = "create a lot of groups make long parent path and it should work")
     public void should_be_able_to_create_big_groups_hierarchy() throws BonitaException {
         // this should work
         // acme -> Site -> Service -> Departement -> Back Office & Logistique

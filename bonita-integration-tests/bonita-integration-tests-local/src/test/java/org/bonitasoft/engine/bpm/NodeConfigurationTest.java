@@ -24,8 +24,6 @@ import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,10 +42,9 @@ public class NodeConfigurationTest {
         nodeConfiguration = platformAccessor.getPlatformConfiguration();
     }
 
-    @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "RestartHandlers" }, story = "Test set restart handlers.", jira = "ENGINE-612")
     @Test
     public void setRestartHandlers() {
-        List<RestartHandler> lRestartHandlers = new ArrayList<RestartHandler>();
+        List<RestartHandler> lRestartHandlers = new ArrayList<>();
         RestartHandler rh = new RestartHandler() {
 
             @Override
@@ -60,21 +57,18 @@ public class NodeConfigurationTest {
         assertEquals(1, nodeConfiguration.getRestartHandlers().size());
     }
 
-    @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "Scheduler" }, story = "Check result of should start scheduler.", jira = "ENGINE-612")
     @Test
     public void getShouldStartScheduler() {
         boolean startScheduler = ((NodeConfigurationImpl) nodeConfiguration).shouldStartScheduler();
         assertEquals(true, startScheduler);
     }
 
-    @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "Restart" }, story = "Check result of should restart element.", jira = "ENGINE-612")
     @Test
     public void getShouldRestartElements() {
         boolean restartElements = ((NodeConfigurationImpl) nodeConfiguration).shouldResumeElements();
         assertEquals(true, restartElements);
     }
 
-    @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "Restart" }, story = "Check result of should start event handling job.", jira = "ENGINE-612")
     @Test
     public void getShouldStartEventHandlingJob() {
         boolean startEvent = ((NodeConfigurationImpl) nodeConfiguration).shouldStartEventHandlingJob();

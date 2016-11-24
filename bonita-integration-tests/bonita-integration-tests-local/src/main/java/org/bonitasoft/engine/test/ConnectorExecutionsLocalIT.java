@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -35,7 +33,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -47,7 +44,6 @@ import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.connectors.ConnectorExecutionIT;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnector3;
@@ -67,8 +63,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -89,7 +83,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         }
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Data input", "Automatic activity" }, story = "Test connector on finish of an automatic activity with data input.", jira = "")
     @Test
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsInput() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -112,7 +105,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On start, User task" }, jira = "ENGINE-472", story = "Test of several connectors on start of an user task.")
     @Test
     public void executeSeveralConnectorsOnUserTaskOnStart() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -143,7 +135,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On start, Automatic task" }, jira = "ENGINE-472", story = "Test of several connectors on start of an automatic task.")
     @Test
     public void executeSeveralConnectorsOnAutomaticTaskOnStart() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -170,7 +161,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On finish, User task" }, jira = "ENGINE-472", story = "Test of several connectors on finish of an user task.")
     @Test
     public void executeSeveralConnectorsOnUserTaskOnFinish() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -198,7 +188,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On finish, Automatic task" }, jira = "ENGINE-472", story = "Test of several connectors on finish of an automatic task.")
     @Test
     public void executeSeveralConnectorsOnAutomaticTaskOnFinish() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -224,7 +213,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector, Several, On start, On finish" }, jira = "ENGINE-472", story = "Test of several connectors on start and finish of an user task.")
     @Test
     public void executeSeveralConnectorsOnStartAndOnFinishWithDataInput() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -264,7 +252,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Automatic activity" }, story = "Test connector on finish of an automatic activity.", jira = "")
     @Test
     public void executeConnectorOnFinishOfAnAutomaticActivity() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -285,7 +272,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "User task" }, story = "Test connector on start of an user task.", jira = "")
     @Test
     public void executeConnectorOnEnterOfAnUserTask() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -305,7 +291,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Connector deletion", "On enter", "User task", }, story = "Test connectors are deleted when the task is completed.", jira = "")
     @Test
     public void connectorsAreDeletedAfterTaskCompletion() throws Exception {
         // deploy process
@@ -345,8 +330,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         return deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
     }
 
-    @Cover(classes = { Connector.class, HumanTaskInstance.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "User task",
-            "Starting State" }, story = "Test connector on finish on starting state of an user task.", jira = "ENGINE-604")
     @Test
     public void executeConnectorOnFinishOfAnUserTask() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -382,8 +365,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { Connector.class, HumanTaskInstance.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "User task",
-            "Boundary event", "Timer event", "Starting State" }, story = "Test connector on finish on starting state of an user task, with a boundary timer event.", jira = "ENGINE-604")
     @Test
     public void executeConnectorOnFinishStateOfAnUserTaskWithTimerEvent() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -446,7 +427,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         assertTrue(waitUntil.waitUntil());
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Process" }, story = "Test connector on start of a process.", jira = "")
     @Test
     public void executeConnectorOnEnterOfProcess() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -468,7 +448,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Process" }, story = "Test connector on finish of a process.", jira = "")
     @Test
     public void executeConnectorOnFinishOfAProcess() throws Exception {
         final String valueOfInput = "valueOfInput1";
@@ -494,7 +473,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Connector deletion", "On finish", "Process" }, story = "Test connectors attached to a process are deleted when the process completes.", jira = "")
     @Test
     public void connectorsAreDeletedAfterProcessCompletion() throws Exception {
         // deploy the a process with a connector
@@ -524,7 +502,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         return deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Automatic activity" }, story = "Test connector on start of an automatic activity.", jira = "")
     @Test
     public void executeConnectorOnEnterOfAnAutomaticActivity() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -545,7 +522,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing implementation", "Process instance" }, story = "Execute connector with missing implementation on process instance.", jira = "")
     @Test
     public void executeMissingImplConnectorOnProcessInstance() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
@@ -562,7 +538,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         deleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing class connector", "Process instance" }, story = "Execute connector with missing class on process instance.", jira = "")
     @Test
     public void executeMissingClassConnectorOnProcessInstance() throws Exception {
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
@@ -579,7 +554,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")
     @Test
     public void executeConnectorWithCustomOutputTypeOnActivity() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
@@ -595,7 +569,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                                 .setType(OperatorType.ASSIGNMENT)
                                 .setRightOperand(
                                         new ExpressionBuilder().createGroovyScriptExpression("script", "output.getValue()", String.class.getName(),
-                                                new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType"))).done());
+                                                new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType")))
+                                .done());
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
@@ -615,7 +590,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")
     @Test
     public void executeConnectorWithCustomOutputTypeOnProcess() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
@@ -628,7 +602,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                         .setType(OperatorType.ASSIGNMENT)
                         .setRightOperand(
                                 new ExpressionBuilder().createGroovyScriptExpression("script", "output.getValue()", String.class.getName(),
-                                        new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType"))).done());
+                                        new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType")))
+                        .done());
         designProcessDefinition.addAutomaticTask("step1");
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
@@ -648,7 +623,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-783", keywords = { "Connector", "No connector implementation", "cache" }, story = "get connector implementation still work avec cache is cleared.")
     @Test
     public void getConnectorImplementationWorksAfterCacheCleared() throws Exception {
         final String valueOfInput1 = "valueOfInput1";
@@ -679,18 +653,15 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed", "Database", "Connector", "On enter", "Automatic activity" }, jira = "ENGINE-936")
     @Test
     public void executeFailedNonSerializableOutputConnectorOnEnterOfAnAutomaticActivity() throws Exception {
         executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_ENTER);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed", "Database", "Connector", "On finish", "Automatic activity" }, jira = "ENGINE-936")
     @Test
     public void executeFailedNonSerializableOutputConnectorOnFinishOfAnAutomaticActivity() throws Exception {
         executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(ConnectorEvent.ON_FINISH);
     }
-
 
     protected void executeFailedNonSerializableOutputConnectorOfAnAutomaticActivity(final ConnectorEvent connectorEvent) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithNonSerializableOutputConnector", "1.0");
@@ -714,7 +685,6 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Expression.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Failed", "Database", "Connector", "On finish", "Automatic activity" }, jira = "ENGINE-1814", story = "execute expression on process that is in initializing, e.g. process execute a connector on on enter, the result must be no exception and be able to retrive data")
     @Test
     public void executeExpressionAtProcessInstantiationOnProcessInInitializing() throws Exception {
         // will block the connector
@@ -740,7 +710,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                 .addConnectorImplementation(
                         new BarResource("blocking-connector.impl", BuildTestUtil.buildConnectorImplementationFile("blocking-connector", "1.0",
                                 "blocking-connector-impl",
-                                "1.0", BlockingConnector.class.getName()))).done();
+                                "1.0", BlockingConnector.class.getName())))
+                .done();
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
 
@@ -751,7 +722,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                 new ExpressionBuilder().createGroovyScriptExpression("ascripte", "a+b+c", String.class.getName(),
                         new ExpressionBuilder().createDataExpression("a", String.class.getName()),
                         new ExpressionBuilder().createDataExpression("b", String.class.getName()),
-                        new ExpressionBuilder().createDataExpression("c", String.class.getName())), Collections.<String, Serializable> emptyMap());
+                        new ExpressionBuilder().createDataExpression("c", String.class.getName())),
+                Collections.<String, Serializable> emptyMap());
         expressions.put(new ExpressionBuilder().createDataExpression("a", String.class.getName()), Collections.<String, Serializable> emptyMap());
         final Map<String, Serializable> evaluateExpressionsAtProcessInstantiation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
                 processInstance.getId(), expressions);

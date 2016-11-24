@@ -45,8 +45,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -202,7 +200,6 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         getAndCheckActors(user, rd, role, processDefinition);
     }
 
-    @Cover(classes = { Problem.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-1881", keywords = { "process resolution" })
     @Test
     public void importActorMappingComputesProcessResolution() throws BonitaException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();

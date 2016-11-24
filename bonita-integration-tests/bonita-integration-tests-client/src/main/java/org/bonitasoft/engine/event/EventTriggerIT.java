@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -28,8 +27,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 /**
@@ -39,7 +36,6 @@ import org.junit.Test;
  */
 public class EventTriggerIT extends AbstractEventIT {
 
-    @Cover(classes = { EventTriggerInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "event trigger instance" }, jira = "BS-10439")
     @Test
     public void searchTimerEventTriggerInstances() throws Exception {
         final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto", "moi");
@@ -76,7 +72,6 @@ public class EventTriggerIT extends AbstractEventIT {
         disableAndDeleteProcess(process2, process1, process3, process4);
     }
 
-    @Cover(classes = { EventTriggerInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "event trigger instance", "update" }, jira = "BS-10439")
     @Test
     public void updateTimerEventTriggerInstance() throws Exception {
         final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto2", "moi");

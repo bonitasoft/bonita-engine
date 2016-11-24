@@ -18,23 +18,17 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
 public class MessageBoundaryEventIT extends AbstractEventIT {
 
     @Test
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
-            "event" }, jira = "ENGINE-499", story = "message sent on a user task having a boundary catch message event")
     public void messageBoundaryEventTriggered() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEvent("MyMessage");
 
@@ -55,8 +49,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
-            "event", "call activity" }, jira = "ENGINE-499", story = "message with wrong name sent on a user task having a boundary catch message event")
     public void messageBoundaryEventNotTriggered() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEvent("MyMessage1");
 
@@ -74,8 +66,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
-            "event", "call activity" }, jira = "ENGINE-499", story = "message sent on a call activity having a boundary catch message event")
     public void messageBoundaryEventOnCallActivityTriggered() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnCallActivity();
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledTask");
@@ -101,8 +91,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
     }
 
     @Test
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
-            "event", "call activity" }, jira = "ENGINE-499", story = "message sent on a call activity having a boundary catch message event")
     public void messageBoundaryEventOnCallActivityNotTriggered() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnCallActivity();
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledTask");
@@ -128,8 +116,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         }
     }
 
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
-            "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event triggered on sequential multi-instance.", jira = "ENGINE-547")
     @Test
     public void messageBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 4;
@@ -152,8 +138,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
-            "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
     @Test
     public void messageBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 3;
@@ -176,8 +160,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
-            "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
     public void messageBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 4;
@@ -205,8 +187,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
-            "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event not triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
     public void messageBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 3;
@@ -231,8 +211,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
-            "Boundary", "Loop activity" }, story = "Execute message boundary event triggered on loop activity", jira = "ENGINE-547")
     @Test
     public void messageBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 3;
@@ -255,8 +233,6 @@ public class MessageBoundaryEventIT extends AbstractEventIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
-            "Boundary", "Loop activity" }, story = "Execute message boundary event not triggered on loop activity", jira = "ENGINE-547")
     @Test
     public void messageBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 2;

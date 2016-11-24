@@ -23,8 +23,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,7 +37,7 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     private ArchiveService archiveService;
 
     @Before
-    public void before(){
+    public void before() {
         this.archiveService = getTenantAccessor().getArchiveService();
     }
 
@@ -80,7 +78,6 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
         }
     }
 
-
     private SAShortTextDataInstanceImpl insertDataWithYesterdayDate() throws SRecorderException {
         return insertData(System.currentTimeMillis() - ONE_DAY);
     }
@@ -101,9 +98,9 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
         return data;
     }
 
-
     private SAShortTextDataInstanceImpl selectDataByIdFromDefinitiveArchive(final SAShortTextDataInstanceImpl dataInstance) throws SBonitaReadException {
-        final SelectByIdDescriptor<SAShortTextDataInstanceImpl> selectByIdDescriptor1 = new SelectByIdDescriptor<>(SAShortTextDataInstanceImpl.class, dataInstance.getId());
+        final SelectByIdDescriptor<SAShortTextDataInstanceImpl> selectByIdDescriptor1 = new SelectByIdDescriptor<>(SAShortTextDataInstanceImpl.class,
+                dataInstance.getId());
         return archiveService.getDefinitiveArchiveReadPersistenceService().selectById(selectByIdDescriptor1);
     }
 
@@ -111,9 +108,7 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     public void testRecordDelete() throws Exception {
         getTransactionService().begin();
 
-
         final SAShortTextDataInstanceImpl dataInstance = insertDataWithYesterdayDate();
-
 
         getTransactionService().complete();
 
@@ -125,7 +120,6 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    @Cover(classes = {ReadPersistenceService.class}, concept = BPMNConcept.OTHERS, keywords = {"archived objects"}, jira = "")
     public void testGetDefinitiveArchiveReadPersistenceService() {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         assertNotNull(persistenceService);
