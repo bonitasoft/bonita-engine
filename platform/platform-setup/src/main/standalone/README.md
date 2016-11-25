@@ -6,7 +6,8 @@
 Use it also to update Bonita BPM configuration (including license files in subscription editions).
 
 * init: creates tables in the database and inserts the initial configuration data
-* pull / push: retrieves database configuration to local folder and updates database with locally modified configuration
+* pull: retrieves database configuration to local folder
+* push: updates database with locally modified configuration (after a pull command)
 * configure: configures automatically the Web Application Server, preventing the need for tedious manual configuration
 
 
