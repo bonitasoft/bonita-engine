@@ -23,9 +23,10 @@ public class ServerAPIFactory {
 
     private static final String SERVER_API_CLASS_NOT_FOUND = "Cannot load class %s. Platform property 'serverApi' may not be set.";
 
-    private static ServerAPIFactory _instance;
+    private static ServerAPIFactory INSTANCE = new ServerAPIFactory(BonitaHomeServer.getInstance());
 
     private final BonitaHomeServer bonitaHomeServer;
+    private Class<?> serverApiClass;
 
     ServerAPIFactory(final BonitaHomeServer bonitaHomeServer) {
         this.bonitaHomeServer = bonitaHomeServer;
@@ -40,34 +41,36 @@ public class ServerAPIFactory {
     }
 
     ServerAPI getServerAPIImplementation() {
-        String serverAPIClassName = bonitaHomeServer.getServerAPIImplementation();
+        Class<?> aClass = getServerAPIClass();
         try {
-            return (ServerAPI) Class.forName(serverAPIClassName).newInstance();
+            return (ServerAPI) aClass.newInstance();
         } catch (Exception e) {
-            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
+            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, aClass.getName()));
         }
     }
 
-    ServerAPI getServerAPIImplementation(final boolean cleanSession) {
-        String serverAPIClassName = bonitaHomeServer.getServerAPIImplementation();
+    private Class<?> getServerAPIClass() {
+        if (serverApiClass == null) {
+            String serverAPIClassName = bonitaHomeServer.getServerAPIImplementation();
+            try {
+                serverApiClass = Class.forName(serverAPIClassName);
+            } catch (Exception e) {
+                throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
+            }
+        }
+        return serverApiClass;
+    }
+
+    private ServerAPI getServerAPIImplementation(final boolean cleanSession) {
+        Class<?> serverApiClass = getServerAPIClass();
         try {
-            Class<?> serverApiClass = Class.forName(serverAPIClassName);
             return (ServerAPI) serverApiClass.getConstructor(boolean.class).newInstance(cleanSession);
         } catch (Exception e) {
-            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverAPIClassName));
+            throw new ExceptionInInitializerError(String.format(SERVER_API_CLASS_NOT_FOUND, serverApiClass.getName()));
         }
     }
 
     public static ServerAPIFactory getInstance() {
-        if (_instance == null) {
-            initializeFactorySingleton();
-        }
-        return _instance;
-    }
-
-    private static synchronized void initializeFactorySingleton() {
-        if (_instance == null) {
-            _instance = new ServerAPIFactory(BonitaHomeServer.getInstance());
-        }
+        return INSTANCE;
     }
 }
