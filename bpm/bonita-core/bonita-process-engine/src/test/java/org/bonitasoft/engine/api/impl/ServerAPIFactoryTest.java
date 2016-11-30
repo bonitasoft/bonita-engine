@@ -15,7 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -32,7 +32,7 @@ public class ServerAPIFactoryTest {
     private BonitaHomeServer bonitaHomeServer;
 
     @InjectMocks
-    ServerAPIFactory serverAPIFactory;
+    private ServerAPIFactory serverAPIFactory;
 
     @Test
     public void getServerAPIImplemShouldReturnTestImplemOfServerAPI() throws Exception {
@@ -44,5 +44,17 @@ public class ServerAPIFactoryTest {
         assertNotNull(serverAPIimplementation);
         assertEquals(TestImplemOfServerAPI.class, serverAPIimplementation.getClass());
 
+    }
+
+    @Test
+    public void should_cache_the_serverapi_class() throws Exception {
+        //given
+        when(bonitaHomeServer.getServerAPIImplementation()).thenReturn("org.bonitasoft.engine.api.impl.TestImplemOfServerAPI");
+        serverAPIFactory.getServerAPIImplementation();
+        //when
+        serverAPIFactory.getServerAPIImplementation();
+
+        //then
+        verify(bonitaHomeServer, times(1)).getServerAPIImplementation();
     }
 }
