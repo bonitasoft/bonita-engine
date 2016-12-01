@@ -42,8 +42,8 @@ public class SQLNameValidatorTest {
     }
 
     @Test
-    public void shouldSQLKeyword__Have_Correct_Size() {
-        assertThat(SQLNameValidator.sqlKeywords.size()).isEqualTo(337);
+    public void shouldSQLKeyword_contains_links_word() {
+        assertThat(SQLNameValidator.sqlKeywords.contains("LINKS"));
     }
 
     @Test
