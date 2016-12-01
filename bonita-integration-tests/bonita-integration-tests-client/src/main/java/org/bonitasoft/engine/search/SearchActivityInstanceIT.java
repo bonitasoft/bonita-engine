@@ -1217,7 +1217,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithEscapeCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(3, searchHumanTaskInstancesWithEscapeCharacter.getCount());
         List<HumanTaskInstance> tasks = searchHumanTaskInstancesWithEscapeCharacter.getResult();
-        assertThat(tasks).extracting("name").containsExactly("step#1_b", "step#1_c", "step#1a");
+        assertThat(tasks).extracting("name").contains("step#1_b", "step#1_c", "step#1a");
 
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
@@ -1225,7 +1225,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithUnderscoreCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(2, searchHumanTaskInstancesWithUnderscoreCharacter.getCount());
         tasks = searchHumanTaskInstancesWithUnderscoreCharacter.getResult();
-        assertThat(tasks).extracting("name").containsExactly("step#1_b", "step#1_c");
+        assertThat(tasks).extracting("name").contains("step#1_b", "step#1_c");
 
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
@@ -1233,7 +1233,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final SearchResult<HumanTaskInstance> searchHumanTaskInstancesWithPercentageCharacter = getProcessAPI().searchHumanTaskInstances(builder.done());
         assertEquals(2, searchHumanTaskInstancesWithPercentageCharacter.getCount());
         tasks = searchHumanTaskInstancesWithPercentageCharacter.getResult();
-        assertThat(tasks).extracting("name").containsExactly("%step#2", "%step#4_a");
+        assertThat(tasks).extracting("name").contains("%step#2", "%step#4_a");
 
         builder = new SearchOptionsBuilder(0, 10);
         builder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
