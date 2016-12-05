@@ -337,6 +337,7 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
                 .end());
 
         TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
+        process.expect("step 3").toBeReady();
         process.execute(user, "step 2");
         process.sendSignal("foo");
         process.execute(user, "step 4", "step 5");
