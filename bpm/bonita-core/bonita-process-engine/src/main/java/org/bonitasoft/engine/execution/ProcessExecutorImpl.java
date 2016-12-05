@@ -368,7 +368,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             SExpressionContext expressionContextToEvaluateOperations, List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter, final Map<String, Serializable> processInputs) throws BonitaHomeNotSetException, IOException,
-                    InvalidEvaluationConnectorConditionException, SBonitaException {
+            InvalidEvaluationConnectorConditionException, SBonitaException {
 
         SExpressionContext expressionContext = createExpressionsContextForProcessInstance(sProcessDefinition, sProcessInstance);
         operations = operations != null ? new ArrayList<>(operations) : Collections.<SOperation> emptyList();
@@ -416,7 +416,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void initializeBusinessData(SFlowElementContainerDefinition processContainer, final SProcessInstance sInstance,
             final SExpressionContext expressionContext)
-                    throws SBonitaException {
+            throws SBonitaException {
         final List<SBusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();
@@ -472,9 +472,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void createDocuments(final SProcessDefinition sDefinition, SFlowElementContainerDefinition processContainer,
             final SProcessInstance sProcessInstance, final long authorId,
             final SExpressionContext expressionContext, final Map<String, Object> context)
-                    throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException,
-                    SBonitaReadException, SObjectModificationException, SExpressionTypeUnknownException, SExpressionDependencyMissingException,
-                    SExpressionEvaluationException, SInvalidExpressionException, SOperationExecutionException {
+            throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException,
+            SBonitaReadException, SObjectModificationException, SExpressionTypeUnknownException, SExpressionDependencyMissingException,
+            SExpressionEvaluationException, SInvalidExpressionException, SOperationExecutionException {
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
         final Map<SExpression, DocumentValue> evaluatedDocumentValues = evaluateInitialExpressionsOfDocument(sProcessInstance, expressionContext, context,
                 documentDefinitions);
@@ -514,7 +514,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private Map<SExpression, DocumentValue> evaluateInitialExpressionsOfDocument(final SProcessInstance processInstance,
             final SExpressionContext expressionContext,
             final Map<String, Object> context, final List<SDocumentDefinition> documentDefinitions) throws SExpressionTypeUnknownException,
-                    SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SOperationExecutionException {
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SOperationExecutionException {
         final List<SExpression> initialValuesExpressions = new ArrayList<>(documentDefinitions.size());
         final Map<SExpression, DocumentValue> evaluatedDocumentValue = new HashMap<>();
         for (final SDocumentDefinition documentDefinition : documentDefinitions) {
@@ -532,7 +532,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void createDocumentLists(SFlowElementContainerDefinition processContainer, final SProcessInstance processInstance, final long authorId,
             final SExpressionContext expressionContext, final Map<String, Object> context)
-                    throws SBonitaException {
+            throws SBonitaException {
         final List<SDocumentListDefinition> documentListDefinitions = processContainer.getDocumentListDefinitions();
         if (!documentListDefinitions.isEmpty()) {
             final List<Object> initialValues = evaluateInitialExpressionsOfDocumentLists(processInstance, expressionContext, context, documentListDefinitions);
@@ -549,7 +549,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private List<Object> evaluateInitialExpressionsOfDocumentLists(final SProcessInstance processInstance, final SExpressionContext expressionContext,
             final Map<String, Object> context, final List<SDocumentListDefinition> documentListDefinitions) throws SExpressionTypeUnknownException,
-                    SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
         final List<SExpression> initialValuesExpressions = new ArrayList<>(documentListDefinitions.size());
         for (final SDocumentListDefinition documentList : documentListDefinitions) {
             initialValuesExpressions.add(documentList.getExpression());
@@ -745,7 +745,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     @Override
     public SProcessInstance start(final long starterId, final long starterSubstituteId, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector, final Map<String, Serializable> processInputs)
-                    throws SProcessInstanceCreationException, SContractViolationException {
+            throws SProcessInstanceCreationException, SContractViolationException {
         return start(starterId, starterSubstituteId, null, operations, context, connectorsWithInput, -1, selector, processInputs);
     }
 
@@ -774,7 +774,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     protected SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContextToEvaluateOperations,
             final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors,
             final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException,
-                    SContractViolationException {
+            SContractViolationException {
 
         final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
 
@@ -869,7 +869,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected void handleEventSubProcess(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
             final long subProcessDefinitionId)
-                    throws SBonitaException {
+            throws SBonitaException {
         if (subProcessDefinitionId == -1) {
             // modify that to support event sub-processes within sub-processes
             try {

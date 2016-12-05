@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
@@ -59,7 +58,8 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final long flowNodeDefinitionId;
 
-    ExecuteConnectorOfActivity(final long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId, final long flowNodeInstanceId, final long connectorInstanceId,
+    ExecuteConnectorOfActivity(final long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
+            final long connectorInstanceId,
             final String connectorDefinitionName) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId), processInstanceId);
@@ -109,7 +109,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
                 sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentProcessInstanceId());
         builder.setParentActivityInstanceId(flowNodeInstanceId);
         final SThrowEventInstance done = (SThrowEventInstance) builder.done();
-        new CreateEventInstance(done, eventInstanceService).call();
+        eventInstanceService.createEventInstance(done);
         return done;
     }
 
