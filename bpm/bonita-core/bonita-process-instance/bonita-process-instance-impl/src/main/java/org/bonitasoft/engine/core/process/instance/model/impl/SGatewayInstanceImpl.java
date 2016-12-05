@@ -41,7 +41,8 @@ public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGate
     }
 
     public SGatewayInstanceImpl(SGatewayInstance gatewayInstance) {
-        super(gatewayInstance.getName(), gatewayInstance.getFlowNodeDefinitionId(), gatewayInstance.getRootContainerId(), gatewayInstance.getParentContainerId(),
+        super(gatewayInstance.getName(), gatewayInstance.getFlowNodeDefinitionId(), gatewayInstance.getRootContainerId(),
+                gatewayInstance.getParentContainerId(),
                 gatewayInstance.getLogicalGroup(0), gatewayInstance.getLogicalGroup(1));
         setLogicalGroup(2, gatewayInstance.getLogicalGroup(2));
         setLogicalGroup(3, gatewayInstance.getLogicalGroup(3));
@@ -75,6 +76,13 @@ public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGate
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.GATEWAY;
+    }
+
+    @Override
+    public boolean mustExecuteOnAbortOrCancelProcess() {
+        //always call execute when abort the gateway because the gateway that merge wait for the flow node in an unstable state
+        // this fact is a little strange but a full cleanup of the flownode execution mechanism should be done in order to change that
+        return true;
     }
 
     @Override

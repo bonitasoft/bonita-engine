@@ -22,19 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessManagementAPI;
-import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
@@ -64,7 +61,7 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final long subStepId = waitForUserTask(processInstance, SUB_PROCESS_USER_TASK_NAME);
 
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>();
         expressions.put(new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName()), new HashMap<String, Serializable>(0));
         final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStepId, expressions);
         assertEquals("childActivityVar", expressionResults.get(SHORT_DATA_NAME));
@@ -232,6 +229,41 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
 
         disableAndDeleteProcess(callerProcess.getId());
         disableAndDeleteProcess(targetProcess.getId());
+    }
+
+    @Test
+    public void should_process_with_gateway_be_canceled_by_event_subprocess() throws Exception {
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessInterrupted", "1.0");
+        processDefinitionBuilder.addActor("john", true);
+        processDefinitionBuilder.addStartEvent("start");
+        processDefinitionBuilder.addAutomaticTask("auto1");
+        processDefinitionBuilder.addGateway("p1", GatewayType.PARALLEL);
+        processDefinitionBuilder.addUserTask("user1", "john");
+        processDefinitionBuilder.addAutomaticTask("auto2");
+        processDefinitionBuilder.addGateway("p2", GatewayType.PARALLEL);
+        processDefinitionBuilder.addEndEvent("end").addTerminateEventTrigger();
+        processDefinitionBuilder.addTransition("start", "auto1");
+        processDefinitionBuilder.addTransition("auto1", "p1");
+        processDefinitionBuilder.addTransition("p1", "auto2");
+        processDefinitionBuilder.addTransition("p1", "user1");
+        processDefinitionBuilder.addTransition("auto2", "p2");
+        processDefinitionBuilder.addTransition("user1", "p2");
+        processDefinitionBuilder.addTransition("p2", "end");
+        SubProcessDefinitionBuilder eventSub = processDefinitionBuilder.addSubProcess("eventSub", true).getSubProcessBuilder();
+        eventSub.addStartEvent("signalStart").addSignalEventTrigger("bip_bip");
+        eventSub.addAutomaticTask("subAuto1");
+        eventSub.addEndEvent("subEnd").addTerminateEventTrigger();
+        eventSub.addTransition("signalStart", "subAuto1").addTransition("subAuto1", "subEnd");
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), "john", user);
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(processInstance.getId(), "user1");
+        getProcessAPI().sendSignal("bip_bip");
+        //then
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
+
+        disableAndDeleteProcess(processDefinition);
     }
 
 }

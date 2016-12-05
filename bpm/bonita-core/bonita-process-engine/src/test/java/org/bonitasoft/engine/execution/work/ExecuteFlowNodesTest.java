@@ -17,12 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +29,9 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
@@ -207,6 +204,28 @@ public class ExecuteFlowNodesTest {
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
 
         assertThat(shouldExecuteFlownode).isFalse();
+    }
+
+    @Test
+    public void should_execute_gateway_when_stateCategory_is_ABORTING() throws Exception {
+        SGatewayInstanceImpl gatewayInstance = new SGatewayInstanceImpl();
+        gatewayInstance.setStateCategory(SStateCategory.ABORTING);
+        when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(false);
+
+        boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
+
+        assertThat(shouldExecuteFlownode).isTrue();
+    }
+
+    @Test
+    public void should_execute_gateway_when_stateCategory_is_CANCELLING() throws Exception {
+        SGatewayInstanceImpl gatewayInstance = new SGatewayInstanceImpl();
+        gatewayInstance.setStateCategory(SStateCategory.CANCELLING);
+        when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(false);
+
+        boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
+
+        assertThat(shouldExecuteFlownode).isTrue();
     }
 
 }

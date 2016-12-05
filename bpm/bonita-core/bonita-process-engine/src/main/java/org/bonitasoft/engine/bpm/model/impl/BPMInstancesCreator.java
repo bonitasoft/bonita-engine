@@ -22,11 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.api.impl.transaction.activity.CreateActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
-import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
-import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
-import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -192,7 +188,7 @@ public class BPMInstancesCreator {
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
             final SStateCategory stateCategory) throws SBonitaException {
-        final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<SFlowNodeInstance>(flowNodeDefinitions.size());
+        final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<>(flowNodeDefinitions.size());
         for (final SFlowNodeDefinition sFlowNodeDefinition : flowNodeDefinitions) {
             flownNodeInstances.add(createFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
                     sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, -1, stateCategory, -1));
@@ -208,11 +204,11 @@ public class BPMInstancesCreator {
                 sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, createInnerActivity, loopCounter, stateCategory,
                 relatedActivityInstanceId);
         if (SFlowNodeType.GATEWAY.equals(flownNodeInstance.getType())) {
-            new CreateGatewayInstance((SGatewayInstance) flownNodeInstance, gatewayInstanceService).call();
+            gatewayInstanceService.createGatewayInstance((SGatewayInstance) flownNodeInstance);
         } else if (flownNodeInstance instanceof SActivityInstance) {
-            new CreateActivityInstance((SActivityInstance) flownNodeInstance, activityInstanceService).call();
+            activityInstanceService.createActivityInstance((SActivityInstance) flownNodeInstance);
         } else {
-            new CreateEventInstance((SEventInstance) flownNodeInstance, eventInstanceService).call();
+            eventInstanceService.createEventInstance((SEventInstance) flownNodeInstance);
         }
         createConnectorInstances(flownNodeInstance, sFlowNodeDefinition.getConnectors(), SConnectorInstance.FLOWNODE_TYPE);
         return flownNodeInstance;
@@ -539,14 +535,15 @@ public class BPMInstancesCreator {
 
     public void createConnectorInstances(final PersistentObject container, final List<SConnectorDefinition> connectors, final String containerType)
             throws SBonitaException {
-        final List<SConnectorInstance> connectorInstances = new ArrayList<SConnectorInstance>(connectors.size());
+        final List<SConnectorInstance> connectorInstances = new ArrayList<>(connectors.size());
         int executionOrder = 0;
         for (final SConnectorDefinition sConnectorDefinition : connectors) {
             final SConnectorInstance connectorInstance = createConnectorInstanceObject(container, containerType, sConnectorDefinition, executionOrder++);
             connectorInstances.add(connectorInstance);
         }
-        final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
-        transaction.execute();
+        for (final SConnectorInstance connectorInstance : connectorInstances) {
+            connectorInstanceService.createConnectorInstance(connectorInstance);
+        }
     }
 
     SConnectorInstance createConnectorInstanceObject(PersistentObject container, String containerType, SConnectorDefinition sConnectorDefinition,

@@ -104,7 +104,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
                 .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
-                .name()));
+                        .name()));
     }
 
     private void logInfo(final TechnicalLoggerService logger, final String message) {
@@ -117,18 +117,17 @@ public class ExecuteFlowNodes implements Callable<Object> {
     /**
      * Determines if the found flownode should be relaunched at restart or not. For now, only Gateways must not always be restarted under certain conditions.
      *
-     * @param sFlowNodeInstance
-     *            the flownode to check
+     * @param sFlowNodeInstance the flownode to check
      * @return true if the flownode should be relaunched because it has not finished its work in progress, false otherwise.
-     * @throws SBonitaException
-     *             in case of error.
+     * @throws SBonitaException in case of error.
      */
     protected boolean shouldExecuteFlownode(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         try {
             final boolean isGateway = SFlowNodeType.GATEWAY.equals(sFlowNodeInstance.getType());
             if (isGateway) {
                 SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId());
-                return gatewayInstanceService.checkMergingCondition(processDefinition, (SGatewayInstance) sFlowNodeInstance);
+                return sFlowNodeInstance.isAborting() || sFlowNodeInstance.isCanceling() ||
+                        gatewayInstanceService.checkMergingCondition(processDefinition, (SGatewayInstance) sFlowNodeInstance);
             }
             return true;
         } catch (final SBonitaException e) {
