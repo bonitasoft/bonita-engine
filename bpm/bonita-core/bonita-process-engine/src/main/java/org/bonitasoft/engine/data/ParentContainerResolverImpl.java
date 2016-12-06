@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -31,6 +30,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.data.instance.api.DataContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -56,22 +56,22 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
     }
 
     @Override
-    public List<Pair<Long, String>> getContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException {
+    public List<DataContainer> getContainerHierarchy(final DataContainer currentContainer) throws SObjectNotFoundException, SObjectReadException {
         return getContainerHierarchy(currentContainer, false);
     }
 
     @Override
-    public List<Pair<Long, String>> getArchivedContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException {
-        try{
+    public List<DataContainer> getArchivedContainerHierarchy(final DataContainer currentContainer) throws SObjectNotFoundException, SObjectReadException {
+        try {
             return getContainerHierarchy(currentContainer, true);
-        } catch (SObjectNotFoundException e){
+        } catch (SObjectNotFoundException e) {
             return Collections.singletonList(currentContainer);
         }
     }
 
-    private List<Pair<Long, String>> getContainerHierarchy(Pair<Long, String> currentContainer, boolean isArchived) throws SObjectNotFoundException, SObjectReadException {
-        Pair<Long, String> container = new Pair<Long, String>(currentContainer.getLeft(), currentContainer.getRight());
-        final List<Pair<Long, String>> containerHierarchy = new ArrayList<Pair<Long, String>>();
+    private List<DataContainer> getContainerHierarchy(DataContainer currentContainer, boolean isArchived) throws SObjectNotFoundException, SObjectReadException {
+        DataContainer container = new DataContainer(currentContainer.getId(), currentContainer.getType());
+        final List<DataContainer> containerHierarchy = new ArrayList<>();
         containerHierarchy.add(container);
         try {
             do {
@@ -85,31 +85,31 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
     }
 
-    private Pair<Long, String> getNextContainer(boolean isArchived, Pair<Long, String> container, List<Pair<Long, String>> containerHierarchy) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException, SProcessInstanceNotFoundException, SProcessInstanceReadException, SObjectNotFoundException {
-        if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(container.getRight())) {
-            container = handleActivityContainer(containerHierarchy, getsFlowNodeInstance(container.getLeft(), isArchived));
-        } else if (DataInstanceContainer.MESSAGE_INSTANCE.name().equals(container.getRight())) {
+    private DataContainer getNextContainer(boolean isArchived, DataContainer container, List<DataContainer> containerHierarchy) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException, SProcessInstanceNotFoundException, SProcessInstanceReadException, SObjectNotFoundException {
+        if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(container.getType())) {
+            container = handleActivityContainer(containerHierarchy, getsFlowNodeInstance(container.getId(), isArchived));
+        } else if (DataInstanceContainer.MESSAGE_INSTANCE.name().equals(container.getType())) {
             container = null;
-        } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(container.getRight())) {
-            container = handleProcessContainer(container.getLeft(), containerHierarchy, isArchived);
+        } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(container.getType())) {
+            container = handleProcessContainer(container.getId(), containerHierarchy, isArchived);
         } else {
-            if(allowUnknownContainer){
+            if (allowUnknownContainer) {
                 return null;
-            }else{
-                throw new SObjectNotFoundException("Unknown container type: " + container.getRight());
+            } else {
+                throw new SObjectNotFoundException("Unknown container type: " + container.getType());
             }
         }
         return container;
     }
 
-    private Pair<Long, String> handleActivityContainer(List<Pair<Long, String>> containerHierarchy, ActivityContainer flowNodeInstance) {
+    private DataContainer handleActivityContainer(List<DataContainer> containerHierarchy, ActivityContainer flowNodeInstance) {
         String containerType;
         if (flowNodeInstance.parentActivityInstanceId > 0) {
             containerType = DataInstanceContainer.ACTIVITY_INSTANCE.name();
         } else {
             containerType = DataInstanceContainer.PROCESS_INSTANCE.name();
         }
-        Pair<Long, String> container = new Pair<Long, String>(flowNodeInstance.parentContainerId, containerType);
+        DataContainer container = new DataContainer(flowNodeInstance.parentContainerId, containerType);
         containerHierarchy.add(container);
         if (flowNodeInstance.parentActivityInstanceId <= 0 && flowNodeInstance.parentContainerId == flowNodeInstance.rootContainerId) {
             container = null;
@@ -117,14 +117,14 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         return container;
     }
 
-    private Pair<Long, String> handleProcessContainer(long id, List<Pair<Long, String>> containerHierarchy, boolean isArchived) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeNotFoundException, SBonitaReadException, SFlowNodeReadException {
+    private DataContainer handleProcessContainer(long id, List<DataContainer> containerHierarchy, boolean isArchived) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeNotFoundException, SBonitaReadException, SFlowNodeReadException {
         final long callerId = getCallerId(id, isArchived);
         if (callerId >= 0) {
             ActivityContainer callerFlowNodeInstance = getsFlowNodeInstance(callerId, isArchived);
             final SFlowNodeType callerType = callerFlowNodeInstance.type;
             if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
                 final long callerProcessInstanceId = callerFlowNodeInstance.parentProcessInstanceId;
-                Pair<Long, String> container = new Pair<Long, String>(callerProcessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+                DataContainer container = new DataContainer(callerProcessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
                 containerHierarchy.add(container);
                 return container;
             } else {
@@ -138,7 +138,7 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
     private ActivityContainer getSaFlowNodeInstance(long id) throws SBonitaReadException, SFlowNodeNotFoundException {
         SAFlowNodeInstance flowNodeInstance;
         flowNodeInstance = flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, id);
-        if(flowNodeInstance == null){
+        if (flowNodeInstance == null) {
             throw new SFlowNodeNotFoundException(id);
         }
         return new ActivityContainer(flowNodeInstance);
