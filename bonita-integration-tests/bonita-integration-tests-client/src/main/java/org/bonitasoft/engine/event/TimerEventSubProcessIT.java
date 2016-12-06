@@ -20,13 +20,20 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -53,7 +60,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final Date processStartDate = processInstance.getStartDate();
         assertThat(subProcInst.getStartDate()).as(
                 String.format("process started at %s should trigger subprocess at %s (+ %d ms) ", formatedDate(processStartDate),
-                        formatedDate(subProcInst.getStartDate()), timerDuration)).isAfter(processStartDate);
+                        formatedDate(subProcInst.getStartDate()), timerDuration))
+                .isAfter(processStartDate);
 
         // cleanup
         assignAndExecuteStep(subStep, user);
@@ -93,7 +101,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         disableAndDeleteProcess(process.getId());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer", "parent process data" }, jira = "ENGINE-536")
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer",
+            "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
         final int timerDuration = 2000;
@@ -121,13 +130,15 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         assertEquals(expectedValue, processDataInstance.getValue());
     }
 
-    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue) throws DataNotFoundException {
+    private void checkActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable expectedValue)
+            throws DataNotFoundException {
         final DataInstance activityDataInstance;
         activityDataInstance = getProcessAPI().getActivityDataInstance(dataName, activityInstanceId);
         assertEquals(expectedValue, activityDataInstance.getValue());
     }
 
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer", "call activity" }, jira = "ENGINE-536")
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer",
+            "call activity" }, jira = "ENGINE-536")
     @Test
     public void timerEventSubProcInsideTargetCallActivity() throws Exception {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(2000);
@@ -148,5 +159,31 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
 
         disableAndDeleteProcess(callerProcess.getId());
         disableAndDeleteProcess(targetProcess.getId());
+    }
+
+    @Test
+    public void should_be_able_to_init_timer_from_data_in_parent() throws Exception {
+        //given
+        ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithESPTimerBasedOnData", "1.0");
+        parentProcessBuilder.addActor(ACTOR_NAME);
+        parentProcessBuilder.addUserTask("userTask", ACTOR_NAME);
+        parentProcessBuilder.addLongData("timeToWait", new ExpressionBuilder().createConstantLongExpression(1000));
+        //construct sub process
+        SubProcessDefinitionBuilder subProcessBuilder = parentProcessBuilder.addSubProcess("subProcessToStartWithTimer", true).getSubProcessBuilder();
+        StartEventDefinitionBuilder startEventDefinitionBuilder = subProcessBuilder.addStartEvent("timerStart");
+        startEventDefinitionBuilder.addTimerEventTriggerDefinition(TimerType.DURATION,
+                new ExpressionBuilder().createDataExpression("timeToWait", Long.class.getName()));
+        subProcessBuilder.addUserTask("userTaskInSubProcess", ACTOR_NAME);
+        subProcessBuilder.addEndEvent("endSubProcess");
+        subProcessBuilder.addTransition("timerStart", "userTaskInSubProcess");
+        subProcessBuilder.addTransition("userTaskInSubProcess", "endSubProcess");
+        DesignProcessDefinition processDefinition1 = parentProcessBuilder.done();
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        //when
+        waitForUserTask("userTaskInSubProcess");
+        //then
+        disableAndDeleteProcess(processDefinition);
     }
 }
