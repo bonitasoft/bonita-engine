@@ -1,0 +1,61 @@
+/**
+ * Copyright (C) 2016 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+
+package org.bonitasoft.engine.data.instance.api;
+
+import java.util.Objects;
+
+/**
+ * @author Baptiste Mesta
+ */
+public class DataContainer {
+
+    private long id;
+    private String type;
+
+    public DataContainer(long id, String type) {
+        this.id = id;
+        this.type = type;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataContainer that = (DataContainer) o;
+        return id == that.id &&
+                Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type);
+    }
+
+    @Override
+    public String toString() {
+        return "DataContainer{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                '}';
+    }
+}
