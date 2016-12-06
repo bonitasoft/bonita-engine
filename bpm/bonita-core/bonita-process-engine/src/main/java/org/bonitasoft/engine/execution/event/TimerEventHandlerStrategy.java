@@ -41,6 +41,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.jobs.TriggerTimerEventJob;
@@ -88,44 +91,63 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, eventInstance);
         final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, eventInstance);
-        scheduleJob(processDefinition, eventInstance, (STimerEventTriggerDefinition) sEventTriggerDefinition, jobDescriptor, jobParameters);
+        STimerEventTriggerDefinition timerEventTriggerDefinition = (STimerEventTriggerDefinition) sEventTriggerDefinition;
+        final Object timerCondition = evaluateTimerCondition(timerEventTriggerDefinition, processDefinition.getId(),
+                eventInstance != null ? eventInstance.getParentProcessInstanceId() : null);
+        Trigger trigger = scheduleJob(timerEventTriggerDefinition, jobDescriptor, jobParameters, timerCondition);
+        if (timerEventTriggerDefinition.getTimerType() != STimerType.CYCLE && eventInstance != null) {
+            final STimerEventTriggerInstance sEventTriggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
+                    .createNewTimerEventTriggerInstance(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName())
+                    .done();
+            eventInstanceService.createEventTriggerInstance(sEventTriggerInstance);
+        }
     }
 
-    protected Trigger getTrigger(final STimerEventTriggerDefinition timerTrigger, final SCatchEventInstance eventInstance, final long processDefinitionId)
+    protected Trigger getTrigger(final STimerEventTriggerDefinition timerTrigger, Object timerCondition)
             throws SBonitaException {
-        final SExpressionContext expressionContext;
-        if (eventInstance != null) {
-            expressionContext = new SExpressionContext(eventInstance.getParentProcessInstanceId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
-                    processDefinitionId);
-        } else {
-            expressionContext = new SExpressionContext();
-            expressionContext.setProcessDefinitionId(processDefinitionId);
-        }
-        final SExpression timerExpression = timerTrigger.getTimerExpression();
-        final Object result = expressionResolverService.evaluate(timerExpression, expressionContext);
-        Date startDate = null;
-        Trigger trigger = null;
-        if (result == null) {
-            throw new SInvalidExpressionException("The duration cannot be null.", timerExpression.getName());
-        }
+        Date startDate;
+        Trigger trigger;
         switch (timerTrigger.getTimerType()) {
             case DURATION:
-                startDate = new Date(System.currentTimeMillis() + (Long) result);
+                startDate = new Date(System.currentTimeMillis() + (Long) timerCondition);
                 trigger = new OneShotTrigger("OneShotTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate);
                 break;
             case DATE:
-                startDate = (Date) result;
+                startDate = (Date) timerCondition;
                 trigger = new OneShotTrigger("OneShotTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate);
                 break;
             case CYCLE:
                 startDate = new Date();
-                trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate, (String) result,
+                trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate, (String) timerCondition,
                         MisfireRestartPolicy.ALL);
                 break;
             default:
                 throw new IllegalStateException();
         }
         return trigger;
+    }
+
+    private Object evaluateTimerCondition(STimerEventTriggerDefinition timerTrigger, long processDefinitionId, Long processInstanceId)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        final SExpressionContext expressionContext = getEvaluationContext(processDefinitionId, processInstanceId);
+        final SExpression timerExpression = timerTrigger.getTimerExpression();
+        final Object result = expressionResolverService.evaluate(timerExpression, expressionContext);
+        if (result == null) {
+            throw new SInvalidExpressionException("The duration cannot be null.", timerExpression.getName());
+        }
+        return result;
+    }
+
+    private SExpressionContext getEvaluationContext(long processDefinitionId, Long processInstanceId) {
+        final SExpressionContext expressionContext;
+        if (processInstanceId != null) {
+            expressionContext = new SExpressionContext(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(),
+                    processDefinitionId);
+        } else {
+            expressionContext = new SExpressionContext();
+            expressionContext.setProcessDefinitionId(processDefinitionId);
+        }
+        return expressionContext;
     }
 
     @Override
@@ -150,22 +172,17 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, null, subProcessId, parentProcessInstance);
 
-        // TODO not only process scope
-
-        scheduleJob(processDefinition, null, (STimerEventTriggerDefinition) sEventTriggerDefinition, jobDescriptor, jobParameters);
+        STimerEventTriggerDefinition timerEventTriggerDefinition = (STimerEventTriggerDefinition) sEventTriggerDefinition;
+        final Object timerCondition = evaluateTimerCondition(timerEventTriggerDefinition, processDefinition.getId(), parentProcessInstance.getId());
+        scheduleJob(timerEventTriggerDefinition, jobDescriptor, jobParameters, timerCondition);
     }
 
-    private void scheduleJob(final SProcessDefinition processDefinition, final SCatchEventInstance eventInstance,
-            final STimerEventTriggerDefinition sEventTriggerDefinition, final SJobDescriptor jobDescriptor, final List<SJobParameter> jobParameters)
+    private Trigger scheduleJob(final STimerEventTriggerDefinition sEventTriggerDefinition, final SJobDescriptor jobDescriptor,
+            final List<SJobParameter> jobParameters, Object timerCondition)
             throws SBonitaException {
-        final Trigger trigger = getTrigger(sEventTriggerDefinition, eventInstance, processDefinition.getId());
+        final Trigger trigger = getTrigger(sEventTriggerDefinition, timerCondition);
         schedulerService.schedule(jobDescriptor, jobParameters, trigger);
-        if (sEventTriggerDefinition.getTimerType() != STimerType.CYCLE && eventInstance != null) {
-            final STimerEventTriggerInstance sEventTriggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
-                    .createNewTimerEventTriggerInstance(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName())
-                    .done();
-            eventInstanceService.createEventTriggerInstance(sEventTriggerInstance);
-        }
+        return trigger;
     }
 
     private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
