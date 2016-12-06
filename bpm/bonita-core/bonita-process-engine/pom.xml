@@ -439,6 +439,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.scheduler</groupId>
+            <artifactId>bonita-scheduler-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.session</groupId>
             <artifactId>bonita-session-impl</artifactId>
             <version>${project.version}</version>
