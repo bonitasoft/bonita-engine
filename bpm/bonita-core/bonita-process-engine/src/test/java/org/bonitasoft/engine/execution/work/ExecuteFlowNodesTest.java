@@ -20,18 +20,24 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
@@ -46,6 +52,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExecuteFlowNodesTest {
+
+    private FlowNodeStateManager flownodeStateManager;
 
     /**
      * @author Baptiste Mesta
@@ -79,32 +87,29 @@ public class ExecuteFlowNodesTest {
 
     @Mock
     private ActivityInstanceService activityInstanceService;
-
     @Mock
     private final ProcessDefinitionService processDefinitionService = mock(ProcessDefinitionService.class);
-
     @Mock
     private final GatewayInstanceService gatewayInstanceService = mock(GatewayInstanceService.class);
-
-    @Mock
-    private Iterator<Long> iterator;
-
     @Mock
     private TechnicalLoggerService logger;
-
+    @Mock
+    private BPMInstancesCreator bpmInstancesCreator;
     @Mock
     private WorkService workService;
-
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
     @Before
     public void before() {
+        flownodeStateManager = new FlowNodeStateManagerImpl(null, null, null, null, null, null, bpmInstancesCreator, null, null,
+                null, null, null, null, null, null, null);
         when(tenantServiceAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         when(tenantServiceAccessor.getGatewayInstanceService()).thenReturn(gatewayInstanceService);
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(logger);
         when(tenantServiceAccessor.getWorkService()).thenReturn(workService);
+        when(tenantServiceAccessor.getFlowNodeStateManager()).thenReturn(flownodeStateManager);
     }
 
     private ExecuteFlowNodes createExecutorWith(final SFlowNodeInstance... flowNodes) throws Exception {
@@ -171,10 +176,8 @@ public class ExecuteFlowNodesTest {
 
     @Test
     public void shouldExecuteFlownodeIfNotGateway() throws Exception {
-        long gatewayId = 17L;
-        SGatewayInstance gatewayInstance = mock(SGatewayInstance.class);
-        when(gatewayInstance.getId()).thenReturn(gatewayId);
-        when(gatewayInstance.getType()).thenReturn(SFlowNodeType.AUTOMATIC_TASK);
+        SUserTaskInstanceImpl gatewayInstance = new SUserTaskInstanceImpl();
+        gatewayInstance.setId(17L);
         ExecuteFlowNodes executeFlowNodes = new ExecuteFlowNodes(tenantServiceAccessor, null);
 
         boolean shouldExecuteFlownode = executeFlowNodes.shouldExecuteFlownode(gatewayInstance);
@@ -186,8 +189,7 @@ public class ExecuteFlowNodesTest {
 
     @Test
     public void shouldExecuteFlownodeForGatewayWithMatchingMergeCondition() throws Exception {
-        SGatewayInstance gatewayInstance = mock(SGatewayInstance.class);
-        when(gatewayInstance.getType()).thenReturn(SFlowNodeType.GATEWAY);
+        SGatewayInstance gatewayInstance = new SGatewayInstanceImpl();
         when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(true);
 
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
@@ -197,8 +199,7 @@ public class ExecuteFlowNodesTest {
 
     @Test
     public void shouldNotExecuteFlownodeForGatewayWithNonMatchingMergeCondition() throws Exception {
-        SGatewayInstance gatewayInstance = mock(SGatewayInstance.class);
-        when(gatewayInstance.getType()).thenReturn(SFlowNodeType.GATEWAY);
+        SGatewayInstance gatewayInstance = new SGatewayInstanceImpl();
         when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(false);
 
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
@@ -207,6 +208,48 @@ public class ExecuteFlowNodesTest {
     }
 
     @Test
+    public void should_execute_flow_node_in_CANCELLING_when_state_is_stable_but_not_in_the_same_stateCategory() throws Exception {
+        SBoundaryEventInstanceImpl boundaryEventInstance = new SBoundaryEventInstanceImpl();
+        boundaryEventInstance.setStateCategory(SStateCategory.CANCELLING);
+        setState(boundaryEventInstance, flownodeStateManager.getState(10)/* waiting state */);
+
+        assertThat(new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(boundaryEventInstance)).isTrue();
+    }
+
+    @Test
+    public void should_not_execute_flow_node_in_CANCELLING_when_state_is_stable_but_in_the_same_stateCategory() throws Exception {
+        SCallActivityInstanceImpl boundaryEventInstance = new SCallActivityInstanceImpl();
+        boundaryEventInstance.setStateCategory(SStateCategory.CANCELLING);
+        setState(boundaryEventInstance, flownodeStateManager.getState(19)/* cancelling call activity */);
+
+        assertThat(new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(boundaryEventInstance)).isFalse();
+    }
+
+    @Test
+    public void should_execute_flow_node_in_ABORTING_when_state_is_stable_but_not_in_the_same_stateCategory() throws Exception {
+        SBoundaryEventInstanceImpl boundaryEventInstance = new SBoundaryEventInstanceImpl();
+        boundaryEventInstance.setStateCategory(SStateCategory.ABORTING);
+        setState(boundaryEventInstance, flownodeStateManager.getState(10)/* waiting state */);
+
+        assertThat(new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(boundaryEventInstance)).isTrue();
+    }
+
+    @Test
+    public void should_not_execute_flow_node_in_ABORTING_when_state_is_stable_but_in_the_same_stateCategory() throws Exception {
+        SBoundaryEventInstanceImpl boundaryEventInstance = new SBoundaryEventInstanceImpl();
+        boundaryEventInstance.setStateCategory(SStateCategory.ABORTING);
+        setState(boundaryEventInstance, flownodeStateManager.getState(20)/* aborting call activity */);
+
+        assertThat(new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(boundaryEventInstance)).isFalse();
+    }
+
+    private void setState(SFlowNodeInstanceImpl boundaryEventInstance, FlowNodeState state) {
+        boundaryEventInstance.setStateId(state.getId());
+        boundaryEventInstance.setStable(state.isStable());
+        boundaryEventInstance.setTerminal(state.isTerminal());
+    }
+
+   @Test
     public void should_execute_gateway_when_stateCategory_is_ABORTING() throws Exception {
         SGatewayInstanceImpl gatewayInstance = new SGatewayInstanceImpl();
         gatewayInstance.setStateCategory(SStateCategory.ABORTING);

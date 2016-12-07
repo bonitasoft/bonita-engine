@@ -22,8 +22,11 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -50,6 +53,8 @@ public class ExecuteFlowNodes implements Callable<Object> {
 
     private final ProcessDefinitionService processDefinitionService;
 
+    private final FlowNodeStateManager flowNodeStateManager;
+
     private final Iterator<Long> iterator;
 
     public ExecuteFlowNodes(final TenantServiceAccessor tenantServiceAccessor, final Iterator<Long> iterator) {
@@ -58,6 +63,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         gatewayInstanceService = tenantServiceAccessor.getGatewayInstanceService();
         processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+        flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
         this.iterator = iterator;
     }
 
@@ -104,7 +110,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
                 .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
-                        .name()));
+                .name()));
     }
 
     private void logInfo(final TechnicalLoggerService logger, final String message) {
@@ -115,7 +121,11 @@ public class ExecuteFlowNodes implements Callable<Object> {
     }
 
     /**
-     * Determines if the found flownode should be relaunched at restart or not. For now, only Gateways must not always be restarted under certain conditions.
+     * Determines if the found flownode should be relaunched at restart or not.
+     * <ul>
+     * <li>Gateways should only be started when they are 'merged'.</li>
+     * <li>Elements in state category cancelling or aborting must be restart only if the current state is not part of this statecategory.</li>
+     * </ul>
      *
      * @param sFlowNodeInstance the flownode to check
      * @return true if the flownode should be relaunched because it has not finished its work in progress, false otherwise.
@@ -123,8 +133,17 @@ public class ExecuteFlowNodes implements Callable<Object> {
      */
     protected boolean shouldExecuteFlownode(final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         try {
-            final boolean isGateway = SFlowNodeType.GATEWAY.equals(sFlowNodeInstance.getType());
-            if (isGateway) {
+            //when state category is cancelling but the state is 'stable' (e.g. boundary event in waiting but that has been cancelled)
+            if ((sFlowNodeInstance.getStateCategory().equals(SStateCategory.CANCELLING)
+                    || sFlowNodeInstance.getStateCategory().equals(SStateCategory.ABORTING)) && !sFlowNodeInstance.isTerminal()
+                    && sFlowNodeInstance.isStable()) {
+                FlowNodeState state = flowNodeStateManager.getState(sFlowNodeInstance.getStateId());
+                //in this case we restart it only if the state is not in this cancelling of aborting category
+                //this can happened when we abort a process with a call activity:
+                //the call activity is put in aborting state and wait for its children to finish, in that case we do not call execute on it
+                return !state.getStateCategory().equals(sFlowNodeInstance.getStateCategory());
+            }
+            if (SFlowNodeType.GATEWAY.equals(sFlowNodeInstance.getType())) {
                 SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId());
                 return sFlowNodeInstance.isAborting() || sFlowNodeInstance.isCanceling() ||
                         gatewayInstanceService.checkMergingCondition(processDefinition, (SGatewayInstance) sFlowNodeInstance);

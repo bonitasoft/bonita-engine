@@ -39,12 +39,13 @@ public class FlowNodeInstanceRepository extends TestRepository {
         namedQuery.setFirstResult(queryOptions.getFromIndex());
         return (List<Long>) namedQuery.list();
     }
+
     @SuppressWarnings("unchecked")
     public SGatewayInstance getActiveGatewayInstanceOfProcess(long parentProcessInstanceId, String name) {
         getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getActiveGatewayInstanceOfProcess");
-        namedQuery.setParameter("parentProcessInstanceId",parentProcessInstanceId);
-        namedQuery.setParameter("name",name);
+        namedQuery.setParameter("parentProcessInstanceId", parentProcessInstanceId);
+        namedQuery.setParameter("name", name);
         return (SGatewayInstance) namedQuery.uniqueResult();
     }
 
