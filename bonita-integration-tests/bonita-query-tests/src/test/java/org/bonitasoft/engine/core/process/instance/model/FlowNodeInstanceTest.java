@@ -16,11 +16,12 @@ package org.bonitasoft.engine.core.process.instance.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
 import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
+import static org.bonitasoft.engine.test.persistence.builder.BoundaryInstanceBuilder.aBoundary;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
 import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
-import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
 import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBuilder.aUserTask;
 import static org.bonitasoft.engine.test.persistence.builder.archive.ArchivedUserTaskInstanceBuilder.anArchivedUserTask;
 
@@ -45,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Celine Souchet
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/testContext.xml" })
+@ContextConfiguration(locations = {"/testContext.xml"})
 @Transactional
 public class FlowNodeInstanceTest {
 
@@ -89,7 +90,7 @@ public class FlowNodeInstanceTest {
     }
 
     @Test
-    public void getFlowNodeInstanceIdsToRestart_should_return_ids_of_flow_nodes_that_are_not_deleted_and_is_executing_notStable_or_terminal() {
+    public void getFlowNodeInstanceIdsToRestart_should_return_ids_of_flow_nodes_that_need_to_be_restarted() {
         // given
         repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
                 .build());
@@ -97,18 +98,29 @@ public class FlowNodeInstanceTest {
                 .build());
         final SFlowNodeInstance notStable = repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
                 .build());
-        final SFlowNodeInstance teminal = repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
+        final SFlowNodeInstance terminal = repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
                 .build());
         repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
                 .build());
+
+        SFlowNodeInstance abortingBoundary = repository
+                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10).withStateExecuting(false).withStable(true)
+                        .withTerminal(false).withStateName("WAITING")
+                        .withStateCategory(SStateCategory.ABORTING).build());
+        SFlowNodeInstance cancellingBoundary = repository
+                .add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10).withStateExecuting(false).withStable(true)
+                        .withTerminal(false).withStateName("WAITING")
+                        .withStateCategory(SStateCategory.CANCELLING).build());
+        repository.add(aBoundary().withName("errorBoundary").withActivity(terminal.getId()).withStateId(10).withStateExecuting(false).withStable(true)
+                .withTerminal(false).withStateName("WAITING")
+                .withStateCategory(SStateCategory.NORMAL).build());
 
         // when
         final QueryOptions options = new QueryOptions(0, 10);
         final List<Long> nodeToRestart = repository.getFlowNodeInstanceIdsToRestart(options);
 
         // then
-        assertThat(nodeToRestart).hasSize(3);
-        assertThat(nodeToRestart).contains(executing.getId(), notStable.getId(), teminal.getId());
+        assertThat(nodeToRestart).containsOnly(executing.getId(), notStable.getId(), terminal.getId(), abortingBoundary.getId(), cancellingBoundary.getId());
     }
 
     // For
@@ -263,7 +275,7 @@ public class FlowNodeInstanceTest {
     }
 
     private SFlowNodeInstance buildAndAddUserTaskWithParentAndRootProcessInstanceId(final String taskName, final long containingProcessInstanceId,
-            final long rootProcessInstanceId, int stateId, String stateName) {
+                                                                                    final long rootProcessInstanceId, int stateId, String stateName) {
         return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
                 .withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId).withStateId(stateId).withStateName(stateName).build());
     }
@@ -295,7 +307,7 @@ public class FlowNodeInstanceTest {
     }
 
     private SAFlowNodeInstance buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId(String taskName, long containingProcessInstanceId,
-            long rootProcessInstanceId, int stateId, String stateName, boolean terminal) {
+                                                                                             long rootProcessInstanceId, int stateId, String stateName, boolean terminal) {
         return repository.add(anArchivedUserTask().withName(taskName).withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId)
                 .withStateId(stateId).withStateName(stateName).withTerminal(terminal).build());
     }
@@ -391,7 +403,8 @@ public class FlowNodeInstanceTest {
     @Test
     public void getActiveGatewayInstance_should_return_gateway_if_not_finished() {
         // Given
-        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1").withTerminal(false).withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
+        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("gate1").withTerminal(false)
+                .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
         repository.add(gatewayInstance);
 
         // When
@@ -401,11 +414,11 @@ public class FlowNodeInstanceTest {
         assertThat(gate1).isEqualTo(gatewayInstance);
     }
 
-
     @Test
     public void getActiveGatewayInstance_should_not_return_gateway_if_finished() {
         // Given
-        repository.add(aGatewayInstanceBuilder().withHitBys("FINISH:1").withTerminal(true).withName("gate1").withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build());
+        repository
+                .add(aGatewayInstanceBuilder().withHitBys("FINISH:1").withTerminal(true).withName("gate1").withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build());
 
         // When
         final SGatewayInstance gate1 = repository.getActiveGatewayInstanceOfProcess(ROOT_PROCESS_INSTANCE_ID, "gate1");
@@ -417,7 +430,8 @@ public class FlowNodeInstanceTest {
     @Test
     public void getActiveGatewayInstance_should_not_return_gateway_if_wrong_name() {
         // Given
-        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("notTheGoodGateway").withTerminal(false).withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
+        final SGatewayInstanceImpl gatewayInstance = aGatewayInstanceBuilder().withHitBys("1,2").withName("notTheGoodGateway").withTerminal(false)
+                .withLogicalGroup4(ROOT_PROCESS_INSTANCE_ID).build();
         repository.add(gatewayInstance);
 
         // When
@@ -514,7 +528,6 @@ public class FlowNodeInstanceTest {
                 .withRootProcessInstanceId(rootProcessInstanceId).build());
     }
 
-
     private SFlowNodeInstance buildAndAddExecutingTask() {
         return repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true)
                 .withTerminal(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
@@ -529,4 +542,5 @@ public class FlowNodeInstanceTest {
         return repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true)
                 .withTerminal(true).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
     }
+
 }

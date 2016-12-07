@@ -52,7 +52,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             // using a to low page size (100) causes too many access to the database and causes timeout exception if there are lot of elements.
             // As we retrieve only the id we can use a greater page size
             QueryOptions queryOptions = new QueryOptions(0, 50000);
-            List<Long> ids = null;
+            List<Long> ids;
             logInfo(logger, "Restarting flow nodes...");
             do {
                 ids = flowNodeInstanceService.getFlowNodeInstanceIdsToRestart(queryOptions);
