@@ -13,22 +13,24 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
+import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -71,6 +73,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -329,7 +332,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
     }
 
     @Test
-    @Cover(classes = {}, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode" }, story = "elements must be restarted when they were not completed when the node was shut down")
+    @Cover(classes = {}, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-469", keywords = { "node", "restart", "transition",
+            "flownode" }, story = "elements must be restarted when they were not completed when the node was shut down")
     public void restartHandlerTests() throws Exception {
         /*
          * process with blocking connector
@@ -347,7 +351,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
                 .addConnectorImplementation(
                         new BarResource("blocking-connector.impl", BuildTestUtil.buildConnectorImplementationFile("blocking-connector", "1.0",
                                 "blocking-connector-impl",
-                                "1.0", BlockingConnector.class.getName()))).done();
+                                "1.0", BlockingConnector.class.getName())))
+                .done();
         final ProcessDefinition p1 = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
 
         /*
@@ -467,7 +472,8 @@ public class BPMLocalIT extends CommonAPILocalIT {
         System.out.println("release semaphore2");
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "The platform version must be the same than the project version.", jira = "")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = {
+            "Platform" }, story = "The platform version must be the same than the project version.", jira = "")
     @Test
     public void getPlatformVersion() throws BonitaException, IOException {
         logoutOnTenant();
@@ -543,4 +549,22 @@ public class BPMLocalIT extends CommonAPILocalIT {
         }
     }
 
+    @Test
+    public void should_warn_when_setting_remote_connection_with_local_engine() throws Exception {
+        //when
+        Logger logger = Logger.getLogger(APITypeManager.class.getName());
+        TestHandler testHandler = new TestHandler();
+        logger.addHandler(testHandler);
+
+        APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, Collections.<String, String> emptyMap());
+
+        //then
+        String log = testHandler.getLogs();
+        APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+
+        logger.removeHandler(testHandler);
+
+        Assertions.assertThat(log).contains(
+                "You are declaring an API access to Bonita BPM Engine as a remote connection, whereas it looks like you are running in the same JVM.");
+    }
 }
