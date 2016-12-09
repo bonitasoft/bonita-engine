@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -65,6 +66,8 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Matthieu Chaffotte
  */
 public class APITypeManager {
+
+    private static final Logger LOGGER = Logger.getLogger(APITypeManager.class.getName());
 
     private static final String API_TYPE = "org.bonitasoft.engine.api-type";
 
@@ -113,10 +116,23 @@ public class APITypeManager {
     }
 
     public static void setAPITypeAndParams(final ApiAccessType type, final Map<String, String> parameters) {
+        warnIfUsingRemoteConnectionWithLocalEngine(type);
         apiAccessType = type;
         apiTypeParameters = new HashMap<>();
         if (parameters != null) {
             apiTypeParameters.putAll(parameters);
+        }
+    }
+
+    private static void warnIfUsingRemoteConnectionWithLocalEngine(ApiAccessType type) {
+        if (type != null && type != LOCAL) {
+            try {
+                Thread.currentThread().getContextClassLoader().loadClass("org.bonitasoft.engine.api.impl.ProcessAPIImpl");
+                LOGGER.warning(
+                        "You are declaring an API access to Bonita BPM Engine as a remote connection, whereas it looks like you are running in the same JVM. You should use LOCAL connection, using constant 'ApiAccessType.LOCAL'");
+            } catch (ClassNotFoundException ignored) {
+                //no warning
+            }
         }
     }
 
