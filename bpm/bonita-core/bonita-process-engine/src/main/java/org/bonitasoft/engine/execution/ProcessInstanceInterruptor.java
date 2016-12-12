@@ -186,7 +186,6 @@ public class ProcessInstanceInterruptor {
         final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         final List<FilterOption> filterOptions = new ArrayList<>(3);
         filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
         filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
         return filterOptions;
     }
@@ -195,7 +194,6 @@ public class ProcessInstanceInterruptor {
         final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         final List<FilterOption> filterOptions = new ArrayList<>(3);
         filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
-        filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
         filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
         filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getIdKey(), childExceptionId, FilterOperationType.DIFFERENT));
         return filterOptions;

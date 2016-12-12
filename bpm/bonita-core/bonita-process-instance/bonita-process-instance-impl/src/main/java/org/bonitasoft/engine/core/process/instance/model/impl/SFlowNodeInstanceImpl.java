@@ -201,7 +201,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
 
     @Override
     public boolean mustExecuteOnAbortOrCancelProcess() {
-        return isStable();
+        return isStable() && !isTerminal();
     }
 
     @Override
