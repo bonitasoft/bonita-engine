@@ -148,7 +148,8 @@ public class ApplicationNode {
     }
 
     public List<ApplicationPageNode> getApplicationPages() {
-        return applicationPages == null ? Collections.<ApplicationPageNode> emptyList() : Collections.unmodifiableList(applicationPages);
+        return applicationPages == null ? Collections.<ApplicationPageNode> emptyList()
+                : Collections.unmodifiableList(applicationPages);
     }
 
     public void addApplicationPage(ApplicationPageNode applicationPage) {
@@ -159,7 +160,8 @@ public class ApplicationNode {
     }
 
     public List<ApplicationMenuNode> getApplicationMenus() {
-        return applicationMenus == null ? Collections.<ApplicationMenuNode> emptyList() : Collections.unmodifiableList(applicationMenus);
+        return applicationMenus == null ? Collections.<ApplicationMenuNode> emptyList()
+                : Collections.unmodifiableList(applicationMenus);
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ApplicationNodeContainer {
 
     @XmlElement(name = "application")
-    private List<ApplicationNode> applications;
+    private final List<ApplicationNode> applications;
 
     public ApplicationNodeContainer() {
         this.applications = new ArrayList<>();
