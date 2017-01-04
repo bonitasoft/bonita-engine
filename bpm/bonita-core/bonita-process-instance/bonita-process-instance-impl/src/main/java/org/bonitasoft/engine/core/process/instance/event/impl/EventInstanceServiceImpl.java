@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventIn
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
@@ -65,6 +66,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -231,7 +233,8 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaReadException {
         List<SWaitingEvent> waitingEvents;
         do {
-            waitingEvents = getPersistenceService().selectList(new SelectListDescriptor<SWaitingEvent>("getWaitingEventsOfFlowNode", Collections.<String, Object>singletonMap("flowNodeInstanceId", flowNodeInstance.getId()), SWaitingEvent.class, new QueryOptions(0, 100)));
+            waitingEvents = getPersistenceService().selectList(new SelectListDescriptor<SWaitingEvent>("getWaitingEventsOfFlowNode",
+                    Collections.<String, Object> singletonMap("flowNodeInstanceId", flowNodeInstance.getId()), SWaitingEvent.class, new QueryOptions(0, 100)));
             for (final SWaitingEvent sWaitingEvent : waitingEvents) {
                 deleteWaitingEvent(sWaitingEvent);
             }
@@ -379,6 +382,21 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
         final SelectListDescriptor<SWaitingSignalEvent> descriptor = SelectDescriptorBuilder.getListeningSignals(signalName, fromIndex, maxResults);
         try {
             return getPersistenceService().selectList(descriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SEventTriggerInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public SWaitingSignalEvent getWaitingSignalEvent(final long id)
+            throws SEventTriggerInstanceReadException, SEventTriggerInstanceNotFoundException {
+        final SelectByIdDescriptor<SWaitingSignalEvent> descriptor = new SelectByIdDescriptor<>(SWaitingSignalEvent.class, id);
+        try {
+            SWaitingSignalEvent sWaitingSignalEvent = getPersistenceService().selectById(descriptor);
+            if (sWaitingSignalEvent == null) {
+                throw new SEventTriggerInstanceNotFoundException(id);
+            }
+            return sWaitingSignalEvent;
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
