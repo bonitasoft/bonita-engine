@@ -455,8 +455,8 @@
                     <!-- when set to 1.8: change field type of default transition 
                         to TransitionDefinition in FlowNodeDefinitionImpl and to ActorDefinition 
                         for actorInitiator of DesignProcessDefinitionImp (jaxb implementation bug) -->
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -464,9 +464,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xmx1024m -XX:MaxPermSize=256m
-                        -XX:+HeapDumpOnOutOfMemoryError
-                    </argLine>
+                    <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -670,8 +668,7 @@
                         <configuration>
                             <!-- Be aware not to omit ${jacoco.agent.it.arg} 
                                 if overriding this property in lower-level pom files: -->
-                            <argLine>-Xmx1024m -XX:MaxPermSize=256m
-                                -XX:+HeapDumpOnOutOfMemoryError
+                            <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError
                                 ${jacoco.agent.it.arg}
                             </argLine>
                             <!-- Listener to show coverage for each test -->
