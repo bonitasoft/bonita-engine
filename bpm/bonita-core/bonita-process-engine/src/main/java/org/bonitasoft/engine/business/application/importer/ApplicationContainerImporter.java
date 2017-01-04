@@ -25,7 +25,7 @@ import org.bonitasoft.engine.io.IOUtils;
 public class ApplicationContainerImporter {
 
     public ApplicationNodeContainer importXML(final byte[] xmlContent) throws ImportException {
-        final URL resource = ApplicationNodeContainer.class.getResource("/applications.xsd");
+        final URL resource = ApplicationNodeContainer.class.getResource("/application.xsd");
         try {
             return IOUtils.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
         } catch (final Exception e) {
