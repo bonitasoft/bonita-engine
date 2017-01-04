@@ -130,6 +130,7 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="messagesHandlingService" ref="messagesHandlingService" />
+        <constructor-arg name="workService" ref="workService" />
     </bean>
 
 

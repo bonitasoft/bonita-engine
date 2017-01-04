@@ -72,6 +72,7 @@ import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Handle event depending on its type
@@ -104,6 +105,7 @@ public class EventsHandler {
     private final TechnicalLoggerService logger;
 
     private final OperationService operationService;
+    private final WorkService workService;
 
     private ProcessExecutor processExecutor;
 
@@ -112,7 +114,7 @@ public class EventsHandler {
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger,
             OperationService operationService,
-            MessagesHandlingService messagesHandlingService) {
+            MessagesHandlingService messagesHandlingService, WorkService workService) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -120,11 +122,12 @@ public class EventsHandler {
         this.processInstanceService = processInstanceService;
         this.logger = logger;
         this.operationService = operationService;
+        this.workService = workService;
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
                 bpmInstancesCreator, processDefinitionService, messagesHandlingService));
-        handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));
+        handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(eventInstanceService, this.workService));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
         handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
