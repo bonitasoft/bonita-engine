@@ -23,7 +23,7 @@
         <wildfly.home>${project.build.directory}/${wildfly.name}</wildfly.home>
 
         <db.vendor>h2</db.vendor>
-        <cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+        <cargo.jvmargs>-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
     </properties>
 
     <dependencies>
@@ -132,8 +132,8 @@
                             <target>
                                 <taskdef name="if" classname="net.sf.antcontrib.logic.IfTask" classpathref="maven.runtime.classpath" />
 
-                                <property name="wildfly.conf.dir" value="${wildfly.home}/standalone/configuration"/>
-                                <property name="wildfly.deploy.dir" value="${wildfly.home}/standalone/deployments"/>
+                                <property name="wildfly.conf.dir" value="${wildfly.home}/standalone/configuration" />
+                                <property name="wildfly.deploy.dir" value="${wildfly.home}/standalone/deployments" />
 
                                 <!-- Download wildfly if needed -->
                                 <available property="wildfly.present" file="${wildfly.zip.folder}/${wildfly.name}.zip" />
@@ -154,7 +154,7 @@
                                     </fileset>
                                 </copy>
                                 <copy todir="${wildfly.home}/modules/system/layers/base/sun/jdk/main/"
-                                            file="${basedir}/src/main/resources/jdk/module.xml" />
+                                      file="${basedir}/src/main/resources/jdk/module.xml" />
 
                                 <if>
                                     <not>
@@ -186,8 +186,8 @@
                                     </then>
                                 </if>
 
-                                <replace file="${wildfly.home}/bin/standalone.conf" token="-XX:MaxPermSize=256m"
-                                         value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" />
+                                <replace file="${wildfly.home}/bin/standalone.conf" token="-XX:MaxMetaspaceSize=256m"
+                                         value="-XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError" />
 
                             </target>
                         </configuration>

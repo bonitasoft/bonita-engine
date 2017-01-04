@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +174,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new StartNodeException("Node already started");
         }
         final PlatformServiceAccessor platformAccessor;
-        SessionAccessor sessionAccessor = null;
+        SessionAccessor sessionAccessor;
         try {
             platformAccessor = getPlatformAccessor();
             sessionAccessor = createSessionAccessor();
@@ -218,7 +218,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             } catch (final StartNodeException sne) {
                 throw sne;
             } catch (final Exception exp) {
-                throw new StartNodeException("Platform stoping failed : " + exp.getMessage(), e);
+                throw new StartNodeException("Platform stopping failed : " + exp.getMessage(), e);
             }
             throw e;
         }
@@ -226,21 +226,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Registers missing default jobs (if any) for the provided tenants
-     *
-     * @param platformAccessor
-     * @param sessionAccessor
-     * @param tenants
-     * @throws BonitaHomeNotSetException
-     * @throws BonitaHomeConfigurationException
-     * @throws NoSuchMethodException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws SBonitaException
-     * @throws IOException
-     * @throws ClassNotFoundException
      */
-    protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
+    void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
             final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
             InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
         final TransactionService transactionService = platformAccessor.getTransactionService();
@@ -276,7 +263,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void registerJob(final SchedulerService schedulerService, final JobRegister jobRegister) throws SSchedulerException {
+    void registerJob(final SchedulerService schedulerService, final JobRegister jobRegister) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
         final List<SJobParameter> jobParameters = new ArrayList<>();
@@ -292,12 +279,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 
-    /**
-     * @param platformAccessor
-     * @param sessionAccessor
-     * @param tenants
-     * @throws SBonitaException
-     */
     void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
             final List<STenant> tenants) {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
@@ -352,15 +333,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
 
-            final Callable<Void> callable = new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
-                    restartHandler.execute();
-                    return null;
-                }
-            };
-            platformAccessor.getTransactionService().executeInTransaction(callable);
+            platformAccessor.getTransactionService().executeInTransaction( () -> {
+                restartHandler.execute();
+                return null;
+            });
         }
     }
 
@@ -457,19 +433,15 @@ public class PlatformAPIImpl implements PlatformAPI {
         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
         for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
-            final Callable<Void> callable = new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
-                    restartHandler.beforeServicesStart(platformAccessor, tenantServiceAccessor);
-                    return null;
-                }
+            final Callable<Void> callable = () -> {
+                restartHandler.beforeServicesStart(platformAccessor, tenantServiceAccessor);
+                return null;
             };
             tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
         }
     }
 
-    protected List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
+    List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
         return transactionService.executeInTransaction(new GetTenantsCallable(platformService));
@@ -536,18 +508,13 @@ public class PlatformAPIImpl implements PlatformAPI {
 
         try {
             platformAccessor = getPlatformAccessor();
-            List<STenant> sTenants = platformAccessor.getTransactionService().executeInTransaction(new Callable<List<STenant>>() {
-
-                @Override
-                public List<STenant> call() throws Exception {
-                    final PlatformService platformService = platformAccessor.getPlatformService();
-                    final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
-                    for (final STenant sTenant : tenants) {
-                        platformService.deactiveTenant(sTenant.getId());
-                    }
-                    return tenants;
+            List<STenant> sTenants = platformAccessor.getTransactionService().executeInTransaction(() -> {
+                final PlatformService platformService = platformAccessor.getPlatformService();
+                final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
+                for (final STenant sTenant : tenants) {
+                    platformService.deactiveTenant(sTenant.getId());
                 }
-
+                return tenants;
             });
             for (STenant sTenant : sTenants) {
                 deleteTenant(sTenant.getId());
@@ -683,7 +650,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private void deleteTenant(final long tenantId) throws STenantDeletionException {
         // TODO : Reduce number of transactions
-        PlatformServiceAccessor platformAccessor = null;
+        PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
@@ -723,7 +690,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private void activateDefaultTenant() throws STenantActivationException {
         // TODO : Reduce number of transactions
-        PlatformServiceAccessor platformAccessor = null;
+        PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
         try {
@@ -734,11 +701,11 @@ public class PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlatformConfiguration();
+            final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
-            startScheduler(platformAccessor, Arrays.asList(defaultTenant));
+            startScheduler(platformAccessor, Collections.singletonList(defaultTenant));
             // FIXME: commented out for the tests to not restart the scheduler all the time. Will need to be refactored. (It should be the responsibility of
             // startNode() method to start the scheduler, not ActivateTenant)
             // schedulerStarted = true;
@@ -749,7 +716,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, platformAccessor.getTechnicalLoggerService(),
-                    tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor(), plaformConfiguration,
+                    tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor(), platformConfiguration,
                     tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
             sessionService.deleteSession(sessionId);
@@ -780,13 +747,8 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     public boolean isPlatformInitialized() throws PlatformNotFoundException {
         try {
-            return getPlatformAccessor().getTransactionService().executeInTransaction(new Callable<Boolean>() {
-
-                @Override
-                public Boolean call() throws Exception {
-                    return getPlatformAccessor().getPlatformService().isDefaultTenantCreated();
-                }
-            });
+            final PlatformService platformService = getPlatformAccessor().getPlatformService();
+            return getPlatformAccessor().getTransactionService().executeInTransaction(platformService::isDefaultTenantCreated);
         } catch (final Exception e) {
             throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
         }
@@ -800,13 +762,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            return platformAccessor.getTransactionService().executeInTransaction(new Callable<Boolean>() {
-
-                @Override
-                public Boolean call() throws Exception {
-                    return platformService.isPlatformCreated();
-                }
-            });
+            return platformAccessor.getTransactionService().executeInTransaction(platformService::isPlatformCreated);
         } catch (Exception e) {
             throw new BonitaRuntimeException(e);
         }
