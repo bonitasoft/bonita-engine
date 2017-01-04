@@ -16,12 +16,14 @@ package org.bonitasoft.engine.execution.work;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.work.failurewrapping.ConnectorDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.TriggerSignalWork;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -135,5 +137,15 @@ public class WorkFactory {
             final long rootProcessInstanceId, final BonitaWork wrappedWork) {
         final ProcessDefinitionContextWork processDefinitionContextWork = new ProcessDefinitionContextWork(wrappedWork, processDefinitionId);
         return new ProcessInstanceContextWork(processDefinitionContextWork, processInstanceId, rootProcessInstanceId);
+    }
+
+    public static BonitaWork createTriggerSignalWork(SWaitingSignalEvent listeningSignal) {
+        BonitaWork triggerSignalWork = new TriggerSignalWork(listeningSignal.getId(), listeningSignal.getSignalName());
+        triggerSignalWork = withTx(triggerSignalWork);
+        long parentProcessInstanceId = listeningSignal.getParentProcessInstanceId();
+        if (parentProcessInstanceId > 0) {
+            triggerSignalWork = withLock(parentProcessInstanceId, triggerSignalWork);
+        }
+        return withFailureHandling(triggerSignalWork);
     }
 }
