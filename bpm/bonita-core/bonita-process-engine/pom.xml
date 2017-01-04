@@ -519,19 +519,6 @@
                 <artifactId>jaxb2-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>application-schemagen</id>
-                        <goals>
-                            <goal>schemagen</goal>
-                        </goals>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <includes>
-                                <include>org/bonitasoft/engine/business/application/xml/**/*.java</include>
-                            </includes>
-                            <outputDirectory>${project.build.directory}/application-schemas</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>organization-schemagen</id>
                         <goals>
                             <goal>schemagen</goal>
@@ -571,8 +558,6 @@
                         <phase>process-sources</phase>
                         <configuration>
                             <target>
-                                <copy file="${project.build.directory}/application-schemas/schema1.xsd"
-                                      toFile="${project.build.directory}/schemas/applications.xsd" />
                                 <copy file="${project.build.directory}/organization-schemas/schema1.xsd"
                                       toFile="${project.build.directory}/schemas/organization.xsd" />
                                 <copy file="${project.build.directory}/profiles-schemas/schema1.xsd"

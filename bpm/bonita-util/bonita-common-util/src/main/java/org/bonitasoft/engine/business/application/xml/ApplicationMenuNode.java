@@ -56,7 +56,8 @@ public class ApplicationMenuNode {
     }
 
     public List<ApplicationMenuNode> getApplicationMenus() {
-        return applicationMenus == null ? Collections.<ApplicationMenuNode> emptyList() : Collections.unmodifiableList(applicationMenus);
+        return applicationMenus == null ? Collections.<ApplicationMenuNode> emptyList()
+                : Collections.unmodifiableList(applicationMenus);
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
