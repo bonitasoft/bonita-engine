@@ -27,9 +27,9 @@ import org.bonitasoft.engine.io.PropertiesManager;
  */
 public class ParameterContribution implements BusinessArchiveContribution {
 
-    public static final String PARAMETERS_FILE = "parameters.properties";
+    static final String PARAMETERS_FILE = "parameters.properties";
 
-    private static final String NULL = "-==NULLL==-";
+    static final String NULL = "-==NULLL==-";
 
     @Override
     public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
@@ -38,9 +38,9 @@ public class ParameterContribution implements BusinessArchiveContribution {
             return false;
         }
         final Properties properties = PropertiesManager.getProperties(file);
-        final Map<String, String> parameters = new HashMap<String, String>(properties.size());
+        final Map<String, String> parameters = new HashMap<>(properties.size());
         for (final Entry<Object, Object> property : properties.entrySet()) {
-            parameters.put((String) property.getKey(), (String) (property.getValue() == NULL ? null : property.getValue()));
+            parameters.put((String) property.getKey(), (String) (NULL.equals(property.getValue()) ? null : property.getValue()));
         }
         businessArchive.setParameters(parameters);
         return true;
