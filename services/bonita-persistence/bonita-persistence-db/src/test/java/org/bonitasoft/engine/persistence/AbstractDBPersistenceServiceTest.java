@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -35,14 +36,13 @@ public class AbstractDBPersistenceServiceTest {
      * Dummy implementation for testing purpose : we are not interested in the data manipulation behaviour.
      *
      * @author Laurent Vaills
-     *
      */
     class DummyDBPersistenceService extends AbstractDBPersistenceService {
 
         public DummyDBPersistenceService(final String name,
-                final String likeEscapeCharacter, final SequenceManager sequenceManager,
+                final char likeEscapeCharacter, final SequenceManager sequenceManager,
                 final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
-                        throws ClassNotFoundException {
+                throws ClassNotFoundException {
             super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                     wordSearchExclusionMappings, logger);
         }
@@ -269,15 +269,14 @@ public class AbstractDBPersistenceServiceTest {
 
     private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
             final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
-                    throws ClassNotFoundException {
+            throws ClassNotFoundException {
         final SequenceManager sequenceManager = mock(SequenceManager.class);
         final DataSource datasource = mock(DataSource.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", "#", sequenceManager,
+        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", '#', sequenceManager,
                 datasource, enableWordSearch, wordSearchExclusionMappings, logger);
 
         assertThat(persistenceService.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);
     }
-
 
 }
