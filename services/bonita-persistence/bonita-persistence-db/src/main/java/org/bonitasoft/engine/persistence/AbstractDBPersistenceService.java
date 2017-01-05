@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
@@ -40,7 +41,7 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public abstract class AbstractDBPersistenceService implements TenantPersistenceService {
 
-    private final String likeEscapeCharacter;
+    final char likeEscapeCharacter;
 
     private final String name;
 
@@ -54,7 +55,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected final TechnicalLoggerService logger;
 
-    public AbstractDBPersistenceService(final String name, final String likeEscapeCharacter,
+    public AbstractDBPersistenceService(final String name, final char likeEscapeCharacter,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         sequenceManager = null;
@@ -75,7 +76,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     }
 
     public AbstractDBPersistenceService(final String name,
-            final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
+            final char likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
@@ -220,7 +221,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     }
 
     /*
-     *  escape for like
+     * escape for like
      */
     protected final String escapeTerm(final String term) {
         // 1) escape ' character by adding another ' character
@@ -233,10 +234,11 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
                 .replaceAll(getLikeEscapeCharacter(), getLikeEscapeCharacter() + getLikeEscapeCharacter())
                 .replaceAll("%", getLikeEscapeCharacter() + "%")
                 .replaceAll("_", getLikeEscapeCharacter() + "_")
-                .replaceAll(":",  "\\:");
+                .replaceAll(":", "\\:");
     }
+
     /*
-     *  escape for other things than like
+     * escape for other things than like
      */
     protected String escapeString(final String term) {
         // 1) escape ' character by adding another ' character
@@ -245,7 +247,7 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     }
 
     protected String getLikeEscapeCharacter() {
-        return likeEscapeCharacter;
+        return String.valueOf(likeEscapeCharacter);
     }
 
 }
