@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
@@ -41,6 +40,7 @@ import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.PlatformSetup;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -67,7 +67,7 @@ public class EngineStarter {
         final long startTime = System.currentTimeMillis();
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
             //force it to local if not specified
-            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
+            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
         }
         if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
             prepareEnvironment();
@@ -79,7 +79,7 @@ public class EngineStarter {
     }
 
     protected void setupPlatform() throws NamingException, PlatformException {
-        PlatformSetup platformSetup = new PlatformSetup();
+        PlatformSetup platformSetup = PlatformSetupAccessor.getPlatformSetup();
         if (isDropOnStart()) {
             platformSetup.destroy();
         }
@@ -123,8 +123,8 @@ public class EngineStarter {
     }
 
     private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[] { "-tcp", "-tcpAllowOthers", "-tcpPort", h2Port };
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[] { args });
+        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
         final Method start = server.getClass().getMethod("start");
         LOGGER.info("Starting h2 on port " + h2Port);
         try {

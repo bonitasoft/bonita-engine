@@ -23,9 +23,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
@@ -43,13 +40,11 @@ import org.bonitasoft.platform.configuration.util.GetConfigurationsInTransaction
 import org.bonitasoft.platform.configuration.util.LicensesResourceVisitor;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationInTransaction;
 import org.bonitasoft.platform.exception.PlatformException;
-import org.bonitasoft.platform.setup.DataSourceLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -82,13 +77,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         this.jdbcTemplate = jdbcTemplate;
         this.transactionTemplate = transactionTemplate;
         this.dbVendor = dbVendor;
-    }
-
-    public ConfigurationServiceImpl() throws NamingException {
-        final DataSource dataSource = new DataSourceLookup().lookup();
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
-        transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
     }
 
     @Override

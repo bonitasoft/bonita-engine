@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
@@ -53,7 +52,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 
 /**
  * @author Matthieu Chaffotte
@@ -121,7 +120,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public ConfigurationService getConfigurationService() throws SProcessDisablementException {
         try {
-            return new ConfigurationServiceImpl();
+            return PlatformSetupAccessor.getConfigurationService();
         } catch (NamingException e) {
             throw new SProcessDisablementException(e);
         }
@@ -172,7 +171,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
                 return Collections.emptyList();
             }
             final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults, order);
-            final List<ParameterInstance> paramterInstances = new ArrayList<ParameterInstance>();
+            final List<ParameterInstance> paramterInstances = new ArrayList<>();
             for (int i = 0; i < parameters.size(); i++) {
                 final SParameter parameter = parameters.get(i);
                 final String name = parameter.getName();
