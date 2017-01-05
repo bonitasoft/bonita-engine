@@ -45,6 +45,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
@@ -1156,6 +1157,29 @@ public class CallActivityIT extends TestWithTechnicalUser {
             disableAndDeleteProcess(callingProcessDefinition);
             disableAndDeleteProcess(targetProcessDefinition);
         }
+    }
+
+    @Test
+    public void should_abort_call_activity_when_sub_process_is_triggered() throws Exception {
+
+        ProcessDefinition mainProcess = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processWithCallActivityAndTimerESB", "1.0")
+                        .addStartEvent("start")
+                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("calledProcess"),
+                                new ExpressionBuilder().createConstantStringExpression("1.0"))
+                        .addTransition("start", "call")
+                        .getProcess());
+        ProcessDefinition calledProcess = getProcessAPI().deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0")
+                //not the normal flow: no elements started
+                .addStartEvent("signalStart").addSignalEventTrigger("calledProcSignal")
+                .addAutomaticTask("auto2")
+                .addTransition("signalStart", "auto2").getProcess());
+
+        ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
+
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
+
+        disableAndDeleteProcess(mainProcess, calledProcess);
     }
 
 }
