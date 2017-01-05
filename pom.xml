@@ -486,6 +486,7 @@
             <id>deploy</id>
             <modules>
                 <module>bpm</module>
+                <module>platform</module>
             </modules>
             <build>
                 <plugins>
