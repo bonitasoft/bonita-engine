@@ -28,6 +28,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -87,6 +88,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -403,10 +405,16 @@ public class StateBehaviors {
                 }
 
                 final long targetProcessDefinitionId = getTargetProcessDefinitionId(callableElement, callableElementVersion);
-                instantiateProcess(processDefinition, callActivity, flowNodeInstance, targetProcessDefinitionId);
+                SProcessInstance sProcessInstance = instantiateProcess(processDefinition, callActivity, flowNodeInstance, targetProcessDefinitionId);
                 final SCallActivityInstance callActivityInstance = (SCallActivityInstance) flowNodeInstance;
                 // update token count
-                activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
+                if (sProcessInstance.getStateId() != ProcessInstanceState.COMPLETED.getId()) {
+                    activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
+                } else {
+                    //the called process is finished, next step is stable so we trigger execution of this flownode
+                    workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinition.getId(), flowNodeInstance.getParentProcessInstanceId(),
+                            flowNodeInstance.getId()));
+                }
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
             }
@@ -425,7 +433,7 @@ public class StateBehaviors {
         return SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType());
     }
 
-    protected void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
+    protected SProcessInstance instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
             final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SProcessInstanceCreationException,
             SContractViolationException, SExpressionException {
         final long callerProcessDefinitionId = callerProcessDefinition.getId();
@@ -435,7 +443,7 @@ public class StateBehaviors {
 
         final Map<String, Serializable> processInputs = getEvaluatedInputExpressions(callActivityDefinition.getProcessStartContractInputs(), context);
 
-        processExecutor
+        return processExecutor
                 .start(targetProcessDefinitionId, -1, 0, 0, context, operationList, callerId, -1, processInputs);
     }
 
