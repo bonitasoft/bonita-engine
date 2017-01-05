@@ -13,25 +13,20 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.EnumToObjectConvertible;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
@@ -73,8 +68,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected final Map<String, Class<? extends PersistentObject>> interfaceToClassMapping;
 
     protected final List<String> mappingExclusions;
-
-    private final OrderByBuilder orderByBuilder;
+    protected final OrderByBuilder orderByBuilder;
 
     Statistics statistics;
 
@@ -94,7 +88,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
-        super("TEST", "#", enableWordSearch, wordSearchExclusionMappings, logger);
+        super("TEST", '#', enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
         this.classAliasMappings = classAliasMappings;
         this.classMapping = classMapping;
@@ -103,7 +97,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         cacheQueries = Collections.emptyMap();
         interfaceToClassMapping = Collections.emptyMap();
         mappingExclusions = Collections.emptyList();
-        this.orderByBuilder = new DefaultOrderByBuilder();
+        orderByBuilder = new DefaultOrderByBuilder();
     }
 
     // Setter for session
@@ -124,7 +118,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
-            final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
@@ -430,105 +424,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter,
-            final boolean enableWordSearch) {
-        final StringBuilder builder = new StringBuilder(query);
-        final Set<String> specificFilters = new HashSet<>(filters.size());
-        if (!filters.isEmpty()) {
-            FilterOption previousFilter = null;
-            if (!query.contains("WHERE")) {
-                builder.append(" WHERE (");
-            } else {
-                builder.append(" AND (");
-            }
-            for (final FilterOption filterOption : filters) {
-                if (previousFilter != null) {
-                    final FilterOperationType prevOp = previousFilter.getFilterOperationType();
-                    final FilterOperationType currOp = filterOption.getFilterOperationType();
-                    // Auto add AND if previous operator was normal op or ')' and that current op is normal op or '(' :
-                    if ((isNormalOperator(prevOp) || prevOp == R_PARENTHESIS) && (isNormalOperator(currOp) || currOp == L_PARENTHESIS)) {
-                        builder.append(" AND ");
-                    }
-                }
-                final StringBuilder aliasBuilder = appendFilterClause(builder, filterOption);
-                // FIXME: is it really filterOption.getFieldName() or is it its formatted value: classAliasMappings.get(.......) ?:
-                // specificFilters.add(filterOption.getFieldName());
-                if (aliasBuilder != null) {
-                    specificFilters.add(aliasBuilder.toString());
-                }
-                previousFilter = filterOption;
-            }
-            builder.append(")");
-        }
-        if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
-            handleMultipleFilters(builder, multipleFilter, specificFilters, enableWordSearch);
-        }
-        return builder.toString();
-    }
-
-    /**
-     * @param builder
-     * @param multipleFilter
-     * @param specificFilters
-     * @param enableWordSearch
-     */
-    protected void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters,
-            final boolean enableWordSearch) {
-        final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
-        final Set<String> fields = new HashSet<>();
-        for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
-            final String alias = getClassAliasMappings().get(entry.getKey().getName());
-            for (final String field : entry.getValue()) {
-                fields.add(alias + '.' + field);
-            }
-        }
-        fields.removeAll(specificFilters);
-
-        if (!fields.isEmpty()) {
-            final List<String> terms = multipleFilter.getTerms();
-            applyFiltersOnQuery(builder, fields, terms, enableWordSearch);
-        }
-    }
-
-    protected void applyFiltersOnQuery(final StringBuilder queryBuilder, final Set<String> fields, final List<String> terms, final boolean enableWordSearch) {
-        if (!queryBuilder.toString().contains("WHERE")) {
-            queryBuilder.append(" WHERE ");
-        } else {
-            queryBuilder.append(" AND ");
-        }
-        queryBuilder.append("(");
-
-        final Iterator<String> fieldIterator = fields.iterator();
-        while (fieldIterator.hasNext()) {
-            buildLikeClauseForOneFieldMultipleTerms(queryBuilder, fieldIterator.next(), terms, enableWordSearch);
-            if (fieldIterator.hasNext()) {
-                queryBuilder.append(" OR ");
-            }
-        }
-
-        queryBuilder.append(")");
-    }
-
-    /**
-     * @param queryBuilder
-     * @param currentField
-     * @param terms
-     * @param enableWordSearch
-     */
-    protected void buildLikeClauseForOneFieldMultipleTerms(final StringBuilder queryBuilder, final String currentField, final List<String> terms,
-            final boolean enableWordSearch) {
-        final Iterator<String> termIterator = terms.iterator();
-        while (termIterator.hasNext()) {
-            final String currentTerm = termIterator.next();
-
-            buildLikeClauseForOneFieldOneTerm(queryBuilder, currentField, currentTerm, enableWordSearch);
-
-            if (termIterator.hasNext()) {
-                queryBuilder.append(" OR ");
-            }
-        }
-    }
-
     /**
      * @param queryBuilder
      * @param currentField
@@ -547,140 +442,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    private <T> String getQueryWithOrderByClause(final String query, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        final StringBuilder builder = new StringBuilder(query);
-        appendOrderByClause(builder, selectDescriptor);
-        return builder.toString();
-    }
-
-    private StringBuilder appendFilterClause(final StringBuilder clause, final FilterOption filterOption) {
-        final FilterOperationType type = filterOption.getFilterOperationType();
-        StringBuilder completeField = null;
-        if (filterOption.getPersistentClass() != null) {
-            completeField = new StringBuilder(getClassAliasMappings().get(filterOption.getPersistentClass().getName())).append('.').append(
-                    filterOption.getFieldName());
-        }
-        Object fieldValue = filterOption.getValue();
-        if (fieldValue instanceof String) {
-            fieldValue = "'" + escapeString((String) fieldValue) + "'";
-        } else if (fieldValue instanceof EnumToObjectConvertible) {
-            fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
-        }
-        switch (type) {
-            case EQUALS:
-                if (fieldValue == null) {
-                    clause.append(completeField).append(" IS NULL");
-                } else {
-                    clause.append(completeField).append(" = ").append(fieldValue);
-                }
-                break;
-            case GREATER:
-                clause.append(completeField).append(" > ").append(fieldValue);
-                break;
-            case GREATER_OR_EQUALS:
-                clause.append(completeField).append(" >= ").append(fieldValue);
-                break;
-            case LESS:
-                clause.append(completeField).append(" < ").append(fieldValue);
-                break;
-            case LESS_OR_EQUALS:
-                clause.append(completeField).append(" <= ").append(fieldValue);
-                break;
-            case DIFFERENT:
-                clause.append(completeField).append(" != ").append(fieldValue);
-                break;
-            case IN:
-                clause.append(getInClause(completeField, filterOption));
-                break;
-            case BETWEEN:
-                final Object from = filterOption.getFrom() instanceof String ? "'" + escapeString((String) filterOption.getFrom()) + "'"
-                        : filterOption.getFrom();
-                final Object to = filterOption.getTo() instanceof String ? "'" + escapeString((String) filterOption.getTo()) + "'" : filterOption.getTo();
-                clause.append("(").append(from).append(" <= ").append(completeField);
-                clause.append(" AND ").append(completeField).append(" <= ").append(to).append(")");
-                break;
-            case LIKE:
-                // TODO:write LIKE
-                clause.append(completeField).append(" LIKE '%").append(escapeTerm((String) filterOption.getValue())).append("%'");
-                break;
-            case L_PARENTHESIS:
-                clause.append(" (");
-                break;
-            case R_PARENTHESIS:
-                clause.append(" )");
-                break;
-            case AND:
-                clause.append(" AND ");
-                break;
-            case OR:
-                clause.append(" OR ");
-                break;
-            default:
-                // TODO:do we want default behaviour?
-                break;
-        }
-        return completeField;
-    }
-
-    private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
-        final StringBuilder stb = new StringBuilder(completeField);
-        stb.append(" in (");
-        stb.append(getInValues(filterOption));
-        stb.append(")");
-        return stb.toString();
-    }
-
-    private String getInValues(final FilterOption filterOption) {
-        final StringBuilder stb = new StringBuilder();
-        for (final Object element : filterOption.getIn()) {
-            stb.append(element + ",");
-        }
-        final String inValues = stb.toString();
-        return inValues.substring(0, inValues.length() - 1);
-    }
-
-    private <T> void appendOrderByClause(final StringBuilder builder, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        builder.append(" ORDER BY ");
-        boolean startWithComma = false;
-        boolean sortedById = false;
-        for (final OrderByOption orderByOption : selectDescriptor.getQueryOptions().getOrderByOptions()) {
-            if (startWithComma) {
-                builder.append(',');
-            }
-            StringBuilder fieldNameBuilder = new StringBuilder();
-            final Class<? extends PersistentObject> clazz = orderByOption.getClazz();
-            if (clazz != null) {
-                appendClassAlias(fieldNameBuilder, clazz);
-            }
-            final String fieldName = orderByOption.getFieldName();
-            if ("id".equalsIgnoreCase(fieldName) || "sourceObjectId".equalsIgnoreCase(fieldName)) {
-                sortedById = true;
-            }
-            fieldNameBuilder.append(fieldName);
-            orderByBuilder.appendOrderBy(builder, fieldNameBuilder.toString(), orderByOption.getOrderByType());
-            startWithComma = true;
-        }
-        if (!sortedById) {
-            if (startWithComma) {
-                builder.append(',');
-            }
-            appendClassAlias(builder, selectDescriptor.getEntityType());
-            builder.append("id");
-            builder.append(' ');
-            builder.append("ASC");
-        }
-    }
-
-    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz) throws SBonitaReadException {
-        final String className = clazz.getName();
-        final String classAlias = getClassAliasMappings().get(className);
-        if (classAlias == null || classAlias.trim().isEmpty()) {
-            throw new SBonitaReadException("No class alias found for class " + className);
-        }
-        builder.append(classAlias);
-        builder.append('.');
-    }
-
     protected void setQueryCache(final Query query, final String name) {
         if (cacheQueries != null && cacheQueries.containsKey(name)) {
             query.setCacheable(true);
@@ -694,21 +455,19 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             checkClassMapping(entityClass);
 
             final Session session = getSession(true);
-            Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-            String builtQuery = query.getQueryString();
 
+            Query query = session.getNamedQuery(selectDescriptor.getQueryName());
+            QueryBuilder queryBuilder = new QueryBuilder(query.getQueryString(), orderByBuilder, classAliasMappings, likeEscapeCharacter);
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
                 final boolean enableWordSearch = isWordSearchEnabled(selectDescriptor.getEntityType());
-                builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
+                queryBuilder.appendFilters(queryOptions.getFilters(), queryOptions.getMultipleFilter(), enableWordSearch);
             }
-
             if (selectDescriptor.hasOrderByParameters()) {
-                builtQuery = getQueryWithOrderByClause(builtQuery, selectDescriptor);
+                queryBuilder.appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(), selectDescriptor.getEntityType());
             }
-
-            if (!builtQuery.equals(query.getQueryString())) {
-                query = session.createQuery(builtQuery);
+            if (queryBuilder.hasChanged()) {
+                query = queryBuilder.buildQuery(session);
             }
             setQueryCache(query, selectDescriptor.getQueryName());
             setParameters(query, selectDescriptor.getInputParameters());

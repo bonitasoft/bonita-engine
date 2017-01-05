@@ -14,10 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -59,7 +56,7 @@ public class TenantHibernatePersistenceServiceTest {
     @Mock
     private HibernateConfigurationProvider hbmConfigurationProvider;
 
-    private final String likeEscapeCharacter = " ";
+    private final char likeEscapeCharacter = ' ';
 
     @Mock
     private TechnicalLoggerService logger;
