@@ -34,8 +34,8 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.springframework.core.io.ClassPathResource;
 
 /**
@@ -61,11 +61,6 @@ public class BonitaHomeServer {
         tenantStorage = new TenantStorage();
     }
 
-    BonitaHomeServer(ConfigurationService configurationService) {
-        this();
-        this.configurationService = configurationService;
-    }
-
     public static BonitaHomeServer getInstance() {
         return INSTANCE;
     }
@@ -75,9 +70,9 @@ public class BonitaHomeServer {
     }
 
     private ConfigurationService getConfigurationService() {
-        if (configurationService == null) {
+        if (configurationService == null) {//should be given by spring
             try {
-                configurationService = new ConfigurationServiceImpl();
+                configurationService = PlatformSetupAccessor.getConfigurationService();
             } catch (NamingException e) {
                 throw new IllegalStateException(e);
             }

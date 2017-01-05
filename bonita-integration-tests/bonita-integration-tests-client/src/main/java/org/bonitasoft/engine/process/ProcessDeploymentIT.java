@@ -48,8 +48,8 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -183,7 +183,7 @@ public class ProcessDeploymentIT extends TestWithUser {
     }
 
     private BonitaConfiguration getPortalAutoLoginConfiguration() throws Exception {
-        ConfigurationService configurationService = new ConfigurationServiceImpl();
+        ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
         return configurationService.getTenantPortalConfiguration(getApiClient().getSession().getTenantId(), "autologin-v6.json");
     }
 

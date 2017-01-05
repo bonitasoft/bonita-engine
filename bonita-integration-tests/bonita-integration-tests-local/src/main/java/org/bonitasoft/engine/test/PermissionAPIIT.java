@@ -16,10 +16,8 @@ package org.bonitasoft.engine.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
@@ -30,8 +28,9 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
+import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -122,14 +121,14 @@ public class PermissionAPIIT extends CommonAPILocalIT {
 
     private void writeScriptToBonitaHome(final String scriptFileContent, final String fileName, final String... folders)
             throws IOException, SBonitaException, BonitaHomeNotSetException, NamingException {
-        ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl();
+        ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
         String path = "";
         for (String folder : folders) {
             path += folder + "/";
         }
         path += fileName + ".groovy";
 
-        configurationService.storeTenantSecurityScripts(Arrays.asList(new BonitaConfiguration(path, scriptFileContent.getBytes())),
+        configurationService.storeTenantSecurityScripts(Collections.singletonList(new BonitaConfiguration(path, scriptFileContent.getBytes())),
                 getTenantAccessor().getTenantId());
 
         final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
