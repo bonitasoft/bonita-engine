@@ -19,15 +19,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.exception.PlatformException;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +88,7 @@ public class PlatformLicensesSetup {
     }
 
     ConfigurationService getConfigurationService() throws NamingException {
-        return new ConfigurationServiceImpl();
+        return PlatformSetupAccessor.getConfigurationService();
     }
 
 }

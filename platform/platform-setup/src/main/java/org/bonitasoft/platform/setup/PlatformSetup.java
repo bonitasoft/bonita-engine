@@ -25,28 +25,21 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
-import org.bonitasoft.platform.version.impl.VersionServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Class that setup an environment for the engine to start on.
@@ -85,27 +78,12 @@ public class PlatformSetup {
     private Path currentConfigurationFolder;
     private Path licensesFolder;
 
+    @Autowired
     PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService, VersionService versionService, DataSource dataSource) {
         this.scriptExecutor = scriptExecutor;
         this.configurationService = configurationService;
         this.versionService = versionService;
         this.dataSource = dataSource;
-    }
-
-    public PlatformSetup(String dbVendor) {
-        this.dbVendor = dbVendor;
-    }
-
-    public PlatformSetup() {
-    }
-
-    public void setDataSource(String driverClassName, String username, String password, String url) {
-        dataSource = new DataSourceBuilder(PlatformSetup.class.getClassLoader())
-                .driverClassName(driverClassName)
-                .username(username)
-                .password(password)
-                .url(url)
-                .build();
     }
 
     /**
@@ -366,29 +344,13 @@ public class PlatformSetup {
         }
     }
 
-    private void initServices() throws PlatformException {
-        if (scriptExecutor == null) {
-            scriptExecutor = new ScriptExecutor(dbVendor, dataSource);
-        }
-        if (configurationService == null) {
-            final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
-            configurationService = new ConfigurationServiceImpl(new JdbcTemplate(dataSource), new TransactionTemplate(dataSourceTransactionManager), dbVendor);
-        }
-        if (versionService == null) {
-            versionService = new VersionServiceImpl(new JdbcTemplate(dataSource), dbVendor);
-        }
-    }
-
     private void initDataSource() throws PlatformException {
         try {
-            if (dataSource == null) {
-                dataSource = new DataSourceLookup().lookup();
-            }
             try (Connection connection = dataSource.getConnection()) {
                 DatabaseMetaData metaData = connection.getMetaData();
                 LOGGER.info("Connected to '" + dbVendor + "' database with url: '" + metaData.getURL() + "' with user: '" + metaData.getUserName() + "'");
             }
-        } catch (NamingException | SQLException e) {
+        } catch (SQLException e) {
             throw new PlatformException(e);
         }
     }
@@ -413,7 +375,6 @@ public class PlatformSetup {
     public void initPlatformSetup() throws PlatformException {
         initProperties();
         initDataSource();
-        initServices();
     }
 
     public ConfigurationService getConfigurationService() {

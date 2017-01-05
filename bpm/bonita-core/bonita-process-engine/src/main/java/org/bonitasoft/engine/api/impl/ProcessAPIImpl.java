@@ -432,7 +432,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.platform.configuration.ConfigurationService;
-import org.bonitasoft.platform.configuration.impl.ConfigurationServiceImpl;
+import org.bonitasoft.platform.setup.PlatformSetupAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -753,7 +753,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessResourcesService processResourcesService = tenantAccessor.getProcessResourcesService();
         try {
-            final ConfigurationService configurationService = new ConfigurationServiceImpl();
+            final ConfigurationService configurationService = PlatformSetupAccessor.getConfigurationService();
             final EnableProcess enableProcess = new EnableProcess(processDefinitionService, configurationService, processResourcesService, processDefinitionId,
                     eventsHandler,
                     tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession(), getSession().getTenantId());

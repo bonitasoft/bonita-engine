@@ -26,12 +26,10 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
-import org.bonitasoft.platform.version.impl.VersionServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,11 +76,7 @@ public class ScriptExecutor {
     private VersionService versionService;
 
     @Autowired
-    public ScriptExecutor(@Value("${db.vendor}") String dbVendor) throws NamingException {
-        this(dbVendor, new DataSourceLookup().lookup());
-    }
-
-    public ScriptExecutor(String dbVendor, DataSource datasource) {
+    public ScriptExecutor(@Value("${db.vendor}") String dbVendor, DataSource datasource, VersionService versionService) {
         if (dbVendor == null) {
             throw new IllegalArgumentException("dbVendor is null");
         }
@@ -90,8 +84,7 @@ public class ScriptExecutor {
         this.datasource = datasource;
         logger.info("configuration for Database vendor: " + dbVendor);
         this.sqlFolder = "/sql/" + dbVendor;
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
-        this.versionService = new VersionServiceImpl(jdbcTemplate);
+        this.versionService = versionService;
     }
 
     public void createTables() throws PlatformException {
