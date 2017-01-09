@@ -88,16 +88,16 @@ public class ProcessStarter {
     }
 
     public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context,
-            final List<String> activityNames) {
-        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames), null);
+            final List<String> activityNames, Map<String, Serializable> instantiationInputs) {
+        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames), instantiationInputs);
     }
 
     public ProcessStarter(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs) {
         this(userId, processDefinitionId, null, null, new StartFlowNodeFilter(), instantiationInputs);
     }
 
-    public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,
-            SContractViolationException {
+    public ProcessInstance start()
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, SContractViolationException {
         try {
             return start(null);
         } catch (final SProcessDefinitionNotFoundException e) {
