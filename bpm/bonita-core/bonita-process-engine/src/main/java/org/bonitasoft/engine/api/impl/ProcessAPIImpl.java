@@ -5783,13 +5783,15 @@ public class ProcessAPIImpl implements ProcessAPI {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
                         executerSubstituteUserId, inputs);
                 logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+            } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Executing state " + flowNodeInstance.getStateName() + " (" + flowNodeInstance.getStateId()
+                        + ") for flownode " + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
             }
             if (executerUserId != executerSubstituteUserId) {
                 try {
-                    final SUser executerUser = identityService.getUser(executerUserId);
-                    String stb = "The user " + session.getUserName() + " " +
-                            "acting as delegate of the user " + executerUser.getUserName() + " " +
-                            "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
+                    final SUser executorUser = identityService.getUser(executerUserId);
+                    String stb = "The user " + session.getUserName() + " " + "acting as delegate of the user " + executorUser.getUserName() + " "
+                            + "has done the task \"" + flowNodeInstance.getDisplayName() + "\".";
                     commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb);
                 } catch (final SBonitaException e) {
                     logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
