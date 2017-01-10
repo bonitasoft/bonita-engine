@@ -36,10 +36,14 @@ public class PlatformSetupAccessor {
 
     public static PlatformSetup getPlatformSetup() throws NamingException {
         final DataSource dataSource = lookupDataSource();
+        String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
+        return getPlatformSetup(dataSource, dbVendor);
+    }
+
+    public static PlatformSetup getPlatformSetup(DataSource dataSource, String dbVendor) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dataSource);
         TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-        String dbVendor = System.getProperty("sysprop.bonita.db.vendor");
         VersionService versionService = new VersionServiceImpl(jdbcTemplate);
         return new PlatformSetup(new ScriptExecutor(dbVendor, dataSource, versionService),
                 new ConfigurationServiceImpl(jdbcTemplate, transactionTemplate, dbVendor), versionService, dataSource);
