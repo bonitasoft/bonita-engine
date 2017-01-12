@@ -403,7 +403,20 @@ public class ConnectorServiceImpl implements ConnectorService {
             if (dependenciesToUpdate.contains(file.getKey())) {
                 dependencyService.updateDependencyOfArtifact(file.getKey(), file.getValue(), file.getKey(), processDefinitionId, ScopeType.PROCESS);
             } else {
-                dependencyService.createMappedDependency(file.getKey(), file.getValue(), file.getKey(), processDefinitionId, ScopeType.PROCESS);
+                final SDependency existingDependency = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, file.getKey());
+                if (existingDependency != null) {
+                    //a dependency with this name did exists event if it was not declared as a dependency of the connector inside the connector impl file
+                    if (connectorImplementationDescriptorToReplace != null) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                                "Updating a dependency of the connector " + connectorImplementationDescriptorToReplace.getDefinitionId() + " in version "
+                                        + connectorImplementationDescriptorToReplace.getDefinitionVersion() +
+                                        " of process definition " + processDefinitionId + ". The jar file " + file.getKey()
+                                        + " was not declared in the previous connector implementation but is in the dependencies of the process. The jar is still updated but this can lead to inconsistencies.");
+                    }
+                    dependencyService.updateDependencyOfArtifact(file.getKey(), file.getValue(), file.getKey(), processDefinitionId, ScopeType.PROCESS);
+                } else {
+                    dependencyService.createMappedDependency(file.getKey(), file.getValue(), file.getKey(), processDefinitionId, ScopeType.PROCESS);
+                }
             }
         }
     }

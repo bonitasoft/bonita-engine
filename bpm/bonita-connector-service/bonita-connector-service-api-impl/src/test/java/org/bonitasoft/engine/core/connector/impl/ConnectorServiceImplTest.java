@@ -21,6 +21,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.notNull;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -55,6 +56,7 @@ import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -116,7 +118,7 @@ public class ConnectorServiceImplTest {
     ArgumentCaptor<SBARResource> sBarResourceArgumentCaptor;
 
     private ConnectorServiceImpl connectorService;
-    
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -372,6 +374,32 @@ public class ConnectorServiceImplTest {
     }
 
     @Test
+    public void should_setConnectorImplementation_replace_jar_even_if_jar_was_not_in_jarDependencies() throws Exception {
+        //given
+        byte[] zip = createConnectorArchiveZip("myConnector1.impl", "connectorId", "connectorVersion", new BarResource("jar2.jar", new byte[] { 3 }));
+        //a process with an inconsistent connector implementation is deployed: connector have a dependency names jar2.jar and jar1.jar but they are not declared in jarDependencies
+        doReturn(Collections.singletonList(
+                new SBARResource("myConnector1.impl", BARResourceType.CONNECTOR, processDefinition.getId(),
+                        createConnectorImplFile("connectorId", "connectorVersion"))))
+                                .when(processResourcesService)
+                                .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
+        doReturn(new SDependencyImpl("jar1.jar", "jar1.jar", new byte[] { 1 })).when(dependencyService)
+                .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar1.jar");
+        doReturn(new SDependencyImpl("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
+                .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar2.jar");
+        //when
+        connectorService.setConnectorImplementation(processDefinition, "connectorId", "connectorVersion", zip);
+        //then
+        verify(dependencyService, never()).createMappedDependency(anyString(), any(byte[].class), anyString(), anyLong(), any(ScopeType.class));
+        verify(dependencyService, never()).deleteDependency(any(SDependency.class));
+        verify(dependencyService).updateDependencyOfArtifact("jar2.jar", new byte[] { 3 }, "jar2.jar", processDefinition.getId(), ScopeType.PROCESS);
+        verify(technicalLoggerService).log(ConnectorServiceImpl.class, TechnicalLogSeverity.WARNING,
+                "Updating a dependency of the connector connectorId in version connectorVersion of process definition 123153. " +
+                        "The jar file jar2.jar was not declared in the previous connector implementation but is in the dependencies of the process. " +
+                        "The jar is still updated but this can lead to inconsistencies.");
+    }
+
+    @Test
     public void should_setConnectorImplementation_update_existing_dependencies() throws Exception {
         //given
         byte[] zip = createConnectorArchiveZip("myConnector2.impl", "connectorId", "connectorVersion", new BarResource("jar2.jar", new byte[] { 3 }),
@@ -471,20 +499,20 @@ public class ConnectorServiceImplTest {
         }
         return result.toString();
     }
-    
+
     @Test
     public void should_throw_a_SConnectorException_if_a_Throwable_is_thrown_when_executing_a_connector() throws Exception {
         //given
         SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
                 "impplVersion", "defId", "defVersion", new JarDependencies(Collections.<String> emptyList()));
         SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
-   
+
         Map<String, Object> inputParameters = Collections.<String, Object> singletonMap("key", "value");
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         when(connectorExecutor.execute(notNull(SConnector.class), eq(inputParameters), eq(contextClassLoader))).thenThrow(new NoClassDefFoundError());
-        
+
         expectedException.expect(SConnectorException.class);
-        
+
         connectorService.executeConnector(PROCESS_DEFINITION_ID, connectorInstance, connectorImplementationDescriptor, contextClassLoader, inputParameters);
     }
 }
