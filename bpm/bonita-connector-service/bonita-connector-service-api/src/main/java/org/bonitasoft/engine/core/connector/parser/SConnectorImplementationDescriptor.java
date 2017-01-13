@@ -15,35 +15,46 @@ package org.bonitasoft.engine.core.connector.parser;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * @author Feng Hui
  * @author Yanyan Liu
  */
+@XmlRootElement(name = "connectorImplementation")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {})
 public class SConnectorImplementationDescriptor implements Serializable, Comparable<SConnectorImplementationDescriptor> {
 
     private static final long serialVersionUID = 1262691234201780432L;
-
     public static final String IMPLEMENTATION_CLASS_NAME = "implementationClassName";
-
     public static final String ID = "id";
-
     public static final String VERSION = "version";
-
     public static final String DEFINITION_ID = "definitionId";
-
     public static final String DEFINITION_VERSION = "definitionVersion";
 
-    private String implementationClassName;
-
+    @XmlElement(name = "implementationId", required = true)
     private String id;
-
+    @XmlElement(name = "implementationVersion", required = true)
     private String version;
-
+    @XmlElement(required = true)
     private String definitionId;
-
+    @XmlElement
     private String definitionVersion;
-
+    @XmlElement(name = "implementationClassname", required = true)
+    private String implementationClassName;
+    // not usefull but must  be in the xsd (studio related
+    @XmlElement
+    private Boolean hasSources;
+    @XmlElement
     private JarDependencies jarDependencies;
+    //can be in xsd
+    @XmlElement
+    private String description;
 
     public static String comparedField;
 

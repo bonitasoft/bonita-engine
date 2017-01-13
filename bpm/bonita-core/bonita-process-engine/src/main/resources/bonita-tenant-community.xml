@@ -1441,7 +1441,6 @@
     <bean id="connectorServiceSub" class="org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl">
         <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="connectorExecutor" ref="connectorExecutor" />
-        <constructor-arg name="parserFactory" ref="parserFactory" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />

@@ -16,17 +16,26 @@ package org.bonitasoft.engine.core.connector.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
@@ -38,8 +47,6 @@ import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
-import org.bonitasoft.engine.core.connector.parser.ConnectorImplementationBinding;
-import org.bonitasoft.engine.core.connector.parser.JarDependenciesBinding;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -52,6 +59,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -67,10 +75,6 @@ import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
-import org.bonitasoft.engine.xml.ElementBinding;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.ParserFactory;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -84,7 +88,6 @@ public class ConnectorServiceImpl implements ConnectorService {
     protected static final String CONNECTOR_CACHE_NAME = "CONNECTOR";
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final String IMPLEMENTATION_EXT = ".impl";
-    private final Parser parser;
     private final CacheService cacheService;
     private final ConnectorExecutor connectorExecutor;
     private final ExpressionResolverService expressionResolverService;
@@ -94,7 +97,10 @@ public class ConnectorServiceImpl implements ConnectorService {
     private final TimeTracker timeTracker;
     private final ProcessResourcesService processResourcesService;
 
-    public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor, final ParserFactory parserFactory,
+    private final JAXBContext jaxbContext;
+    private final Schema schema;
+
+    public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor,
             final ExpressionResolverService expressionResolverService, final OperationService operationService,
             final DependencyService dependencyService, final TechnicalLoggerService logger, final TimeTracker timeTracker,
             ProcessResourcesService processResourcesService) {
@@ -102,14 +108,18 @@ public class ConnectorServiceImpl implements ConnectorService {
         this.connectorExecutor = connectorExecutor;
         this.expressionResolverService = expressionResolverService;
         this.processResourcesService = processResourcesService;
-        final List<Class<? extends ElementBinding>> bindings = new ArrayList<>();
-        bindings.add(ConnectorImplementationBinding.class);
-        bindings.add(JarDependenciesBinding.class);
-        parser = parserFactory.createParser(bindings);
         this.operationService = operationService;
         this.dependencyService = dependencyService;
         this.logger = logger;
         this.timeTracker = timeTracker;
+        try {
+            jaxbContext = JAXBContext.newInstance(SConnectorImplementationDescriptor.class);
+            URL schemaURL = ConnectorServiceImpl.class.getResource("/connectors-impl.xsd");
+            final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schema = sf.newSchema(schemaURL);
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException("Unable to load unmarshaller for connector implementation descriptor", e);
+        }
     }
 
     /**
@@ -322,14 +332,9 @@ public class ConnectorServiceImpl implements ConnectorService {
             final List<SBARResource> connectorImplementations = getConnectorImplementations(processDefinitionId, 0, Integer.MAX_VALUE);
             for (SBARResource connectorImplementationFile : connectorImplementations) {
                 name = connectorImplementationFile.getName();
-                final Object objectFromXML = parser.getObjectFromXML(connectorImplementationFile.getContent());
-                if (objectFromXML == null) {
-                    throw new SConnectorException("Can not parse ConnectorImplementation XML. The file name is <" + name + ">.");
-                }
-                // check dependencies in the bar
-                cache(processDefinitionId, (SConnectorImplementationDescriptor) objectFromXML);
+                cache(processDefinitionId, convert(connectorImplementationFile.getContent()));
             }
-        } catch (final IOException | SXMLParseException e) {
+        } catch (final IOException e) {
             throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is <" + name + ">.", e);
         } catch (final SCacheException e) {
             throw new SConnectorException("Unable to cache the connector implementation " + name + ".", e);
@@ -337,6 +342,21 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException("Unable to list the connector implementations", e);
         }
         return true;
+    }
+
+    private SConnectorImplementationDescriptor convert(byte[] content) throws IOException {
+        try {
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            unmarshaller.setSchema(schema);
+            String connectorImplementationFileContent = new String(content);
+            connectorImplementationFileContent = connectorImplementationFileContent.replace("<connectorImplementation>",
+                    "<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">");
+            connectorImplementationFileContent = connectorImplementationFileContent.replace("</connectorImplementation>",
+                    "</implementation:connectorImplementation>");
+            return (SConnectorImplementationDescriptor) unmarshaller.unmarshal(new StringReader(connectorImplementationFileContent));
+        } catch (final JAXBException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -464,13 +484,8 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private SConnectorImplementationDescriptor parseConnectorImplementation(final byte[] bytes) throws SInvalidConnectorImplementationException {
         try {
-            final Object objectFromXML = parser.getObjectFromXML(bytes);
-            final SConnectorImplementationDescriptor connectorImplementation = (SConnectorImplementationDescriptor) objectFromXML;
-            if (connectorImplementation == null) {
-                throw new SInvalidConnectorImplementationException("Can not parse ConnectorImplementation XML.");
-            }
-            return connectorImplementation;
-        } catch (final IOException | SXMLParseException e) {
+            return convert(bytes);
+        } catch (final IOException e) {
             throw new SInvalidConnectorImplementationException("Can not load ConnectorImplementation XML.", e);
         }
     }
