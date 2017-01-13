@@ -71,7 +71,8 @@ public class BuildTestUtil {
     public static byte[] buildConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
             final String implementationVersion, final String implementationClassname, String... dependencies) {
         final StringBuilder stb = new StringBuilder();
-        stb.append("<connectorImplementation>\n");
+        stb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        stb.append("<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">\n");
         stb.append("\t<definitionId>").append(definitionId).append("</definitionId>\n");
         stb.append("\t<definitionVersion>").append(definitionVersion).append("</definitionVersion>\n");
         stb.append("\t<implementationClassname>").append(implementationClassname).append("</implementationClassname>\n");
@@ -84,9 +85,24 @@ public class BuildTestUtil {
             }
             stb.append("\t</jarDependencies>\n");
         }
-        stb.append("</connectorImplementation>\n");
+        stb.append("</implementation:connectorImplementation>");
         return stb.toString().getBytes();
     }
+    /*
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
+     * <implementationId>plop-impl</implementationId>
+     * <implementationVersion>1.0.0</implementationVersion>
+     * <definitionId>plop</definitionId>
+     * <definitionVersion>1.0.0</definitionVersion>
+     * <implementationClassname>org.mycompany.connector.PlopImpl</implementationClassname>
+     * <hasSources>true</hasSources>
+     * <description></description>
+     * <jarDependencies>
+     * <jarDependency>plop-impl-1.0.0.jar</jarDependency>
+     * </jarDependencies>
+     * </implementation:connectorImplementation>
+     */
 
     public static BusinessArchiveBuilder buildBusinessArchiveWithConnectorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies, final List<BarResource> userFilters)
