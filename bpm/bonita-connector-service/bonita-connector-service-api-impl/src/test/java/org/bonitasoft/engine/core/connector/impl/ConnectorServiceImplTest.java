@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.connector.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -46,7 +45,6 @@ import org.bonitasoft.engine.core.connector.parser.JarDependencies;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.operation.OperationService;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -64,8 +62,6 @@ import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.tracking.TimeTracker;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.SXMLParseException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,6 +70,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -89,11 +86,7 @@ public class ConnectorServiceImplTest {
     @Mock
     private BonitaHomeServer bonitaHomeServer;
     @Mock
-    private Parser parser;
-    @Mock
     private CacheService cacheService;
-    @Mock
-    private ParserFactory parserFactory;
     @Mock
     private DependencyService dependencyService;
     @Mock
@@ -116,7 +109,7 @@ public class ConnectorServiceImplTest {
     ArgumentCaptor<SDependency> dependencyArgumentCaptor;
     @Captor
     ArgumentCaptor<SBARResource> sBarResourceArgumentCaptor;
-
+    @InjectMocks
     private ConnectorServiceImpl connectorService;
 
     @Rule
@@ -125,10 +118,6 @@ public class ConnectorServiceImplTest {
     @SuppressWarnings("unchecked")
     @Before
     public void setup() {
-        doReturn(parser).when(parserFactory).createParser(anyList());
-        connectorService = new ConnectorServiceImpl(cacheService, connectorExecutor, parserFactory, expressionResolverService,
-                operationService, dependencyService,
-                technicalLoggerService, timeTracker, processResourcesService);
         processDefinition = new SProcessDefinitionImpl("proc", "1");
         processDefinition.setId(PROCESS_DEFINITION_ID);
     }
@@ -147,9 +136,6 @@ public class ConnectorServiceImplTest {
 
     @Test(expected = SInvalidConnectorImplementationException.class)
     public void setConnectorImplementationValidFileButWrongImpl() throws Exception {
-        when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
-                new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnectorWrong", "1.0.0", new JarDependencies(Collections
-                        .<String> emptyList())));
         final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.impl", "mocked".getBytes()));
         connectorService.setConnectorImplementation(processDefinition, "myConnector", "1.0.0", zip);
     }
@@ -172,17 +158,16 @@ public class ConnectorServiceImplTest {
                 connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Collections.singletonList("file.jar")));
 
         Map<String, byte[]> zipFileMap = new HashMap<>(3);
-        final byte[] implBytes = "tototo".getBytes();
-        zipFileMap.put("HoogardenBeerConnector.impl", implBytes);
+        byte[] connectorImplFile = createConnectorImplFile(hoogardenConnectorDescriptor);
+        zipFileMap.put("HoogardenBeerConnector.impl", connectorImplFile);
         final byte[] dep1Bytes = { 12, 94, 14, 12 };
         zipFileMap.put("some1.jar", dep1Bytes);
         final byte[] hoogardenConnectorBytes = { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 };
         zipFileMap.put("HoogardenConnector.jar", hoogardenConnectorBytes);
         final byte[] zip1 = IOUtil.zip(zipFileMap);
-        when(parser.getObjectFromXML(eq(new byte[] { 2 }))).thenReturn(oldConnectorDescriptor);
-        when(parser.getObjectFromXML(eq(implBytes))).thenReturn(hoogardenConnectorDescriptor);
 
-        final SBARResource originalConnector = new SBARResource("file.impl", BARResourceType.CONNECTOR, processDefId, new byte[] { 2 });
+        final SBARResource originalConnector = new SBARResource("file.impl", BARResourceType.CONNECTOR, processDefId,
+                createConnectorImplFile(oldConnectorDescriptor));
         doReturn(Collections.singletonList(originalConnector)).when(processResourcesService)
                 .get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
         SDependency dependency = mock(SDependency.class);
@@ -192,7 +177,7 @@ public class ConnectorServiceImplTest {
         verify(dependencyService).createMappedDependency("HoogardenConnector.jar", hoogardenConnectorBytes, "HoogardenConnector.jar", processDefId,
                 ScopeType.PROCESS);
         verify(dependencyService).createMappedDependency("some1.jar", dep1Bytes, "some1.jar", processDefId, ScopeType.PROCESS);
-        verify(processResourcesService).add(processDefId, "HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, implBytes);
+        verify(processResourcesService).add(processDefId, "HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, connectorImplFile);
         verify(dependencyService).deleteDependency(dependency);
         verify(processResourcesService).remove(originalConnector);
     }
@@ -254,11 +239,6 @@ public class ConnectorServiceImplTest {
             throws BonitaHomeNotSetException, SXMLParseException,
             IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException, SBonitaReadException {
 
-        final long processDefId = 17L;
-        final SProcessDefinition sProcessDef;
-        sProcessDef = mock(SProcessDefinition.class);
-
-        when(sProcessDef.getId()).thenReturn(processDefId);
         final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
         final String connectorDefVersion = "1.0.0";
         final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
@@ -266,27 +246,29 @@ public class ConnectorServiceImplTest {
         final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
         final SConnectorImplementationDescriptor connectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
                 connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
-        when(parser.getObjectFromXML(eq("tototo".getBytes()))).thenReturn(connectorImplDescriptor);
+        byte[] connectorImplFile = createConnectorImplFile(connectorImplDescriptor);
 
         final Map<String, byte[]> zipFileMap = new HashMap<>(3);
 
-        zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
+        zipFileMap.put("HoogardenBeerConnector.impl", connectorImplFile);
         zipFileMap.put("some1.jar", new byte[] { 12, 94, 14, 12 });
         zipFileMap.put("HoogardenConnector.jar", new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
         final byte[] zip1 = IOUtil.zip(zipFileMap);
 
-        doReturn(Collections.singletonList(new SBARResource("HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, processDefId, "tototo".getBytes())))
-                .when(processResourcesService).get(eq(processDefId), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
+        doReturn(Collections
+                .singletonList(new SBARResource("HoogardenBeerConnector.impl", BARResourceType.CONNECTOR, processDefinition.getId(),
+                        connectorImplFile)))
+                                .when(processResourcesService).get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), eq(0), anyInt());
 
         //setConnectorImplementation store to cache
-        connectorService.setConnectorImplementation(sProcessDef, connectorDefId, connectorDefVersion, zip1);
+        connectorService.setConnectorImplementation(processDefinition, connectorDefId, connectorDefVersion, zip1);
 
         //given
         doReturn(givenCacheSizeToBeReturned).when(cacheService).getCacheSize(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
 
         List<String> cacheContentKeys = Collections.emptyList();
         final String buildConnectorImplementationKey = connectorService
-                .buildConnectorImplementationKey(processDefId, connectorImplId, connectorImplVersion);
+                .buildConnectorImplementationKey(processDefinition.getId(), connectorImplId, connectorImplVersion);
         if (shouldCacheContainsConnectorImplementation) {
             cacheContentKeys = Collections.singletonList(buildConnectorImplementationKey);
         }
@@ -294,7 +276,7 @@ public class ConnectorServiceImplTest {
         doReturn(connectorImplDescriptor).when(cacheService).get(ConnectorServiceImpl.CONNECTOR_CACHE_NAME, buildConnectorImplementationKey);
 
         //when
-        connectorService.getConnectorImplementations(processDefId, 0,
+        connectorService.getConnectorImplementations(processDefinition.getId(), 0,
                 10, "", OrderByType.ASC);
 
         //then
@@ -457,7 +439,7 @@ public class ConnectorServiceImplTest {
         }
     }
 
-    byte[] createConnectorArchiveZip(String connectorImplFileName, String definitionId, final String definitionVersion, BarResource... jars)
+    private byte[] createConnectorArchiveZip(String connectorImplFileName, String definitionId, final String definitionVersion, BarResource... jars)
             throws IOException, SXMLParseException {
         HashMap<String, byte[]> files = new HashMap<>();
         for (BarResource jar : jars) {
@@ -468,34 +450,38 @@ public class ConnectorServiceImplTest {
         return IOUtil.zip(files);
     }
 
-    private byte[] createConnectorImplFile(String definitionId, String definitionVersion, BarResource... jars) throws SXMLParseException, IOException {
-        byte[] connectorImplFileContent = ("<connectorImplementation>\n" +
+    private byte[] createConnectorImplFile(SConnectorImplementationDescriptor connector) {
+        return createConnectorImplFile(connector.getDefinitionId(), connector.getDefinitionVersion(), connector.getId(), connector.getVersion(),
+                connector.getImplementationClassName(), connector.getJarDependencies().getDependencies());
+    }
+
+    private byte[] createConnectorImplFile(String definitionId, String definitionVersion, String id, String version, String className, List<String> jars) {
+        return ("<connectorImplementation>\n" +
                 "\n" +
                 "\t<definitionId>" + definitionId + "</definitionId>\n" +
                 "\t<definitionVersion>" + definitionVersion + "</definitionVersion>\n" +
-                "\t<implementationClassname>TheClass</implementationClassname>\n" +
-                "\t<implementationId>implId</implementationId>\n" +
-                "\t<implementationVersion>1.0</implementationVersion>\n" +
+                "\t<implementationClassname>" + className + "</implementationClassname>\n" +
+                "\t<implementationId>" + id + "</implementationId>\n" +
+                "\t<implementationVersion>" + version + "</implementationVersion>\n" +
                 "\n" +
                 "\t<jarDependencies>\n" +
                 getJarsXml(jars) +
                 "\t</jarDependencies>\n" +
                 "</connectorImplementation>\n").getBytes();
+    }
 
-        ArrayList<String> jarNames = new ArrayList<>();
+    private byte[] createConnectorImplFile(String definitionId, String definitionVersion, BarResource... jars) {
+        List<String> jarNames = new ArrayList<>(jars.length);
         for (BarResource jar : jars) {
             jarNames.add(jar.getName());
         }
-        doReturn(new SConnectorImplementationDescriptor("TheClass", "implId", "1.0", definitionId, definitionVersion, new JarDependencies(jarNames)))
-                .when(parser)
-                .getObjectFromXML(connectorImplFileContent);
-        return connectorImplFileContent;
+        return createConnectorImplFile(definitionId, definitionVersion, "implId", "1.0", "TheClass", jarNames);
     }
 
-    private String getJarsXml(BarResource... jars) {
+    private String getJarsXml(List<String> jars) {
         StringBuilder result = new StringBuilder();
-        for (BarResource jar : jars) {
-            result.append("\t\t<jarDependency>").append(jar.getName()).append("</jarDependency>\n");
+        for (String jar : jars) {
+            result.append("\t\t<jarDependency>").append(jar).append("</jarDependency>\n");
         }
         return result.toString();
     }
