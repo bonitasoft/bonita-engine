@@ -29,41 +29,76 @@ import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.io.PropertiesManager;
 
 /**
- * Specify how the client communicate with the engine
+ * Specify how the client communicate with the engine. There are three ways of doing it:
+ * <ul>
+ * <li>Using Java System Properties</li>
+ * <li>Programmatically</li>
+ * <li>DEPRECATED: using a file inside bonita-home. See <a href="http://documentation.bonitasoft.com/?page=configure-client-of-bonita-bpm-engine#toc3">online
+ * documentation</a>.</li>
+ * </ul>
+ * <h1>Using Java System Properties</h1>
  * <p>
- * Use system properties <code>org.bonitasoft.engine.api-type</code> to specify that:
+ * Use System property <code>-Dorg.bonitasoft.engine.api-type=</code>
  * <ul>
  * <li>LOCAL:
- * <p>connect to the server in the local JVM (default)</p>
+ * <p>connect to the server in the local JVM (default). No other configuration is necessary.</p>
  * </li>
  * <li>HTTP
  * <p>
- * connect to the server using HTTP, must specify
+ * connect to the server using HTTP. You must also specify:
  * <ul>
- * <li><code>org.bonitasoft.engine.api-type.server.url</code>, e.g. http://localhost:8080</li>
- * <li><code>org.bonitasoft.engine.api-type.application.name</code>, this is the name of the web application, e.g. bonita</li>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.server.url=HTTP_SERVER_URL</code>, e.g. <code>http://localhost:8080</code></li>
+ * <li><code>-Dorg.bonitasoft.engine.api-type.application.name=WEBAPP_NAME</code>, this is the name of the web application, e.g. <code>bonita</code></li>
  * </ul>
  * </p>
  * </li>
  * <li>EJB3
  * <p>
- * connect to the server using EJB3, must specify<br> For Wildfly 10 :
+ * connect to the server using EJB3. You must also<br> For Wildfly 10 :
  * <ul>
- * <li>java.naming.factory.url.pkgs, e.g. org.jboss.ejb.client.naming</li>
- * <li>org.bonitasoft.engine.ejb.naming.reference, e.g. ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI</li>
+ * <li><code>-Djava.naming.factory.url.pkgs=org.jboss.ejb.client.naming</code></li>
+ * <li><code>-Dorg.bonitasoft.engine.ejb.naming.reference=ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI</code></li>
  * </ul>
  * </p>
  * </li>
  * <li>TCP
  * <p>
- * not recommended, only for testing purpose
+ * not recommended, only for testing purpose.
  * </p></li>
  * </ul>
  * </p>
+ * <h1>Programmatically</h1>
+ * <ul>
+ * <li>LOCAL access:
+ * <p>APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, null);</p>
+ * </li>
+ * <li>HTTP access:
+ *
+ * <pre>
+ * <code>HashMap<String, String> parameters = new HashMap<>();
+ * parameters.put("server.url", "http://myserver.com:8080");
+ * parameters.put("application.name", "bonita-application");
+ * APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);</code>
+ * </pre>
+ *
+ * </li>
+ * <li>
+ * EJB3 access:
+ * 
+ * <pre>
+ * <code>HashMap<String,String> parameters= new HashMap<>();
+ * parameters.put("java.naming.factory.url.pkgs", "org.jboss.ejb.client.naming");
+ * parameters.put("org.bonitasoft.engine.ejb.naming.reference","ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI");
+ * APITypeManager.setAPITypeAndParams(ApiAccessType.EJB3, parameters);</code>
+ * </pre>
+ * 
+ * </li>
+ * </ul>
  *
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @see <a href="http://documentation.bonitasoft.com/?page=configure-client-of-bonita-bpm-engine#toc0">Online documentation on Client configuration</a>
  */
 public class APITypeManager {
 
