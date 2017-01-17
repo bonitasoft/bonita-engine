@@ -24,9 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -366,6 +368,12 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
     private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final List<String> activityNames,
             final List<Operation> operations,
             final Map<String, Serializable> context) throws Exception {
+        return startProcess(startedBy, processDefinitionId, activityNames, operations, context, null);
+    }
+
+    private TestUtils.Process startProcess(final long startedBy, final long processDefinitionId, final List<String> activityNames,
+            final List<Operation> operations,
+            final Map<String, Serializable> context, Map<String, Serializable> processContractInputs) throws Exception {
         final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("started_by", startedBy);
         parameters.put("process_definition_id", processDefinitionId);
@@ -376,7 +384,9 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
         if (context != null) {
             parameters.put("context", new HashMap<>(context));
         }
-
+        if (processContractInputs != null) {
+            parameters.put("process_contract_inputs", new HashMap<>(processContractInputs));
+        }
         return wrapper.wrap((ProcessInstance) getCommandAPI().execute("multipleStartPointsProcessCommand", parameters));
     }
 
@@ -423,6 +433,39 @@ public class MultipleStartPointsProcessCommandIT extends TestWithUser {
         waitForUserTask("step2");
 
         // Clean
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_start_process_with_process_contract_input() throws Exception {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("process1", "1.0");
+        builder.addContract().addInput("input1", Type.TEXT, "text input");
+        builder.addContract().addInput("input2", Type.INTEGER, "int input");
+        builder.addUserTask("user1", "actor").addDisplayName(new ExpressionBuilder().createDataExpression("calculatedTaskName", String.class.getName()));
+        builder.addUserTask("user2", "actor");
+        builder.addActor("actor", true);
+        builder.addLongTextData("calculatedTaskName", null);
+        ProcessDefinition processDefinition = processDeployer.deploy(builder.done());
+
+        Map<String, Serializable> processContractInputs = new HashMap<>();
+        processContractInputs.put("input1", "the Input1 value");
+        processContractInputs.put("input2", 145325);
+        List<Operation> operations = Collections.singletonList(new OperationBuilder().createSetDataOperation("calculatedTaskName",
+                new ExpressionBuilder().createContractInputExpression("input1", String.class.getName())));
+        TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), Collections.singletonList("user1"),
+                operations,
+                null,
+                processContractInputs);
+
+        long user1 = waitForUserTask("user1");
+        String taskDisplayName = getProcessAPI().getFlowNodeInstance(user1).getDisplayName();
+        Assertions.assertThat(taskDisplayName).isEqualTo("the Input1 value");
+        getProcessAPI().assignUserTask(user1, user.getId());
+        getProcessAPI().executeUserTask(user1, Collections.<String, Serializable> emptyMap());
+
+        process.isExpected().toFinish();
+        process.expect("user1").toBeExecuted(1);
+        process.expect("user2").toNotHaveArchives();
         disableAndDeleteProcess(processDefinition);
     }
 }
