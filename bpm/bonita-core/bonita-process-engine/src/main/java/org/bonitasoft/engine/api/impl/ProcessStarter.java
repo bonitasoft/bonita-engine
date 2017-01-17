@@ -72,16 +72,16 @@ public class ProcessStarter {
 
     private final Filter<SFlowNodeDefinition> filter;
 
-    private final Map<String, Serializable> instantiationInputs;
+    private final Map<String, Serializable> processContractInputs;
 
     private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
-            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter, final Map<String, Serializable> instantiationInputs) {
+            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter, final Map<String, Serializable> processContractInputs) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
         this.context = context;
         this.filter = filter;
-        this.instantiationInputs = instantiationInputs;
+        this.processContractInputs = processContractInputs;
     }
 
     public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context) {
@@ -89,15 +89,16 @@ public class ProcessStarter {
     }
 
     public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context,
-            final List<String> activityNames) {
-        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames), null);
+            final List<String> activityNames, Map<String, Serializable> processContractInputs) {
+        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames), processContractInputs);
     }
 
-    public ProcessStarter(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs) {
-        this(userId, processDefinitionId, null, null, new StartFlowNodeFilter(), instantiationInputs);
+    public ProcessStarter(final long userId, final long processDefinitionId, final Map<String, Serializable> processContractInputs) {
+        this(userId, processDefinitionId, null, null, new StartFlowNodeFilter(), processContractInputs);
     }
 
-    public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
+    public ProcessInstance start()
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
         try {
             return start(null);
         } catch (final SContractViolationException e) {
@@ -128,8 +129,8 @@ public class ProcessStarter {
         final SProcessInstance startedSProcessInstance;
         try {
             final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
-            startedSProcessInstance =  processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
-                    new FlowNodeSelector(sProcessDefinition, filter), instantiationInputs);
+            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
+                    new FlowNodeSelector(sProcessDefinition, filter), processContractInputs);
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
             e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
