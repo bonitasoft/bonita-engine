@@ -269,7 +269,7 @@ public interface IdentityService {
      *        the password
      * @return true if the couple user/password is valid; false otherwise
      */
-    boolean chechCredentials(SUser user, String password);
+    boolean checkCredentials(SUser user, String password);
 
     /**
      * Get {@link SUser} by its name
