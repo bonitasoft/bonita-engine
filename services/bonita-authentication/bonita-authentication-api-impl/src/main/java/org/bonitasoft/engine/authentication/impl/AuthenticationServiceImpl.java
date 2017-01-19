@@ -56,7 +56,7 @@ public class AuthenticationServiceImpl implements GenericAuthenticationService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
             }
             final SUser user = identityService.getUserByUserName(userName);
-            if (identityService.chechCredentials(user, password)) {
+            if (identityService.checkCredentials(user, password)) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
                 }
