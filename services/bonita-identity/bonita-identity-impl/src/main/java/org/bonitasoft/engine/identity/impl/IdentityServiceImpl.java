@@ -1477,7 +1477,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public boolean chechCredentials(final SUser user, final String password) {
+    public boolean checkCredentials(final SUser user, final String password) {
         final String hashPassword = user.getPassword();
         return encrypter.check(password, hashPassword);
     }

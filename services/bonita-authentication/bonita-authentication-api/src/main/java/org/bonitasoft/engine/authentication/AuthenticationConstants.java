@@ -24,6 +24,8 @@ public class AuthenticationConstants {
 
     public static final String BASIC_PASSWORD = "authentication.password";
 
+    public static final String SAML_CREDENTIALS_PASSPHRASE = "authentication.passphrase";
+
     public static final String BASIC_TENANT_ID = "authentication.tenant.id";
 
     public static final String CAS_TICKET = "ticket";
