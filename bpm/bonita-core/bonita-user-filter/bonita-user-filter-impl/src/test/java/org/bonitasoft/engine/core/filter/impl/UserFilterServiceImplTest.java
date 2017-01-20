@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.core.filter.impl;
 
-import static org.mockito.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -9,27 +11,29 @@ import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.resources.BARResourceType;
-import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.filter.JarDependencies;
-import org.bonitasoft.engine.core.filter.UserFilterImplementationDescriptor;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
+import org.bonitasoft.engine.core.filter.model.JarDependencies;
+import org.bonitasoft.engine.core.filter.model.UserFilterImplementationDescriptor;
 import org.bonitasoft.engine.core.process.definition.model.impl.SUserFilterDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.filter.AbstractUserFilter;
 import org.bonitasoft.engine.filter.UserFilterException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.ParserFactory;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,12 +43,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class UserFilterServiceImplTest {
 
-    public static final long PROCESS_DEFINITION_ID = 123456l;
-    @Mock
-    private Parser parser;
-    @Mock
-    private ParserFactory parserFactory;
-    @Mock
+    public static final long PROCESS_DEFINITION_ID = 123456L;
+    @InjectMocks
     private UserFilterServiceImpl userFilterService;
     @Mock
     private TechnicalLoggerService logger;
@@ -59,10 +59,11 @@ public class UserFilterServiceImplTest {
     private SUserFilterDefinitionImpl sUserFilterDefinition;
     private UserFilterImplementationDescriptor userFilterImplementationDescriptor;
 
+    @Captor
+    private ArgumentCaptor<UserFilterImplementationDescriptor> userFilterImplementationDescriptorArgumentCaptor;
+
     @Before
     public void setup() {
-        doReturn(parser).when(parserFactory).createParser(anyList());
-        userFilterService = new UserFilterServiceImpl(connectorExecutor, cacheService, expressionResolverService, parserFactory, logger, resourceService);
         sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("UserFiler", "filterId", "version"));
         userFilterImplementationDescriptor = new UserFilterImplementationDescriptor(MyUserFilter.class.getName(), "id", "version", "filterId", "version",
                 new JarDependencies(Collections.singletonList("dep.jar")));
@@ -87,6 +88,39 @@ public class UserFilterServiceImplTest {
         userFilterService.loadUserFilters(PROCESS_DEFINITION_ID);
 
         verify(resourceService).get(eq(PROCESS_DEFINITION_ID), eq(BARResourceType.USER_FILTER), anyInt(), anyInt());
+    }
+
+    @Test
+    public void should_parse_user_filter_implementation_file_and_cache_it_when_loading_userfilters() throws Exception {
+        //given
+        byte[] userFilterImplContent = ("<connectorImplementation>\n" +
+                "\n" +
+                "\t<definitionId>user-filter-def</definitionId>\n" +
+                "\t<definitionVersion>1.0</definitionVersion>\n" +
+                "\t<implementationClassname>org.bonitasoft.user.filter.TestUserFilter</implementationClassname>\n" +
+                "\t<implementationId>user-filter-impl</implementationId>\n" +
+                "\t<implementationVersion>1.0</implementationVersion>\n" +
+                "\n" +
+                "\t<jarDependencies>\n" +
+                "\t\t<jarDependency>UserFilterDependency.jar</jarDependency>\n" +
+                "\t</jarDependencies>\n" +
+                "</connectorImplementation>\n").getBytes();
+        doReturn(Collections.singletonList(new SBARResource("my-user-filter.impl", BARResourceType.USER_FILTER, PROCESS_DEFINITION_ID, userFilterImplContent)))
+                .when(resourceService).get(eq(PROCESS_DEFINITION_ID), eq(BARResourceType.USER_FILTER), anyInt(), anyInt());
+        //when
+        userFilterService.loadUserFilters(PROCESS_DEFINITION_ID);
+
+        //then
+        verify(cacheService).store(eq("USER_FILTER"), eq(PROCESS_DEFINITION_ID + ":user-filter-def-1.0"),
+                userFilterImplementationDescriptorArgumentCaptor.capture());
+        UserFilterImplementationDescriptor userFilterImplementationDescriptor = userFilterImplementationDescriptorArgumentCaptor.getValue();
+        assertThat(userFilterImplementationDescriptor.getDefinitionId()).isEqualTo("user-filter-def");
+        assertThat(userFilterImplementationDescriptor.getDefinitionVersion()).isEqualTo("1.0");
+        assertThat(userFilterImplementationDescriptor.getImplementationClassName()).isEqualTo("org.bonitasoft.user.filter.TestUserFilter");
+        assertThat(userFilterImplementationDescriptor.getId()).isEqualTo("user-filter-impl");
+        assertThat(userFilterImplementationDescriptor.getVersion()).isEqualTo("1.0");
+        assertThat(userFilterImplementationDescriptor.getJarDependencies().getDependencies()).containsOnly("UserFilterDependency.jar");
+
     }
 
     public static class MyUserFilter extends AbstractUserFilter {
