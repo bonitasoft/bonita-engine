@@ -24,6 +24,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.core.connector</groupId>
+            <artifactId>bonita-connector-service-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.cache</groupId>
             <artifactId>bonita-cache-api</artifactId>
             <version>${project.version}</version>
@@ -36,11 +41,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
             <artifactId>bonita-home-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.xml</groupId>
-            <artifactId>bonita-xml-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

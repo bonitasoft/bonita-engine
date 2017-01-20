@@ -1,6 +1,9 @@
-<connectorImplementation id="org.bonitasoft.engine.filter.user.GroupUserFilter" version="1.0"
-	definitionId="org.bonitasoft.engine.filter.user.GroupUserFilter" definitionVersion="1.0"
-	implementationClassname="org.bonitasoft.engine.filter.user.GroupUserFilter">
+<connectorImplementation>
+	<definitionId>org.bonitasoft.engine.filter.user.GroupUserFilter</definitionId>
+	<definitionVersion>1.0</definitionVersion>
+	<implementationClassname>org.bonitasoft.engine.filter.user.GroupUserFilter</implementationClassname>
+	<implementationId>org.bonitasoft.engine.filter.user.GroupUserFilter</implementationId>
+	<implementationVersion>1.0</implementationVersion>
 	<jarDependencies>
 		<jarDependency>GroupUserFilter.jar</jarDependency>
 	</jarDependencies>
