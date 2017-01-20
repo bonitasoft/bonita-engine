@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -84,7 +83,7 @@ public class DefaultProfilesUpdaterTest {
         // Given
         doReturn(false).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
         // When
-        boolean hasUpdated = defaultProfilesUpdater.execute(false);
+        boolean hasUpdated = defaultProfilesUpdater.execute();
         // Then
         assertThat(hasUpdated).isFalse();
     }
@@ -95,45 +94,20 @@ public class DefaultProfilesUpdaterTest {
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
         doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
         // When
-        boolean hasUpdated = defaultProfilesUpdater.execute(false);
+        boolean hasUpdated = defaultProfilesUpdater.execute();
         // Then
         assertThat(hasUpdated).isTrue();
     }
 
     @Test
-    public void execute_should_create_transaction_when_called_with_shouldCreateTransaction_set_to_true() throws Exception {
-        // Given
-        doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        Callable<Object> callable = Mockito.mock(Callable.class);
-        doReturn(callable).when(defaultProfilesUpdater).getUpdateProfilesCallable(any(File.class), anyString(), any(ExportedProfiles.class));
-        doReturn(null).when(transactionService).executeInTransaction(callable);
-        // When
-        defaultProfilesUpdater.execute(true);
-        // Then
-        verify(transactionService).executeInTransaction(callable);
-        verify(defaultProfilesUpdater, never()).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
-    }
-
-    @Test
-    public void execute_should_not_create_transaction_when_called_with_shouldCreateTransaction_set_to_false() throws Exception {
+    public void execute_call_doUpdateProfiles() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
         doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
         // When
-        defaultProfilesUpdater.execute(false);
+        defaultProfilesUpdater.execute();
         // Then
-        verify(transactionService, never()).executeInTransaction(any(Callable.class));
         verify(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
-    }
-
-    @Test
-    public void getUpdateProfilesCallable_callable_should_call_do_update() throws Exception {
-        // Given
-        String defaultProfilesXml = "the XML";
-        // When
-        defaultProfilesUpdater.getUpdateProfilesCallable(md5File, defaultProfilesXml, defaultProfiles).call();
-        // Then
-        verify(defaultProfilesUpdater).doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
     }
 
     @Test
