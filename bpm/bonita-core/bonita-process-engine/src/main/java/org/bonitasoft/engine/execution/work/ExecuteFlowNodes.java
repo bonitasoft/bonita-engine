@@ -81,7 +81,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
                         if (logger.isLoggable(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO)) {
                             logger.log(RestartFlowNodesHandler.class, TechnicalLogSeverity.INFO, "Flownode with name = <" + flowNodeInstance.getName()
                                     + ">, and id = <" + flowNodeInstance.getId() + "> in state = <" + flowNodeInstance.getStateName()
-                                    + "> does not fullfill the restart conditions.");
+                                    + "> does not fulfill the restart conditions.");
                         }
                     }
                 }

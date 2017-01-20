@@ -37,7 +37,9 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class RestartFlowNodesHandler implements TenantRestartHandler {
 
-    final Map<Long, List<Long>> flownodesToRestartByTenant = new HashMap<Long, List<Long>>();
+    //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
+    //It should not be a singleton but have a factory to create it
+    final Map<Long, List<Long>> flownodesToRestartByTenant = new HashMap<>();
 
     @Override
     public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
@@ -45,7 +47,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         try {
             final long tenantId = tenantServiceAccessor.getTenantId();
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-            final ArrayList<Long> flownodesToRestart = new ArrayList<Long>();
+            final ArrayList<Long> flownodesToRestart = new ArrayList<>();
             flownodesToRestartByTenant.put(tenantId, flownodesToRestart);
             final FlowNodeInstanceService flowNodeInstanceService = tenantServiceAccessor.getActivityInstanceService();
 
@@ -85,7 +87,8 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         try {
             final Iterator<Long> iterator = flownodesIds.iterator();
             do {
-                transactionService.executeInTransaction(new ExecuteFlowNodes(tenantServiceAccessor, iterator));
+                final ExecuteFlowNodes callable = new ExecuteFlowNodes(tenantServiceAccessor, iterator);
+                transactionService.executeInTransaction(callable);
             } while (iterator.hasNext());
         } catch (final Exception e) {
             throw new RestartException("Unable to restart elements", e);
