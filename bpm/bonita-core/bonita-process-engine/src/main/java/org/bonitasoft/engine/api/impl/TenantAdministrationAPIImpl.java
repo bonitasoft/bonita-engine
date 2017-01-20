@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +36,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.execution.work.TenantRestarter;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -52,9 +52,7 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
@@ -158,13 +156,16 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             throws UpdateException {
         // clustered services
         try {
-            beforeServiceStartOfRestartHandlersOfTenant(platformServiceAccessor, tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+            TenantRestarter tenantRestarter = new TenantRestarter(platformServiceAccessor, tenantServiceAccessor);
+            List<TenantRestartHandler> tenantRestartHandlers = tenantRestarter.executeBeforeServicesStart();
             resumeScheduler(platformServiceAccessor, tenantId);
 
             // on all nodes
             setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new ResumeServiceStrategy());
 
-            afterServiceStartOfRestartHandlersOfTenant(platformServiceAccessor, tenantId);
+            tenantRestarter
+                    .executeAfterServicesStartAfterCurrentTransaction(tenantRestartHandlers);
         } catch (final RestartException e) {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         } catch (final SSchedulerException e) {
@@ -174,43 +175,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
-            throws RestartException {
-        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlatformConfiguration();
-        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-        final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
-        for (final TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
-            tenantRestartHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);
-        }
-    }
-
-    private void afterServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException, STransactionNotFoundException {
-        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlatformConfiguration();
-        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-        final STenant tenant;
-        try {
-            tenant = platformServiceAccessor.getPlatformService().getTenant(tenantId);
-        } catch (STenantNotFoundException e) {
-            throw new RestartException("Unable to restart tenant", e);
-        }
-        platformServiceAccessor.getTransactionService().registerBonitaSynchronization(new BonitaTransactionSynchronization() {
-            @Override
-            public void beforeCommit() {
-
-            }
-
-            @Override
-            public void afterCompletion(TransactionState txState) {
-                if(txState.equals(TransactionState.COMMITTED)) {
-                    new StarterThread(platformServiceAccessor, nodeConfiguration, Arrays.asList(tenant),
-                            tenantServiceAccessor.getSessionAccessor(), tenantServiceAccessor.getTechnicalLoggerService()).start();
-                }
-            }
-        });
-    }
-
-    // In Protected for unit tests
-    protected void setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(final PlatformServiceAccessor platformServiceAccessor, final long tenantId,
+    // In package private for unit tests
+    void setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(final PlatformServiceAccessor platformServiceAccessor, final long tenantId,
             final ServiceStrategy serviceStrategy) throws UpdateException {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
         final SetServiceState setServiceState = new SetServiceState(tenantId, serviceStrategy);

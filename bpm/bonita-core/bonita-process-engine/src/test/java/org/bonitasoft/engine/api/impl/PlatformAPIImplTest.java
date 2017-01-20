@@ -19,6 +19,8 @@ import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.eq;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -140,10 +142,11 @@ public class PlatformAPIImplTest {
         doNothing().when(platformAPI).checkPlatformVersion(platformServiceAccessor);
         doNothing().when(platformAPI).startPlatformServices(platformServiceAccessor);
         doReturn(false).when(platformAPI).isNodeStarted();
-        doNothing().when(platformAPI).beforeServicesStartOfRestartHandlersOfTenant(platformServiceAccessor, sessionAccessor, tenants);
+        doReturn(Collections.singletonMap(sTenant, Collections.emptyList())).when(platformAPI)
+                .beforeServicesStartOfRestartHandlersOfTenant(platformServiceAccessor, sessionAccessor, tenants);
         doNothing().when(platformAPI).startServicesOfTenants(platformServiceAccessor, sessionAccessor, tenants);
         doNothing().when(platformAPI).restartHandlersOfPlatform(platformServiceAccessor);
-        doNothing().when(platformAPI).afterServicesStartOfRestartHandlersOfTenant(platformServiceAccessor, sessionAccessor, tenants);
+        doNothing().when(platformAPI).afterServicesStartOfRestartHandlersOfTenant(eq(platformServiceAccessor), anyMap());
         doNothing().when(platformAPI).registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
 
         // When

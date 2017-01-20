@@ -113,6 +113,8 @@ public class RestartProcessHandler implements TenantRestartHandler {
         }
     }
 
+    //the handler is executed on one tenant only but we keep a map by tenant because this class is a singleton
+    //It should not be a singleton but have a factory to create it
     private final Map<Long, List<Long>> processInstancesByTenant = new HashMap<Long, List<Long>>();
 
     @Override
@@ -176,7 +178,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         final List<Long> list = processInstancesByTenant.get(tenantId);
         final Iterator<Long> iterator = list.iterator();
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + list.size() + " processes for tenant " + tenantId);
-        ExecuteProcesses exec = null;
+        ExecuteProcesses exec;
         try {
             do {
                 exec = new ExecuteProcesses(workService, logger, activityInstanceService, processDefinitionService, processInstanceService, processExecutor,

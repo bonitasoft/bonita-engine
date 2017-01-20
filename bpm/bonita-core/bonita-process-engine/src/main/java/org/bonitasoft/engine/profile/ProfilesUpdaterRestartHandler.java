@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -35,14 +37,22 @@ public class ProfilesUpdaterRestartHandler implements TenantRestartHandler {
     public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) {
         // Update default profiles (with a new transaction)
         try {
-            getProfileUpdater(platformServiceAccessor, tenantServiceAccessor).execute(true);
+            platformServiceAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
+
+                @Override
+                public Void call() throws Exception {
+                    getProfileUpdater(platformServiceAccessor, tenantServiceAccessor).execute();
+                    return null;
+                }
+            });
         } catch (Exception e) {
             tenantServiceAccessor.getTechnicalLoggerService().log(ProfilesUpdaterRestartHandler.class, TechnicalLogSeverity.ERROR,
-                "Unable to update default profiles", e);
+                    "Unable to update default profiles", e);
         }
     }
 
-    protected DefaultProfilesUpdater getProfileUpdater(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) {
+    protected DefaultProfilesUpdater getProfileUpdater(final PlatformServiceAccessor platformServiceAccessor,
+            final TenantServiceAccessor tenantServiceAccessor) {
         return new DefaultProfilesUpdater(platformServiceAccessor, tenantServiceAccessor);
     }
 }

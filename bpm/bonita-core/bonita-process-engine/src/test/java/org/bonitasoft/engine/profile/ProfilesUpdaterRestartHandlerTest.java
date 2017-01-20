@@ -13,11 +13,17 @@
  **/
 package org.bonitasoft.engine.profile;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
+import java.util.concurrent.Callable;
+
+import org.bonitasoft.engine.execution.TransactionServiceMock;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -32,17 +38,36 @@ public class ProfilesUpdaterRestartHandlerTest {
     @Mock
     public TenantServiceAccessor tenantServiceAccessor;
     @Mock
-    public DefaultProfilesUpdater defaultProfilesUpdater;
-
+    private DefaultProfilesUpdater defaultProfilesUpdater;
+    @Mock
+    private TechnicalLoggerService technicalLoggerService;
     @Spy
-    ProfilesUpdaterRestartHandler profilesUpdaterRestartHandler;
+    private ProfilesUpdaterRestartHandler profilesUpdaterRestartHandler;
+
+    @Before
+    public void before() throws Exception {
+        doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
+    }
 
     @Test
     public void should_execute_default_profiles_update_after_service_start() throws Exception {
+        doReturn(new TransactionServiceMock()).when(platformServiceAccessor).getTransactionService();
         doReturn(defaultProfilesUpdater).when(profilesUpdaterRestartHandler).getProfileUpdater(platformServiceAccessor, tenantServiceAccessor);
 
         profilesUpdaterRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
 
-        verify(defaultProfilesUpdater).execute(true);
+        verify(defaultProfilesUpdater).execute();
     }
+
+    @Test
+    public void should_execute_in_transaction() throws Exception {
+        TransactionService transactionService = mock(TransactionService.class);
+        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
+        doReturn(defaultProfilesUpdater).when(profilesUpdaterRestartHandler).getProfileUpdater(platformServiceAccessor, tenantServiceAccessor);
+
+        profilesUpdaterRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
+
+        verify(transactionService).executeInTransaction(any(Callable.class));
+    }
+
 }

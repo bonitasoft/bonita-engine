@@ -55,6 +55,7 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.execution.work.TenantRestarter;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -187,9 +188,10 @@ public class PlatformAPIImpl implements PlatformAPI {
                 final List<STenant> tenants = getTenants(platformAccessor);
                 startPlatformServices(platformAccessor);
                 final boolean mustRestartElements = !isNodeStarted();
+                Map<STenant, List<TenantRestartHandler>> restartHandlersOfTenant = null;
                 if (mustRestartElements) {
                     // restart handlers of tenant are executed before any service start
-                    beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
+                    restartHandlersOfTenant = beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
                 }
                 startServicesOfTenants(platformAccessor, sessionAccessor, tenants);
                 if (mustRestartElements) {
@@ -198,7 +200,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
                 isNodeStarted = true;
                 if (mustRestartElements) {
-                    afterServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
+                    afterServicesStartOfRestartHandlersOfTenant(platformAccessor, restartHandlersOfTenant);
                 }
                 registerMissingTenantsDefaultJobs(platformAccessor, sessionAccessor, tenants);
 
@@ -279,11 +281,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createSessionAccessor();
     }
 
-    void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-            final List<STenant> tenants) {
+    void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor,
+            final Map<STenant, List<TenantRestartHandler>> tenantRestartHandlersOfTenants) {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
-
         if (platformConfiguration.shouldResumeElements()) {
             // Here get all elements that are not "finished"
             // * FlowNodes that have flag: stateExecuting to true: call execute on them (connectors were executing)
@@ -291,16 +291,19 @@ public class PlatformAPIImpl implements PlatformAPI {
             // * transitions that are in state created: call execute on them
             // * flow node that are completed and not deleted : call execute to make it create transitions and so on
             // * all element that are in not stable state
-            new StarterThread(platformAccessor, platformConfiguration, tenants, sessionAccessor, technicalLoggerService)
-                    .start();
+            for (Entry<STenant, List<TenantRestartHandler>> tenantRestartHandlers : tenantRestartHandlersOfTenants.entrySet()) {
+                TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantRestartHandlers.getKey().getId());
+                new TenantRestarter(platformAccessor, tenantServiceAccessor).executeAfterServicesStart(tenantRestartHandlers.getValue());
+            }
 
         }
     }
 
-    void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
+    Map<STenant, List<TenantRestartHandler>> beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor,
+            final SessionAccessor sessionAccessor,
             final List<STenant> tenants) throws Exception {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-
+        Map<STenant, List<TenantRestartHandler>> restartHandlers = new HashMap<>();
         if (platformConfiguration.shouldResumeElements()) {
             // Here get all elements that are not "finished"
             // * FlowNodes that have flag: stateExecuting to true: call execute on them (connectors were executing)
@@ -319,7 +322,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         sessionAccessor.deleteSessionId();
                         sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
 
-                        beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, tenantId);
+                        restartHandlers.put(tenant, beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, tenantId));
                     } finally {
                         sessionService.deleteSession(sessionId);
                         cleanSessionAccessor(sessionAccessor, platformSessionId);
@@ -327,13 +330,14 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
             }
         }
+        return restartHandlers;
     }
 
     void restartHandlersOfPlatform(final PlatformServiceAccessor platformAccessor) throws Exception {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
 
-            platformAccessor.getTransactionService().executeInTransaction( () -> {
+            platformAccessor.getTransactionService().executeInTransaction(() -> {
                 restartHandler.execute();
                 return null;
             });
@@ -428,17 +432,19 @@ public class PlatformAPIImpl implements PlatformAPI {
         return platformConfiguration.getLifecycleServices();
     }
 
-    private void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final long tenantId) throws Exception {
-        final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
+    private List<TenantRestartHandler> beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final long tenantId)
+            throws Exception {
         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
-        for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
-            final Callable<Void> callable = () -> {
-                restartHandler.beforeServicesStart(platformAccessor, tenantServiceAccessor);
-                return null;
-            };
-            tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
-        }
+        final Callable<List<TenantRestartHandler>> callable = new Callable<List<TenantRestartHandler>>() {
+
+            @Override
+            public List<TenantRestartHandler> call() throws Exception {
+                return new TenantRestarter(platformAccessor, tenantServiceAccessor).executeBeforeServicesStart();
+            }
+        };
+        return tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
+
     }
 
     List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
@@ -609,7 +615,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
             // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
-            new DefaultProfilesUpdater(platformAccessor, tenantServiceAccessor).execute(false);
+            new DefaultProfilesUpdater(platformAccessor, tenantServiceAccessor).execute();
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
 
@@ -690,11 +696,10 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private void activateDefaultTenant() throws STenantActivationException {
         // TODO : Reduce number of transactions
-        PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
         try {
-            platformAccessor = getPlatformAccessor();
+            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             sessionAccessor = createSessionAccessor();
             STenant defaultTenant = getDefaultTenant();
             final long tenantId = defaultTenant.getId();

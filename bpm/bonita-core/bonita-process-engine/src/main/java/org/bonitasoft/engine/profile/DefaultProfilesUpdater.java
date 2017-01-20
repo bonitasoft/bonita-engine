@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -27,7 +26,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * Class that creates and updates default profiles<br/>
@@ -50,11 +48,10 @@ public class DefaultProfilesUpdater {
     /**
      * Executes a default profile update
      * 
-     * @param shouldCreateTransaction whether or not a new transaction is created to execute updater
      * @return whether the default profiles where updated
      * @throws Exception if execution fails
      */
-    public boolean execute(final boolean shouldCreateTransaction) throws Exception {
+    public boolean execute() throws Exception {
         try {
             final File md5File = getProfilesMD5File();
             final String defaultProfilesXml = getDefaultProfilesXml();
@@ -63,12 +60,7 @@ public class DefaultProfilesUpdater {
                 tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                         "Default profiles not up to date, updating them...");
                 final ExportedProfiles defaultProfiles = getProfilesFromXML(defaultProfilesXml);
-                if (shouldCreateTransaction) {
-                    final TransactionService transactionService = platformServiceAccessor.getTransactionService();
-                    transactionService.executeInTransaction(getUpdateProfilesCallable(md5File, defaultProfilesXml, defaultProfiles));
-                } else {
-                    doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
-                }
+                doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
                 return true;
             } else {
                 // No update required
@@ -85,17 +77,6 @@ public class DefaultProfilesUpdater {
                     "Unable to update default profiles", e);
         }
         return false;
-    }
-
-    Callable<Object> getUpdateProfilesCallable(final File md5File, final String defaultProfilesXml, final ExportedProfiles defaultProfiles) {
-        return new Callable<Object>() {
-
-            @Override
-            public Object call() throws Exception {
-                return doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
-            }
-
-        };
     }
 
     Object doUpdateProfiles(final ExportedProfiles defaultProfiles, final File md5File, final String defaultProfilesXml)
