@@ -1079,7 +1079,6 @@
         <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="processResourcesService" ref="processResourcesService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-        <constructor-arg name="parserFactory" ref="parserFactory" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
