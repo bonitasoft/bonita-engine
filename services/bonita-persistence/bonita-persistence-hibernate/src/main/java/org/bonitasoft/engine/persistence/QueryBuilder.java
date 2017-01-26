@@ -30,17 +30,20 @@ import org.hibernate.Session;
 /**
  * @author Baptiste Mesta
  */
-class QueryBuilder {
+abstract class QueryBuilder {
 
     private final String baseQuery;
-    private StringBuilder stringQueryBuilder;
-    private Map<String, String> classAliasMappings;
+    StringBuilder stringQueryBuilder;
+    Map<String, String> classAliasMappings;
+    Map<String, Class<? extends PersistentObject>> interfaceToClassMapping;
     private String likeEscapeCharacter;
     private OrderByBuilder orderByBuilder;
 
-    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings, char likeEscapeCharacter) {
+    QueryBuilder(String baseQuery, OrderByBuilder orderByBuilder, Map<String, String> classAliasMappings,
+            Map<String, Class<? extends PersistentObject>> interfaceToClassMapping, char likeEscapeCharacter) {
         this.orderByBuilder = orderByBuilder;
         this.classAliasMappings = classAliasMappings;
+        this.interfaceToClassMapping = interfaceToClassMapping;
         this.likeEscapeCharacter = String.valueOf(likeEscapeCharacter);
         stringQueryBuilder = new StringBuilder(baseQuery);
         this.baseQuery = baseQuery;
@@ -199,7 +202,7 @@ class QueryBuilder {
         }
     }
 
-    private void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm,
+    void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm,
             final boolean enableWordSearch) {
         // Search if a sentence starts with the term
         queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
@@ -237,10 +240,10 @@ class QueryBuilder {
     /*
      * escape for other things than like
      */
-    private String escapeString(final String term) {
+    String escapeString(final String term) {
         // 1) escape ' character by adding another ' character
         return term
-                .replace("'", "''");
+                .replaceAll("'", "''");
     }
 
     private String getInClause(final StringBuilder completeField, final FilterOption filterOption) {
@@ -304,7 +307,7 @@ class QueryBuilder {
         return !baseQuery.equals(stringQueryBuilder.toString());
     }
 
-    Query buildQuery(Session session) {
-        return session.createQuery(stringQueryBuilder.toString());
-    }
+    abstract Query buildQuery(Session session);
+
+    public abstract void setTenantId(Query query, long tenantId);
 }
