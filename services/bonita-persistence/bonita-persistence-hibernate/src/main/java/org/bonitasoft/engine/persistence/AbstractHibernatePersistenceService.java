@@ -30,6 +30,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
@@ -424,24 +425,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    /**
-     * @param queryBuilder
-     * @param currentField
-     * @param currentTerm
-     * @param enableWordSearch
-     */
-    protected void buildLikeClauseForOneFieldOneTerm(final StringBuilder queryBuilder, final String currentField, final String currentTerm,
-            final boolean enableWordSearch) {
-        // Search if a sentence starts with the term
-        queryBuilder.append(currentField).append(buildLikeEscapeClause(currentTerm, "", "%"));
-
-        if (enableWordSearch) {
-            // Search also if a word starts with the term
-            // We do not want to search for %currentTerm% to ensure we can use Lucene-like library.
-            queryBuilder.append(" OR ").append(currentField).append(buildLikeEscapeClause(currentTerm, "% ", "%"));
-        }
-    }
-
     protected void setQueryCache(final Query query, final String name) {
         if (cacheQueries != null && cacheQueries.containsKey(name)) {
             query.setCacheable(true);
@@ -457,7 +440,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final Session session = getSession(true);
 
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-            QueryBuilder queryBuilder = new QueryBuilder(query.getQueryString(), orderByBuilder, classAliasMappings, likeEscapeCharacter);
+            QueryBuilder queryBuilder = new QueryBuilderFactory().createQueryBuilderFor(query, selectDescriptor.getEntityType(), orderByBuilder,
+                    classAliasMappings, interfaceToClassMapping,
+                    likeEscapeCharacter);
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
                 final boolean enableWordSearch = isWordSearchEnabled(selectDescriptor.getEntityType());
@@ -466,10 +451,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             if (selectDescriptor.hasOrderByParameters()) {
                 queryBuilder.appendOrderByClause(selectDescriptor.getQueryOptions().getOrderByOptions(), selectDescriptor.getEntityType());
             }
+
             if (queryBuilder.hasChanged()) {
                 query = queryBuilder.buildQuery(session);
             }
             setQueryCache(query, selectDescriptor.getQueryName());
+            try {
+                queryBuilder.setTenantId(query, getTenantId());
+            } catch (STenantIdNotSetException e) {
+                throw new SBonitaReadException(e);
+            }
             setParameters(query, selectDescriptor.getInputParameters());
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());

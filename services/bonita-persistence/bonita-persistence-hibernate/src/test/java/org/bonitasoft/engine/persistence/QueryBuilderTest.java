@@ -33,23 +33,28 @@ import org.junit.Test;
 public class QueryBuilderTest {
 
     private static final char LIKE_ESCAPE_CHARACTER = '§';
-    private Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
+    public Map<String, String> classAliasMappings = singletonMap(TestObject.class.getName(), "testObj");
+    public Map<String, Class<? extends PersistentObject>> interfaceToClassMapping = Collections
+            .singletonMap(TestObject.class.getName(), TestObject.class);
 
     @Test
     public void should_hasChanged_return_false_if_query_has_not_changed() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT TOTO FROM STUFF", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT TOTO FROM STUFF");
         //when
         //then
         assertThat(queryBuilder.hasChanged()).isFalse();
     }
 
+    private QueryBuilder createQueryBuilder(String baseQuery) {
+        return new HQLQueryBuilder(baseQuery, new DefaultOrderByBuilder(), classAliasMappings, interfaceToClassMapping,
+                LIKE_ESCAPE_CHARACTER);
+    }
+
     @Test
     public void should_hasChanged_return_true_if_query_has_changed() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT TOTO FROM STUFF", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT TOTO FROM STUFF");
         //when
         queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)), TestObject.class);
         //then
@@ -59,8 +64,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_order_by() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)), TestObject.class);
         //then
@@ -70,8 +74,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_multiple_order_by() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendOrderByClause(Arrays.asList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC),
                 new OrderByOption(TestObject.class, "id", OrderByType.ASC), new OrderByOption(TestObject.class, "lastName", OrderByType.DESC_NULLS_LAST)),
@@ -85,8 +88,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null, false);
         //then
@@ -96,8 +98,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_multiple_filters() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Arrays.asList(new FilterOption(TestObject.class, "age", 25), new FilterOption(TestObject.class, "lastname", "John")), null,
                 false);
@@ -108,9 +109,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_filter_on_query_containing_filters_already() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true", new DefaultOrderByBuilder(),
-                classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null, false);
         //then
@@ -120,9 +119,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_filter_and_order_clause() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true", new DefaultOrderByBuilder(),
-                classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj WHERE testObj.enabled = true");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", 12)), null, false);
         queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(TestObject.class, "theValue", OrderByType.ASC)), TestObject.class);
@@ -134,8 +131,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_search_term() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Collections.singletonList("toto"),
                 Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))), false);
@@ -147,8 +143,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_multiple_search_terms() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Arrays.asList("toto", "tata"),
                 Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))), false);
@@ -163,8 +158,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_search_term_with_word_search() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Collections.singletonList("toto"),
                 Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))), true);
@@ -183,12 +177,11 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_search_term_and_filters() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "field1", "tata")),
                 new SearchFields(Collections.singletonList("toto"),
-                        Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1", "field2"))),
+                        Collections.singletonMap(TestObject.class, aSet("field1", "field2"))),
                 false);
         //then
         assertThat(queryBuilder.getQuery()).isEqualTo(
@@ -198,8 +191,7 @@ public class QueryBuilderTest {
     @Test
     public void should_escape_special_chars_with_escape_character_in_filters() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "theValue", "the'value%with_special:_§§")), null, false);
         //then
@@ -209,11 +201,10 @@ public class QueryBuilderTest {
     @Test
     public void should_escape_special_chars_with_escape_character_in_search_terms() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
-        queryBuilder.appendFilters(Collections.<FilterOption> emptyList(), new SearchFields(Collections.singletonList("the'value%with_special:_§§"),
-                Collections.<Class<? extends PersistentObject>, Set<String>> singletonMap(TestObject.class, aSet("field1"))), false);
+        queryBuilder.appendFilters(Collections.emptyList(), new SearchFields(Collections.singletonList("the'value%with_special:_§§"),
+                Collections.singletonMap(TestObject.class, aSet("field1"))), false);
         //then
         assertThat(queryBuilder.getQuery())
                 .isEqualTo("SELECT testObj.* FROM test_object testObj WHERE (testObj.field1 LIKE 'the''value§%with§_special:§_§§§§%' ESCAPE '§')");
@@ -222,8 +213,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_greater_or_equals_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER_OR_EQUALS)), null,
                 false);
@@ -234,8 +224,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_greater_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.GREATER)), null,
                 false);
@@ -246,8 +235,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_less_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS)), null,
                 false);
@@ -256,10 +244,45 @@ public class QueryBuilderTest {
     }
 
     @Test
+    public void should_escapeString_escape_quote() {
+        final String s = createBaseQueryBuilder().escapeString("toto'toto");
+
+        assertThat(s).isEqualTo("toto''toto");
+    }
+
+    @Test
+    public void should_escapeString_do_not_escape_like_wildcard() {
+        final String s = createBaseQueryBuilder().escapeString("%to'to%t_oto%");
+
+        assertThat(s).isEqualTo("%to''to%t_oto%");
+    }
+
+    private QueryBuilder createBaseQueryBuilder() {
+        return createQueryBuilder("SELECT testObj.* FROM test_object testObj");
+    }
+
+    @Test
+    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_enabled() {
+        final StringBuilder queryBuilder = new StringBuilder();
+        createBaseQueryBuilder().buildLikeClauseForOneFieldOneTerm(queryBuilder, "myField", "foo", true);
+
+        assertThat(queryBuilder.toString())
+                .as("query should contains like to check if the field start with foo and if the field contains a word starting by foo")
+                .contains("LIKE 'foo%'").contains("LIKE '% foo%'");
+    }
+
+    @Test
+    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_not_enabled() {
+        final StringBuilder queryBuilder = new StringBuilder();
+        createBaseQueryBuilder().buildLikeClauseForOneFieldOneTerm(queryBuilder, "myField", "foo", false);
+
+        assertThat(queryBuilder.toString()).contains("LIKE 'foo%'").doesNotContain("LIKE '% foo%'");
+    }
+
+    @Test
     public void should_generate_query_with_less_or_equals_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.LESS_OR_EQUALS)), null,
                 false);
@@ -270,8 +293,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_different_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, FilterOperationType.DIFFERENT)), null,
                 false);
@@ -282,8 +304,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_between_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "age", 25, 27)), null,
                 false);
@@ -294,8 +315,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_in_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         FilterOption age = new FilterOption(TestObject.class, "age");
         age.setIn(Arrays.asList(25, 26, 27));
@@ -310,8 +330,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_parenthesis_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Arrays.asList(new FilterOption(TestObject.class, "age", 12),
                 new FilterOption(FilterOperationType.AND),
@@ -329,8 +348,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_like_filter() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "lastname", "jack", FilterOperationType.LIKE)), null,
                 false);
@@ -341,8 +359,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_equals_filter_and_null_value() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "lastname", null, FilterOperationType.EQUALS)), null,
                 false);
@@ -353,8 +370,7 @@ public class QueryBuilderTest {
     @Test
     public void should_generate_query_with_filter_having_convertible_value() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendFilters(Collections.singletonList(new FilterOption(TestObject.class, "lastname", TEST_ENUM.TEST1, FilterOperationType.EQUALS)), null,
                 false);
@@ -365,8 +381,7 @@ public class QueryBuilderTest {
     @Test(expected = SBonitaReadException.class)
     public void should_throw_exception_if_class_is_not_mapped_in_filters() throws Exception {
         //given
-        QueryBuilder queryBuilder = new QueryBuilder("SELECT testObj.* FROM test_object testObj", new DefaultOrderByBuilder(), classAliasMappings,
-                LIKE_ESCAPE_CHARACTER);
+        QueryBuilder queryBuilder = createQueryBuilder("SELECT testObj.* FROM test_object testObj");
         //when
         queryBuilder.appendOrderByClause(Collections.singletonList(new OrderByOption(PersistentObject.class, "theValue", OrderByType.ASC)),
                 PersistentObject.class);

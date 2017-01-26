@@ -174,7 +174,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             boolean hasFilters = filters != null && !filters.isEmpty();
             String baseQuery = "DELETE FROM " + entityClassName + " " + (hasFilters ? getClassAliasMappings().get(entityClassName) : "")
                     + " WHERE tenantId= :tenantId";
-            QueryBuilder queryBuilder = new QueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(), likeEscapeCharacter);
+            QueryBuilder queryBuilder = new HQLQueryBuilder(baseQuery, orderByBuilder, getClassAliasMappings(), interfaceToClassMapping, likeEscapeCharacter);
             if (hasFilters) {
                 queryBuilder.appendFilters(filters, null, enableWordSearch);
             }
