@@ -38,7 +38,7 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 @RunWith(MockitoJUnitRunner.class)
 public class IsProcessInitiatorRuleTest extends RuleTest {
