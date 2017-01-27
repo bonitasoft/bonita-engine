@@ -23,7 +23,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 public class IsTaskPerformerRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 

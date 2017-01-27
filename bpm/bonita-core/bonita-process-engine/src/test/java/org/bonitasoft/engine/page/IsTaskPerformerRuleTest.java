@@ -35,7 +35,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 @RunWith(MockitoJUnitRunner.class)
 public class IsTaskPerformerRuleTest extends RuleTest {

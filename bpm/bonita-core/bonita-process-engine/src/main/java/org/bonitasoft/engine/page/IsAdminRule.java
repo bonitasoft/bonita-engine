@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * author Emmanuel Duchastenier, Anthony Birembaut
+ * @author Emmanuel Duchastenier, Anthony Birembaut
  */
 public class IsAdminRule implements AuthorizationRule {
 

@@ -25,7 +25,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 
 /**
- * author Emmanuel Duchastenier, Anthony Birembaut
+ * @author Emmanuel Duchastenier, Anthony Birembaut
  */
 public class IsProcessOwnerRule implements AuthorizationRule {
 
