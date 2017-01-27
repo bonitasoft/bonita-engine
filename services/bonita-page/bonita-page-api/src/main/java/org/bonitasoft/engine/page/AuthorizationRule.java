@@ -29,7 +29,7 @@ public interface AuthorizationRule {
      * 
      * @param key the page mapping key
      * @param context the information necessary to execute this rule.
-     * @return true if allowed, false otherwise.If determination cannot be fullfilled, an Exception should be thrown.
+     * @return true if allowed, false otherwise.If determination cannot be fulfilled, an Exception should be thrown.
      * @throws SExecutionException exception thrown if authorization cannot be determined.
      */
     boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException;
