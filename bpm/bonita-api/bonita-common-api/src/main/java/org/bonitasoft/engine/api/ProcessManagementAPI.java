@@ -46,10 +46,12 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -59,6 +61,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -893,38 +896,28 @@ public interface ProcessManagementAPI {
      * file names pattern. The pattern format must be relative to the root of the business archive, without starting with a '/' character. The pattern can
      * contain forward slashes after the first character.
      * eg. if you have an image in resources/folder/image.jpg in your bar file, you can call:
-     * 
      * <pre>
      * processAPI.getProcessResources(processDefinitionId, "resources/folder/image.jpg");
      * </pre>
-     * 
      * to retrieve a map with one entry: the key is the path of the resource, the value is the binary content of the resource.
-     * 
      * <pre>
      * eg.processAPI().getProcessResources(processDefinitionId, ".{@literal *}/.*\\.txt")
      * </pre>
-     * 
      * would retrieve all .txt files in a first-level subfolder. The key in the map is the path for each matching resource.
      * <p>
      * <u>Note</u> that this method is <b>expensive</b>, as it rebuilds the business archive with all its resources. If you need to retrieve several resources,
      * instead of calling this method several times, consider using the following code:
-     * 
-     * <pre>
-     *{@code
+     * <pre> {@code
      *
      *      final BusinessArchive businessArchive = BusinessArchiveFactory
      *          .readBusinessArchive(new ByteArrayInputStream(getProcessAPI().exportBarProcessContentUnderHome(processDefinitionId)));
-     *      // loop here if needed:
-     *      for (String myPattern : myPatterns) {
-     *          Map<String, byte[]> myResources = businessArchive.getResources(myPattern);
-     *          // deal with myResources here
-     *      }
-     *
-     * }
+     *      // loop here if needed: for (String myPattern : myPatterns)
+     * Map<String, byte[]> myResources = businessArchive.getResources(myPattern);
+     * // deal with myResources here
+     * } }
      * </pre>
-     * 
      * </p>
-     * 
+     *
      * @param processDefinitionId
      *        The identifier of the process definition.
      * @param filenamesPattern
@@ -1024,7 +1017,8 @@ public interface ProcessManagementAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of processes which have been recently started by the user.
      * @throws SearchException
      *         If an exception occurs when getting the processes.
@@ -1038,7 +1032,8 @@ public interface ProcessManagementAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of processes that the user can start.
      * @throws SearchException
      *         If an exception occurs when getting the processes.
@@ -1050,7 +1045,8 @@ public interface ProcessManagementAPI {
      * Searches for the number and the list of process definitions.
      *
      * @param searchOptions
-     *        The criterion used to search ProcessDeploymentInfo.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return matching process deployment information results.
      * @throws SearchException
      *         If an exception occurs when getting the processes.
@@ -1090,7 +1086,8 @@ public interface ProcessManagementAPI {
      * Searches for the number and the list of uncategorized processes.
      *
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of uncategorized processes.
      * @throws SearchException
      *         If an exception occurs when searching the process deployment information.
@@ -1104,7 +1101,8 @@ public interface ProcessManagementAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of uncategorized processes.
      * @throws SearchException
      *         If an exception occurs when searching the process deployment information.
@@ -1118,7 +1116,8 @@ public interface ProcessManagementAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of uncategorized processes that the user can start.
      * @throws SearchException
      *         If an exception occurs when searching the process deployment information.
@@ -1328,7 +1327,8 @@ public interface ProcessManagementAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of processes supervised by the user.
      * @throws SearchException
      *         If an exception occurs when getting the process deployment information.
@@ -1341,7 +1341,8 @@ public interface ProcessManagementAPI {
      * @param managerUserId
      *        The identifier of the manager.
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessDeploymentInfoSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return
      *         The list of process definitions that have at least one initiator who is mapped to a user to who reports to the specified manager.
      * @throws SearchException
@@ -1487,7 +1488,8 @@ public interface ProcessManagementAPI {
      * Searches for the number and the list of processes supervisors.
      *
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use ProcessSupervisorSearchDescriptor constants
+     * @see ProcessSupervisorSearchDescriptor
      * @return The number and the list of processes supervisors.
      * @throws SearchException
      *         If an exception occurs when getting the processes supervisors.
@@ -1543,7 +1545,8 @@ public interface ProcessManagementAPI {
      * @param processDefinitionId
      *        The identifier of the process definition.
      * @param searchOptions
-     *        The search criteria.
+     *        The search criteria. Use UserSearchDescriptor constants
+     * @see ProcessDeploymentInfoSearchDescriptor
      * @return The number and the list of users who can start the process.
      * @throws SearchException
      *         If an exception occurs when getting the users.
@@ -1705,7 +1708,8 @@ public interface ProcessManagementAPI {
      * Search for form mapping
      *
      * @param searchOptions
-     *        search options to search for form mapping
+     *        The search criteria. Use FormMappingSearchDescriptor constants
+     * @see FormMappingSearchDescriptor
      * @return the result of the search
      * @see org.bonitasoft.engine.form.FormMappingSearchDescriptor
      * @see org.bonitasoft.engine.form.FormMappingType
