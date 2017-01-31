@@ -29,13 +29,13 @@ import org.junit.Test;
 
 public class GetNumberOfActorsTest {
 
-    static ProcessDefinitionService processDefinitionService;
-    static SProcessDefinition definition;
-    static GetNumberOfActors getNumberOfActors;
+    private static ProcessDefinitionService processDefinitionService;
+    private static SProcessDefinition definition;
+    private static GetNumberOfActors getNumberOfActors;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        processDefinitionService  = mock(ProcessDefinitionService.class);
+        processDefinitionService = mock(ProcessDefinitionService.class);
         definition = mock(SProcessDefinition.class);
         getNumberOfActors = new GetNumberOfActors(processDefinitionService, 1);
         when(processDefinitionService.getProcessDefinition(1)).thenReturn(definition);
