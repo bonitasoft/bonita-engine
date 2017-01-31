@@ -28,29 +28,16 @@ public class GetTenantInstance implements TransactionContentWithResult<STenant> 
 
     private final PlatformService platformService;
 
-    private final String tenantName;
-
     private final long tenantId;
-
-    public GetTenantInstance(final String tenantName, final PlatformService platformService) {
-        this.tenantName = tenantName;
-        this.platformService = platformService;
-        tenantId = -1;
-    }
 
     public GetTenantInstance(final long tenantId, final PlatformService platformService) {
         this.tenantId = tenantId;
         this.platformService = platformService;
-        tenantName = null;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        if (tenantName == null) {
-            sTenant = platformService.getTenant(tenantId);
-        } else {
-            sTenant = platformService.getTenantByName(tenantName);
-        }
+        sTenant = platformService.getTenant(tenantId);
     }
 
     @Override

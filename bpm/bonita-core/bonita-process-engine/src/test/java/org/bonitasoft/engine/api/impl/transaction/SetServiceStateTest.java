@@ -14,13 +14,7 @@
 package org.bonitasoft.engine.api.impl.transaction;
 
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 
@@ -32,59 +26,62 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SetServiceStateTest {
+
+    @Mock
+    private PlatformServiceAccessor platformServiceAccessor;
+    @Mock
+    private TenantServiceAccessor tenantServiceAccessor;
+    @Mock
+    private DependencyService dependencyService;
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+    @Mock
+    private ServiceStrategy serviceStrategy;
+    private SetServiceState setServiceState;
+    public static final long TENANT_ID = 635434L;
+
+    @Before
+    public void before() throws Exception {
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
+
+        when(tenantServiceAccessor.getClassLoaderService()).thenReturn(mock(ClassLoaderService.class));
+        when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(mock(TenantConfiguration.class));
+        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
+        when(tenantServiceAccessor.getDependencyService()).thenReturn(dependencyService);
+        when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        setServiceState = spy(new SetServiceState(platformServiceAccessor, TENANT_ID, serviceStrategy));
+        doReturn(true).when(serviceStrategy).shouldRefreshClassLoaders();
+    }
 
     @Test
     public void callShouldRefreshClassloaderOnCurrentTenant() throws Exception {
         // given:
-        long tenantId = 635434L;
-        ServiceStrategy mock = mock(ServiceStrategy.class);
-        doReturn(true).when(mock).shouldRefreshClassLoaders();
-        SetServiceState setServiceState = spy(new SetServiceState(tenantId, mock));
-        PlatformServiceAccessor platformAccessor = mock(PlatformServiceAccessor.class);
-        TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
-        DependencyService dependencyService = mock(DependencyService.class);
-        doReturn(platformAccessor).when(setServiceState).getPlatformAccessor();
-        doNothing().when(setServiceState).refreshClassloaderOfProcessDefinitions(tenantAccessor);
-        when(platformAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantAccessor);
+        doNothing().when(setServiceState).refreshClassloaderOfProcessDefinitions(tenantServiceAccessor);
 
         // Usefull only for test / mock purposes:
-        when(tenantAccessor.getClassLoaderService()).thenReturn(mock(ClassLoaderService.class));
-        when(tenantAccessor.getTenantConfiguration()).thenReturn(mock(TenantConfiguration.class));
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
-        when(tenantAccessor.getDependencyService()).thenReturn(dependencyService);
 
         // when:
         setServiceState.call();
 
         // then:
-        verify(dependencyService).refreshClassLoader(ScopeType.TENANT, tenantId);
+        verify(dependencyService).refreshClassLoader(ScopeType.TENANT, TENANT_ID);
     }
 
     @Test
     public void callShouldRefreshClassloaderOfProcesses() throws Exception {
         // given:
-        long tenantId = 635434L;
-        ServiceStrategy mock = mock(ServiceStrategy.class);
-        doReturn(true).when(mock).shouldRefreshClassLoaders();
-        SetServiceState setServiceState = spy(new SetServiceState(tenantId, mock));
-        PlatformServiceAccessor platformAccessor = mock(PlatformServiceAccessor.class);
-        TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
-        DependencyService dependencyService = mock(DependencyService.class);
-        ProcessDefinitionService processDefinitionService = mock(ProcessDefinitionService.class);
-        doReturn(platformAccessor).when(setServiceState).getPlatformAccessor();
-        when(platformAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantAccessor);
         InOrder order = inOrder(dependencyService);
 
         // Usefull only for test / mock purposes:
-        when(tenantAccessor.getClassLoaderService()).thenReturn(mock(ClassLoaderService.class));
-        when(tenantAccessor.getTenantConfiguration()).thenReturn(mock(TenantConfiguration.class));
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
-        when(tenantAccessor.getDependencyService()).thenReturn(dependencyService);
-        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         doReturn(Arrays.asList(1L, 2L)).when(processDefinitionService).getProcessDefinitionIds(anyInt(), anyInt());
 
         // when:

@@ -107,7 +107,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
-
     static boolean isNodeStarted = false;
 
     public PlatformAPIImpl() {
@@ -236,7 +235,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         for (final STenant tenant : tenants) {
             long platformSessionId = -1;
             try {
-                final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenant.getId());
+                final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
 
                 final long sessionId = createSession(tenant.getId(), tenantServiceAccessor.getSessionService());
                 platformSessionId = sessionAccessor.getSessionId();
@@ -352,23 +351,26 @@ public class PlatformAPIImpl implements PlatformAPI {
         if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
             schedulerService.initializeScheduler();
             addPlatformJobListeners(platformAccessor, schedulerService);
-            addTenantJobListeners(tenants, schedulerService);
+            addTenantJobListeners(platformAccessor, tenants, schedulerService);
             schedulerService.start();
         }
     }
 
-    private void addTenantJobListeners(final List<STenant> tenants, final SchedulerService schedulerService) throws SBonitaException,
+    private void addTenantJobListeners(PlatformServiceAccessor platformAccessor, final List<STenant> tenants, final SchedulerService schedulerService)
+            throws SBonitaException,
             BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException, ClassNotFoundException {
         for (STenant tenant : tenants) {
-            addTenantJobListener(schedulerService, tenant.getId());
+            addTenantJobListener(platformAccessor, schedulerService, tenant.getId());
         }
     }
 
-    private void addTenantJobListener(final SchedulerService schedulerService, final long tenantId) throws SBonitaException, BonitaHomeNotSetException,
+    private void addTenantJobListener(PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService, final long tenantId)
+            throws SBonitaException, BonitaHomeNotSetException,
             IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
             ClassNotFoundException {
-        final List<AbstractBonitaTenantJobListener> jobListeners = getTenantServiceAccessor(tenantId).getTenantConfiguration().getJobListeners();
+        final List<AbstractBonitaTenantJobListener> jobListeners = platformAccessor.getTenantServiceAccessor(tenantId).getTenantConfiguration()
+                .getJobListeners();
         TenantJobListenerManager tenantJobListenerManager = new TenantJobListenerManager(schedulerService);
         tenantJobListenerManager.registerListeners(jobListeners, tenantId);
     }
@@ -391,7 +393,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     platformSessionId = sessionAccessor.getSessionId();
                     sessionAccessor.deleteSessionId();
                     sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
-                    final SetServiceState startService = new SetServiceState(tenantId, new StartServiceStrategy());
+                    final SetServiceState startService = new SetServiceState(platformAccessor, tenantId, new StartServiceStrategy());
                     platformAccessor.getTransactionService().executeInTransaction(startService);
                 } finally {
                     sessionService.deleteSession(sessionId);
@@ -453,12 +455,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         return transactionService.executeInTransaction(new GetTenantsCallable(platformService));
     }
 
-    protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
-            ClassNotFoundException {
-        return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
-    }
-
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
@@ -479,7 +475,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     tenantServiceAccessor.getSessionService().deleteSessions();
                 }
                 // stop the tenant services:
-                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
+                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(platformAccessor, tenant.getId(), new StopServiceStrategy()));
             }
             for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStop) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
@@ -654,7 +650,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         return properties.getProperty("userName");
     }
 
-    private void deleteTenant(final long tenantId) throws STenantDeletionException {
+    void deleteTenant(final long tenantId) throws STenantDeletionException {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor;
         try {
@@ -675,7 +671,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
             // stop the tenant services:
-            final SetServiceState stopService = new SetServiceState(tenantId, new StopServiceStrategy());
+            final SetServiceState stopService = new SetServiceState(platformAccessor, tenantId, new StopServiceStrategy());
             platformAccessor.getTransactionService().executeInTransaction(stopService);
 
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);
@@ -719,7 +715,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
             final long sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
 
-            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, platformAccessor.getTechnicalLoggerService(),
                     tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor(), platformConfiguration,
                     tenantServiceAccessor.getTenantConfiguration());
@@ -749,11 +745,9 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @Override
     @AvailableOnStoppedNode
-    @CustomTransactions
     public boolean isPlatformInitialized() throws PlatformNotFoundException {
         try {
-            final PlatformService platformService = getPlatformAccessor().getPlatformService();
-            return getPlatformAccessor().getTransactionService().executeInTransaction(platformService::isDefaultTenantCreated);
+            return getPlatformAccessor().getPlatformService().isDefaultTenantCreated();
         } catch (final Exception e) {
             throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
         }
