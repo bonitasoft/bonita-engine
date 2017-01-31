@@ -24,16 +24,22 @@ import static org.mockito.Mockito.eq;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobRegister;
@@ -43,7 +49,14 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionCommitException;
+import org.bonitasoft.engine.transaction.STransactionCreationException;
+import org.bonitasoft.engine.transaction.STransactionException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,39 +71,28 @@ public class PlatformAPIImplTest {
     public static final long TENANT_ID = 56423L;
     @Mock
     private PlatformServiceAccessor platformServiceAccessor;
-
     @Mock
     private SchedulerService schedulerService;
-
     @Mock
     private SessionService sessionService;
-
     @Mock
     private SessionAccessor sessionAccessor;
-
     @Mock
     private NodeConfiguration platformConfiguration;
-
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
-
     @Mock
     private TenantConfiguration tenantConfiguration;
     @Mock
     private BonitaHomeServer bonitaHomeServer;
-
     @Mock
     private PlatformService platformService;
-
     @Mock
     private STenant sTenant;
-
     private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
-
     private final List<AbstractBonitaTenantJobListener> tenantJobListeners = Collections.singletonList(mock(AbstractBonitaTenantJobListener.class));
-
     private final List<AbstractBonitaPlatformJobListener> platformJobListeners = Collections.singletonList(mock(AbstractBonitaPlatformJobListener.class));
-
+    private TransactionService transactionService = new MockedTransactionService();
     @Spy
     @InjectMocks
     private PlatformAPIImpl platformAPI;
@@ -99,6 +101,10 @@ public class PlatformAPIImplTest {
     public void setup() throws Exception {
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
+        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
+        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
+        doReturn(transactionService).when(platformServiceAccessor).getTransactionExecutor();
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
         doReturn(platformJobListeners).when(platformConfiguration).getJobListeners();
 
         doReturn(schedulerService).when(tenantServiceAccessor).getSchedulerService();
@@ -108,7 +114,6 @@ public class PlatformAPIImplTest {
 
         doReturn(platformServiceAccessor).when(platformAPI).getPlatformAccessor();
         doReturn(sessionAccessor).when(platformAPI).createSessionAccessor();
-        doReturn(tenantServiceAccessor).when(platformAPI).getTenantServiceAccessor(anyLong());
         doReturn(-1L).when(platformAPI).createSession(anyLong(), any(SessionService.class));
         doReturn(tenants).when(platformAPI).getTenants(platformServiceAccessor);
         doReturn(bonitaHomeServer).when(platformAPI).getBonitaHomeServerInstance();
@@ -327,4 +332,76 @@ public class PlatformAPIImplTest {
         verify(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
     }
 
+    @Test
+    public void should_deactivate_and_delete_tenant_when_cleaning_platform() throws Exception {
+        //given
+        STenantImpl tenant1 = new STenantImpl("t1", "john", 123342, "ACTIVATED", true);
+        tenant1.setId(1L);
+        STenantImpl tenant2 = new STenantImpl("t2", "john", 12335645, "ACTIVATED", false);
+        tenant2.setId(2L);
+        doReturn(Arrays.asList(tenant1,
+                tenant2)).when(platformService).getTenants(any(QueryOptions.class));
+        doNothing().when(platformAPI).deleteTenant(anyLong());
+        //when
+        platformAPI.cleanPlatform();
+        //then
+        verify(platformService).deactiveTenant(1L);
+        verify(platformService).deactiveTenant(2L);
+        verify(platformAPI).deleteTenant(1L);
+        verify(platformAPI).deleteTenant(2L);
+    }
+
+    private static class MockedTransactionService implements TransactionService, TransactionExecutor {
+
+        @Override
+        public void begin() throws STransactionCreationException {
+        }
+
+        @Override
+        public void complete() throws STransactionCommitException, STransactionRollbackException {
+        }
+
+        public TransactionState getState() throws STransactionException {
+            return null;
+        }
+
+        @Override
+        public boolean isTransactionActive() throws STransactionException {
+            return false;
+        }
+
+        @Override
+        public void setRollbackOnly() throws STransactionException {
+        }
+
+        @Override
+        public boolean isRollbackOnly() throws STransactionException {
+            return false;
+        }
+
+        @Override
+        public long getNumberOfActiveTransactions() {
+            return 0;
+        }
+
+        @Override
+        public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+            return callable.call();
+        }
+
+        @Override
+        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+
+        }
+
+        @Override
+        public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
+
+        }
+
+        @Override
+        public void execute(TransactionContent transactionContent) throws SBonitaException {
+            transactionContent.execute();
+        }
+    }
 }
