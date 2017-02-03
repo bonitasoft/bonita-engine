@@ -744,10 +744,13 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
+    @CustomTransactions
     @AvailableOnStoppedNode
     public boolean isPlatformInitialized() throws PlatformNotFoundException {
         try {
-            return getPlatformAccessor().getPlatformService().isDefaultTenantCreated();
+            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            PlatformService platformService = platformAccessor.getPlatformService();
+            return platformAccessor.getTransactionService().executeInTransaction(platformService::isDefaultTenantCreated);
         } catch (final Exception e) {
             throw new PlatformNotFoundException("Cannot determine if the default tenant is created", e);
         }
