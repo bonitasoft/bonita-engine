@@ -25,7 +25,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * author Anthony Birembaut
+ * @author Anthony Birembaut
  */
 public class IsActorInitiatorRule implements AuthorizationRule {
 
