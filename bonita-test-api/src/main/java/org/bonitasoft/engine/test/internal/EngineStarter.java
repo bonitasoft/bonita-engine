@@ -5,7 +5,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.naming.NamingException;
 
@@ -52,13 +52,11 @@ public class EngineStarter {
 
     private static final String DATABASE_DIR = "org.bonitasoft.h2.database.dir";
 
-    private Object h2Server;
     protected static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
     private Map<String, byte[]> overrideConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
     private boolean dropOnStop = true;
-    private String dbVendor;
 
     public void start() throws Exception {
         LOGGER.info("=====================================================");
@@ -67,7 +65,7 @@ public class EngineStarter {
         final long startTime = System.currentTimeMillis();
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {
             //force it to local if not specified
-            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String>emptyMap());
+            APITypeManager.setAPITypeAndParams(ApiAccessType.LOCAL, Collections.<String, String> emptyMap());
         }
         if (APITypeManager.getAPIType().equals(ApiAccessType.LOCAL)) {
             prepareEnvironment();
@@ -90,73 +88,18 @@ public class EngineStarter {
 
     protected void prepareEnvironment() throws Exception {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
-        dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+        String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
         //is h2 and not started outside
-        if ("h2".equals(dbVendor)) {
-            LOGGER.info("Using h2, starting H2 server: ");
-            this.h2Server = startH2Server();
+        if (Objects.equals("h2", dbVendor)) {
+            setSystemPropertyIfNotSet(DATABASE_DIR, "target/database");
         }
         //init jndi
         new ClassPathXmlApplicationContext("classpath:local-server.xml").refresh();
     }
 
-    private Object startH2Server()
-            throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
-        final int h2Port = 6666;
-        setSystemPropertyIfNotSet(DATABASE_DIR, "target/database");
-
-        final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
-        final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", String[].class);
-
-        int nbTry = -1;
-        Object server;
-        do {
-            nbTry++;
-            server = startH2OnPort(String.valueOf(h2Port + nbTry), createTcpServer);
-        } while (server == null && nbTry <= 10);
-        if (nbTry > 10) {
-            throw new IOException("h2 server not started, all ports occupied");
-        }
-        System.setProperty("db.server.port", String.valueOf(h2Port + nbTry));
-        LOGGER.info("h2 server started on port: " + (h2Port + nbTry));
-        return server;
-    }
-
-    private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
-        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
-        final Method start = server.getClass().getMethod("start");
-        LOGGER.info("Starting h2 on port " + h2Port);
-        try {
-            start.invoke(server);
-        } catch (InvocationTargetException e) {
-            LOGGER.info("Unable to start h2 on port " + h2Port, e);
-            return null;
-        }
-        return server;
-    }
-
-    private void stopH2Server(Object h2Server) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-        final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
-        final Method stop = h2ServerClass.getMethod("stop");
-        stop.invoke(h2Server);
-        LOGGER.info("h2 server stopped");
-    }
-
     protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-        try {
             undeployCommands();
             deleteTenantAndPlatform();
-        } finally {
-            cleanupEnvironment();
-        }
-    }
-
-    protected void cleanupEnvironment() throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-        LOGGER.info("=========  CLEAN ENVIRONMENT =======");
-        if (this.h2Server != null) {
-            stopH2Server(this.h2Server);
-        }
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 public abstract class RuleTest {
 

@@ -23,7 +23,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
  */
 public abstract class AuthorizationRuleWithParameters {
 
