@@ -28,7 +28,7 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * author Emmanuel Duchastenier, Anthony Birembaut
+ * @author Emmanuel Duchastenier, Anthony Birembaut
  */
 public class IsTaskAvailableForUserRule implements AuthorizationRule {
 
