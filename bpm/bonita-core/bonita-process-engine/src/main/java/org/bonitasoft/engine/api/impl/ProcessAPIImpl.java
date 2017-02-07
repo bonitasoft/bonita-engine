@@ -5949,6 +5949,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             SProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getProcessInstance(processInstanceId);
+            if (processInstance == null) {
+                throw new ProcessInstanceNotFoundException("Process Instance not found " + processInstanceId);
+            }
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
             final SExpressionContext expressionContext = createExpressionContext(processInstanceId, processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE, null);
             return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, processDefinition.getContext());
@@ -5965,6 +5968,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             SAProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getArchivedProcessInstance(archivedProcessInstanceId);
+            if (processInstance == null) {
+                throw new ProcessInstanceNotFoundException("Archived Process Instance not found " + archivedProcessInstanceId);
+            }
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
             final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition,
                     CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());
