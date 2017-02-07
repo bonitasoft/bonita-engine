@@ -134,6 +134,7 @@ import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -1499,5 +1500,15 @@ public class ProcessAPIImplTest {
 
         // when:
         processAPI.executeMessageCouple(456L, 888L);
+    }
+
+    @Test(expected = ProcessInstanceNotFoundException.class)
+    public void getArchivedProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID() throws ProcessInstanceNotFoundException,ExpressionEvaluationException {
+        processAPI.getArchivedProcessInstanceExecutionContext(935);
+    }
+
+    @Test(expected = ProcessInstanceNotFoundException.class)
+    public void getProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID() throws ProcessInstanceNotFoundException,ExpressionEvaluationException {
+        processAPI.getProcessInstanceExecutionContext(935);
     }
 }
