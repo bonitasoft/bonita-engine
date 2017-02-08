@@ -17,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
@@ -954,6 +955,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
     @Test
     public void searchUsersWhoCanStartProcess() throws Exception {
         final User jack = createUser("jack", PASSWORD);
+        final User jackot = createUser("jackot", PASSWORD);
 
         // Disabled jack
         final UserUpdater updateDescriptor = new UserUpdater();
@@ -961,20 +963,21 @@ public class SearchProcessInstanceIT extends TestWithUser {
         getIdentityAPI().updateUser(jack.getId(), updateDescriptor);
 
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME,
-                PROCESS_VERSION, Arrays.asList("step1"), Arrays.asList(true), ACTOR_NAME, true);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, Arrays.asList(ACTOR_NAME, ACTOR_NAME),
-                Arrays.asList(user, jack));
+                PROCESS_VERSION, Collections.singletonList("step1"), Collections.singletonList(true), ACTOR_NAME, true);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, Arrays.asList(ACTOR_NAME, ACTOR_NAME, ACTOR_NAME),
+                Arrays.asList(user, jack, jackot));
 
         // Search
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
         searchBuilder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
+        searchBuilder.searchTerm("jac");
         final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanStartProcessDefinition(processDefinition.getId(), searchBuilder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> users = searchResult.getResult();
-        assertEquals(user.getId(), users.get(0).getId());
+        assertEquals(jackot.getId(), users.get(0).getId());
 
         // clean up
-        deleteUsers(jack);
+        deleteUsers(jack, jackot);
         disableAndDeleteProcess(processDefinition.getId());
     }
 

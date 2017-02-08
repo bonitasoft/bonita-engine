@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static org.bonitasoft.engine.services.Vendor.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -70,10 +72,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     protected final List<String> mappingExclusions;
     protected final OrderByBuilder orderByBuilder;
-
     Statistics statistics;
-
     int stat_display_count;
+    private QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory();
 
     // ----
 
@@ -88,7 +89,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      */
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
+            final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
+            throws ClassNotFoundException {
         super("TEST", '#', enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
         this.classAliasMappings = classAliasMappings;
@@ -120,7 +122,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final Properties extraHibernateProperties,
             final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
+            throws SPersistenceException, ClassNotFoundException {
         super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
         orderByCheckingMode = getOrderByCheckingMode();
@@ -139,14 +142,21 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
         if (dialect != null) {
 
-            if (dialect.contains("PostgreSQL")) {
+            if (dialect.toLowerCase().contains("postgresql")) {
                 configuration.setInterceptor(new PostgresInterceptor());
                 configuration.registerTypeOverride(new PostgresMaterializedBlobType());
                 configuration.registerTypeOverride(new PostgresMaterializedClobType());
-            } else if (dialect.contains("SQLServer")) {
+                queryBuilderFactory.setVendor(POSTGRES);
+            } else if (dialect.toLowerCase().contains("sqlserver")) {
                 SQLServerInterceptor sqlServerInterceptor = new SQLServerInterceptor();
                 configuration.setInterceptor(sqlServerInterceptor);
                 orderByBuilder = new SQLServerOrderByBuilder();
+                queryBuilderFactory.setVendor(SQLSERVER);
+            } else if (dialect.toLowerCase().contains("oracle")) {
+                queryBuilderFactory.setVendor(ORACLE);
+            } else if (dialect.toLowerCase().contains("mysql")) {
+                queryBuilderFactory.setVendor(MYSQL);
+
             }
         }
         this.orderByBuilder = orderByBuilder;
@@ -440,7 +450,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final Session session = getSession(true);
 
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-            QueryBuilder queryBuilder = new QueryBuilderFactory().createQueryBuilderFor(query, selectDescriptor.getEntityType(), orderByBuilder,
+            QueryBuilder queryBuilder = queryBuilderFactory.createQueryBuilderFor(query, selectDescriptor.getEntityType(), orderByBuilder,
                     classAliasMappings, interfaceToClassMapping,
                     likeEscapeCharacter);
             if (selectDescriptor.hasAFilter()) {
