@@ -31,6 +31,8 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
@@ -68,6 +70,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -251,7 +254,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         executeCallAtivityUntilEndOfProcess(true, true, "2.0", false);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message" }, jira = "ENGINE-1713")
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway",
+            "Message" }, jira = "ENGINE-1713")
     @Test
     public void callActivityAndGatewayAndMessageAndIntermediateEvent() throws Exception {
         ProcessDefinition mainProcessDefinition = null;
@@ -390,7 +394,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Execute an operation using one of this data.
      * -> operation must be executed after the data mapping is executed
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, jira = "ENGINE-878", keywords = { "Data mapping with operations execution order" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, jira = "ENGINE-878", keywords = {
+            "Data mapping with operations execution order" })
     @Test
     public void callActivityWithDataOutputAndOperationAreExecutedInTheGoodOrder() throws Exception {
 
@@ -666,7 +671,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDef);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Undeployed target" }, jira = "BS-10502")
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity",
+            "Undeployed target" }, jira = "BS-10502")
     @Test
     public void callActivityUsingUndeployedProcess() throws Exception {
         final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", null);
@@ -678,7 +684,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDef);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Disabled target" }, jira = "BS-10745")
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity",
+            "Disabled target" }, jira = "BS-10745")
     @Test
     public void callActivityUsingDisabledProcess() throws Exception {
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -916,7 +923,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "container hierarchy" }, jira = "ENGINE-1899")
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process",
+            "container hierarchy" }, jira = "ENGINE-1899")
     public void getProcessDefinitionIdFromActivityInstanceId() throws Exception {
         // check that real root process definition is retrieved (taken from parent process instance)
         // Build target process
@@ -951,7 +959,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Engine constant" }, jira = "ENGINE-1009")
+    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity",
+            "Engine constant" }, jira = "ENGINE-1009")
     @Test
     public void callActivityWithTaskUsingEngineExpressions() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
@@ -986,7 +995,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Connector", "Data mapping" }, jira = "ENGINE-1243")
+    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Connector",
+            "Data mapping" }, jira = "ENGINE-1243")
     @Test
     public void callActivityWithDataMappingAndConnectors() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
@@ -1180,6 +1190,36 @@ public class CallActivityIT extends TestWithTechnicalUser {
         waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
 
         disableAndDeleteProcess(mainProcess, calledProcess);
+    }
+
+    @Test
+    public void should_be_able_to_cancel_process_with_call_activity_calling_unknown_process() throws Exception {
+        //given
+        ProcessDefinition processDefinition = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processThatCallUnknownProcess", "1.0")
+                        .addStartEvent("start")
+                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
+                                new ExpressionBuilder().createConstantStringExpression("1.0"))
+                        .addTransition("start", "call")
+                        .getProcess());
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        ActivityInstance activityInstance = waitForTaskToFail(processInstance);
+        assertThat(activityInstance.getName()).isEqualTo("call");
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
+        //then
+        try {
+            getProcessAPI().getProcessInstance(processInstance.getId());
+            fail("process should not exists anymore");
+        } catch (ProcessInstanceNotFoundException ignored) {
+        }
+        //verify the call activity was archived in cancelled
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(1, 10)
+                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").done());
+        assertThat(archivedFlowNodeInstances.getResult()).hasSize(1);
+        assertThat(archivedFlowNodeInstances.getResult().get(0).getState()).isEqualTo("cancelled");
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
