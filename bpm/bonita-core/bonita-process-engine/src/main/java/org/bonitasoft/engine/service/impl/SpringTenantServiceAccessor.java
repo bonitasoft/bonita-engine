@@ -71,6 +71,8 @@ import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.ProfilesExporter;
+import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
@@ -217,6 +219,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ProcessResourcesService processResourcesService;
     private TenantResourcesService tenantResourceService;
     private MessagesHandlingService messagesHandlingService;
+    private ProfilesImporter profilesImporter;
+    private ProfilesExporter profilesExporter;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = BeanAccessorFactory.getTenantBeanAccessor(tenantId);
@@ -470,6 +474,22 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             profileService = beanAccessor.getService(ProfileService.class);
         }
         return profileService;
+    }
+
+    @Override
+    public ProfilesImporter getProfilesImporter() {
+        if (profilesImporter == null) {
+            profilesImporter = beanAccessor.getService(ProfilesImporter.class);
+        }
+        return profilesImporter;
+    }
+
+    @Override
+    public ProfilesExporter getProfilesExporter() {
+        if (profilesExporter == null) {
+            profilesExporter = beanAccessor.getService(ProfilesExporter.class);
+        }
+        return profilesExporter;
     }
 
     @Override

@@ -16,6 +16,8 @@ package org.bonitasoft.engine.profile.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -36,12 +38,12 @@ public class ExportedProfileMapping {
     @XmlElementWrapper(name = "groups")
     @XmlElement(name = "group")
     private List<String> groups;
-    @XmlElementWrapper(name = "roles")
-    @XmlElement(name = "role")
-    private List<String> roles;
     @XmlElementWrapper(name = "memberships")
     @XmlElement(name = "membership")
     private List<ExportedMembership> memberships;
+    @XmlElementWrapper(name = "roles")
+    @XmlElement(name = "role")
+    private List<String> roles;
 
     public ExportedProfileMapping() {
         users = new ArrayList<>();
@@ -51,7 +53,7 @@ public class ExportedProfileMapping {
     }
 
     public List<String> getUsers() {
-        return users == null ? Collections.<String>emptyList() : users;
+        return users == null ? Collections.emptyList() : users;
     }
 
     public void setUsers(final List<String> users) {
@@ -59,7 +61,7 @@ public class ExportedProfileMapping {
     }
 
     public List<String> getGroups() {
-        return groups == null ? Collections.<String>emptyList() : groups;
+        return groups == null ? Collections.emptyList() : groups;
     }
 
     public void setGroups(final List<String> groups) {
@@ -67,7 +69,7 @@ public class ExportedProfileMapping {
     }
 
     public List<String> getRoles() {
-        return roles == null ? Collections.<String>emptyList() : roles;
+        return roles == null ? Collections.emptyList() : roles;
     }
 
     public void setRoles(final List<String> roles) {
@@ -75,11 +77,38 @@ public class ExportedProfileMapping {
     }
 
     public List<ExportedMembership> getMemberships() {
-        return memberships == null ? Collections.<ExportedMembership>emptyList() : memberships;
+        return memberships == null ? Collections.emptyList() : memberships;
     }
 
     public void setMemberships(final List<ExportedMembership> memberships) {
         this.memberships = memberships;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ExportedProfileMapping that = (ExportedProfileMapping) o;
+        return Objects.equals(users, that.users) &&
+                Objects.equals(groups, that.groups) &&
+                Objects.equals(roles, that.roles) &&
+                Objects.equals(memberships, that.memberships);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(users, groups, roles, memberships);
+    }
+
+    @Override
+    public String toString() {
+        return "ExportedProfileMapping{" +
+                "users=" + users +
+                ", groups=" + groups +
+                ", roles=" + roles +
+                ", memberships=" + memberships +
+                '}';
+    }
 }

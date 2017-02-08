@@ -31,7 +31,7 @@ import org.junit.Test;
  */
 public class ProfilesParserTest {
 
-    public ProfilesParser profilesParser = new ProfilesParser();
+    private ProfilesParser profilesParser = new ProfilesParser();
 
     @Test
     public void should_be_able_to_parse_AllProfilesXml_file() throws Exception {
@@ -50,7 +50,6 @@ public class ProfilesParserTest {
         ExportedParentProfileEntry organizationFolder = adminProfile.getParentProfileEntries().get(1);
         assertThat(organizationFolder.getName()).isEqualTo("Organization");
         assertThat(organizationFolder.isCustom()).isFalse();
-        assertThat(organizationFolder.getParentName()).isEqualTo("NULL");
         assertThat(organizationFolder.getIndex()).isEqualTo(2);
         assertThat(organizationFolder.getDescription()).isEqualTo("Organization");
         assertThat(organizationFolder.getType()).isEqualTo("folder");
@@ -60,14 +59,40 @@ public class ProfilesParserTest {
         ExportedProfileEntry rolesProfileEntry = organizationChildren.get(2);
         assertThat(rolesProfileEntry.getName()).isEqualTo("Roles");
         assertThat(rolesProfileEntry.isCustom()).isFalse();
-        assertThat(rolesProfileEntry.getParentName()).isEqualTo("Organization");
         assertThat(rolesProfileEntry.getIndex()).isEqualTo(4);
         assertThat(rolesProfileEntry.getType()).isEqualTo("link");
         assertThat(rolesProfileEntry.getPage()).isEqualTo("AllRoles");
         assertThat(adminProfile.getProfileMapping().getUsers()).containsOnly("userName1");
         assertThat(adminProfile.getProfileMapping().getRoles()).containsOnly("role1", "role2");
         assertThat(adminProfile.getProfileMapping().getGroups()).isEmpty();
-        assertThat(adminProfile.getProfileMapping().getMemberships()).containsOnly(new ExportedMembership("/group1", "role2"), new ExportedMembership("/group2", "role2"));
+        assertThat(adminProfile.getProfileMapping().getMemberships()).containsOnly(new ExportedMembership("/group1", "role2"),
+                new ExportedMembership("/group2", "role2"));
+    }
+
+    @Test
+    public void should_import_profile_xml_containing_obsolete_parentName() throws Exception {
+        //given
+        final String xmlAsText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<profiles:profiles xmlns:profiles=\"http://www.bonitasoft.org/ns/profile/6.1\">"
+                + "<profile isDefault=\"false\" name=\"ProfileWithNull\"> "
+                + "<description>ImportExportProfileDescription</description>"
+                + "<profileEntries>"
+                + "<parentProfileEntry isCustom=\"true\" name=\"menu3\">"
+                + "<parentName>NULL</parentName>"
+                + "<index>0</index>"
+                + "<type>folder</type>"
+                + "</parentProfileEntry>"
+                + "</profileEntries>"
+                + "</profile>"
+                + "</profiles:profiles>";
+
+        //when
+        ExportedProfiles exportedProfiles = profilesParser.convert(xmlAsText);
+        //then
+        ExportedParentProfileEntry menu3 = new ExportedParentProfileEntry("menu3");
+        menu3.setCustom(true);
+        menu3.setType("folder");
+        assertThat(exportedProfiles.getExportedProfiles().get(0).getParentProfileEntries().get(0)).isEqualTo(menu3);
     }
 
 }

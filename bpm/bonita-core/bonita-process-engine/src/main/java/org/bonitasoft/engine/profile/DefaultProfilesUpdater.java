@@ -26,11 +26,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.SessionService;
 
 /**
  * Class that creates and updates default profiles<br/>
  * Called at node restart and tenant creation
- * 
+ *
  * @author Philippe Ozil
  */
 public class DefaultProfilesUpdater {
@@ -82,8 +83,8 @@ public class DefaultProfilesUpdater {
     Object doUpdateProfiles(final ExportedProfiles defaultProfiles, final File md5File, final String defaultProfilesXml)
             throws NoSuchAlgorithmException, IOException {
         try {
-            final ProfilesImporter profilesImporter = createProfilesImporter(defaultProfiles);
-            final List<ImportStatus> importStatuses = profilesImporter.importProfiles(-1);
+            final ProfilesImporter profilesImporter = tenantServiceAccessor.getProfilesImporter();
+            final List<ImportStatus> importStatuses = profilesImporter.importProfiles(defaultProfiles, ImportPolicy.UPDATE_DEFAULTS, SessionService.SYSTEM_ID);
             tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                     "Updated default profiles " + importStatuses);
             if (md5File != null) {
@@ -96,18 +97,13 @@ public class DefaultProfilesUpdater {
         return null;
     }
 
-    protected ProfilesImporter createProfilesImporter(final ExportedProfiles profilesFromXML) {
-        return new ProfilesImporter(tenantServiceAccessor.getProfileService(), tenantServiceAccessor
-                .getIdentityService(), profilesFromXML, ImportPolicy.UPDATE_DEFAULTS);
-    }
-
     File getProfilesMD5File() throws BonitaHomeNotSetException, IOException {
         return ProfilesImporter.getFileContainingMD5(tenantServiceAccessor.getTenantId());
     }
 
     /**
      * Checks if profiles should be updated: if MD5 file differs from MD5 of XML file
-     * 
+     *
      * @param md5File
      * @param defaultProfilesXml
      * @return true if profiles should be updated
@@ -126,6 +122,6 @@ public class DefaultProfilesUpdater {
     }
 
     ExportedProfiles getProfilesFromXML(final String defaultProfilesXml) throws IOException {
-        return ProfilesImporter.getProfilesFromXML(defaultProfilesXml);
+        return tenantServiceAccessor.getProfilesImporter().convertFromXml(defaultProfilesXml);
     }
 }
