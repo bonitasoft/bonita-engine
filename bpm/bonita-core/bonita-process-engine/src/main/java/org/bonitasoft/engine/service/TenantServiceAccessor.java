@@ -70,6 +70,8 @@ import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.ProfilesExporter;
+import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
@@ -156,6 +158,10 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     DocumentService getDocumentService();
 
     ProfileService getProfileService();
+
+    ProfilesImporter getProfilesImporter();
+
+    ProfilesExporter getProfilesExporter();
 
     DataInstanceService getDataInstanceService();
 

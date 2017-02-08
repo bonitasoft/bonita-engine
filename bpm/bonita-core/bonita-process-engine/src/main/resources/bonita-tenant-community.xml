@@ -1197,6 +1197,22 @@
     </bean>
 
 
+    <bean id="profilesImporter" class="org.bonitasoft.engine.profile.ProfilesImporter">
+        <constructor-arg name="profileService" ref="profileService" />
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="profilesParser" ref="profilesParser" />
+    </bean>
+
+    <bean id="profilesExporter" class="org.bonitasoft.engine.profile.ProfilesExporter">
+        <constructor-arg name="profileService" ref="profileService" />
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="profilesParser" ref="profilesParser" />
+    </bean>
+
+    <bean id="profilesParser" class="org.bonitasoft.engine.profile.ProfilesParser">
+    </bean>
+
+
     <bean id="activityInstanceService"
           class="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />

@@ -62,16 +62,13 @@ import org.bonitasoft.engine.profile.model.SProfileEntry;
 public class ProfilesImporter {
 
     private final ProfileService profileService;
-
     private final IdentityService identityService;
+    private final ProfilesParser profilesParser;
 
-    private final ExportedProfiles exportedProfiles;
-
-    private final ProfileImportStrategy importStrategy;
-
-    public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final ExportedProfiles exportedProfiles,
-            final ImportPolicy policy) {
-        this(profileService, identityService, exportedProfiles, getStrategy(profileService, policy));
+    public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, ProfilesParser profilesParser) {
+        this.profileService = profileService;
+        this.identityService = identityService;
+        this.profilesParser = profilesParser;
     }
 
     private static ProfileImportStrategy getStrategy(final ProfileService profileService, final ImportPolicy policy) {
@@ -87,20 +84,12 @@ public class ProfilesImporter {
             case UPDATE_DEFAULTS:
                 return new UpdateDefaultsImportStrategy(profileService);
             default:
-                return null;
-
+                throw new IllegalStateException("No strategy defined for policy: " + policy);
         }
     }
 
-    ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final ExportedProfiles exportedProfiles,
-            final ProfileImportStrategy importStrategy) {
-        this.profileService = profileService;
-        this.identityService = identityService;
-        this.exportedProfiles = exportedProfiles;
-        this.importStrategy = importStrategy;
-    }
-
-    public List<ImportStatus> importProfiles(final long importerId) throws ExecutionException {
+    public List<ImportStatus> importProfiles(ExportedProfiles exportedProfiles, ImportPolicy policy, final long importerId) throws ExecutionException {
+        ProfileImportStrategy importStrategy = getStrategy(profileService, policy);
         importStrategy.beforeImport();
         try {
             final List<ImportStatus> importStatus = new ArrayList<>(exportedProfiles.getExportedProfiles().size());
@@ -118,7 +107,7 @@ public class ProfilesImporter {
                 } catch (final SProfileNotFoundException e1) {
                     // profile does not exists
                 }
-                final SProfile newProfile = importTheProfile(importerId, exportedProfile, existingProfile);
+                final SProfile newProfile = importTheProfile(importerId, exportedProfile, existingProfile, importStrategy);
                 if (newProfile == null) {
                     // in case of skip
                     currentStatus.setStatus(Status.SKIPPED);
@@ -237,7 +226,8 @@ public class ProfilesImporter {
 
     protected SProfile importTheProfile(final long importerId,
             final ExportedProfile exportedProfile,
-            final SProfile existingProfile) throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
+            final SProfile existingProfile, ProfileImportStrategy importStrategy)
+            throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
             SProfileUpdateException,
             SProfileCreationException {
         final SProfile newProfile;
@@ -270,7 +260,7 @@ public class ProfilesImporter {
                 .setParentId(parentId).setType(childEntry.getType()).setCustom(childEntry.isCustom()).done();
     }
 
-    public static List<String> toWarnings(final List<ImportStatus> importProfiles) {
+    public List<String> toWarnings(final List<ImportStatus> importProfiles) {
         final ArrayList<String> warns = new ArrayList<>();
         for (final ImportStatus importStatus : importProfiles) {
             for (final ImportError error : importStatus.getErrors()) {
@@ -280,10 +270,9 @@ public class ProfilesImporter {
         return warns;
     }
 
-    @SuppressWarnings("unchecked")
-    public static ExportedProfiles getProfilesFromXML(final String xmlContent) throws IOException {
+    public ExportedProfiles convertFromXml(final String xmlContent) throws IOException {
         try {
-            return new ProfilesParser().convert(xmlContent);
+            return profilesParser.convert(xmlContent);
         } catch (JAXBException e) {
             throw new IOException(e);
         }
@@ -292,4 +281,5 @@ public class ProfilesImporter {
     static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
         return BonitaHomeServer.getInstance().getTenantStorage().getProfileMD5(tenantId);
     }
+
 }

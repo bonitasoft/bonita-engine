@@ -22,9 +22,7 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ImportPolicy;
-import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfiles;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -32,7 +30,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * Specific Command to import profiles xml content as byte[].
  * "byte[]" : xml content
- * 
+ *
  * @author Zhao Na
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -45,24 +43,16 @@ public class ImportProfilesCommand extends TenantCommand {
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final ProfileService profileService = serviceAccessor.getProfileService();
-        final IdentityService identityService = serviceAccessor.getIdentityService();
+        ProfilesImporter profilesImporter = serviceAccessor.getProfilesImporter();
 
-        byte[] xmlContent;
         try {
-            xmlContent = (byte[]) parameters.get("xmlContent");
+            byte[] xmlContent = (byte[]) parameters.get("xmlContent");
             if (xmlContent == null) {
                 throw new SCommandParameterizationException("Parameters map must contain an entry  xmlContent with a byte array value.");
             }
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Parameters map must contain an entry  xmlContent with a byte array value.", e);
-        }
-
-        try {
-            final ExportedProfiles profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent));
-
-            return (Serializable) ProfilesImporter.toWarnings(new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.DELETE_EXISTING)
-                    .importProfiles(SessionInfos.getUserIdFromSession()));
+            final ExportedProfiles profiles = profilesImporter.convertFromXml(new String(xmlContent));
+            return (Serializable) profilesImporter
+                    .toWarnings(profilesImporter.importProfiles(profiles, ImportPolicy.DELETE_EXISTING, SessionInfos.getUserIdFromSession()));
         } catch (ExecutionException | IOException e) {
             throw new SCommandExecutionException(e);
         }
