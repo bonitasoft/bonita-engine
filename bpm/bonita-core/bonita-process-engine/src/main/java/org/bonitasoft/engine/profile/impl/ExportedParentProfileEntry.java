@@ -14,7 +14,10 @@
 package org.bonitasoft.engine.profile.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -32,7 +35,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
 
     @XmlElementWrapper(name = "childrenEntries")
     @XmlElement(name = "profileEntry")
-    private List<ExportedProfileEntry> childProfileEntries;
+    private List<ExportedProfileEntry> childProfileEntries = Collections.emptyList();
 
     public ExportedParentProfileEntry() {
         childProfileEntries = new ArrayList<>();
@@ -48,33 +51,6 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
 
     public ExportedParentProfileEntry(final String name) {
         super(name);
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-
-        }
-        if (!compareExportedProfileEntry(obj)) {
-            return false;
-        }
-        final ExportedParentProfileEntry other = (ExportedParentProfileEntry) obj;
-        if (getChildProfileEntries() == null) {
-            if (other.getChildProfileEntries() != null) {
-                return false;
-            }
-        } else if (!getChildProfileEntries().equals(other.getChildProfileEntries())) {
-            return false;
-        }
-
-        return true;
     }
 
     public List<ImportError> getErrors() {
@@ -97,10 +73,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
     }
 
     public boolean hasErrors() {
-        if (getErrors() == null) {
-            return false;
-        }
-        return true;
+        return getErrors() != null;
     }
 
     @Override
@@ -123,5 +96,30 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        ExportedParentProfileEntry that = (ExportedParentProfileEntry) o;
+        return Objects.equals(childProfileEntries, that.childProfileEntries);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), childProfileEntries);
+    }
+
+    @Override
+    public String toString() {
+        return "ExportedParentProfileEntry{" +
+                super.toString() +
+                "childProfileEntries=" + childProfileEntries +
+                '}';
     }
 }

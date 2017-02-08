@@ -19,6 +19,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +50,6 @@ public class DefaultProfilesUpdaterTest {
     public TenantServiceAccessor tenantServiceAccessor = Mockito.mock(TenantServiceAccessor.class);
     @Spy
     public DefaultProfilesUpdater defaultProfilesUpdater = new DefaultProfilesUpdater(platformServiceAccessor, tenantServiceAccessor);
-
     @Mock
     public TransactionService transactionService;
     @Mock
@@ -74,8 +74,8 @@ public class DefaultProfilesUpdaterTest {
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
         doReturn(profileService).when(tenantServiceAccessor).getProfileService();
         doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
-        doReturn(profilesImporter).when(defaultProfilesUpdater).createProfilesImporter(any(ExportedProfiles.class));
-        doReturn(null).when(profilesImporter).importProfiles(anyLong());
+        doReturn(profilesImporter).when(tenantServiceAccessor).getProfilesImporter();
+        doReturn(null).when(profilesImporter).importProfiles(any(ExportedProfiles.class), any(ImportPolicy.class), anyLong());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class DefaultProfilesUpdaterTest {
     public void doUpdateProfiles_should_not_write_MD5_if_import_fails() throws IOException, ExecutionException, NoSuchAlgorithmException {
         // Given
         IOUtil.writeFile(md5File, "oldHash");
-        doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(anyLong());
+        doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(any(ExportedProfiles.class), any(ImportPolicy.class), anyLong());
         // When
         defaultProfilesUpdater.doUpdateProfiles(defaultProfiles, md5File, "content of profiles");
         // Then
@@ -139,8 +139,7 @@ public class DefaultProfilesUpdaterTest {
         // When
         defaultProfilesUpdater.doUpdateProfiles(profilesFromXML, md5File, "content of profiles");
         // Then
-        verify(defaultProfilesUpdater).createProfilesImporter(profilesFromXML);
-        verify(profilesImporter).importProfiles(-1);
+        verify(profilesImporter).importProfiles(any(ExportedProfiles.class), eq(ImportPolicy.UPDATE_DEFAULTS), eq(-1L));
         assertThat(md5File).hasContent(IOUtil.md5("content of profiles".getBytes()));
     }
 

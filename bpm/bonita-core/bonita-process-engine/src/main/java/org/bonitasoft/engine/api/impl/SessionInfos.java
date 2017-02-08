@@ -57,9 +57,7 @@ public class SessionInfos {
         try {
             final long sessionId = getSessionAccessor().getSessionId();
             session = getSessionService().getSession(sessionId);
-        } catch (final SessionIdNotSetException e) {
-            return null;
-        } catch (SSessionNotFoundException e) {
+        } catch (final SessionIdNotSetException | SSessionNotFoundException e) {
             return null;
         }
         return session;

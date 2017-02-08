@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
@@ -232,18 +232,18 @@ import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.ContactData;
+import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
+import org.bonitasoft.engine.identity.GroupCreator.GroupField;
 import org.bonitasoft.engine.identity.Icon;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleCreator;
+import org.bonitasoft.engine.identity.RoleCreator.RoleField;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
-import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
-import org.bonitasoft.engine.identity.GroupCreator.GroupField;
-import org.bonitasoft.engine.identity.RoleCreator.RoleField;
 import org.bonitasoft.engine.identity.UserCreator.UserField;
+import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.impl.ContactDataImpl;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
@@ -2255,4 +2255,5 @@ public class ModelConvertor {
     public static Icon toIcon(SIcon icon) {
         return new IconImpl(icon.getId(), icon.getMimeType(), icon.getContent());
     }
+
 }

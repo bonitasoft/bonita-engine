@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -32,6 +34,8 @@ public class ExportedProfileEntry {
     private String name;
     @XmlAttribute
     private boolean isCustom;
+    //deprecated because it is not used but kept in xsd, this should be removed along with xsd change and migration
+    @Deprecated
     @XmlElement
     private String parentName;
     @XmlElement
@@ -74,14 +78,6 @@ public class ExportedProfileEntry {
         this.type = type;
     }
 
-    public final String getParentName() {
-        return parentName;
-    }
-
-    public final void setParentName(final String parentName) {
-        this.parentName = parentName;
-    }
-
     public final long getIndex() {
         return index;
     }
@@ -102,81 +98,6 @@ public class ExportedProfileEntry {
         return name;
     }
 
-    @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (getDescription() == null ? 0 : getDescription().hashCode());
-        result = prime * result + (getName() == null ? 0 : getName().hashCode());
-        result = prime * result + (getType() == null ? 0 : getType().hashCode());
-        result = prime * result + (getPage() == null ? 0 : getPage().hashCode());
-        result = prime * result + (!isCustom() ? 0 : getPage().hashCode());
-        result = prime * result + (getParentName() == null ? 0 : getParentName().hashCode());
-        result = prime * result + (int) (getIndex() ^ (getIndex() >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        return compareExportedProfileEntry(obj);
-    }
-
-    protected boolean compareExportedProfileEntry(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ExportedProfileEntry other = (ExportedProfileEntry) obj;
-        if (getName() == null) {
-            if (other.getName() != null) {
-                return false;
-            }
-        } else if (!getName().equals(other.getName())) {
-            return false;
-        }
-
-        if (getDescription() == null) {
-            if (other.getDescription() != null) {
-                return false;
-            }
-        } else if (!getDescription().equals(other.getDescription())) {
-            return false;
-        }
-        if (getType() == null) {
-            if (other.getType() != null) {
-                return false;
-            }
-        } else if (!getType().equals(other.getType())) {
-            return false;
-        }
-        if (getPage() == null) {
-            if (other.getPage() != null) {
-                return false;
-            }
-        } else if (!getPage().equals(other.getPage())) {
-            return false;
-        }
-        if (isCustom() != other.isCustom()) {
-            return false;
-        }
-        if (getIndex() != other.getIndex()) {
-            return false;
-        }
-        if (getParentName() == null) {
-            if (other.getParentName() != null) {
-                return false;
-            }
-        } else if (!getParentName().equals(other.getParentName())) {
-            return false;
-        }
-        return true;
-    }
-
     public boolean hasError() {
         return getError() != null;
     }
@@ -191,4 +112,35 @@ public class ExportedProfileEntry {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ExportedProfileEntry that = (ExportedProfileEntry) o;
+        return isCustom == that.isCustom &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(index, that.index) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(page, that.page);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, isCustom, index, description, type, page);
+    }
+
+    @Override
+    public String toString() {
+        return "ExportedProfileEntry{" +
+                "name='" + name + '\'' +
+                ", isCustom=" + isCustom +
+                ", index=" + index +
+                ", description='" + description + '\'' +
+                ", type='" + type + '\'' +
+                ", page='" + page + '\'' +
+                '}';
+    }
 }
