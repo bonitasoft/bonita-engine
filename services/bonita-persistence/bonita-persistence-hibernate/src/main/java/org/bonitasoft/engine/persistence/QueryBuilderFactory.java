@@ -16,6 +16,7 @@ package org.bonitasoft.engine.persistence;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.services.Vendor;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
@@ -24,14 +25,21 @@ import org.hibernate.SQLQuery;
  */
 public class QueryBuilderFactory {
 
+    private Vendor vendor;
+
     public QueryBuilder createQueryBuilderFor(Query query, Class<? extends PersistentObject> entityType, OrderByBuilder orderByBuilder,
             Map<String, String> classAliasMappings,
             Map<String, Class<? extends PersistentObject>> interfaceToClassMapping, char likeEscapeCharacter) {
         if (query instanceof SQLQuery) {
-            return new SQLQueryBuilder(query.getQueryString(), entityType, orderByBuilder, classAliasMappings, interfaceToClassMapping, likeEscapeCharacter);
+            return new SQLQueryBuilder(query.getQueryString(), vendor, entityType, orderByBuilder, classAliasMappings, interfaceToClassMapping,
+                    likeEscapeCharacter);
         } else {
             return new HQLQueryBuilder(query.getQueryString(), orderByBuilder, classAliasMappings, interfaceToClassMapping, likeEscapeCharacter);
         }
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
 }

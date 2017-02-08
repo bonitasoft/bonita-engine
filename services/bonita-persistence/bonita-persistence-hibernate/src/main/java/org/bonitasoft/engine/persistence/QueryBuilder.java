@@ -92,11 +92,7 @@ abstract class QueryBuilder {
                     filterOption.getFieldName());
         }
         Object fieldValue = filterOption.getValue();
-        if (fieldValue instanceof String) {
-            fieldValue = "'" + escapeString((String) fieldValue) + "'";
-        } else if (fieldValue instanceof EnumToObjectConvertible) {
-            fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
-        }
+        fieldValue = processValue(fieldValue);
         switch (type) {
             case EQUALS:
                 if (fieldValue == null) {
@@ -149,6 +145,15 @@ abstract class QueryBuilder {
                 break;
         }
         return completeField;
+    }
+
+    protected Object processValue(Object fieldValue) {
+        if (fieldValue instanceof String) {
+            fieldValue = "'" + escapeString((String) fieldValue) + "'";
+        } else if (fieldValue instanceof EnumToObjectConvertible) {
+            fieldValue = ((EnumToObjectConvertible) fieldValue).fromEnum();
+        }
+        return fieldValue;
     }
 
     private void handleMultipleFilters(final StringBuilder builder, final SearchFields multipleFilter, final Set<String> specificFilters,
