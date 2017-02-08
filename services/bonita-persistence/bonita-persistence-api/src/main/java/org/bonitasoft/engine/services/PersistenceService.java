@@ -87,7 +87,7 @@ public interface PersistenceService extends ReadPersistenceService {
      * Delete all elements of a specific table for a specific tenant
      *
      * @param entityClass Entity class corresponding to the table to empty
-     * @param filters     Filters
+     * @param filters Filters
      * @throws SPersistenceException
      * @since 6.1
      */
@@ -107,7 +107,7 @@ public interface PersistenceService extends ReadPersistenceService {
     /**
      * Delete a record from the table by id and its class type.
      *
-     * @param id          entity's id
+     * @param id entity's id
      * @param entityClass The class which extends persistentObject
      * @throws SPersistenceException
      * @since 6.0
@@ -117,7 +117,7 @@ public interface PersistenceService extends ReadPersistenceService {
     /**
      * Delete records from the table.
      *
-     * @param ids         A list contains entity ids
+     * @param ids A list contains entity ids
      * @param entityClass The class which extends persistentObject
      * @throws SPersistenceException
      * @since 6.0

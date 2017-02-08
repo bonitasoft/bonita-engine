@@ -82,11 +82,11 @@ public interface ReadPersistenceService {
 
     /**
      * @param entityClass
-     *            class of the object we want to search on
+     *        class of the object we want to search on
      * @param querySuffix
-     *            Used to define customized search query
+     *        Used to define customized search query
      * @param options
-     *            query options
+     *        query options
      * @param parameters
      * @return
      * @throws SBonitaReadException
