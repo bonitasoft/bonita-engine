@@ -36,6 +36,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -115,9 +116,14 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
 
     private void archiveChildProcessInstance(final SFlowNodeInstance instance) throws SProcessInstanceNotFoundException, SArchivingException,
             SBonitaReadException {
-        final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
-        new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
-                commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+        try {
+            final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
+            new ProcessArchiver().archiveProcessInstance(childProcInst, archiveService, processInstanceService, documentService, logger,
+                    commentService, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+        } catch (SProcessInstanceNotFoundException ignored) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "No target process instance found when archiving the call activity " + instance.getId() + " in state " + getName());
+        }
     }
 
     @Override
