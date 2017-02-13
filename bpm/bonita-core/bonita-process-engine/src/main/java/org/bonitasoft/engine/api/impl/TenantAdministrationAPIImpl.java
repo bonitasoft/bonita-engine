@@ -179,7 +179,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     void setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(final PlatformServiceAccessor platformServiceAccessor, final long tenantId,
             final ServiceStrategy serviceStrategy) throws UpdateException {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
-        final SetServiceState setServiceState = new SetServiceState(platformServiceAccessor, tenantId, serviceStrategy);
+        final SetServiceState setServiceState = new SetServiceState(tenantId, serviceStrategy);
         final Map<String, TaskResult<Void>> result = broadcastService.executeOnAllNodes(setServiceState, tenantId);
         handleResult(result);
     }

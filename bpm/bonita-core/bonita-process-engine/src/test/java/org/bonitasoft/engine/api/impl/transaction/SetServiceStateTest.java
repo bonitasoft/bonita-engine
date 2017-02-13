@@ -58,7 +58,8 @@ public class SetServiceStateTest {
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
         when(tenantServiceAccessor.getDependencyService()).thenReturn(dependencyService);
         when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        setServiceState = spy(new SetServiceState(platformServiceAccessor, TENANT_ID, serviceStrategy));
+        setServiceState = spy(new SetServiceState(TENANT_ID, serviceStrategy));
+        doReturn(platformServiceAccessor).when(setServiceState).getPlatformAccessor();
         doReturn(true).when(serviceStrategy).shouldRefreshClassLoaders();
     }
 
