@@ -393,7 +393,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     platformSessionId = sessionAccessor.getSessionId();
                     sessionAccessor.deleteSessionId();
                     sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
-                    final SetServiceState startService = new SetServiceState(platformAccessor, tenantId, new StartServiceStrategy());
+                    final SetServiceState startService = new SetServiceState(tenantId, new StartServiceStrategy());
                     platformAccessor.getTransactionService().executeInTransaction(startService);
                 } finally {
                     sessionService.deleteSession(sessionId);
@@ -475,7 +475,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     tenantServiceAccessor.getSessionService().deleteSessions();
                 }
                 // stop the tenant services:
-                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(platformAccessor, tenant.getId(), new StopServiceStrategy()));
+                platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
             }
             for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStop) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
@@ -671,7 +671,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
 
             // stop the tenant services:
-            final SetServiceState stopService = new SetServiceState(platformAccessor, tenantId, new StopServiceStrategy());
+            final SetServiceState stopService = new SetServiceState(tenantId, new StopServiceStrategy());
             platformAccessor.getTransactionService().executeInTransaction(stopService);
 
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Destroy tenant context of tenant " + tenantId);

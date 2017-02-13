@@ -32,6 +32,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -43,10 +44,8 @@ public class SetServiceState implements Callable<Void>, Serializable {
     private final long tenantId;
 
     private final ServiceStrategy serviceStrategy;
-    private PlatformServiceAccessor platformServiceAccessor;
 
-    public SetServiceState(PlatformServiceAccessor platformServiceAccessor, final long tenantId, final ServiceStrategy serviceStrategy) {
-        this.platformServiceAccessor = platformServiceAccessor;
+    public SetServiceState(final long tenantId, final ServiceStrategy serviceStrategy) {
         this.tenantId = tenantId;
         this.serviceStrategy = serviceStrategy;
     }
@@ -106,7 +105,7 @@ public class SetServiceState implements Callable<Void>, Serializable {
 
     public PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        return platformServiceAccessor;
+        return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
 }
