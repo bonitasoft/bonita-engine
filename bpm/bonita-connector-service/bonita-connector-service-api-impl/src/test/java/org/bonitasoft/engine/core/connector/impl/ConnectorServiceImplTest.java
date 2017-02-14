@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.notNull;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
@@ -51,18 +49,15 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.tracking.TimeTracker;
-import org.bonitasoft.engine.xml.SXMLParseException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -236,8 +231,7 @@ public class ConnectorServiceImplTest {
 
     private void checkGetConnectorImplementationUsesCache(final int givenCacheSizeToBeReturned, final int expectedNumberOfCacheStoreInvocations,
             final boolean shouldCacheContainsConnectorImplementation)
-            throws BonitaHomeNotSetException, SXMLParseException,
-            IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException, SBonitaReadException {
+            throws Exception {
 
         final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
         final String connectorDefVersion = "1.0.0";
@@ -428,7 +422,7 @@ public class ConnectorServiceImplTest {
     }
 
     private void havingConnector(SProcessDefinitionImpl processDefinition, String implName, String connectorId, String connectorVersion, BarResource... jars)
-            throws SXMLParseException, IOException, SBonitaReadException {
+            throws Exception {
         doReturn(Collections.singletonList(
                 new SBARResource(implName, BARResourceType.CONNECTOR, processDefinition.getId(), createConnectorImplFile(connectorId, connectorVersion, jars))))
                         .when(processResourcesService)
@@ -440,7 +434,7 @@ public class ConnectorServiceImplTest {
     }
 
     private byte[] createConnectorArchiveZip(String connectorImplFileName, String definitionId, final String definitionVersion, BarResource... jars)
-            throws IOException, SXMLParseException {
+            throws Exception {
         HashMap<String, byte[]> files = new HashMap<>();
         for (BarResource jar : jars) {
             files.put("classpath/" + jar.getName(), jar.getContent());
