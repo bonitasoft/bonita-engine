@@ -563,13 +563,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- XML -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.xml</groupId>
-            <artifactId>bonita-xml-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Web Command (???) -->
         <dependency>
             <groupId>org.bonitasoft.engine.external</groupId>
@@ -796,9 +789,6 @@
                                     <!-- Work -->
                                     <include>org.bonitasoft.engine.work:bonita-work-api</include>
                                     <include>org.bonitasoft.engine.work:bonita-work-impl</include>
-                                    <!-- XML -->
-                                    <include>org.bonitasoft.engine.xml:bonita-xml-api</include>
-                                    <include>org.bonitasoft.engine.xml:bonita-xml-impl</include>
                                     <!-- Web Commands -->
                                     <include>org.bonitasoft.engine.external:bonita-web-commands</include>
                                     <!-- Web Profile -->

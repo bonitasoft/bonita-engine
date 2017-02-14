@@ -13,26 +13,15 @@
  **/
 package org.bonitasoft.engine.external.web.profile.command;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.profile.ImportPolicy;
-import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.ProfilesImporter;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.xml.Parser;
 
 /**
  * @author Charles Souillard

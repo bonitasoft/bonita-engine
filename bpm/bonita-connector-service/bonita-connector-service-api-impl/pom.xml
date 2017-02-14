@@ -35,11 +35,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
 			<artifactId>bonita-cache-api</artifactId>
 			<version>${project.version}</version>
@@ -140,7 +135,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<!-- because we need the builderfactory impl and it does not make sense 
+			<!-- because we need the builderfactory impl and it does not make sense
 				to mock them -->
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
@@ -148,7 +143,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<!-- because we need the builderfactory impl and it does not make sense 
+			<!-- because we need the builderfactory impl and it does not make sense
 				to mock them -->
 			<groupId>org.bonitasoft.engine.dependency</groupId>
 			<artifactId>bonita-dependency-impl</artifactId>
