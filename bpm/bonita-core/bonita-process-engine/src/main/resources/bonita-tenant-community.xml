@@ -1269,19 +1269,6 @@
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
-    <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
-        <constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-    </bean>
-
-    <bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
-
-    <bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
-
-    <bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
-        <constructor-arg name="validator" ref="xmlValidator" />
-    </bean>
-
     <bean id="processDefinitionService"
           class="org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />

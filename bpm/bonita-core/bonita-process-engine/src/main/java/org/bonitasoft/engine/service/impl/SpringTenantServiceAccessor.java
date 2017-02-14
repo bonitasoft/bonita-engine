@@ -91,8 +91,6 @@ import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.engine.xml.ParserFactory;
-import org.bonitasoft.engine.xml.XMLWriter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
@@ -135,8 +133,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ProfileService profileService;
 
     private DataInstanceService dataInstanceService;
-
-    private ParserFactory parserFactory;
 
     private OperationService operationService;
 
@@ -502,24 +498,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public ParserFactory getParserFactgory() {
-        if (parserFactory == null) {
-            parserFactory = beanAccessor.getService(ParserFactory.class);
-        }
-        return parserFactory;
-    }
-
-    @Override
     public OperationService getOperationService() {
         if (operationService == null) {
             operationService = beanAccessor.getService(OperationService.class);
         }
         return operationService;
-    }
-
-    @Override
-    public XMLWriter getXMLWriter() {
-        return beanAccessor.getService(XMLWriter.class);
     }
 
     @Override
