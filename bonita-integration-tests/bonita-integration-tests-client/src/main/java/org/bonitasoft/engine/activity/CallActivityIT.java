@@ -31,6 +31,8 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -65,6 +67,7 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
@@ -1148,6 +1151,36 @@ public class CallActivityIT extends TestWithTechnicalUser {
         waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
 
         disableAndDeleteProcess(mainProcess, calledProcess);
+    }
+
+    @Test
+    public void should_be_able_to_cancel_process_with_call_activity_calling_unknown_process() throws Exception {
+        //given
+        ProcessDefinition processDefinition = getProcessAPI()
+                .deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processThatCallUnknownProcess", "1.0")
+                        .addStartEvent("start")
+                        .addCallActivity("call", new ExpressionBuilder().createConstantStringExpression("unknownProcess"),
+                                new ExpressionBuilder().createConstantStringExpression("1.0"))
+                        .addTransition("start", "call")
+                        .getProcess());
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        ActivityInstance activityInstance = waitForTaskToFail(processInstance);
+        assertThat(activityInstance.getName()).isEqualTo("call");
+        getProcessAPI().cancelProcessInstance(processInstance.getId());
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
+        //then
+        try {
+            getProcessAPI().getProcessInstance(processInstance.getId());
+            fail("process should not exists anymore");
+        } catch (ProcessInstanceNotFoundException ignored) {
+        }
+        //verify the call activity was archived in cancelled
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(1, 10)
+                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").done());
+        assertThat(archivedFlowNodeInstances.getResult()).hasSize(1);
+        assertThat(archivedFlowNodeInstances.getResult().get(0).getState()).isEqualTo("cancelled");
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
