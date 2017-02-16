@@ -224,7 +224,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public boolean executeConnectors(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance, final ConnectorEvent activationEvent,
-            final FlowNodeSelector selectorForConnectorOnEnter) throws SBonitaException {
+                                     final FlowNodeSelector selectorForConnectorOnEnter) throws SBonitaException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final long processDefinitionId = processDefinition.getId();
         final List<SConnectorDefinition> connectors = processContainer.getConnectors(activationEvent);
@@ -264,7 +264,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private SProcessInstance createProcessInstance(final SProcessDefinition sDefinition, final long starterId, final long starterSubstituteId,
-            final long callerId, final SFlowNodeType callerType, final long rootProcessInstanceId) throws SProcessInstanceCreationException {
+                                                   final long callerId, final SFlowNodeType callerType, final long rootProcessInstanceId) throws SProcessInstanceCreationException {
         final SProcessInstanceBuilder processInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class).createNewInstance(sDefinition)
                 .setStartedBy(starterId).setStartedBySubstitute(starterSubstituteId).setCallerId(callerId, callerType)
                 .setRootProcessInstanceId(rootProcessInstanceId);
@@ -304,7 +304,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SFlowNodeInstance flowNodeThatTriggeredTheTransition) throws SBonitaException {
         final long parentProcessInstanceId = flowNodeThatTriggeredTheTransition.getParentProcessInstanceId();
         final long rootProcessInstanceId = flowNodeThatTriggeredTheTransition.getRootProcessInstanceId();
-        final SFlowNodeDefinition sFlowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionDefinition.getName());
+        final SFlowNodeDefinition sFlowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, String.valueOf(sTransitionDefinition.getId()));
         try {
             List<SGatewayInstance> gatewaysToExecute = new ArrayList<>(1);
             final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
@@ -312,7 +312,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SGatewayInstance gatewayInstance = getActiveGatewayOrCreateIt(sProcessDefinition, sFlowNodeDefinition, stateCategory,
                     parentProcessInstanceId,
                     rootProcessInstanceId);
-            gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(sTransitionDefinition.getName()));
+            gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(sTransitionDefinition.getId()));
             if (gatewayInstanceService.checkMergingCondition(sProcessDefinition, gatewayInstance)) {
                 gatewaysToExecute.add(gatewayInstance);
                 gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
@@ -684,7 +684,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
                 .size());
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getValidOutgoingTransitionDefinitions()) {
-            final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(processDefinition, sTransitionDefinition.getName());
+            final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(processDefinition, String.valueOf(sTransitionDefinition.getId()));
             if (flowNodeDefinition instanceof SGatewayDefinition) {
                 chosenGatewaysTransitions.add(sTransitionDefinition);
             } else {

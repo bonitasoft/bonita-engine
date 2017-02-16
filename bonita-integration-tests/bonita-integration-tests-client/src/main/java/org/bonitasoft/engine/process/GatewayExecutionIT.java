@@ -1277,4 +1277,34 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Test
+    public void link_events_following_a_parallel_gateway_and_going_into_one_should_properly_activate_it() throws Exception {
+
+
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
+        String task2 = "task2";
+        String gateway = "gateway";
+        String gateway1 = "gateway1";
+        String theEnd = "theEnd";
+        builder.addEndEvent(theEnd);
+        builder.addActor("user");
+        builder.addGateway(gateway1, GatewayType.PARALLEL);
+        builder.addUserTask(task2,"user");
+        builder.addGateway(gateway, GatewayType.PARALLEL);
+        builder.addTransition(gateway, gateway1);
+        builder.addTransition(gateway, gateway1);
+        builder.addTransition(gateway, gateway1);
+        builder.addTransition(gateway1, task2);
+        builder.addTransition(task2,theEnd);
+        DesignProcessDefinition designProcessDefinition = builder.done();
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "user", user);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt(processInstance,task2,user);
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(processDefinition);
+
+    }
+
+
+
 }
