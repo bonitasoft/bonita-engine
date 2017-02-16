@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
+import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
@@ -23,7 +24,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public interface TransitionDefinition extends NamedElement, Visitable {
+public interface TransitionDefinition extends NamedElement, BaseElement, Visitable {
 
     /**
      * @deprecated from 6.5.0 on, name is not used anymore on TransitionDefinition. It is kept for retro-compatibility.

@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Test;
 
@@ -44,5 +45,17 @@ public class STransitionDefinitionImplTest {
 
         //then
         assertThat(hasCondition).isFalse();
+    }
+
+    @Test
+    public void constructor_should_correctly_get_the_id_of_the_TransitionDefinition(){
+
+        //given
+        STransitionDefinitionImpl transition = new STransitionDefinitionImpl(new TransitionDefinitionImpl());
+
+        //when
+        long id = transition.getId();
+        //then
+        assertThat(id).isNotNull();
     }
 }
