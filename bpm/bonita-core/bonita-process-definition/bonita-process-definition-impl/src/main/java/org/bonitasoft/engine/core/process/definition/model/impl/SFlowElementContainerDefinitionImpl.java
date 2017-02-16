@@ -321,7 +321,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     public void addTransition(final STransitionDefinition transition) {
         transitions.add(transition);
-        transitionsMap.put(transition.getName(), transition);
+        transitionsMap.put(transition.getId().toString(), transition);
     }
 
     public void addActivity(final SActivityDefinition activity) {
@@ -446,10 +446,10 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     @Override
-    public STransitionDefinition getTransition(final String name) {
-        STransitionDefinition transitionDefinition = transitionsMap.get(name);
+    public STransitionDefinition getTransition(final String id) {
+        STransitionDefinition transitionDefinition = transitionsMap.get(id);
         if (transitionDefinition == null) {
-            transitionDefinition = getTransitionFromSubProcesses(name);
+            transitionDefinition = getTransitionFromSubProcesses(id);
         }
         return transitionDefinition;
     }

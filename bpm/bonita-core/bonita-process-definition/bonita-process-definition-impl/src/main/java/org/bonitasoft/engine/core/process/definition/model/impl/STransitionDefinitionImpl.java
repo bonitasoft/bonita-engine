@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -38,6 +35,7 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
 
     public STransitionDefinitionImpl(final TransitionDefinition transition) {
         this(transition.getName(), transition.getSource(), transition.getTarget());
+        setId(transition.getId());
         if (transition.getCondition() != null) {
             condition = ServerModelConvertor.convertExpression(transition.getCondition());
         }

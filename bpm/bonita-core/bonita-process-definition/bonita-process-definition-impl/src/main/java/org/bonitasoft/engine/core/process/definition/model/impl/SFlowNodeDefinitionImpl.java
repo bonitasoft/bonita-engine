@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.model.SExpression;
 
+
 /**
  * @author Feng Hui
  * @author Elias Ricken de Medeiros
@@ -70,7 +71,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         incomings = buildIncomingTransitions(flowNodeDefinition, sTransitionsMap);
         outgoings = buildOutGoingTransitions(flowNodeDefinition, sTransitionsMap);
         if (flowNodeDefinition.getDefaultTransition() != null) {
-            defaultTransition = sTransitionsMap.get(flowNodeDefinition.getDefaultTransition().getName());
+            defaultTransition = sTransitionsMap.get(String.valueOf(flowNodeDefinition.getDefaultTransition().getId()));
         }
         final List<ConnectorDefinition> connectors2 = flowNodeDefinition.getConnectors();
         final ArrayList<SConnectorDefinition> mConnectors = new ArrayList<>(connectors2.size());
@@ -118,7 +119,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         iterator = outgoingTransitions.iterator();
         while (iterator.hasNext()) {
             final TransitionDefinition sTransition = iterator.next();
-            final STransitionDefinition outgoing = sTransitionsMap.get(sTransition.getName());
+            final STransitionDefinition outgoing = sTransitionsMap.get(String.valueOf(sTransition.getId()));
             outgoings.add(outgoing);
         }
         return outgoings;
@@ -131,7 +132,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         final Iterator<TransitionDefinition> iterator = incomingTransitions.iterator();
         while (iterator.hasNext()) {
             final TransitionDefinition sTransition = iterator.next();
-            final STransitionDefinition incoming = sTransitionsMap.get(sTransition.getName());
+            final STransitionDefinition incoming = sTransitionsMap.get(String.valueOf(sTransition.getId()));
             incomings.add(incoming);
         }
         return incomings;
@@ -314,13 +315,13 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     }
 
     @Override
-    public int getTransitionIndex(final String transitionName) {
+    public int getTransitionIndex(final Long transitionId) {
         int index = 1;
         boolean found = false;
         final Iterator<STransitionDefinition> iterator = incomings.iterator();
         while (!found && iterator.hasNext()) {
             final STransitionDefinition next = iterator.next();
-            if (next.getName().equals(transitionName)) {
+            if (next.getId().equals(transitionId)) {
                 found = true;
             } else {
                 index++;
