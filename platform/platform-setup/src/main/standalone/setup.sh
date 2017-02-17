@@ -3,6 +3,9 @@
 BASEDIR=$(cd $(dirname $( dirname "$0" )/..) && pwd -P)
 cd ${BASEDIR}
 
+# JAVA_CMD is exported by start-bonita.sh, so that same Java command is used:
+JAVA_EXE=${JAVA_CMD:-java}
+
 CFG_FOLDER=${BASEDIR}/platform_conf
 INITIAL_CFG_FOLDER=$CFG_FOLDER/initial
 LIB_FOLDER=${BASEDIR}/lib
@@ -15,7 +18,7 @@ if [ "$BONITA_DATABASE" != "h2" -a "$BONITA_DATABASE" != "postgres" -a "$BONITA_
     exit 1
 fi
 
-java -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}:${LIB_FOLDER}/*" -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
+"${JAVA_EXE}" -cp "${BASEDIR}:${CFG_FOLDER}:${INITIAL_CFG_FOLDER}:${LIB_FOLDER}/*" -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=${BONITA_DATABASE} org.bonitasoft.platform.setup.PlatformSetupApplication "$@"
 COD_RET=$?
 if [ ${COD_RET} -ne 0 ]; then
         cd - 1>/dev/null

@@ -1,10 +1,15 @@
 @echo off
 setlocal
 
-rem Let's position into folder containing this script:
+:: Let's position into folder containing this script:
 set CURRENTDIR="%cd%"
 set BASEDIR=%~dp0
 cd %BASEDIR%
+
+:: Check if JAVA_CMD has been passed by start-bonita.bat:
+if not "%JAVA_CMD%" == "" goto gotJavaCmd
+set JAVA_CMD="java"
+:gotJavaCmd
 
 set CFG_FOLDER=%BASEDIR%\platform_conf
 set INITIAL_CFG_FOLDER=%CFG_FOLDER%\initial
@@ -20,15 +25,15 @@ IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" IF N
 )
 
 
-REM get rid of first parameter (action parameter) and pass the rest of the command line to the java program through $@:
+:: get rid of first parameter (action parameter) and pass the rest of the command line to the java program through $@:
 SHIFT
-java -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*"  -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %0 %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*"  -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %0 %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 if errorlevel 1 (
     exit /b 1
 )
 
-rem restore previous folder:
+:: restore previous folder:
 cd %CURRENTDIR%
 
 exit /b 0
