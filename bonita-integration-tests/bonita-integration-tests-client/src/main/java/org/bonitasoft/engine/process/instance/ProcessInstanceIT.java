@@ -181,40 +181,40 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     }
 
     @Test
-    public void getArchivedProcessInstance() throws Exception {
+    public void should_archivedProcessInstance_startDate_in_same_order() throws Exception {
+        // given
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
                 Arrays.asList("step1", "step2"), Arrays.asList(false, false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
 
+        // when
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
-        // We asked for creation date descending order:
-        final List<ArchivedProcessInstance> processInstances;
-        checkProcessInstanceIsArchived(pi2);
-        processInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_ASC);
-        assertEquals(3, processInstances.size());
-        //
+
+        waitForProcessToFinish(pi0.getId());
+        waitForProcessToFinish(pi1.getId());
+        waitForProcessToFinish(pi2.getId());
+
+        // then 
+        final List<ArchivedProcessInstance> processInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_ASC);
+        assertThat(processInstances).as("should find 3 archived processes").hasSize(3);
+
         final ArchivedProcessInstance returnedPI0 = processInstances.get(0);
         final ArchivedProcessInstance returnedPI1 = processInstances.get(1);
         final ArchivedProcessInstance returnedPI2 = processInstances.get(2);
 
-        System.out.println("process instances : " + processInstances);
+        assertThat(pi0.getId()).as("archived process should have the same id").isEqualTo(returnedPI0.getSourceObjectId());
+        assertThat(pi1.getId()).as("archived process should have the same id").isEqualTo(returnedPI1.getSourceObjectId());
+        assertThat(pi2.getId()).as("archived process should have the same id").isEqualTo(returnedPI2.getSourceObjectId());
 
-        // We check that the retrieved processes are the good ones:
-        assertEquals(pi0.getId(), returnedPI0.getSourceObjectId());
-        assertEquals(pi1.getId(), returnedPI1.getSourceObjectId());
-        assertEquals(pi2.getId(), returnedPI2.getSourceObjectId());
-
-        // First creation date must be after second creation date:
-        assertTrue(returnedPI0.getStartDate().before(returnedPI1.getStartDate()));
-        // Second creation date must be after third creation date:
-        assertTrue(returnedPI1.getStartDate().before(returnedPI2.getStartDate()));
+        assertThat(returnedPI0.getStartDate()).as("process 0 should start before or at same time than process 1").isBeforeOrEqualsTo(returnedPI1.getStartDate());
+        assertThat(returnedPI1.getStartDate()).as("process 1 should start before or at same time than process 2").isBeforeOrEqualsTo(returnedPI2.getStartDate());
 
         disableAndDeleteProcess(processDefinition);
-        assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
+        assertThat(getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT)).as("should delete all instances after process deletion").hasSize(0);
     }
-
+    
     @Test
     public void getArchivedProcessInstanceOrderByLastUpdate() throws Exception {
         getArchivedProcessInstances(ProcessInstanceCriterion.LAST_UPDATE_ASC, 0, 1, 2, ProcessInstanceCriterion.LAST_UPDATE_DESC, 2, 1, 0);
