@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -208,8 +208,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         return model;
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData",
-            "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
+    @Cover(classes = {Operation.class}, concept = BPMNConcept.OPERATION, keywords = {"BusinessData",
+            "business data java setter operation"}, jira = "BS-7217", story = "update a business data using a java setter operation")
     @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final String processContractInputName = "lastName_input";
@@ -284,7 +284,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(),
+                        .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
@@ -317,7 +317,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void deployABDRAndCreateABOAndUpdateThroughAGroovyScript() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
+                        .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME);
 
         final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", EMPLOYEE_QUALIFIED_NAME);
@@ -462,8 +462,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String firstName = "FlofFlof";
         final String lastName = "Boudin";
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; import ").append(ADDRESS_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = '")
-                .append(firstName).append("'; e.lastName = '").append(lastName).append("'; e.addToAddresses(myAddress); return e;").toString(),
+                        .append(EMPLOYEE_QUALIFIED_NAME).append("; import ").append(ADDRESS_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = '")
+                        .append(firstName).append("'; e.lastName = '").append(lastName).append("'; e.addToAddresses(myAddress); return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
@@ -495,7 +495,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String getLastNameWithDAOExpression = "retrieveEmployeeByFirstName";
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = "
-                        + employeeDAOName + ".findByFirstName('" + firstName + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
+                                + employeeDAOName + ".findByFirstName('" + firstName + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
                         new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")),
                 null);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_ADDRESS, "Address." + COUNT_ADDRESS, Long.class.getName()), null);
@@ -532,7 +532,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     /**
      * {@link BDRepositoryIT#should_use_apiClient_to_instantiate_dao_on_client_side}
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -630,12 +630,65 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
+    @Test
+    public void should_retrieve_bdm_object_with_lazy_and_non_lazy_composition_objects_using_dao() throws Exception {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
+                        "import " + EMPLOYEE_QUALIFIED_NAME + "\n" +
+                                "import " + DOG_QUALIFIED_NAME + "\n" +
+                                "import " + CAT_QUALIFIED_NAME + "\n" +
+                                "Employee e = new Employee()\n" +
+                                "e.firstName ='john'\n" +
+                                "e.lastName ='doe'\n" +
+                                "def d = new Dog()\n" +
+                                "d.name = 'kiki'\n" +
+                                "d.age = 2\n" +
+                                "e.setDog(d)\n" +
+                                "def c = new Cat()\n" +
+                                "c.name = 'fifi'\n" +
+                                "c.age = 5\n" +
+                                "e.setCat(c)\n" +
+                                "return e",
+                        EMPLOYEE_QUALIFIED_NAME));
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(instance, "step1");
+
+        disableAndDeleteProcess(definition.getId());
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(getTenantAdministrationAPI().getClientBDMZip(),
+                contextClassLoader,
+                EMPLOYEE_QUALIFIED_NAME, clientFolder);
+
+        try {
+            Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
+            final BusinessObjectDAO daoImpl = new APIClient(getSession())
+                    .getDAO((Class<? extends BusinessObjectDAO>) Class.forName(EMPLOYEE_QUALIFIED_NAME + "DAO", true,
+                            classLoaderWithBDM));
+
+            List<?> employees = (List<?>) daoImpl.getClass().getMethod("find", int.class, int.class).invoke(daoImpl, 0, 100);
+            assertThat(invokeMethod(invokeMethod(employees.get(0), "getCat"), "getName")).isEqualTo("fifi");
+            assertThat(invokeMethod(invokeMethod(employees.get(0), "getDog"), "getName")).isEqualTo("kiki");
+            Object employee = daoImpl.getClass().getMethod("findByFirstNameAndLastName", String.class, String.class).invoke(daoImpl, "john", "doe");
+            assertThat(invokeMethod(invokeMethod(employee, "getCat"), "getName")).isEqualTo("fifi");
+            assertThat(invokeMethod(invokeMethod(employee, "getDog"), "getName")).isEqualTo("kiki");
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    private Object invokeMethod(Object object, String method) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return object.getClass().getMethod(method, new Class[0]).invoke(object);
+    }
+
     private void addEmployee(final String firstName, final String lastName, final AddressRef... addresses) throws Exception {
         final List<Expression> dependencies = new ArrayList<>();
-        if (addresses != null) {
-            for (final AddressRef ref : addresses) {
-                dependencies.add(ref.createDependency());
-            }
+        for (final AddressRef ref : addresses) {
+            dependencies.add(ref.getExpression());
         }
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 createNewEmployeeScriptContent(firstName, lastName, addresses),
@@ -645,22 +698,14 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIFIED_NAME, null);
         final UserTaskDefinitionBuilder task = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-        if (addresses != null) {
-            for (final AddressRef ref : addresses) {
-                processDefinitionBuilder.addBusinessData(ref.getVarName(), ADDRESS_QUALIFIED_NAME, null);
-                final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createAddress" + ref.getVarName(),
-                        createNewAddressScriptContent(ref.getStreet(), ref.getCity()),
-                        ADDRESS_QUALIFIED_NAME);
-                task.addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(ref.getVarName()),
-                        OperatorType.ASSIGNMENT, null, null, addressExpression);
-            }
+        for (final AddressRef ref : addresses) {
+            processDefinitionBuilder.addBusinessData(ref.getVarName(), ADDRESS_QUALIFIED_NAME, null);
+            task.addOperation(ref.getCreationOperation());
         }
-
         task.addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, testUser);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", testUser);
 
@@ -684,30 +729,13 @@ public class BDRepositoryIT extends CommonAPIIT {
         sb.append("'" + lastName + "'");
         sb.append("\n");
         if (addresses != null) {
-            for (int i = 0; i < addresses.length; i++) {
-                sb.append("e.addToAddresses(" + addresses[i].getVarName() + ")");
+            for (AddressRef address : addresses) {
+                sb.append("e.addToAddresses(" + address.getVarName() + ")");
                 sb.append("\n");
             }
         }
 
         sb.append("return e;");
-        return sb.toString();
-    }
-
-    private String createNewAddressScriptContent(final String street, final String city) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("import ");
-        sb.append(ADDRESS_QUALIFIED_NAME);
-        sb.append("\n");
-        sb.append("Address a = new Address();");
-        sb.append("\n");
-        sb.append("a.street =");
-        sb.append("'" + street + "'");
-        sb.append("\n");
-        sb.append("a.city =");
-        sb.append("'" + city + "'");
-        sb.append("\n");
-        sb.append("return a;");
         return sb.toString();
     }
 
@@ -750,7 +778,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String expressionEmployee = "retrieve_Employee";
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee, "\"Employee [firstName=\" + " + businessDataName
-                        + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
+                                + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
                         new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)),
                 null);
         try {
@@ -762,8 +790,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
-            "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
+    @Cover(classes = {Operation.class}, concept = BPMNConcept.OPERATION, keywords = {"BusinessData", "java setter operation", "mandatory field",
+            "intermixed"}, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
     @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
         final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(),
@@ -844,7 +872,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
+                        .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
@@ -862,7 +890,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final long step1Id = waitForUserTask(processInstance, "step1");
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.<String, Serializable>emptyMap());
 
         final long processInstanceId = processInstance.getId();
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
@@ -879,7 +907,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     public void assertCount(final long processInstanceId) throws Exception {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.<String, Serializable>emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         assertThat(result.get("countEmployee")).isEqualTo(1L);
@@ -925,7 +953,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String expressionEmployee = "retrieve_Employee";
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee, "\"Employee [firstName=\" + " + businessDataName
-                        + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
+                                + ".firstName + \", lastName=\" + " + businessDataName + ".lastName + \"]\";", String.class.getName(),
                         new ExpressionBuilder().createBusinessDataExpression(businessDataName, List.class.getName())),
                 null);
         try {
@@ -1139,7 +1167,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addCallActivity("call",
                 new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getName()),
                 new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getVersion())).addProcessStartContractInput("theInput",
-                        new ExpressionBuilder().createConstantStringExpression("theValue"));
+                new ExpressionBuilder().createConstantStringExpression("theValue"));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("call", "step2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
@@ -1149,7 +1177,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final Expression employee = new ExpressionBuilder().createGroovyScriptExpression("script", "employee.firstName", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression("employee", EMPLOYEE_QUALIFIED_NAME));
         final Serializable employeeResult = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
-                Collections.<Expression, Map<String, Serializable>> singletonMap(employee, null)).get("script");
+                Collections.<Expression, Map<String, Serializable>>singletonMap(employee, null)).get("script");
         assertThat(employeeResult).isEqualTo("theValue");
         getProcessAPI().assignUserTask(step1Id, testUser.getId());
         getProcessAPI().executeFlowNode(step1Id);
@@ -1191,7 +1219,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
                 instance.getId(),
                 Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
-                        Collections.<String, Serializable> emptyMap()));
+                        Collections.<String, Serializable>emptyMap()));
         assertThat(employee).hasSize(1);
         assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
         final MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
@@ -1326,7 +1354,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // when
         ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
-        getCommandAPI().addDependency("temporaryDeps", new byte[] { 0, 1 });
+        getCommandAPI().addDependency("temporaryDeps", new byte[]{0, 1});
         final Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
 
         // then
@@ -1564,7 +1592,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "import " + ADDRESS_QUALIFIED_NAME + "; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
                 ADDRESS_QUALIFIED_NAME);
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIFIED_NAME
-                + "; new Employee(firstName:'John', lastName:'Doe', address:myAddress)", EMPLOYEE_QUALIFIED_NAME,
+                        + "; new Employee(firstName:'John', lastName:'Doe', address:myAddress)", EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
@@ -1613,7 +1641,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "import " + ADDRESS_QUALIFIED_NAME + "; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
                 ADDRESS_QUALIFIED_NAME);
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIFIED_NAME
-                + "; new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress])", EMPLOYEE_QUALIFIED_NAME,
+                        + "; new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress])", EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
@@ -1742,7 +1770,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     public Long getNumberOfAddresses(final long processInstanceId) throws Exception {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countAddresses", "Address.countAddress", Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.<String, Serializable>emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         return (Long) result.get("countAddresses");
@@ -1752,7 +1780,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(2);
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression("getAddress", "\"Address [street=\" + " + addressName
-                        + ".street + \", city=\" + " + addressName + ".city + \"]\";", String.class.getName(),
+                                + ".street + \", city=\" + " + addressName + ".city + \"]\";", String.class.getName(),
                         new ExpressionBuilder().createBusinessDataExpression(addressName, ADDRESS_QUALIFIED_NAME)),
                 null);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
@@ -1793,7 +1821,7 @@ public class BDRepositoryIT extends CommonAPIIT {
             this.city = city;
         }
 
-        public Expression createDependency() throws InvalidExpressionException {
+        public Expression getExpression() throws InvalidExpressionException {
             return new ExpressionBuilder().createBusinessDataExpression(getVarName(), ADDRESS_QUALIFIED_NAME);
         }
 
@@ -1807,6 +1835,21 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         public String getCity() {
             return city;
+        }
+
+        public Operation getCreationOperation() throws InvalidExpressionException {
+            String sb = "import " + ADDRESS_QUALIFIED_NAME + "\n" +
+                    "Address a = new Address();\n" +
+                    "a.street ='" + street + "'\n" +
+                    "a.city ='" + city + "'\n" +
+                    "return a;";
+            final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createAddress" + varName,
+                    sb,
+                    ADDRESS_QUALIFIED_NAME);
+            return new OperationBuilder().createNewInstance()
+                    .setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(varName))
+                    .setType(OperatorType.ASSIGNMENT)
+                    .setRightOperand(addressExpression).done();
         }
 
     }
@@ -1908,7 +1951,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
+                Collections.<String, Serializable>singletonMap("employeeName", "Doe"));
         //when
         waitForUserTask("userTask");
         assertThat(new String(getProcessAPI().getDocumentContent(getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
@@ -1961,11 +2004,11 @@ public class BDRepositoryIT extends CommonAPIIT {
         BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
+                Collections.<String, Serializable>singletonMap("employeeName", "Doe"));
         waitForUserTask("userTask");
         assertThatJson(getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
                 processInstance.getId()).get("ref_myBusinessData")))
-                        .node("lastName").isEqualTo("\"Doe\"");
+                .node("lastName").isEqualTo("\"Doe\"");
         //when
         getProcessAPI().sendSignal("theSignal");
         waitForUserTask("userTaskInSubProcess");
@@ -1973,7 +2016,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         //then
         assertThatJson(getBusinessDataAsJson((SimpleBusinessDataReference) getProcessAPI().getProcessInstanceExecutionContext(
                 processInstance.getId()).get("ref_myBusinessData")))
-                        .node("lastName").isEqualTo("\"newName\"");
+                .node("lastName").isEqualTo("\"newName\"");
         disableAndDeleteProcess(processDefinition);
     }
 

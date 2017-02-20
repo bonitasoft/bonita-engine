@@ -78,6 +78,8 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     private byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        //avoid to fail when serializing proxy (proxy will be recreated client side) see BS-16031
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         ((DefaultSerializerProvider) mapper.getSerializerProvider()).flushCachedSerializers();
         try {
             return mapper.writeValueAsBytes(result);
