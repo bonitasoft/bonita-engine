@@ -38,4 +38,6 @@ public interface SUserMembership extends PersistentObject {
 
     long getAssignedDate();
 
+    String getGroupParentPath();
+
 }
