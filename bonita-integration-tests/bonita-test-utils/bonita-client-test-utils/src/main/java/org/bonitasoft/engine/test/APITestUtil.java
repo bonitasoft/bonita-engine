@@ -166,6 +166,8 @@ public class APITestUtil extends PlatformTestUtil {
     private static final String BDM_PACKAGE_PREFIX = "com.company.model";
     protected static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
     protected static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
+    protected static final String DOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Dog";
+    protected static final String CAT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Cat";
     protected static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
     protected static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
     protected static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
@@ -1367,6 +1369,9 @@ public class APITestUtil extends PlatformTestUtil {
         final SimpleField name = new SimpleField();
         name.setName("name");
         name.setType(FieldType.STRING);
+        final SimpleField age = new SimpleField();
+        age.setName("age");
+        age.setType(FieldType.INTEGER);
 
         final BusinessObject countryBO = new BusinessObject();
         countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
@@ -1397,6 +1402,15 @@ public class APITestUtil extends PlatformTestUtil {
         addressBO.addQuery(COUNT_ADDRESS, "SELECT count(a) FROM Address a", Long.class.getName());
         addressBO.addUniqueConstraint("addressUK_with_relation", "city", "country");
 
+        final BusinessObject dogBO = new BusinessObject();
+        dogBO.setQualifiedName(DOG_QUALIFIED_NAME);
+        dogBO.addField(name);
+        dogBO.addField(age);
+        final BusinessObject catBO = new BusinessObject();
+        catBO.setQualifiedName(CAT_QUALIFIED_NAME);
+        catBO.addField(name);
+        catBO.addField(age);
+
         final RelationField addresses = new RelationField();
         addresses.setType(RelationField.Type.AGGREGATION);
         addresses.setFetchType(RelationField.FetchType.EAGER);
@@ -1413,10 +1427,27 @@ public class APITestUtil extends PlatformTestUtil {
         address.setNullable(Boolean.TRUE);
         address.setReference(addressBO);
 
+        final RelationField dog = new RelationField();
+        dog.setType(RelationField.Type.COMPOSITION);
+        dog.setFetchType(RelationField.FetchType.EAGER);
+        dog.setName("dog");
+        dog.setCollection(Boolean.FALSE);
+        dog.setNullable(Boolean.TRUE);
+        dog.setReference(dogBO);
+
+        final RelationField cat = new RelationField();
+        cat.setType(RelationField.Type.COMPOSITION);
+        cat.setFetchType(RelationField.FetchType.LAZY);
+        //bug on lazy attribute in composition starting with a capital letter, see:  https://bonitasoft.atlassian.net/browse/BS-16031
+        cat.setName("Cat");
+        cat.setCollection(Boolean.FALSE);
+        cat.setNullable(Boolean.TRUE);
+        cat.setReference(catBO);
+
         final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
-        firstName.setLength(Integer.valueOf(10));
+        firstName.setLength(10);
 
         final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
@@ -1426,7 +1457,7 @@ public class APITestUtil extends PlatformTestUtil {
         final SimpleField phoneNumbers = new SimpleField();
         phoneNumbers.setName("phoneNumbers");
         phoneNumbers.setType(FieldType.STRING);
-        phoneNumbers.setLength(Integer.valueOf(10));
+        phoneNumbers.setLength(10);
         phoneNumbers.setCollection(Boolean.TRUE);
 
         final SimpleField hireDate = new SimpleField();
@@ -1446,6 +1477,8 @@ public class APITestUtil extends PlatformTestUtil {
         employee.addField(phoneNumbers);
         employee.addField(addresses);
         employee.addField(address);
+        employee.addField(dog);
+        employee.addField(cat);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
@@ -1528,6 +1561,8 @@ public class APITestUtil extends PlatformTestUtil {
         model.addBusinessObject(employee);
         model.addBusinessObject(person);
         model.addBusinessObject(addressBO);
+        model.addBusinessObject(dogBO);
+        model.addBusinessObject(catBO);
         model.addBusinessObject(countryBO);
         model.addBusinessObject(productBO);
         model.addBusinessObject(editionBO);
