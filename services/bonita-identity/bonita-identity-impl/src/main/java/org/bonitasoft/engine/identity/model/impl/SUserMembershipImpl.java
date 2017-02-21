@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 
 /**
@@ -33,6 +36,8 @@ public class SUserMembershipImpl extends SPersistentObjectImpl implements SUserM
 
     private long assignedDate;
 
+    private String groupParentPath;
+
     private transient String roleName;
 
     private transient String groupName;
@@ -44,7 +49,7 @@ public class SUserMembershipImpl extends SPersistentObjectImpl implements SUserM
     }
 
     public SUserMembershipImpl(final long id, final long userId, final long groupId, final long roleId, final long assignedBy, final long assignedDate,
-            final String roleName, final String groupName, final String username) {
+            final String roleName, final String groupName, final String username, String groupParentPath) {
         super();
         setId(id);
         this.userId = userId;
@@ -55,6 +60,7 @@ public class SUserMembershipImpl extends SPersistentObjectImpl implements SUserM
         this.roleName = roleName;
         this.groupName = groupName;
         this.username = username;
+        this.groupParentPath = groupParentPath;
     }
 
     public SUserMembershipImpl(final long userId, final long groupId, final long roleId) {
@@ -141,70 +147,66 @@ public class SUserMembershipImpl extends SPersistentObjectImpl implements SUserM
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (assignedBy ^ assignedBy >>> 32);
-        result = prime * result + (int) (assignedDate ^ assignedDate >>> 32);
-        result = prime * result + (int) (groupId ^ groupId >>> 32);
-        result = prime * result + (int) (roleId ^ roleId >>> 32);
-        result = prime * result + (int) (userId ^ userId >>> 32);
-        return result;
+    public String getGroupParentPath() {
+        return groupParentPath;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SUserMembershipImpl other = (SUserMembershipImpl) obj;
-        if (assignedBy != other.assignedBy) {
-            return false;
-        }
-        if (assignedDate != other.assignedDate) {
-            return false;
-        }
-        if (groupId != other.groupId) {
-            return false;
-        }
-        if (roleId != other.roleId) {
-            return false;
-        }
-        if (userId != other.userId) {
-            return false;
-        }
-        return true;
+    public void setGroupParentPath(String groupParentPath) {
+        this.groupParentPath = groupParentPath;
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("SUserMembershipImpl (");
-        builder.append(getId());
-        builder.append(" [roleId=");
-        builder.append(roleId);
-        builder.append(", groupId=");
-        builder.append(groupId);
-        builder.append(", userId=");
-        builder.append(userId);
-        builder.append(", assignedBy=");
-        builder.append(assignedBy);
-        builder.append(", assignedDate=");
-        builder.append(assignedDate);
-        builder.append(", roleName=");
-        builder.append(roleName);
-        builder.append(", groupName=");
-        builder.append(groupName);
-        builder.append(", username=");
-        builder.append(username);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("roleId", roleId)
+                .append("groupId", groupId)
+                .append("userId", userId)
+                .append("assignedBy", assignedBy)
+                .append("assignedDate", assignedDate)
+                .append("groupParentPath", groupParentPath)
+                .append("roleName", roleName)
+                .append("groupName", groupName)
+                .append("username", username)
+                .toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+
+        if (!(o instanceof SUserMembershipImpl))
+            return false;
+
+        SUserMembershipImpl that = (SUserMembershipImpl) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(getRoleId(), that.getRoleId())
+                .append(getGroupId(), that.getGroupId())
+                .append(getUserId(), that.getUserId())
+                .append(getAssignedBy(), that.getAssignedBy())
+                .append(getAssignedDate(), that.getAssignedDate())
+                .append(getGroupParentPath(), that.getGroupParentPath())
+                .append(getRoleName(), that.getRoleName())
+                .append(getGroupName(), that.getGroupName())
+                .append(getUsername(), that.getUsername())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(getRoleId())
+                .append(getGroupId())
+                .append(getUserId())
+                .append(getAssignedBy())
+                .append(getAssignedDate())
+                .append(getGroupParentPath())
+                .append(getRoleName())
+                .append(getGroupName())
+                .append(getUsername())
+                .toHashCode();
+    }
 }

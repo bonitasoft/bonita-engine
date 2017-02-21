@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -83,8 +84,10 @@ import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -668,6 +671,19 @@ public class ModelConvertorTest {
         //then
         assertThat(urgentATask.getExpectedEndDate()).isEqualTo(new Date(15L));
         assertThat(takeYourTimeATask.getExpectedEndDate()).isNull();
+    }
+    
+    @Test
+    public void should_set_the_parentPath_when_creating_a_UserMembership(){
+        //given
+        SUserMembershipImpl sUserMembership = new SUserMembershipImpl(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
+        
+        //when
+        UserMembershipImpl userMembership = (UserMembershipImpl) toUserMembership(sUserMembership);
+        
+        //then
+        assertThat(userMembership.getGroupParentPath()).isNotNull();
+        assertThat(userMembership.getGroupParentPath()).isEqualToIgnoringCase("Bonita/dummy");
     }
 
 }

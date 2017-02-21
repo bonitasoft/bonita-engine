@@ -1061,6 +1061,7 @@ public class ModelConvertor {
         userMembership.setGroupName(sUserMembership.getGroupName());
         userMembership.setRoleName(sUserMembership.getRoleName());
         userMembership.setUsername(sUserMembership.getUsername());
+        userMembership.setGroupParentPath(sUserMembership.getGroupParentPath());
         return userMembership;
     }
 
