@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +84,7 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.session.APISession;
@@ -625,12 +627,65 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
+    @Test
+    public void should_retrieve_bdm_object_with_lazy_and_non_lazy_composition_objects_using_dao() throws Exception {
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
+                        "import " + EMPLOYEE_QUALIFIED_NAME + "\n" +
+                                "import " + DOG_QUALIFIED_NAME + "\n" +
+                                "import " + CAT_QUALIFIED_NAME + "\n" +
+                                "Employee e = new Employee()\n" +
+                                "e.firstName ='john'\n" +
+                                "e.lastName ='doe'\n" +
+                                "def d = new Dog()\n" +
+                                "d.name = 'kiki'\n" +
+                                "d.age = 2\n" +
+                                "e.setDog(d)\n" +
+                                "def c = new Cat()\n" +
+                                "c.name = 'fifi'\n" +
+                                "c.age = 5\n" +
+                                "e.setCat(c)\n" +
+                                "return e",
+                        EMPLOYEE_QUALIFIED_NAME));
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(instance, "step1");
+
+        disableAndDeleteProcess(definition.getId());
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(getTenantAdministrationAPI().getClientBDMZip(),
+                contextClassLoader,
+                EMPLOYEE_QUALIFIED_NAME, clientFolder);
+
+        try {
+            Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
+            final BusinessObjectDAO daoImpl = new APIClient(getSession())
+                    .getDAO((Class<? extends BusinessObjectDAO>) Class.forName(EMPLOYEE_QUALIFIED_NAME + "DAO", true,
+                            classLoaderWithBDM));
+
+            List<?> employees = (List<?>) daoImpl.getClass().getMethod("find", int.class, int.class).invoke(daoImpl, 0, 100);
+            assertThat(invokeMethod(invokeMethod(employees.get(0), "getCat"), "getName")).isEqualTo("fifi");
+            assertThat(invokeMethod(invokeMethod(employees.get(0), "getDog"), "getName")).isEqualTo("kiki");
+            Object employee = daoImpl.getClass().getMethod("findByFirstNameAndLastName", String.class, String.class).invoke(daoImpl, "john", "doe");
+            assertThat(invokeMethod(invokeMethod(employee, "getCat"), "getName")).isEqualTo("fifi");
+            assertThat(invokeMethod(invokeMethod(employee, "getDog"), "getName")).isEqualTo("kiki");
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    private Object invokeMethod(Object object, String method) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return object.getClass().getMethod(method, new Class[0]).invoke(object);
+    }
+
     private void addEmployee(final String firstName, final String lastName, final AddressRef... addresses) throws Exception {
         final List<Expression> dependencies = new ArrayList<>();
-        if (addresses != null) {
-            for (final AddressRef ref : addresses) {
-                dependencies.add(ref.createDependency());
-            }
+        for (final AddressRef ref : addresses) {
+            dependencies.add(ref.getExpression());
         }
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 createNewEmployeeScriptContent(firstName, lastName, addresses),
@@ -640,22 +695,14 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIFIED_NAME, null);
         final UserTaskDefinitionBuilder task = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-        if (addresses != null) {
-            for (final AddressRef ref : addresses) {
-                processDefinitionBuilder.addBusinessData(ref.getVarName(), ADDRESS_QUALIFIED_NAME, null);
-                final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createAddress" + ref.getVarName(),
-                        createNewAddressScriptContent(ref.getStreet(), ref.getCity()),
-                        ADDRESS_QUALIFIED_NAME);
-                task.addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(ref.getVarName()),
-                        OperatorType.ASSIGNMENT, null, null, addressExpression);
-            }
+        for (final AddressRef ref : addresses) {
+            processDefinitionBuilder.addBusinessData(ref.getVarName(), ADDRESS_QUALIFIED_NAME, null);
+            task.addOperation(ref.getCreationOperation());
         }
-
         task.addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myEmployee"),
                 OperatorType.ASSIGNMENT, null, null, employeeExpression);
 
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, testUser);
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", testUser);
 
@@ -679,30 +726,13 @@ public class BDRepositoryIT extends CommonAPIIT {
         sb.append("'" + lastName + "'");
         sb.append("\n");
         if (addresses != null) {
-            for (int i = 0; i < addresses.length; i++) {
-                sb.append("e.addToAddresses(" + addresses[i].getVarName() + ")");
+            for (AddressRef address : addresses) {
+                sb.append("e.addToAddresses(" + address.getVarName() + ")");
                 sb.append("\n");
             }
         }
 
         sb.append("return e;");
-        return sb.toString();
-    }
-
-    private String createNewAddressScriptContent(final String street, final String city) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("import ");
-        sb.append(ADDRESS_QUALIFIED_NAME);
-        sb.append("\n");
-        sb.append("Address a = new Address();");
-        sb.append("\n");
-        sb.append("a.street =");
-        sb.append("'" + street + "'");
-        sb.append("\n");
-        sb.append("a.city =");
-        sb.append("'" + city + "'");
-        sb.append("\n");
-        sb.append("return a;");
         return sb.toString();
     }
 
@@ -1786,7 +1816,7 @@ public class BDRepositoryIT extends CommonAPIIT {
             this.city = city;
         }
 
-        public Expression createDependency() throws InvalidExpressionException {
+        public Expression getExpression() throws InvalidExpressionException {
             return new ExpressionBuilder().createBusinessDataExpression(getVarName(), ADDRESS_QUALIFIED_NAME);
         }
 
@@ -1800,6 +1830,21 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         public String getCity() {
             return city;
+        }
+
+        public Operation getCreationOperation() throws InvalidExpressionException {
+            String sb = "import " + ADDRESS_QUALIFIED_NAME + "\n" +
+                    "Address a = new Address();\n" +
+                    "a.street ='" + street + "'\n" +
+                    "a.city ='" + city + "'\n" +
+                    "return a;";
+            final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createAddress" + varName,
+                    sb,
+                    ADDRESS_QUALIFIED_NAME);
+            return new OperationBuilder().createNewInstance()
+                    .setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(varName))
+                    .setType(OperatorType.ASSIGNMENT)
+                    .setRightOperand(addressExpression).done();
         }
 
     }
