@@ -167,7 +167,7 @@
 	</query>
 
 	<query name="getUserMembershipsByGroup">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName, group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
@@ -176,10 +176,11 @@
 		AND user_membership.groupId = group_.id 
 		AND user_membership.userId = user.id 
 		AND user_membership.groupId = :groupId
+
 	</query>
 
 	<query name="getUserMembershipsByRole">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName,group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
@@ -191,7 +192,7 @@
 	</query>
 
 	<query name="getUserMembershipsOfUser">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName,group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
@@ -203,7 +204,7 @@
 	</query>
 
 	<query name="getUserMembershipWithIds">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName,group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
@@ -226,7 +227,7 @@
 
 <!-- User memberships  -->
 	<query name="getUserMemberships">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName,group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
@@ -240,7 +241,7 @@
 	</query>
 
 	<query name="getSUserMembershipById">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName,group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
@@ -369,7 +370,7 @@
 	</query>
 
 	<query name="searchUserMembership">
-		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName)
+		SELECT new org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl(user_membership.id, user_membership.userId, user_membership.groupId, user_membership.roleId, user_membership.assignedBy, user_membership.assignedDate, role.name, group_.name, user.userName,group_.parentPath)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
