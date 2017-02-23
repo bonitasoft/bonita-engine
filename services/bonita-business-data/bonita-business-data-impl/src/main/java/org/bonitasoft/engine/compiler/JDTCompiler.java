@@ -34,7 +34,9 @@ import org.eclipse.jdt.internal.compiler.batch.Main;
  */
 public class JDTCompiler {
 
-    private static final String COMPILER_COMPLIANCE_LEVEL = "-1.7";
+    private static final String COMPILER_COMPLIANCE_LEVEL = "-1.8";
+    //Used to keep parameters name in bytecode to allow reflection in DAO
+    private static final String PARAMETERS_NAME_ARG = "-parameters";
     private ClassLoader classLoader;
 
     /**
@@ -52,21 +54,21 @@ public class JDTCompiler {
     }
 
     public void compile(final File srcDirectory, ClassLoader classLoader) throws CompilationException {
-        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[]{"java"}, true);
+        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
         compile(files, srcDirectory, classLoader);
     }
 
     private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory) {
-        final List<String> arguments = new ArrayList<String>();
+        final List<String> arguments = new ArrayList<>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
+        arguments.add(PARAMETERS_NAME_ARG);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
         arguments.addAll(filesToBeCompiledArguments(files));
         return arguments.toArray(new String[arguments.size()]);
     }
 
-
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
-        final List<String> arguments = new ArrayList<String>(files.size());
+        final List<String> arguments = new ArrayList<>(files.size());
         for (final File file : files) {
             arguments.add(file.getAbsolutePath());
         }
@@ -97,7 +99,6 @@ public class JDTCompiler {
 
     private void doCompilation(final String[] commandLine, final PrintWriter outWriter, final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
             throws CompilationException {
-
         final Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */, new DummyCompilationProgress()) {
 
             @Override

@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -69,6 +70,13 @@ public class JDTCompilerTest {
 
         assertThat(new File(outputDirectory, "org/bonitasoft/CompilableOne.class")).exists();
         assertThat(new File(outputDirectory, "org/bonitasoft/CompilableTwo.class")).exists();
+
+        try (URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { outputDirectory.toURI().toURL() },
+                Thread.currentThread().getContextClassLoader())) {
+            final Class<?> compilableOneClass = urlClassLoader.loadClass("org.bonitasoft.CompilableOne");
+            final Method method = compilableOneClass.getMethod("setaClassVariable", int.class);
+            assertThat(method.getParameters()[0].getName()).isEqualTo("aClassVariable");
+        }
     }
 
     @Test(expected = CompilationException.class)
@@ -93,8 +101,7 @@ public class JDTCompilerTest {
     public void should_compile_class_with_external_dependencies() throws Exception {
         final File compilableWithDependency = getTestResourceAsFile("DependenciesNeeded.java");
         final File externalLib = getTestResourceAsFile("external-lib.jar");
-        URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{externalLib.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
-
+        final URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { externalLib.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
 
         jdtCompiler.compile(asList(compilableWithDependency), outputDirectory, urlClassLoader);
     }
