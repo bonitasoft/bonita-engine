@@ -128,6 +128,7 @@
             <logger category="com.bonitasoft">
                 <level name="WARN" />
             </logger>
+
             <logger category="org.bonitasoft.engine.EngineInitializer">
                 <level name="INFO" />
             </logger>
@@ -207,6 +208,12 @@
             <logger category="org.tuckey">
                 <level name="WARN" />
             </logger>
+            <logger category="org.hibernate.dialect.H2Dialect">
+                <level name="ERROR" />
+            </logger>
+            <logger category="org.hibernate.type.TypeFactory">
+                <level name="ERROR" />
+            </logger>
 
             <root-logger>
                 <level name="INFO" />
@@ -236,18 +243,14 @@
         <subsystem xmlns="urn:jboss:domain:bean-validation:1.0" />
         <subsystem xmlns="urn:jboss:domain:datasources:4.0">
             <datasources>
-                <!--
-                #######################################################################################################
-                BEGIN of AREA RESERVED to Bonita BPM Platform setup / configuration tool
-                DO NOT TOUCH THE PART BELOW !
-                #######################################################################################################
-                -->
 
-                <!--
-                #######################################################################################################
-                Drivers: used by Bonita BPM Platform setup / configuration tool: Do not touch this paragraph !
-                #######################################################################################################
-                -->
+                <!-- #################################################################################################################### -->
+                <!-- ##############   BETWEEN THESE 2 SECTIONS IS A TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL.          ################ -->
+                <!-- #######   BELOW VALUES SURROUNDED BY '@@' MUST NOT BE TOUCHED, AS THEY ARE USED INTERNALLY BY SETUP TOOL.   ######## -->
+                <!-- #########      FOR OTHER VALUES, DO NOT CHANGE ANYTHING UNLESS YOU ARE SURE OF WHAT YOU ARE DOING.      ############ -->
+                <!-- ##############          YOU CAN ADD CUSTOM CONFIGURATION ABOVE AND BELOW THIS TEMPLATE.            ################# -->
+                <!-- #################################################################################################################### -->
+
                 <drivers>
 
                     <driver name="@@DB_VENDOR@@" module="@@MODULE_NAME@@">
@@ -261,7 +264,6 @@
                 <!--
                 #######################################################################################################
                 Configure Data source for Bonita BPM standard database
-                used by Bonita BPM Platform setup / configuration tool: Do not touch this paragraph !
                 #######################################################################################################
                 -->
                 <!-- H2 -->
@@ -279,6 +281,9 @@
                     <!--xa-datasource-property name="DatabaseName">@@DB_DATABASE_NAME@@</xa-datasource-property-->
 
                     <xa-pool>
+                        <!-- Oracle-specific properties : -->
+                        <!--is-same-rm-override>@@IS_SAME_RM_OVERRIDE@@</is-same-rm-override-->
+                        <!--no-tx-separate-pools>@@NO_TX_SEPARATE_POOL@@</no-tx-separate-pools-->
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>50</max-pool-size>
                         <prefill>true</prefill>
@@ -288,9 +293,13 @@
                         <password>@@PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
+                    <timeout>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
+                    </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
@@ -302,6 +311,11 @@
                             use-java-context="false">
                     <driver>@@DB_VENDOR@@</driver>
                     <connection-url>@@DB_URL@@</connection-url>
+                    <pool>
+                        <min-pool-size>3</min-pool-size>
+                        <max-pool-size>12</max-pool-size>
+                        <prefill>true</prefill>
+                    </pool>
                     <security>
                         <user-name>@@USERNAME@@</user-name>
                         <password>@@PASSWORD@@</password>
@@ -309,9 +323,10 @@
                     <validation>
                         <background-validation-millis>30000</background-validation-millis>
                         <check-valid-connection-sql>@@TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
                     <timeout>
-                        <idle-timeout-minutes>0</idle-timeout-minutes>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
                     </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
@@ -321,7 +336,6 @@
                 <!--
                 #######################################################################################################
                 Configure Data source for Bonita Business Data database
-                used by Bonita BPM Platform setup / configuration tool: Do not touch this paragraph !
                 #######################################################################################################
                 -->
 
@@ -339,6 +353,9 @@
                     <!--xa-datasource-property name="DatabaseName">@@BDM_DB_DATABASE_NAME@@</xa-datasource-property-->
 
                     <xa-pool>
+                        <!-- Oracle-specific properties : -->
+                        <!--is-same-rm-override>@@BDM_IS_SAME_RM_OVERRIDE@@</is-same-rm-override-->
+                        <!--no-tx-separate-pools>@@BDM_NO_TX_SEPARATE_POOL@@</no-tx-separate-pools-->
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>50</max-pool-size>
                         <prefill>true</prefill>
@@ -348,9 +365,13 @@
                         <password>@@BDM_PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@BDM_TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
+                    <timeout>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
+                    </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
@@ -362,33 +383,39 @@
                             use-java-context="false">
                     <driver>@@BDM_DB_VENDOR@@</driver>
                     <connection-url>@@BDM_DB_URL@@</connection-url>
+                    <pool>
+                        <min-pool-size>3</min-pool-size>
+                        <max-pool-size>12</max-pool-size>
+                        <prefill>true</prefill>
+                    </pool>
                     <security>
                         <user-name>@@BDM_USERNAME@@</user-name>
                         <password>@@BDM_PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@BDM_TESTQUERY@@</check-valid-connection-sql>
+                        <background-validation-millis>90000</background-validation-millis>
                     </validation>
                     <timeout>
-                        <idle-timeout-minutes>0</idle-timeout-minutes>
+                        <idle-timeout-minutes>1</idle-timeout-minutes>
                     </timeout>
                     <statement>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
                 </datasource>
 
-                <!--
-               #######################################################################################################
-               END of AREA RESERVED to Bonita BPM Platform setup / configuration tool
-               DO NOT TOUCH THE PART ABOVE !
-               #######################################################################################################
-               -->
+                <!-- #################################################################################################################### -->
+                <!-- ########################         END OF TEMPLATE MODIFIED BY BONITA BPM SETUP TOOL         ######################### -->
+                <!-- ###################            YOU CAN ADD CUSTOM CONFIGURATION *BELOW* THIS TEMPLATE              ################# -->
+                <!-- #################################################################################################################### -->
 
             </datasources>
+
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}" />
+            <!-- 'deployment-timeout' value can be increased if your startup is too long to fit, because there are too many BPM elements to restart -->
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" deployment-timeout="600" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}" />
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:4.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
