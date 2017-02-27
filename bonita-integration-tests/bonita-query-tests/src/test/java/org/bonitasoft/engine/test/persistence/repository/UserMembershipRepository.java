@@ -15,6 +15,8 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -35,4 +37,55 @@ public class UserMembershipRepository extends TestRepository {
         namedQuery.setParameterList("actorMemberIds", actorMemberIds);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
+
+    public List getUserMembershipsByGroup(SGroup group) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getUserMembershipsByGroup");
+        namedQuery.setParameter("groupId", group.getId());
+        return namedQuery.list();
+
+    }
+
+    public List getUserMembershipsByRole(SRole role) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getUserMembershipsByRole");
+        namedQuery.setParameter("roleId", role.getId());
+        return namedQuery.list();
+    }
+
+    public List getUserMembershipsOfUser(long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getUserMembershipsOfUser");
+        namedQuery.setParameter("userId", userId);
+        return namedQuery.list();
+    }
+
+    public List getUserMembershipWithIds(long roleId, long groupId, long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getUserMembershipWithIds");
+        namedQuery.setParameter("userId", userId);
+        namedQuery.setParameter("roleId", roleId);
+        namedQuery.setParameter("groupId", groupId);
+        return namedQuery.list();
+    }
+
+    public List getUserMemberships() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getUserMemberships");
+        return namedQuery.list();
+    }
+
+    public List getSUserMembershipById(long id) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("getSUserMembershipById");
+        namedQuery.setParameter("id", id);
+        return namedQuery.list();
+    }
+
+    public List searchUserMembership() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        Query namedQuery = getNamedQuery("searchUserMembership");
+        return namedQuery.list();
+    }
+
 }
