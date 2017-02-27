@@ -52,7 +52,7 @@
         <slf4j.version>1.6.1</slf4j.version>
         <httpclient.version>4.2.5</httpclient.version>
         <xstream.version>1.4.2</xstream.version>
-        <hibernate.version>4.2.13.Final</hibernate.version>
+        <hibernate.version>4.3.11.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring.version>4.2.4.RELEASE</spring.version>
@@ -131,7 +131,7 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.jboss.spec.javax.transaction</groupId>
-                        <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                        <artifactId>jboss-transaction-api_1.2_spec</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -142,14 +142,14 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.jboss.spec.javax.transaction</groupId>
-                        <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                        <artifactId>jboss-transaction-api_1.2_spec</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.0-api</artifactId>
-                <version>1.0.1.Final</version>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>1.0.0.Final</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
