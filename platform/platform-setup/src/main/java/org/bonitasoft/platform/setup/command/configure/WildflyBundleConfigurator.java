@@ -145,6 +145,10 @@ class WildflyBundleConfigurator extends BundleConfigurator {
         } else {
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", escapeXmlCharacters(configuration.getUrl())));
         }
+        if (ORACLE.equals(configuration.getDbVendor())) {
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "IS_SAME_RM_OVERRIDE@@", "false"));//forced to false
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "NO_TX_SEPARATE_POOL@@", "true"));//forced to true
+        }
 
         return replaceValues(content, replacements);
     }
