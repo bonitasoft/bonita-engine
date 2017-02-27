@@ -63,7 +63,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
-			<version>${jaxb.version}</version>
+            <version>${jaxb.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.xml.bind</groupId>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-			<version>${jaxb.version}</version>
+            <version>${jaxb.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
