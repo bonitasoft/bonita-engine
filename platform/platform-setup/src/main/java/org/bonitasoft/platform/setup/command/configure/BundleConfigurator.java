@@ -50,7 +50,7 @@ abstract class BundleConfigurator {
 
     protected final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
-    private static final String ORACLE = "oracle";
+    static final String ORACLE = "oracle";
     private static final String SQLSERVER = "sqlserver";
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
@@ -259,7 +259,7 @@ abstract class BundleConfigurator {
     /**
      * Constructs path relative to rootPath.
      *
-     * @param partialPath path relative to rootPath
+     * @param partialPath    path relative to rootPath
      * @param failIfNotExist should we fail if file does not exist?
      * @return the real path, constructed from rootPath, appending the partialPath
      */
