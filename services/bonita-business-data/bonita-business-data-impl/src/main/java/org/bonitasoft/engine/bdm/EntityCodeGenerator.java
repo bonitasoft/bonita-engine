@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm;
 
-import java.util.List;
-
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -29,7 +28,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
+import java.util.List;
 
+import com.sun.codemodel.JAnnotationArrayMember;
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JClassAlreadyExistsException;
+import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
 import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -40,13 +46,6 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-
-import com.sun.codemodel.JAnnotationArrayMember;
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
 
 /**
  * @author Colin PUY,
@@ -159,6 +158,7 @@ public class EntityCodeGenerator {
 
     /**
      * get real column name used in database
+     * 
      * @param businessObject
      * @param fieldName
      * @return fieldName for simple fields or reduced name suffix by "_PID" when we have an entity relationship
@@ -245,6 +245,15 @@ public class EntityCodeGenerator {
             codeGenerator.addAnnotation(fieldVar, Lob.class);
         } else if (FieldType.STRING == sfield.getType() && sfield.getLength() != null && sfield.getLength() > 0) {
             columnAnnotation.param("length", sfield.getLength());
+        } else if (FieldType.LOCALDATE == sfield.getType()) {
+            // 10 = to support ISO-8801 date format:
+            columnAnnotation.param("length", 10);
+            final JAnnotationUse converterAnnotation = codeGenerator.addAnnotation(fieldVar, Convert.class);
+            converterAnnotation.param("converter", DateConverter.class);
+        } else if (FieldType.LOCALDATETIME == sfield.getType()) {
+            columnAnnotation.param("length", 30);
+            final JAnnotationUse converterAnnotation = codeGenerator.addAnnotation(fieldVar, Convert.class);
+            converterAnnotation.param("converter", DateAndTimeConverter.class);
         }
     }
 
