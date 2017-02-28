@@ -8,6 +8,7 @@
     "lastName": "Dupond",
     "hireDate": "123456789",
     "booleanField": true,
+    "birthDate": null,
     "phoneNumbers": [
       "123456789"
     ],

@@ -1449,6 +1449,11 @@ public class APITestUtil extends PlatformTestUtil {
         firstName.setType(FieldType.STRING);
         firstName.setLength(10);
 
+        final SimpleField birthDate = new SimpleField();
+        birthDate.setName("birthDate");
+        birthDate.setType(FieldType.LOCALDATE);
+        birthDate.setNullable(Boolean.TRUE);
+        
         final SimpleField lastName = new SimpleField();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
@@ -1479,6 +1484,7 @@ public class APITestUtil extends PlatformTestUtil {
         employee.addField(address);
         employee.addField(dog);
         employee.addField(cat);
+        employee.addField(birthDate);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 

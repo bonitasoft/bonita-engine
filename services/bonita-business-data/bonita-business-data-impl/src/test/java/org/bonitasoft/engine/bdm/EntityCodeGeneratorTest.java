@@ -15,14 +15,8 @@ package org.bonitasoft.engine.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -31,10 +25,20 @@ import javax.persistence.NamedQueries;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
+import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JFormatter;
@@ -149,7 +153,6 @@ public class EntityCodeGeneratorTest {
         final JMethod getter = (JMethod) definedClass.methods().toArray()[1];
         assertThat(getter.name()).isEqualTo("getName");
     }
-
 
     @Test
     public void shouldAddBasicField_AddAFieldWithTemporalAnnotation_InDefinedClass() throws Exception {
@@ -318,5 +321,71 @@ public class EntityCodeGeneratorTest {
                         "        \"UNIQUERELATION_PID\"\n" +
                         "    })\n" +
                         "})");
+    }
+
+    @Test
+    public void annotateSimpleField_should_generate_the_correct_annotation_for_localDate_type() throws JClassAlreadyExistsException {
+
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        SimpleField nameField = new SimpleField();
+        nameField.setName("name");
+        nameField.setType(FieldType.LOCALDATE);
+        nameField.setNullable(Boolean.FALSE);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addField(definedClass, nameField);
+        final JFieldVar nameFieldVar = definedClass.fields().get("name");
+
+        assertThat(nameFieldVar).isNotNull();
+        assertThat(nameFieldVar.type()).isEqualTo(codeGenerator.getModel().ref(LocalDate.class.getName()));
+        assertThat(nameFieldVar.annotations().size()).isEqualTo(2);
+        final Iterator<JAnnotationUse> iterator = nameFieldVar.annotations().iterator();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+        final String name = getAnnotationParamValue(annotationUse, "name");
+        assertThat(name).isNotNull().isEqualTo("NAME");
+        final String nullable = getAnnotationParamValue(annotationUse, "nullable");
+        assertThat(nullable).isNotNull().isEqualTo("false");
+        final int length = Integer.parseInt(getAnnotationParamValue(annotationUse, "length"));
+        assertThat(length).isEqualTo(10);
+        annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Convert.class.getName());
+        assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
+        final String value = getAnnotationParamValue(annotationUse, "converter");
+        assertThat(value).isNotNull().isEqualTo("org.bonitasoft.engine.bdm.DateConverter.class");
+
+    }
+
+    @Test
+    public void annotateSimpleField_should_generate_the_correct_annotation_for_localDateAndTime_type() throws JClassAlreadyExistsException {
+
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        SimpleField nameField = new SimpleField();
+        nameField.setName("name");
+        nameField.setType(FieldType.LOCALDATETIME);
+        nameField.setNullable(Boolean.FALSE);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addField(definedClass, nameField);
+        final JFieldVar nameFieldVar = definedClass.fields().get("name");
+
+        assertThat(nameFieldVar).isNotNull();
+        assertThat(nameFieldVar.type()).isEqualTo(codeGenerator.getModel().ref(LocalDateTime.class.getName()));
+        assertThat(nameFieldVar.annotations().size()).isEqualTo(2);
+        final Iterator<JAnnotationUse> iterator = nameFieldVar.annotations().iterator();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+
+        final String name = getAnnotationParamValue(annotationUse, "name");
+        assertThat(name).isNotNull().isEqualTo("NAME");
+        final String nullable = getAnnotationParamValue(annotationUse, "nullable");
+        assertThat(nullable).isNotNull().isEqualTo("false");
+        final int length = Integer.parseInt(getAnnotationParamValue(annotationUse, "length"));
+        assertThat(length).isEqualTo(30);
+        annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Convert.class.getName());
+        assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
+        final String value = getAnnotationParamValue(annotationUse, "converter");
+        assertThat(value).isNotNull().isEqualTo("org.bonitasoft.engine.bdm.DateAndTimeConverter.class");
     }
 }
