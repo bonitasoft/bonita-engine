@@ -48,13 +48,15 @@ public class STransitionDefinitionImplTest {
     }
 
     @Test
-    public void constructor_should_correctly_get_the_id_of_the_TransitionDefinition(){
+    public void constructor_should_correctly_set_the_id(){
+
 
         //given
         STransitionDefinitionImpl transition = new STransitionDefinitionImpl(new TransitionDefinitionImpl());
 
         //when
         long id = transition.getId();
+
         //then
         assertThat(id).isNotNull();
     }

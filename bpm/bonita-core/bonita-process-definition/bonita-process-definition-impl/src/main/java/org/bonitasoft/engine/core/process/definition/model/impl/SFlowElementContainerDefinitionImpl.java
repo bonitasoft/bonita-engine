@@ -446,22 +446,22 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     @Override
-    public STransitionDefinition getTransition(final String id) {
-        STransitionDefinition transitionDefinition = transitionsMap.get(id);
+    public STransitionDefinition getTransition(final String transitionId) {
+        STransitionDefinition transitionDefinition = transitionsMap.get(transitionId);
         if (transitionDefinition == null) {
-            transitionDefinition = getTransitionFromSubProcesses(id);
+            transitionDefinition = getTransitionFromSubProcesses(transitionId);
         }
         return transitionDefinition;
     }
 
-    private STransitionDefinition getTransitionFromSubProcesses(final String name) {
+    private STransitionDefinition getTransitionFromSubProcesses(final String transitionId) {
         boolean found = false;
         STransitionDefinition transition = null;
         final Iterator<SActivityDefinition> iterator = activities.iterator();
         while (iterator.hasNext() && !found) {
             final SActivityDefinition activityDefinition = iterator.next();
             if (SFlowNodeType.SUB_PROCESS.equals(activityDefinition.getType())) {
-                transition = ((SSubProcessDefinition) activityDefinition).getSubProcessContainer().getTransition(name);
+                transition = ((SSubProcessDefinition) activityDefinition).getSubProcessContainer().getTransition(transitionId);
                 if (transition != null) {
                     found = true;
                 }
