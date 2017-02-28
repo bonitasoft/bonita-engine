@@ -18,9 +18,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.bdm.Entity;
@@ -69,6 +71,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
@@ -679,7 +682,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
         final FlowNodeTransitionsWrapper transitionsDescriptor = transitionEvaluator.buildTransitionsWrapper(sFlowNodeDefinition, processDefinition, child);
 
-        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<>(transitionsDescriptor
+        List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<>(transitionsDescriptor
                 .getValidOutgoingTransitionDefinitions().size());
         final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
                 .size());
@@ -695,9 +698,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         archiveFlowNodeInstance(processDefinition, child, sProcessInstance);
 
-        // execute transition/activities
         final long processInstanceId = sProcessInstance.getId();
         createAndExecuteActivities(processDefinition.getId(), child, processInstanceId, chosenFlowNode, child.getRootProcessInstanceId());
+
+        //test to check the particular case of an inclusive gateway receiving transitions from the same flownode.
+        //if that's the case only one should be executed.
+        removeDuplicatedInclusiveGatewayTransitions(processDefinition, chosenGatewaysTransitions);
+
+        // execute transition/activities
         for (final STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
             executeGateway(processDefinition, sTransitionDefinition, child);
         }
@@ -717,6 +725,29 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         }
         return transitionsDescriptor.isLastFlowNode();
+    }
+
+    protected void removeDuplicatedInclusiveGatewayTransitions(SProcessDefinition processDefinition, List<STransitionDefinition> chosenGatewaysTransitions) {
+        List<STransitionDefinition> transitionToRemove = new ArrayList<>();
+        Set<SGatewayDefinition> gateways = new HashSet<>();
+        for (STransitionDefinition gatewaysTransition : chosenGatewaysTransitions) {
+            SGatewayDefinition gateway = getGateway(gatewaysTransition, processDefinition);
+            if(isInclusiveGateway(gateway)){
+                boolean alreadyExists = !gateways.add(gateway);
+                if(alreadyExists){
+                    transitionToRemove.add(gatewaysTransition);
+                }
+            }
+        }
+        chosenGatewaysTransitions.removeAll(transitionToRemove);
+    }
+    
+    private boolean isInclusiveGateway(SGatewayDefinition gateway) {
+        return gateway.getGatewayType() == SGatewayType.INCLUSIVE;
+    }
+    
+    private SGatewayDefinition getGateway(STransitionDefinition gatewaysTransition, SProcessDefinition processDefinition) {
+        return (SGatewayDefinition) processDefinition.getProcessContainer().getFlowNode(gatewaysTransition.getTarget());
     }
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
