@@ -1306,5 +1306,37 @@ public class GatewayExecutionIT extends TestWithUser {
     }
 
 
+    @Test
+    public void link_events_coming_from_the_same_node_and_going_into_an_inclusive_gateway_should_activate_it_only_once() throws Exception {
+
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
+        String task1 = "task1";
+        String gateway = "gateway";
+        String gateway1 = "gateway1";
+        String theEnd = "theEnd";
+        String task2 = "task2";
+        String start = "start";
+        builder.addEndEvent(theEnd);
+        builder.addStartEvent(start);
+        builder.addActor("user");
+        builder.addGateway(gateway, GatewayType.INCLUSIVE);
+        builder.addGateway(gateway1, GatewayType.PARALLEL);
+        builder.addUserTask(task2,"user");
+        builder.addAutomaticTask(task1);
+        builder.addTransition(task1,gateway1);
+        builder.addTransition(gateway1,gateway);
+        builder.addTransition(gateway1,gateway);
+        builder.addTransition(gateway1,gateway);
+        builder.addTransition(gateway, task2);
+        builder.addTransition(task2,theEnd);
+        builder.addTransition(start,task1);
+        DesignProcessDefinition designProcessDefinition = builder.done();
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "user", user);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt(processInstance,task2,user);
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(processDefinition);
+
+    }
 
 }

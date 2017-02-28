@@ -44,7 +44,7 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     Set<STransitionDefinition> getTransitions();
 
-    STransitionDefinition getTransition(String name);
+    STransitionDefinition getTransition(String transitionId);
 
     Set<SGatewayDefinition> getGateways();
 

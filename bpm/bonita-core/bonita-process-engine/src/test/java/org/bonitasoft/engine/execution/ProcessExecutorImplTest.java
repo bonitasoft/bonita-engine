@@ -17,22 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,8 +53,10 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SGatewayDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -189,6 +183,15 @@ public class ProcessExecutorImplTest {
 
     @Mock
     private RefBusinessDataService refBusinessDataService;
+
+    @Mock
+    private SProcessDefinition processDefinition;
+
+    @Mock
+    private SFlowNodeDefinition flowNodeDefinition;
+
+    @Mock
+    private SFlowElementContainerDefinition processContainer;
 
     @InjectMocks
     private ProcessExecutorImpl processExecutorImpl;
@@ -442,5 +445,64 @@ public class ProcessExecutorImplTest {
 
         assertThat(gatewayInstance).isEqualTo(gatewayInstanceToBeReturned);
     }
+    
+    private STransitionDefinitionImpl create_Transition_and_set_Id(String name, long source, long target, long id){
+        STransitionDefinitionImpl transition = new STransitionDefinitionImpl(name,source,target);
+        transition.setId(id);
+        return transition;
+    }
+    
+    @Test
+    public void removeDuplicatedInclusiveGatewayTransitions_should_remove_transitions_going_into_the_same_inclusive_gateway(){
+        List<STransitionDefinition> transitionList = new LinkedList<>();
+        SFlowNodeDefinition localFlowNodeDefinitionInclusive = new SGatewayDefinitionImpl(1,"The Inclusive Gateway",SGatewayType.INCLUSIVE);
+        SFlowNodeDefinition localFlowNodeDefinitionParallel = new SGatewayDefinitionImpl(2,"The Parallel Gateway",SGatewayType.PARALLEL);
+        STransitionDefinitionImpl transition1 = create_Transition_and_set_Id("The identical one",0,1,11L);
+        STransitionDefinitionImpl transition2 = create_Transition_and_set_Id("The identical one",0,1,22L);
+        STransitionDefinitionImpl transition3 = create_Transition_and_set_Id("The different transition",0,2,33L);
+        transitionList.add(transition1);
+        transitionList.add(transition2);
+        transitionList.add(transition3);
+        doReturn(processContainer).when(processDefinition).getProcessContainer();
+        doReturn(localFlowNodeDefinitionInclusive).when(processContainer).getFlowNode(1);
+        doReturn(localFlowNodeDefinitionParallel).when(processContainer).getFlowNode(2);
 
+        processExecutorImpl.removeDuplicatedInclusiveGatewayTransitions(processDefinition,transitionList);
+
+        assertThat(transitionList).hasSize(2);
+        assertThat(transitionList).contains(transition1);
+        assertThat(transitionList).contains(transition3);
+        assertThat(transitionList).doesNotContain(transition2);
+    }
+    
+    @Test
+    public void removeDuplicatedInclusiveGatewayTransitions_should_keep_transitions_going_to_different_gateways(){
+
+        SFlowNodeDefinition localFlowNodeDefinitionInclusive = new SGatewayDefinitionImpl(1,"The Inclusive Gateway",SGatewayType.INCLUSIVE);
+        SFlowNodeDefinition localFlowNodeDefinitionInclusive2 = new SGatewayDefinitionImpl(3,"Another Inclusive Gateway",SGatewayType.INCLUSIVE);
+        SFlowNodeDefinition localFlowNodeDefinitionParallel = new SGatewayDefinitionImpl(2,"The Parallel Gateway",SGatewayType.PARALLEL);
+        STransitionDefinitionImpl transition1 = create_Transition_and_set_Id("The identical one going into Inclusive",0,1,11L);
+        STransitionDefinitionImpl transition2 = create_Transition_and_set_Id("The identical one going into Inclusive",0,1,22L);
+        STransitionDefinitionImpl transition3 = create_Transition_and_set_Id("The identical one going into Parallel",0,2,33L);
+        STransitionDefinitionImpl transition4 = create_Transition_and_set_Id("The identical one going into Parallel",0,2,44L);
+        STransitionDefinitionImpl transition5 = create_Transition_and_set_Id("The identical one going into another Inclusive",0,3,55L);
+        List<STransitionDefinition> transitionList = new LinkedList<>();
+        transitionList.add(transition1);
+        transitionList.add(transition2);
+        transitionList.add(transition3);
+        transitionList.add(transition4);
+        transitionList.add(transition5);
+        doReturn(processContainer).when(processDefinition).getProcessContainer();
+        doReturn(localFlowNodeDefinitionInclusive).when(processContainer).getFlowNode(1);
+        doReturn(localFlowNodeDefinitionParallel).when(processContainer).getFlowNode(2);
+        doReturn(localFlowNodeDefinitionInclusive2).when(processContainer).getFlowNode(3);
+        
+        processExecutorImpl.removeDuplicatedInclusiveGatewayTransitions(processDefinition,transitionList);
+        
+        assertThat(transitionList).hasSize(4);
+        assertThat(transitionList).contains(transition1);
+        assertThat(transitionList).contains(transition3);
+        assertThat(transitionList).contains(transition4);
+        assertThat(transitionList).contains(transition5);
+    }
 }
