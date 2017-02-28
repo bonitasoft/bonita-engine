@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bdm.model.field;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -30,7 +32,9 @@ public enum FieldType {
     BOOLEAN(Boolean.class),
     BYTE(Byte.class),
     SHORT(Short.class),
-    CHAR(Character.class);
+    CHAR(Character.class),
+    LOCALDATETIME(LocalDateTime.class),
+    LOCALDATE(LocalDate.class);
     
     private Class<?> clazz;
 

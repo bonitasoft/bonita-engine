@@ -18,6 +18,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.*;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -1636,9 +1635,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "import " + ADDRESS_QUALIFIED_NAME + "; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
                 ADDRESS_QUALIFIED_NAME);
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIFIED_NAME
-                + "; new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress])", EMPLOYEE_QUALIFIED_NAME,
+                + ";import java.time.LocalDate;LocalDate localDate = LocalDate.of(1984,10,24); Employee e = new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress]);e.birthDate = localDate; return e; ", EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "theProcess", "6.3.1");
         final String bizDataName = "myEmployee";
@@ -1675,8 +1673,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         address = getAddressAsAString("myAddress", processInstance.getId());
         assertThat(address).isEqualTo("Address [street=32, rue Gustave Eiffel, city=Grenoble]");
         final String employee = getEmployeeAsAString(bizDataName, processInstance.getId());
-        assertThat(employee).isEqualTo("Employee [firstName=John, lastName=Smith, address=null, addresses.count=2 ]");
-
+        assertThat(employee).isEqualTo("Employee [firstName=John, lastName=Smith, address=null, addresses.count=2, birthDate = 1984-10-24 ]");
         disableAndDeleteProcess(definition.getId());
     }
 
@@ -1789,7 +1786,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee,
                         "\"Employee [firstName=\" + " + businessDataName + ".firstName + \", lastName=\" + " + businessDataName
                                 + ".lastName + \", address=\" + " + businessDataName + ".address + \", addresses.count=\" + "
-                                + businessDataName + ".addresses.size() + \" ]\";",
+                                + businessDataName + ".addresses.size() + \", birthDate = \"+" + businessDataName + ".birthDate + \" ]\";",
                         String.class.getName(),
                         new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)),
                 null);
@@ -1970,7 +1967,6 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void should_be_able_to_update_business_object_in_event_sub_process() throws Exception {
-        //given
         //given
         ProcessDefinitionBuilder parentProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("UpdateBusinessDataInEventSubProcess", "1.0");
         parentProcessBuilder.addActor(ACTOR_NAME);
