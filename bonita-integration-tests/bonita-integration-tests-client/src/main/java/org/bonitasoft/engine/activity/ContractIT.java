@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -131,8 +133,8 @@ public class ContractIT extends CommonAPIIT {
         assertThat(getProcessAPI().getProcessDataInstance("multipleTextData", processInstance.getId()).getValue()).isEqualTo(multiples);
         assertThat(getProcessAPI().getProcessDataInstance("complexData", processInstance.getId()).getValue()).isEqualTo(map);
         assertThat(processDataValueInitializedFromIntInput.getValue()).isEqualTo(value);
-        assertThat(processDataValueInitializedFromLongInput.getValue()).isEqualTo( 1L);
-        
+        assertThat(processDataValueInitializedFromLongInput.getValue()).isEqualTo(1L);
+
         final Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
                 numberOfDaysProcessContractData);
         assertThat(processInstanciationInputValue).isEqualTo(value);
@@ -584,27 +586,32 @@ public class ContractIT extends CommonAPIIT {
         userTaskBuilder.addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
                 .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
                 .addOutput(new OperationBuilder().createSetDataOperation("processData", outputExpression));
-        userTaskBuilder.addContract().addInput("inputVersion", Type.TEXT, null).addInput("processInputId", Type.INTEGER, null);
+        userTaskBuilder.addContract().addInput("inputVersion", Type.TEXT, null).addInput("processInputId", Type.INTEGER, null)
+                .addInput("LocalDateInput", Type.LOCALDATE, null).addInput("LocalDateTimeInput", Type.LOCALDATETIME, null)
+                .addInput("LocalDateTimeNullInput", Type.LOCALDATETIME, null);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorWithAPICall(designProcessDefinition);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTaskAndGetIt("task3");
 
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
-        try {
-            final Map<String, Serializable> inputs = new HashMap<>();
-            inputs.put("inputVersion", PROCESS_VERSION);
-            inputs.put("processInputId", BigInteger.valueOf(45L));
-
-            getProcessAPI().executeUserTask(userTask.getId(), inputs);
-        } catch (final ContractViolationException e) {
-            System.err.println(e.getExplanations());
-        }
+        final Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("inputVersion", PROCESS_VERSION);
+        inputs.put("processInputId", BigInteger.valueOf(45L));
+        inputs.put("LocalDateInput", LocalDate.of(2017, 4, 12));
+        inputs.put("LocalDateTimeInput", LocalDateTime.of(2017, 4, 12, 19, 45, 22));
+        inputs.put("LocalDateTimeNullInput", null);
+        getProcessAPI().executeUserTask(userTask.getId(), inputs);
 
         waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
-
+        LocalDateTime localDateTime = (LocalDateTime) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "LocalDateTimeInput");
+        LocalDate localDate = (LocalDate) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "LocalDateInput");
+        LocalDateTime nullLocalDateTime = (LocalDateTime) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "LocalDateTimeNullInput");
         final BigInteger processInputId = (BigInteger) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "processInputId");
         assertThat(processInputId).isEqualTo(BigInteger.valueOf(45L));
+        assertThat(localDate).isNotNull().isEqualTo(LocalDate.of(2017, 4, 12));
+        assertThat(localDateTime).isNotNull().isEqualTo(LocalDateTime.of(2017, 4, 12, 19, 45, 22));
+        assertThat(nullLocalDateTime).isNull();
 
         disableAndDeleteProcess(processDefinition);
     }
