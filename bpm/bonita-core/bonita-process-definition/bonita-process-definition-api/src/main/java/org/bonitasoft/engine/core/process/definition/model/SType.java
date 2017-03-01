@@ -15,6 +15,8 @@ package org.bonitasoft.engine.core.process.definition.model;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +33,9 @@ public enum SType {
     INTEGER(Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
     DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
     BYTE_ARRAY(byte[].class),
-    FILE(FileInputValue.class), LONG(Long.class, Integer.class, BigInteger.class, Short.class, Byte.class);
+    FILE(FileInputValue.class), LONG(Long.class, Integer.class, BigInteger.class, Short.class, Byte.class),
+    LOCALDATE(LocalDate.class),
+    LOCALDATETIME(LocalDateTime.class);
 
     private final List<Class<?>> assignableTypes;
 
