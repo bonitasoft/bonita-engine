@@ -33,9 +33,9 @@ public class XStreamFactory {
         if (xStream == null) {
             xStream = new XStream(new StaxDriver());
             XSTREAM_MAP.put(classLoader, xStream);
+            xStream.registerConverter(new LocalDateConverter());
+            xStream.registerConverter(new LocalDateTimeConverter());
         }
-        xStream.registerConverter(new LocalDateConverter());
-        xStream.registerConverter(new LocalDateTimeConverter());
 
         return xStream;
     }
