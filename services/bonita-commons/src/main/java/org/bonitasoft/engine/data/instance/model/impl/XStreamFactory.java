@@ -13,10 +13,14 @@
  **/
 package org.bonitasoft.engine.data.instance.model.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 public class XStreamFactory {
@@ -30,14 +34,57 @@ public class XStreamFactory {
             xStream = new XStream(new StaxDriver());
             XSTREAM_MAP.put(classLoader, xStream);
         }
+        xStream.registerConverter(new LocalDateConverter());
+        xStream.registerConverter(new LocalDateTimeConverter());
+
         return xStream;
     }
 
     /**
      * Removes the XStream object related from given ClassLoader from the cache
+     * 
      * @param classLoader classLoader related to the XStreamObject to be removed.
      */
     public static void remove(ClassLoader classLoader) {
         XSTREAM_MAP.remove(classLoader);
     }
+
+    private static class LocalDateConverter extends AbstractSingleValueConverter {
+
+        public boolean canConvert(Class type) {
+            return LocalDate.class.equals(type);
+        }
+
+        public String toString(Object source) {
+            return source.toString();
+        }
+
+        public Object fromString(String str) {
+            try {
+                return LocalDate.parse(str);
+            } catch (DateTimeParseException e) {
+                throw new RuntimeException("LocalDate failed to parse the incoming string", e);
+            }
+        }
+    }
+
+    private static class LocalDateTimeConverter extends AbstractSingleValueConverter {
+
+        public boolean canConvert(Class type) {
+            return LocalDateTime.class.equals(type);
+        }
+
+        public String toString(Object source) {
+            return source.toString();
+        }
+
+        public Object fromString(String str) {
+            try {
+                return LocalDateTime.parse(str);
+            } catch (DateTimeParseException e) {
+                throw new RuntimeException("LocalDateTime failed to parse the incoming string", e);
+            }
+        }
+    }
+
 }
