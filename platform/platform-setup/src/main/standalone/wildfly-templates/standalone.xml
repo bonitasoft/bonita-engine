@@ -281,6 +281,9 @@
                     <!--xa-datasource-property name="DatabaseName">@@DB_DATABASE_NAME@@</xa-datasource-property-->
 
                     <xa-pool>
+                        <!-- Oracle-specific properties : -->
+                        <!--is-same-rm-override>@@IS_SAME_RM_OVERRIDE@@</is-same-rm-override-->
+                        <!--no-tx-separate-pools>@@NO_TX_SEPARATE_POOL@@</no-tx-separate-pools-->
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>50</max-pool-size>
                         <prefill>true</prefill>
@@ -350,6 +353,9 @@
                     <!--xa-datasource-property name="DatabaseName">@@BDM_DB_DATABASE_NAME@@</xa-datasource-property-->
 
                     <xa-pool>
+                        <!-- Oracle-specific properties : -->
+                        <!--is-same-rm-override>@@BDM_IS_SAME_RM_OVERRIDE@@</is-same-rm-override-->
+                        <!--no-tx-separate-pools>@@BDM_NO_TX_SEPARATE_POOL@@</no-tx-separate-pools-->
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>50</max-pool-size>
                         <prefill>true</prefill>
