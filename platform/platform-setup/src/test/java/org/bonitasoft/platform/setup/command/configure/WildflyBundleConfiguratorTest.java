@@ -151,6 +151,59 @@ public class WildflyBundleConfiguratorTest {
         assertThat(numberOfBackups("standalone.xml")).isEqualTo(1);
     }
 
+
+    @Test
+    public void should_set_isSameRmOverride_to_false_on_oracle() throws Exception {
+        System.setProperty("db.vendor", "oracle");
+        System.setProperty("bdm.db.vendor", "oracle");
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        checkFileContains(configFile,
+                "<is-same-rm-override>false</is-same-rm-override>");
+    }
+
+    @Test
+    public void should_not_set_isSameRmOverride_when_not_oracle() throws Exception {
+        System.setProperty("db.vendor", "postgres");
+        System.setProperty("bdm.db.vendor", "postgres");
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        checkFileDoesNotContain(configFile,
+                "<is-same-rm-override>");
+    }
+
+    @Test
+    public void should_set_noTxSeparatePools_to_true_on_oracle() throws Exception {
+        System.setProperty("db.vendor", "oracle");
+        System.setProperty("bdm.db.vendor", "oracle");
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        checkFileContains(configFile,
+                "<no-tx-separate-pools>true</no-tx-separate-pools>");
+    }
+
+    @Test
+    public void should_not_set_noTxSeparatePools_when_not_oracle() throws Exception {
+        System.setProperty("db.vendor", "postgres");
+        System.setProperty("bdm.db.vendor", "postgres");
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        checkFileDoesNotContain(configFile,
+                "<no-tx-separate-pools>");
+    }
+
     @Test
     public void configureWildfly_should_copy_module_file_in_right_folder() throws Exception {
         // given:
