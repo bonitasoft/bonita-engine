@@ -17,17 +17,19 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import com.company.model.Person;
 import com.company.model.Phone;
 
@@ -75,6 +77,42 @@ public class JsonBusinessDataSerializerImplTest {
 
         // then
         assertThatJson(jsonPersonList).as("should get employee count ").isEqualTo(getJsonContent("multiplePerson.json"));
+    }
+
+    @Test
+    public void patternUri_should_replace_field_value() throws Exception {
+        //given
+        EntitySerializerPojo value = createPojo();
+
+        //when
+        final String serializedEntity = jsonBusinessDataSerializer.serializeEntity(value, null);
+
+        //then
+        final String expectedJson = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream("EntitySerializerPojo.json")));
+        assertThatJson(serializedEntity).as("should replace field value").isEqualTo(expectedJson);
+    }
+
+    protected EntitySerializerPojo createPojo() {
+        final EntitySerializerPojo entitySerializerPojo = new EntitySerializerPojo();
+
+        entitySerializerPojo.setPersistenceId(Long.MAX_VALUE);
+        entitySerializerPojo.setPersistenceVersion(1L);
+        entitySerializerPojo.setABoolean(Boolean.TRUE);
+        entitySerializerPojo.setADate(new Date(123L));
+        entitySerializerPojo.setALocalDate(LocalDate.of(2017, 3, 6));
+        entitySerializerPojo.setALocalDateTime(LocalDateTime.of(1945, 5, 8, 12, 31, 17));
+        entitySerializerPojo.setADouble(Double.MAX_VALUE);
+        entitySerializerPojo.setAFloat(Float.MAX_VALUE);
+        entitySerializerPojo.setAInteger(Integer.MAX_VALUE);
+        entitySerializerPojo.setALong(Long.MAX_VALUE);
+        entitySerializerPojo.setAString("string");
+        entitySerializerPojo.setAText("text");
+        entitySerializerPojo.addToManyLong(1L);
+        entitySerializerPojo.addToManyLong(2L);
+        entitySerializerPojo.addToManyString("abc");
+        entitySerializerPojo.addToManyString("def");
+
+        return entitySerializerPojo;
     }
 
     private Person initPerson(long persistenceId) {

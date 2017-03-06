@@ -14,11 +14,15 @@
 
 package org.bonitasoft.engine.business.data.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,6 +33,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.apache.commons.beanutils.converters.DateTimeConverter;
+import org.bonitasoft.engine.bdm.DateConverter;
 import org.bonitasoft.engine.bdm.Entity;
 
 public class EntitySerializerPojo implements Entity {
@@ -64,6 +70,14 @@ public class EntitySerializerPojo implements Entity {
     @OrderColumn
     @Column(name = "MANYSTRING", nullable = true, length = 255)
     private List<String> manyString = new ArrayList<String>(10);
+
+    @Convert(converter = DateConverter.class)
+    @Column(name = "LOCALDATE", nullable = true, length = 10)
+    private LocalDate aLocalDate;
+
+    @Convert(converter = DateTimeConverter.class)
+    @Column(name = "LOCALDATETIME", nullable = true, length = 30)
+    private LocalDateTime aLocalDateTime;
 
     public EntitySerializerPojo() {
     }
@@ -102,6 +116,14 @@ public class EntitySerializerPojo implements Entity {
 
     public void setADate(Date aDate) {
         this.aDate = aDate;
+    }
+
+    public LocalDate getALocalDate() {
+        return aLocalDate;
+    }
+
+    public void setALocalDate(LocalDate localDate) {
+        this.aLocalDate = localDate;
     }
 
     public Date getADate() {
@@ -194,193 +216,40 @@ public class EntitySerializerPojo implements Entity {
         manyString.remove(removeFrom);
     }
 
+    public LocalDateTime getALocalDateTime() {
+        return aLocalDateTime;
+    }
+
+    public void setALocalDateTime(LocalDateTime aLocalDateTime) {
+        this.aLocalDateTime = aLocalDateTime;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null) {
+        if (!(o instanceof EntitySerializerPojo))
             return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        EntitySerializerPojo other = ((EntitySerializerPojo) obj);
-        if (persistenceId == null) {
-            if (other.persistenceId != null) {
-                return false;
-            }
-        } else {
-            if (!persistenceId.equals(other.persistenceId)) {
-                return false;
-            }
-        }
-        if (persistenceVersion == null) {
-            if (other.persistenceVersion != null) {
-                return false;
-            }
-        } else {
-            if (!persistenceVersion.equals(other.persistenceVersion)) {
-                return false;
-            }
-        }
-        if (aString == null) {
-            if (other.aString != null) {
-                return false;
-            }
-        } else {
-            if (!aString.equals(other.aString)) {
-                return false;
-            }
-        }
-        if (aBoolean == null) {
-            if (other.aBoolean != null) {
-                return false;
-            }
-        } else {
-            if (!aBoolean.equals(other.aBoolean)) {
-                return false;
-            }
-        }
-        if (aDate == null) {
-            if (other.aDate != null) {
-                return false;
-            }
-        } else {
-            if (!aDate.equals(other.aDate)) {
-                return false;
-            }
-        }
-        if (aDouble == null) {
-            if (other.aDouble != null) {
-                return false;
-            }
-        } else {
-            if (!aDouble.equals(other.aDouble)) {
-                return false;
-            }
-        }
-        if (aFloat == null) {
-            if (other.aFloat != null) {
-                return false;
-            }
-        } else {
-            if (!aFloat.equals(other.aFloat)) {
-                return false;
-            }
-        }
-        if (aInteger == null) {
-            if (other.aInteger != null) {
-                return false;
-            }
-        } else {
-            if (!aInteger.equals(other.aInteger)) {
-                return false;
-            }
-        }
-        if (aLong == null) {
-            if (other.aLong != null) {
-                return false;
-            }
-        } else {
-            if (!aLong.equals(other.aLong)) {
-                return false;
-            }
-        }
-        if (aText == null) {
-            if (other.aText != null) {
-                return false;
-            }
-        } else {
-            if (!aText.equals(other.aText)) {
-                return false;
-            }
-        }
-        if (manyLong == null) {
-            if (other.manyLong != null) {
-                return false;
-            }
-        } else {
-            if (!manyLong.equals(other.manyLong)) {
-                return false;
-            }
-        }
-        if (manyString == null) {
-            if (other.manyString != null) {
-                return false;
-            }
-        } else {
-            if (!manyString.equals(other.manyString)) {
-                return false;
-            }
-        }
-        return true;
+        EntitySerializerPojo that = (EntitySerializerPojo) o;
+        return Objects.equals(persistenceId, that.persistenceId) &&
+                Objects.equals(persistenceVersion, that.persistenceVersion) &&
+                Objects.equals(aString, that.aString) &&
+                Objects.equals(aBoolean, that.aBoolean) &&
+                Objects.equals(aDate, that.aDate) &&
+                Objects.equals(aDouble, that.aDouble) &&
+                Objects.equals(aFloat, that.aFloat) &&
+                Objects.equals(aInteger, that.aInteger) &&
+                Objects.equals(aLong, that.aLong) &&
+                Objects.equals(aText, that.aText) &&
+                Objects.equals(manyLong, that.manyLong) &&
+                Objects.equals(manyString, that.manyString) &&
+                Objects.equals(aLocalDate, that.aLocalDate) &&
+                Objects.equals(aLocalDateTime, that.aLocalDateTime);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        int persistenceIdCode = 0;
-        if (persistenceId != null) {
-            persistenceIdCode = persistenceId.hashCode();
-        }
-        result = ((prime * result) + persistenceIdCode);
-        int persistenceVersionCode = 0;
-        if (persistenceVersion != null) {
-            persistenceVersionCode = persistenceVersion.hashCode();
-        }
-        result = ((prime * result) + persistenceVersionCode);
-        int aStringCode = 0;
-        if (aString != null) {
-            aStringCode = aString.hashCode();
-        }
-        result = ((prime * result) + aStringCode);
-        int aBooleanCode = 0;
-        if (aBoolean != null) {
-            aBooleanCode = aBoolean.hashCode();
-        }
-        result = ((prime * result) + aBooleanCode);
-        int aDateCode = 0;
-        if (aDate != null) {
-            aDateCode = aDate.hashCode();
-        }
-        result = ((prime * result) + aDateCode);
-        int aDoubleCode = 0;
-        if (aDouble != null) {
-            aDoubleCode = aDouble.hashCode();
-        }
-        result = ((prime * result) + aDoubleCode);
-        int aFloatCode = 0;
-        if (aFloat != null) {
-            aFloatCode = aFloat.hashCode();
-        }
-        result = ((prime * result) + aFloatCode);
-        int aIntegerCode = 0;
-        if (aInteger != null) {
-            aIntegerCode = aInteger.hashCode();
-        }
-        result = ((prime * result) + aIntegerCode);
-        int aLongCode = 0;
-        if (aLong != null) {
-            aLongCode = aLong.hashCode();
-        }
-        result = ((prime * result) + aLongCode);
-        int aTextCode = 0;
-        if (aText != null) {
-            aTextCode = aText.hashCode();
-        }
-        result = ((prime * result) + aTextCode);
-        int manyLongCode = 0;
-        if (manyLong != null) {
-            manyLongCode = manyLong.hashCode();
-        }
-        result = ((prime * result) + manyLongCode);
-        int manyStringCode = 0;
-        if (manyString != null) {
-            manyStringCode = manyString.hashCode();
-        }
-        result = ((prime * result) + manyStringCode);
-        return result;
+        return Objects.hash(persistenceId, persistenceVersion, aString, aBoolean, aDate, aDouble, aFloat, aInteger, aLong, aText, manyLong, manyString,
+                aLocalDate, aLocalDateTime);
     }
 }

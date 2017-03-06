@@ -6,6 +6,8 @@
   "aString": "string",
   "aBoolean": true,
   "aDate": 123,
+  "aLocalDate": "2017-03-06",
+  "aLocalDateTime": "1945-05-08T12:31:17",
   "aDouble": 1.7976931348623157E308,
   "aDouble_string": "1.7976931348623157E308",
   "aFloat": 3.4028235E38,
