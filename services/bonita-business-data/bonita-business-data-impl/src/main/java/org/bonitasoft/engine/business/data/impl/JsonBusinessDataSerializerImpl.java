@@ -15,6 +15,8 @@ package org.bonitasoft.engine.business.data.impl;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
@@ -42,9 +44,11 @@ public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerialize
     private void init() {
         serializer = new EntitySerializer(new JsonNumberSerializerHelper());
         mapper = new ObjectMapper();
-        final SimpleModule hbm = new SimpleModule();
-        hbm.addSerializer(serializer);
-        mapper.registerModule(hbm);
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(serializer);
+        module.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
+        module.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+        mapper.registerModule(module);
     }
 
     @Override

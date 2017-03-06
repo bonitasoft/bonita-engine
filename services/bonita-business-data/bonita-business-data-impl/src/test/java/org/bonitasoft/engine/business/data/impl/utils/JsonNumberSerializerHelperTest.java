@@ -12,6 +12,7 @@ import org.junit.Test;
  */
 public class JsonNumberSerializerHelperTest {
 
+    // This fields are used by reflection in the test:
     public Long longField;
     public Double doubleField;
     public Float floatField;
@@ -25,18 +26,18 @@ public class JsonNumberSerializerHelperTest {
     public List<String> stringList;
 
     @Test
-    public void should_check_is_string_represention_is_needed() throws Exception {
+    public void should_check_is_string_representation_is_needed() throws Exception {
         //given
         JsonNumberSerializerHelper jsonNumberSerializerHelper = new JsonNumberSerializerHelper();
         String[] fieldsThatNeedStringRepresentation = { "long", "double", "float" };
-        String[] fieldsThatDontNeedStringRepresentation = { "int", "string" };
+        String[] fieldsThatDoNotNeedStringRepresentation = { "int", "string" };
 
         //then
         for (String field : fieldsThatNeedStringRepresentation) {
             checkStringRepresentation(jsonNumberSerializerHelper, field, true);
         }
 
-        for (String field : fieldsThatDontNeedStringRepresentation) {
+        for (String field : fieldsThatDoNotNeedStringRepresentation) {
             checkStringRepresentation(jsonNumberSerializerHelper, field, false);
         }
 
@@ -46,7 +47,7 @@ public class JsonNumberSerializerHelperTest {
     public void should_convert_list_to_string() throws Exception {
         //given
         JsonNumberSerializerHelper jsonNumberSerializerHelper = new JsonNumberSerializerHelper();
-        longList = new ArrayList<>();
+        List<Long> longList = new ArrayList<>();
         longList.add(1L);
         longList.add(2L);
 
@@ -82,7 +83,7 @@ public class JsonNumberSerializerHelperTest {
 
     }
 
-    protected void checkStringRepresentation(JsonNumberSerializerHelper jsonNumberSerializerHelper, String fieldName, boolean expectedResult)
+    private void checkStringRepresentation(JsonNumberSerializerHelper jsonNumberSerializerHelper, String fieldName, boolean expectedResult)
             throws NoSuchFieldException {
         assertThat(jsonNumberSerializerHelper.shouldAddStringRepresentationForNumber(this.getClass().getField(fieldName + "Field"))).isEqualTo(expectedResult);
         assertThat(jsonNumberSerializerHelper.shouldAddStringRepresentationForNumberList(this.getClass().getField(fieldName + "Field"))).isFalse();
