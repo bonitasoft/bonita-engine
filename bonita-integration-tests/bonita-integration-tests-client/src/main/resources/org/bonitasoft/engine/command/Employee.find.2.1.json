@@ -6,6 +6,7 @@
     "persistenceVersion_string": "0",
     "firstName": "Matthieu",
     "lastName": "Chaffotte",
+    "birthdate": null,
     "links": [
       {
         "rel": "addresses",

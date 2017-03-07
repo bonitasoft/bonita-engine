@@ -13,91 +13,126 @@
  **/
 package org.bonitasoft.engine.bdm.proxy.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Objects;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bdm.Entity;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Child implements Entity {
 
-	private static final long serialVersionUID = 3000056129946432830L;
-	
-	private String name;
-	private Integer age;
+    private static final long serialVersionUID = 3000056129946432830L;
 
-	public Child() {
-	}
-	
-	public Child(String name, Integer age) {
-		super();
-		this.name = name;
-		this.age = age;
-	}
+    private String name;
+    private Integer age;
 
-	public String getName() {
-		return name;
-	}
+    private Date oldDate;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private LocalDate birthdate;
 
-	public Integer getAge() {
-		return age;
-	}
+    private LocalDateTime localDateTime;
 
-	public void setAge(Integer age) {
-		this.age = age;
-	}
+    public Child() {
+    }
 
-	@Override
-	public Long getPersistenceId() {
-		return null;
-	}
+    public Child(String name, Integer age, Date oldDate, LocalDate birthdate, LocalDateTime localDateTime) {
+        this.name = name;
+        this.age = age;
+        this.oldDate = oldDate;
+        this.birthdate = birthdate;
+        this.localDateTime = localDateTime;
+    }
 
-	@Override
-	public Long getPersistenceVersion() {
-		return null;
-	}
-	
-	public String toJson() {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			return mapper.writeValueAsString(this);
-		} catch (JsonProcessingException e) {
-			return null;
-		}
-	}
+    public Child(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((age == null) ? 0 : age.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    public Date getOldDate() {
+        return oldDate;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Child other = (Child) obj;
-		if (age == null) {
-			if (other.age != null)
-				return false;
-		} else if (!age.equals(other.age))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
-	}
-	
-	
+    public void setOldDate(Date oldDate) {
+        this.oldDate = oldDate;
+    }
+
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(LocalDate birthdate) {
+        this.birthdate = birthdate;
+    }
+
+    public LocalDateTime getLocalDateTime() {
+        return localDateTime;
+    }
+
+    public void setLocalDateTime(LocalDateTime localDateTime) {
+        this.localDateTime = localDateTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Override
+    public Long getPersistenceId() {
+        return null;
+    }
+
+    @Override
+    public Long getPersistenceVersion() {
+        return null;
+    }
+
+    public String toJson() {
+        return "{\"name\" : \"" + name + "\", \"age\" : " + age + ", \"oldDate\" : " + (oldDate != null ? oldDate.getTime() : null)
+                + ", \"birthdate\" : " + (birthdate != null ? "\"" + birthdate.toString() + "\"" : null) + ", \"localDateTime\" : "
+                + (localDateTime != null ? "\"" + localDateTime.toString() + "\"" : null) + " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Child))
+            return false;
+        Child child = (Child) o;
+        return Objects.equals(name, child.name) &&
+                Objects.equals(age, child.age) &&
+                Objects.equals(oldDate, child.oldDate) &&
+                Objects.equals(birthdate, child.birthdate) &&
+                Objects.equals(localDateTime, child.localDateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age, oldDate, birthdate, localDateTime);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("age", age)
+                .append("oldDate", oldDate)
+                .append("birthdate", birthdate)
+                .append("localDateTime", localDateTime)
+                .toString();
+    }
 }

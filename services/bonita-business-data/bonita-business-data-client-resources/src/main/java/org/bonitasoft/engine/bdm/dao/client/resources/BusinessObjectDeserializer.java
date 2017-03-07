@@ -15,6 +15,8 @@ package org.bonitasoft.engine.bdm.dao.client.resources;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -22,11 +24,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.bonitasoft.engine.bdm.serialization.CustomLocalDateDeserializer;
+import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
 
 /**
  * @author Romain Bioteau
- *
  */
 public class BusinessObjectDeserializer {
 
@@ -36,16 +40,20 @@ public class BusinessObjectDeserializer {
     public BusinessObjectDeserializer() {
         mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final SimpleModule customModule = new SimpleModule();
+        customModule.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
+        customModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+        mapper.registerModule(customModule);
         typeFactory = mapper.getTypeFactory();
     }
 
     @SuppressWarnings("unchecked")
-	public <T> T deserialize(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
+    public <T> T deserialize(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
         return (T) mapper.readValue(serializedResult, createJavaType(targetType));
     }
-    
+
     @SuppressWarnings("unchecked")
-	public <T> List<T> deserializeList(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
+    public <T> List<T> deserializeList(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
         return (List<T>) mapper.readValue(serializedResult, createListJavaType(targetType));
     }
 

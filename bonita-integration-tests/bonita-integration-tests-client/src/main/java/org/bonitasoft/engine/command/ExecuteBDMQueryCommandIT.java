@@ -24,6 +24,7 @@ import static org.bonitasoft.engine.bdm.builder.QueryBuilder.aQuery;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataQueryResultImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -55,8 +57,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Romain Bioteau
@@ -90,12 +90,14 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     private ClassLoader contextClassLoader;
 
     private static File clientFolder;
+    private LocalDate birthdate;
 
     private BusinessObjectModel buildCustomBOM() {
         final BusinessObject addressBO = aBO(ADDRESS_QUALIF_CLASSNAME).withField(aSimpleField().withName("street").ofType(FieldType.STRING).build()).build();
         final BusinessObject employee = aBO(EMPLOYEE_QUALIF_CLASSNAME).withDescription("Describe final a simple employee")
                 .withField(aSimpleField().withName("firstName").ofType(FieldType.STRING).withLength(10).build())
                 .withField(aSimpleField().withName("lastName").ofType(FieldType.STRING).notNullable().build())
+                .withField(aSimpleField().withName("birthdate").ofType(FieldType.LOCALDATE).nullable().build())
                 .withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build())
                 .withQuery(
                         aQuery().withName("getNoEmployees")
@@ -155,9 +157,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         loadClientJars();
 
-        addEmployee("Romain", "Bioteau", "54, Grand Rue", "38 , Gabrile Péri");
-        addEmployee("Jules", "Bioteau", "78 , Colonel Bougault");
-        addEmployee("Matthieu", "Chaffotte");
+        birthdate = LocalDate.of(1982, 3, 17);
+        addEmployee("Romain", "Bioteau", birthdate, "54, Grand Rue", "38 , Gabrile Péri");
+        addEmployee("Jules", "Bioteau", null, "78 , Colonel Bougault");
+        addEmployee("Matthieu", "Chaffotte", null);
     }
 
     protected void loadClientJars() throws Exception {
@@ -235,7 +238,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         parameters.put(MAX_RESULTS, 1);
         final byte[] result = (byte[]) getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final BusinessDataObjectMapper mapper = new BusinessDataObjectMapper();
         final Long count = mapper.readValue(result, Long.class);
         assertThat(count).isEqualTo(3L);
     }
@@ -312,6 +315,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         assertThat(employee.getClass().getName()).isEqualTo(EMPLOYEE_QUALIF_CLASSNAME);
         assertThat(employee.getClass().getMethod("getFirstName", new Class[0]).invoke(employee)).isEqualTo("Romain");
         assertThat(employee.getClass().getMethod("getLastName", new Class[0]).invoke(employee)).isEqualTo("Bioteau");
+        assertThat(employee.getClass().getMethod("getBirthdate", new Class[0]).invoke(employee)).isEqualTo(birthdate);
         final Object invoke = employee.getClass().getMethod("getAddresses", new Class[0]).invoke(employee);
         assertThat(invoke).isInstanceOf(List.class);
         assertThat((List<?>) invoke).isEmpty();
@@ -336,9 +340,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         getCommandAPI().execute(EXECUTE_BDM_QUERY_COMMAND, parameters);
     }
 
-    public void addEmployee(final String firstName, final String lastName, final String... addresses) throws Exception {
+    public void addEmployee(final String firstName, final String lastName, final LocalDate birthdate, final String... addresses) throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
-                createNewEmployeeScriptContent(firstName, lastName, addresses),
+                createNewEmployeeScriptContent(firstName, lastName, birthdate, addresses),
                 EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
@@ -351,11 +355,12 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", businessUser);
+        checkProcessInstanceIsArchived(instance);
 
         disableAndDeleteProcess(definition.getId());
     }
 
-    private String createNewEmployeeScriptContent(final String firstName, final String lastName, final String... addresses) {
+    private String createNewEmployeeScriptContent(final String firstName, final String lastName, LocalDate birthdate, final String... addresses) {
         final StringBuilder sb = new StringBuilder();
         sb.append("import ");
         sb.append(EMPLOYEE_QUALIF_CLASSNAME);
@@ -370,6 +375,13 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         sb.append("\n");
         sb.append("e.lastName =");
         sb.append("'" + lastName + "'");
+        sb.append("\n");
+        sb.append("e.birthdate = ");
+        if (birthdate != null) {
+            sb.append("java.time.LocalDate.parse(\"" + birthdate.toString() + "\")");
+        } else {
+            sb.append("null");
+        }
         sb.append("\n");
         if (addresses != null) {
             for (int i = 0; i < addresses.length; i++) {
@@ -389,21 +401,17 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     }
 
     private Serializable deserializeSimpleResult(final byte[] result) throws Exception {
-        final Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME);
-        final ObjectMapper mapper = new ObjectMapper();
-        return (Serializable) mapper.readValue(result, loadClass);
+        return new BusinessDataObjectMapper().readValue(result,
+                (Class<Serializable>) Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME));
     }
 
     private List<?> deserializeListResult(final byte[] result) throws Exception {
-        final Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME);
-        final ObjectMapper mapper = new ObjectMapper();
-        return (List<?>) mapper.readValue(result, mapper.getTypeFactory().constructCollectionType(List.class, loadClass));
+        return new BusinessDataObjectMapper().readListValue(result,
+                (Class<Serializable>) Thread.currentThread().getContextClassLoader().loadClass(EMPLOYEE_QUALIF_CLASSNAME));
     }
 
     private String getJsonContent(final String jsonFileName) throws IOException {
-        final String json;
-        json = new String(org.apache.commons.io.IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
-        return json;
+        return new String(org.apache.commons.io.IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
     }
 
 }
