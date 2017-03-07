@@ -17,15 +17,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 
 /**
  * @author Romain Bioteau
@@ -76,11 +75,11 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     }
 
     private byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        final BusinessDataObjectMapper mapper = new BusinessDataObjectMapper();
+        mapper.enableSerializationFeature(SerializationFeature.INDENT_OUTPUT);
         //avoid to fail when serializing proxy (proxy will be recreated client side) see BS-16031
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        ((DefaultSerializerProvider) mapper.getSerializerProvider()).flushCachedSerializers();
+        mapper.disableSerializationFeature(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
         try {
             return mapper.writeValueAsBytes(result);
         } catch (final JsonProcessingException jpe) {
