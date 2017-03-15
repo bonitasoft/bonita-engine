@@ -15,6 +15,7 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -35,6 +36,7 @@ public class XStreamFactory {
             XSTREAM_MAP.put(classLoader, xStream);
             xStream.registerConverter(new LocalDateConverter());
             xStream.registerConverter(new LocalDateTimeConverter());
+            xStream.registerConverter(new OffsetDateTimeConverter());
         }
 
         return xStream;
@@ -83,6 +85,25 @@ public class XStreamFactory {
                 return LocalDateTime.parse(str);
             } catch (DateTimeParseException e) {
                 throw new RuntimeException("LocalDateTime failed to parse the incoming string", e);
+            }
+        }
+    }
+    
+    private static class OffsetDateTimeConverter extends AbstractSingleValueConverter {
+       
+        public boolean canConvert(Class type) {
+            return OffsetDateTime.class.equals(type);
+        }
+
+        public String toString(Object source) {
+            return source.toString();
+        }
+
+        public Object fromString(String str) {
+            try {
+                return OffsetDateTime.parse(str);
+            } catch (DateTimeParseException e) {
+                throw new RuntimeException("OffsetDateTime failed to parse the incoming string", e);
             }
         }
     }

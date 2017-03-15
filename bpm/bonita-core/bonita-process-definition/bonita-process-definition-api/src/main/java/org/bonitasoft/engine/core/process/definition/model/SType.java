@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +36,8 @@ public enum SType {
     BYTE_ARRAY(byte[].class),
     FILE(FileInputValue.class), LONG(Long.class, Integer.class, BigInteger.class, Short.class, Byte.class),
     LOCALDATE(LocalDate.class),
-    LOCALDATETIME(LocalDateTime.class);
+    LOCALDATETIME(LocalDateTime.class),
+    OFFSETDATETIME(OffsetDateTime.class);
 
     private final List<Class<?>> assignableTypes;
 
