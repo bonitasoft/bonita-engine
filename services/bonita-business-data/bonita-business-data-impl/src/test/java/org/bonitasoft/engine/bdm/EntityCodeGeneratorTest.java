@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -387,5 +388,39 @@ public class EntityCodeGeneratorTest {
         assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
         final String value = getAnnotationParamValue(annotationUse, "converter");
         assertThat(value).isNotNull().isEqualTo("org.bonitasoft.engine.bdm.DateAndTimeConverter.class");
+    }
+    
+    @Test
+    public void annotateSimpleField_should_generate_the_correct_annotation_for_OffsetDateAndTime_type() throws JClassAlreadyExistsException {
+        
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        SimpleField nameField = new SimpleField();
+        nameField.setName("reunion");
+        nameField.setType(FieldType.OFFSETDATETIME);
+        nameField.setNullable(Boolean.FALSE);
+        final JDefinedClass definedClass = codeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        entityCodeGenerator.addField(definedClass, nameField);
+        final JFieldVar nameFieldVar = definedClass.fields().get("reunion");
+
+        assertThat(nameFieldVar).isNotNull();
+        assertThat(nameFieldVar.type()).isEqualTo(codeGenerator.getModel().ref(OffsetDateTime.class.getName()));
+        assertThat(nameFieldVar.annotations().size()).isEqualTo(2);
+        final Iterator<JAnnotationUse> iterator = nameFieldVar.annotations().iterator();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+
+        final String name = getAnnotationParamValue(annotationUse, "name");
+        assertThat(name).isNotNull().isEqualTo("REUNION");
+        final String nullable = getAnnotationParamValue(annotationUse, "nullable");
+        assertThat(nullable).isNotNull().isEqualTo("false");
+        final int length = Integer.parseInt(getAnnotationParamValue(annotationUse, "length"));
+        assertThat(length).isEqualTo(30);
+        annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Convert.class.getName());
+        assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
+        final String value = getAnnotationParamValue(annotationUse, "converter");
+        assertThat(value).isNotNull().isEqualTo("org.bonitasoft.engine.bdm.OffsetDateTimeConverter.class");
+        
     }
 }

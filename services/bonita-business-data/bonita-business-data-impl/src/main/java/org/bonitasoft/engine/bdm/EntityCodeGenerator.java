@@ -254,6 +254,10 @@ public class EntityCodeGenerator {
             columnAnnotation.param("length", 30);
             final JAnnotationUse converterAnnotation = codeGenerator.addAnnotation(fieldVar, Convert.class);
             converterAnnotation.param("converter", DateAndTimeConverter.class);
+        } else if (FieldType.OFFSETDATETIME == sfield.getType()){
+            columnAnnotation.param("length", 30);
+            final JAnnotationUse converterAnnotation = codeGenerator.addAnnotation(fieldVar, Convert.class);
+            converterAnnotation.param("converter", OffsetDateTimeConverter.class);
         }
     }
 
