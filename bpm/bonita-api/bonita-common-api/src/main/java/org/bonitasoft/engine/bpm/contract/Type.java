@@ -37,5 +37,11 @@ public enum Type {
      * Date format following the ISO-8601 norm. Timezone-independent, stores a date, and a time. Ex: 1993-02-24 17:25:00.
      * The time is precise up to the nanosecond. Uses the java 1.8 LocalDateTime.class.
       */
-    LOCALDATETIME
+    LOCALDATETIME,
+    /**
+     * Date format following the ISO-8601 norm. Timezone-dependent, stores a date, a time, and an Offset. Systematically rebased to the UTC
+     * timezone by the engine. Ex: 1993-02-24 17:25:00Z. Uses the java 1.8 OffsetDateTime.class.
+     *
+     */
+    OFFSETDATETIME
 }
