@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bdm.model.field;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 /**
@@ -34,7 +35,8 @@ public enum FieldType {
     SHORT(Short.class),
     CHAR(Character.class),
     LOCALDATETIME(LocalDateTime.class),
-    LOCALDATE(LocalDate.class);
+    LOCALDATE(LocalDate.class),
+    OFFSETDATETIME(OffsetDateTime.class);
     
     private Class<?> clazz;
 
