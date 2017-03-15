@@ -379,7 +379,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context,
                 expressionContextToEvaluateOperations);
 
-        initializeData(sProcessDefinition, sProcessInstance);
+        initializeData(processContainer, sProcessDefinition, sProcessInstance);
         initializeBusinessData(processContainer, sProcessInstance, expressionContext);
 
         createDocuments(sProcessDefinition, processContainer, sProcessInstance, userId, expressionContext, context);
@@ -410,7 +410,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         contractDataService.addProcessData(processInstanceId, processInputs);
     }
 
-    protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
+    protected void initializeData(final SFlowElementContainerDefinition processContainer, SProcessDefinition sProcessDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
         // nothing to do
     }
 
