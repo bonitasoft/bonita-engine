@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
@@ -56,7 +57,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
-import org.bonitasoft.engine.core.process.definition.model.SNamedElement;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
@@ -122,8 +122,6 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     private final List<SDocumentListDefinition> sDocumentListDefinitions;
 
-    private SNamedElement elementContainer;
-
     private boolean containsInclusiveGateway = false;
 
     public SFlowElementContainerDefinitionImpl() {
@@ -152,8 +150,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         sBoundaryEvents = new ArrayList<>();
     }
 
-    public SFlowElementContainerDefinitionImpl(final SNamedElement elementContainer, final FlowElementContainerDefinition container) {
-        this.elementContainer = elementContainer;
+    public SFlowElementContainerDefinitionImpl(final FlowElementContainerDefinition container) {
         transitions = new HashSet<>();
         transitionsMap = new HashMap<>();
         for (final TransitionDefinition transition : container.getTransitions()) {
@@ -555,11 +552,6 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     @Override
-    public SNamedElement getElementContainer() {
-        return elementContainer;
-    }
-
-    @Override
     public List<SBoundaryEventDefinition> getBoundaryEvents() {
         return Collections.unmodifiableList(sBoundaryEvents);
     }
@@ -593,4 +585,39 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         return sDocumentListDefinitions;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SFlowElementContainerDefinitionImpl that = (SFlowElementContainerDefinitionImpl) o;
+        return containsInclusiveGateway == that.containsInclusiveGateway &&
+                Objects.equals(connectorsMap, that.connectorsMap) &&
+                Objects.equals(allElementsMapString, that.allElementsMapString) &&
+                Objects.equals(gatewaysMap, that.gatewaysMap) &&
+                Objects.equals(allElementsMap, that.allElementsMap) &&
+                Objects.equals(allConnectorsMap, that.allConnectorsMap) &&
+                Objects.equals(transitionsMap, that.transitionsMap) &&
+                Objects.equals(activities, that.activities) &&
+                Objects.equals(subProcessDefinitions, that.subProcessDefinitions) &&
+                Objects.equals(transitions, that.transitions) &&
+                Objects.equals(gateways, that.gateways) &&
+                Objects.equals(allElements, that.allElements) &&
+                Objects.equals(connectors, that.connectors) &&
+                Objects.equals(sStartEvents, that.sStartEvents) &&
+                Objects.equals(sIntermediateCatchEvents, that.sIntermediateCatchEvents) &&
+                Objects.equals(sBoundaryEvents, that.sBoundaryEvents) &&
+                Objects.equals(sEndEvents, that.sEndEvents) &&
+                Objects.equals(sIntermediateThrowEvents, that.sIntermediateThrowEvents) &&
+                Objects.equals(sDataDefinitions, that.sDataDefinitions) &&
+                Objects.equals(sBusinessDataDefinitions, that.sBusinessDataDefinitions) &&
+                Objects.equals(sDocumentDefinitions, that.sDocumentDefinitions) &&
+                Objects.equals(sDocumentListDefinitions, that.sDocumentListDefinitions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), connectorsMap, allElementsMapString, gatewaysMap, allElementsMap, allConnectorsMap, transitionsMap, activities, subProcessDefinitions, transitions, gateways, allElements, connectors, sStartEvents, sIntermediateCatchEvents, sBoundaryEvents, sEndEvents, sIntermediateThrowEvents, sDataDefinitions, sBusinessDataDefinitions, sDocumentDefinitions, sDocumentListDefinitions, containsInclusiveGateway);
+    }
 }
