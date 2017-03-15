@@ -966,6 +966,7 @@
       <xs:enumeration value="BOOLEAN"/>
       <xs:enumeration value="INTEGER"/>
       <xs:enumeration value="LOCALDATETIME"/>
+      <xs:enumeration value="OFFSETDATETIME"/>
       <xs:enumeration value="LONG"/>
       <xs:enumeration value="DATE"/>
     </xs:restriction>
