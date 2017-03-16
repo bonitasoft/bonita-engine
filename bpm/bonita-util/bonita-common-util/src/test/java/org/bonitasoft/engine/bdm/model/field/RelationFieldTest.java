@@ -13,17 +13,15 @@
  **/
 package org.bonitasoft.engine.bdm.model.field;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
 import static org.bonitasoft.engine.bdm.model.assertion.FieldAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import org.junit.Test;
 
 /**
  * @author Colin PUY
@@ -42,7 +40,6 @@ public class RelationFieldTest {
     }
 
     @Test
-    @Ignore
     public void should_not_be_marshallizable_without_name() {
         final RelationField field = new RelationField();
         field.setType(Type.AGGREGATION);

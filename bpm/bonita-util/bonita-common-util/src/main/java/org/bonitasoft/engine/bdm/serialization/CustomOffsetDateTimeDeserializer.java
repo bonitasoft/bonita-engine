@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,11 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
+
 package org.bonitasoft.engine.bdm.serialization;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,25 +25,24 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 /**
- * @author Emmanuel Duchastenier
+ * @author Danila Mazour
  */
-public class CustomLocalDateDeserializer extends StdDeserializer<LocalDate> {
+public class CustomOffsetDateTimeDeserializer extends StdDeserializer<OffsetDateTime> {
 
-    public CustomLocalDateDeserializer() {
-        super(LocalDate.class);
+    public CustomOffsetDateTimeDeserializer() {
+        super(LocalDateTime.class);
     }
 
-    protected CustomLocalDateDeserializer(Class<?> vc) {
+    public CustomOffsetDateTimeDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public LocalDate deserialize(JsonParser p, DeserializationContext context) throws IOException, JsonProcessingException {
-        final String value = p.readValueAs(String.class);
+    public OffsetDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        final String value = jp.readValueAs(String.class);
         if (value == null) {
             return null;
         }
-        return LocalDate.parse(value);
+        return OffsetDateTime.parse(value).withOffsetSameInstant(ZoneOffset.UTC);
     }
-
 }

@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
@@ -43,8 +44,10 @@ public class BusinessDataObjectMapper {
         module = new SimpleModule();
         module.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
         module.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+        module.addSerializer(OffsetDateTime.class, new CustomOffsetDateTimeSerializer());
         module.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
         module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+        module.addDeserializer(OffsetDateTime.class, new CustomOffsetDateTimeDeserializer());
         objectMapper.registerModule(module);
     }
 

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bdm.model.field;
 
 import static org.bonitasoft.engine.bdm.model.assertion.FieldAssert.assertThat;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -24,7 +23,6 @@ import org.junit.Test;
 public class SimpleFieldTest {
 
     @Test
-    @Ignore
     public void should_not_be_marshallizable_without_name() {
         final SimpleField field = new SimpleField();
         field.setType(FieldType.BOOLEAN);
