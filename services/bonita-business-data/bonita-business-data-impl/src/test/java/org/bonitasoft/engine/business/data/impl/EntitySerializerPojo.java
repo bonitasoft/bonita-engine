@@ -16,10 +16,10 @@ package org.bonitasoft.engine.business.data.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -34,8 +34,11 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.apache.commons.beanutils.converters.DateTimeConverter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bonitasoft.engine.bdm.DateConverter;
 import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.OffsetDateTimeConverter;
 
 public class EntitySerializerPojo implements Entity {
 
@@ -79,7 +82,19 @@ public class EntitySerializerPojo implements Entity {
     @Column(name = "LOCALDATETIME", nullable = true, length = 30)
     private LocalDateTime aLocalDateTime;
 
+    @Convert(converter = OffsetDateTimeConverter.class)
+    @Column(name = "OFFSETDATETIME", nullable = true, length = 40)
+    private OffsetDateTime anOffsetDateTime;
+
     public EntitySerializerPojo() {
+    }
+
+    public OffsetDateTime getAnOffsetDateTime() {
+        return anOffsetDateTime;
+    }
+
+    public void setAnOffsetDateTime(OffsetDateTime anOffsetDateTime) {
+        this.anOffsetDateTime = anOffsetDateTime;
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -228,28 +243,49 @@ public class EntitySerializerPojo implements Entity {
     public boolean equals(Object o) {
         if (this == o)
             return true;
+
         if (!(o instanceof EntitySerializerPojo))
             return false;
+
         EntitySerializerPojo that = (EntitySerializerPojo) o;
-        return Objects.equals(persistenceId, that.persistenceId) &&
-                Objects.equals(persistenceVersion, that.persistenceVersion) &&
-                Objects.equals(aString, that.aString) &&
-                Objects.equals(aBoolean, that.aBoolean) &&
-                Objects.equals(aDate, that.aDate) &&
-                Objects.equals(aDouble, that.aDouble) &&
-                Objects.equals(aFloat, that.aFloat) &&
-                Objects.equals(aInteger, that.aInteger) &&
-                Objects.equals(aLong, that.aLong) &&
-                Objects.equals(aText, that.aText) &&
-                Objects.equals(manyLong, that.manyLong) &&
-                Objects.equals(manyString, that.manyString) &&
-                Objects.equals(aLocalDate, that.aLocalDate) &&
-                Objects.equals(aLocalDateTime, that.aLocalDateTime);
+
+        return new EqualsBuilder()
+                .append(getPersistenceId(), that.getPersistenceId())
+                .append(getPersistenceVersion(), that.getPersistenceVersion())
+                .append(aString, that.aString)
+                .append(aBoolean, that.aBoolean)
+                .append(aDate, that.aDate)
+                .append(aDouble, that.aDouble)
+                .append(aFloat, that.aFloat)
+                .append(aInteger, that.aInteger)
+                .append(aLong, that.aLong)
+                .append(aText, that.aText)
+                .append(getManyLong(), that.getManyLong())
+                .append(getManyString(), that.getManyString())
+                .append(aLocalDate, that.aLocalDate)
+                .append(aLocalDateTime, that.aLocalDateTime)
+                .append(getAnOffsetDateTime(), that.getAnOffsetDateTime())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(persistenceId, persistenceVersion, aString, aBoolean, aDate, aDouble, aFloat, aInteger, aLong, aText, manyLong, manyString,
-                aLocalDate, aLocalDateTime);
+        return new HashCodeBuilder(17, 37)
+                .append(getPersistenceId())
+                .append(getPersistenceVersion())
+                .append(aString)
+                .append(aBoolean)
+                .append(aDate)
+                .append(aDouble)
+                .append(aFloat)
+                .append(aInteger)
+                .append(aLong)
+                .append(aText)
+                .append(getManyLong())
+                .append(getManyString())
+                .append(aLocalDate)
+                .append(aLocalDateTime)
+                .append(getAnOffsetDateTime())
+                .toHashCode();
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,37 +10,35 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
+
 package org.bonitasoft.engine.bdm.serialization;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * @author Emmanuel Duchastenier
+ * @author Danila Mazour
  */
-public class CustomLocalDateDeserializer extends StdDeserializer<LocalDate> {
+public class CustomOffsetDateTimeSerializer extends StdSerializer<OffsetDateTime> {
 
-    public CustomLocalDateDeserializer() {
-        super(LocalDate.class);
+    public CustomOffsetDateTimeSerializer() {
+        this(null);
     }
 
-    protected CustomLocalDateDeserializer(Class<?> vc) {
-        super(vc);
+    public CustomOffsetDateTimeSerializer(Class<OffsetDateTime> t) {
+        super(t);
     }
 
     @Override
-    public LocalDate deserialize(JsonParser p, DeserializationContext context) throws IOException, JsonProcessingException {
-        final String value = p.readValueAs(String.class);
-        if (value == null) {
-            return null;
-        }
-        return LocalDate.parse(value);
+    public void serialize(OffsetDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+        jgen.writeString((value != null) ? DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value.withOffsetSameInstant(ZoneOffset.UTC)) : null);
     }
-
 }

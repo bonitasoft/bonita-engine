@@ -17,7 +17,12 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
+
+import org.bonitasoft.engine.bdm.serialization.CustomLocalDateDeserializer;
+import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
+import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeDeserializer;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -26,8 +31,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.bonitasoft.engine.bdm.serialization.CustomLocalDateDeserializer;
-import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
 
 /**
  * @author Romain Bioteau
@@ -43,6 +46,7 @@ public class BusinessObjectDeserializer {
         final SimpleModule customModule = new SimpleModule();
         customModule.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
         customModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
+        customModule.addDeserializer(OffsetDateTime.class, new CustomOffsetDateTimeDeserializer());
         mapper.registerModule(customModule);
         typeFactory = mapper.getTypeFactory();
     }
