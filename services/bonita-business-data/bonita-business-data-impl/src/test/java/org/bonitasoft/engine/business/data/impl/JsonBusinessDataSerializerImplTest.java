@@ -19,6 +19,8 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -101,6 +103,7 @@ public class JsonBusinessDataSerializerImplTest {
         entitySerializerPojo.setADate(new Date(123L));
         entitySerializerPojo.setALocalDate(LocalDate.of(2017, 3, 6));
         entitySerializerPojo.setALocalDateTime(LocalDateTime.of(1945, 5, 8, 12, 31, 17));
+        entitySerializerPojo.setAnOffsetDateTime(OffsetDateTime.of(LocalDateTime.of(1949, 4, 9, 12, 14, 5), ZoneOffset.ofHours(1)));
         entitySerializerPojo.setADouble(Double.MAX_VALUE);
         entitySerializerPojo.setAFloat(Float.MAX_VALUE);
         entitySerializerPojo.setAInteger(Integer.MAX_VALUE);

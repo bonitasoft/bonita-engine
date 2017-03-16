@@ -15,9 +15,11 @@ package org.bonitasoft.engine.bdm.proxy.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
-import java.util.Objects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bdm.Entity;
 
@@ -34,7 +36,18 @@ public class Child implements Entity {
 
     private LocalDateTime localDateTime;
 
+    private OffsetDateTime nextAppointment;
+
     public Child() {
+    }
+
+    public Child(String name, Integer age, Date oldDate, LocalDate birthdate, LocalDateTime localDateTime, OffsetDateTime nextAppointment) {
+        this.name = name;
+        this.age = age;
+        this.oldDate = oldDate;
+        this.birthdate = birthdate;
+        this.localDateTime = localDateTime;
+        this.nextAppointment = nextAppointment;
     }
 
     public Child(String name, Integer age, Date oldDate, LocalDate birthdate, LocalDateTime localDateTime) {
@@ -90,6 +103,14 @@ public class Child implements Entity {
         this.age = age;
     }
 
+    public OffsetDateTime getNextAppointment() {
+        return nextAppointment;
+    }
+
+    public void setNextAppointment(OffsetDateTime nextAppointment) {
+        this.nextAppointment = nextAppointment;
+    }
+
     @Override
     public Long getPersistenceId() {
         return null;
@@ -103,26 +124,43 @@ public class Child implements Entity {
     public String toJson() {
         return "{\"name\" : \"" + name + "\", \"age\" : " + age + ", \"oldDate\" : " + (oldDate != null ? oldDate.getTime() : null)
                 + ", \"birthdate\" : " + (birthdate != null ? "\"" + birthdate.toString() + "\"" : null) + ", \"localDateTime\" : "
-                + (localDateTime != null ? "\"" + localDateTime.toString() + "\"" : null) + " }";
+                + (localDateTime != null ? "\"" + localDateTime.toString() + "\"" : null) + ", \"nextAppointment\" : "
+                + (nextAppointment != null ? "\""
+                        // leave TimeZone offset as is, if any, as this is the Deserializer job to convert it to UTC:
+                        + nextAppointment.toString() + "\"" : null)
+                + " }";
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
+
         if (!(o instanceof Child))
             return false;
+
         Child child = (Child) o;
-        return Objects.equals(name, child.name) &&
-                Objects.equals(age, child.age) &&
-                Objects.equals(oldDate, child.oldDate) &&
-                Objects.equals(birthdate, child.birthdate) &&
-                Objects.equals(localDateTime, child.localDateTime);
+
+        return new EqualsBuilder()
+                .append(getName(), child.getName())
+                .append(getAge(), child.getAge())
+                .append(getOldDate(), child.getOldDate())
+                .append(getBirthdate(), child.getBirthdate())
+                .append(getLocalDateTime(), child.getLocalDateTime())
+                .append(getNextAppointment(), child.getNextAppointment())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, age, oldDate, birthdate, localDateTime);
+        return new HashCodeBuilder(17, 37)
+                .append(getName())
+                .append(getAge())
+                .append(getOldDate())
+                .append(getBirthdate())
+                .append(getLocalDateTime())
+                .append(getNextAppointment())
+                .toHashCode();
     }
 
     @Override
@@ -133,6 +171,7 @@ public class Child implements Entity {
                 .append("oldDate", oldDate)
                 .append("birthdate", birthdate)
                 .append("localDateTime", localDateTime)
+                .append("nextAppointment", nextAppointment)
                 .toString();
     }
 }
