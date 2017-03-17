@@ -591,7 +591,7 @@ public class ContractIT extends CommonAPIIT {
         userTaskBuilder.addContract().addInput("inputVersion", Type.TEXT, null).addInput("processInputId", Type.INTEGER, null)
                 .addInput("LocalDateInput", Type.LOCALDATE, null).addInput("LocalDateTimeInput", Type.LOCALDATETIME, null)
                 .addInput("LocalDateTimeNullInput", Type.LOCALDATETIME, null)
-                .addInput("OffsetDateTimeInput",Type.OFFSETDATETIME, null);
+                .addInput("OffsetDateTimeInput", Type.OFFSETDATETIME, null);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorWithAPICall(designProcessDefinition);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -604,20 +604,20 @@ public class ContractIT extends CommonAPIIT {
         inputs.put("LocalDateInput", LocalDate.of(2017, 4, 12));
         inputs.put("LocalDateTimeInput", LocalDateTime.of(2017, 4, 12, 19, 45, 22));
         inputs.put("LocalDateTimeNullInput", null);
-        inputs.put("OffsetDateTimeInput", OffsetDateTime.of(LocalDateTime.of(1973,10,17,13,42,0), ZoneOffset.ofHours(-4)));
+        inputs.put("OffsetDateTimeInput", OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 13, 42, 0), ZoneOffset.ofHours(-4)));
         getProcessAPI().executeUserTask(userTask.getId(), inputs);
 
         waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
         LocalDateTime localDateTime = (LocalDateTime) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "LocalDateTimeInput");
         LocalDate localDate = (LocalDate) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "LocalDateInput");
         LocalDateTime nullLocalDateTime = (LocalDateTime) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "LocalDateTimeNullInput");
-        OffsetDateTime offsetDateTime = (OffsetDateTime) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(),"OffsetDateTimeInput");
+        OffsetDateTime offsetDateTime = (OffsetDateTime) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "OffsetDateTimeInput");
         final BigInteger processInputId = (BigInteger) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "processInputId");
         assertThat(processInputId).isEqualTo(BigInteger.valueOf(45L));
         assertThat(localDate).isNotNull().isEqualTo(LocalDate.of(2017, 4, 12));
         assertThat(localDateTime).isNotNull().isEqualTo(LocalDateTime.of(2017, 4, 12, 19, 45, 22));
         assertThat(nullLocalDateTime).isNull();
-        assertThat(offsetDateTime).isEqualTo(OffsetDateTime.of(LocalDateTime.of(1973,10,17,13,42,0), ZoneOffset.ofHours(-4)));
+        assertThat(offsetDateTime).isEqualTo(OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 17, 42, 0), ZoneOffset.UTC));
 
         disableAndDeleteProcess(processDefinition);
     }
