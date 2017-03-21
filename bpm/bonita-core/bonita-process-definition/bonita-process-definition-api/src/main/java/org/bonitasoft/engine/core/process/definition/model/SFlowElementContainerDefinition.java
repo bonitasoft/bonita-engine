@@ -30,8 +30,6 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
  */
 public interface SFlowElementContainerDefinition extends SBaseElement {
 
-    SNamedElement getElementContainer();
-
     Set<SFlowNodeDefinition> getFlowNodes();
 
     List<SBoundaryEventDefinition> getBoundaryEvents();
