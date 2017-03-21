@@ -33,7 +33,7 @@ public class SSubProcessDefinitionImpl extends SActivityDefinitionImpl implement
     public SSubProcessDefinitionImpl(final SubProcessDefinition subProcess) {
         super(subProcess.getId(), subProcess.getName());
         triggeredByEvent = subProcess.isTriggeredByEvent();
-        subProcessContainer = new SFlowElementContainerDefinitionImpl(this, subProcess.getSubProcessContainer());
+        subProcessContainer = new SFlowElementContainerDefinitionImpl(subProcess.getSubProcessContainer());
     }
 
     public SSubProcessDefinitionImpl(final long id, final String name, final boolean triggeredByEvent) {

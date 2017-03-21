@@ -1169,15 +1169,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
         assertThat(activityInstance.getName()).isEqualTo("call");
         getProcessAPI().cancelProcessInstance(processInstance.getId());
         waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
+
         //then
         try {
             getProcessAPI().getProcessInstance(processInstance.getId());
-            fail("process should not exists anymore");
+            fail("process should not exist anymore");
         } catch (ProcessInstanceNotFoundException ignored) {
         }
-        //verify the call activity was archived in cancelled
-        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(1, 10)
-                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").done());
+        //verify the call activity was archived in cancelled state:
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(new SearchOptionsBuilder(0, 10)
+                .filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "call").filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true).done());
         assertThat(archivedFlowNodeInstances.getResult()).hasSize(1);
         assertThat(archivedFlowNodeInstances.getResult().get(0).getState()).isEqualTo("cancelled");
         disableAndDeleteProcess(processDefinition);
