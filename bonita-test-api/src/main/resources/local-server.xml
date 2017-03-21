@@ -19,20 +19,16 @@
         </property>
     </bean>
 
-    <bean id="bonitaSequenceManagerDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
-        <property name="driverClass" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
-        <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
-        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
-        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-
-        <property name="idleConnectionTestPeriodInMinutes" value="${local.journal.nonxads.idleConnectionTestPeriodInMinutes}" />
-        <property name="idleMaxAgeInMinutes" value="${local.journal.nonxads.idleMaxAgeInMinutes}" />
-        <property name="maxConnectionsPerPartition" value="${local.journal.nonxads.maxConnectionsPerPartition}" />
-        <property name="minConnectionsPerPartition" value="${local.journal.nonxads.minConnectionsPerPartition}" />
-        <property name="partitionCount" value="${local.journal.nonxads.partitionCount}" />
-        <property name="acquireIncrement" value="${local.journal.nonxads.acquireIncrement}" />
-        <property name="statementsCacheSize" value="${local.journal.nonxads.statementsCacheSize}" />
-        <property name="releaseHelperThreads" value="${local.journal.nonxads.releaseHelperThreads}" />
+    <bean id="bonitaSequenceManagerDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <constructor-arg name="configuration">
+            <bean class="com.zaxxer.hikari.HikariConfig">
+                <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
+                <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
+                <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
+                <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
+                <property name="idleTimeout" value="1800000" />
+            </bean>
+        </constructor-arg>
     </bean>
 
     <bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
@@ -46,19 +42,16 @@
         </property>
     </bean>
 
-    <bean id="notManagedBizDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
-        <property name="driverClass" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
-        <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
-        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
-        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-        <property name="idleConnectionTestPeriodInMinutes" value="${local.bdm.nonxads.idleConnectionTestPeriodInMinutes}" />
-        <property name="idleMaxAgeInMinutes" value="${local.bdm.nonxads.idleMaxAgeInMinutes}" />
-        <property name="maxConnectionsPerPartition" value="${local.bdm.nonxads.maxConnectionsPerPartition}" />
-        <property name="minConnectionsPerPartition" value="${local.bdm.nonxads.minConnectionsPerPartition}" />
-        <property name="partitionCount" value="${local.bdm.nonxads.partitionCount}" />
-        <property name="acquireIncrement" value="${local.bdm.nonxads.acquireIncrement}" />
-        <property name="statementsCacheSize" value="${local.bdm.nonxads.statementsCacheSize}" />
-        <property name="releaseHelperThreads" value="${local.bdm.nonxads.releaseHelperThreads}" />
+    <bean id="notManagedBizDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <constructor-arg name="configuration">
+            <bean class="com.zaxxer.hikari.HikariConfig">
+                <property name="driverClassName" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
+                <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
+                <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
+                <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
+                <property name="idleTimeout" value="1800000" />
+            </bean>
+        </constructor-arg>
     </bean>
 
     <!-- H2 -->

@@ -183,7 +183,7 @@ public class EngineStarter {
         if (threadGroup != null && threadGroup.getName().equals("system")) {
             return true;
         }
-        final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
+        final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
                 "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */, "daemon-shutdown",
                 "surefire-forkedjvm",
