@@ -125,6 +125,11 @@
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernate.version}</version>
@@ -269,6 +274,26 @@
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-rules</artifactId>
                 <version>${system-rules.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-classloader</artifactId>
+                <version>3.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>${xstream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${httpclient.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
