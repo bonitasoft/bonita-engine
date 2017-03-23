@@ -17,7 +17,7 @@
         <server.port>8384</server.port>
         <server.ajp.port>8313</server.ajp.port>
         <provider.port>8184</provider.port>
-        <tomcat.version>7.0.67</tomcat.version>
+        <tomcat.version>7.0.76</tomcat.version>
         <tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
         <tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
         <tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
