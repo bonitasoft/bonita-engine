@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -1353,8 +1354,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("queryParameters", (Serializable) queryParameters);
 
         // when
-        ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
-        getCommandAPI().addDependency("temporaryDeps", new byte[]{0, 1});
         final Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
 
         // then
