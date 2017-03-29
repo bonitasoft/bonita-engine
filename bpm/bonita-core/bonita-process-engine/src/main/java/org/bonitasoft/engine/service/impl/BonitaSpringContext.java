@@ -13,69 +13,47 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class BonitaSpringContext extends FileSystemXmlApplicationContext {
+public class BonitaSpringContext extends AbstractXmlApplicationContext {
 
     private List<Resource> resources = new ArrayList<>();
 
     /**
-     * Create a new FileSystemXmlApplicationContext with the given parent,
+     * Create a new XmlApplicationContext with the given parent,
      * loading the definitions from the given XML files and automatically
      * refreshing the context.
      *
-     * @param configLocations array of file paths
      * @param parent          the parent context
      * @throws BeansException if context creation failed
      */
-    public BonitaSpringContext(final String[] configLocations, final ApplicationContext parent)
-            throws BeansException {
-        super(configLocations, false, parent);
+    public BonitaSpringContext(ApplicationContext parent) throws BeansException {
+        super(parent);
 
     }
-
+    
     @Override
-    protected Resource getResourceByPath(final String path) {
-        return new FileSystemResource(path);
+    protected Resource[] getConfigResources() {
+        return resources.toArray(new Resource[resources.size()]);
     }
-
 
     public void addClassPathResource(String location) {
         ClassPathResource classPathResource = new ClassPathResource(location);
         if (classPathResource.exists()) {
             resources.add(classPathResource);
         }
-    }
-
-
-    @Override
-    protected Resource[] getConfigResources() {
-        String[] configLocations = getConfigLocations();
-        ArrayList<Resource> resourcesList = new ArrayList<>();
-        for (String configLocation : configLocations) {
-            try {
-                resourcesList.addAll(Arrays.asList(getResources(configLocation)));
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-        resourcesList.addAll(resources);
-        return resourcesList.toArray(new Resource[resourcesList.size()]);
     }
 
     public void addByteArrayResource(BonitaConfiguration configuration) {
