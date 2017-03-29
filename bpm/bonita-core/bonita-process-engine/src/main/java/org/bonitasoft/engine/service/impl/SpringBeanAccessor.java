@@ -82,7 +82,7 @@ public abstract class SpringBeanAccessor {
     }
 
     BonitaSpringContext createSpringContext() {
-        return new BonitaSpringContext(new String[] {}, parent);
+        return new BonitaSpringContext(parent);
     }
 
     BonitaHomeServer getBonitaHomeServer() {
