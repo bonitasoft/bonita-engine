@@ -4257,38 +4257,24 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException {
-        try {
-            // TODO: refactor this method when deprecated addComment() method is removed from API:
-            return addComment(processInstanceId, comment);
-        } catch (final RetrieveException e) {
-            throw new CreationException(buildCantAddCommentOnProcessInstance(), e.getCause());
-        }
-    }
-
-    private String buildCantAddCommentOnProcessInstance() {
-        return "Cannot add a comment on a finished or inexistant process instance";
-    }
-
-    @Override
-    @Deprecated
-    public Comment addComment(final long processInstanceId, final String comment) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
-        } catch (final SProcessInstanceReadException e) {
-            throw new RetrieveException(buildCantAddCommentOnProcessInstance(), e); // FIXME: should be another exception
-        } catch (final SProcessInstanceNotFoundException e) {
+        } catch (final SProcessInstanceReadException | SProcessInstanceNotFoundException e) {
             throw new RetrieveException(buildCantAddCommentOnProcessInstance(), e); // FIXME: should be another exception
         }
         final SCommentService commentService = tenantAccessor.getCommentService();
         final AddComment addComment = new AddComment(commentService, processInstanceId, comment);
         try {
             addComment.execute();
-            final SComment sComment = addComment.getResult();
-            return ModelConvertor.toComment(sComment);
+            return ModelConvertor.toComment(addComment.getResult());
         } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
+            throw new CreationException(buildCantAddCommentOnProcessInstance(), e.getCause());
         }
+    }
+
+    private String buildCantAddCommentOnProcessInstance() {
+        return "Cannot add a comment on a finished or inexistant process instance";
     }
 
     @Deprecated
