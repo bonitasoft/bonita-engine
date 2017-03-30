@@ -1747,22 +1747,6 @@ public interface ProcessRuntimeAPI {
      * @return The newly created comment.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @deprecated use {@link #addProcessComment(long, String)} instead, that can throw CreationException is case of inexistant Process Instance
-     * @since 6.0
-     */
-    @Deprecated
-    Comment addComment(long processInstanceId, String comment);
-
-    /**
-     * Add a comment on a process instance.
-     *
-     * @param processInstanceId
-     *        The identifier of the process instance.
-     * @param comment
-     *        The content of the comment.
-     * @return The newly created comment.
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid, e.g. the session has expired.
      * @throws CreationException
      *         If the parameter processInstanceId does not refer to any active process instance (existing and non-archived).
      * @since 6.1
