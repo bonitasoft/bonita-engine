@@ -23,6 +23,9 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * Spring bean accessor that get its configuration from configuration file in classpath and in database
@@ -34,6 +37,7 @@ public abstract class SpringBeanAccessor {
     static final BonitaHomeServer BONITA_HOME_SERVER = BonitaHomeServer.getInstance();
     private final ApplicationContext parent;
     private BonitaSpringContext context;
+
 
     public SpringBeanAccessor(ApplicationContext parent) {
         this.parent = parent;
@@ -62,15 +66,17 @@ public abstract class SpringBeanAccessor {
             init();
             try {
                 context = createSpringContext();
+
                 for (String classPathResource : getSpringFileFromClassPath(isCluster())) {
                     context.addClassPathResource(classPathResource);
                 }
                 for (BonitaConfiguration bonitaConfiguration : getConfigurationFromDatabase()) {
                     context.addByteArrayResource(bonitaConfiguration);
                 }
-                final PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-                configurer.setProperties(getProperties());
-                context.addBeanFactoryPostProcessor(configurer);
+
+                MutablePropertySources propertySources = context.getEnvironment().getPropertySources();
+                propertySources.addLast(new PropertiesPropertySource("contextProperties", getProperties()));
+
                 final String[] activeProfiles = getActiveProfiles();
                 context.getEnvironment().setActiveProfiles(activeProfiles);
                 context.refresh();
