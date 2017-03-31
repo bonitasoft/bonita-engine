@@ -31,7 +31,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.mock.env.MockEnvironment;
 
 /**
  * @author Baptiste Mesta
@@ -44,8 +46,9 @@ public class SpringBeanAccessorTest {
     private SpringBeanAccessor springBeanAccessor;
     @Mock
     private BonitaSpringContext context;
-    @Mock
-    private ConfigurableEnvironment environment;
+
+    private Properties contextProperties = new Properties();
+    private ConfigurableEnvironment environment = new MockEnvironment();
 
     @Before
     public void before() throws Exception {
@@ -56,12 +59,11 @@ public class SpringBeanAccessorTest {
         doReturn(platformInitProperties).when(bonitaHomeServer).getPlatformInitProperties();
         doReturn(context).when(springBeanAccessor).createSpringContext();
         doReturn(environment).when(context).getEnvironment();
+        doReturn(true).when(springBeanAccessor).isCluster();
     }
 
     @Test
     public void should_getContext_call_init_first() throws Exception {
-        //given
-        doReturn(true).when(springBeanAccessor).isCluster();
         //when
         springBeanAccessor.getContext();
         //then
@@ -75,7 +77,7 @@ public class SpringBeanAccessorTest {
 
             @Override
             protected Properties getProperties() throws IOException {
-                return new Properties();
+                return contextProperties;
             }
 
             @Override
@@ -95,7 +97,6 @@ public class SpringBeanAccessorTest {
     public void should_getContext_create_context_using_classpathResources() throws Exception {
         //given
         doReturn(Arrays.asList("classpathResource1", "classpathResource2")).when(springBeanAccessor).getSpringFileFromClassPath(anyBoolean());
-        doReturn(true).when(springBeanAccessor).isCluster();
         //when
         springBeanAccessor.getContext();
         //then
@@ -110,13 +111,21 @@ public class SpringBeanAccessorTest {
         BonitaConfiguration res1 = new BonitaConfiguration("res1", "c1".getBytes());
         BonitaConfiguration res2 = new BonitaConfiguration("res2", "c2".getBytes());
         doReturn(Arrays.asList(res1, res2)).when(springBeanAccessor).getConfigurationFromDatabase();
-        doReturn(true).when(springBeanAccessor).isCluster();
         //when
         springBeanAccessor.getContext();
         //then
         InOrder inOrder = inOrder(context);
         inOrder.verify(context).addByteArrayResource(res1);
         inOrder.verify(context).addByteArrayResource(res2);
+    }
+
+    @Test
+    public void should_populate_environment_with_properties() throws Exception {
+        contextProperties.setProperty("a.property", "itsValue");
+
+        ApplicationContext context = springBeanAccessor.getContext();
+
+        assertThat(context.getEnvironment().getProperty("a.property")).isEqualTo("itsValue");
     }
 
     @Test
@@ -166,5 +175,6 @@ public class SpringBeanAccessorTest {
         //then
         assertThat(value).isEqualTo("toto}");
     }
+
 
 }
