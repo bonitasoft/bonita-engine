@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -61,11 +59,11 @@ public class ApplicationNode {
 
     @XmlElementWrapper(name = "applicationPages")
     @XmlElement(name = "applicationPage")
-    private List<ApplicationPageNode> applicationPages;
+    private List<ApplicationPageNode> applicationPages = new ArrayList<>();
 
     @XmlElementWrapper(name = "applicationMenus")
     @XmlElement(name = "applicationMenu")
-    private List<ApplicationMenuNode> applicationMenus;
+    private List<ApplicationMenuNode> applicationMenus = new ArrayList<>();
 
     public String getVersion() {
         return version;
@@ -148,26 +146,26 @@ public class ApplicationNode {
     }
 
     public List<ApplicationPageNode> getApplicationPages() {
-        return applicationPages == null ? Collections.<ApplicationPageNode> emptyList()
-                : Collections.unmodifiableList(applicationPages);
+        return applicationPages;
+    }
+
+    public void setApplicationPages(List<ApplicationPageNode> applicationPages) {
+        this.applicationPages = applicationPages;
     }
 
     public void addApplicationPage(ApplicationPageNode applicationPage) {
-        if (applicationPages == null) {
-            applicationPages = new ArrayList<>();
-        }
         this.applicationPages.add(applicationPage);
     }
 
     public List<ApplicationMenuNode> getApplicationMenus() {
-        return applicationMenus == null ? Collections.<ApplicationMenuNode> emptyList()
-                : Collections.unmodifiableList(applicationMenus);
+        return applicationMenus;
+    }
+
+    public void setApplicationMenus(List<ApplicationMenuNode> applicationMenus) {
+        this.applicationMenus = applicationMenus;
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
-        if (applicationMenus == null) {
-            applicationMenus = new ArrayList<>();
-        }
         applicationMenus.add(applicationMenu);
     }
 }
