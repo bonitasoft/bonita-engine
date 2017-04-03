@@ -23,6 +23,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * @author Elias Ricken de Medeiros
  */
@@ -65,5 +67,20 @@ public class ApplicationMenuNode {
             applicationMenus = new ArrayList<>();
         }
         applicationMenus.add(applicationMenu);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ApplicationMenuNode) {
+            ApplicationMenuNode applicationMenuNode = (ApplicationMenuNode) obj;
+            return new EqualsBuilder()
+                    .append(applicationMenuNode.getDisplayName(), displayName)
+                    .append(applicationMenuNode.getApplicationPage(), applicationPage).isEquals()
+                    && getApplicationMenus().stream()
+                            .allMatch(menu -> applicationMenuNode.getApplicationMenus().stream()
+                                    .anyMatch(menu::equals));
+
+        }
+        return false;
     }
 }

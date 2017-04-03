@@ -36,6 +36,7 @@ import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -51,6 +52,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationImporterTest {
+
+    private static final String UNUSED_PAGE = "";
 
     @Mock
     private ApplicationService applicationService;
@@ -84,8 +87,8 @@ public class ApplicationImporterTest {
         ApplicationPageNode pageNode1 = mock(ApplicationPageNode.class);
         ApplicationPageNode pageNode2 = mock(ApplicationPageNode.class);
 
-        ApplicationMenuNode menu1 = new ApplicationMenuNode();
-        ApplicationMenuNode menu2 = new ApplicationMenuNode();
+        ApplicationMenuNode menu1 = ApplicationNodeBuilder.newMenu("menu1", UNUSED_PAGE).create();
+        ApplicationMenuNode menu2 = ApplicationNodeBuilder.newMenu("menu2", UNUSED_PAGE).create();
 
         ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.addApplicationPage(pageNode1);
@@ -246,7 +249,8 @@ public class ApplicationImporterTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void importApplication_should_throw_alreadyExistsException_when_stratege_throws_AlreadyExistsException() throws Exception {
+    public void importApplication_should_throw_alreadyExistsException_when_stratege_throws_AlreadyExistsException()
+            throws Exception {
         //given
         long createdBy = 5L;
         SApplication appToBeImported = mock(SApplication.class);
@@ -260,7 +264,8 @@ public class ApplicationImporterTest {
         ApplicationNode applicationNode = mock(ApplicationNode.class);
         given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
-        doThrow(new AlreadyExistsException("")).when(strategy).whenApplicationExists(appInConflict, appToBeImported);
+        doThrow(new AlreadyExistsException("")).when(strategy).whenApplicationExists(appInConflict,
+                appToBeImported);
 
         //when
         applicationImporter.importApplication(applicationNode, createdBy);
@@ -269,7 +274,8 @@ public class ApplicationImporterTest {
     }
 
     @Test(expected = ImportException.class)
-    public void importApplication_should_throw_ExecutionException_when_application_service_throws_exception() throws Exception {
+    public void importApplication_should_throw_ExecutionException_when_application_service_throws_exception()
+            throws Exception {
         //given
         long createdBy = 5L;
         SApplication app1 = mock(SApplication.class);

@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.business.application.xml;
 
 import static org.bonitasoft.engine.business.application.xml.ApplicationNodeAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -47,7 +49,8 @@ public class ApplicationNodeTest {
         app.setVersion(version);
 
         //then
-        assertThat(app).hasDisplayName(displayName).hasDescription(description).hasHomePage(homePage).hasIconPath(iconPath).hasLayout(layout)
+        assertThat(app).hasDisplayName(displayName).hasDescription(description).hasHomePage(homePage).hasIconPath(iconPath)
+                .hasLayout(layout)
                 .hasTheme(theme).hasProfile(profile).hasState(state).hasToken(token).hasVersion(version);
     }
 
@@ -103,6 +106,52 @@ public class ApplicationNodeTest {
 
         //then
         assertThat(applicationNode).hasApplicationMenus(menu1, menu2);
+    }
+
+    @Test
+    public void equals_should_return_true_on_different_applications_with_same_content() {
+        ApplicationNode applicationNode1 = ApplicationNodeBuilder.newApplication("appToken", "appName", "1.0")
+                .havingApplicationPages(
+                        ApplicationNodeBuilder.newApplicationPage("page1", "tokenPage1"),
+                        ApplicationNodeBuilder.newApplicationPage("page2", "tokenPage2"))
+                .havingApplicationMenus(
+                        ApplicationNodeBuilder.newMenu("topMenu", "").havingMenu(
+                                ApplicationNodeBuilder.newMenu("menu1", "page1"),
+                                ApplicationNodeBuilder.newMenu("menu2", "page2")))
+                .create();
+        ApplicationNode applicationNode2 = ApplicationNodeBuilder.newApplication("appToken", "appName", "1.0")
+                .havingApplicationPages(
+                        ApplicationNodeBuilder.newApplicationPage("page1", "tokenPage1"),
+                        ApplicationNodeBuilder.newApplicationPage("page2", "tokenPage2"))
+                .havingApplicationMenus(
+                        ApplicationNodeBuilder.newMenu("topMenu", "").havingMenu(
+                                ApplicationNodeBuilder.newMenu("menu1", "page1"),
+                                ApplicationNodeBuilder.newMenu("menu2", "page2")))
+                .create();
+        assertTrue(applicationNode1.equals(applicationNode2));
+    }
+
+    @Test
+    public void equals_should_return_false_on_different_applications_with_different_content() {
+        ApplicationNode applicationNode1 = ApplicationNodeBuilder.newApplication("appToken", "appName", "1.0")
+                .havingApplicationPages(
+                        ApplicationNodeBuilder.newApplicationPage("page1", "tokenPage1"),
+                        ApplicationNodeBuilder.newApplicationPage("page2_diff", "tokenPage2"))
+                .havingApplicationMenus(
+                        ApplicationNodeBuilder.newMenu("topMenu", "").havingMenu(
+                                ApplicationNodeBuilder.newMenu("menu1", "page1"),
+                                ApplicationNodeBuilder.newMenu("menu2", "page2_diff")))
+                .create();
+        ApplicationNode applicationNode2 = ApplicationNodeBuilder.newApplication("appToken", "appName", "1.0")
+                .havingApplicationPages(
+                        ApplicationNodeBuilder.newApplicationPage("page1", "tokenPage1"),
+                        ApplicationNodeBuilder.newApplicationPage("page2", "tokenPage2"))
+                .havingApplicationMenus(
+                        ApplicationNodeBuilder.newMenu("topMenu", "").havingMenu(
+                                ApplicationNodeBuilder.newMenu("menu1", "page1"),
+                                ApplicationNodeBuilder.newMenu("menu2", "page2")))
+                .create();
+        assertFalse(applicationNode1.equals(applicationNode2));
     }
 
 }
