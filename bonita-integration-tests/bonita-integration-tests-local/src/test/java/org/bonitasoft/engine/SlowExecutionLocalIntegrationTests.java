@@ -15,15 +15,17 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.event.InterruptingTimerBoundaryEventIT;
 import org.bonitasoft.engine.event.MessageBoundaryEventIT;
-import org.bonitasoft.engine.event.MessageEventSubProcessIT;
 import org.bonitasoft.engine.event.MessageEventIT;
+import org.bonitasoft.engine.event.MessageEventSubProcessIT;
 import org.bonitasoft.engine.event.NonInterruptingTimerBoundaryEventIT;
 import org.bonitasoft.engine.event.TimerBoundaryEventIT;
-import org.bonitasoft.engine.event.TimerEventSubProcessIT;
 import org.bonitasoft.engine.event.TimerEventIT;
-import org.bonitasoft.engine.platform.PlatformLoginIT;
+import org.bonitasoft.engine.event.TimerEventSubProcessIT;
 import org.bonitasoft.engine.platform.PlatformIT;
+import org.bonitasoft.engine.platform.PlatformLoginIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceIT;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
@@ -46,5 +48,15 @@ import org.junit.runners.Suite.SuiteClasses;
 
 })
 public class SlowExecutionLocalIntegrationTests extends LocalIntegrationTests {
+
+    @BeforeClass
+    public static void beforeClass() {
+        System.err.println("=================== Slow-execution Local Integration Test Suite");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        System.err.println("=================== Slow-execution Local Integration Test Suite clean-up");
+    }
 
 }
