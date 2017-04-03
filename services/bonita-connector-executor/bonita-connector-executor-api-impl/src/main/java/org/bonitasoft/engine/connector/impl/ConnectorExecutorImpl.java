@@ -126,7 +126,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         } catch (final TimeoutException e) {
             submit.cancel(true);
             disconnectSilently(sConnector);
-            throw new SConnectorException("The connector timed out " + sConnector);
+            throw new SConnectorException("The connector timed out " + sConnector, e);
         } finally {
             track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, startTime, sConnector, inputParameters);
         }
@@ -183,7 +183,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final ClassLoader loader;
 
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId, final ClassLoader loader) {
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId,
+                final ClassLoader loader) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
             this.tenantId = tenantId;
