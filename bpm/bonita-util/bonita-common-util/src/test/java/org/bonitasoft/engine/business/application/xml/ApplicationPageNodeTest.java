@@ -15,6 +15,8 @@
 package org.bonitasoft.engine.business.application.xml;
 
 import static org.bonitasoft.engine.business.application.xml.ApplicationPageNodeAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -29,6 +31,20 @@ public class ApplicationPageNodeTest {
 
         //then
         assertThat(pageNode).hasToken("hr").hasCustomPage("hrPage");
+    }
+
+    @Test
+    public void equals_should_return_true_on_different_pages_with_same_content() {
+        ApplicationPageNode page1 = ApplicationNodeBuilder.newApplicationPage("Page", "Token").create();
+        ApplicationPageNode page2 = ApplicationNodeBuilder.newApplicationPage("Page", "Token").create();
+        assertTrue(page1.equals(page2));
+    }
+
+    @Test
+    public void equals_should_return_false_on_different_pages_with_different_content() {
+        ApplicationPageNode page1 = ApplicationNodeBuilder.newApplicationPage("Page", "Token").create();
+        ApplicationPageNode page2 = ApplicationNodeBuilder.newApplicationPage("Page", "Token_diff").create();
+        assertFalse(page1.equals(page2));
     }
 
 }

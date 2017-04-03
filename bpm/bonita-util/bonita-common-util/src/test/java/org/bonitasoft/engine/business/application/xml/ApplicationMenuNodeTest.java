@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.business.application.xml;
 
 import static org.bonitasoft.engine.business.application.xml.ApplicationMenuNodeAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -56,5 +58,35 @@ public class ApplicationMenuNodeTest {
 
         //then
         assertThat(mainMenu).hasApplicationMenus(subMenu1, subMenu2);
+    }
+
+    @Test
+    public void equals_should_return_true_on_different_menus_with_same_content() {
+        ApplicationMenuNode menu1 = ApplicationNodeBuilder.newMenu("Menu", "Page")
+                .havingMenu(
+                        ApplicationNodeBuilder.newMenu("Menu2", "Page2"),
+                        ApplicationNodeBuilder.newMenu("Menu3", "Page3"))
+                .create();
+        ApplicationMenuNode menu2 = ApplicationNodeBuilder.newMenu("Menu", "Page")
+                .havingMenu(
+                        ApplicationNodeBuilder.newMenu("Menu2", "Page2"),
+                        ApplicationNodeBuilder.newMenu("Menu3", "Page3"))
+                .create();
+        assertTrue(menu1.equals(menu2));
+    }
+
+    @Test
+    public void equals_should_return_false_on_different_menus_with_different_content() {
+        ApplicationMenuNode menu1 = ApplicationNodeBuilder.newMenu("Menu", "Page")
+                .havingMenu(
+                        ApplicationNodeBuilder.newMenu("Menu2", "Page2"),
+                        ApplicationNodeBuilder.newMenu("Menu3", "Page3"))
+                .create();
+        ApplicationMenuNode menu2 = ApplicationNodeBuilder.newMenu("Menu", "Page")
+                .havingMenu(
+                        ApplicationNodeBuilder.newMenu("Menu2", "Page2"),
+                        ApplicationNodeBuilder.newMenu("Menu3_diff", "Page3"))
+                .create();
+        assertFalse(menu1.equals(menu2));
     }
 }

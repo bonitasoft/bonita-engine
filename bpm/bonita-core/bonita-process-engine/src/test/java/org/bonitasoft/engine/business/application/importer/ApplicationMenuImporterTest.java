@@ -28,6 +28,7 @@ import org.bonitasoft.engine.business.application.converter.NodeToApplicationMen
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
+import org.bonitasoft.engine.business.application.xml.ApplicationNodeBuilder;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.junit.Test;
@@ -52,9 +53,9 @@ public class ApplicationMenuImporterTest {
     public void importApplicationMenu_should_create_applicationMenu_and_sub_menus_when_no_error() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
-        ApplicationMenuNode subMenuNode = new ApplicationMenuNode();
+        ApplicationMenuNode subMenuNode = ApplicationNodeBuilder.newMenu("subMenuNode", "").create();
 
-        ApplicationMenuNode menuNode = new ApplicationMenuNode();
+        ApplicationMenuNode menuNode = ApplicationNodeBuilder.newMenu("menuNode", "").create();
         menuNode.addApplicationMenu(subMenuNode);
 
         SApplicationMenu mainMenu = mock(SApplicationMenu.class);
@@ -125,8 +126,8 @@ public class ApplicationMenuImporterTest {
     public void importApplicationMenu_should_return_errors_for_sub_menus() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
-        ApplicationMenuNode subMenuNode1 = new ApplicationMenuNode();
-        ApplicationMenuNode subMenuNode2 = new ApplicationMenuNode();
+        ApplicationMenuNode subMenuNode1 = ApplicationNodeBuilder.newMenu("subMenuNode1", "").create();
+        ApplicationMenuNode subMenuNode2 = ApplicationNodeBuilder.newMenu("subMenuNode2", "").create();
 
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
         menuNode.addApplicationMenu(subMenuNode1);
