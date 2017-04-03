@@ -17,6 +17,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * @author Elias Ricken de Medeiros
  */
@@ -43,5 +45,17 @@ public class ApplicationPageNode {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ApplicationPageNode) {
+            ApplicationPageNode applicationPageNode = (ApplicationPageNode) obj;
+            return new EqualsBuilder()
+                    .append(applicationPageNode.getToken(), token)
+                    .append(applicationPageNode.getCustomPage(), customPage)
+                    .isEquals();
+        }
+        return false;
     }
 }
