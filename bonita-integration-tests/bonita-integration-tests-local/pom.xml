@@ -10,6 +10,15 @@
 
     <artifactId>bonita-integration-tests-local</artifactId>
 
+    <properties>
+
+        <!-- turns on/off logs from docker image-->
+        <docker.showLogs>true</docker.showLogs>
+
+        <testSuite.name>org/bonitasoft/engine/LocalIntegrationTests.java</testSuite.name>
+
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -95,7 +104,7 @@
                         <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                     </systemPropertyVariables>
                     <includes>
-                        <include>org/bonitasoft/engine/LocalIntegrationTests.java</include>
+                        <include>${testSuite.name}</include>
                     </includes>
                 </configuration>
                 <executions>
@@ -113,6 +122,9 @@
     <profiles>
         <profile>
             <id>slow</id>
+            <properties>
+                <testSuite.name>org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.java</testSuite.name>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -134,6 +146,125 @@
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>postgres</id>
+            <properties>
+                <db.vendor>postgres</db.vendor>
+            </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mysql</id>
+            <properties>
+                <db.vendor>mysql</db.vendor>
+            </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <properties>
+                <db.vendor>oracle</db.vendor>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc</artifactId>
+                    <version>6</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
