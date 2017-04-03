@@ -53,7 +53,7 @@ import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
-public class ConcurrencyIT {
+public class ConcurrencyTest {
 
     public static final long TENANT_ID = 654643L;
     private JPABusinessDataRepositoryImpl businessDataRepository;
