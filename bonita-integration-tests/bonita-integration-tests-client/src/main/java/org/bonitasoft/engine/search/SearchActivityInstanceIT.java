@@ -13,6 +13,20 @@
  **/
 package org.bonitasoft.engine.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
+import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -44,7 +58,9 @@ import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -54,26 +70,13 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.bonitasoft.engine.matchers.ListElementMatcher.stateAre;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public class SearchActivityInstanceIT extends TestWithUser {
+
+    final long ONE_HOUR = 60L * 60L * 1000L;
 
     /**
      * Tests that the archiving mechanism works:
@@ -460,12 +463,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         definitionBuilder.addStartEvent("start");
         definitionBuilder.addActor(ACTOR_NAME);
-        definitionBuilder.addUserTask("initTask1", ACTOR_NAME).addPriority(TaskPriority.HIGHEST.name()).addExpectedDuration(1000);
-        definitionBuilder.addUserTask("initTask2", ACTOR_NAME).addPriority(TaskPriority.HIGHEST.name()).addExpectedDuration(2000);
-        definitionBuilder.addUserTask("initTask3", ACTOR_NAME).addPriority(TaskPriority.LOWEST.name()).addExpectedDuration(3000);
-        definitionBuilder.addUserTask("initTask4", ACTOR_NAME).addPriority(TaskPriority.HIGHEST.name()).addExpectedDuration(500);
-        definitionBuilder.addUserTask("initTask5", ACTOR_NAME).addPriority(TaskPriority.NORMAL.name()).addExpectedDuration(1500);
-        definitionBuilder.addUserTask("initTask6", ACTOR_NAME).addPriority(TaskPriority.NORMAL.name()).addExpectedDuration(1000);
+        definitionBuilder.addUserTask("initTask1", ACTOR_NAME).addPriority(TaskPriority.HIGHEST.name()).addExpectedDuration(dueDateInHours(10L));
+        definitionBuilder.addUserTask("initTask2", ACTOR_NAME).addPriority(TaskPriority.HIGHEST.name()).addExpectedDuration(dueDateInHours(20L));
+        definitionBuilder.addUserTask("initTask3", ACTOR_NAME).addPriority(TaskPriority.LOWEST.name()).addExpectedDuration(dueDateInHours(30L));
+        definitionBuilder.addUserTask("initTask4", ACTOR_NAME).addPriority(TaskPriority.HIGHEST.name()).addExpectedDuration(dueDateInHours(5L));
+        definitionBuilder.addUserTask("initTask5", ACTOR_NAME).addPriority(TaskPriority.NORMAL.name()).addExpectedDuration(dueDateInHours(15L));
+        definitionBuilder.addUserTask("initTask6", ACTOR_NAME).addPriority(TaskPriority.NORMAL.name()).addExpectedDuration(dueDateInHours(10L));
         definitionBuilder.addEndEvent("end");
         definitionBuilder.addTransition("start", "initTask1");
         definitionBuilder.addTransition("start", "initTask2");
@@ -549,6 +552,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         assertEquals("initTask3", humanTaskInstances.get(5).getName());
 
         disableAndDeleteProcess(processDef);
+    }
+
+    private Expression dueDateInHours(long nbHours) throws InvalidExpressionException {
+        Expression expression = new ExpressionBuilder().createConstantLongExpression(nbHours * ONE_HOUR);
+        return expression;
     }
 
     /**
