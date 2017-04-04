@@ -50,7 +50,7 @@ public class FileLoggerIncidentHandlerTest {
         //Given
         long tenantId = 1;
         temporaryFolder.newFolder("logFolder");
-        final File incidentFile = new File(temporaryFolder.newFolder("logFolder" + File.separatorChar + tenantId), TenantStorage.INCIDENTS_LOG_FILENAME);
+        final File incidentFile = new File(temporaryFolder.newFolder("logFolder", String.valueOf(tenantId)), TenantStorage.INCIDENTS_LOG_FILENAME);
         final FileHandler fh = new FileHandler(incidentFile.getAbsolutePath());
 
         when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
