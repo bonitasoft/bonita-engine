@@ -18,6 +18,8 @@ import static org.springframework.jdbc.datasource.init.ScriptUtils.*;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,10 +153,10 @@ public class ConfigurationServiceImplIT {
     @Test
     public void should_store_configuration() throws Exception {
         //given
-        final File configFolder = new File(this.getClass().getResource("/conf").getPath());
+        Path configFolder = Paths.get(getClass().getResource("/conf").toURI());
 
         //when
-        configurationService.storePlatformConfiguration(configFolder);
+        configurationService.storePlatformConfiguration(configFolder.toFile());
 
         //then
         assertThat(configurationService.getPlatformEngineConf()).as("should retrieve configuration")
@@ -165,8 +167,8 @@ public class ConfigurationServiceImplIT {
     @Test
     public void should_write_configuration_to_fileSystem() throws Exception {
         //given
-        final File configFolder = new File(this.getClass().getResource("/conf").getPath());
-        configurationService.storePlatformConfiguration(configFolder);
+        Path configFolder = Paths.get(getClass().getResource("/conf").toURI());
+        configurationService.storePlatformConfiguration(configFolder.toFile());
 
         //when
         final File destFolder = temporaryFolder.newFolder();
@@ -178,17 +180,17 @@ public class ConfigurationServiceImplIT {
         assertThat(destFolder).as("should retrieve config files")
                 .exists()
                 .isDirectory();
-        new FolderComparator().compare(configFolder, destFolder);
+        new FolderComparator().compare(configFolder.toFile(), destFolder);
 
     }
 
     @Test
     public void should_store_licenses() throws Exception {
         //given
-        final File licenseFolder = new File(this.getClass().getResource("/licenses").getPath());
+        Path licenseFolder = Paths.get(getClass().getResource("/licenses").toURI());
 
         //when
-        configurationService.storeLicenses(licenseFolder);
+        configurationService.storeLicenses(licenseFolder.toFile());
 
         //then
         BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic", "license 1 content".getBytes());
@@ -200,12 +202,12 @@ public class ConfigurationServiceImplIT {
     @Test
     public void should_store_licenses_override_previous_licenses() throws Exception {
         //given
-        final File givenlicensesFolder = new File(this.getClass().getResource("/licenses").getPath());
-        configurationService.storeLicenses(givenlicensesFolder);
+        Path givenlicensesFolder = Paths.get(getClass().getResource("/licenses").toURI());
+        configurationService.storeLicenses(givenlicensesFolder.toFile());
 
         //when
-        final File newlicensesFolder = new File(this.getClass().getResource("/newLicenses").getPath());
-        configurationService.storeLicenses(newlicensesFolder);
+        Path newlicensesFolder = Paths.get(getClass().getResource("/newLicenses").toURI());
+        configurationService.storeLicenses(newlicensesFolder.toFile());
 
         //then
         BonitaConfiguration newLicense2 = new BonitaConfiguration("license2.lic", "new license 2 content".getBytes());
