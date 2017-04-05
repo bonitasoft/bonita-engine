@@ -13,17 +13,14 @@
  **/
 package org.bonitasoft.platform.configuration.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
-import java.util.Objects;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,20 +41,12 @@ public class ConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         return FileVisitResult.CONTINUE;
-
     }
 
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-        Objects.requireNonNull(path);
-        Objects.requireNonNull(basicFileAttributes);
-        final File file = path.toFile();
-        if (file.isFile()) {
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                LOGGER.info("found file " + file.getName());
-                bonitaConfigurations.add(new BonitaConfiguration(file.getName(), IOUtils.toByteArray(fileInputStream)));
-            }
-        }
+        LOGGER.info("found file " + path.getFileName());
+        bonitaConfigurations.add(new BonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path)));
         return FileVisitResult.CONTINUE;
     }
 
