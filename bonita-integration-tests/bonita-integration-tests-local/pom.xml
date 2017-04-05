@@ -126,6 +126,9 @@
     <profiles>
         <profile>
             <id>slow</id>
+            <properties>
+                <testSuite.name>org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.java</testSuite.name>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -158,29 +161,14 @@
             <properties>
                 <db.vendor>postgres</db.vendor>
             </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.18.1</version>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <name>${docker-postgres-image}</name>
-                                    <alias>bonita-postgres-IT</alias>
-                                    <run>
-                                        <namingStrategy>alias</namingStrategy>
-                                        <ports>
-                                            <port>db.random.port:5432</port>
-                                        </ports>
-                                        <wait>
-                                            <log>PostgreSQL init process complete; ready for start up.</log>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>start</id>
@@ -196,27 +184,12 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <sysprop.bonita.db.vendor>postgres</sysprop.bonita.db.vendor>
-                                <sysprop.bonita.bdm.db.vendor>postgres</sysprop.bonita.bdm.db.vendor>
-                                <db.vendor>postgres</db.vendor>
-                                <db.user>bonita</db.user>
-                                <db.password>bpm</db.password>
-                                <db.server.port>${db.random.port}</db.server.port>
-                            </systemPropertyVariables>
-                            <includes>
-                                <include>${testSuite.name}</include>
-                            </includes>
-                        </configuration>
-                    </plugin>
-
                 </plugins>
             </build>
         </profile>
@@ -225,35 +198,14 @@
             <properties>
                 <db.vendor>mysql</db.vendor>
             </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
             <build>
                 <plugins>
-
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.18.1</version>
-                        <configuration>
-                            <images>
-                                <image>
-
-                                    <name>${docker-mysql-image}</name>
-                                    <alias>bonita-mysql-IT</alias>
-                                    <run>
-                                        <namingStrategy>alias</namingStrategy>
-                                        <env>
-                                            <MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
-                                        </env>
-                                        <ports>
-                                            <port>db.random.port:3306</port>
-                                        </ports>
-                                        <wait>
-                                            <time>20000</time>
-                                            <log>MySQL init process done. Ready for start up.</log>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>start</id>
@@ -269,25 +221,11 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>
-                                <sysprop.bonita.bdm.db.vendor>mysql</sysprop.bonita.bdm.db.vendor>
-                                <db.vendor>mysql</db.vendor>
-                                <db.user>bonita</db.user>
-                                <db.password>bpm</db.password>
-                                <db.server.port>${db.random.port}</db.server.port>
-                            </systemPropertyVariables>
-                            <includes>
-                                <include>${testSuite.name}</include>
-                            </includes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -305,30 +243,14 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.18.1</version>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <name>${docker-oracle-image}</name>
-                                    <alias>bonita-oracle-IT</alias>
-                                    <run>
-                                        <namingStrategy>alias</namingStrategy>
-                                        <ports>
-                                            <port>db.random.port:1521</port>
-                                        </ports>
-                                        <wait>
-                                            <time>240000</time>
-                                            <log>end of customization</log>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>start</id>
@@ -344,26 +266,11 @@
                                 <goals>
                                     <goal>stop</goal>
                                 </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <sysprop.bonita.db.vendor>oracle</sysprop.bonita.db.vendor>
-                                <sysprop.bonita.bdm.db.vendor>oracle</sysprop.bonita.bdm.db.vendor>
-                                <db.vendor>oracle</db.vendor>
-                                <db.user>bonita</db.user>
-                                <db.password>bpm</db.password>
-                                <db.database.name>xe</db.database.name>
-                                <db.server.port>${db.random.port}</db.server.port>
-                            </systemPropertyVariables>
-                            <includes>
-                                <include>${testSuite.name}</include>
-                            </includes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

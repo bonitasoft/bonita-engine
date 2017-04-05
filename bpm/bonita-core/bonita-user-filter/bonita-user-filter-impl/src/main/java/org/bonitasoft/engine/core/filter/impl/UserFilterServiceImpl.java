@@ -75,7 +75,8 @@ public class UserFilterServiceImpl implements UserFilterService {
     private final Schema schema;
 
     public UserFilterServiceImpl(final ConnectorExecutor connectorExecutor, final CacheService cacheService,
-            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger, ProcessResourcesService processResourcesService) {
+            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger,
+            ProcessResourcesService processResourcesService) {
         super();
         this.connectorExecutor = connectorExecutor;
         this.cacheService = cacheService;
@@ -96,8 +97,14 @@ public class UserFilterServiceImpl implements UserFilterService {
     public FilterResult executeFilter(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition, final Map<String, SExpression> inputs,
             final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException {
         final FilterResult filterResult;
+        String implementationClassName = "";
+        UserFilterImplementationDescriptor descriptor = null;
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    Thread.currentThread().toString() + "-[" + Thread.currentThread().getId() + "," + Thread.currentThread().getState() + "]");
+        }
         try {
-            UserFilterImplementationDescriptor descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
+            descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
             if (descriptor == null) {
                 loadUserFilters(processDefinitionId);
                 descriptor = getDescriptor(processDefinitionId, sUserFilterDefinition);
@@ -105,10 +112,19 @@ public class UserFilterServiceImpl implements UserFilterService {
                     throw new SUserFilterExecutionException("unable to load descriptor for filter " + sUserFilterDefinition.getUserFilterId());
                 }
             }
-            final String implementationClassName = descriptor.getImplementationClassName();
+            implementationClassName = descriptor.getImplementationClassName();
             filterResult = executeFilterInClassloader(implementationClassName, inputs, classLoader, expressionContext, actorName);
         } catch (final SConnectorException e) {
-            throw new SUserFilterExecutionException(e.getCause());// UserFilterException wrapped in a connectorException
+            String dbgInfo = "";
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                dbgInfo = buildDebugMessage(processDefinitionId, sUserFilterDefinition, inputs, classLoader, expressionContext, actorName,
+                        implementationClassName, descriptor);
+            }
+            if (e.getCause() != null) {
+                throw new SUserFilterExecutionException(dbgInfo, e.getCause());
+            } else {
+                throw new SUserFilterExecutionException("SConnectorException: " + e.getMessage() + dbgInfo, e);
+            }
         } catch (final SUserFilterExecutionException e) {
             throw e;
         } catch (final Throwable e) {// catch throwable because we might have NoClassDefFound... see ENGINE-1333
@@ -131,6 +147,37 @@ public class UserFilterServiceImpl implements UserFilterService {
         return filterResult;
     }
 
+    protected String buildDebugMessage(long processDefinitionId, SUserFilterDefinition sUserFilterDefinition, Map<String, SExpression> inputs,
+            ClassLoader classLoader, SExpressionContext expressionContext, String actorName, String implementationClassName,
+            UserFilterImplementationDescriptor descriptor) {
+        final StringBuilder stb = new StringBuilder();
+        stb.append(" Flow node instance id: <");
+        stb.append(expressionContext.getContainerId());
+        stb.append(">");
+        stb.append("\n Current Thread ID : <");
+        stb.append(Thread.currentThread().getId());
+        stb.append(">, Current Thread State : <");
+        stb.append(Thread.currentThread().getState());
+        stb.append(">,\n ProcessDefinitionID : <");
+        stb.append(processDefinitionId);
+        stb.append(">, SUserFilterDefinition : <");
+        stb.append(sUserFilterDefinition);
+        stb.append(">, Inputs : <");
+        stb.append(inputs.toString());
+        stb.append(">, ClassLoader : <");
+        stb.append(classLoader.toString());
+        stb.append(">, ExpressionContext : <");
+        stb.append(expressionContext);
+        stb.append(">, ActorName : <");
+        stb.append(actorName);
+        stb.append(">, UserFilterImplementationDescriptor : <");
+        stb.append(descriptor);
+        stb.append(">, ImplementationClassName : <");
+        stb.append(implementationClassName);
+        stb.append(">");
+        return stb.toString();
+    }
+
     private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition)
             throws SCacheException {
         return (UserFilterImplementationDescriptor) cacheService.get(FILTER_CACHE_NAME,
@@ -141,7 +188,7 @@ public class UserFilterServiceImpl implements UserFilterService {
         return String.valueOf(processDefinitionId) + ":" + userFilterId + "-" + version;
     }
 
-    private FilterResult executeFilterInClassloader(final String implementationClassName, final Map<String, SExpression> parameters,
+    protected FilterResult executeFilterInClassloader(final String implementationClassName, final Map<String, SExpression> parameters,
             final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws InstantiationException,
             IllegalAccessException, ClassNotFoundException, SUserFilterExecutionException, SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException, SConnectorException {
