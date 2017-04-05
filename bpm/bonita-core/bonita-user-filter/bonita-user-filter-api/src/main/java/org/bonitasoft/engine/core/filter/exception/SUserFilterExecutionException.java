@@ -30,4 +30,7 @@ public class SUserFilterExecutionException extends SBonitaException {
         super(message);
     }
 
+    public SUserFilterExecutionException(String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

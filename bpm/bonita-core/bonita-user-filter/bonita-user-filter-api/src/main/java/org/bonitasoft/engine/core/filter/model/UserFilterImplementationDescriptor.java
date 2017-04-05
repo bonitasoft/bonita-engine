@@ -109,5 +109,17 @@ public class UserFilterImplementationDescriptor implements Serializable {
     public void setJarDependencies(final JarDependencies jarDependencies) {
         this.jarDependencies = jarDependencies;
     }
-
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("UserFilterImplementationDescriptor{");
+        sb.append("implementationClassName='").append(implementationClassName).append('\'');
+        sb.append(", id='").append(id).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append(", definitionId='").append(definitionId).append('\'');
+        sb.append(", definitionVersion='").append(definitionVersion).append('\'');
+        sb.append(", jarDependencies=").append(jarDependencies);
+        sb.append('}');
+        return sb.toString();
+    }
 }

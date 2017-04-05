@@ -67,6 +67,11 @@
         <powermock.version>1.6.6</powermock.version>
         <system-rules.version>1.16.0</system-rules.version>
 
+        <!-- use -Dkey=value or activate profile in settings.xml to override -->
+        <docker-postgres-image>postgres:9.3</docker-postgres-image>
+        <docker-mysql-image>mysql:5.5.49</docker-mysql-image>
+        <docker-oracle-image>oracle:11g</docker-oracle-image>
+
         <!-- ************************ -->
         <!-- Sonar/Reporting settings -->
         <!-- ************************ -->
@@ -455,6 +460,11 @@
                         <generateJUnitSoftAssertions>false</generateJUnitSoftAssertions>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.18.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -827,5 +837,188 @@
                 </dependency>
             </dependencies>
         </profile>
+
+        <!-- Profiles use to run tests on docker images -->
+        <profile>
+            <id>postgres</id>
+            <properties>
+                <db.vendor>postgres</db.vendor>
+                <docker-container-alias>bonita-postgres-IT</docker-container-alias>
+            </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>${docker-postgres-image}</name>
+                                    <alias>${docker-container-alias}</alias>
+                                    <run>
+                                        <namingStrategy>alias</namingStrategy>
+                                        <ports>
+                                            <port>db.random.port:5432</port>
+                                        </ports>
+                                        <wait>
+                                            <time>45000</time>
+                                            <log>PostgreSQL init process complete; ready for start up.</log>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <sysprop.bonita.db.vendor>postgres</sysprop.bonita.db.vendor>
+                                <sysprop.bonita.bdm.db.vendor>postgres</sysprop.bonita.bdm.db.vendor>
+                                <db.vendor>postgres</db.vendor>
+                                <db.user>bonita</db.user>
+                                <db.password>bpm</db.password>
+                                <db.server.port>${db.random.port}</db.server.port>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>${testSuite.name}</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mysql</id>
+            <properties>
+                <db.vendor>mysql</db.vendor>
+                <docker-container-alias>bonita-mysql-IT</docker-container-alias>
+            </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>${docker-mysql-image}</name>
+                                    <alias>${docker-container-alias}</alias>
+                                    <run>
+                                        <namingStrategy>alias</namingStrategy>
+                                        <env>
+                                            <MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
+                                        </env>
+                                        <ports>
+                                            <port>db.random.port:3306</port>
+                                        </ports>
+                                        <wait>
+                                            <time>30000</time>
+                                            <log>MySQL init process done. Ready for start up.</log>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>
+                                <sysprop.bonita.bdm.db.vendor>mysql</sysprop.bonita.bdm.db.vendor>
+                                <db.vendor>mysql</db.vendor>
+                                <db.user>bonita</db.user>
+                                <db.password>bpm</db.password>
+                                <db.server.port>${db.random.port}</db.server.port>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>${testSuite.name}</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <properties>
+                <db.vendor>oracle</db.vendor>
+                <docker-container-alias>bonita-oracle-IT</docker-container-alias>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc</artifactId>
+                    <version>6</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>${docker-oracle-image}</name>
+                                    <alias>${docker-container-alias}</alias>
+                                    <run>
+                                        <namingStrategy>alias</namingStrategy>
+                                        <ports>
+                                            <port>db.random.port:1521</port>
+                                        </ports>
+                                        <wait>
+                                            <time>240000</time>
+                                            <log>end of customization</log>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <sysprop.bonita.db.vendor>oracle</sysprop.bonita.db.vendor>
+                                <sysprop.bonita.bdm.db.vendor>oracle</sysprop.bonita.bdm.db.vendor>
+                                <db.vendor>oracle</db.vendor>
+                                <db.user>bonita</db.user>
+                                <db.password>bpm</db.password>
+                                <db.database.name>xe</db.database.name>
+                                <db.server.port>${db.random.port}</db.server.port>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>${testSuite.name}</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- profile used to pull docker image from bonita internal repository: -->
+            <id>bonita-internal</id>
+            <properties>
+                <docker-postgres-image>ci-01.rd.lan:5000/bonitasoft/postgres:9.3</docker-postgres-image>
+                <docker-mysql-image>ci-01.rd.lan:5000/bonitasoft/mysql:5.5.49</docker-mysql-image>
+                <docker-oracle-image>ci-01.rd.lan:5000/bonitasoft/oracle:11g</docker-oracle-image>
+            </properties>
+        </profile>
+
     </profiles>
 </project>
