@@ -15,9 +15,7 @@ package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +27,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -76,7 +73,7 @@ public class BonitaClassLoaderTest {
         File folder = temporaryFolder.newFolder();
         BonitaClassLoader classLoader = spy(new BonitaClassLoader(Collections.singletonMap("myJar1.jar", "content".getBytes()), "type", 12L, folder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader()));
-        when(classLoader.generateUUID()).thenReturn("firstCall", "firstCall", "secondCall");
+        doReturn("firstCall").doReturn("firstCall").doReturn("secondCall").when(classLoader).generateUUID();
         //create the folder that should be used by the classloader
         new File(folder, "first").mkdir();
         //when
@@ -94,7 +91,7 @@ public class BonitaClassLoaderTest {
         BonitaClassLoader classLoader1 = spy(new BonitaClassLoader(resources, "type", 12L, tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader()));
         //when
-        doThrow(IOException.class).when(classLoader1).writeResource(Matchers.<Map.Entry<String, byte[]>> any(), any(byte[].class));
+        doThrow(new IOException()).when(classLoader1).writeResource(any(), any(byte[].class));
 
         expectedException.expect(RuntimeException.class);
         classLoader1.addResources(resources);
