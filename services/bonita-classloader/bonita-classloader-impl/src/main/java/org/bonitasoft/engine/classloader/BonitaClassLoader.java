@@ -69,7 +69,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         addURLs(urls.toArray(new URL[urls.size()]));
     }
 
-    File createTemporaryDirectory(URI temporaryDirectoryUri) {
+    private File createTemporaryDirectory(URI temporaryDirectoryUri) {
         File temporaryDirectory = new File(temporaryDirectoryUri);
         if (!temporaryDirectory.exists()) {
             temporaryDirectory.mkdirs();
@@ -93,21 +93,22 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     protected void addResources(final Map<String, byte[]> resources) {
-        if (resources != null) {
-            for (final Map.Entry<String, byte[]> resource : resources.entrySet()) {
-                if (resource.getKey().matches(".*\\.jar")) {
-                    final byte[] data = resource.getValue();
-                    try {
-                        final File file = writeResource(resource, data);
-                        final String path = file.getAbsolutePath();
-                        final URL url = new File(path).toURI().toURL();
-                        urls.add(url);
-                    } catch (final IOException e) {
-                        throw new BonitaRuntimeException(e);
-                    }
-                } else {
-                    nonJarResources.put(resource.getKey(), resource.getValue());
+        if (resources == null) {
+            return;
+        }
+        for (final Map.Entry<String, byte[]> resource : resources.entrySet()) {
+            if (resource.getKey().matches(".*\\.jar")) {
+                final byte[] data = resource.getValue();
+                try {
+                    final File file = writeResource(resource, data);
+                    final String path = file.getAbsolutePath();
+                    final URL url = new File(path).toURI().toURL();
+                    urls.add(url);
+                } catch (final IOException e) {
+                    throw new BonitaRuntimeException(e);
                 }
+            } else {
+                nonJarResources.put(resource.getKey(), resource.getValue());
             }
         }
     }
