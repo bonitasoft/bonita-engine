@@ -16,17 +16,14 @@ package org.bonitasoft.platform.configuration.util;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
-import java.util.Objects;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +45,7 @@ public class LicensesResourceVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         initRootFolder(dir);
-        if (isSubFolder(dir)){
+        if (isSubFolder(dir)) {
             return SKIP_SUBTREE;
         }
         return CONTINUE;
@@ -66,20 +63,15 @@ public class LicensesResourceVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-        Objects.requireNonNull(path);
-        Objects.requireNonNull(basicFileAttributes);
-        final File file = path.toFile();
-        if (isLicenseFile(file)) {
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                LOGGER.info("found license file: " + file.getName());
-                bonitaConfigurations.add(new BonitaConfiguration(file.getName(), IOUtils.toByteArray(fileInputStream)));
-            }
+        if (isLicenseFile(path)) {
+            LOGGER.info("found license file: " + path.getFileName());
+            bonitaConfigurations.add(new BonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path)));
         }
         return CONTINUE;
     }
 
-    private boolean isLicenseFile(File file) {
-        return file.isFile() && file.getName().endsWith(".lic");
+    private boolean isLicenseFile(Path path) {
+        return path.getFileName().toString().endsWith(".lic");
     }
 
 }

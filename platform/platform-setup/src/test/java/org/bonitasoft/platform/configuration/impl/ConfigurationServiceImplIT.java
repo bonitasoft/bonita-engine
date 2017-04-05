@@ -13,11 +13,15 @@
  */
 package org.bonitasoft.platform.configuration.impl;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.jdbc.datasource.init.ScriptUtils.*;
 
+import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -25,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.util.FolderComparator;
@@ -100,8 +103,8 @@ public class ConfigurationServiceImplIT {
     public void should_add_configuration() throws Exception {
         //given
         final List<BonitaConfiguration> bonitaConfigurations1 = new ArrayList<>();
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 1", "resource content1".getBytes()));
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 2", "resource content2".getBytes()));
+        bonitaConfigurations1.add(new BonitaConfiguration("resource 1", "resource content1".getBytes(UTF_8)));
+        bonitaConfigurations1.add(new BonitaConfiguration("resource 2", "resource content2".getBytes(UTF_8)));
 
         //when
         configurationService.storePlatformInitEngineConf(bonitaConfigurations1);
@@ -115,27 +118,27 @@ public class ConfigurationServiceImplIT {
     public void should_store_put_resources_in_database() throws Exception {
         //when
         configurationService.storePlatformInitEngineConf(Arrays.asList(
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes()),
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes())));
+                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes(UTF_8)),
+                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes(UTF_8))));
         configurationService.storePlatformEngineConf(Collections.singletonList(
-                new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes())));
+                new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8))));
         configurationService.storeTenantTemplateEngineConf(Collections.singletonList(
-                new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes())));
+                new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes(UTF_8))));
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_1), TENANT_ID_1);
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_12), TENANT_ID_12);
 
         //then
         assertThat(configurationService.getPlatformInitEngineConf()).containsExactly(
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes()),
-                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes()));
+                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 1", "resource content1".getBytes(UTF_8)),
+                new BonitaConfiguration("PLATFORM_INIT_ENGINE resource 2", "resource content2".getBytes(UTF_8)));
         assertThat(configurationService.getPlatformEngineConf()).containsExactly(
-                new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes()));
+                new BonitaConfiguration("resourceOfPlatform.xml", "platform resource content".getBytes(UTF_8)));
         assertThat(configurationService.getTenantTemplateEngineConf()).containsExactly(
-                new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes()));
+                new BonitaConfiguration("theResourceOfTenantTemplate.xml", "tenantTemplate resource content".getBytes(UTF_8)));
         assertThat(configurationService.getTenantEngineConf(TENANT_ID_1)).containsExactly(
-                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1".getBytes()));
+                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1".getBytes(UTF_8)));
         assertThat(configurationService.getTenantEngineConf(TENANT_ID_12)).containsExactly(
-                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 12".getBytes()));
+                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 12".getBytes(UTF_8)));
     }
 
     @Test
@@ -144,10 +147,10 @@ public class ConfigurationServiceImplIT {
         configurationService.storeTenantEngineConf(getBonitaConfigurationsSample(TENANT_ID_1), TENANT_ID_1);
         //when
         configurationService.storeTenantEngineConf(Collections.singletonList(
-                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes())), 1L);
+                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes(UTF_8))), 1L);
         //then
         assertThat(configurationService.getTenantEngineConf(1L)).containsExactly(
-                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes()));
+                new BonitaConfiguration("resourceOfTenant.xml", "resource content in tenant 1 modified".getBytes(UTF_8)));
     }
 
     @Test
@@ -187,14 +190,14 @@ public class ConfigurationServiceImplIT {
     @Test
     public void should_store_licenses() throws Exception {
         //given
-        Path licenseFolder = Paths.get(getClass().getResource("/licenses").toURI());
+        File licenses = createLicenseFolder();
 
         //when
-        configurationService.storeLicenses(licenseFolder.toFile());
+        configurationService.storeLicenses(licenses);
 
         //then
-        BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic", "license 1 content".getBytes());
-        BonitaConfiguration expectedLicense2 = new BonitaConfiguration("license2.lic", "license 2 content".getBytes());
+        BonitaConfiguration expectedLicense1 = new BonitaConfiguration("license1.lic", "license 1 content".getBytes(UTF_8));
+        BonitaConfiguration expectedLicense2 = new BonitaConfiguration("license2.lic", "license 2 content".getBytes(UTF_8));
         assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(expectedLicense1, expectedLicense2);
 
     }
@@ -202,16 +205,14 @@ public class ConfigurationServiceImplIT {
     @Test
     public void should_store_licenses_override_previous_licenses() throws Exception {
         //given
-        Path givenlicensesFolder = Paths.get(getClass().getResource("/licenses").toURI());
-        configurationService.storeLicenses(givenlicensesFolder.toFile());
+        configurationService.storeLicenses(createLicenseFolder());
 
         //when
-        Path newlicensesFolder = Paths.get(getClass().getResource("/newLicenses").toURI());
-        configurationService.storeLicenses(newlicensesFolder.toFile());
+        configurationService.storeLicenses(createNewLicenseFolder());
 
         //then
-        BonitaConfiguration newLicense2 = new BonitaConfiguration("license2.lic", "new license 2 content".getBytes());
-        BonitaConfiguration newLicense3 = new BonitaConfiguration("license3.lic", "license 3 content".getBytes());
+        BonitaConfiguration newLicense2 = new BonitaConfiguration("license2.lic", "new license 2 content".getBytes(UTF_8));
+        BonitaConfiguration newLicense3 = new BonitaConfiguration("license3.lic", "license 3 content".getBytes(UTF_8));
         assertThat(configurationService.getLicenses()).as("should retrieve configuration").containsOnly(newLicense2, newLicense3);
 
     }
@@ -240,8 +241,8 @@ public class ConfigurationServiceImplIT {
     public void should_clean_configuration() throws Exception {
         //given
         final List<BonitaConfiguration> bonitaConfigurations1 = new ArrayList<>();
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 1", "resource content1".getBytes()));
-        bonitaConfigurations1.add(new BonitaConfiguration("resource 2", "resource content2".getBytes()));
+        bonitaConfigurations1.add(new BonitaConfiguration("resource 1", "resource content1".getBytes(UTF_8)));
+        bonitaConfigurations1.add(new BonitaConfiguration("resource 2", "resource content2".getBytes(UTF_8)));
         configurationService.storePlatformInitEngineConf(bonitaConfigurations1);
 
         //when
@@ -261,7 +262,7 @@ public class ConfigurationServiceImplIT {
     private List<BonitaConfiguration> getBonitaConfigurationsSample(long tenantId) {
         final String content = "resource content in tenant " + tenantId;
         return Collections.singletonList(
-                new BonitaConfiguration("resourceOfTenant.xml", content.getBytes()));
+                new BonitaConfiguration("resourceOfTenant.xml", content.getBytes(UTF_8)));
     }
 
     private void createTables() throws Exception {
@@ -285,6 +286,24 @@ public class ConfigurationServiceImplIT {
             default:
                 return DEFAULT_STATEMENT_SEPARATOR;
         }
+    }
+
+    public File createLicenseFolder() throws IOException {
+        File licenses = temporaryFolder.newFolder("licenses");
+        Files.write(licenses.toPath().resolve("license1.lic"), "license 1 content".getBytes(UTF_8));
+        Files.write(licenses.toPath().resolve("license2.lic"), "license 2 content".getBytes(UTF_8));
+        Files.write(licenses.toPath().resolve("not_a_license.txt"), "*".getBytes(UTF_8));
+        Path subFolder = licenses.toPath().resolve("subFolder");
+        Files.createDirectories(licenses.toPath().resolve("subFolder"));
+        Files.write(subFolder.resolve("ignoreMe.lic"), "ignore this license content".getBytes(UTF_8));
+        return licenses;
+    }
+
+    public File createNewLicenseFolder() throws IOException {
+        File newLicenses = temporaryFolder.newFolder("newLicenses");
+        Files.write(newLicenses.toPath().resolve("license2.lic"), "new license 2 content".getBytes(UTF_8));
+        Files.write(newLicenses.toPath().resolve("license3.lic"), "license 3 content".getBytes(UTF_8));
+        return newLicenses;
     }
 
     private Connection getConnection() throws Exception {
