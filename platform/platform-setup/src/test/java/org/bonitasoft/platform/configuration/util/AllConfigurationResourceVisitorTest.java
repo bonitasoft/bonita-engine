@@ -1,7 +1,8 @@
 package org.bonitasoft.platform.configuration.util;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +24,13 @@ public class AllConfigurationResourceVisitorTest {
     @Test
     public void should_read_configuration_folder() throws Exception {
         //given
-        final File rootFolder = new File(this.getClass().getResource("/allConfiguration").getFile());
-        LOGGER.info("folder:" + rootFolder.getAbsolutePath());
+        Path rootFolder = Paths.get(getClass().getResource("/allConfiguration").toURI());
+        LOGGER.info("folder:" + rootFolder);
         final List<FullBonitaConfiguration> bonitaConfigurations = new ArrayList<>();
 
         //when
         final AllConfigurationResourceVisitor resourceVisitor = new AllConfigurationResourceVisitor(bonitaConfigurations);
-        Files.walkFileTree(rootFolder.toPath(), resourceVisitor);
+        Files.walkFileTree(rootFolder, resourceVisitor);
 
         //then
         Assertions.assertThat(bonitaConfigurations).hasSize(EXPECTED_CONFIGURATION_FILES);
