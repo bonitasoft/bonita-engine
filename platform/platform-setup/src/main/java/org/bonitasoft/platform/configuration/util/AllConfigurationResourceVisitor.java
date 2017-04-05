@@ -15,18 +15,15 @@ package org.bonitasoft.platform.configuration.util;
 
 import static org.bonitasoft.platform.configuration.type.ConfigurationType.*;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,28 +77,25 @@ public class AllConfigurationResourceVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-        Objects.requireNonNull(path);
-        Objects.requireNonNull(basicFileAttributes);
-        final File file = path.toFile();
         if (isConfigurationFile(path)) {
             final Long tenantId = getTenantId(path.getParent());
             final String configurationType = getFolderName(path.getParent());
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                LOGGER.debug(buildMessage(file, tenantId, configurationType));
-                fullBonitaConfigurations.add(new FullBonitaConfiguration(file.getName(), IOUtils.toByteArray(fileInputStream), configurationType, tenantId));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(buildMessage(path, tenantId, configurationType));
             }
+            fullBonitaConfigurations.add(new FullBonitaConfiguration(path.getFileName().toString(), Files.readAllBytes(path), configurationType, tenantId));
         }
         return FileVisitResult.CONTINUE;
     }
 
-    private String buildMessage(File file, Long tenantId, String configurationType) {
+    private String buildMessage(Path path, Long tenantId, String configurationType) {
         final StringBuilder message = new StringBuilder("found file: ");
         if (tenantId > 0) {
             message.append("tenants/").append(tenantId).append("/").append(configurationType.toLowerCase());
         } else {
             message.append(configurationType.toLowerCase());
         }
-        message.append("/").append(file.getName());
+        message.append("/").append(path.getFileName());
         return message.toString();
     }
 
