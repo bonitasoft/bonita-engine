@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.connector.parser;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -70,7 +71,11 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
         this.version = version;
         this.definitionId = definitionId;
         this.definitionVersion = definitionVersion;
-        this.jarDependencies = jarDependencies;
+        if (jarDependencies != null) {
+            this.jarDependencies = jarDependencies;
+        } else {
+            this.jarDependencies = new JarDependencies(new ArrayList<String>());
+        }
     }
 
     public String getImplementationClassName() {

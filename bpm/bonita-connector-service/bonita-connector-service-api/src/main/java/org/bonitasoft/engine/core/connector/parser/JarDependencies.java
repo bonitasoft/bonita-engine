@@ -59,4 +59,12 @@ public class JarDependencies implements Serializable {
     public List<String> getDependencies() {
         return dependencies;
     }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("JarDependencies{");
+        sb.append("dependencies=").append(dependencies);
+        sb.append('}');
+        return sb.toString();
+    }
 }

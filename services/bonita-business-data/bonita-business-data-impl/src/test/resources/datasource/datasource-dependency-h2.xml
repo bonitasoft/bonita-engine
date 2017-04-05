@@ -10,7 +10,7 @@
 				<prop key="db.datasource.classname">org.h2.jdbcx.JdbcDataSource</prop>
 				<prop key="db.url">jdbc:h2:mem:datamanagement;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTOCOMMIT=OFF;</prop>
 				<prop key="db.user">sa</prop>
-				<prop key="db.password"></prop>
+				<prop key="db.password" />
 			</props>
 		</property>
 	</bean>
