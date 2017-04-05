@@ -24,9 +24,7 @@ public class BonitaConfigurationRowMapperTest {
 
     @Before
     public void setup() throws Exception {
-        doReturn(1L).when(rs).getLong(TENANT_ID);
         doReturn("my resource").when(rs).getString(RESOURCE_NAME);
-        doReturn("PLATFORM_PORTAL").when(rs).getString(CONTENT_TYPE);
         doReturn("my content".getBytes()).when(rs).getBytes(RESOURCE_CONTENT);
     }
 
