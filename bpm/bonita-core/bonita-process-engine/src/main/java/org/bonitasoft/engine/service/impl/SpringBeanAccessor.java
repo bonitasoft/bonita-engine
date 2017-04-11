@@ -87,7 +87,7 @@ public abstract class SpringBeanAccessor {
         context.getEnvironment().setActiveProfiles(activeProfiles);
     }
 
-    BonitaSpringContext createContext() {
+    protected BonitaSpringContext createContext() {
         return new BonitaSpringContext(parent);
     }
 
