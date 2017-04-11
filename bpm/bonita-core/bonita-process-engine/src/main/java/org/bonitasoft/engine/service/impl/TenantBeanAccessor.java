@@ -29,7 +29,7 @@ public class TenantBeanAccessor extends SpringBeanAccessor {
 
     private final long tenantId;
 
-    public TenantBeanAccessor(final ApplicationContext parent, final long tenantId) {
+    protected TenantBeanAccessor(final ApplicationContext parent, final long tenantId) {
         super(parent);
         this.tenantId = tenantId;
     }
