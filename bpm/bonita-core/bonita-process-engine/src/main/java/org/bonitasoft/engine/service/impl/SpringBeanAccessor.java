@@ -21,9 +21,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 
@@ -43,7 +41,7 @@ public abstract class SpringBeanAccessor {
         this.parent = parent;
     }
 
-    protected String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
+    private String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
         final Properties properties = getBonitaHomeServer().getPlatformInitProperties();
         final String activeProfiles = (String) properties.get("activeProfiles");
         return activeProfiles.split(",");
@@ -53,32 +51,19 @@ public abstract class SpringBeanAccessor {
         return getContext().getBean(serviceClass);
     }
 
-    public <T> T getService(String name, Class<T> clazz) {
+    <T> T getService(String name, Class<T> clazz) {
         return getContext().getBean(name, clazz);
     }
 
-    public <T> T getService(String serviceName) {
+    <T> T getService(String serviceName) {
         return (T) getContext().getBean(serviceName);
     }
 
     public ApplicationContext getContext() {
         if (context == null) {
-            init();
             try {
-                context = createSpringContext();
-
-                for (String classPathResource : getSpringFileFromClassPath(isCluster())) {
-                    context.addClassPathResource(classPathResource);
-                }
-                for (BonitaConfiguration bonitaConfiguration : getConfigurationFromDatabase()) {
-                    context.addByteArrayResource(bonitaConfiguration);
-                }
-
-                MutablePropertySources propertySources = context.getEnvironment().getPropertySources();
-                propertySources.addLast(new PropertiesPropertySource("contextProperties", getProperties()));
-
-                final String[] activeProfiles = getActiveProfiles();
-                context.getEnvironment().setActiveProfiles(activeProfiles);
+                context = createContext();
+                configureContext(context);
                 context.refresh();
             } catch (IOException | BonitaHomeNotSetException e) {
                 throw new BonitaRuntimeException(e);
@@ -87,16 +72,27 @@ public abstract class SpringBeanAccessor {
         return context;
     }
 
-    BonitaSpringContext createSpringContext() {
+    private void configureContext(BonitaSpringContext context) throws IOException, BonitaHomeNotSetException {
+        for (String classPathResource : getSpringFileFromClassPath(isCluster())) {
+            context.addClassPathResource(classPathResource);
+        }
+        for (BonitaConfiguration bonitaConfiguration : getConfigurationFromDatabase()) {
+            context.addByteArrayResource(bonitaConfiguration);
+        }
+
+        MutablePropertySources propertySources = context.getEnvironment().getPropertySources();
+        propertySources.addLast(new PropertiesPropertySource("contextProperties", getProperties()));
+
+        final String[] activeProfiles = getActiveProfiles();
+        context.getEnvironment().setActiveProfiles(activeProfiles);
+    }
+
+    BonitaSpringContext createContext() {
         return new BonitaSpringContext(parent);
     }
 
     BonitaHomeServer getBonitaHomeServer() {
         return BONITA_HOME_SERVER;
-    }
-
-    void init() {
-
     }
 
     public void destroy() {

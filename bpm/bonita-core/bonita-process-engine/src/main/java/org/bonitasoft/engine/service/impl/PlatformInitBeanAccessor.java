@@ -31,8 +31,9 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected void init() {
+    BonitaSpringContext createContext() {
         getPlatformLicensesSetup().setupLicenses();
+        return super.createContext();
     }
 
     PlatformLicensesSetup getPlatformLicensesSetup() {
