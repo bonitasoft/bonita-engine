@@ -57,19 +57,9 @@ public class SpringBeanAccessorTest {
         Properties platformInitProperties = new Properties();
         platformInitProperties.put("activeProfiles", "community");
         doReturn(platformInitProperties).when(bonitaHomeServer).getPlatformInitProperties();
-        doReturn(context).when(springBeanAccessor).createSpringContext();
+        doReturn(context).when(springBeanAccessor).createContext();
         doReturn(environment).when(context).getEnvironment();
         doReturn(true).when(springBeanAccessor).isCluster();
-    }
-
-    @Test
-    public void should_getContext_call_init_first() throws Exception {
-        //when
-        springBeanAccessor.getContext();
-        //then
-        InOrder inOrder = inOrder(springBeanAccessor, bonitaHomeServer);
-        inOrder.verify(springBeanAccessor).init();
-        inOrder.verify(springBeanAccessor).createSpringContext();
     }
 
     private SpringBeanAccessor createSpringBeanAccessor() {

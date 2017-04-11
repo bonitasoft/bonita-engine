@@ -41,9 +41,9 @@ public class PlatformInitBeanAccessorTest {
     }
 
     @Test
-    public void should_getContext_call_setupLicenses() throws Exception {
+    public void should_call_setupLicenses_when_initializing_context() throws Exception {
         //when
-        platformInitBeanAccessor.init();
+        platformInitBeanAccessor.createContext();
 
         //then
         verify(platformLicensesSetup).setupLicenses();
