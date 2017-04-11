@@ -11,16 +11,7 @@
     <artifactId>bonita-integration-tests-local</artifactId>
 
     <properties>
-        <!-- use -Dkey=value or activate profile in settings.xml ot overide -->
-        <docker-postgres-image>postgres:9.3</docker-postgres-image>
-        <docker-mysql-image>mysql:5.5.49</docker-mysql-image>
-        <docker-oracle-image>oracle:11g</docker-oracle-image>
-
-        <!-- turns on/off logs from docker image-->
-        <docker.showLogs>true</docker.showLogs>
-
         <testSuite.name>org/bonitasoft/engine/LocalIntegrationTests.java</testSuite.name>
-        
     </properties>
 
     <dependencies>
