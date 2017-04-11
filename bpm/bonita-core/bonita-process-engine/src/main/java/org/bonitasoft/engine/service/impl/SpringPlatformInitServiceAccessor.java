@@ -20,29 +20,26 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class SpringPlatformInitServiceAccessor implements PlatformInitServiceAccessor {
 
-    private static final PlatformInitServiceAccessor instance = new SpringPlatformInitServiceAccessor();
 
     private static SessionAccessor sessionAccessor;
+    private SpringBeanAccessor platformInitBeanAccessor;
 
-    public SpringPlatformInitServiceAccessor() {
 
-    }
-
-    public static PlatformInitServiceAccessor getInstance() {
-        return instance;
+    public SpringPlatformInitServiceAccessor(SpringBeanAccessor platformInitBeanAccessor) {
+        this.platformInitBeanAccessor = platformInitBeanAccessor;
     }
 
     @Override
     public SessionAccessor getSessionAccessor() {
         if (sessionAccessor == null) {
-            sessionAccessor = BeanAccessorFactory.getPlatformInitBeanAccessor().getService(SessionAccessor.class);
+            sessionAccessor = platformInitBeanAccessor.getService(SessionAccessor.class);
         }
         return sessionAccessor;
     }
 
     @Override
     public void destroy() {
-        BeanAccessorFactory.getPlatformInitBeanAccessor().destroy();
+        platformInitBeanAccessor.destroy();
 
     }
 

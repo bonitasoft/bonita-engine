@@ -33,7 +33,7 @@ public class PlatformBeanAccessor extends SpringBeanAccessor {
 
     private File bonita_conf;
 
-    public PlatformBeanAccessor(ApplicationContext parent) {
+    PlatformBeanAccessor(ApplicationContext parent) {
         super(parent);
     }
 
