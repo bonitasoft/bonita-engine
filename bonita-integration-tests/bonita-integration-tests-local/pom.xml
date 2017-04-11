@@ -11,12 +11,7 @@
     <artifactId>bonita-integration-tests-local</artifactId>
 
     <properties>
-
-        <!-- turns on/off logs from docker image-->
-        <docker.showLogs>true</docker.showLogs>
-
         <testSuite.name>org/bonitasoft/engine/LocalIntegrationTests.java</testSuite.name>
-
     </properties>
 
     <dependencies>
