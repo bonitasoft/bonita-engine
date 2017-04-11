@@ -981,7 +981,7 @@
                                             <port>db.random.port:1521</port>
                                         </ports>
                                         <wait>
-                                            <time>240000</time>
+                                            <time>380000</time>
                                             <log>end of customization</log>
                                         </wait>
                                     </run>
@@ -1017,8 +1017,9 @@
                 <docker-postgres-image>ci-01.rd.lan:5000/bonitasoft/postgres:9.3</docker-postgres-image>
                 <docker-mysql-image>ci-01.rd.lan:5000/bonitasoft/mysql:5.5.49</docker-mysql-image>
                 <docker-oracle-image>ci-01.rd.lan:5000/bonitasoft/oracle:11g</docker-oracle-image>
+                <!-- turns on/off logs from docker image-->
+                <docker.showLogs>true</docker.showLogs>
             </properties>
         </profile>
-
     </profiles>
 </project>
