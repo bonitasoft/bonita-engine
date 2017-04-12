@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.bonitasoft.platform.exception.PlatformException;
 
@@ -101,18 +102,18 @@ class TomcatBundleConfigurator extends BundleConfigurator {
 
     private String updateBitronixFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
         Map<String, String> replacements = new HashMap<>(7);
-        replacements.put("@@" + bitronixDatasourceAlias + "_driver_class_name@@", configuration.getXaDriverClassName());
-        replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_user@@", configuration.getDatabaseUser());
-        replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_password@@", configuration.getDatabasePassword());
-        replacements.put("@@" + bitronixDatasourceAlias + "_database_test_query@@", configuration.getTestQuery());
+        replacements.put("@@" + bitronixDatasourceAlias + "_driver_class_name@@", Matcher.quoteReplacement(configuration.getXaDriverClassName()));
+        replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_user@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
+        replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_password@@", Matcher.quoteReplacement(configuration.getDatabasePassword()));
+        replacements.put("@@" + bitronixDatasourceAlias + "_database_test_query@@", Matcher.quoteReplacement(configuration.getTestQuery()));
 
         // Let's uncomment and replace dbvendor-specific values:
         if (POSTGRES.equals(configuration.getDbVendor())) {
-            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_server_name@@", configuration.getServerName()));
-            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_port_number@@", configuration.getServerPort()));
-            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_database_name@@", configuration.getDatabaseName()));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_server_name@@", Matcher.quoteReplacement(configuration.getServerName())));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_port_number@@", Matcher.quoteReplacement(configuration.getServerPort())));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_database_name@@", Matcher.quoteReplacement(configuration.getDatabaseName())));
         } else {
-            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_database_connection_url@@", configuration.getUrl()));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_database_connection_url@@", Matcher.quoteReplacement(convertWindowsBackslashes(configuration.getUrl()))));
         }
 
         return replaceValues(content, replacements);
@@ -124,17 +125,17 @@ class TomcatBundleConfigurator extends BundleConfigurator {
 
     private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
         Map<String, String> replacements = new HashMap<>(5);
-        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_user@@", configuration.getDatabaseUser());
-        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_password@@", configuration.getDatabasePassword());
-        replacements.put("@@" + bitronixDatasourceAlias + ".driver_class_name@@", configuration.getNonXaDriverClassName());
-        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", escapeXmlCharacters(configuration.getUrl()));
-        replacements.put("@@" + bitronixDatasourceAlias + ".database_test_query@@", configuration.getTestQuery());
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_user@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_password@@", Matcher.quoteReplacement(configuration.getDatabasePassword()));
+        replacements.put("@@" + bitronixDatasourceAlias + ".driver_class_name@@", Matcher.quoteReplacement(configuration.getNonXaDriverClassName()));
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_url@@", Matcher.quoteReplacement(escapeXmlCharacters(convertWindowsBackslashes(configuration.getUrl()))));
+        replacements.put("@@" + bitronixDatasourceAlias + ".database_test_query@@", Matcher.quoteReplacement(configuration.getTestQuery()));
         return replaceValues(content, replacements);
     }
 
     private String updateSetEnvFile(String setEnvFileContent, String dbVendor, final String systemPropertyName) throws PlatformException {
         final Map<String, String> replacementMap = Collections.singletonMap("-D" + systemPropertyName + "=.*\"",
-                "-D" + systemPropertyName + "=" + dbVendor + "\"");
+                Matcher.quoteReplacement("-D" + systemPropertyName + "=" + dbVendor + "\""));
 
         return replaceValues(setEnvFileContent, replacementMap);
     }
