@@ -35,9 +35,7 @@ public class ExecutorWorkService implements WorkService {
 
     private final UserTransactionService transactionService;
 
-    private final WorkSynchronizationFactory workSynchronizationFactory;
-
-    private final ThreadLocal<AbstractWorkSynchronization> synchronizations = new ThreadLocal<>();
+    private final ThreadLocal<WorkSynchronization> synchronizations = new ThreadLocal<>();
 
     private final TechnicalLoggerService loggerService;
 
@@ -51,17 +49,16 @@ public class ExecutorWorkService implements WorkService {
 
     /**
      * @param transactionService
-     * @param workSynchronizationFactory
      * @param loggerService
      * @param sessionAccessor
      * @param bonitaExecutorServiceFactory
      * @param workTerminationTimeout time in secondes to wait for works to finish
      */
-    public ExecutorWorkService(final UserTransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
-            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
+    public ExecutorWorkService(final UserTransactionService transactionService,
+            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
+            final BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
             final int workTerminationTimeout) {
         this.transactionService = transactionService;
-        this.workSynchronizationFactory = workSynchronizationFactory;
         this.loggerService = loggerService;
         this.sessionAccessor = sessionAccessor;
         this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
@@ -74,7 +71,7 @@ public class ExecutorWorkService implements WorkService {
             logExecutorStateWarn(work);
             return;
         }
-        final AbstractWorkSynchronization synchro = getContinuationSynchronization();
+        final WorkSynchronization synchro = getContinuationSynchronization();
         if (synchro != null) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Registered work " + work.getDescription());
             synchro.addWork(work);
@@ -100,11 +97,11 @@ public class ExecutorWorkService implements WorkService {
         executor.submit(work);
     }
 
-    private AbstractWorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
+    private WorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
         synchronized (getSynchroLock) {
-            AbstractWorkSynchronization synchro = synchronizations.get();
+            WorkSynchronization synchro = synchronizations.get();
             if (synchro == null) {
-                synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor, this);
+                synchro = new WorkSynchronization(executor, sessionAccessor, this);
                 try {
                     transactionService.registerBonitaSynchronization(synchro);
                 } catch (final STransactionNotFoundException e) {
@@ -166,7 +163,8 @@ public class ExecutorWorkService implements WorkService {
     private void awaitTermination() throws SWorkException {
         try {
             if (!executor.awaitTermination(workTerminationTimeout, TimeUnit.SECONDS)) {
-                throw new SWorkException("Waited termination of all work " + workTerminationTimeout + "s but all tasks were not finished");
+                throw new SWorkException("Waited termination of all work " + workTerminationTimeout
+                        + "s but all tasks were not finished");
             }
         } catch (final InterruptedException e) {
             throw new SWorkException("Interrupted while stopping the work service", e);

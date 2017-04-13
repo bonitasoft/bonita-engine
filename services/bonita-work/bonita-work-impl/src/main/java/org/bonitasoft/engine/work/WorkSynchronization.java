@@ -21,20 +21,20 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
 
-public abstract class AbstractWorkSynchronization implements BonitaTransactionSynchronization {
+public class WorkSynchronization implements BonitaTransactionSynchronization {
 
     private final Collection<BonitaWork> works;
 
-    protected final BonitaExecutorService executorService;
-
-    protected final WorkService workService;
+    private final WorkService workService;
+    private final BonitaExecutorService executorService;
 
     private long tenantId;
 
-    public AbstractWorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor, final WorkService workService) {
+    WorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor,
+            final WorkService workService) {
         super();
         this.executorService = executorService;
-        works = new HashSet<BonitaWork>();
+        works = new HashSet<>();
         try {
             // Instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
             tenantId = sessionAccessor.getTenantId();
@@ -45,17 +45,16 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
         this.workService = workService;
     }
 
-    public long getTenantId() {
-        return tenantId;
+    void addWork(final BonitaWork work) {
+        works.add(work);
     }
 
-    public void addWork(final BonitaWork work) {
-        works.add(work);
+    Collection<BonitaWork> getWorks() {
+        return works;
     }
 
     @Override
     public void beforeCommit() {
-        // NOTHING
     }
 
     @Override
@@ -64,11 +63,11 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
             for (final BonitaWork work : works) {
                 work.setTenantId(tenantId);
             }
-            executeRunnables(works);
+            for (final BonitaWork work : works) {
+                executorService.execute(work);
+            }
         }
         workService.removeSynchronization();
     }
-
-    protected abstract void executeRunnables(Collection<BonitaWork> works);
 
 }

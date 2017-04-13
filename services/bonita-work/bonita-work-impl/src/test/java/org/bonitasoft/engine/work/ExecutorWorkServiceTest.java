@@ -30,52 +30,44 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ExecutorWorkServiceTest {
 
-    private ExecutorWorkService workService;
-
+    @Mock
     private UserTransactionService transactionService;
-
-    private WorkSynchronizationFactory workSynchronizationFactory;
-
+    @Mock
     private TechnicalLoggerService loggerService;
-
+    @Mock
     private SessionAccessor sessionAccessor;
-
+    @Mock
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
-
-    private AbstractWorkSynchronization abstractWorkSynchronization;
-
+    @Mock
     private BonitaExecutorService executorService;
-
+    @Mock
     private Queue<Runnable> queue;
+    private ExecutorWorkService workService;
+    @Captor
+    private ArgumentCaptor<BonitaTransactionSynchronization> captor;
 
-    @SuppressWarnings("unchecked")
+
     @Before
     public void before() throws Exception {
-        transactionService = mock(UserTransactionService.class);
-        workSynchronizationFactory = mock(WorkSynchronizationFactory.class);
-        loggerService = mock(TechnicalLoggerService.class);
-        sessionAccessor = mock(SessionAccessor.class);
-        bonitaExecutorServiceFactory = mock(BonitaExecutorServiceFactory.class);
-        abstractWorkSynchronization = mock(AbstractWorkSynchronization.class);
-        executorService = mock(BonitaExecutorService.class);
-        queue = mock(Queue.class);
-
-        doReturn(abstractWorkSynchronization).when(workSynchronizationFactory).getWorkSynchronization(any(BonitaExecutorService.class),
-                any(TechnicalLoggerService.class), any(SessionAccessor.class), any(WorkService.class));
         doReturn(1L).when(sessionAccessor).getTenantId();
         doReturn(executorService).when(bonitaExecutorServiceFactory).createExecutorService();
         doReturn(false).when(executorService).isShutdown();
         doReturn(true).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
-
-        workService = spy(new ExecutorWorkService(transactionService, workSynchronizationFactory, loggerService, sessionAccessor, bonitaExecutorServiceFactory,
-                30));
+        workService = new ExecutorWorkService(transactionService, loggerService, sessionAccessor, bonitaExecutorServiceFactory, 30);
     }
 
     @Test
@@ -93,7 +85,7 @@ public class ExecutorWorkServiceTest {
 
     @Test
     public void should_pause_shutdown_ThreadPool_and_clear_queue() throws InterruptedException, SBonitaException {
-        final InOrder inOrder = inOrder(executorService, workService, queue);
+        final InOrder inOrder = inOrder(executorService, queue);
         // given
         workService.start();
 
@@ -108,7 +100,7 @@ public class ExecutorWorkServiceTest {
 
     @Test
     public void should_stop_shutdown_ThreadPool_and_not_clear_queue() throws InterruptedException {
-        final InOrder inOrder = inOrder(executorService, workService, queue);
+        final InOrder inOrder = inOrder(executorService, queue);
         // given
         workService.start();
 
@@ -131,7 +123,7 @@ public class ExecutorWorkServiceTest {
         workService.registerWork(createBonitaWork());
 
         // then
-        verify(abstractWorkSynchronization, times(0)).addWork(createBonitaWork());
+        verifyZeroInteractions(transactionService);
 
     }
 
@@ -174,7 +166,7 @@ public class ExecutorWorkServiceTest {
         workService.registerWork(createBonitaWork());
 
         // then
-        verify(abstractWorkSynchronization, times(0)).addWork(createBonitaWork());
+        verify(transactionService).registerBonitaSynchronization(any(WorkSynchronization.class));
     }
 
     @Test
@@ -341,7 +333,10 @@ public class ExecutorWorkServiceTest {
         workService.registerWork(bonitaWork);
 
         // then
-        verify(abstractWorkSynchronization).addWork(bonitaWork);
+        verify(transactionService).registerBonitaSynchronization(captor.capture());
+        BonitaTransactionSynchronization transactionSynchro = captor.getValue();
+        assertThat(transactionSynchro).isInstanceOf(WorkSynchronization.class);
+        assertThat(((WorkSynchronization) transactionSynchro).getWorks()).containsOnly(bonitaWork);
     }
 
 }
