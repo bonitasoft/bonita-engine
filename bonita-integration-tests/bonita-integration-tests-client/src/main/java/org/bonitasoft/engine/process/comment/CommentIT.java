@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.process.comment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -51,26 +52,42 @@ public class CommentIT extends TestWithUser {
     }
 
     @Test
-    public void getComments() throws Exception {
+    public void should_be_able_to_search_comments() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
-        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).getProcess();
+        String taskName = "userTask1";
+        final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(taskName, ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
         // get comments before add new.
-        final List<Comment> comments1 = getProcessAPI().searchComments(
+        final List<Comment> originalComments = getProcessAPI().searchComments(
                 new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
         // add comments
-        final String commentContent = "abc";
-        getProcessAPI().addProcessComment(pi0.getId(), commentContent);
-        getProcessAPI().addProcessComment(pi0.getId(), commentContent);
-        getProcessAPI().addProcessComment(pi0.getId(), commentContent);
+        getProcessAPI().addProcessComment(pi0.getId(), "added comment 0");
+        getProcessAPI().addProcessComment(pi0.getId(), "added comment 1");
+        Comment comment2 = getProcessAPI().addProcessComment(pi0.getId(), "added comment 2");
         // get comments again.
-        final List<Comment> comments2 = getProcessAPI().searchComments(
+        final List<Comment> commentsAfterAdd = getProcessAPI().searchComments(
                 new SearchOptionsBuilder(0, 100).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi0.getId()).done()).getResult();
-        assertEquals(comments1.size() + 3, comments2.size());
-        assertEquals(commentContent, comments2.get(1).getContent());
+        assertThat(commentsAfterAdd).as("should have 3 more comments").hasSize(originalComments.size() + 3);
+        assertThat(commentsAfterAdd.get(1).getContent()).isEqualTo("added comment 1");
+
+        // Archive comments
+        waitForUserTaskAndExecuteIt(pi0, taskName, user);
+        waitForProcessToFinish(pi0);
+
+        // ensure we can retrieve archived comments using the SOURCE_OBJECT_ID field
+        final SearchResult<ArchivedComment> searchArchivedCommentsBySourceObjectId = getProcessAPI().searchArchivedComments(
+                new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, comment2.getId()).done());
+        assertThat(searchArchivedCommentsBySourceObjectId.getCount()).isEqualTo(1);
+        assertThat(searchArchivedCommentsBySourceObjectId.getResult().get(0).getContent()).isEqualTo("added comment 2");
+
+        // ensure we can retrieve archived comments using the CONTENT field
+        final SearchResult<ArchivedComment> searchArchivedCommentsByContent = getProcessAPI().searchArchivedComments(
+                new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.CONTENT, "added comment 2").done());
+        assertThat(searchArchivedCommentsByContent.getCount()).isEqualTo(1);
+        assertThat(searchArchivedCommentsByContent.getResult().get(0).getSourceObjectId()).isEqualTo(comment2.getId());
 
         disableAndDeleteProcess(processDefinition);
     }
