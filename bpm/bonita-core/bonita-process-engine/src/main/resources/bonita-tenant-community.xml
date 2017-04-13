@@ -928,11 +928,8 @@
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
 
-    <bean id="workSynchronizationFactory" class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
-
     <bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
         <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="workSynchronizationFactory" ref="workSynchronizationFactory" />
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
