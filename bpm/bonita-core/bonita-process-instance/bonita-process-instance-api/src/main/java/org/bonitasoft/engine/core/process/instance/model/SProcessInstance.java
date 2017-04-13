@@ -89,7 +89,7 @@ public interface SProcessInstance extends SFlowElementsContainer {
     boolean hasBeenInterruptedByEvent();
 
     /**
-     * Determines if this instance is a root process instance. That is, it is neither a called by a call activity, neither a sub-process
+     * Determines if this instance is a root process instance. That is, it is neither a process called by a call activity, neither a sub-process
      * @return true if it's a root process instance; false otherwise.
      */
     boolean isRootInstance();
