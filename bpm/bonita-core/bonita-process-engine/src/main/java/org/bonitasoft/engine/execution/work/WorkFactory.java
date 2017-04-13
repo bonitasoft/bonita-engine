@@ -73,7 +73,7 @@ public class WorkFactory {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
-        BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId, processInstanceId);
+        BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId);
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
         return withFailureHandling(wrappedWork);
@@ -83,7 +83,7 @@ public class WorkFactory {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(flowNodeInstanceId, processInstanceId);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(flowNodeInstanceId);
         executeFlowNodeWork.setReadyHumanTask(true);
         BonitaWork wrappedWork = executeFlowNodeWork;
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));

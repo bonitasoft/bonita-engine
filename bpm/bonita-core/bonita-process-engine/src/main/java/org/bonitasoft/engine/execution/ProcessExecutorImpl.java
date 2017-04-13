@@ -214,8 +214,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public FlowNodeState executeFlowNode(final long flowNodeInstanceId,
-            final long processInstanceId, final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
-        return flowNodeExecutor.stepForward(flowNodeInstanceId, processInstanceId, executerId, executerSubstituteId);
+                                         final Long executerId, final Long executerSubstituteId) throws SFlowNodeExecutionException {
+        return flowNodeExecutor.stepForward(flowNodeInstanceId, executerId, executerSubstituteId);
     }
 
     private SConnectorInstance getNextConnectorInstance(final SProcessInstance processInstance, final ConnectorEvent event)
@@ -321,7 +321,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 gatewaysToExecute.addAll(gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), parentProcessInstanceId, null, null);
+                executeFlowNode(gatewayToExecute.getId(), null, null);
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
@@ -720,7 +720,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         gatewayInstance));
             }
             for (final SGatewayInstance gatewayToExecute : gatewaysToExecute) {
-                executeFlowNode(gatewayToExecute.getId(), gatewayToExecute.getParentProcessInstanceId(), null, null);
+                executeFlowNode(gatewayToExecute.getId(), null, null);
             }
 
         }

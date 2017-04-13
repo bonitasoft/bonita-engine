@@ -40,14 +40,10 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     private final long flowNodeInstanceId;
 
-    private final long processInstanceId;
-
     private boolean isReadyHumanTask = false;
 
-    ExecuteFlowNodeWork(final long flowNodeInstanceId,
-            final long processInstanceId) {
+    ExecuteFlowNodeWork(final long flowNodeInstanceId) {
         this.flowNodeInstanceId = flowNodeInstanceId;
-        this.processInstanceId = processInstanceId;
     }
 
     public void setReadyHumanTask(boolean readyHumanTask) {
@@ -56,7 +52,7 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
 
     @Override
     public String getDescription() {
-        return getClass().getSimpleName() + ": processInstanceId:" + processInstanceId + ", flowNodeInstanceId: " + flowNodeInstanceId;
+        return getClass().getSimpleName() + ": flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
     @Override
@@ -86,7 +82,7 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
                                 + humanTaskInstance.getStateName() + "). Someone probably already called execute on it.");
             }
         }
-        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, processInstanceId, null, null);
+        tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, null, null);
     }
 
     @Override

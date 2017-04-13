@@ -105,7 +105,7 @@ public class FlowNodeRetrierTest {
 
         //then
         verify(strategy).resetConnectorsOf(FLOW_NODE_INSTANCE_ID);
-        verify(flowNodeExecutor).setStateByStateId(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, PREVIOUS_STATE_ID);
+        verify(flowNodeExecutor).setStateByStateId(FLOW_NODE_INSTANCE_ID, PREVIOUS_STATE_ID);
         verify(registry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, FLOW_NODE_INSTANCE_ID);
     }
 
@@ -122,7 +122,7 @@ public class FlowNodeRetrierTest {
 
         //then
         verify(registry, never()).executeFlowNode(anyLong(), anyLong(), anyLong());
-        verify(flowNodeExecutor).setStateByStateId(PROCESS_DEFINITION_ID, FLOW_NODE_INSTANCE_ID, PREVIOUS_STATE_ID);
+        verify(flowNodeExecutor).setStateByStateId(FLOW_NODE_INSTANCE_ID, PREVIOUS_STATE_ID);
     }
 
     @Test(expected = ActivityExecutionException.class)
