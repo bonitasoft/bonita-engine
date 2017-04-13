@@ -25,13 +25,11 @@ public interface State<T> {
     StateCode execute(SProcessDefinition processDefinition, T instance) throws SActivityStateExecutionException;
 
     /**
-     * @param processDefinition
-     * @param parentInstance
-     * @param childInstance
-     *            TODO
+     *
+     * Called when a children of the flow node parentInstance finish
+     *
      * @return
      *         true if the state is finished (the execution will continue automatically)
-     * @throws SActivityStateExecutionException
      */
     boolean hit(SProcessDefinition processDefinition, T parentInstance, T childInstance) throws SActivityStateExecutionException;
 

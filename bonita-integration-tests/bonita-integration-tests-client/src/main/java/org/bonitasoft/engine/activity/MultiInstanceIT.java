@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescrip
 import org.bonitasoft.engine.bpm.flownode.ArchivedMultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
@@ -66,6 +67,7 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.TestStates;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1035,5 +1037,27 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         disableAndDeleteProcess(processDefinition);
     }
+
+    @Test
+    public void should_abort_children_of_multi_instance_when_skipping_the_multi_instance() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("skippedMultiInstance", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(2));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(processInstance, "step1");
+        HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
+
+        FlowNodeInstance multiInstance = getProcessAPI().getFlowNodeInstance(step1.getParentContainerId());
+        assertThat(multiInstance.getType()).isEqualTo(FlowNodeType.MULTI_INSTANCE_ACTIVITY);
+        getProcessAPI().setActivityStateByName(multiInstance.getId(),ActivityStates.SKIPPED_STATE);
+
+        waitForTaskInState(processInstance, "step1", TestStates.ABORTED);
+        waitForTaskInState(processInstance, "step1", TestStates.ABORTED);
+        waitForProcessToFinish(processInstance);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
 
 }
