@@ -62,10 +62,10 @@ public class ContainerRegistry {
         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId));
     }
 
-    public void executeFlowNodeInSameThread(final Long processInstanceId, final long flowNodeInstanceId,
+    public void executeFlowNodeInSameThread(final long flowNodeInstanceId,
                                             final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
-        containerExecutor.executeFlowNode(flowNodeInstanceId, processInstanceId, null, null);
+        containerExecutor.executeFlowNode(flowNodeInstanceId, null, null);
     }
 
 }

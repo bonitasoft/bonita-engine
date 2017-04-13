@@ -25,6 +25,8 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  */
 public class SkippedFlowNodeStateImpl implements FlowNodeState {
 
+    public static final int ID = 12;
+
     public SkippedFlowNodeStateImpl() {
     }
 
@@ -35,7 +37,7 @@ public class SkippedFlowNodeStateImpl implements FlowNodeState {
 
     @Override
     public int getId() {
-        return 12;
+        return ID;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class SkippedFlowNodeStateImpl implements FlowNodeState {
 
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
-        return false;
+        return parentInstance.getTokenCount() == 0;
     }
 
     @Override

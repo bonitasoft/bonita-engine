@@ -36,25 +36,21 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     /**
      * 
      * @param flowNodeInstanceId
-     * @param processInstanceId
      * @param executerId
      * @param executerSubstituteId
      * @return
      * @throws SFlowNodeExecutionException
      * @since 6.0
      */
-    FlowNodeState stepForward(long flowNodeInstanceId, long processInstanceId,
+    FlowNodeState stepForward(long flowNodeInstanceId,
                               Long executerId, Long executerSubstituteId) throws SFlowNodeExecutionException;
 
     /**
-     * 
-     * @param sProcessDefinitionId
+     *  force the state of a flow node toa particular state
      * @param flowNodeInstanceId
      * @param stateId
-     * @throws SActivityStateExecutionException
-     * @since 6.1
      */
-    void setStateByStateId(long sProcessDefinitionId, long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
+    void setStateByStateId(long flowNodeInstanceId, int stateId) throws SActivityStateExecutionException;
 
     /**
      * 

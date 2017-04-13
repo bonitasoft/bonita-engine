@@ -66,7 +66,7 @@ public class ExecuteFlowNodeWorkTest {
     @Test
     public void should_throw_exception_if_executing_human_task_not_ready_when_isReadyHumanTask_flag_is_true() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
         executeFlowNodeWork.setReadyHumanTask(true);
         sHumanTaskInstance.setStateId(2);
         //when
@@ -79,7 +79,7 @@ public class ExecuteFlowNodeWorkTest {
     @Test
     public void should_throw_exception_if_executing_human_task_ready_but_not_executing_when_isReadyHumanTask_flag_is_true() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
         executeFlowNodeWork.setReadyHumanTask(true);
         sHumanTaskInstance.setStateId(4);
         sHumanTaskInstance.setStateExecuting(false);
@@ -93,25 +93,25 @@ public class ExecuteFlowNodeWorkTest {
     @Test
     public void should_execute_human_task_in_ready_and_executing_if_isReadyHumanTask_flag_is_true() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
         executeFlowNodeWork.setReadyHumanTask(true);
         sHumanTaskInstance.setStateId(4);
         sHumanTaskInstance.setStateExecuting(true);
         //when
         executeFlowNodeWork.work(context);
         //then
-        verify(flowNodeExecutor).executeFlowNode(FLOW_NODE_INSTANCE_ID, PROCESS_INSTANCE_ID, null, null);
+        verify(flowNodeExecutor).executeFlowNode(FLOW_NODE_INSTANCE_ID, null, null);
     }
 
     @Test
     public void should_execute_flow_node_in_any_state_if_isReadyHumanTask_flag_is_false() throws Exception {
         //given
-        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID, PROCESS_INSTANCE_ID);
+        ExecuteFlowNodeWork executeFlowNodeWork = new ExecuteFlowNodeWork(FLOW_NODE_INSTANCE_ID);
         sHumanTaskInstance.setStateId(2);
         sHumanTaskInstance.setStateExecuting(true);
         //when
         executeFlowNodeWork.work(context);
         //then
-        verify(flowNodeExecutor).executeFlowNode(FLOW_NODE_INSTANCE_ID, PROCESS_INSTANCE_ID, null, null);
+        verify(flowNodeExecutor).executeFlowNode(FLOW_NODE_INSTANCE_ID, null, null);
     }
 }

@@ -350,10 +350,10 @@ public class EventsHandler {
             default:
                 if (waitingEvent != null) { // is null if it's a timer
                     eventInstanceService.deleteWaitingEvent(waitingEvent);
-                    executeFlowNode(flowNodeInstanceId, operations, waitingEvent.getParentProcessInstanceId());
+                    executeFlowNode(flowNodeInstanceId, operations);
                 } else {
                     final long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
-                    executeFlowNode(flowNodeInstanceId, operations, processInstanceId);
+                    executeFlowNode(flowNodeInstanceId, operations);
                 }
                 break;
         }
@@ -398,7 +398,7 @@ public class EventsHandler {
                 subProcessId, parentProcessInstanceId, rootProcessInstanceId, isInterrupting);
     }
 
-    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, final long processInstanceId)
+    private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations)
             throws SFlowNodeReadException, SFlowNodeExecutionException {
         // in same thread because we delete the message instance after triggering the catch event. The data is of the message
         // is deleted so we will be unable to execute the flow node instance
@@ -410,7 +410,7 @@ public class EventsHandler {
                 throw new SFlowNodeExecutionException("Unable to execute operation before executing flow node " + flowNodeInstanceId, e);
             }
         }
-        containerRegistry.executeFlowNodeInSameThread(processInstanceId, flowNodeInstanceId,
+        containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId,
                 operations.getContainerType());
     }
 
