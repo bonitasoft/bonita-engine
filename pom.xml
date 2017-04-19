@@ -920,7 +920,7 @@
                                             <port>db.random.port:3306</port>
                                         </ports>
                                         <wait>
-                                            <time>30000</time>
+                                            <time>60000</time>
                                             <log>MySQL init process done. Ready for start up.</log>
                                         </wait>
                                     </run>
