@@ -24,11 +24,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.util.FolderComparator;
@@ -60,8 +64,8 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 //keep order
 @SpringApplicationConfiguration(classes = {
-        PlatformSetupApplication.class})
-@ComponentScan(basePackages = {"org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration"})
+        PlatformSetupApplication.class })
+@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration" })
 @PropertySource("classpath:/application.properties")
 @Component
 public class ConfigurationServiceImplIT {
