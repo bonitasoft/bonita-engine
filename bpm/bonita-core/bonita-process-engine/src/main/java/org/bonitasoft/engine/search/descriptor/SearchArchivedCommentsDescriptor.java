@@ -38,16 +38,18 @@ public class SearchArchivedCommentsDescriptor extends SearchEntityDescriptor {
 
     SearchArchivedCommentsDescriptor() {
         SACommentBuilderFactory saCommentBuilderFact = BuilderFactory.get(SACommentBuilderFactory.class);
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(5);
+        searchEntityKeys = new HashMap<>(7);
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SAComment.class, saCommentBuilderFact.getProcessInstanceIdKey()));
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTED_BY_ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getUserIdKey()));
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getIdKey()));
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTDATE, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getPostDateKey()));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getSourceObjectId()));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.CONTENT, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getContentKey()));
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
 
-        archivedCommentsAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> archivedCommentFields = new HashSet<String>(1);
+        archivedCommentsAllFields = new HashMap<>(1);
+        final Set<String> archivedCommentFields = new HashSet<>(1);
         archivedCommentFields.add(saCommentBuilderFact.getContentKey());
         archivedCommentsAllFields.put(SAComment.class, archivedCommentFields);
     }
