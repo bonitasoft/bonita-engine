@@ -932,12 +932,12 @@
 
   <xs:simpleType name="operatorType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="DELETION"/>
-      <xs:enumeration value="DOCUMENT_CREATE_UPDATE"/>
-      <xs:enumeration value="STRING_INDEX"/>
-      <xs:enumeration value="XPATH_UPDATE_QUERY"/>
       <xs:enumeration value="JAVA_METHOD"/>
+      <xs:enumeration value="XPATH_UPDATE_QUERY"/>
+      <xs:enumeration value="DELETION"/>
       <xs:enumeration value="ASSIGNMENT"/>
+      <xs:enumeration value="STRING_INDEX"/>
+      <xs:enumeration value="DOCUMENT_CREATE_UPDATE"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -950,32 +950,32 @@
 
   <xs:simpleType name="failAction">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="ERROR_EVENT"/>
       <xs:enumeration value="FAIL"/>
       <xs:enumeration value="IGNORE"/>
-      <xs:enumeration value="ERROR_EVENT"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="type">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="BYTE_ARRAY"/>
-      <xs:enumeration value="TEXT"/>
       <xs:enumeration value="FILE"/>
       <xs:enumeration value="DECIMAL"/>
-      <xs:enumeration value="LOCALDATE"/>
-      <xs:enumeration value="BOOLEAN"/>
       <xs:enumeration value="INTEGER"/>
-      <xs:enumeration value="LOCALDATETIME"/>
+      <xs:enumeration value="BYTE_ARRAY"/>
       <xs:enumeration value="OFFSETDATETIME"/>
-      <xs:enumeration value="LONG"/>
+      <xs:enumeration value="TEXT"/>
       <xs:enumeration value="DATE"/>
+      <xs:enumeration value="LOCALDATE"/>
+      <xs:enumeration value="LOCALDATETIME"/>
+      <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="LONG"/>
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="timerType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="CYCLE"/>
       <xs:enumeration value="DURATION"/>
+      <xs:enumeration value="CYCLE"/>
       <xs:enumeration value="DATE"/>
     </xs:restriction>
   </xs:simpleType>
@@ -988,8 +988,8 @@
 
   <xs:simpleType name="gatewayType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="PARALLEL"/>
       <xs:enumeration value="INCLUSIVE"/>
+      <xs:enumeration value="PARALLEL"/>
       <xs:enumeration value="EXCLUSIVE"/>
     </xs:restriction>
   </xs:simpleType>
