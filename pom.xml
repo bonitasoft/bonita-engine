@@ -510,9 +510,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <!-- when set to 1.8: change field type of default transition 
-                        to TransitionDefinition in FlowNodeDefinitionImpl and to ActorDefinition 
-                        for actorInitiator of DesignProcessDefinitionImp (jaxb implementation bug) -->
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
