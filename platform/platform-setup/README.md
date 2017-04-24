@@ -11,7 +11,7 @@ Project **Bonita Platform Setup** sets up Bonita BPM Platform before **Bonita BP
 
 Requirements
 -------------
->     Java JDK 1.7 or higher
+>     Java JDK 1.8 or higher
 
 Building platform-setup
 -----------------
