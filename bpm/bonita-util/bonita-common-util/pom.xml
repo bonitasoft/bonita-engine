@@ -115,9 +115,23 @@
                                 <include>org/bonitasoft/engine/business/application/xml/**/*.java</include>
                             </includes>
                             <excludes>
-                                <exclude>org/bonitasoft/engine/business/application/xml/ApplicationNodeBuilder.java</exclude>
+                                <exclude>org/bonitasoft/engine/business/application/xml/ApplicationNodeBuilder.java
+                                </exclude>
                             </excludes>
                             <outputDirectory>${project.build.directory}/application-schemas</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>profiles-schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <includes>
+                                <include>org/bonitasoft/engine/profile/impl/**/*.java</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/profiles-schemas</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -134,8 +148,12 @@
                         <phase>process-sources</phase>
                         <configuration>
                             <target>
-                                <copy file="${project.build.directory}/bdm-schemas/schema1.xsd" toFile="${project.build.directory}/schemas/bom.xsd" />
-                                <copy file="${project.build.directory}/application-schemas/schema1.xsd" toFile="${project.build.directory}/schemas/application.xsd" />
+                                <copy file="${project.build.directory}/bdm-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/bom.xsd"/>
+                                <copy file="${project.build.directory}/application-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/application.xsd"/>
+                                <copy file="${project.build.directory}/profiles-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/profiles.xsd" />
                             </target>
                         </configuration>
                     </execution>
