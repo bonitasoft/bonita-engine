@@ -33,12 +33,12 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.impl.ExportedMembership;
-import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.MembershipNode;
+import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.impl.ProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileMappingNode;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -83,7 +83,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_replace_custom_profile() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", false);
 
         addTwoProfileEntries(exportedProfile);
 
@@ -102,7 +102,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_replace_default_profile() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", true);
 
         addTwoProfileEntries(exportedProfile);
 
@@ -117,11 +117,11 @@ public class ProfilesImporterTest {
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("Mine", Status.REPLACED));
     }
 
-    private ExportedProfiles exportedProfiles(ExportedProfile... exportedProfile) {
-        return new ExportedProfiles(Arrays.asList(exportedProfile));
+    private ProfilesNode exportedProfiles(ProfileNode... exportedProfile) {
+        return new ProfilesNode(Arrays.asList(exportedProfile));
     }
 
-    private void addTwoProfileEntries(final ExportedProfile exportedProfile) {
+    private void addTwoProfileEntries(final ProfileNode exportedProfile) {
         exportedProfile.getParentProfileEntries().add(
                 createParent("p1", "page1", true));
         exportedProfile.getParentProfileEntries().add(
@@ -133,7 +133,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_with_replace_do_not_delete_profile_entries() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", true);
 
         addTwoProfileEntries(exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
@@ -149,7 +149,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_on_default_with_replace_do_not_delete_profile_entries() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", false);
 
         addTwoProfileEntries(exportedProfile);
 
@@ -169,7 +169,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_with_ReplaceDuplicate_do_not_insert_default_profile() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", true);
         addTwoProfileEntries(exportedProfile);
 
         final SProfile existingProfile = mock(SProfile.class);
@@ -189,14 +189,14 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_add_profile() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("MineNotDefault", false);
+        final ProfileNode exportedProfile = new ProfileNode("MineNotDefault", false);
         addTwoProfileEntries(exportedProfile);
         // profile do not exists
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("MineNotDefault");
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("MineDefault");
 
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile, new ExportedProfile("MineDefault", true)),
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(exportedProfile, new ProfileNode("MineDefault", true)),
                 ImportPolicy.REPLACE_DUPLICATES, -1);
 
         assertThat(importProfiles.get(0)).isEqualTo(importStatusWith("MineNotDefault", Status.ADDED));
@@ -206,7 +206,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_skip_profile_when_strategy_tells_it() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", false);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", false);
         addTwoProfileEntries(exportedProfile);
         // profile exists
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
@@ -220,7 +220,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_import_nothing_when_profile_name_is_empty() throws Exception {
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(new ExportedProfile("", false)),
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(new ProfileNode("", false)),
                 ImportPolicy.UPDATE_DEFAULTS, -1);
 
         // then
@@ -230,7 +230,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_import_nothing_when_profile_name_is_null() throws Exception {
         // when
-        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(new ExportedProfile(null, false)),
+        final List<ImportStatus> importProfiles = profilesImporter.importProfiles(exportedProfiles(new ProfileNode(null, false)),
                 ImportPolicy.UPDATE_DEFAULTS, -1);
 
         // then
@@ -240,7 +240,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfiles_with_skip_strategy_return_skip_status() throws Exception {
         // given
-        final ExportedProfile exportedProfile = new ExportedProfile("Mine", true);
+        final ProfileNode exportedProfile = new ProfileNode("Mine", true);
 
         addTwoProfileEntries(exportedProfile);
         doReturn(mock(SProfile.class)).when(profileService).getProfileByName(exportedProfile.getName());
@@ -259,21 +259,21 @@ public class ProfilesImporterTest {
         return expected;
     }
 
-    private ExportedParentProfileEntry createParent(final String name, final String pageName, final boolean custom) {
-        final ExportedParentProfileEntry parentProfileEntry = new ExportedParentProfileEntry(name);
+    private ParentProfileEntryNode createParent(final String name, final String pageName, final boolean custom) {
+        final ParentProfileEntryNode parentProfileEntry = new ParentProfileEntryNode(name);
         parentProfileEntry.setPage(pageName);
         parentProfileEntry.setCustom(custom);
         return parentProfileEntry;
     }
 
-    private ExportedParentProfileEntry createParent(final String name, final ExportedProfileEntry... children) {
-        final ExportedParentProfileEntry parentProfileEntry = new ExportedParentProfileEntry(name);
+    private ParentProfileEntryNode createParent(final String name, final ProfileEntryNode... children) {
+        final ParentProfileEntryNode parentProfileEntry = new ParentProfileEntryNode(name);
         parentProfileEntry.setChildProfileEntries(Arrays.asList(children));
         return parentProfileEntry;
     }
 
-    private ExportedProfileEntry createChild(final String name, final String pageName, final boolean custom) {
-        final ExportedProfileEntry parentProfileEntry = new ExportedProfileEntry(name);
+    private ProfileEntryNode createChild(final String name, final String pageName, final boolean custom) {
+        final ProfileEntryNode parentProfileEntry = new ProfileEntryNode(name);
         parentProfileEntry.setPage(pageName);
         parentProfileEntry.setCustom(custom);
         return parentProfileEntry;
@@ -282,7 +282,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_error_if_user_do_not_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
         exportedProfileMapping.setUsers(Collections.singletonList("john"));
         doThrow(new SUserNotFoundException("john")).when(identityService).getUserByUserName("john");
         // when
@@ -295,7 +295,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_no_error_if_user_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
         exportedProfileMapping.setUsers(Collections.singletonList("john"));
         final SUser user = mock(SUser.class);
         when(user.getId()).thenReturn(456L);
@@ -313,7 +313,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_error_if_role_do_not_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
         exportedProfileMapping.setRoles(Collections.singletonList("role"));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         // when
@@ -326,7 +326,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_no_error_if_role_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
         exportedProfileMapping.setRoles(Collections.singletonList("role"));
         final SRole role = mock(SRole.class);
         when(role.getId()).thenReturn(456L);
@@ -345,7 +345,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_error_if_group_do_not_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
         exportedProfileMapping.setGroups(Collections.singletonList("group"));
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
@@ -358,7 +358,7 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_no_error_if_group_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
         exportedProfileMapping.setGroups(Collections.singletonList("group"));
         final SGroup group = mock(SGroup.class);
         when(group.getId()).thenReturn(456L);
@@ -378,8 +378,8 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_error_if_group_membership_do_not_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
+        exportedProfileMapping.setMemberships(Collections.singletonList(new MembershipNode("group", "role")));
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
         final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
@@ -392,8 +392,8 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_error_if_role_membership_do_not_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
+        exportedProfileMapping.setMemberships(Collections.singletonList(new MembershipNode("group", "role")));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         // when
         final List<ImportError> importProfileMapping = profilesImporter.importProfileMapping(profileService, identityService, 123, exportedProfileMapping);
@@ -406,8 +406,8 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_error_if_role_and_group_membership_do_not_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
+        exportedProfileMapping.setMemberships(Collections.singletonList(new MembershipNode("group", "role")));
         doThrow(new SRoleNotFoundException("role")).when(identityService).getRoleByName("role");
         doThrow(new SGroupNotFoundException("group")).when(identityService).getGroupByPath("group");
         // when
@@ -422,8 +422,8 @@ public class ProfilesImporterTest {
     @Test
     public void should_importProfileMapping_return_no_error_if_membershi_exists() throws Exception {
         // given
-        final ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setMemberships(Collections.singletonList(new ExportedMembership("group", "role")));
+        final ProfileMappingNode exportedProfileMapping = new ProfileMappingNode();
+        exportedProfileMapping.setMemberships(Collections.singletonList(new MembershipNode("group", "role")));
         final SRole role = mock(SRole.class);
         when(role.getId()).thenReturn(456L);
         when(role.getName()).thenReturn("role");

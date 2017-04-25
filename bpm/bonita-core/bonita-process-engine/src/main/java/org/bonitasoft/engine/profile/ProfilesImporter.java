@@ -45,12 +45,12 @@ import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreatio
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
-import org.bonitasoft.engine.profile.impl.ExportedMembership;
-import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.MembershipNode;
+import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileMappingNode;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
@@ -88,26 +88,26 @@ public class ProfilesImporter {
         }
     }
 
-    public List<ImportStatus> importProfiles(ExportedProfiles exportedProfiles, ImportPolicy policy, final long importerId) throws ExecutionException {
+    public List<ImportStatus> importProfiles(ProfilesNode profiles, ImportPolicy policy, final long importerId) throws ExecutionException {
         ProfileImportStrategy importStrategy = getStrategy(profileService, policy);
         importStrategy.beforeImport();
         try {
-            final List<ImportStatus> importStatus = new ArrayList<>(exportedProfiles.getExportedProfiles().size());
-            for (final ExportedProfile exportedProfile : exportedProfiles.getExportedProfiles()) {
-                if (exportedProfile.getName() == null || exportedProfile.getName().isEmpty()) {
+            final List<ImportStatus> importStatus = new ArrayList<>(profiles.getProfiles().size());
+            for (final ProfileNode profile : profiles.getProfiles()) {
+                if (profile.getName() == null || profile.getName().isEmpty()) {
                     continue;
                 }
-                final ImportStatus currentStatus = new ImportStatus(exportedProfile.getName());
+                final ImportStatus currentStatus = new ImportStatus(profile.getName());
                 importStatus.add(currentStatus);
                 SProfile existingProfile = null;
 
                 try {
-                    existingProfile = profileService.getProfileByName(exportedProfile.getName());
+                    existingProfile = profileService.getProfileByName(profile.getName());
                     currentStatus.setStatus(Status.REPLACED);
                 } catch (final SProfileNotFoundException e1) {
                     // profile does not exists
                 }
-                final SProfile newProfile = importTheProfile(importerId, exportedProfile, existingProfile, importStrategy);
+                final SProfile newProfile = importTheProfile(importerId, profile, existingProfile, importStrategy);
                 if (newProfile == null) {
                     // in case of skip
                     currentStatus.setStatus(Status.SKIPPED);
@@ -119,18 +119,18 @@ public class ProfilesImporter {
                 /*
                  * Import mapping with pages
                  */
-                if (existingProfile == null || importStrategy.shouldUpdateProfileEntries(exportedProfile, existingProfile)) {
+                if (existingProfile == null || importStrategy.shouldUpdateProfileEntries(profile, existingProfile)) {
                     // update entries only if it's a custom profile
                     if (existingProfile != null) {
                         profileService.deleteAllProfileEntriesOfProfile(existingProfile);
                     }
-                    currentStatus.getErrors().addAll(importProfileEntries(profileService, exportedProfile.getParentProfileEntries(), profileId));
+                    currentStatus.getErrors().addAll(importProfileEntries(profileService, profile.getParentProfileEntries(), profileId));
                 }
 
                 /*
                  * Import mapping with organization
                  */
-                ExportedProfileMapping profileMapping = exportedProfile.getProfileMapping();
+                ProfileMappingNode profileMapping = profile.getProfileMapping();
                 if (profileMapping != null) {
                     currentStatus.getErrors().addAll(importProfileMapping(profileService, identityService, profileId, profileMapping));
                 }
@@ -142,20 +142,20 @@ public class ProfilesImporter {
         }
     }
 
-    protected List<ImportError> importProfileEntries(final ProfileService profileService, final List<ExportedParentProfileEntry> parentProfileEntries,
+    protected List<ImportError> importProfileEntries(final ProfileService profileService, final List<ParentProfileEntryNode> parentProfileEntries,
             final long profileId)
             throws SProfileEntryCreationException {
         final ArrayList<ImportError> errors = new ArrayList<>();
-        for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
+        for (final ParentProfileEntryNode parentProfileEntry : parentProfileEntries) {
             if (parentProfileEntry.hasErrors()) {
                 errors.addAll(parentProfileEntry.getErrors());
                 continue;
             }
             final SProfileEntry parentEntry = profileService.createProfileEntry(createProfileEntry(parentProfileEntry, profileId, 0));
             final long parentProfileEntryId = parentEntry.getId();
-            final List<ExportedProfileEntry> childrenProfileEntry = parentProfileEntry.getChildProfileEntries();
+            final List<ProfileEntryNode> childrenProfileEntry = parentProfileEntry.getChildProfileEntries();
             if (childrenProfileEntry != null && childrenProfileEntry.size() > 0) {
-                for (final ExportedProfileEntry childProfileEntry : childrenProfileEntry) {
+                for (final ProfileEntryNode childProfileEntry : childrenProfileEntry) {
                     if (childProfileEntry.hasError()) {
                         errors.add(childProfileEntry.getError());
                         continue;
@@ -167,12 +167,11 @@ public class ProfilesImporter {
         return errors;
     }
 
-    List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService,
-            final long profileId,
-            final ExportedProfileMapping exportedProfileMapping) throws SProfileMemberCreationException {
+    List<ImportError> importProfileMapping(final ProfileService profileService, final IdentityService identityService, final long profileId,
+            final ProfileMappingNode profileMapping) throws SProfileMemberCreationException {
         final ArrayList<ImportError> errors = new ArrayList<>();
 
-        for (final String userName : exportedProfileMapping.getUsers()) {
+        for (final String userName : profileMapping.getUsers()) {
             SUser user = null;
             try {
                 user = identityService.getUserByUserName(userName);
@@ -182,7 +181,7 @@ public class ProfilesImporter {
             }
             profileService.addUserToProfile(profileId, user.getId(), user.getFirstName(), user.getLastName(), user.getUserName());
         }
-        for (final String groupPath : exportedProfileMapping.getGroups()) {
+        for (final String groupPath : profileMapping.getGroups()) {
             SGroup group = null;
             try {
                 group = identityService.getGroupByPath(groupPath);
@@ -192,7 +191,7 @@ public class ProfilesImporter {
             }
             profileService.addGroupToProfile(profileId, group.getId(), group.getName(), group.getParentPath());
         }
-        for (final String roleName : exportedProfileMapping.getRoles()) {
+        for (final String roleName : profileMapping.getRoles()) {
             SRole role = null;
             try {
                 role = identityService.getRoleByName(roleName);
@@ -203,7 +202,7 @@ public class ProfilesImporter {
             profileService.addRoleToProfile(profileId, role.getId(), role.getName());
         }
 
-        for (final ExportedMembership membership : exportedProfileMapping.getMemberships()) {
+        for (final MembershipNode membership : profileMapping.getMemberships()) {
             SGroup group = null;
             try {
                 group = identityService.getGroupByPath(membership.getGroup());
@@ -224,37 +223,33 @@ public class ProfilesImporter {
         return errors;
     }
 
-    protected SProfile importTheProfile(final long importerId,
-            final ExportedProfile exportedProfile,
-            final SProfile existingProfile, ProfileImportStrategy importStrategy)
-            throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException,
-            SProfileUpdateException,
-            SProfileCreationException {
+    protected SProfile importTheProfile(final long importerId, final ProfileNode profile, final SProfile existingProfile, ProfileImportStrategy importStrategy)
+            throws ExecutionException, SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException, SProfileCreationException {
         final SProfile newProfile;
         if (existingProfile != null) {
-            newProfile = importStrategy.whenProfileExists(importerId, exportedProfile, existingProfile);
-        } else if (importStrategy.canCreateProfileIfNotExists(exportedProfile)) {
-            newProfile = profileService.createProfile(createSProfile(exportedProfile, importerId));
+            newProfile = importStrategy.whenProfileExists(importerId, profile, existingProfile);
+        } else if (importStrategy.canCreateProfileIfNotExists(profile)) {
+            newProfile = profileService.createProfile(createSProfile(profile, importerId));
         } else {
             newProfile = null;
         }
         return newProfile;
     }
 
-    SProfile createSProfile(final ExportedProfile exportedProfile, final long importerId) {
-        final boolean isDefault = exportedProfile.isDefault();
+    SProfile createSProfile(final ProfileNode profileNode, final long importerId) {
+        final boolean isDefault = profileNode.isDefault();
         final long creationDate = System.currentTimeMillis();
-        return BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(exportedProfile.getName(),
-                isDefault, creationDate, importerId, creationDate, importerId).setDescription(exportedProfile.getDescription()).done();
+        return BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(profileNode.getName(),
+                isDefault, creationDate, importerId, creationDate, importerId).setDescription(profileNode.getDescription()).done();
     }
 
-    protected SProfileEntry createProfileEntry(final ExportedParentProfileEntry parentEntry, final long profileId, final long parentId) {
+    protected SProfileEntry createProfileEntry(final ParentProfileEntryNode parentEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentEntry.getName(), profileId)
                 .setDescription(parentEntry.getDescription()).setIndex(parentEntry.getIndex()).setPage(parentEntry.getPage())
                 .setParentId(parentId).setType(parentEntry.getType()).setCustom(parentEntry.isCustom()).done();
     }
 
-    protected SProfileEntry createProfileEntry(final ExportedProfileEntry childEntry, final long profileId, final long parentId) {
+    protected SProfileEntry createProfileEntry(final ProfileEntryNode childEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childEntry.getName(), profileId)
                 .setDescription(childEntry.getDescription()).setIndex(childEntry.getIndex()).setPage(childEntry.getPage())
                 .setParentId(parentId).setType(childEntry.getType()).setCustom(childEntry.isCustom()).done();
@@ -270,7 +265,7 @@ public class ProfilesImporter {
         return warns;
     }
 
-    public ExportedProfiles convertFromXml(final String xmlContent) throws IOException {
+    public ProfilesNode convertFromXml(final String xmlContent) throws IOException {
         try {
             return profilesParser.convert(xmlContent);
         } catch (JAXBException e) {

@@ -23,9 +23,9 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
 import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
@@ -58,9 +58,9 @@ public class ProfilesExporterTest {
         SProfileImpl profile2 = new SProfileImpl();
         profile2.setName("MyProfile2");
         //when
-        ExportedProfiles exportedProfiles = profilesExporter.toExportedProfiles(Arrays.asList((SProfile) profile1, profile2));
+        ProfilesNode exportedProfiles = profilesExporter.toProfiles(Arrays.asList((SProfile) profile1, profile2));
         //then
-        assertThat(exportedProfiles.getExportedProfiles()).containsOnly(new ExportedProfile("MyProfile1", false), new ExportedProfile("MyProfile2", false));
+        assertThat(exportedProfiles.getProfiles()).containsOnly(new ProfileNode("MyProfile1", false), new ProfileNode("MyProfile2", false));
     }
 
     @Test
@@ -76,11 +76,11 @@ public class ProfilesExporterTest {
         doReturn(Arrays.asList(sProfileEntry1, sProfileEntry2)).doReturn(Collections.emptyList()).when(profileService)
                 .searchProfileEntries(any(QueryOptions.class));
         //when
-        ExportedProfiles exportedProfiles = profilesExporter.toExportedProfiles(Collections.singletonList((SProfile) profile1));
+        ProfilesNode exportedProfiles = profilesExporter.toProfiles(Collections.singletonList((SProfile) profile1));
         //then
-        ExportedProfile myProfile1 = new ExportedProfile("MyProfile1", false);
-        myProfile1.setParentProfileEntries(Arrays.asList(new ExportedParentProfileEntry("p1"), new ExportedParentProfileEntry("p2")));
-        assertThat(exportedProfiles.getExportedProfiles()).containsOnly(myProfile1);
+        ProfileNode myProfile1 = new ProfileNode("MyProfile1", false);
+        myProfile1.setParentProfileEntries(Arrays.asList(new ParentProfileEntryNode("p1"), new ParentProfileEntryNode("p2")));
+        assertThat(exportedProfiles.getProfiles()).containsOnly(myProfile1);
     }
 
 }

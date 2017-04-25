@@ -16,7 +16,7 @@ package org.bonitasoft.engine.profile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,10 +30,10 @@ public class ProfileImportStrategyTest {
     private ProfileService profileService;
 
     @Mock
-    private ExportedProfile defaultExportedProfile;
+    private ProfileNode defaultExportedProfile;
 
     @Mock
-    private ExportedProfile customExportedProfile;
+    private ProfileNode customExportedProfile;
 
     @Before
     public void before() {

@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.profile.impl.ExportedMembership;
-import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.MembershipNode;
+import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.impl.ProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.junit.Test;
 
 /**
@@ -38,25 +38,25 @@ public class ProfilesParserTest {
         //given
         String allProfilesXml = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream("/AllProfiles.xml")));
         //when
-        ExportedProfiles exportedProfiles = profilesParser.convert(allProfilesXml);
+        ProfilesNode exportedProfiles = profilesParser.convert(allProfilesXml);
 
         //then
-        assertThat(exportedProfiles.getExportedProfiles()).hasSize(4);
-        ExportedProfile adminProfile = exportedProfiles.getExportedProfiles().get(0);
+        assertThat(exportedProfiles.getProfiles()).hasSize(4);
+        ProfileNode adminProfile = exportedProfiles.getProfiles().get(0);
         assertThat(adminProfile.getName()).isEqualTo("Administrator");
         assertThat(adminProfile.isDefault()).isTrue();
         assertThat(adminProfile.getDescription()).isEqualTo("Administrator profile");
         assertThat(adminProfile.getParentProfileEntries()).hasSize(7);
-        ExportedParentProfileEntry organizationFolder = adminProfile.getParentProfileEntries().get(1);
+        ParentProfileEntryNode organizationFolder = adminProfile.getParentProfileEntries().get(1);
         assertThat(organizationFolder.getName()).isEqualTo("Organization");
         assertThat(organizationFolder.isCustom()).isFalse();
         assertThat(organizationFolder.getIndex()).isEqualTo(2);
         assertThat(organizationFolder.getDescription()).isEqualTo("Organization");
         assertThat(organizationFolder.getType()).isEqualTo("folder");
         assertThat(organizationFolder.getPage()).isEqualTo("1");
-        List<ExportedProfileEntry> organizationChildren = organizationFolder.getChildProfileEntries();
+        List<ProfileEntryNode> organizationChildren = organizationFolder.getChildProfileEntries();
         assertThat(organizationChildren).hasSize(4);
-        ExportedProfileEntry rolesProfileEntry = organizationChildren.get(2);
+        ProfileEntryNode rolesProfileEntry = organizationChildren.get(2);
         assertThat(rolesProfileEntry.getName()).isEqualTo("Roles");
         assertThat(rolesProfileEntry.isCustom()).isFalse();
         assertThat(rolesProfileEntry.getIndex()).isEqualTo(4);
@@ -65,8 +65,8 @@ public class ProfilesParserTest {
         assertThat(adminProfile.getProfileMapping().getUsers()).containsOnly("userName1");
         assertThat(adminProfile.getProfileMapping().getRoles()).containsOnly("role1", "role2");
         assertThat(adminProfile.getProfileMapping().getGroups()).isEmpty();
-        assertThat(adminProfile.getProfileMapping().getMemberships()).containsOnly(new ExportedMembership("/group1", "role2"),
-                new ExportedMembership("/group2", "role2"));
+        assertThat(adminProfile.getProfileMapping().getMemberships()).containsOnly(new MembershipNode("/group1", "role2"),
+                new MembershipNode("/group2", "role2"));
     }
 
     @Test
@@ -87,12 +87,12 @@ public class ProfilesParserTest {
                 + "</profiles:profiles>";
 
         //when
-        ExportedProfiles exportedProfiles = profilesParser.convert(xmlAsText);
+        ProfilesNode exportedProfiles = profilesParser.convert(xmlAsText);
         //then
-        ExportedParentProfileEntry menu3 = new ExportedParentProfileEntry("menu3");
+        ParentProfileEntryNode menu3 = new ParentProfileEntryNode("menu3");
         menu3.setCustom(true);
         menu3.setType("folder");
-        assertThat(exportedProfiles.getExportedProfiles().get(0).getParentProfileEntries().get(0)).isEqualTo(menu3);
+        assertThat(exportedProfiles.getProfiles().get(0).getParentProfileEntries().get(0)).isEqualTo(menu3);
     }
 
 }

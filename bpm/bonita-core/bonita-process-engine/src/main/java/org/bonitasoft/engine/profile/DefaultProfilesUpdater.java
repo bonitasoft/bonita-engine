@@ -23,7 +23,7 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
@@ -60,7 +60,7 @@ public class DefaultProfilesUpdater {
                 // Default profiles do not exist or are different
                 tenantServiceAccessor.getTechnicalLoggerService().log(DefaultProfilesUpdater.class, TechnicalLogSeverity.INFO,
                         "Default profiles not up to date, updating them...");
-                final ExportedProfiles defaultProfiles = getProfilesFromXML(defaultProfilesXml);
+                final ProfilesNode defaultProfiles = getProfilesFromXML(defaultProfilesXml);
                 doUpdateProfiles(defaultProfiles, md5File, defaultProfilesXml);
                 return true;
             } else {
@@ -80,7 +80,7 @@ public class DefaultProfilesUpdater {
         return false;
     }
 
-    Object doUpdateProfiles(final ExportedProfiles defaultProfiles, final File md5File, final String defaultProfilesXml)
+    Object doUpdateProfiles(final ProfilesNode defaultProfiles, final File md5File, final String defaultProfilesXml)
             throws NoSuchAlgorithmException, IOException {
         try {
             final ProfilesImporter profilesImporter = tenantServiceAccessor.getProfilesImporter();
@@ -121,7 +121,7 @@ public class DefaultProfilesUpdater {
         return IOUtil.readResource(DEFAULT_PROFILES_FILE);
     }
 
-    ExportedProfiles getProfilesFromXML(final String defaultProfilesXml) throws IOException {
+    ProfilesNode getProfilesFromXML(final String defaultProfilesXml) throws IOException {
         return tenantServiceAccessor.getProfilesImporter().convertFromXml(defaultProfilesXml);
     }
 }

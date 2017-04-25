@@ -27,20 +27,20 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "profiles")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExportedProfiles {
+public class ProfilesNode {
 
     @XmlElement(name = "profile")
-    private final List<ExportedProfile> exportedProfiles;
+    private final List<ProfileNode> profiles;
 
-    public ExportedProfiles(List<ExportedProfile> exportedProfiles) {
-        this.exportedProfiles = exportedProfiles;
+    public ProfilesNode(List<ProfileNode> profiles) {
+        this.profiles = profiles;
     }
 
-    public ExportedProfiles() {
-        exportedProfiles = new ArrayList<>();
+    public ProfilesNode() {
+        profiles = new ArrayList<>();
     }
 
-    public List<ExportedProfile> getExportedProfiles() {
-        return exportedProfiles;
+    public List<ProfileNode> getProfiles() {
+        return profiles;
     }
 }
