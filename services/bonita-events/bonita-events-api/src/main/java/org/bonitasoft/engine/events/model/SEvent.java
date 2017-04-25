@@ -13,28 +13,69 @@
  **/
 package org.bonitasoft.engine.events.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
- * @author Christophe Havard
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
-public interface SEvent {
+public class SEvent {
 
-    String UPDATED = "_UPDATED";
+    public static final String UPDATED = "_UPDATED";
+    public static final String CREATED = "_CREATED";
+    public static final String DELETED = "_DELETED";
+    private final String type;
+    private Object object;
 
-    String CREATED = "_CREATED";
+    public SEvent(String type) {
+        this.type = type;
+    }
 
-    String DELETED = "_DELETED";
-
-    String getType();
+    public String getType() {
+        return type;
+    }
 
     /**
      * Retrieve the object which the event occurred on
      */
-    Object getObject();
+    public Object getObject() {
+        return object;
+    }
 
     /**
      * Set the object passed inside the fired Event
      */
-    void setObject(Object ob);
+    public void setObject(Object object) {
+        this.object = object;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        SEvent sEvent = (SEvent) o;
+        return new EqualsBuilder()
+                .append(type, sEvent.type)
+                .append(object, sEvent.object)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(type)
+                .append(object)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("type", type)
+                .append("object", object)
+                .toString();
+    }
 }

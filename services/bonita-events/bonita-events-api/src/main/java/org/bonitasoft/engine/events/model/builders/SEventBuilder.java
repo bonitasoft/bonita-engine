@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2017 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,10 +18,22 @@ import org.bonitasoft.engine.events.model.SEvent;
 /**
  * @author Christophe Havard
  */
-public interface SEventBuilder {
+public class SEventBuilder {
 
-    SEventBuilder setObject(Object ob);
+    private final SEvent event;
 
-    SEvent done();
+    public SEventBuilder(final SEvent event) {
+        super();
+        this.event = event;
+    }
+
+    public SEvent done() {
+        return this.event;
+    }
+
+    public SEventBuilder setObject(final Object ob) {
+        this.event.setObject(ob);
+        return this;
+    }
 
 }

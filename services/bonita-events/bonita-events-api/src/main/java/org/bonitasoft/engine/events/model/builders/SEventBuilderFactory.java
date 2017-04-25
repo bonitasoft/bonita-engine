@@ -13,18 +13,35 @@
  **/
 package org.bonitasoft.engine.events.model.builders;
 
+import org.bonitasoft.engine.events.model.SDeleteEvent;
+import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 
 /**
+ * @author Baptiste Mesta
  * @author Christophe Havard
  */
-public interface SEventBuilderFactory {
+public class SEventBuilderFactory {
 
-    SEventBuilder createNewInstance(String type);
+    public SEventBuilder createNewInstance(final String type) {
+        final SEvent event = new SEvent(type);
+        return new SEventBuilder(event);
+    }
 
-    SEventBuilder createInsertEvent(String type);
+    public SEventBuilder createInsertEvent(final String type) {
+        final SEvent event = new SInsertEvent(type + SEvent.CREATED);
+        return new SEventBuilder(event);
+    }
 
-    SEventBuilder createDeleteEvent(String type);
+    public SEventBuilder createDeleteEvent(final String type) {
+        final SEvent event = new SDeleteEvent(type + SEvent.DELETED);
+        return new SEventBuilder(event);
+    }
 
-    SEventBuilder createUpdateEvent(String type);
+    public SEventBuilder createUpdateEvent(final String type) {
+        final SEvent event = new SUpdateEvent(type + SEvent.UPDATED);
+        return new SEventBuilder(event);
+    }
 
 }
