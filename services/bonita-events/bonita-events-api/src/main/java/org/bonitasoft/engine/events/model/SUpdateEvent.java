@@ -13,16 +13,21 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-public interface SUpdateEvent extends SEvent {
 
-    /**
-     * Retrieve the old object.
-     */
-    Object getOldObject();
 
-    /**
-     * Set the old object.
-     */
-    void setOldObject(Object oldObject);
+public class SUpdateEvent extends SEvent {
 
+    private Object oldObject;
+
+    public SUpdateEvent(String type) {
+        super(type);
+    }
+
+    public Object getOldObject() {
+        return oldObject;
+    }
+
+    public void setOldObject(Object oldObject) {
+        this.oldObject = oldObject;
+    }
 }

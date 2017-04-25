@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-public interface SInsertEvent extends SEvent {
 
+public class SInsertEvent extends SEvent {
+
+    public SInsertEvent(String type) {
+        super(type);
+    }
 }

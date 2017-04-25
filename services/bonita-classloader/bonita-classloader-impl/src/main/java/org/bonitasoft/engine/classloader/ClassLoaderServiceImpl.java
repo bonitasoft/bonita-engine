@@ -26,7 +26,6 @@ import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.impl.SEventImpl;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -195,7 +194,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         try {
             refreshClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id),
                     getParentClassLoader(key));
-            final SEvent event = new SEventImpl("ClassLoaderRefreshed");
+            final SEvent event = new SEvent("ClassLoaderRefreshed");
             event.setObject(key);
             eventService.fireEvent(event);
         } catch (Exception e) {

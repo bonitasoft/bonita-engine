@@ -23,9 +23,6 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.impl.SDeleteEventImpl;
-import org.bonitasoft.engine.events.model.impl.SInsertEventImpl;
-import org.bonitasoft.engine.events.model.impl.SUpdateEventImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -90,17 +87,17 @@ public class RecorderImplTest {
     }
 
     private SInsertEvent insertEvent(PersistentObject entity, String eventName) {
-        SInsertEventImpl event = new SInsertEventImpl(eventName);
+        SInsertEvent event = new SInsertEvent(eventName);
         event.setObject(entity);
         return event;
     }
     private SUpdateEvent updateEvent(PersistentObject entity, String eventName) {
-        SUpdateEventImpl event = new SUpdateEventImpl(eventName);
+        SUpdateEvent event = new SUpdateEvent(eventName);
         event.setObject(entity);
         return event;
     }
     private SDeleteEvent deleteEvent(PersistentObject entity, String eventName) {
-        SDeleteEventImpl event = new SDeleteEventImpl(eventName);
+        SDeleteEvent event = new SDeleteEvent(eventName);
         event.setObject(entity);
         return event;
     }
