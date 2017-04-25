@@ -15,38 +15,21 @@ package org.bonitasoft.engine.events;
 
 import org.bonitasoft.engine.events.model.SEvent;
 
-public class TestEvent implements SEvent {
+class TestEvent extends SEvent {
 
     private boolean flagged = false;
-    private final String type;
 
-    public TestEvent(final String type) {
-        this.type = type;
+    TestEvent(String type) {
+        super(type);
     }
 
-    public void flag() {
+
+    void flag() {
         this.flagged = true;
     }
 
-    public boolean isFlagged() {
+    boolean isFlagged() {
         return flagged;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public Object getObject() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setObject(final Object ob) {
-        // TODO Auto-generated method stub
-
     }
 
 }

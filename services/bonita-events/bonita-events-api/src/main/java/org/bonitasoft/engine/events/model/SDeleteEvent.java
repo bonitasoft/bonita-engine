@@ -13,16 +13,13 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-public interface SDeleteEvent extends SEvent {
 
-    /**
-     * Retrieve the old object.
-     */
-    Object getOldObject();
+/**
+ * represent the deletion of an persisted element
+ */
+public class SDeleteEvent extends SEvent {
 
-    /**
-     * Set the old object.
-     */
-    void setOldObject(Object oldObject);
-
+    public SDeleteEvent(String type) {
+        super(type);
+    }
 }
