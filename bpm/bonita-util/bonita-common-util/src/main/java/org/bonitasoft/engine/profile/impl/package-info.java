@@ -11,13 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
-/**
- * <p>
- * Contains Actor mapping model classes.
- * </p>
- */
-//
 @XmlSchema(namespace = "http://www.bonitasoft.org/ns/profile/6.1", elementFormDefault = XmlNsForm.UNSET, xmlns = {
         @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://www.bonitasoft.org/ns/profile/6.1", prefix = "profiles") })
 package org.bonitasoft.engine.profile.impl;

@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {})
-public class ExportedProfileMapping {
+public class ProfileMappingNode {
 
     @XmlElementWrapper(name = "users")
     @XmlElement(name = "user")
@@ -40,12 +40,12 @@ public class ExportedProfileMapping {
     private List<String> groups;
     @XmlElementWrapper(name = "memberships")
     @XmlElement(name = "membership")
-    private List<ExportedMembership> memberships;
+    private List<MembershipNode> memberships;
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
     private List<String> roles;
 
-    public ExportedProfileMapping() {
+    public ProfileMappingNode() {
         users = new ArrayList<>();
         groups = new ArrayList<>();
         roles = new ArrayList<>();
@@ -76,11 +76,11 @@ public class ExportedProfileMapping {
         this.roles = roles;
     }
 
-    public List<ExportedMembership> getMemberships() {
+    public List<MembershipNode> getMemberships() {
         return memberships == null ? Collections.emptyList() : memberships;
     }
 
-    public void setMemberships(final List<ExportedMembership> memberships) {
+    public void setMemberships(final List<MembershipNode> memberships) {
         this.memberships = memberships;
     }
 
@@ -90,7 +90,7 @@ public class ExportedProfileMapping {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ExportedProfileMapping that = (ExportedProfileMapping) o;
+        ProfileMappingNode that = (ProfileMappingNode) o;
         return Objects.equals(users, that.users) &&
                 Objects.equals(groups, that.groups) &&
                 Objects.equals(roles, that.roles) &&
@@ -104,7 +104,7 @@ public class ExportedProfileMapping {
 
     @Override
     public String toString() {
-        return "ExportedProfileMapping{" +
+        return "ProfileMappingNode{" +
                 "users=" + users +
                 ", groups=" + groups +
                 ", roles=" + roles +

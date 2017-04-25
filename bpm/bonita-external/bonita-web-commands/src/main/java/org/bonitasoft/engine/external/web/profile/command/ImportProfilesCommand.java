@@ -24,7 +24,7 @@ import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfilesImporter;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -50,7 +50,7 @@ public class ImportProfilesCommand extends TenantCommand {
             if (xmlContent == null) {
                 throw new SCommandParameterizationException("Parameters map must contain an entry  xmlContent with a byte array value.");
             }
-            final ExportedProfiles profiles = profilesImporter.convertFromXml(new String(xmlContent));
+            final ProfilesNode profiles = profilesImporter.convertFromXml(new String(xmlContent));
             return (Serializable) profilesImporter
                     .toWarnings(profilesImporter.importProfiles(profiles, ImportPolicy.DELETE_EXISTING, SessionInfos.getUserIdFromSession()));
         } catch (ExecutionException | IOException e) {

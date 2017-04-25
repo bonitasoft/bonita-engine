@@ -34,12 +34,12 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
-import org.bonitasoft.engine.profile.impl.ExportedMembership;
-import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
-import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.MembershipNode;
+import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileEntryNode;
+import org.bonitasoft.engine.profile.impl.ProfileMappingNode;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -66,9 +66,9 @@ public class ProfilesExporter {
 
     public String exportAllProfiles() throws ExecutionException {
         try {
-            ArrayList<SProfile> profiles = getAllProfiles();
-            ExportedProfiles exportedProfiles = toExportedProfiles(profiles);
-            return profilesParser.convert(exportedProfiles);
+            ArrayList<SProfile> sProfiles = getAllProfiles();
+            ProfilesNode profiles = toProfiles(sProfiles);
+            return profilesParser.convert(profiles);
         } catch (SBonitaException | JAXBException e) {
             throw new ExecutionException(e);
         }
@@ -90,69 +90,67 @@ public class ProfilesExporter {
 
     public String exportProfiles(List<Long> longs) throws ExecutionException {
         try {
-            List<SProfile> profiles = profileService.getProfiles(longs);
-            ExportedProfiles exportedProfiles = toExportedProfiles(profiles);
-            return profilesParser.convert(exportedProfiles);
+            List<SProfile> sProfile = profileService.getProfiles(longs);
+            ProfilesNode profiles = toProfiles(sProfile);
+            return profilesParser.convert(profiles);
         } catch (SBonitaException | JAXBException e) {
             throw new ExecutionException(e);
         }
     }
 
-    ExportedProfiles toExportedProfiles(List<SProfile> profiles)
-            throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
-        ArrayList<ExportedProfile> exportedProfiles = new ArrayList<>();
-        for (SProfile profile : profiles) {
-            exportedProfiles.add(toExportedProfile(profile));
+    ProfilesNode toProfiles(List<SProfile> sProfile) throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
+        ArrayList<ProfileNode> profiles = new ArrayList<>();
+        for (SProfile profile : sProfile) {
+            profiles.add(toProfile(profile));
         }
-        return new ExportedProfiles(exportedProfiles);
+        return new ProfilesNode(profiles);
     }
 
-    private ExportedProfile toExportedProfile(SProfile profile)
-            throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
-        ExportedProfile exportedProfile = new ExportedProfile(profile.getName(), profile.isDefault());
-        exportedProfile.setDescription(profile.getDescription());
-        exportedProfile.setParentProfileEntries(getExportedProfilesEntries(profile));
-        exportedProfile.setProfileMapping(getExportedProfileMapping(profile));
-        return exportedProfile;
+    private ProfileNode toProfile(SProfile sProfile) throws SBonitaReadException, SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
+        ProfileNode profile = new ProfileNode(sProfile.getName(), sProfile.isDefault());
+        profile.setDescription(sProfile.getDescription());
+        profile.setParentProfileEntries(getProfilesEntries(sProfile));
+        profile.setProfileMapping(getProfileMapping(sProfile));
+        return profile;
     }
 
-    private List<ExportedParentProfileEntry> getExportedProfilesEntries(SProfile profile) throws SBonitaReadException {
-        ArrayList<ExportedParentProfileEntry> exportedParentProfileEntries = new ArrayList<>();
+    private List<ParentProfileEntryNode> getProfilesEntries(SProfile profile) throws SBonitaReadException {
+        ArrayList<ParentProfileEntryNode> parentProfileEntries = new ArrayList<>();
         List<SProfileEntry> sProfileEntries = searchProfileEntries(profile.getId(), 0);
         for (SProfileEntry sProfileEntry : sProfileEntries) {
-            exportedParentProfileEntries.add(toExportedParentProfileEntry(sProfileEntry));
+            parentProfileEntries.add(toParentProfileEntry(sProfileEntry));
         }
-        return exportedParentProfileEntries;
+        return parentProfileEntries;
     }
 
-    private ExportedParentProfileEntry toExportedParentProfileEntry(SProfileEntry sProfileEntry) throws SBonitaReadException {
-        ExportedParentProfileEntry exportedParentProfileEntry = new ExportedParentProfileEntry(sProfileEntry.getName());
-        exportedParentProfileEntry.setCustom(sProfileEntry.isCustom());
-        exportedParentProfileEntry.setIndex(sProfileEntry.getIndex());
-        exportedParentProfileEntry.setDescription(sProfileEntry.getDescription());
-        exportedParentProfileEntry.setType(sProfileEntry.getType());
-        exportedParentProfileEntry.setPage(sProfileEntry.getPage());
-        exportedParentProfileEntry.setChildProfileEntries(getExportedChildrenProfilesEntries(sProfileEntry));
-        return exportedParentProfileEntry;
+    private ParentProfileEntryNode toParentProfileEntry(SProfileEntry sProfileEntry) throws SBonitaReadException {
+        ParentProfileEntryNode parentProfileEntry = new ParentProfileEntryNode(sProfileEntry.getName());
+        parentProfileEntry.setCustom(sProfileEntry.isCustom());
+        parentProfileEntry.setIndex(sProfileEntry.getIndex());
+        parentProfileEntry.setDescription(sProfileEntry.getDescription());
+        parentProfileEntry.setType(sProfileEntry.getType());
+        parentProfileEntry.setPage(sProfileEntry.getPage());
+        parentProfileEntry.setChildProfileEntries(getChildrenProfilesEntries(sProfileEntry));
+        return parentProfileEntry;
     }
 
-    private List<ExportedProfileEntry> getExportedChildrenProfilesEntries(SProfileEntry sProfileEntry) throws SBonitaReadException {
-        ArrayList<ExportedProfileEntry> exportedProfileEntries = new ArrayList<>();
+    private List<ProfileEntryNode> getChildrenProfilesEntries(SProfileEntry sProfileEntry) throws SBonitaReadException {
+        ArrayList<ProfileEntryNode> profileEntries = new ArrayList<>();
         List<SProfileEntry> sProfileEntries = searchProfileEntries(sProfileEntry.getProfileId(), sProfileEntry.getId());
         for (SProfileEntry profileEntry : sProfileEntries) {
-            exportedProfileEntries.add(toExportedProfileEntry(profileEntry, sProfileEntry.getName()));
+            profileEntries.add(toProfileEntry(profileEntry, sProfileEntry.getName()));
         }
-        return exportedProfileEntries;
+        return profileEntries;
     }
 
-    private ExportedProfileEntry toExportedProfileEntry(SProfileEntry profileEntry, String parentName) {
-        ExportedProfileEntry exportedProfileEntry = new ExportedProfileEntry(profileEntry.getName());
-        exportedProfileEntry.setCustom(profileEntry.isCustom());
-        exportedProfileEntry.setIndex(profileEntry.getIndex());
-        exportedProfileEntry.setDescription(profileEntry.getDescription());
-        exportedProfileEntry.setType(profileEntry.getType());
-        exportedProfileEntry.setPage(profileEntry.getPage());
-        return exportedProfileEntry;
+    private ProfileEntryNode toProfileEntry(SProfileEntry sProfileEntry, String parentName) {
+        ProfileEntryNode profileEntry = new ProfileEntryNode(sProfileEntry.getName());
+        profileEntry.setCustom(sProfileEntry.isCustom());
+        profileEntry.setIndex(sProfileEntry.getIndex());
+        profileEntry.setDescription(sProfileEntry.getDescription());
+        profileEntry.setType(sProfileEntry.getType());
+        profileEntry.setPage(sProfileEntry.getPage());
+        return profileEntry;
     }
 
     protected List<SProfileEntry> searchProfileEntries(final long profileId, final long parentId) throws SBonitaReadException {
@@ -165,14 +163,14 @@ public class ProfilesExporter {
         return profileService.searchProfileEntries(queryOptions);
     }
 
-    private ExportedProfileMapping getExportedProfileMapping(SProfile profile)
+    private ProfileMappingNode getProfileMapping(SProfile sProfile)
             throws SUserNotFoundException, SBonitaReadException, SGroupNotFoundException, SRoleNotFoundException {
-        ExportedProfileMapping exportedProfileMapping = new ExportedProfileMapping();
-        exportedProfileMapping.setUsers(getUsers(profile));
-        exportedProfileMapping.setGroups(getGroups(profile));
-        exportedProfileMapping.setRoles(getRoles(profile));
-        exportedProfileMapping.setMemberships(getMemberships(profile));
-        return exportedProfileMapping;
+        ProfileMappingNode profileMapping = new ProfileMappingNode();
+        profileMapping.setUsers(getUsers(sProfile));
+        profileMapping.setGroups(getGroups(sProfile));
+        profileMapping.setRoles(getRoles(sProfile));
+        profileMapping.setMemberships(getMemberships(sProfile));
+        return profileMapping;
     }
 
     private List<String> getUsers(SProfile profile) throws SBonitaReadException, SUserNotFoundException {
@@ -217,14 +215,14 @@ public class ProfilesExporter {
         return roles;
     }
 
-    private List<ExportedMembership> getMemberships(SProfile profile) throws SBonitaReadException, SRoleNotFoundException, SGroupNotFoundException {
-        ArrayList<ExportedMembership> memberships = new ArrayList<>();
+    private List<MembershipNode> getMemberships(SProfile profile) throws SBonitaReadException, SRoleNotFoundException, SGroupNotFoundException {
+        ArrayList<MembershipNode> memberships = new ArrayList<>();
         int pageIndex = 0;
         List<SProfileMember> sProfileMembers;
         do {
             sProfileMembers = searchProfileMembers(pageIndex, profile.getId(), ROLE_AND_GROUP_SUFFIX);
             for (final SProfileMember sProfileMember : sProfileMembers) {
-                memberships.add(new ExportedMembership(identityService.getGroup(sProfileMember.getGroupId()).getPath(),
+                memberships.add(new MembershipNode(identityService.getGroup(sProfileMember.getGroupId()).getPath(),
                         identityService.getRole(sProfileMember.getRoleId()).getName()));
             }
             pageIndex++;

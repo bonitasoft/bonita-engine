@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.profile;
 
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
@@ -31,18 +31,18 @@ public class IgnoreDuplicateImportStrategy extends ProfileImportStrategy {
     }
 
     @Override
-    public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile) {
+    public SProfile whenProfileExists(final long importerId, final ProfileNode profile, final SProfile existingProfile) {
         // will be skipped
         return null;
     }
 
     @Override
-    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
+    public boolean canCreateProfileIfNotExists(final ProfileNode profile) {
         return true;
     }
 
     @Override
-    public boolean shouldUpdateProfileEntries(ExportedProfile exportedProfile, SProfile existingProfile) {
+    public boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile) {
         return false;
     }
 

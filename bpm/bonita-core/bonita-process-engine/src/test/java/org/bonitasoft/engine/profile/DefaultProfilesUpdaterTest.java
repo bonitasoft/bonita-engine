@@ -29,7 +29,7 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.profile.impl.ExportedProfiles;
+import org.bonitasoft.engine.profile.impl.ProfilesNode;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -59,7 +59,7 @@ public class DefaultProfilesUpdaterTest {
     @Mock
     public ProfilesImporter profilesImporter;
     @Mock
-    public ExportedProfiles defaultProfiles;
+    public ProfilesNode defaultProfiles;
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private File md5File;
@@ -75,7 +75,7 @@ public class DefaultProfilesUpdaterTest {
         doReturn(profileService).when(tenantServiceAccessor).getProfileService();
         doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
         doReturn(profilesImporter).when(tenantServiceAccessor).getProfilesImporter();
-        doReturn(null).when(profilesImporter).importProfiles(any(ExportedProfiles.class), any(ImportPolicy.class), anyLong());
+        doReturn(null).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class), anyLong());
     }
 
     @Test
@@ -92,7 +92,7 @@ public class DefaultProfilesUpdaterTest {
     public void execute_should_update_when_shouldUpdateProfiles_returns_true() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
+        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class), anyString());
         // When
         boolean hasUpdated = defaultProfilesUpdater.execute();
         // Then
@@ -103,11 +103,11 @@ public class DefaultProfilesUpdaterTest {
     public void execute_call_doUpdateProfiles() throws Exception {
         // Given
         doReturn(true).when(defaultProfilesUpdater).shouldUpdateProfiles(any(File.class), anyString());
-        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
+        doReturn(null).when(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class), anyString());
         // When
         defaultProfilesUpdater.execute();
         // Then
-        verify(defaultProfilesUpdater).doUpdateProfiles(any(ExportedProfiles.class), any(File.class), anyString());
+        verify(defaultProfilesUpdater).doUpdateProfiles(any(ProfilesNode.class), any(File.class), anyString());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class DefaultProfilesUpdaterTest {
     public void doUpdateProfiles_should_not_write_MD5_if_import_fails() throws IOException, ExecutionException, NoSuchAlgorithmException {
         // Given
         IOUtil.writeFile(md5File, "oldHash");
-        doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(any(ExportedProfiles.class), any(ImportPolicy.class), anyLong());
+        doThrow(new ExecutionException("")).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class), anyLong());
         // When
         defaultProfilesUpdater.doUpdateProfiles(defaultProfiles, md5File, "content of profiles");
         // Then
@@ -135,11 +135,11 @@ public class DefaultProfilesUpdaterTest {
     @Test
     public void doUpdate_call_importer() throws IOException, NoSuchAlgorithmException, ExecutionException {
         // Given
-        ExportedProfiles profilesFromXML = new ExportedProfiles();
+        ProfilesNode profilesFromXML = new ProfilesNode();
         // When
         defaultProfilesUpdater.doUpdateProfiles(profilesFromXML, md5File, "content of profiles");
         // Then
-        verify(profilesImporter).importProfiles(any(ExportedProfiles.class), eq(ImportPolicy.UPDATE_DEFAULTS), eq(-1L));
+        verify(profilesImporter).importProfiles(any(ProfilesNode.class), eq(ImportPolicy.UPDATE_DEFAULTS), eq(-1L));
         assertThat(md5File).hasContent(IOUtil.md5("content of profiles".getBytes()));
     }
 

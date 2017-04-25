@@ -23,7 +23,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
@@ -55,18 +55,18 @@ public class DeleteExistingImportStrategy extends ProfileImportStrategy {
     }
 
     @Override
-    public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile) {
+    public SProfile whenProfileExists(final long importerId, final ProfileNode profile, final SProfile existingProfile) {
         // nothing to do because we deleted all profiles
         return null;
     }
 
     @Override
-    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
+    public boolean canCreateProfileIfNotExists(final ProfileNode profile) {
         return true;
     }
 
     @Override
-    public boolean shouldUpdateProfileEntries(ExportedProfile exportedProfile, SProfile existingProfile) {
+    public boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile) {
         return false;
     }
 
