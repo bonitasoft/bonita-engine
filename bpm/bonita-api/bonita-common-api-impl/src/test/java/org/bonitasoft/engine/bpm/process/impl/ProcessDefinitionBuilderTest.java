@@ -13,12 +13,16 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Rule;
 import org.junit.Test;
@@ -389,7 +393,7 @@ public class ProcessDefinitionBuilderTest {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName2() throws Exception {
+    public void aUserTaskineventSubProcessCannotAssignAndDeleteTheSameBO() throws Exception {
         final Expression expression = new ExpressionBuilder().createConstantDoubleExpression(45d);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -400,19 +404,20 @@ public class ProcessDefinitionBuilderTest {
     }
 
     @Test
-    public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName3() throws Exception {
+    public void processCanDeleteAndInstantiateDifferentBOsInSameTask() throws Exception {
         final Expression expression = new ExpressionBuilder().createConstantDoubleExpression(45d);
 
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Process", "1.0");
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.JAVA_METHOD, null, null, expression);
         builder.done();
     }
 
     @Test
-    public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName43() throws Exception {
+    public void processCannotHaveTwoFlowNodesWithTheSameName() throws Exception {
         final Expression expression = new ExpressionBuilder().createConstantDoubleExpression(45d);
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
@@ -696,4 +701,147 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
+    @Test
+    public void validateOperations_should_detect_delete_and_instantiate_in_same_task() throws InvalidProcessDefinitionException, InvalidExpressionException {
+
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        AutomaticTaskDefinitionBuilder autoTask1 = processDefinitionBuilder.addAutomaticTask("auto1");
+        autoTask1.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+        autoTask1.addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData",
+                new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                        "toto",
+                        "com.company.model.Employee")));
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage(
+                "The business variable myBusinessData on the current element has been deleted by an operation. Other operations performed on this instance through the same element: auto1 are not allowed");
+
+        //when
+        processDefinitionBuilder.done();
+
+    }
+
+    @Test
+    public void validateOperations_should_not_fail_when_delete_and_instantiate_in_different_tasks()
+            throws InvalidExpressionException, InvalidProcessDefinitionException {
+
+        // given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        AutomaticTaskDefinitionBuilder autoTask1 = processDefinitionBuilder.addAutomaticTask("auto1");
+        AutomaticTaskDefinitionBuilder autoTask2 = processDefinitionBuilder.addAutomaticTask("auto2");
+        processDefinitionBuilder.addTransition("auto1", "auto2");
+        autoTask1.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+        autoTask1.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData2"));
+        autoTask1.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData3"));
+        autoTask2.addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData",
+                new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                        "toto",
+                        "com.company.model.Employee")));
+        autoTask2.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData2"));
+        autoTask2.addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData3",
+                new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                        "toto",
+                        "com.company.model.Employee")));
+        autoTask2.addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData4",
+                new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                        "toto;",
+                        "com.company.model.Employee")));
+        // when
+        DesignProcessDefinition processDefinition = processDefinitionBuilder.done();
+
+        // then
+        // no exception thrown
+    }
+
+    @Test
+    public void should_detect_deletion_operations_in_subprocesses_activities() throws InvalidExpressionException, InvalidProcessDefinitionException {
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        SubProcessDefinitionBuilder subProcessDefinitionBuilder = processDefinitionBuilder.addSubProcess("MySubprocess", false).getSubProcessBuilder();
+        subProcessDefinitionBuilder.addAutomaticTask("subProcessAutoTask")
+                .addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData",
+                        new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                                "toto;",
+                                "com.company.model.Employee")))
+                .addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+        //when
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage(
+                "The business variable myBusinessData on the current element has been deleted by an operation. Other operations performed on this instance through the same element: subProcessAutoTask are not allowed");
+        processDefinitionBuilder.done();
+    }
+
+    @Test
+    public void should_detect_deletion_operations_in_catchMessageEventTriggers() throws InvalidExpressionException, InvalidProcessDefinitionException {
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addMessageEventTrigger("newMessage")
+                .addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData",
+                        new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                                "toto;",
+                                "com.company.model.Employee")))
+                .addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage(
+                "The business variable myBusinessData on the current element has been deleted by an operation. Other operations performed on this instance through the same element: intermediateCatchEvent are not allowed");
+        //when
+        processDefinitionBuilder.done();
+    }
+
+    @Test
+    public void should_detect_deletion_operations_in_Connectors() throws InvalidExpressionException, InvalidProcessDefinitionException {
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        ConnectorDefinitionBuilder connectorDefinitionBuilder = processDefinitionBuilder.addConnector("connectorName", "257", "1.0", null);
+        connectorDefinitionBuilder.addOutput(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData",
+                new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                        "tototo",
+                        "com.company.model.Employee")))
+                .addOutput(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage(
+                "The business variable myBusinessData on the current element has been deleted by an operation. Other operations performed on this instance through the same element: connectorName are not allowed");
+        //when
+        processDefinitionBuilder.done();
+    }
+
+    @Test
+    public void should_detect_deletion_operations_in_Connectors_in_Activities() throws InvalidProcessDefinitionException, InvalidExpressionException {
+
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        AutomaticTaskDefinitionBuilder autoTask1 = processDefinitionBuilder.addAutomaticTask("auto1");
+        autoTask1.addConnector("connector", "245", "0.1", ConnectorEvent.ON_ENTER);
+        autoTask1.getActivity().getConnectors().get(0).getOutputs().add(new OperationBuilder().attachBusinessDataSetAttributeOperation("myBusinessData",
+                new ExpressionBuilder().createGroovyScriptExpression("assignNewValue",
+                        "toto",
+                        "com.company.model.Employee")));
+        autoTask1.getActivity().getConnectors().get(0).getOutputs().add(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+
+        //then
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage(
+                "The business variable myBusinessData on the current element has been deleted by an operation. Other operations performed on this instance through the same element: connector are not allowed");
+        //when
+        processDefinitionBuilder.done();
+    }
+
+    @Test
+    public void deleting_twice_the_same_bizData_should_be_allowed() throws InvalidProcessDefinitionException, InvalidExpressionException {
+
+        //given
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("delete Twice", "2.0");
+        AutomaticTaskDefinitionBuilder autoTask = processDefinitionBuilder.addAutomaticTask("auto1");
+        autoTask.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+        autoTask.addOperation(new OperationBuilder().deleteBusinessDataOperation("myBusinessData"));
+
+        //when
+        processDefinitionBuilder.done();
+
+        // then
+        // no exception thrown
+    }
 }
