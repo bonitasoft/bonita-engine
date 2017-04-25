@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.profile.impl;
 
 import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,17 +26,17 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {})
-public class ExportedMembership {
+public class MembershipNode {
 
     @XmlElement
     private String group;
     @XmlElement
     private String role;
 
-    public ExportedMembership() {
+    public MembershipNode() {
     }
 
-    public ExportedMembership(String group, String role) {
+    public MembershipNode(String group, String role) {
         this.group = group;
         this.role = role;
     }
@@ -62,7 +63,7 @@ public class ExportedMembership {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ExportedMembership that = (ExportedMembership) o;
+        MembershipNode that = (MembershipNode) o;
         return Objects.equals(group, that.group) &&
                 Objects.equals(role, that.role);
     }
@@ -74,7 +75,7 @@ public class ExportedMembership {
 
     @Override
     public String toString() {
-        return "ExportedMembership{" +
+        return "MembershipNode{" +
                 "group='" + group + '\'' +
                 ", role='" + role + '\'' +
                 '}';

@@ -28,7 +28,7 @@ import org.bonitasoft.engine.api.ImportError.Type;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExportedProfileEntry {
+public class ProfileEntryNode {
 
     @XmlAttribute
     private String name;
@@ -47,10 +47,10 @@ public class ExportedProfileEntry {
     @XmlElement
     private String page;
 
-    public ExportedProfileEntry() {
+    public ProfileEntryNode() {
     }
 
-    public ExportedProfileEntry(final String name) {
+    public ProfileEntryNode(final String name) {
         this.name = name;
     }
 
@@ -118,7 +118,7 @@ public class ExportedProfileEntry {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ExportedProfileEntry that = (ExportedProfileEntry) o;
+        ProfileEntryNode that = (ProfileEntryNode) o;
         return isCustom == that.isCustom &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(index, that.index) &&
@@ -134,7 +134,7 @@ public class ExportedProfileEntry {
 
     @Override
     public String toString() {
-        return "ExportedProfileEntry{" +
+        return "ProfileEntryNode{" +
                 "name='" + name + '\'' +
                 ", isCustom=" + isCustom +
                 ", index=" + index +

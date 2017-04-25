@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -45,7 +45,7 @@ public class UpdateDefaultsImportStrategyTest {
         //when
         SProfileImpl sProfile = new SProfileImpl();
         sProfile.setDefault(false);
-        updateDefaultsImportStrategy.whenProfileExists(-1,new ExportedProfile("plop",true), sProfile);
+        updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",true), sProfile);
 
         verify(profileService).updateProfile(eq(sProfile), any(EntityUpdateDescriptor.class));
     }
@@ -54,7 +54,7 @@ public class UpdateDefaultsImportStrategyTest {
         //when
         SProfileImpl sProfile = new SProfileImpl();
         sProfile.setDefault(true);
-        updateDefaultsImportStrategy.whenProfileExists(-1,new ExportedProfile("plop",false), sProfile);
+        updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
 
         verify(profileService).updateProfile(eq(sProfile), any(EntityUpdateDescriptor.class));
     }
@@ -63,7 +63,7 @@ public class UpdateDefaultsImportStrategyTest {
         //when
         SProfileImpl sProfile = new SProfileImpl();
         sProfile.setDefault(false);
-        updateDefaultsImportStrategy.whenProfileExists(-1,new ExportedProfile("plop",false), sProfile);
+        updateDefaultsImportStrategy.whenProfileExists(-1,new ProfileNode("plop",false), sProfile);
 
         verify(profileService,times(0)).updateProfile(any(SProfile.class), any(EntityUpdateDescriptor.class));
     }
@@ -77,13 +77,13 @@ public class UpdateDefaultsImportStrategyTest {
 
     @Test
     public void  should_canCreateProfileIfNotExists_return_true_if_default(){
-        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy.canCreateProfileIfNotExists(new ExportedProfile("plop", true));
+        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy.canCreateProfileIfNotExists(new ProfileNode("plop", true));
 
         assertThat(canCreateProfileIfNotExists).isTrue();
     }
     @Test
     public void  should_canCreateProfileIfNotExists_return_false_if_custom(){
-        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy.canCreateProfileIfNotExists(new ExportedProfile("plop", false));
+        boolean canCreateProfileIfNotExists = updateDefaultsImportStrategy.canCreateProfileIfNotExists(new ProfileNode("plop", false));
 
         assertThat(canCreateProfileIfNotExists).isFalse();
     }

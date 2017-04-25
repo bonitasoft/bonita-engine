@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {})
-public class ExportedProfile {
+public class ProfileNode {
 
     @XmlAttribute
     private String name;
@@ -40,19 +40,19 @@ public class ExportedProfile {
     private String description;
     @XmlElementWrapper(name = "profileEntries")
     @XmlElement(name = "parentProfileEntry")
-    private List<ExportedParentProfileEntry> parentProfileEntries;
+    private List<ParentProfileEntryNode> parentProfileEntries;
     @XmlElement(name = "profileMapping")
-    private ExportedProfileMapping profileMapping;
+    private ProfileMappingNode profileMapping;
 
-    public ExportedProfile() {
+    public ProfileNode() {
         parentProfileEntries = new ArrayList<>();
     }
 
-    public ExportedProfile(final String name, final boolean isDefault) {
+    public ProfileNode(final String name, final boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
         parentProfileEntries = new ArrayList<>();
-        profileMapping = new ExportedProfileMapping();
+        profileMapping = new ProfileMappingNode();
     }
 
     public boolean isDefault() {
@@ -71,19 +71,19 @@ public class ExportedProfile {
         this.description = description;
     }
 
-    public List<ExportedParentProfileEntry> getParentProfileEntries() {
+    public List<ParentProfileEntryNode> getParentProfileEntries() {
         return parentProfileEntries;
     }
 
-    public void setParentProfileEntries(final List<ExportedParentProfileEntry> parentProfileEntries) {
+    public void setParentProfileEntries(final List<ParentProfileEntryNode> parentProfileEntries) {
         this.parentProfileEntries = parentProfileEntries;
     }
 
-    public ExportedProfileMapping getProfileMapping() {
+    public ProfileMappingNode getProfileMapping() {
         return profileMapping;
     }
 
-    public void setProfileMapping(final ExportedProfileMapping profileMapping) {
+    public void setProfileMapping(final ProfileMappingNode profileMapping) {
         this.profileMapping = profileMapping;
     }
 
@@ -93,7 +93,7 @@ public class ExportedProfile {
 
     public boolean hasCustomPages() {
         if (parentProfileEntries != null) {
-            for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
+            for (final ParentProfileEntryNode parentProfileEntry : parentProfileEntries) {
                 if (parentProfileEntry.hasCustomPages()) {
                     return true;
                 }
@@ -108,7 +108,7 @@ public class ExportedProfile {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        ExportedProfile that = (ExportedProfile) o;
+        ProfileNode that = (ProfileNode) o;
         return isDefault == that.isDefault &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&
@@ -123,7 +123,7 @@ public class ExportedProfile {
 
     @Override
     public String toString() {
-        return "ExportedProfile{" +
+        return "ProfileNode{" +
                 "name='" + name + '\'' +
                 ", isDefault=" + isDefault +
                 ", description='" + description + '\'' +

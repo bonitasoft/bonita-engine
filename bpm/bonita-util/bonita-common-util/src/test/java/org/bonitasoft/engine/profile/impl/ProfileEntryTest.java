@@ -18,24 +18,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.bonitasoft.engine.api.ImportError;
 import org.junit.Test;
 
-public class ExportedProfileEntryTest {
+public class ProfileEntryTest {
 
     private static final String OTHER_NAME = "other name";
 
     private static final String NAME = "name";
 
-    private ExportedProfileEntry entry1;
+    private ProfileEntryNode entry1;
 
-    private ExportedProfileEntry entry2;
+    private ProfileEntryNode entry2;
 
-    private ExportedProfileEntry entry3;
+    private ProfileEntryNode entry3;
 
     @Test
     public void testEqual_sameEntry() {
         // given
-        entry1 = new ExportedProfileEntry(NAME);
-        entry2 = new ExportedProfileEntry(NAME);
-        entry3 = new ExportedProfileEntry(OTHER_NAME);
+        entry1 = new ProfileEntryNode(NAME);
+        entry2 = new ProfileEntryNode(NAME);
+        entry3 = new ProfileEntryNode(OTHER_NAME);
 
         // when
         shouldBeEquals(entry1, entry2);
@@ -44,12 +44,12 @@ public class ExportedProfileEntryTest {
 
     }
 
-    private void shouldBeEquals(final ExportedProfileEntry entryA, final ExportedProfileEntry entryB) {
+    private void shouldBeEquals(final ProfileEntryNode entryA, final ProfileEntryNode entryB) {
         assertThat(entryA).as("should be equals").isEqualTo(entryB);
         assertThat(entryA.hashCode()).as("hash code should be equals").isEqualTo(entryB.hashCode());
     }
 
-    private void shouldNotBeEquals(final ExportedProfileEntry entryA, final ExportedProfileEntry entryB) {
+    private void shouldNotBeEquals(final ProfileEntryNode entryA, final ProfileEntryNode entryB) {
         if (null != entryA && null != entryB)
         {
             assertThat(entryA).as("should not be equals").isNotEqualTo(entryB);
@@ -60,7 +60,7 @@ public class ExportedProfileEntryTest {
     @Test
     public void testEqual_with_null() {
         // given
-        entry1 = new ExportedProfileEntry(NAME);
+        entry1 = new ProfileEntryNode(NAME);
 
         // when then
         shouldNotBeEquals(entry1, null);
@@ -72,7 +72,7 @@ public class ExportedProfileEntryTest {
     @Test
     public void should_get_error() {
         // given
-        final ExportedProfileEntry entry = new ExportedProfileEntry(null);
+        final ProfileEntryNode entry = new ProfileEntryNode(null);
 
         // when
         final ImportError hasError = entry.getError();
@@ -85,7 +85,7 @@ public class ExportedProfileEntryTest {
     @Test
     public void should_get_no_error() {
         // given
-        final ExportedProfileEntry entry = new ExportedProfileEntry("name");
+        final ProfileEntryNode entry = new ProfileEntryNode("name");
         entry.setPage("page");
 
         // when
@@ -100,7 +100,7 @@ public class ExportedProfileEntryTest {
     public void should_has_error_when_page_is_null
             () {
         // given
-        final ExportedProfileEntry entry = new ExportedProfileEntry("name");
+        final ProfileEntryNode entry = new ProfileEntryNode("name");
         entry.setPage(null);
 
         // when

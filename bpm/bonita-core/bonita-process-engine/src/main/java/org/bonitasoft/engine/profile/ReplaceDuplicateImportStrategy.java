@@ -19,7 +19,7 @@ import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.impl.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -38,33 +38,33 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStrategy {
     }
 
     @Override
-    public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile)
+    public SProfile whenProfileExists(final long importerId, final ProfileNode profile, final SProfile existingProfile)
             throws SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
         getProfileService().deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
-        if (exportedProfile.isDefault() || existingProfile.isDefault()) {
+        if (profile.isDefault() || existingProfile.isDefault()) {
             // only update LastUpdatedBy and LastUpdateDate
-            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, false));
+            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(profile, importerId, false));
         }else{
-            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, true));
+            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(profile, importerId, true));
         }
     }
 
     @Override
-    public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
-        return !exportedProfile.isDefault();
+    public boolean canCreateProfileIfNotExists(final ProfileNode profile) {
+        return !profile.isDefault();
     }
 
     @Override
-    public boolean shouldUpdateProfileEntries(ExportedProfile exportedProfile, SProfile existingProfile) {
-        return !exportedProfile.isDefault() && !existingProfile.isDefault();
+    public boolean shouldUpdateProfileEntries(ProfileNode profile, SProfile existingProfile) {
+        return !profile.isDefault() && !existingProfile.isDefault();
     }
 
-    EntityUpdateDescriptor getProfileUpdateDescriptor(final ExportedProfile exportedProfile, final long importerId, final boolean updateAllProfile) {
+    EntityUpdateDescriptor getProfileUpdateDescriptor(final ProfileNode profile, final long importerId, final boolean updateAllProfile) {
         final SProfileUpdateBuilder updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.setLastUpdateDate(System.currentTimeMillis()).setLastUpdatedBy(importerId);
         if (updateAllProfile) {
-            updateBuilder.setDescription(exportedProfile.getDescription());
+            updateBuilder.setDescription(profile.getDescription());
         }
         return updateBuilder.done();
     }

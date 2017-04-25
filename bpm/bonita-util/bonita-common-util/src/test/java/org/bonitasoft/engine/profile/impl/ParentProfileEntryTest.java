@@ -21,24 +21,24 @@ import java.util.List;
 import org.bonitasoft.engine.api.ImportError;
 import org.junit.Test;
 
-public class ExportedParentProfileEntryTest {
+public class ParentProfileEntryTest {
 
     private static final String OTHER_NAME = "other name";
 
     private static final String NAME = "name";
 
-    private ExportedParentProfileEntry entry1;
+    private ParentProfileEntryNode entry1;
 
-    private ExportedParentProfileEntry entry2;
+    private ParentProfileEntryNode entry2;
 
-    private ExportedParentProfileEntry entry3;
+    private ParentProfileEntryNode entry3;
 
     @Test
     public void testEqual_sameEntry() {
         // given
-        entry1 = new ExportedParentProfileEntry(NAME);
-        entry2 = new ExportedParentProfileEntry(NAME);
-        entry3 = new ExportedParentProfileEntry(OTHER_NAME);
+        entry1 = new ParentProfileEntryNode(NAME);
+        entry2 = new ParentProfileEntryNode(NAME);
+        entry3 = new ParentProfileEntryNode(OTHER_NAME);
 
         // when
         shouldBeEquals(entry1, entry2);
@@ -47,12 +47,12 @@ public class ExportedParentProfileEntryTest {
 
     }
 
-    private void shouldBeEquals(final ExportedParentProfileEntry entryA, final ExportedParentProfileEntry entryB) {
+    private void shouldBeEquals(final ParentProfileEntryNode entryA, final ParentProfileEntryNode entryB) {
         assertThat(entryA).as("should be equals").isEqualTo(entryB);
         assertThat(entryA.hashCode()).as("hash code should be equals").isEqualTo(entryB.hashCode());
     }
 
-    private void shouldNotBeEquals(final ExportedParentProfileEntry entryA, final ExportedParentProfileEntry entryB) {
+    private void shouldNotBeEquals(final ParentProfileEntryNode entryA, final ParentProfileEntryNode entryB) {
         if (null != entryA && null != entryB)
         {
             assertThat(entryA).as("should not be equals").isNotEqualTo(entryB);
@@ -63,7 +63,7 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void testEqual_with_null() {
         // given
-        entry1 = new ExportedParentProfileEntry(NAME);
+        entry1 = new ParentProfileEntryNode(NAME);
 
         // when then
         shouldNotBeEquals(entry1, null);
@@ -75,7 +75,7 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_get_one_errors() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry(null);
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode(null);
 
         // when
         final List<ImportError> errors = parentEntry.getErrors();
@@ -89,8 +89,8 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_get_child_errors() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
-        final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode("name");
+        final ProfileEntryNode childEntry = new ProfileEntryNode("name");
         childEntry.setPage(null);
         parentEntry.setChildProfileEntries(Arrays.asList(childEntry));
 
@@ -106,8 +106,8 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_get_no_errors_with_valid_children() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
-        final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode("name");
+        final ProfileEntryNode childEntry = new ProfileEntryNode("name");
         childEntry.setPage("page");
 
         // when
@@ -122,7 +122,7 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_get_no_errors() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode("name");
 
         // when
         final List<ImportError> errors = parentEntry.getErrors();
@@ -136,7 +136,7 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_hasCustomPage_beTrue() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode("name");
         parentEntry.setCustom(true);
 
         // when then
@@ -147,9 +147,9 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_hasCustomPage_child_beTrue() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode("name");
         parentEntry.setCustom(false);
-        final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
+        final ProfileEntryNode childEntry = new ProfileEntryNode("name");
         childEntry.setPage("page");
         childEntry.setCustom(true);
 
@@ -162,7 +162,7 @@ public class ExportedParentProfileEntryTest {
     @Test
     public void should_hasCustomPage_beFalse() {
         // given
-        final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
+        final ParentProfileEntryNode parentEntry = new ParentProfileEntryNode("name");
         parentEntry.setCustom(false);
 
         // when then

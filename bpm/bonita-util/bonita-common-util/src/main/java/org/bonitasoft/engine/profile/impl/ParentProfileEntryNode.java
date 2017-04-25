@@ -31,25 +31,25 @@ import org.bonitasoft.engine.api.ImportError.Type;
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ExportedParentProfileEntry extends ExportedProfileEntry {
+public class ParentProfileEntryNode extends ProfileEntryNode {
 
     @XmlElementWrapper(name = "childrenEntries")
     @XmlElement(name = "profileEntry")
-    private List<ExportedProfileEntry> childProfileEntries = Collections.emptyList();
+    private List<ProfileEntryNode> childProfileEntries = Collections.emptyList();
 
-    public ExportedParentProfileEntry() {
+    public ParentProfileEntryNode() {
         childProfileEntries = new ArrayList<>();
     }
 
-    public List<ExportedProfileEntry> getChildProfileEntries() {
+    public List<ProfileEntryNode> getChildProfileEntries() {
         return childProfileEntries;
     }
 
-    public void setChildProfileEntries(final List<ExportedProfileEntry> childProfileEntries) {
+    public void setChildProfileEntries(final List<ProfileEntryNode> childProfileEntries) {
         this.childProfileEntries = childProfileEntries;
     }
 
-    public ExportedParentProfileEntry(final String name) {
+    public ParentProfileEntryNode(final String name) {
         super(name);
     }
 
@@ -58,9 +58,9 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
         if (hasError()) {
             errors.add(getError());
         }
-        final List<ExportedProfileEntry> childProfileEntries = getChildProfileEntries();
+        final List<ProfileEntryNode> childProfileEntries = getChildProfileEntries();
         if (childProfileEntries != null) {
-            for (final ExportedProfileEntry childEntry : childProfileEntries) {
+            for (final ProfileEntryNode childEntry : childProfileEntries) {
                 if (childEntry.hasError()) {
                     errors.add(childEntry.getError());
                 }
@@ -89,8 +89,8 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
             return true;
         }
         if (getChildProfileEntries() != null) {
-            for (final ExportedProfileEntry exportedProfileEntry : getChildProfileEntries()) {
-                if (exportedProfileEntry.isCustom()) {
+            for (final ProfileEntryNode profileEntryNode : getChildProfileEntries()) {
+                if (profileEntryNode.isCustom()) {
                     return true;
                 }
             }
@@ -106,7 +106,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
             return false;
         if (!super.equals(o))
             return false;
-        ExportedParentProfileEntry that = (ExportedParentProfileEntry) o;
+        ParentProfileEntryNode that = (ParentProfileEntryNode) o;
         return Objects.equals(childProfileEntries, that.childProfileEntries);
     }
 
@@ -117,7 +117,7 @@ public class ExportedParentProfileEntry extends ExportedProfileEntry {
 
     @Override
     public String toString() {
-        return "ExportedParentProfileEntry{" +
+        return "ParentProfileEntryNode{" +
                 super.toString() +
                 "childProfileEntries=" + childProfileEntries +
                 '}';
