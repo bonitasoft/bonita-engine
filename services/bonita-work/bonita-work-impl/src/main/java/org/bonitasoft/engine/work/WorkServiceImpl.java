@@ -13,23 +13,20 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.TimeUnit;
-
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
- * Execute works using an ExecutorService
+ * Directly calls the WorkExecutorService
  *
  * @author Charles Souillard
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class ExecutorWorkService implements WorkService {
+public class WorkServiceImpl implements WorkService {
 
     private final Object getSynchroLock = new Object();
 
@@ -41,28 +38,21 @@ public class ExecutorWorkService implements WorkService {
 
     private final SessionAccessor sessionAccessor;
 
-    private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
-
-    private BonitaExecutorService executor;
-
-    private final int workTerminationTimeout;
+    private final WorkExecutorService workExecutorService;
 
     /**
      * @param transactionService
      * @param loggerService
      * @param sessionAccessor
-     * @param bonitaExecutorServiceFactory
-     * @param workTerminationTimeout time in secondes to wait for works to finish
+     * @param workExecutorService
      */
-    public ExecutorWorkService(final UserTransactionService transactionService,
-            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
-            final BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
-            final int workTerminationTimeout) {
+    public WorkServiceImpl(final UserTransactionService transactionService,
+                           final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
+                           WorkExecutorService workExecutorService) {
         this.transactionService = transactionService;
         this.loggerService = loggerService;
         this.sessionAccessor = sessionAccessor;
-        this.bonitaExecutorServiceFactory = bonitaExecutorServiceFactory;
-        this.workTerminationTimeout = workTerminationTimeout;
+        this.workExecutorService = workExecutorService;
     }
 
     @Override
@@ -83,25 +73,11 @@ public class ExecutorWorkService implements WorkService {
                 + ", but the work service is stopped.");
     }
 
-    @Override
-    public void executeWork(final BonitaWork work) throws SWorkRegisterException {
-        if (isStopped()) {
-            logExecutorStateWarn(work);
-            return;
-        }
-        try {
-            work.setTenantId(sessionAccessor.getTenantId());
-        } catch (final STenantIdNotSetException e) {
-            throw new SWorkRegisterException("Unable to read tenant id from session.", e);
-        }
-        executor.submit(work);
-    }
-
     private WorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
         synchronized (getSynchroLock) {
             WorkSynchronization synchro = synchronizations.get();
             if (synchro == null) {
-                synchro = new WorkSynchronization(executor, sessionAccessor, this);
+                synchro = new WorkSynchronization(workExecutorService, sessionAccessor, this);
                 try {
                     transactionService.registerBonitaSynchronization(synchro);
                 } catch (final STransactionNotFoundException e) {
@@ -116,43 +92,20 @@ public class ExecutorWorkService implements WorkService {
     @Override
     public boolean isStopped() {
         // the executor must handle elements when it's shutting down
-        return executor == null;
+        return workExecutorService.isStopped();
     }
 
     @Override
     public synchronized void stop() {
-        // we don't throw exception just stop it and log if something happens
-        try {
-            if (isStopped()) {
-                return;
-            }
-            shutdownExecutor();
-            awaitTermination();
-        } catch (final SWorkException e) {
-            if (e.getCause() != null) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage(), e.getCause());
-            } else {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
-            }
-        }
+
     }
 
     @Override
     public synchronized void start() {
-        if (isStopped()) {
-            executor = bonitaExecutorServiceFactory.createExecutorService();
-        }
     }
 
     @Override
     public synchronized void pause() throws SWorkException {
-        if (isStopped()) {
-            return;
-        }
-        shutdownExecutor();
-        // completely clear the queue because it's a global pause
-        executor.clearAllQueues();
-        awaitTermination();
     }
 
     @Override
@@ -160,35 +113,7 @@ public class ExecutorWorkService implements WorkService {
         start();
     }
 
-    private void awaitTermination() throws SWorkException {
-        try {
-            if (!executor.awaitTermination(workTerminationTimeout, TimeUnit.SECONDS)) {
-                throw new SWorkException("Waited termination of all work " + workTerminationTimeout
-                        + "s but all tasks were not finished");
-            }
-        } catch (final InterruptedException e) {
-            throw new SWorkException("Interrupted while stopping the work service", e);
-        }
-        executor = null;
-    }
-
-    private void shutdownExecutor() {
-        executor.shutdownAndEmptyQueue();
-        loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Stopped executor service");
-    }
-
-    @Override
-    public void notifyNodeStopped(final String nodeName) {
-        if (!isStopped()) {
-            executor.notifyNodeStopped(nodeName);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeSynchronization() {
+    void removeSynchronization() {
         synchronizations.remove();
     }
 }

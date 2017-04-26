@@ -928,10 +928,15 @@
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
 
-    <bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
+    <bean id="workService" class="org.bonitasoft.engine.work.WorkServiceImpl">
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="workExecutorService" ref="workExecutorService" />
+    </bean>
+
+    <bean id="workExecutorService" class="org.bonitasoft.engine.work.WorkExecutorServiceImpl">
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
         <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
     </bean>
