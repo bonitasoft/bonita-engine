@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2016 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,33 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.TimeUnit;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
  *
- * This is the interface we use to wrap the ThreadPool that execute works
+ * Trigger the asynchronous execution of a work
  *
- * @author Julien Reboul
  * @author Baptiste Mesta
  */
-public interface BonitaExecutorService {
+public interface WorkExecutorService extends TenantLifecycleService {
 
-    /**
-     * clear the queue of work
-     */
-    void clearAllQueues();
+    void execute(BonitaWork work);
 
-    /**
-     * shutdown and handle the queue properly
-     */
-    void shutdownAndEmptyQueue();
+    boolean isStopped();
 
-    void submit(BonitaWork work);
-
-    boolean awaitTermination(long workTerminationTimeout, TimeUnit seconds) throws InterruptedException;
-
-    default void notifyNodeStopped(String nodeName){
-    }
+    void notifyNodeStopped(String nodeName);
 }

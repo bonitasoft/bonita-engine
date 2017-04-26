@@ -25,15 +25,15 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
 
     private final Collection<BonitaWork> works;
 
-    private final WorkService workService;
-    private final BonitaExecutorService executorService;
+    private final WorkExecutorService workExecutorService;
+    private final WorkServiceImpl workService;
 
     private long tenantId;
 
-    WorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor,
-            final WorkService workService) {
+    WorkSynchronization(final WorkExecutorService workExecutorService, final SessionAccessor sessionAccessor,
+            WorkServiceImpl workService) {
         super();
-        this.executorService = executorService;
+        this.workService = workService;
         works = new HashSet<>();
         try {
             // Instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
@@ -42,7 +42,7 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
             // We are not in a tenant
             tenantId = -1L;
         }
-        this.workService = workService;
+        this.workExecutorService = workExecutorService;
     }
 
     void addWork(final BonitaWork work) {
@@ -64,7 +64,7 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
                 work.setTenantId(tenantId);
             }
             for (final BonitaWork work : works) {
-                executorService.execute(work);
+                workExecutorService.execute(work);
             }
         }
         workService.removeSynchronization();

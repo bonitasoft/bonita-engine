@@ -27,7 +27,7 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.work.WorkExecutorService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +45,7 @@ public class LockProcessInstanceWorkTest {
 
     private LockService lockService;
 
-    private WorkService workService;
+    private WorkExecutorService workService;
 
     private static final long TENANT_ID = 1;
 
@@ -55,9 +55,9 @@ public class LockProcessInstanceWorkTest {
         when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
         tenantAccessor = mock(TenantServiceAccessor.class);
         lockService = mock(LockService.class);
-        workService = mock(WorkService.class);
+        workService = mock(WorkExecutorService.class);
         when(tenantAccessor.getLockService()).thenReturn(lockService);
-        when(tenantAccessor.getWorkService()).thenReturn(workService);
+        when(tenantAccessor.getWorkExecutorService()).thenReturn(workService);
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(mock(TechnicalLoggerService.class));
     }
 
@@ -137,7 +137,7 @@ public class LockProcessInstanceWorkTest {
 
         // in fact we should ensure the rootWork of the lockProcessInstanceWork has been re-executed. We should check the method getRootWork has been called
         verify(lockService).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
-        verify(workService).executeWork(spiedWork);
+        verify(workService).execute(spiedWork);
         verify(spiedWork).getRootWork();
     }
 

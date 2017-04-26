@@ -19,18 +19,14 @@ import java.util.concurrent.TimeUnit;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.SWorkRegisterException;
-import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.work.WorkExecutorService;
 
 /**
  * Transactional work that lock the process instance
- * 
  * This work try to lock a process instance, if it can't be locked before the end of the TIMEOUT, we reschedule the fill stack of work on the work service.
- * 
  * 
  * @author Charles Souillard
  * @author Baptiste Mesta
@@ -69,7 +65,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
                     loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " did not get lock for instance "
                             + processInstanceId + ": " + getWorkStack());
                 }
-                rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
+                rescheduleWork(getTenantAccessor(context).getWorkExecutorService(), getRootWork());
                 return;
             }
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -98,13 +94,9 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         return "nothing";
     }
 
-    private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
-        try {
-            // executeWork is called and not registerWork because the registerWork is relying on transaction
-            workService.executeWork(rootWork);
-        } catch (SWorkRegisterException e) {
-            throw new SLockException(e);
-        }
+    private void rescheduleWork(final WorkExecutorService workService, final BonitaWork rootWork) {
+        // executeWork is called and not registerWork because the registerWork is relying on transaction
+        workService.execute(rootWork);
 
     }
 

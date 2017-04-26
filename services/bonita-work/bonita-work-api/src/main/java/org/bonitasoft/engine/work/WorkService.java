@@ -16,8 +16,7 @@ package org.bonitasoft.engine.work;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
- * This service allows to trigger the execution of work asynchronously
- * Any runnable registered on the service will be launched in other thread at the end of the transaction.
+ * This service allows register the execution of a work at the end of the current transaction
  *
  * @author Charles Souillard
  * @author Baptiste Mesta
@@ -35,27 +34,9 @@ public interface WorkService extends TenantLifecycleService {
     void registerWork(final BonitaWork work) throws SWorkRegisterException;
 
     /**
-     * @param work
-     * @throws SWorkRegisterException
-     * @since 6.0
-     */
-    void executeWork(final BonitaWork work) throws SWorkRegisterException;
-
-    /**
-     * @return
-     *         true if the work service is stopped
+     * @return true if the work service is stopped
      * @since 6.3
      */
     boolean isStopped();
-
-    /**
-     * @since 6.3.1
-     */
-    void notifyNodeStopped(String nodeName);
-
-    /**
-     * Removes the current <code>AbstractWorkSynchronization</code> from the current Thread.
-     */
-    void removeSynchronization();
 
 }
