@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.state.FailedActivityStateImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +68,6 @@ public class RestartProcessHandlerTest {
         SProcessInstance processInstance = mock(SProcessInstance.class);
         //        when(processInstance.getId()).thenReturn(1654534L);
         when(processInstance.getCallerId()).thenReturn(5L);
-        doNothing().when(workService).executeWork(any(BonitaWork.class));
         new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
     }
 }

@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
@@ -28,7 +26,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 /**
  * @author Julien Reboul
  * @author Baptiste Mesta
- * 
  */
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
 
@@ -63,26 +60,6 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     }
 
     @Override
-    public <T> Future<T> submit(final Callable<T> task) {
-        throw new UnsupportedOperationException("Use submit(Runnable)");
-    }
-
-    @Override
-    public <T> Future<T> submit(final Runnable task, final T result) {
-        throw new UnsupportedOperationException("Use submit(Runnable)");
-    }
-
-    @Override
-    public List<Runnable> shutdownNow() {
-        throw new UnsupportedOperationException("Use stop instead");
-    }
-
-    @Override
-    public void shutdown() {
-        throw new UnsupportedOperationException("Use stop instead");
-    }
-
-    @Override
     public void shutdownAndEmptyQueue() {
         super.shutdown();
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Clearing queue of work, had " + workQueue.size() + " elements");
@@ -90,7 +67,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     }
 
     @Override
-    public void notifyNodeStopped(final String nodeName) {
-        // nothing to do
+    public void submit(BonitaWork work) {
+        submit((Runnable)work);
     }
 }

@@ -91,6 +91,7 @@ import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.work.WorkExecutorService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
@@ -163,6 +164,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
 
     private WorkService workService;
+
+    private WorkExecutorService workExecutorService;
 
     private SessionService sessionService;
 
@@ -611,6 +614,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             workService = beanAccessor.getService(WorkService.class);
         }
         return workService;
+    }
+
+    @Override
+    public WorkExecutorService getWorkExecutorService() {
+        if (workExecutorService == null) {
+            workExecutorService = beanAccessor.getService(WorkExecutorService.class);
+        }
+        return workExecutorService;
     }
 
     @Override

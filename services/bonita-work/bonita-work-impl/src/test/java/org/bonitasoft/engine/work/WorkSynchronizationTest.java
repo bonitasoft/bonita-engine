@@ -33,7 +33,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class WorkSynchronizationTest {
 
     @Mock
-    private WorkService workService;
+    private WorkServiceImpl workService;
+    @Mock
+    private WorkExecutorService workExecutorService;
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
@@ -51,7 +53,7 @@ public class WorkSynchronizationTest {
 
         workSynchronization.afterCompletion(COMMITTED);
 
-        verify(bonitaExecutorService).execute(bonitaWork1);
+        verify(workExecutorService).execute(bonitaWork1);
     }
 
     @Test
@@ -61,8 +63,8 @@ public class WorkSynchronizationTest {
 
         workSynchronization.afterCompletion(COMMITTED);
 
-        verify(bonitaExecutorService).execute(bonitaWork1);
-        verify(bonitaExecutorService).execute(bonitaWork2);
+        verify(workExecutorService).execute(bonitaWork1);
+        verify(workExecutorService).execute(bonitaWork2);
     }
 
     @Test
@@ -71,7 +73,7 @@ public class WorkSynchronizationTest {
 
         workSynchronization.afterCompletion(ROLLEDBACK);
 
-        verify(bonitaExecutorService, never()).execute(bonitaWork1);
+        verify(workExecutorService, never()).execute(bonitaWork1);
     }
 
 }
