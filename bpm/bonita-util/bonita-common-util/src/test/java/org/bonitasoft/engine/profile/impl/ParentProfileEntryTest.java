@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
 import org.junit.Test;
 
 public class ParentProfileEntryTest {

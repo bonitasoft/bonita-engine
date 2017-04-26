@@ -23,7 +23,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
