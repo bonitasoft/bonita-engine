@@ -23,9 +23,9 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.impl.ProfileNode;
-import org.bonitasoft.engine.profile.impl.ProfilesNode;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
 import org.bonitasoft.engine.profile.model.impl.SProfileImpl;

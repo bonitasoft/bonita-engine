@@ -16,7 +16,7 @@ package org.bonitasoft.engine.profile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.bonitasoft.engine.profile.impl.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

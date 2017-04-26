@@ -129,7 +129,7 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <includes>
-                                <include>org/bonitasoft/engine/profile/impl/**/*.java</include>
+                                <include>org/bonitasoft/engine/profile/xml/**/*.java</include>
                             </includes>
                             <outputDirectory>${project.build.directory}/profiles-schemas</outputDirectory>
                         </configuration>

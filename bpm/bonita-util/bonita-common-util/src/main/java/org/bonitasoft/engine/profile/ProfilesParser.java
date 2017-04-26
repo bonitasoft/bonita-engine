@@ -25,8 +25,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import com.sun.security.auth.UserPrincipal;
-import org.bonitasoft.engine.profile.impl.ProfilesNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 
 /**
  * @author Baptiste Mesta
@@ -39,7 +38,7 @@ public class ProfilesParser {
     public ProfilesParser() {
         try {
             jaxbContext = JAXBContext.newInstance(ProfilesNode.class);
-            URL schemaURL = UserPrincipal.class.getResource("/profiles.xsd");
+            URL schemaURL = ProfilesParser.class.getResource("/profiles.xsd");
             final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schema = sf.newSchema(schemaURL);
         } catch (final Exception e) {

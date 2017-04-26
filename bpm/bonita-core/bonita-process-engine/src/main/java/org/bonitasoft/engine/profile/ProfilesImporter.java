@@ -45,12 +45,12 @@ import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreatio
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
-import org.bonitasoft.engine.profile.impl.MembershipNode;
-import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.impl.ProfileEntryNode;
-import org.bonitasoft.engine.profile.impl.ProfileMappingNode;
-import org.bonitasoft.engine.profile.impl.ProfileNode;
-import org.bonitasoft.engine.profile.impl.ProfilesNode;
+import org.bonitasoft.engine.profile.xml.MembershipNode;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
