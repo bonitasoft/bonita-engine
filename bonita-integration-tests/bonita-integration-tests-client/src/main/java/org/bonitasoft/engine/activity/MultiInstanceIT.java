@@ -14,6 +14,9 @@
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID;
+import static org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor.STATE_NAME;
+import static org.bonitasoft.engine.test.TestStates.ABORTED;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -67,7 +70,6 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.TestStates;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1052,9 +1054,11 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         assertThat(multiInstance.getType()).isEqualTo(FlowNodeType.MULTI_INSTANCE_ACTIVITY);
         getProcessAPI().setActivityStateByName(multiInstance.getId(),ActivityStates.SKIPPED_STATE);
 
-        waitForTaskInState(processInstance, "step1", TestStates.ABORTED);
-        waitForTaskInState(processInstance, "step1", TestStates.ABORTED);
         waitForProcessToFinish(processInstance);
+        SearchResult<ArchivedActivityInstance> archivedActivityInstance = getProcessAPI()
+                .searchArchivedActivities(new SearchOptionsBuilder(0, 10)
+                        .filter(ROOT_PROCESS_INSTANCE_ID, processInstance.getId()).filter(STATE_NAME, ABORTED.getStateName()).done());
+        assertThat(archivedActivityInstance.getResult()).hasSize(2);
 
         disableAndDeleteProcess(processDefinition);
     }
