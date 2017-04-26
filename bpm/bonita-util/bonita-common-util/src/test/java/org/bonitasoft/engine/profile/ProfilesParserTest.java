@@ -19,11 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.profile.impl.MembershipNode;
-import org.bonitasoft.engine.profile.impl.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.impl.ProfileNode;
-import org.bonitasoft.engine.profile.impl.ProfileEntryNode;
-import org.bonitasoft.engine.profile.impl.ProfilesNode;
+import org.bonitasoft.engine.profile.xml.MembershipNode;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.junit.Test;
 
 /**

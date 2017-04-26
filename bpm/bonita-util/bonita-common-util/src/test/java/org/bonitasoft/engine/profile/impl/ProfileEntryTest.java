@@ -16,6 +16,7 @@ package org.bonitasoft.engine.profile.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
 import org.junit.Test;
 
 public class ProfileEntryTest {

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfilesImporter;
-import org.bonitasoft.engine.profile.impl.ProfilesNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
