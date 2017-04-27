@@ -17,10 +17,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.lang.model.SourceVersion;
 
@@ -44,6 +42,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
@@ -59,7 +58,6 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
 
@@ -130,6 +128,71 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateActors();
         validateBusinessData();
         validateProcessContract();
+        validateOperationsInActivities(flowElementContainer);
+        validateCatchEventsOperations(flowElementContainer);
+        validateConnectors(flowElementContainer.getConnectors());
+    }
+
+    //checks that you don't access a BusinessObject in the same task you deleted it.
+    //see : BS-16291
+    private void validateOperationsInActivities(final FlowElementContainerDefinition flowElementContainer) {
+        for (ActivityDefinition activity : flowElementContainer.getActivities()) {
+            if (activity.getOperations().size() > 1) {
+                validateOperations(activity.getOperations(), activity.getName());
+            }
+            validateConnectors(activity.getConnectors());
+        }
+    }
+
+    private void validateConnectors(List<ConnectorDefinition> connectors) {
+        validateConnectorNames(connectors);
+        for (ConnectorDefinition connector : connectors) {
+            validateOperations(connector.getOutputs(), connector.getName());
+        }
+    }
+
+    private void validateConnectorNames(final List<ConnectorDefinition> connectorDefinitions) {
+        final List<String> names = new ArrayList<>();
+        for (final ConnectorDefinition connectorDefinition : connectorDefinitions) {
+            if (names.contains(connectorDefinition.getName())) {
+                designErrors.add("More than one connector are named '" + connectorDefinition.getName() + "'. All names must be unique.");
+            } else {
+                names.add(connectorDefinition.getName());
+            }
+        }
+    }
+
+    private void validateOperations(List<Operation> operations, String elementName) {
+        HashSet<String> deletedObjectNames = new HashSet<>();
+        HashSet<String> accessedObjectNames = new HashSet<>();
+        for (Operation operation : operations) {
+            final String bizDataName = operation.getLeftOperand().getName();
+            String errorMessage = "The business variable " + bizDataName
+                    + " on the current element has been deleted by an operation. Other operations performed on this instance through the same element: "
+                    + elementName + " are not allowed.";
+            // DELETION are only for Business Object operations:
+            if (operation.getType() == OperatorType.DELETION) {
+                addToListAndVerifyNotAlreadySeen(deletedObjectNames, accessedObjectNames, bizDataName, errorMessage);
+            } else {
+                addToListAndVerifyNotAlreadySeen(accessedObjectNames, deletedObjectNames, bizDataName, errorMessage);
+            }
+        }
+    }
+
+    private void addToListAndVerifyNotAlreadySeen(HashSet<String> listToAddBizDataNameTo, HashSet<String> listToCheckBizDataNameAlreadySeen, String bizDataName,
+                                                  String errorMessage) {
+        listToAddBizDataNameTo.add(bizDataName);
+        if (listToCheckBizDataNameAlreadySeen.contains(bizDataName)) {
+            addError(errorMessage);
+        }
+    }
+
+    private void validateCatchEventsOperations(final FlowElementContainerDefinition flowElementContainer) {
+        for (IntermediateCatchEventDefinition catchEvent : flowElementContainer.getIntermediateCatchEvents()) {
+            for (CatchMessageEventTriggerDefinition eventTrigger : catchEvent.getMessageEventTriggerDefinitions()) {
+                validateOperations(eventTrigger.getOperations(), catchEvent.getName());
+            }
+        }
     }
 
     private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
@@ -272,17 +335,6 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 || processContainer.getDataDefinition(dataReference) != null;
     }
 
-    private void validateConnectors(final List<ConnectorDefinition> connectorDefinitions) {
-        final List<String> names = new ArrayList<>();
-        for (final ConnectorDefinition connectorDefinition : connectorDefinitions) {
-            if (names.contains(connectorDefinition.getName())) {
-                designErrors.add("More than one connector are named '" + connectorDefinition.getName() + "'. All names must be unique.");
-            } else {
-                names.add(connectorDefinition.getName());
-            }
-        }
-    }
-
     private void validateActors() {
         final ActorDefinition actorInitiator = process.getActorInitiator();
         if (actorInitiator != null) {
@@ -313,6 +365,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateMultiInstances(flowElementContainer);
         validateEvents(flowElementContainer, isRootContainer);
         validateActivities(flowElementContainer);
+        validateOperationsInActivities(flowElementContainer);
+        validateCatchEventsOperations(flowElementContainer);
+        validateConnectors(flowElementContainer.getConnectors());
     }
 
     private void validateFlowNodeUnique(final FlowElementContainerDefinition flowElementContainer, final List<String> names) {
@@ -359,20 +414,6 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             }
             if (activity instanceof SendTaskDefinition && ((SendTaskDefinition) activity).getMessageTrigger().getTargetProcess() == null) {
                 addError("The send task " + activity.getName() + " hasn't target");
-            }
-            final List<Operation> operations = activity.getOperations();
-
-            final Map<String, Boolean> leftOperandUpdates = new HashMap<>();
-            for (final Operation operation : operations) {
-                final LeftOperand leftOperand = operation.getLeftOperand();
-                final Boolean update = leftOperandUpdates.get(leftOperand.getName());
-                final Boolean updateOperator = operation.getType() != OperatorType.DELETION;
-                if (update == null) {
-                    leftOperandUpdates.put(leftOperand.getName(), updateOperator);
-                } else if (update && !updateOperator) {
-                    addError("In activity " + activity.getName() + ". It is not possible to modify and delete the leftOperand " + leftOperand.getName()
-                            + " through the same activty");
-                }
             }
         }
     }
