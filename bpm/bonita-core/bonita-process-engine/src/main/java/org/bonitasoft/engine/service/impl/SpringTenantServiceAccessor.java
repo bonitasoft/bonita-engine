@@ -103,198 +103,56 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private final SpringBeanAccessor beanAccessor;
-    private final long tenantId;
-    private IdentityService identityService;
-    private LoginService loginService;
-    private QueriableLoggerService queriableLoggerService;
-    private TechnicalLoggerService technicalLoggerService;
-    private TransactionService transactionService;
-    private ProcessDefinitionService processDefinitionService;
-    private ActivityInstanceService activityInstanceService;
-    private ProcessInstanceService processInstanceService;
-    private FlowNodeExecutor flowNodeExecutor;
-    private ProcessExecutor processExecutor;
-    private FlowNodeStateManager flowNodeStateManager;
-    private TransactionExecutor transactionExecutor;
-    private BPMInstancesCreator bpmInstancesCreator;
-    private ActorMappingService actorMappingService;
-    private ArchiveService archiveService;
-    private CategoryService categoryService;
-    private ExpressionService expressionService;
-    private CommandService commandService;
-    private ClassLoaderService classLoaderService;
-    private DependencyService dependencyService;
-    private EventInstanceService eventInstanceService;
-    private ConnectorService connectorService;
+    private Long tenantId;
 
-    private ConnectorInstanceService connectorInstanceService;
-
-    private DocumentService documentService;
-
-    private ProfileService profileService;
-
-    private DataInstanceService dataInstanceService;
-
-    private OperationService operationService;
-
-    private ExpressionResolverService expressionResolverService;
-
-    private SupervisorMappingService supervisorService;
-
-    private UserFilterService userFilterService;
-
-    private SearchEntitiesDescriptor searchEntitiesDescriptor;
-
-    private SCommentService commentService;
-
-    private ContainerRegistry containerRegistry;
-
-    private ExternalIdentityMappingService externalIdentityMappingService;
-
-    private LockService lockService;
-
-    private EventsHandler eventsHandler;
-
-    private EventService eventService;
-
-    private ConnectorExecutor connectorExecutor;
-
-    private CacheService cacheService;
-
-    private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
-
-    private WorkService workService;
-
-    private WorkExecutorService workExecutorService;
-
-    private SessionService sessionService;
-
-    private SessionAccessor sessionAccessor;
-
-    private SynchroService synchroService;
-
-    private IncidentService incidentService;
-
-    private SchedulerService schedulerService;
-
-    private JobService jobService;
-
-    private ThemeService themeService;
-
-    private TenantConfiguration tenantConfiguration;
-
-    private GatewayInstanceService gatewayInstanceService;
-
-    private TransientDataService transientDataService;
-
-    private TimeTracker timeTracker;
-
-    private PermissionService permissionService;
-
-    private ParentContainerResolver parentContainerResolver;
-
-    private ContractDataService contractDataService;
-
-    private ParameterService parameterService;
-
-    private PageService pageService;
-
-    private ApplicationService applicationService;
-
-    private FormMappingService formMappingService;
-
-    private BusinessDataRepository businessDataRespository;
-
-    private RefBusinessDataService refBusinessDataService;
-
-    private BusinessDataModelRepository businessDataModelRespository;
-
-    private BusinessDataService businessDataService;
-    private PageMappingService pageMappingService;
-    private GenericAuthenticationService genericAuthenticationService;
-    private ReadPersistenceService readPersistenceService;
-    private Recorder recorder;
-    private BusinessArchiveService businessArchiveService;
-    private ProcessResourcesService processResourcesService;
-    private TenantResourcesService tenantResourceService;
-    private MessagesHandlingService messagesHandlingService;
-    private ProfilesImporter profilesImporter;
-    private ProfilesExporter profilesExporter;
-
-    public SpringTenantServiceAccessor(SpringBeanAccessor beanAccessor, Long tenantId) {
+    public SpringTenantServiceAccessor(final SpringBeanAccessor beanAccessor, Long tenantId) {
         this.beanAccessor = beanAccessor;
         this.tenantId = tenantId;
     }
 
+
     @Override
     public ParentContainerResolver getParentContainerResolver() {
-        if (parentContainerResolver == null) {
-            parentContainerResolver = beanAccessor.getService(ParentContainerResolver.class);
-        }
-        return parentContainerResolver;
+        return beanAccessor.getService(ParentContainerResolver.class);
     }
 
     @Override
     public TimeTracker getTimeTracker() {
-        if (timeTracker == null) {
-            timeTracker = beanAccessor.getService(TimeTracker.class);
-        }
-        return timeTracker;
+        return beanAccessor.getService(TimeTracker.class);
     }
 
     @Override
     public SessionAccessor getSessionAccessor() {
-        if (sessionAccessor == null) {
-            sessionAccessor = beanAccessor.getService(SessionAccessor.class);
-        }
-        return sessionAccessor;
+        return beanAccessor.getService(SessionAccessor.class);
     }
 
     @Override
     public SessionService getSessionService() {
-        if (sessionService == null) {
-            sessionService = beanAccessor.getService(SessionService.class);
-        }
-        return sessionService;
+        return beanAccessor.getService(SessionService.class);
     }
 
     @Override
     public IdentityService getIdentityService() {
-        if (identityService == null) {
-            identityService = beanAccessor.getService(IdentityService.class);
-        }
-        return identityService;
+        return beanAccessor.getService(IdentityService.class);
     }
 
     @Override
     public LoginService getLoginService() {
-        if (loginService == null) {
-            loginService = beanAccessor.getService(LoginService.class);
-        }
-        return loginService;
+        return beanAccessor.getService(LoginService.class);
     }
 
     @Override
     public QueriableLoggerService getQueriableLoggerService() {
-        if (queriableLoggerService == null) {
-            queriableLoggerService = beanAccessor.getService("syncQueriableLoggerService", QueriableLoggerService.class);
-        }
-        return queriableLoggerService;
+        return beanAccessor.getService("syncQueriableLoggerService", QueriableLoggerService.class);
     }
 
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
-        if (technicalLoggerService == null) {
-            technicalLoggerService = beanAccessor.getService("tenantTechnicalLoggerService", TechnicalLoggerService.class);
-        }
-        return technicalLoggerService;
+        return beanAccessor.getService("tenantTechnicalLoggerService", TechnicalLoggerService.class);
     }
 
     private TransactionService getTransactionService() {
-        if (transactionService == null) {
-            transactionService = beanAccessor.getService(TransactionService.class);
-        }
-        return transactionService;
+        return beanAccessor.getService(TransactionService.class);
     }
 
     @Override
@@ -304,114 +162,72 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public ProcessDefinitionService getProcessDefinitionService() {
-        if (processDefinitionService == null) {
-            processDefinitionService = beanAccessor.getService(ProcessDefinitionService.class);
-        }
-        return processDefinitionService;
+        return beanAccessor.getService(ProcessDefinitionService.class);
     }
 
     @Override
     public ProcessInstanceService getProcessInstanceService() {
-        if (processInstanceService == null) {
-            processInstanceService = beanAccessor.getService(ProcessInstanceService.class);
-        }
-        return processInstanceService;
+        return beanAccessor.getService(ProcessInstanceService.class);
     }
 
     @Override
     public ActivityInstanceService getActivityInstanceService() {
-        if (activityInstanceService == null) {
-            activityInstanceService = beanAccessor.getService(ActivityInstanceService.class);
-        }
-        return activityInstanceService;
+        return beanAccessor.getService(ActivityInstanceService.class);
     }
 
     @Override
     public BPMInstancesCreator getBPMInstancesCreator() {
-        if (bpmInstancesCreator == null) {
-            bpmInstancesCreator = beanAccessor.getService(BPMInstancesCreator.class);
-        }
-        return bpmInstancesCreator;
+        return beanAccessor.getService(BPMInstancesCreator.class);
     }
 
     @Override
     public FlowNodeExecutor getFlowNodeExecutor() {
-        if (flowNodeExecutor == null) {
-            flowNodeExecutor = beanAccessor.getService(FlowNodeExecutor.class);
-        }
-        return flowNodeExecutor;
+        return beanAccessor.getService(FlowNodeExecutor.class);
     }
 
     @Override
     public ProcessExecutor getProcessExecutor() {
-        if (processExecutor == null) {
-            processExecutor = beanAccessor.getService(ProcessExecutor.class);
-        }
-        return processExecutor;
+        return beanAccessor.getService(ProcessExecutor.class);
     }
 
     @Override
     public FlowNodeStateManager getFlowNodeStateManager() {
-        if (flowNodeStateManager == null) {
-            flowNodeStateManager = beanAccessor.getService(FlowNodeStateManager.class);
-        }
-        return flowNodeStateManager;
+        return beanAccessor.getService(FlowNodeStateManager.class);
     }
 
     @Override
     public TransactionExecutor getTransactionExecutor() {
-        if (transactionExecutor == null) {
-            transactionExecutor = beanAccessor.getService(TransactionExecutor.class);
-        }
-        return transactionExecutor;
+        return beanAccessor.getService(TransactionExecutor.class);
     }
 
     @Override
     public ActorMappingService getActorMappingService() {
-        if (actorMappingService == null) {
-            actorMappingService = beanAccessor.getService(ActorMappingService.class);
-        }
-        return actorMappingService;
+        return beanAccessor.getService(ActorMappingService.class);
     }
 
     @Override
     public ArchiveService getArchiveService() {
-        if (archiveService == null) {
-            archiveService = beanAccessor.getService(ArchiveService.class);
-        }
-        return archiveService;
+        return beanAccessor.getService(ArchiveService.class);
     }
 
     @Override
     public CategoryService getCategoryService() {
-        if (categoryService == null) {
-            categoryService = beanAccessor.getService(CategoryService.class);
-        }
-        return categoryService;
+        return beanAccessor.getService(CategoryService.class);
     }
 
     @Override
     public CommandService getCommandService() {
-        if (commandService == null) {
-            commandService = beanAccessor.getService(CommandService.class);
-        }
-        return commandService;
+        return beanAccessor.getService(CommandService.class);
     }
 
     @Override
     public ClassLoaderService getClassLoaderService() {
-        if (classLoaderService == null) {
-            classLoaderService = beanAccessor.getService("classLoaderService", ClassLoaderService.class);
-        }
-        return classLoaderService;
+        return beanAccessor.getService("classLoaderService", ClassLoaderService.class);
     }
 
     @Override
     public DependencyService getDependencyService() {
-        if (dependencyService == null) {
-            dependencyService = beanAccessor.getService("dependencyService", DependencyService.class);
-        }
-        return dependencyService;
+        return beanAccessor.getService("dependencyService", DependencyService.class);
     }
 
     @Override
@@ -421,171 +237,107 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public EventInstanceService getEventInstanceService() {
-        if (eventInstanceService == null) {
-            eventInstanceService = beanAccessor.getService(EventInstanceService.class);
-        }
-        return eventInstanceService;
+        return beanAccessor.getService(EventInstanceService.class);
     }
 
     @Override
     public ConnectorService getConnectorService() {
-        if (connectorService == null) {
-            connectorService = beanAccessor.getService("connectorService", ConnectorService.class);
-        }
-        return connectorService;
+        return beanAccessor.getService("connectorService", ConnectorService.class);
     }
 
     @Override
     public ConnectorInstanceService getConnectorInstanceService() {
-        if (connectorInstanceService == null) {
-            connectorInstanceService = beanAccessor.getService(ConnectorInstanceService.class);
-        }
-        return connectorInstanceService;
+        return beanAccessor.getService(ConnectorInstanceService.class);
     }
 
     @Override
     public ConnectorExecutor getConnectorExecutor() {
-        if (connectorExecutor == null) {
-            connectorExecutor = beanAccessor.getService(ConnectorExecutor.class);
-        }
-        return connectorExecutor;
+        return beanAccessor.getService(ConnectorExecutor.class);
     }
 
     @Override
     public ExpressionService getExpressionService() {
-        if (expressionService == null) {
-            expressionService = beanAccessor.getService(ExpressionService.class);
-        }
-        return expressionService;
+        return beanAccessor.getService(ExpressionService.class);
     }
 
     @Override
     public DocumentService getDocumentService() {
-        if (documentService == null) {
-            documentService = beanAccessor.getService(DocumentService.class);
-        }
-        return documentService;
+        return beanAccessor.getService(DocumentService.class);
     }
 
     @Override
     public ProfileService getProfileService() {
-        if (profileService == null) {
-            profileService = beanAccessor.getService(ProfileService.class);
-        }
-        return profileService;
+        return beanAccessor.getService(ProfileService.class);
     }
 
     @Override
     public ProfilesImporter getProfilesImporter() {
-        if (profilesImporter == null) {
-            profilesImporter = beanAccessor.getService(ProfilesImporter.class);
-        }
-        return profilesImporter;
+        return beanAccessor.getService(ProfilesImporter.class);
     }
 
     @Override
     public ProfilesExporter getProfilesExporter() {
-        if (profilesExporter == null) {
-            profilesExporter = beanAccessor.getService(ProfilesExporter.class);
-        }
-        return profilesExporter;
+        return beanAccessor.getService(ProfilesExporter.class);
     }
 
     @Override
     public DataInstanceService getDataInstanceService() {
-
-        if (dataInstanceService == null) {
-            dataInstanceService = beanAccessor.getService(DataInstanceService.class);
-        }
-        return dataInstanceService;
+        return beanAccessor.getService(DataInstanceService.class);
     }
 
     @Override
     public OperationService getOperationService() {
-        if (operationService == null) {
-            operationService = beanAccessor.getService(OperationService.class);
-        }
-        return operationService;
+        return beanAccessor.getService(OperationService.class);
     }
 
     @Override
     public ExpressionResolverService getExpressionResolverService() {
-        if (expressionResolverService == null) {
-            expressionResolverService = beanAccessor.getService(ExpressionResolverService.class);
-        }
-        return expressionResolverService;
+        return beanAccessor.getService(ExpressionResolverService.class);
     }
 
     @Override
     public SupervisorMappingService getSupervisorService() {
-        if (supervisorService == null) {
-            supervisorService = beanAccessor.getService(SupervisorMappingService.class);
-        }
-        return supervisorService;
+        return beanAccessor.getService(SupervisorMappingService.class);
     }
 
     @Override
     public UserFilterService getUserFilterService() {
-        if (userFilterService == null) {
-            userFilterService = beanAccessor.getService("userFilterService", UserFilterService.class);
-        }
-        return userFilterService;
+        return beanAccessor.getService("userFilterService", UserFilterService.class);
     }
 
     @Override
     public SearchEntitiesDescriptor getSearchEntitiesDescriptor() {
-        if (searchEntitiesDescriptor == null) {
-            searchEntitiesDescriptor = beanAccessor.getService(SearchEntitiesDescriptor.class);
-        }
-        return searchEntitiesDescriptor;
+        return beanAccessor.getService(SearchEntitiesDescriptor.class);
     }
 
     @Override
     public SCommentService getCommentService() {
-        if (commentService == null) {
-            commentService = beanAccessor.getService(SCommentService.class);
-        }
-        return commentService;
+        return beanAccessor.getService(SCommentService.class);
     }
 
     @Override
     public ContainerRegistry getContainerRegistry() {
-        if (containerRegistry == null) {
-            containerRegistry = beanAccessor.getService(ContainerRegistry.class);
-        }
-        return containerRegistry;
+        return beanAccessor.getService(ContainerRegistry.class);
     }
 
     @Override
     public ExternalIdentityMappingService getExternalIdentityMappingService() {
-        if (externalIdentityMappingService == null) {
-            externalIdentityMappingService = beanAccessor.getService(ExternalIdentityMappingService.class);
-        }
-        return externalIdentityMappingService;
+        return beanAccessor.getService(ExternalIdentityMappingService.class);
     }
 
     @Override
     public LockService getLockService() {
-        if (lockService == null) {
-            lockService = beanAccessor.getService(LockService.class);
-        }
-        return lockService;
+        return beanAccessor.getService(LockService.class);
     }
 
     @Override
     public EventsHandler getEventsHandler() {
-        if (eventsHandler == null) {
-            eventsHandler = beanAccessor.getService(EventsHandler.class);
-        }
-        return eventsHandler;
+        return beanAccessor.getService(EventsHandler.class);
     }
 
     @Override
     public EventService getEventService() {
-        if (eventService == null) {
-            eventService = beanAccessor.getService(EventService.class);
-        }
-        return eventService;
+        return beanAccessor.getService(EventService.class);
     }
 
     public SpringBeanAccessor getBeanAccessor() {
@@ -594,90 +346,57 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public CacheService getCacheService() {
-        if (cacheService == null) {
-            cacheService = beanAccessor.getService("cacheService", CacheService.class);
-        }
-        return cacheService;
+        return beanAccessor.getService("cacheService", CacheService.class);
     }
 
     @Override
     public BusinessArchiveArtifactsManager getBusinessArchiveArtifactsManager() {
-        if (businessArchiveArtifactsManager == null) {
-            businessArchiveArtifactsManager = beanAccessor.getService(BusinessArchiveArtifactsManager.class);
-        }
-        return businessArchiveArtifactsManager;
+        return beanAccessor.getService(BusinessArchiveArtifactsManager.class);
     }
 
     @Override
     public WorkService getWorkService() {
-        if (workService == null) {
-            workService = beanAccessor.getService(WorkService.class);
-        }
-        return workService;
+        return beanAccessor.getService(WorkService.class);
     }
 
     @Override
     public WorkExecutorService getWorkExecutorService() {
-        if (workExecutorService == null) {
-            workExecutorService = beanAccessor.getService(WorkExecutorService.class);
-        }
-        return workExecutorService;
+        return beanAccessor.getService(WorkExecutorService.class);
     }
 
     @Override
     public SynchroService getSynchroService() {
-        if (synchroService == null) {
-            synchroService = beanAccessor.getService(SynchroService.class);
-        }
-        return synchroService;
+        return beanAccessor.getService(SynchroService.class);
     }
 
     @Override
     public IncidentService getIncidentService() {
-        if (incidentService == null) {
-            incidentService = beanAccessor.getService(IncidentService.class);
-        }
-        return incidentService;
+        return beanAccessor.getService(IncidentService.class);
     }
 
     @Override
     public SchedulerService getSchedulerService() {
-        if (schedulerService == null) {
-            schedulerService = beanAccessor.getService(SchedulerService.class);
-        }
-        return schedulerService;
+        return beanAccessor.getService(SchedulerService.class);
     }
 
     @Override
     public JobService getJobService() {
-        if (jobService == null) {
-            jobService = beanAccessor.getService(JobService.class);
-        }
-        return jobService;
+        return beanAccessor.getService(JobService.class);
     }
 
     @Override
     public ThemeService getThemeService() {
-        if (themeService == null) {
-            themeService = beanAccessor.getService(ThemeService.class);
-        }
-        return themeService;
+        return beanAccessor.getService(ThemeService.class);
     }
 
     @Override
     public TransientDataService getTransientDataService() {
-        if (transientDataService == null) {
-            transientDataService = beanAccessor.getService(TransientDataService.class);
-        }
-        return transientDataService;
+        return beanAccessor.getService(TransientDataService.class);
     }
 
     @Override
     public GatewayInstanceService getGatewayInstanceService() {
-        if (gatewayInstanceService == null) {
-            gatewayInstanceService = beanAccessor.getService(GatewayInstanceService.class);
-        }
-        return gatewayInstanceService;
+        return beanAccessor.getService(GatewayInstanceService.class);
     }
 
     @Override
@@ -687,10 +406,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public TenantConfiguration getTenantConfiguration() {
-        if (tenantConfiguration == null) {
-            tenantConfiguration = beanAccessor.getService(TenantConfiguration.class);
-        }
-        return tenantConfiguration;
+        return beanAccessor.getService(TenantConfiguration.class);
     }
 
     @Override
@@ -705,26 +421,17 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public PermissionService getPermissionService() {
-        if (permissionService == null) {
-            permissionService = beanAccessor.getService(PermissionService.class);
-        }
-        return permissionService;
+        return beanAccessor.getService(PermissionService.class);
     }
 
     @Override
     public ContractDataService getContractDataService() {
-        if (contractDataService == null) {
-            contractDataService = beanAccessor.getService(ContractDataService.class);
-        }
-        return contractDataService;
+        return beanAccessor.getService(ContractDataService.class);
     }
 
     @Override
     public ParameterService getParameterService() {
-        if (parameterService == null) {
-            parameterService = beanAccessor.getService(ParameterService.class);
-        }
-        return parameterService;
+        return beanAccessor.getService(ParameterService.class);
     }
 
     /**
@@ -732,118 +439,73 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
      */
     @Override
     public PageService getPageService() {
-        if (pageService == null) {
-            pageService = beanAccessor.getService(PageService.class);
-        }
-        return pageService;
+        return beanAccessor.getService(PageService.class);
     }
 
     @Override
     public ApplicationService getApplicationService() {
-        if (applicationService == null) {
-            applicationService = beanAccessor.getService(ApplicationService.class);
-        }
-        return applicationService;
+        return beanAccessor.getService(ApplicationService.class);
     }
 
     @Override
     public BusinessDataRepository getBusinessDataRepository() {
-        if (businessDataRespository == null) {
-            businessDataRespository = beanAccessor.getService(BusinessDataRepository.class);
-        }
-        return businessDataRespository;
+        return beanAccessor.getService(BusinessDataRepository.class);
     }
 
     @Override
     public BusinessDataModelRepository getBusinessDataModelRepository() {
-        if (businessDataModelRespository == null) {
-            businessDataModelRespository = beanAccessor.getService(BusinessDataModelRepository.class);
-        }
-        return businessDataModelRespository;
+        return beanAccessor.getService(BusinessDataModelRepository.class);
     }
 
     @Override
     public RefBusinessDataService getRefBusinessDataService() {
-        if (refBusinessDataService == null) {
-            refBusinessDataService = beanAccessor.getService(RefBusinessDataService.class);
-        }
-        return refBusinessDataService;
+        return beanAccessor.getService(RefBusinessDataService.class);
     }
 
     @Override
     public GenericAuthenticationService getAuthenticationService() {
-        if (genericAuthenticationService == null) {
-            genericAuthenticationService = beanAccessor.getService(GenericAuthenticationServiceAccessor.class).getAuthenticationService();
-        }
-        return genericAuthenticationService;
+        return beanAccessor.getService(GenericAuthenticationServiceAccessor.class).getAuthenticationService();
     }
 
     @Override
     public ReadPersistenceService getReadPersistenceService() {
-        if (readPersistenceService == null) {
-            readPersistenceService = beanAccessor.getService("persistenceService");
-        }
-        return readPersistenceService;
+        return beanAccessor.getService("persistenceService");
     }
 
     @Override
     public Recorder getRecorder() {
-        if (recorder == null) {
-            recorder = beanAccessor.getService(Recorder.class);
-        }
-        return recorder;
+        return beanAccessor.getService(Recorder.class);
     }
 
     @Override
     public BusinessArchiveService getBusinessArchiveService() {
-        if (businessArchiveService == null) {
-            businessArchiveService = beanAccessor.getService(BusinessArchiveService.class);
-        }
-        return businessArchiveService;
+        return beanAccessor.getService(BusinessArchiveService.class);
     }
 
     @Override
     public BusinessDataService getBusinessDataService() {
-        if (businessDataService == null) {
-            businessDataService = beanAccessor.getService(BusinessDataService.class);
-        }
-        return businessDataService;
+        return beanAccessor.getService(BusinessDataService.class);
     }
 
     @Override
     public FormMappingService getFormMappingService() {
-        if (formMappingService == null) {
-            formMappingService = beanAccessor.getService(FormMappingService.class);
-        }
-        return formMappingService;
+        return beanAccessor.getService(FormMappingService.class);
     }
 
     @Override
     public PageMappingService getPageMappingService() {
-        if (pageMappingService == null) {
-            pageMappingService = beanAccessor.getService(PageMappingService.class);
-        }
-        return pageMappingService;
+        return beanAccessor.getService(PageMappingService.class);
     }
 
     public ProcessResourcesService getProcessResourcesService() {
-        if (processResourcesService == null) {
-            processResourcesService = beanAccessor.getService(ProcessResourcesService.class);
-        }
-        return processResourcesService;
+        return beanAccessor.getService(ProcessResourcesService.class);
     }
 
     public TenantResourcesService getTenantResourcesService() {
-        if (tenantResourceService == null) {
-            tenantResourceService = beanAccessor.getService(TenantResourcesService.class);
-        }
-        return tenantResourceService;
+        return beanAccessor.getService(TenantResourcesService.class);
     }
 
     public MessagesHandlingService getMessagesHandlingService() {
-        if (messagesHandlingService == null) {
-            messagesHandlingService = beanAccessor.getService(MessagesHandlingService.class);
-        }
-        return messagesHandlingService;
+        return beanAccessor.getService(MessagesHandlingService.class);
     }
 }
