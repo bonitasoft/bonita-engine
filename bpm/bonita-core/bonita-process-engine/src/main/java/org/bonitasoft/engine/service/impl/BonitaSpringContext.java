@@ -31,19 +31,20 @@ public class BonitaSpringContext extends AbstractXmlApplicationContext {
 
     private List<Resource> resources = new ArrayList<>();
 
+
     /**
      * Create a new XmlApplicationContext with the given parent,
      * loading the definitions from the given XML files and automatically
      * refreshing the context.
      *
-     * @param parent          the parent context
+     * @param parent the parent context
      * @throws BeansException if context creation failed
      */
     public BonitaSpringContext(ApplicationContext parent) throws BeansException {
         super(parent);
 
     }
-    
+
     @Override
     protected Resource[] getConfigResources() {
         return resources.toArray(new Resource[resources.size()]);
