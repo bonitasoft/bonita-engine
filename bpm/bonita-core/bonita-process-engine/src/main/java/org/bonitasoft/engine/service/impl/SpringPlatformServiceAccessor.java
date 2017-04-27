@@ -43,75 +43,33 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     private final SpringBeanAccessor beanAccessor;
 
-    private PlatformService platformService;
-
-    private PlatformLoginService platformLoginService;
-
-    private SchedulerService schedulerService;
-
-    private TechnicalLoggerService technicalLoggerService;
-
-    private TransactionService transactionService;
-
-    private TransactionExecutor transactionExecutor;
-
-    private ClassLoaderService classLoaderService;
-
-    private DependencyService dependencyService;
-
-    private PlatformCommandService platformCommandService;
-
-    private PlatformSessionService platformSessionService;
-
-    private NodeConfiguration platformConfguration;
-
-    private PlatformCacheService platformCacheService;
-    private BroadcastService broadcastService;
-    private PlatformAuthenticationService platformAuthenticationService;
-    private ServicesResolver servicesResolver;
-
-    public SpringPlatformServiceAccessor(SpringBeanAccessor platformBeanAccessor) {
-        beanAccessor = platformBeanAccessor;
+    public SpringPlatformServiceAccessor(SpringBeanAccessor beanAccessor) {
+        this.beanAccessor = beanAccessor;
     }
 
     @Override
     public TransactionService getTransactionService() {
-        if (transactionService == null) {
-            transactionService = beanAccessor.getService(TransactionService.class);
-        }
-        return transactionService;
+        return beanAccessor.getService(TransactionService.class);
     }
 
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
-        if (technicalLoggerService == null) {
-            technicalLoggerService = beanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
-        }
-        return technicalLoggerService;
+        return beanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
     }
 
     @Override
     public PlatformLoginService getPlatformLoginService() {
-        if (platformLoginService == null) {
-            platformLoginService = beanAccessor.getService(PlatformLoginService.class);
-        }
-        return platformLoginService;
+        return beanAccessor.getService(PlatformLoginService.class);
     }
 
     @Override
     public SchedulerService getSchedulerService() {
-        if (schedulerService == null) {
-            schedulerService = beanAccessor.getService(SchedulerService.class);
-        }
-        return schedulerService;
+        return beanAccessor.getService(SchedulerService.class);
     }
 
     @Override
     public PlatformService getPlatformService() {
-        if (platformService == null) {
-            platformService = beanAccessor.getService(PlatformService.class);
-        }
-        return platformService;
+        return beanAccessor.getService(PlatformService.class);
     }
 
     @Override
@@ -121,58 +79,38 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     @Override
     public TransactionExecutor getTransactionExecutor() {
-        if (transactionExecutor == null) {
-            transactionExecutor = beanAccessor.getService(TransactionExecutor.class);
-        }
-        return transactionExecutor;
+        return beanAccessor.getService(TransactionExecutor.class);
     }
 
     @Override
     public ClassLoaderService getClassLoaderService() {
-        if (classLoaderService == null) {
-            classLoaderService = beanAccessor.getService("classLoaderService", ClassLoaderService.class);
-        }
-        return classLoaderService;
+        return beanAccessor.getService("classLoaderService", ClassLoaderService.class);
     }
 
     @Override
     public DependencyService getDependencyService() {
-        if (dependencyService == null) {
-            dependencyService = beanAccessor.getService("platformDependencyService", DependencyService.class);
-        }
-        return dependencyService;
+        return beanAccessor.getService("platformDependencyService", DependencyService.class);
     }
 
     @Override
     public PlatformCommandService getPlatformCommandService() {
-        if (platformCommandService == null) {
-            platformCommandService = beanAccessor.getService("platformCommandService", PlatformCommandService.class);
-        }
-        return platformCommandService;
+        return beanAccessor.getService("platformCommandService", PlatformCommandService.class);
     }
 
     @Override
     public PlatformSessionService getPlatformSessionService() {
-        if (platformSessionService == null) {
-            platformSessionService = beanAccessor.getService(PlatformSessionService.class);
-        }
-        return platformSessionService;
+        return beanAccessor.getService(PlatformSessionService.class);
     }
 
     @Override
     public NodeConfiguration getPlatformConfiguration() {
-        if (platformConfguration == null) {
-            platformConfguration = beanAccessor.getService(NodeConfiguration.class);
-        }
-        return platformConfguration;
+        return beanAccessor.getService(NodeConfiguration.class);
     }
 
     @Override
     public PlatformCacheService getPlatformCacheService() {
-        if (platformCacheService == null) {
-            platformCacheService = beanAccessor.getService(PlatformCacheService.class);
-        }
-        return platformCacheService;
+        return beanAccessor.getService(PlatformCacheService.class);
+
     }
 
     @Override
@@ -182,24 +120,17 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     @Override
     public BroadcastService getBroadcastService() {
-        if (broadcastService == null) {
-            broadcastService = beanAccessor.getService(BroadcastService.class);
-        }
-        return broadcastService;
+        return beanAccessor.getService(BroadcastService.class);
     }
 
     @Override
     public PlatformAuthenticationService getPlatformAuthenticationService() {
-        if (platformAuthenticationService == null) {
-            platformAuthenticationService = beanAccessor.getService(PlatformAuthenticationService.class);
-        }
-        return platformAuthenticationService;
+        return beanAccessor.getService(PlatformAuthenticationService.class);
     }
 
     @Override
     public <T> T lookup(String serviceName) throws NotFoundException {
         try{
-
             return beanAccessor.getService(serviceName);
         }catch (NoSuchBeanDefinitionException e) {
             throw new NotFoundException(e);
@@ -209,9 +140,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     @Override
     public ServicesResolver getServicesResolver() {
-        if (servicesResolver == null) {
-            servicesResolver = beanAccessor.getService(ServicesResolver.class);
-        }
-        return servicesResolver;
+        return beanAccessor.getService(ServicesResolver.class);
     }
 }
