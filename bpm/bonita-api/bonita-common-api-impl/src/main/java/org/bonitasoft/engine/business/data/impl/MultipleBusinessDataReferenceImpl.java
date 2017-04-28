@@ -41,7 +41,11 @@ public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
         this.storageIdsAsString = new ArrayList<>();
         for (final Long storageId : storageIds) {
             this.storageIds.add(storageId);
-            this.storageIdsAsString.add(storageId.toString());
+            if (storageId == null){
+                this.storageIdsAsString.add(null);
+            } else {
+                this.storageIdsAsString.add(storageId.toString());
+            }
         }
     }
 
