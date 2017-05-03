@@ -44,13 +44,21 @@ public class IOUtilTest {
     @Test
     public void getClassNameList() throws Exception {
         // given:
-        final byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
+        final byte[] jarContent = getFromResources("bdr-jar.bak");
 
         // when:
         final List<String> classNameList = IOUtil.getClassNameList(jarContent);
 
         // then:
         assertThat(classNameList).containsOnly("org.bonita.pojo.Employee");
+    }
+
+    private byte[] getFromResources(String name) throws IOException {
+        InputStream resourceAsStream = getClass().getResourceAsStream(name);
+        if (resourceAsStream == null) {
+            throw new IllegalStateException(String.format("no resource %s found", name));
+        }
+        return IOUtil.getAllContentFrom(resourceAsStream);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -81,8 +89,8 @@ public class IOUtilTest {
 
     @Test
     public void shouldAddJarEntry_AddAnEntryInExistingJar() throws Exception {
-        final byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
-        final byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
+        final byte[] jarContent = getFromResources("bdr-jar.bak");
+        final byte[] entryContent = getFromResources("persistence.xml");
         final String entryName = "META-INF/myNewEntry.xml";
         final byte[] updatedJar = IOUtil.addJarEntry(jarContent, entryName, entryContent);
         assertThat(updatedJar).isNotNull();
@@ -110,8 +118,8 @@ public class IOUtilTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldAddJarEntry_ThrowIllegalArgumentExceptionIfEntryAlreadyExists() throws Exception {
-        final byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
-        final byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
+        final byte[] jarContent = getFromResources("bdr-jar.bak");
+        final byte[] entryContent = getFromResources("persistence.xml");
         final String entryName = "META-INF/persistence.xml";
         IOUtil.addJarEntry(jarContent, entryName, entryContent);
     }
