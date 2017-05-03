@@ -391,7 +391,7 @@
         <!-- Platform Session -->
         <dependency>
             <groupId>org.bonitasoft.engine.platform.session</groupId>
-            <artifactId>bonita-platform-session-impl</artifactId>
+            <artifactId>bonita-platform-session</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -736,8 +736,7 @@
                                     <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
                                     <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
                                     <!-- Platform Session -->
-                                    <include>org.bonitasoft.engine.platform.session:bonita-platform-session-api</include>
-                                    <include>org.bonitasoft.engine.platform.session:bonita-platform-session-impl</include>
+                                    <include>org.bonitasoft.engine.platform.session:bonita-platform-session</include>
                                     <!-- Process Comment -->
                                     <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api</include>
                                     <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
