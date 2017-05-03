@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.platform.session</groupId>
-            <artifactId>bonita-platform-session-api</artifactId>
+            <artifactId>bonita-platform-session</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
