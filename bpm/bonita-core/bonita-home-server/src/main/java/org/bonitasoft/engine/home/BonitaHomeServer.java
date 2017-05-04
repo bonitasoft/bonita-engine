@@ -65,10 +65,6 @@ public class BonitaHomeServer {
         return INSTANCE;
     }
 
-    public Properties getPlatformInitProperties() throws IOException {
-        return mergeProperties(getPropertiesFromClassPath("bonita-platform-init-community.properties"), getConfigurationService().getPlatformInitEngineConf());
-    }
-
     private ConfigurationService getConfigurationService() {
         if (configurationService == null) {//should be given by spring
             try {

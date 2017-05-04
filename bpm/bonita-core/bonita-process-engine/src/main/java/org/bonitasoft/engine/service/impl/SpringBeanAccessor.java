@@ -41,12 +41,6 @@ public abstract class SpringBeanAccessor {
         this.parent = parent;
     }
 
-    private String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
-        final Properties properties = getBonitaHomeServer().getPlatformInitProperties();
-        final String activeProfiles = (String) properties.get("activeProfiles");
-        return activeProfiles.split(",");
-    }
-
     public <T> T getService(final Class<T> serviceClass) {
         return getContext().getBean(serviceClass);
     }
@@ -65,14 +59,14 @@ public abstract class SpringBeanAccessor {
                 context = createContext();
                 configureContext(context);
                 context.refresh();
-            } catch (IOException | BonitaHomeNotSetException e) {
+            } catch (IOException e) {
                 throw new BonitaRuntimeException(e);
             }
         }
         return context;
     }
 
-    private void configureContext(BonitaSpringContext context) throws IOException, BonitaHomeNotSetException {
+    private void configureContext(BonitaSpringContext context) throws IOException {
         for (String classPathResource : getSpringFileFromClassPath(isCluster())) {
             context.addClassPathResource(classPathResource);
         }
@@ -82,9 +76,6 @@ public abstract class SpringBeanAccessor {
 
         MutablePropertySources propertySources = context.getEnvironment().getPropertySources();
         propertySources.addLast(new PropertiesPropertySource("contextProperties", getProperties()));
-
-        final String[] activeProfiles = getActiveProfiles();
-        context.getEnvironment().setActiveProfiles(activeProfiles);
     }
 
     protected BonitaSpringContext createContext() {

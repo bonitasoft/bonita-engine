@@ -66,15 +66,17 @@ public class PlatformSetupDistributionIT {
         oCmdLine.addArgument("init");
         DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
         executor.setStreamHandler(PlatformSetupTestUtils.getExecuteStreamHandler("yes"));
+
         //when
         int iExitValue = executor.execute(oCmdLine);
+
         //then
         assertThat(iExitValue).isEqualTo(0);
         Connection jdbcConnection = PlatformSetupTestUtils.getJdbcConnection(distFolder);
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
-        assertThat(resultSet.getInt("nb")).isEqualTo(43);
+        assertThat(resultSet.getInt("nb")).isGreaterThan(0);
     }
 
     @Test
@@ -92,7 +94,7 @@ public class PlatformSetupDistributionIT {
         Statement statement = jdbcConnection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
-        assertThat(resultSet.getInt("nb")).isEqualTo(43);
+        assertThat(resultSet.getInt("nb")).isGreaterThan(0);
     }
 
     @Test
