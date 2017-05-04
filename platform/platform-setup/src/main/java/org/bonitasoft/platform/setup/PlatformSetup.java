@@ -264,7 +264,6 @@ public class PlatformSetup {
     private void initConfigurationWithClasspath() throws PlatformException {
         try {
             List<BonitaConfiguration> platformInitConfigurations = new ArrayList<>(2);
-            addIfExists(platformInitConfigurations, ConfigurationType.PLATFORM_INIT_ENGINE, "bonita-platform-init-community-custom.properties");
             addIfExists(platformInitConfigurations, ConfigurationType.PLATFORM_INIT_ENGINE, "bonita-platform-init-custom.xml");
             configurationService.storePlatformInitEngineConf(platformInitConfigurations);
 

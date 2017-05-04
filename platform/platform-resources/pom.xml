@@ -57,13 +57,6 @@
                                         </filterreader>
                                     </filterchain>
                                 </copy>
-                                <copy file="${engine.properties.source}/bonita-platform-init-community.properties" toFile="${generated.resources.root}/platform_init_engine/bonita-platform-init-community-custom.properties">
-                                    <filterchain>
-                                        <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
-                                            <param name="prefix" value="#" />
-                                        </filterreader>
-                                    </filterchain>
-                                </copy>
                                 <copy file="${engine.properties.source}/bonita-tenant-community.properties" toFile="${generated.resources.root}/tenant_template_engine/bonita-tenant-community-custom.properties">
                                     <filterchain>
                                         <filterreader classname="org.apache.tools.ant.filters.PrefixLines">

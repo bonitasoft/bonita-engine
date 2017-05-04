@@ -42,7 +42,7 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
 
     @Override
     protected Properties getProperties() throws IOException {
-        return BONITA_HOME_SERVER.getPlatformInitProperties();
+        return new Properties();
     }
 
     @Override
