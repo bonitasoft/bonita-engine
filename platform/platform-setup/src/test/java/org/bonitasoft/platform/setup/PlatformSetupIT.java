@@ -116,7 +116,7 @@ public class PlatformSetupIT {
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
         FileUtils.write(setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("platform_init_engine")
-                .resolve("bonita-platform-init-community.properties").toFile(), "custom content", Charset.defaultCharset());
+                .resolve("whatever.properties").toFile(), "custom content", Charset.defaultCharset());
         configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
         systemOutRule.clearLog();
 
@@ -125,7 +125,7 @@ public class PlatformSetupIT {
 
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'bonita-platform-init-community.properties'");
+                .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'whatever.properties'");
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).get("resource_content")).isEqualTo("custom content".getBytes());
         assertThat(systemOutRule.getLog()).contains("Database will be initialized with configuration files from folder: "
@@ -224,7 +224,6 @@ public class PlatformSetupIT {
         assertThat(configurations).extracting("resourceName").containsOnly(
                 "bonita-platform-community-custom.properties",
                 "bonita-platform-custom.xml",
-                "bonita-platform-init-community-custom.properties",
                 "bonita-platform-init-custom.xml",
                 "cache-config.xml",
                 "jaas-standard.cfg",

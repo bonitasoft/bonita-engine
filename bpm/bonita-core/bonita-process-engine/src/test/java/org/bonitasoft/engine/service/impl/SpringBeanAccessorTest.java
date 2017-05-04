@@ -54,9 +54,6 @@ public class SpringBeanAccessorTest {
     public void before() throws Exception {
         springBeanAccessor = createSpringBeanAccessor();
         doReturn(bonitaHomeServer).when(springBeanAccessor).getBonitaHomeServer();
-        Properties platformInitProperties = new Properties();
-        platformInitProperties.put("activeProfiles", "community");
-        doReturn(platformInitProperties).when(bonitaHomeServer).getPlatformInitProperties();
         doReturn(context).when(springBeanAccessor).createContext();
         doReturn(environment).when(context).getEnvironment();
         doReturn(true).when(springBeanAccessor).isCluster();
