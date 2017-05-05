@@ -150,7 +150,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.command</groupId>
-            <artifactId>bonita-command-api</artifactId>
+            <artifactId>bonita-command</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

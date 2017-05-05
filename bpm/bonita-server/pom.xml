@@ -164,7 +164,7 @@
         <!-- Command -->
         <dependency>
             <groupId>org.bonitasoft.engine.command</groupId>
-            <artifactId>bonita-command-impl</artifactId>
+            <artifactId>bonita-command</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -652,8 +652,7 @@
                                     <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
                                     <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
                                     <!-- Command -->
-                                    <include>org.bonitasoft.engine.command:bonita-command-api</include>
-                                    <include>org.bonitasoft.engine.command:bonita-command-impl</include>
+                                    <include>org.bonitasoft.engine.command:bonita-command</include>
                                     <!-- Contract Data -->
                                     <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-api</include>
                                     <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-impl</include>
