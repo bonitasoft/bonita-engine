@@ -41,7 +41,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.connector</groupId>
-			<artifactId>bonita-connector-executor-api</artifactId>
+			<artifactId>bonita-connector-executor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
