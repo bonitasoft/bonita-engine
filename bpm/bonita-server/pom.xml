@@ -525,7 +525,7 @@
         <!-- Transaction -->
         <dependency>
             <groupId>org.bonitasoft.engine.transaction</groupId>
-            <artifactId>bonita-transaction-impl</artifactId>
+            <artifactId>bonita-transaction</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -775,8 +775,7 @@
                                     <include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
                                     <include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
                                     <!-- Transaction -->
-                                    <include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
-                                    <include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
+                                    <include>org.bonitasoft.engine.transaction:bonita-transaction</include>
                                     <!-- Transient Data -->
                                     <include>org.bonitasoft.engine.core.data:bonita-data-instance-transient</include>
                                     <!-- Technical Logs -->

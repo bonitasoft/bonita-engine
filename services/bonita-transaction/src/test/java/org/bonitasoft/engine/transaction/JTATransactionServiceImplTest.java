@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
-
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
@@ -29,9 +28,7 @@ import javax.transaction.TransactionManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
@@ -53,8 +50,6 @@ public class JTATransactionServiceImplTest {
     private Callable<Object> txContent;
     @Mock
     private Callable<Void> beforeCommitCallable;
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void before() throws Exception {
@@ -71,7 +66,7 @@ public class JTATransactionServiceImplTest {
         assertEquals(1, txService.getNumberOfActiveTransactions());
     }
 
-    @Test
+    @Test(expected = STransactionCreationException.class)
     public void should_throw_exception_if_call_is_nested() throws Exception {
         when(txManager.getStatus()).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
@@ -79,8 +74,6 @@ public class JTATransactionServiceImplTest {
         JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
         txService.begin();
-        expectedException.expect(STransactionCreationException.class);
-        expectedException.expectMessage("We do not support nested calls to the transaction service.");
         txService.begin();
     }
 
@@ -296,11 +289,10 @@ public class JTATransactionServiceImplTest {
         verify(txManager).rollback();
     }
 
-    @Test
+    @Test(expected = STransactionCommitException.class)
     public void should_throw_exception_when_complete_on_no_transaction() throws Exception {
         doReturn(Status.STATUS_NO_TRANSACTION).when(txManager).getStatus();
 
-        expectedException.expect(STransactionCommitException.class);
         txService.complete();
     }
 
@@ -325,10 +317,12 @@ public class JTATransactionServiceImplTest {
 
         in_an_other_method_to_verify_the_stacktrace_contains_this_method_name(txService);
 
-        expectedException.expect(STransactionCreationException.class);
-        expectedException.expectMessage("Last begin made by:");
-        expectedException.expectMessage("in_an_other_method_to_verify_the_stacktrace_contains_this_method_name");
-        txService.begin();
+        try {
+            txService.begin();
+            fail();
+        } catch (STransactionCreationException e) {
+            assertThat(e.getMessage()).contains("in_an_other_method_to_verify_the_stacktrace_contains_this_method_name");
+        }
     }
 
     private void in_an_other_method_to_verify_the_stacktrace_contains_this_method_name(TransactionService txService) throws STransactionCreationException {
