@@ -297,7 +297,7 @@
         <!-- Lock -->
         <dependency>
             <groupId>org.bonitasoft.engine.lock</groupId>
-            <artifactId>bonita-lock-api-memory-impl</artifactId>
+            <artifactId>bonita-lock</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -697,8 +697,7 @@
                                     <include>org.bonitasoft.engine.identity:bonita-identity-api</include>
                                     <include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
                                     <!-- Lock -->
-                                    <include>org.bonitasoft.engine.lock:bonita-lock-api</include>
-                                    <include>org.bonitasoft.engine.lock:bonita-lock-api-memory-impl</include>
+                                    <include>org.bonitasoft.engine.lock:bonita-lock</include>
                                     <!-- Login -->
                                     <include>org.bonitasoft.engine.core.login:bonita-login-api</include>
                                     <include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
