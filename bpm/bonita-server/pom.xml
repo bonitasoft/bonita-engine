@@ -177,7 +177,7 @@
 
         <!-- Connector Executor -->
         <dependency>
-            <artifactId>bonita-connector-executor-api-impl</artifactId>
+            <artifactId>bonita-connector-executor</artifactId>
             <groupId>org.bonitasoft.engine.connector</groupId>
             <version>${project.version}</version>
         </dependency>
@@ -658,8 +658,7 @@
                                     <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-api</include>
                                     <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-impl</include>
                                     <!-- Connector Executor -->
-                                    <include>org.bonitasoft.engine.connector:bonita-connector-executor-api</include>
-                                    <include>org.bonitasoft.engine.connector:bonita-connector-executor-api-impl</include>
+                                    <include>org.bonitasoft.engine.connector:bonita-connector-executor</include>
                                     <!-- Connector -->
                                     <include>org.bonitasoft.engine.core.connector:bonita-connector-service-api</include>
                                     <include>org.bonitasoft.engine.core.connector:bonita-connector-service-api-impl</include>
