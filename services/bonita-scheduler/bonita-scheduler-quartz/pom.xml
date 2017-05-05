@@ -46,7 +46,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.transaction</groupId>
-			<artifactId>bonita-transaction-api</artifactId>
+			<artifactId>bonita-transaction</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- Log -->
