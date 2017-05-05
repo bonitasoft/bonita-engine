@@ -280,7 +280,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.theme</groupId>
-            <artifactId>bonita-theme-api</artifactId>
+            <artifactId>bonita-theme</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
