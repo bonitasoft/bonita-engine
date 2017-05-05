@@ -580,7 +580,7 @@
         <!-- Web Theme -->
         <dependency>
             <groupId>org.bonitasoft.engine.theme</groupId>
-            <artifactId>bonita-theme-impl</artifactId>
+            <artifactId>bonita-theme</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -793,8 +793,7 @@
                                     <include>org.bonitasoft.engine.profile:bonita-profile-api</include>
                                     <include>org.bonitasoft.engine.profile:bonita-profile-impl</include>
                                     <!-- Web Theme -->
-                                    <include>org.bonitasoft.engine.theme:bonita-theme-api</include>
-                                    <include>org.bonitasoft.engine.theme:bonita-theme-impl</include>
+                                    <include>org.bonitasoft.engine.theme:bonita-theme</include>
                                     <!-- Engine -->
                                     <include>org.bonitasoft.engine.core:bonita-process-engine</include>
                                 </includes>
