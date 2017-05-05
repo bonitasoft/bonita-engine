@@ -200,7 +200,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.lock</groupId>
-            <artifactId>bonita-lock-api</artifactId>
+            <artifactId>bonita-lock</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
