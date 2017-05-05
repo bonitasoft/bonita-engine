@@ -15,10 +15,12 @@ package org.bonitasoft.engine.core.connector.parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -51,8 +53,9 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
     // not usefull but must  be in the xsd (studio related
     @XmlElement
     private Boolean hasSources;
-    @XmlElement
-    private JarDependencies jarDependencies;
+    @XmlElementWrapper(name = "jarDependencies")
+    @XmlElement(type = String.class,name = "jarDependency")
+    private List<String> jarDependencies = new ArrayList<>();
     //can be in xsd
     @XmlElement
     private String description;
@@ -64,7 +67,7 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
     }
 
     public SConnectorImplementationDescriptor(final String implementationClassName, final String id, final String version, final String definitionId,
-            final String definitionVersion, final JarDependencies jarDependencies) {
+            final String definitionVersion, final ArrayList<String> jarDependencies) {
         super();
         this.implementationClassName = implementationClassName;
         this.id = id;
@@ -73,8 +76,6 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
         this.definitionVersion = definitionVersion;
         if (jarDependencies != null) {
             this.jarDependencies = jarDependencies;
-        } else {
-            this.jarDependencies = new JarDependencies(new ArrayList<String>());
         }
     }
 
@@ -98,7 +99,7 @@ public class SConnectorImplementationDescriptor implements Serializable, Compara
         return definitionVersion;
     }
 
-    public JarDependencies getJarDependencies() {
+    public List<String> getJarDependencies() {
         return jarDependencies;
     }
 
