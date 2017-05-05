@@ -160,7 +160,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.data.definition</groupId>
-            <artifactId>bonita-data-definition-model</artifactId>
+            <artifactId>bonita-data-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -409,13 +409,6 @@
             <!-- because we need the builderfactory impl and it does not make sense to mock them -->
             <artifactId>bonita-data-instance-impl</artifactId>
             <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!-- because we need the builderfactory impl and it does not make sense to mock them -->
-            <artifactId>bonita-data-definition-model-impl</artifactId>
-            <groupId>org.bonitasoft.engine.data.definition</groupId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

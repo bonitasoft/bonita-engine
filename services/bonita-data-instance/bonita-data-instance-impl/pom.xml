@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.data.definition</groupId>
-            <artifactId>bonita-data-definition-model</artifactId>
+            <artifactId>bonita-data-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
 

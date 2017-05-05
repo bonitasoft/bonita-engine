@@ -198,7 +198,7 @@
         <!-- Data Definition -->
         <dependency>
             <groupId>org.bonitasoft.engine.data.definition</groupId>
-            <artifactId>bonita-data-definition-model-impl</artifactId>
+            <artifactId>bonita-data-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -662,8 +662,7 @@
                                     <include>org.bonitasoft.engine.core.connector:bonita-connector-service-api</include>
                                     <include>org.bonitasoft.engine.core.connector:bonita-connector-service-api-impl</include>
                                     <!-- Data Definition -->
-                                    <include>org.bonitasoft.engine.data.definition:bonita-data-definition-model</include>
-                                    <include>org.bonitasoft.engine.data.definition:bonita-data-definition-model-impl</include>
+                                    <include>org.bonitasoft.engine.data.definition:bonita-data-definition</include>
                                     <!-- Data Instance -->
                                     <include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
                                     <include>org.bonitasoft.engine.data.instance:bonita-data-instance-impl</include>
