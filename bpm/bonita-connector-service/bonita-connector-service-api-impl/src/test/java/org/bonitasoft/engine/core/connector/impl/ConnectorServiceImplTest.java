@@ -18,8 +18,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.notNull;
 
 import java.io.Serializable;
@@ -39,7 +39,6 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
-import org.bonitasoft.engine.core.connector.parser.JarDependencies;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -148,9 +147,9 @@ public class ConnectorServiceImplTest {
         final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
         final SConnectorImplementationDescriptor hoogardenConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName,
                 connectorImplId,
-                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
+                connectorImplVersion, connectorDefId, connectorDefVersion, new ArrayList<>(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
         final SConnectorImplementationDescriptor oldConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Collections.singletonList("file.jar")));
+                connectorImplVersion, connectorDefId, connectorDefVersion, new ArrayList<>(Collections.singletonList("file.jar")));
 
         Map<String, byte[]> zipFileMap = new HashMap<>(3);
         byte[] connectorImplFile = createConnectorImplFile(hoogardenConnectorDescriptor);
@@ -215,7 +214,7 @@ public class ConnectorServiceImplTest {
     public void should_executeConnector_call_connector_executor() throws Exception {
         //given
         SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
-                "impplVersion", "defId", "defVersion", new JarDependencies(Collections.<String> emptyList()));
+                "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.<String> emptyList()));
         SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
 
         //when
@@ -239,7 +238,7 @@ public class ConnectorServiceImplTest {
         final String connectorImplVersion = "1.0";
         final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
         final SConnectorImplementationDescriptor connectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
+                connectorImplVersion, connectorDefId, connectorDefVersion, new ArrayList<>(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
         byte[] connectorImplFile = createConnectorImplFile(connectorImplDescriptor);
 
         final Map<String, byte[]> zipFileMap = new HashMap<>(3);
@@ -446,7 +445,7 @@ public class ConnectorServiceImplTest {
 
     private byte[] createConnectorImplFile(SConnectorImplementationDescriptor connector) {
         return createConnectorImplFile(connector.getDefinitionId(), connector.getDefinitionVersion(), connector.getId(), connector.getVersion(),
-                connector.getImplementationClassName(), connector.getJarDependencies().getDependencies());
+                connector.getImplementationClassName(), connector.getJarDependencies());
     }
 
     private byte[] createConnectorImplFile(String definitionId, String definitionVersion, String id, String version, String className, List<String> jars) {
@@ -484,7 +483,7 @@ public class ConnectorServiceImplTest {
     public void should_throw_a_SConnectorException_if_a_Throwable_is_thrown_when_executing_a_connector() throws Exception {
         //given
         SConnectorImplementationDescriptor connectorImplementationDescriptor = new SConnectorImplementationDescriptor(MyTestConnector.class.getName(), "implId",
-                "impplVersion", "defId", "defVersion", new JarDependencies(Collections.<String> emptyList()));
+                "impplVersion", "defId", "defVersion", new ArrayList<>(Collections.<String> emptyList()));
         SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
 
         Map<String, Object> inputParameters = Collections.<String, Object> singletonMap("key", "value");
