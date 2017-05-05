@@ -35,7 +35,13 @@ public class SConnectorImplementationDescriptorTest {
         assertThat(theConnector.getVersion()).isEqualTo("version");
         assertThat(theConnector.getDefinitionVersion()).isEqualTo("definitionVersion");
         assertThat(theConnector.getId()).isEqualTo("id");
-
     }
 
+    @Test
+    public void theDefaultConstructorShouldNotGenerateANullFieldForJarsDependencies(){
+        
+        SConnectorImplementationDescriptor theConnector = new SConnectorImplementationDescriptor();
+        assertThat(theConnector.getJarDependencies()).isNotNull();
+        
+    }
 }

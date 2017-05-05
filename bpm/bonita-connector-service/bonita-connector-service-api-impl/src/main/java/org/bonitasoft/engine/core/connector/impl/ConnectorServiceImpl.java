@@ -403,7 +403,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             SConnectorImplementationDescriptor connectorImplementationDescriptorToReplace)
             throws SBonitaReadException, SDependencyException {
         List<String> jarFileNames = connectorImplementationDescriptorToReplace == null ? Collections.<String> emptyList()
-                : connectorImplementationDescriptorToReplace.getJarDependencies().getDependencies();
+                : connectorImplementationDescriptorToReplace.getJarDependencies();
         Set<String> dependenciesToUpdate = new HashSet<>();
         // delete the .jar files for the specified connector
         if (jarFileNames != null) {
