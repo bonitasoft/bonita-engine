@@ -272,12 +272,12 @@
         <!-- Incident -->
         <dependency>
             <groupId>org.bonitasoft.engine.incident</groupId>
-            <artifactId>bonita-incident-api</artifactId>
+            <artifactId>bonita-incident</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.incident</groupId>
-            <artifactId>bonita-incident-log</artifactId>
+            <artifactId>bonita-incident</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -689,8 +689,7 @@
                                     <!-- Home Server -->
                                     <include>org.bonitasoft.engine.core:bonita-home-server</include>
                                     <!-- Incident -->
-                                    <include>org.bonitasoft.engine.incident:bonita-incident-api</include>
-                                    <include>org.bonitasoft.engine.incident:bonita-incident-log</include>
+                                    <include>org.bonitasoft.engine.incident:bonita-incident</include>
                                     <!-- Identity -->
                                     <include>org.bonitasoft.engine.identity:bonita-identity-api</include>
                                     <include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
