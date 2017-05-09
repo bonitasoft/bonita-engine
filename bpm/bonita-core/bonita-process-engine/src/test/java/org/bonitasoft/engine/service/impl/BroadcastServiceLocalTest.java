@@ -16,6 +16,7 @@ package org.bonitasoft.engine.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
@@ -142,7 +143,7 @@ public class BroadcastServiceLocalTest {
     @Test
     public void should_execute_on_platform_throw_illegalStateException__when_unable_to_inject_service() throws Exception {
         //given
-        doThrow(InvocationTargetException.class).when(servicesResolver).injectServices(anyLong(), any(Object.class));
+        doThrow(InvocationTargetException.class).when(servicesResolver).injectServices(nullable(Long.class), nullable(Object.class));
         //then
         expectedException.expect(IllegalStateException.class);
         broadcastServiceLocal.executeOnAllNodes(callable);

@@ -49,8 +49,6 @@ public class ClassLoaderEnvironmentTest {
 
     @Test
     public void should_isPackage_return_false_for_known_class() throws ClassNotFoundException {
-        doReturn(String.class).when(classloader).loadClass(String.class.getName());
-
         boolean aPackage = classLoaderEnvironment.isPackage(new char[][]{"java".toCharArray(), "lang".toCharArray()}, "String".toCharArray());
 
         assertThat(aPackage).isFalse();
@@ -58,8 +56,6 @@ public class ClassLoaderEnvironmentTest {
 
     @Test
     public void should_isPackage_return_false_for_parent_known_class() throws ClassNotFoundException {
-        doReturn(String.class).when(classloader).loadClass(String.class.getName());
-
         boolean aPackage = classLoaderEnvironment.isPackage(charsArray("java.lang.String"),"SubElement".toCharArray());
 
         assertThat(aPackage).isFalse();
@@ -86,8 +82,6 @@ public class ClassLoaderEnvironmentTest {
 
     @Test
     public void should_isPackage_return_false_for_empty_package() throws ClassNotFoundException {
-        doReturn(this.getClass()).when(classloader).loadClass("Toto");
-
         boolean aPackage = classLoaderEnvironment.isPackage(new char[][]{}, "Toto".toCharArray());
 
         assertThat(aPackage).isFalse();

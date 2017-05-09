@@ -33,7 +33,6 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -66,16 +65,6 @@ public class DisableProcessTest {
 
     @Mock
     private BonitaConfiguration bonitaConfiguration;
-
-    @Before
-    public void setUp() {
-
-        when(platformServiceAccessor.getSchedulerService()).thenReturn(scheduler);
-        when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
-        when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        when(tenantServiceAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
-        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(logger);
-    }
 
     @Test
     public void execute_should_not_clean_the_classLoader_due_to_its_use_for_running_instances() throws SBonitaException {

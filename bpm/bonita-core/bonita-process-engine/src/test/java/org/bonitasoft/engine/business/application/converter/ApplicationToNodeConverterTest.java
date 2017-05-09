@@ -15,15 +15,12 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +42,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -57,42 +53,21 @@ public class ApplicationToNodeConverterTest {
 
     @Mock
     private ProfileService profileService;
-
     @Mock
     private ApplicationService applicationService;
-
     @Mock
     private ApplicationPageToNodeConverter pageConverter;
-
     @Mock
     private ApplicationMenuToNodeConverter menuConverter;
-
     @Mock
     private PageService pageService;
-
     @Mock
     private SPage defaultLayout;
-
     @Mock
     private SPage defaultTheme;
 
-    public static final long DEFAULT_LAYOUT_ID = 101;
-
-    public static final long DEFAULT_THEME_ID = 102;
-
     @InjectMocks
     private ApplicationToNodeConverter converter;
-
-    @Before
-    public void setUp() throws Exception {
-        given(defaultLayout.getId()).willReturn(DEFAULT_LAYOUT_ID);
-        given(defaultLayout.getName()).willReturn(ApplicationService.DEFAULT_LAYOUT_NAME);
-        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
-
-        given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
-        given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
-        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
-    }
 
     @Test
     public void toNode_should_return_convert_all_string_fields() throws Exception {
@@ -174,9 +149,6 @@ public class ApplicationToNodeConverterTest {
         final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
         application.setHomePageId(8L);
 
-        final SApplicationPage homePage = mock(SApplicationPage.class);
-        given(homePage.getToken()).willReturn("home");
-
         given(applicationService.getApplicationPage(8L)).willThrow(new SObjectNotFoundException());
 
         //when
@@ -225,8 +197,8 @@ public class ApplicationToNodeConverterTest {
         //given
         final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
 
-        doThrow(new SBonitaReadException("")).when(menuConverter).addMenusToApplicationNode(anyLong(), anyLong(), any(ApplicationNode.class),
-                any(ApplicationMenuNode.class));
+        doThrow(new SBonitaReadException("")).when(menuConverter).addMenusToApplicationNode(nullable(Long.class), nullable(Long.class), nullable(ApplicationNode.class),
+                nullable(ApplicationMenuNode.class));
 
         converter.toNode(application);
     }

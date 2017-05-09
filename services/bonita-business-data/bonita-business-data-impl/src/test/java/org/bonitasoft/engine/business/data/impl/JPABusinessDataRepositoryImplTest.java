@@ -21,14 +21,12 @@ import static org.mockito.Mockito.*;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
@@ -82,7 +80,6 @@ public class JPABusinessDataRepositoryImplTest {
         doReturn(criteriaBuilder).when(manager).getCriteriaBuilder();
         CriteriaQuery criteriaQuery = mock(CriteriaQuery.class);
         doReturn(criteriaQuery).when(criteriaBuilder).createQuery(any(Class.class));
-        doReturn(criteriaQuery).when(criteriaQuery).where(any(Expression.class));
         doReturn(criteriaQuery).when(criteriaQuery).select(any(Selection.class));
         Root root = mock(Root.class);
         doReturn(root).when(criteriaQuery).from(any(Class.class));
@@ -102,9 +99,6 @@ public class JPABusinessDataRepositoryImplTest {
 
     @Test
     public void should_stop_remove_listener_on_classloader() throws Exception {
-        //given
-        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
-        doReturn(mock(EntityManagerFactory.class)).when(repository).createEntityManagerFactory();
         //when
         repository.stop();
         //then
@@ -116,7 +110,6 @@ public class JPABusinessDataRepositoryImplTest {
         //given
         EntityManagerFactory entityManagerFactory = mock(EntityManagerFactory.class);
         doReturn(entityManagerFactory).when(repository).createEntityManagerFactory();
-        doReturn(entityManagerFactory).when(repository).getEntityManagerFactory();
         repository.start();
         //when
         repository.onUpdate(null);

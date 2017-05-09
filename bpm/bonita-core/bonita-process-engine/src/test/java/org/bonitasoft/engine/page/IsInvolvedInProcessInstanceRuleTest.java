@@ -71,7 +71,6 @@ public class IsInvolvedInProcessInstanceRuleTest extends RuleTest {
     @Test
     public void shouldNotAllowIfNotPendingOrAssignedTasks() throws Exception {
         Map<String, Serializable> context = buildContext(189L, null);
-        doReturn(false).when(taskInvolvementDelegate).hasUserPendingOrAssignedTasks(32L, 35L);
 
         final boolean allowed = rule.isAllowed("someKey", context);
 

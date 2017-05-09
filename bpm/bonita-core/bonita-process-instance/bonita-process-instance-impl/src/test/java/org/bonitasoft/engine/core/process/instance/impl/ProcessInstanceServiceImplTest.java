@@ -18,7 +18,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -191,7 +190,6 @@ public class ProcessInstanceServiceImplTest {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
         doReturn(null).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
-        doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
 
         // when:
         processInstanceService.deleteArchivedParentProcessInstanceAndElements(aProcessInstance);
@@ -272,7 +270,6 @@ public class ProcessInstanceServiceImplTest {
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
-        when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(mock(ReadPersistenceService.class));
         processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteProcessInstanceElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
@@ -634,8 +631,6 @@ public class ProcessInstanceServiceImplTest {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SIntermediateCatchEventInstanceImpl();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
@@ -665,8 +660,6 @@ public class ProcessInstanceServiceImplTest {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SStartEventInstanceImpl();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
@@ -681,8 +674,6 @@ public class ProcessInstanceServiceImplTest {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SBoundaryEventInstanceImpl();
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
@@ -766,7 +757,7 @@ public class ProcessInstanceServiceImplTest {
 
         processInstanceService.getNumberOfProcessInstances(45L);
 
-        verify(readPersistenceService).selectOne(argThat(new SelectOneDescriptorMatcher(countDescriptor)));
+        verify(readPersistenceService).selectOne(eq(countDescriptor));
     }
 
     @Test(expected = SBonitaReadException.class)

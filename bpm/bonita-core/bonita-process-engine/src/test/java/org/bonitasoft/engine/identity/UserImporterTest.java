@@ -80,12 +80,6 @@ public class UserImporterTest {
 
         given(persistedUser.getId()).willReturn(USER_ID);
 
-        given(skills.getName()).willReturn(SKILLS_NAME);
-        given(skills.getId()).willReturn(SKILLS_ID);
-
-        given(location.getName()).willReturn(LOCATION_NAME);
-        given(location.getId()).willReturn(LOCATION_ID);
-
         skillsValue = new ExportedCustomUserInfoValue(SKILLS_NAME, SKILLS_VALUE);
         locationValue = new ExportedCustomUserInfoValue(LOCATION_NAME, lOCATION_VALUE);
         manager = new SUserImpl();
@@ -94,7 +88,6 @@ public class UserImporterTest {
         currentUser = new SUserImpl();
 
         userToImport = getUser(FIRST_USER, Arrays.asList(skillsValue, locationValue));
-        doReturn(currentUser).when(identityService).createUser(any(SUser.class));
     }
 
     private ExportedUser getUser(String username, List<ExportedCustomUserInfoValue> userInfoValues) {

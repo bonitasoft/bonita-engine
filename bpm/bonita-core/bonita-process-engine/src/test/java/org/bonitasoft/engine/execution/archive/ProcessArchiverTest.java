@@ -42,6 +42,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -53,31 +54,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ProcessArchiverTest {
 
     @Mock
-    ArchiveService archiveService;
+    private ArchiveService archiveService;
     @Mock
-    ProcessInstanceService processInstanceService;
+    private ProcessInstanceService processInstanceService;
     @Mock
-    DocumentService documentService;
+    private DocumentService documentService;
     @Mock
-    TechnicalLoggerService logger;
+    private TechnicalLoggerService logger;
     @Mock
-    SCommentService commentService;
+    private SCommentService commentService;
     @Mock
-    ProcessDefinitionService processDefinitionService;
+    private ProcessDefinitionService processDefinitionService;
     @Mock
-    ConnectorInstanceService connectorInstanceService;
+    private ConnectorInstanceService connectorInstanceService;
     @Mock
-    ClassLoaderService classLoaderService;
+    private ClassLoaderService classLoaderService;
     @Mock
-    RefBusinessDataService refBusinessDataService;
+    private RefBusinessDataService refBusinessDataService;
     @Mock
     DataInstanceService dataInstanceService;
     @Mock
     private ActivityInstanceService activityInstanceService;
     @Mock
     private ContractDataService contractDataInstanceService;
-
     @Spy
+    @InjectMocks
     private ProcessArchiver processArchiver;
 
     @Test
@@ -92,11 +93,12 @@ public class ProcessArchiverTest {
         processInstance.setId(451L);
 
         doReturn(mock(SAProcessInstance.class)).when(processArchiver).buildArchiveProcessInstance(processInstance);
-        doNothing().when(processArchiver).archiveConnectorInstancesIfAny(eq(processInstance), eq(connectorInstanceService), any(SProcessDefinition.class),
+        doNothing().when(processArchiver).archiveConnectorInstancesIfAny(eq(processInstance), eq(connectorInstanceService), nullable(SProcessDefinition.class),
                 anyLong());
 
         doReturn(sRefBusinessDataInstances).when(refBusinessDataService).getRefBusinessDataInstances(eq(processInstance.getId()), eq(0), anyInt());
-        doNothing().when(refBusinessDataService).archiveRefBusinessDataInstance(any(SRefBusinessDataInstance.class));
+        doNothing().when(refBusinessDataService)
+                .archiveRefBusinessDataInstance(nullable(SRefBusinessDataInstance.class));
 
         processArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, documentService, logger, commentService,
                 processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
@@ -106,16 +108,4 @@ public class ProcessArchiverTest {
         verify(refBusinessDataService).archiveRefBusinessDataInstance(ref3);
     }
 
-    //    @Test
-    //    public void archiveFlownodeInstance_should_() throws Exception {
-    //        long processDefinitionId = 214L;
-    //        final SUserTaskInstanceImpl intTxflowNodeInstance = new SUserTaskInstanceImpl();
-    //        final SFlowNodeSimpleRefBusinessDataInstanceImpl refBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstanceImpl();
-    //        doReturn(refBusinessDataInstance).when(refBusinessDataService).getRefBusinessDataInstances(eq(processInstance.getId()), eq(0), anyInt());
-    //
-    //        processArchiver.archiveFlowNodeInstance(intTxflowNodeInstance, true, processDefinitionId, processInstanceService, processDefinitionService,
-    //                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataInstanceService);
-    //
-    //        verify(refBusinessDataService).archiveRefBusinessDataInstance(refBusinessDataInstance);
-    //    }
 }

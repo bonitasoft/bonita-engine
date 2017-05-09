@@ -14,6 +14,9 @@
 
 package org.bonitasoft.engine.commons;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Elias Ricken de Medeiros
  */
@@ -34,5 +37,27 @@ public class Container {
 
     public String getType() {
         return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Container container = (Container) o;
+
+        return new EqualsBuilder()
+                .append(id, container.id)
+                .append(type, container.type)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(type)
+                .toHashCode();
     }
 }

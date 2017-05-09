@@ -17,13 +17,10 @@ package org.bonitasoft.engine.theme.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.mockito.Mockito.*;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.theme.model.SThemeType;
@@ -33,11 +30,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtil.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ThemeActionCalculatorTest {
 
     @Mock
@@ -48,7 +43,7 @@ public class ThemeActionCalculatorTest {
 
     @Before
     public void setUp() throws Exception {
-        given(loggerService.isLoggable(eq(ThemeActionCalculator.class), any(TechnicalLogSeverity.class))).willReturn(true);
+        given(loggerService.isLoggable(any(), any())).willReturn(true);
 
     }
 
@@ -131,22 +126,19 @@ public class ThemeActionCalculatorTest {
     @Test
     public void calculate_should_log_message_when_unable_to_calculate_md5() throws Exception {
         //given
+        actionCalculator = spy(actionCalculator);
         byte[] oldContent = { 1 };
         byte[] newContent = { 1 };
         SThemeImpl theme = new SThemeImpl(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
-
-        mockStatic(IOUtil.class);
         NoSuchAlgorithmException exception = new NoSuchAlgorithmException("msg");
-
-        given(IOUtil.md5(newContent)).willThrow(exception);
-
+        doThrow(exception).when(actionCalculator).md5(any());
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(theme, newContent);
 
         //then
         assertThat(action).isEqualTo(ThemeActionCalculator.ThemeAction.NONE);
-        verify(loggerService).log(ThemeActionCalculator.class, TechnicalLogSeverity.ERROR,
-                "Unable to verify if default theme 'PORTAL' has changed. It will not be updated.", exception);
+        verify(loggerService).log(any(), eq(TechnicalLogSeverity.ERROR),
+                eq("Unable to verify if default theme 'PORTAL' has changed. It will not be updated."), eq(exception));
     }
 
     @Test

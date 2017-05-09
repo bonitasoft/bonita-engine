@@ -56,10 +56,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FormMappingServiceImplTest {
 
-    private static final long PROCESS_DEFINITION_ID = 456123l;
-    private static final long ID = 154l;
-    private static final Long PAGE_ID = 554l;
-    public static final String EXTERNAL = "external";
+    private static final long PROCESS_DEFINITION_ID = 456123L;
+    private static final long ID = 154L;
+    private static final Long PAGE_ID = 554L;
+    private static final String EXTERNAL = "external";
     private static final String LEGACY = "legacy";
     @Mock
     private Recorder recorder;
@@ -111,7 +111,7 @@ public class FormMappingServiceImplTest {
 
         formMappingService.create(PROCESS_DEFINITION_ID, "someHumanTask", 84, SFormMapping.TARGET_NONE, null);
 
-        verify(pageMappingService).create(eq("mockedKey"), (Long) eq(null), anyList());
+        verify(pageMappingService).create(eq("mockedKey"), isNull(), isNull());
     }
 
     @Test
@@ -120,7 +120,7 @@ public class FormMappingServiceImplTest {
 
         formMappingService.create(PROCESS_DEFINITION_ID, "step1", 2, SFormMapping.TARGET_INTERNAL, null);
 
-        verify(pageMappingService).create(eq("theKey"), isNull(Long.class), anyList());
+        verify(pageMappingService).create(eq("theKey"), nullable(Long.class), anyList());
     }
 
     @Test

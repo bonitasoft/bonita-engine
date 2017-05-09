@@ -27,12 +27,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class TenantResourcesServiceImplTest {
 
     @Mock
@@ -78,7 +78,7 @@ public class TenantResourcesServiceImplTest {
         tenantResourcesService.add("resourceName", TenantResourceType.BDM, "someValidContent".getBytes());
 
         // then
-        verify(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        verify(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
         verifyZeroInteractions(logger);
     }
 

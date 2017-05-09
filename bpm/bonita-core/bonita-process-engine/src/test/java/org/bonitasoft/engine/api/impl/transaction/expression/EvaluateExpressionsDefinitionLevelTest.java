@@ -15,7 +15,7 @@ package org.bonitasoft.engine.api.impl.transaction.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +46,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         Long processDefId = 15935777L;
         when(processDef.getId()).thenReturn(processDefId);
-        when(expressionResolverService.evaluate(any(SExpression.class), any(SExpressionContext.class))).thenThrow(
+        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class))).thenThrow(
                 new SExpressionEvaluationException("some msg", "some expressionName"));
 
         try {
@@ -66,7 +66,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         String processName = "my_process";
         when(processDef.getName()).thenReturn(processName);
-        when(expressionResolverService.evaluate(any(SExpression.class), any(SExpressionContext.class))).thenThrow(
+        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class))).thenThrow(
                 new SExpressionEvaluationException("some msg", "some expressionName"));
 
         try {
@@ -86,7 +86,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
         SProcessDefinition processDef = mock(SProcessDefinition.class);
         String processVersion = "7.3.1";
         when(processDef.getVersion()).thenReturn(processVersion);
-        when(expressionResolverService.evaluate(any(SExpression.class), any(SExpressionContext.class))).thenThrow(
+        when(expressionResolverService.evaluate(nullable(SExpression.class), nullable(SExpressionContext.class))).thenThrow(
                 new SExpressionEvaluationException("some msg", "some expressionName"));
 
         try {

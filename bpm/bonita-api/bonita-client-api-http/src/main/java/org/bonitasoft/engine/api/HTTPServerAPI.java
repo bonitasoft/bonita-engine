@@ -146,7 +146,8 @@ public class HTTPServerAPI implements ServerAPI {
         }
     }
 
-    private Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
+    //package-private for testing purpose
+    Object checkInvokeMethodReturn(final String response, final XStream xstream) throws Throwable {
         Object invokeMethodReturn = null;
         if (response != null && !response.isEmpty() && !"null".equals(response)) {
             invokeMethodReturn = fromXML(response, xstream);
@@ -157,7 +158,8 @@ public class HTTPServerAPI implements ServerAPI {
         return invokeMethodReturn;
     }
 
-    private String executeHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
+    //package-private for testing purpose
+    String executeHttpPost(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues, final XStream xstream) throws UnsupportedEncodingException, IOException,
             ClientProtocolException {
         final HttpPost httpost = createHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);

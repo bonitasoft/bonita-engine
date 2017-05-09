@@ -15,7 +15,7 @@
 
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.eq
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.doReturn
 
 import org.assertj.core.api.Assertions
 import org.bonitasoft.engine.api.APIAccessor
@@ -23,10 +23,6 @@ import org.bonitasoft.engine.api.IdentityAPI
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException
-import org.bonitasoft.engine.bpm.process.ProcessInstance
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.search.SearchOptions
 import org.bonitasoft.engine.search.impl.SearchResultImpl
@@ -35,9 +31,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessInstantiationPermissionRuleTest {
 
     @Mock

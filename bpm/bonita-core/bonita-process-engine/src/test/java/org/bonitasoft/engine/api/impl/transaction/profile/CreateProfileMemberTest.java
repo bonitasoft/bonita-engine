@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.transaction.profile;
 
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -75,7 +76,6 @@ public class CreateProfileMemberTest {
         doReturn(sUser).when(identityService).getUser(anyLong());
         doReturn(sRole).when(identityService).getRole(anyLong());
 
-        doReturn(null).when(profileService).addUserToProfile(anyLong(), anyLong(), anyString(), anyString(), anyString());
         doReturn(null).when(profileService).addGroupToProfile(anyLong(), anyLong(), anyString(), anyString());
         doReturn(null).when(profileService).addRoleToProfile(anyLong(), anyLong(), anyString());
         doReturn(null).when(profileService).addRoleAndGroupToProfile(anyLong(), anyLong(), anyLong(), anyString(), anyString(), anyString());
@@ -96,7 +96,7 @@ public class CreateProfileMemberTest {
         createProfileMember.execute();
 
         // Then
-        verify(profileService).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), anyString(), anyString(), anyString());
+        verify(profileService).addUserToProfile(eq(PROFILE_ID), eq(USER_ID), nullable(String.class), nullable(String.class), nullable(String.class));
         verify(profileService, times(1)).updateProfileMetaData(anyLong());
     }
 

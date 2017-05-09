@@ -15,21 +15,11 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.AdditionalMatchers.not;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.quartz.JobKey.jobKey;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupStartsWith;
@@ -114,8 +104,6 @@ public class QuartzSchedulerExecutorTest {
     @Before
     public void before() throws Exception {
         when(schedulerFactory.getScheduler()).thenReturn(scheduler);
-        when(scheduler.getListenerManager()).thenReturn(mock(ListenerManager.class));
-
         quartzSchedulerExecutor = initQuartzScheduler(false);
     }
 
@@ -314,7 +302,6 @@ public class QuartzSchedulerExecutorTest {
         final JobKey toBeDeletedAlso = jobKey("job2", groupName);
         final JobKey notToBeDeleted = jobKey("job1", "anotherGroup");
         when(scheduler.getJobKeys(jobGroupEquals(groupName))).thenReturn(newSet(toBeDeleted, toBeDeletedAlso));
-        when(scheduler.getJobKeys(not(eq(jobGroupEquals(groupName))))).thenReturn(newSet(notToBeDeleted));
 
         quartzSchedulerExecutor.deleteJobs(groupName);
 
@@ -336,9 +323,7 @@ public class QuartzSchedulerExecutorTest {
         final String groupName = "aGroup";
         final JobKey toBeRetrieved = jobKey("job1", groupName);
         final JobKey toBeRetrievedAlso = jobKey("job2", groupName);
-        final JobKey notToBeRetrieved = jobKey("job1", "anotherGroup");
         when(scheduler.getJobKeys(jobGroupEquals(groupName))).thenReturn(newSet(toBeRetrieved, toBeRetrievedAlso));
-        when(scheduler.getJobKeys(not(eq(jobGroupEquals(groupName))))).thenReturn(newSet(notToBeRetrieved));
 
         final List<String> jobs = quartzSchedulerExecutor.getJobs(groupName);
 

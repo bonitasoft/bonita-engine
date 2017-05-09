@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.HashMap;

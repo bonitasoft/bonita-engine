@@ -52,7 +52,6 @@ import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.InitializingActivityStateImpl;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -156,7 +155,6 @@ public class BPMInstancesCreatorTest {
 
     @Test
     public void createFlownodeInstanceShouldSetReachedStateDateAndLastUpdateDate() throws Exception {
-        doReturn(mock(SManualTaskInstance.class)).when(activityInstanceService).getFlowNodeInstance(anyLong());
         doReturn(new InitializingActivityStateImpl(null)).when(flowNodeStateManager).getFirstState(SFlowNodeType.GATEWAY);
 
         final SGatewayInstance gatewayInstance = (SGatewayInstance) bpmInstancesCreator.createFlowNodeInstance(2345L, 999L, 888L,
@@ -177,8 +175,6 @@ public class BPMInstancesCreatorTest {
 
         ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         expressionBuilder.createConstantLongExpression(3600L);
-
-        doReturn(ModelConvertor.constructSExpression(expressionBuilder.done())).when(sHumanTaskDefinition).getExpectedDuration();
 
         //when
         final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) bpmInstancesCreator.createFlowNodeInstance(2345L, 456L, 987L,

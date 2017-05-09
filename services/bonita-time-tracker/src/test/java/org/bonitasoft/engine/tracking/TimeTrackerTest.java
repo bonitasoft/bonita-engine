@@ -307,10 +307,8 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void testActivateListeners() {
         final FlushEventListener listener1 = mock(FlushEventListener.class);
         when(listener1.getName()).thenReturn("listener1");
-        when(listener1.isActive()).thenReturn(true);
         final FlushEventListener listener2 = mock(FlushEventListener.class);
         when(listener2.getName()).thenReturn("listener2");
-        when(listener2.isActive()).thenReturn(false);
 
         final List<FlushEventListener> flushEventListeners = new ArrayList<>();
         flushEventListeners.add(listener1);
@@ -326,7 +324,6 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     public void testDeactivateListeners() {
         final FlushEventListener listener1 = mock(FlushEventListener.class);
         when(listener1.getName()).thenReturn("listener1");
-        when(listener1.isActive()).thenReturn(true);
 
         final List<FlushEventListener> flushEventListeners = new ArrayList<>();
         flushEventListeners.add(listener1);

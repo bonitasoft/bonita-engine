@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -51,7 +50,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeExecutorImplTest {
 
-    private static final long PROCESS_DEFINITION_ID = 302332L;
     private static final long PROCESS_INSTANCE_ID = 343332L;
     @Mock
     private WorkService workService;
@@ -73,10 +71,8 @@ public class FlowNodeExecutorImplTest {
 
     @Before
     public void before() throws Exception {
-
         skippedFlowNodeState = new SkippedFlowNodeStateImpl();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
-        doReturn(new SProcessDefinitionImpl("process", "1.0")).when(processDefinitionService).getProcessDefinition(PROCESS_DEFINITION_ID);
     }
 
     @Test
@@ -85,7 +81,7 @@ public class FlowNodeExecutorImplTest {
         flowNodeInstance.setTokenCount(2);
         SUserTaskInstanceImpl task1 = aTask(2L, true);
         SUserTaskInstanceImpl task2 = aTask(3L, true);
-        doReturn(Arrays.asList(task1, task2)).when(activityInstanceService).searchActivityInstances(eq(SActivityInstance.class), any(QueryOptions.class));
+        doReturn(Arrays.asList(task1, task2)).when(activityInstanceService).searchActivityInstances(eq(SActivityInstance.class), nullable(QueryOptions.class));
 
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
 

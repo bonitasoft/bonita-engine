@@ -20,9 +20,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.nullable;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -31,11 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
@@ -56,54 +53,36 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BuilderFactory.class)
+@RunWith(MockitoJUnitRunner.class)
 public class SchedulerServiceImplTest {
 
     private static final long TENANT_ID = 1L;
 
     private SchedulerServiceImpl schedulerService;
-
     @Mock
     private SchedulerExecutor schedulerExecutor;
-
     @Mock
     private JobService jobService;
-
     @Mock
     private EventService eventService;
-
     @Mock
     private SessionAccessor sessionAccessor;
     @Mock
     private PersistenceService persistenceService;
-
     @Mock
-    ServicesResolver servicesResolver;
+    private ServicesResolver servicesResolver;
 
     @Before
     public void setUp() throws STenantIdNotSetException {
-        PowerMockito.mockStatic(BuilderFactory.class);
         initMocks(this);
 
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final TransactionService transactionService = mock(TransactionService.class);
 
-        final SEventBuilder sEventBuilder = mock(SEventBuilder.class);
-        final SEventBuilderFactory sEventBuilderFactory = mock(SEventBuilderFactory.class);
-        when(BuilderFactory.get(SEventBuilderFactory.class)).thenReturn(sEventBuilderFactory);
-
-        when(sEventBuilderFactory.createNewInstance(anyString())).thenReturn(sEventBuilder);
-        when(sEventBuilderFactory.createInsertEvent(anyString())).thenReturn(sEventBuilder);
-        when(sEventBuilder.setObject(any(Object.class))).thenReturn(sEventBuilder);
-
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 
-        servicesResolver = mock(ServicesResolver.class);
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver,
                 persistenceService);
     }
@@ -192,7 +171,7 @@ public class SchedulerServiceImplTest {
     @Test(expected = SSchedulerException.class)
     public void cannot_schedule_a_null_job() throws Exception {
         final Trigger trigger = mock(Trigger.class);
-        when(jobService.createJobDescriptor(any(SJobDescriptor.class), any(Long.class))).thenThrow(new SJobDescriptorCreationException(""));
+        when(jobService.createJobDescriptor(nullable(SJobDescriptor.class), any(Long.class))).thenThrow(new SJobDescriptorCreationException(""));
 
         schedulerService.schedule(null, trigger);
     }
@@ -261,7 +240,7 @@ public class SchedulerServiceImplTest {
         // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
         verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
-        verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), anyString(), anyBoolean());
+        verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), nullable(String.class), anyBoolean());
     }
 
     @Test

@@ -71,8 +71,6 @@ public class DefaultProfilesUpdaterTest {
         doReturn("xml content").when(defaultProfilesUpdater).getDefaultProfilesXml();
         doReturn(defaultProfiles).when(defaultProfilesUpdater).getProfilesFromXML(anyString());
 
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doReturn(profileService).when(tenantServiceAccessor).getProfileService();
         doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
         doReturn(profilesImporter).when(tenantServiceAccessor).getProfilesImporter();
         doReturn(null).when(profilesImporter).importProfiles(any(ProfilesNode.class), any(ImportPolicy.class), anyLong());

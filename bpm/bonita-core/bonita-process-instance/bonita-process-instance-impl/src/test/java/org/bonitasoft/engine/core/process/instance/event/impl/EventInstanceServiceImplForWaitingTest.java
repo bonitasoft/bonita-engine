@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -106,14 +107,14 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.createWaitingEvent(sWaitingEventImpl);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), any(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
     }
 
     @Test(expected = SWaitingEventCreationException.class)
     public final void createWaitingEvent_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SWaitingMessageEventImpl sWaitingEventImpl = new SWaitingMessageEventImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         eventInstanceServiceImpl.createWaitingEvent(sWaitingEventImpl);
@@ -134,14 +135,14 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.deleteWaitingEvent(sWaitingEventImpl);
 
         // Then
-        verify(recorder).recordDelete(eq(insertRecord), any(SDeleteEvent.class));
+        verify(recorder).recordDelete(eq(insertRecord), nullable(SDeleteEvent.class));
     }
 
     @Test(expected = SWaitingEventModificationException.class)
     public final void deleteWaitingEvent_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SWaitingSignalEventImpl sWaitingEventImpl = new SWaitingSignalEventImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         eventInstanceServiceImpl.deleteWaitingEvent(sWaitingEventImpl);
@@ -410,7 +411,7 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.updateWaitingMessage(waitingMessageEventImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
     }
 
     @Test(expected = SWaitingEventModificationException.class)
@@ -418,19 +419,10 @@ public class EventInstanceServiceImplForWaitingTest {
         // Given
         final SWaitingMessageEventImpl waitingMessageEventImpl = new SWaitingMessageEventImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
 
         // When
         eventInstanceServiceImpl.updateWaitingMessage(waitingMessageEventImpl, descriptor);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getBoundaryWaitingErrorEvent(long, java.lang.String)}.
-     */
-    // @Test
-    // public final void testGetBoundaryWaitingErrorEvent() throws Exception {
-    // // TODO
-    // throw new RuntimeException("not yet implemented");
-    // }
 }

@@ -38,8 +38,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,7 +63,6 @@ public class ContractConstraintsValidatorTest {
     public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException,
             SInvalidExpressionException {
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
-        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
         doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class), anyMapOf(Integer.class, Object.class),
                 any(ContainerState.class));
         returnTrueForExpressionWithContent("isValid != null");
@@ -73,14 +70,14 @@ public class ContractConstraintsValidatorTest {
         validator = new ContractConstraintsValidator(loggerService, expressionService);
     }
 
-    void returnTrueForExpressionWithContent(String content) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+    private void returnTrueForExpressionWithContent(String content) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         doReturn(true).when(expressionService).evaluate(expressionHavingContent(content), anyMapOf(String.class, Object.class),
                 anyMapOf(Integer.class, Object.class), any(ContainerState.class));
     }
 
-    SExpression expressionHavingContent(String content) {
-        return argThat(new ExpressionWithContentMatcher(content));
+    private SExpression expressionHavingContent(String content) {
+        return argThat(expr -> expr.getContent().equals(content));
     }
 
     @Test
@@ -102,7 +99,6 @@ public class ContractConstraintsValidatorTest {
 
         //given
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(false);
-        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(false);
 
         //
         validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
@@ -175,22 +171,4 @@ public class ContractConstraintsValidatorTest {
                 .build();
     }
 
-    private static class ExpressionWithContentMatcher extends BaseMatcher<SExpression> {
-
-        private final String content;
-
-        public ExpressionWithContentMatcher(String content) {
-            this.content = content;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-
-        }
-
-        @Override
-        public boolean matches(Object item) {
-            return ((SExpression) item).getContent().equals(content);
-        }
-    }
 }

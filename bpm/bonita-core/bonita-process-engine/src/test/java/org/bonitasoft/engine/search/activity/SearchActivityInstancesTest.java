@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.search.activity;
 
+import static org.mockito.Mockito.doReturn;
+
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -16,8 +18,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.mockito.Mockito.doReturn;
 
 /**
  * @author Julien Mege
@@ -45,10 +45,6 @@ public class SearchActivityInstancesTest {
 
     @Before
     public void setUp() throws Exception {
-        doReturn(searchEntitiesDescriptor).when(tenantAccessor).getSearchEntitiesDescriptor();
-        doReturn(activityInstanceService).when(tenantAccessor).getActivityInstanceService();
-        doReturn(flowNodeStateManager).when(tenantAccessor).getFlowNodeStateManager();
-
         doReturn(searchActivityInstanceDescriptor).when(searchEntitiesDescriptor).getSearchActivityInstanceDescriptor();
 
     }

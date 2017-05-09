@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.impl.IndexUpdater;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
@@ -90,15 +89,6 @@ public class IndexUpdaterTest {
 
     @Test
     public void incrementIndexes_should_do_nothing_when_from_is_greater_then_to() throws Exception {
-        //given
-        SApplicationMenuBuilderFactoryImpl appMenuFactory = new SApplicationMenuBuilderFactoryImpl();
-        List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, appMenuFactory.getIndexKey(), OrderByType.ASC));
-        List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, appMenuFactory.getIndexKey(), 3, 5), new FilterOption(
-                SApplicationMenu.class, appMenuFactory.getParentIdKey(), 1L));
-
-        given(applicationService.searchApplicationMenus(new QueryOptions(0, MAX_RESULTS, orderBy, filters, null))).willReturn(Arrays.asList(menu3, menu4));
-        given(applicationService.searchApplicationMenus(new QueryOptions(MAX_RESULTS, MAX_RESULTS, orderBy, filters, null))).willReturn(Arrays.asList(menu5));
-
         //when
         indexUpdater.incrementIndexes(1L, 4, 3);
 

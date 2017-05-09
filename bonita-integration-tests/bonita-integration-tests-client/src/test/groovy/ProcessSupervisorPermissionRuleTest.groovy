@@ -53,7 +53,6 @@ public class ProcessSupervisorPermissionRuleTest {
     @Before
     public void before() {
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 

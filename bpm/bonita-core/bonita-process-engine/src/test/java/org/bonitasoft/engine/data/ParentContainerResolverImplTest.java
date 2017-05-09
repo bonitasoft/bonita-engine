@@ -162,8 +162,6 @@ public class ParentContainerResolverImplTest {
 
     @Test
     public void getArchivedContainerHierarchy_on_process_with_no_caller() throws Exception {
-        //given
-        doReturn(new SProcessInstanceImpl()).when(processInstanceService).getProcessInstance(5l);
         //when
         List<DataContainer> containerHierarchy = parentContainerResolver
                 .getArchivedContainerHierarchy(new DataContainer(5l, DataInstanceContainer.PROCESS_INSTANCE.name()));

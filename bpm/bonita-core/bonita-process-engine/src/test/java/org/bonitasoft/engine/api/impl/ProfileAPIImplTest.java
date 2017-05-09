@@ -81,23 +81,11 @@ public class ProfileAPIImplTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(sGroup).when(identityService).getGroup(anyLong());
         doReturn(sUser).when(identityService).getUser(anyLong());
-        doReturn(sRole).when(identityService).getRole(anyLong());
-
-        doReturn("group").when(sGroup).getName();
-        doReturn("/parent").when(sGroup).getParentPath();
-
-        doReturn("role").when(sRole).getName();
-
         doReturn(tenantServiceAccessor).when(profileAPIImpl).getTenantAccessor();
         doReturn(identityService).when(tenantServiceAccessor).getIdentityService();
-
-        doReturn(1l).when(profileAPIImpl).getUserIdFromSession();
         doReturn(profileMember).when(profileAPIImpl).convertToProfileMember(any(CreateProfileMember.class));
-
         doReturn(profileService).when(tenantServiceAccessor).getProfileService();
-
         doReturn(sProfileMember).when(profileService).getProfileMemberWithoutDisplayName(anyLong());
     }
 

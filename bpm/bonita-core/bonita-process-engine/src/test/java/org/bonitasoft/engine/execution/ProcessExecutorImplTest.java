@@ -296,7 +296,6 @@ public class ProcessExecutorImplTest {
                 sProcessInstance);
 
         final Map<String, Serializable> processInputs = new HashMap<>(0);
-        doNothing().when(mockedProcessExecutorImpl).validateContractInputs(processInputs, sProcessDefinition);
 
         // Let's call it for real:
         doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterSubstituteId, expressionContext, operations, context,

@@ -70,7 +70,6 @@ public class AssignmentOperationExecutorStrategyTest {
     @Test
     public void testGetValueOnExternalData() throws Exception {
         // return type is not compatible
-        when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
         Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
         assertThat(returnedValue).isEqualTo("value");

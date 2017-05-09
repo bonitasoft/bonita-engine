@@ -1,4 +1,4 @@
-/**
+ /**
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -15,21 +15,17 @@ package org.bonitasoft.engine.core.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -41,46 +37,32 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BonitaHomeServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class SecuredLoginServiceImplTest {
 
+    private static final String TECH_USER_NAME = "install";
+    private static final String TECH_USER_PASS = "install";
+    private static final Long TENANT_ID = 1L;
+    private static final Long USER_ID = (long) -1;
     private SecuredLoginServiceImpl securedLoginServiceImpl;
-
-    @Mock
-    private BonitaHomeServer bonitaHomeServer;
-
     @Mock
     private GenericAuthenticationService genericAuthenticationService;
-
     @Mock
     private SessionService sessionService;
-
     @Mock
     private SessionAccessor sessionAccessor;
-
     @Mock
     private IdentityService identityService;
-
     @Mock
     private TechnicalLoggerService logger;
 
     @Before
-    public void setUp() throws IOException, BonitaHomeNotSetException {
-        mockStatic(BonitaHomeServer.class);
-
-        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
-
-        final Properties properties = new Properties();
-        properties.put("userName", "install");
-        properties.put("userPassword", "install");
-        doReturn(properties).when(bonitaHomeServer).getTenantProperties(1);
-
-        securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService, logger);
-
+    public void setUp() throws IOException, BonitaHomeNotSetException, SLoginException {
+        securedLoginServiceImpl = spy(new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
+                sessionAccessor, identityService, logger));
+        doReturn(new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS)).when(securedLoginServiceImpl).getTechnicalUser(1L);
     }
 
     @Test
@@ -97,8 +79,7 @@ public class SecuredLoginServiceImplTest {
     public void testSecuredLoginServiceWithNullLogin() throws SUserNotFoundException {
         try {
             final Map<String, Serializable> credentials = new HashMap<>();
-            final Long tenantId = new Long(1);
-            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
             securedLoginServiceImpl.login(credentials);
             fail();
         } catch (final SLoginException e) {
@@ -110,10 +91,9 @@ public class SecuredLoginServiceImplTest {
     public void testSecuredLoginServiceWithWrongCredentials() {
         try {
             final Map<String, Serializable> credentials = new HashMap<>();
-            final Long tenantId = new Long(1);
             final String login = "login";
             final String password = "password";
-            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
             credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
             credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
             securedLoginServiceImpl.login(credentials);
@@ -126,10 +106,9 @@ public class SecuredLoginServiceImplTest {
     @Test(expected = SUserNotFoundException.class)
     public void testSecuredLoginServiceWithUnknownUserThrowSUserNotFoundException() throws Exception {
         final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = new Long(1);
         final String login = "login";
         final String password = "password";
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
 
@@ -142,16 +121,10 @@ public class SecuredLoginServiceImplTest {
     @Test
     public void testSecuredLoginServiceWithInvalidPlatformCredentials() throws Exception {
         final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = new Long(1);
-        final Long userId = new Long(-1);
-        final String login = "install";
         final String password = "poutpout";
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, TECH_USER_NAME);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-
-        final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
         try {
             securedLoginServiceImpl.login(credentials);
             fail();
@@ -172,9 +145,6 @@ public class SecuredLoginServiceImplTest {
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         when(genericAuthenticationService.checkUserCredentials(anyMapOf(String.class, Serializable.class))).thenThrow(new AuthenticationException());
 
-        final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
-
         try {
             securedLoginServiceImpl.login(credentials);
         } catch (final SLoginException e) {
@@ -193,13 +163,11 @@ public class SecuredLoginServiceImplTest {
         final Map<String, Serializable> credentials = new HashMap<>();
         final Long tenantId = new Long(1);
         final Long userId = new Long(-1);
-        final String login = "install";
-        final String password = "install";
+        final String login = TECH_USER_NAME;
+        final String password = TECH_USER_PASS;
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        when(genericAuthenticationService.checkUserCredentials(anyMapOf(String.class, Serializable.class))).thenThrow(new AuthenticationException());
-
         final SSession sSession = mock(SSession.class);
         when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
 
@@ -214,33 +182,27 @@ public class SecuredLoginServiceImplTest {
     @Test
     public void testSecuredLoginServiceWithPlatformCredentials() throws Exception {
         final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = new Long(1);
-        final Long userId = new Long(-1);
-        final String login = "install";
-        final String password = "install";
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, TECH_USER_NAME);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, TECH_USER_PASS);
 
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true)).thenReturn(sSession);
 
-        final SecuredLoginServiceImpl spy = spy(securedLoginServiceImpl);
+        final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
-        final SSession sSessionResult = spy.login(credentials);
-
-        verify(genericAuthenticationService, times(0)).checkUserCredentials(credentials);
-        verify(spy).getTechnicalUser(tenantId);
-        verify(sessionAccessor, times(1)).deleteSessionId();
-        verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
+        verify(genericAuthenticationService, never()).checkUserCredentials(credentials);
+        verify(securedLoginServiceImpl).getTechnicalUser(TENANT_ID);
+        verify(sessionAccessor).deleteSessionId();
+        verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true);
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
     @Test
     public void testSecuredLoginServiceWithStandardUserCredentials() throws Exception {
         final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = new Long(1);
-        final Long userId = new Long(112345);
+        final Long tenantId = 1L;
+        final Long userId = 112345L;
         final String login = "julien";
         final String password = "julien";
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);

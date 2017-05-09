@@ -14,11 +14,7 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -79,13 +75,11 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
     public void handleFailureWithNameAndIdAndActivationEvent() throws Throwable {
         txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID,
                 ACTIVATION_EVENT));
-        doReturn("The description").when(txBonitawork).getDescription();
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
-        doThrow(e).when(wrappedWork).work(context);
 
         txBonitawork.handleFailure(e, context);
 

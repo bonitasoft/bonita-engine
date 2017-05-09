@@ -13,6 +13,7 @@
  **/
 
 
+
 import org.assertj.core.api.Assertions
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.IdentityAPI
@@ -31,7 +32,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.runners.MockitoJUnitRunner
 
-import static org.assertj.core.api.Assertions.assertThat
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.doReturn
 import static org.mockito.Mockito.mock
@@ -58,10 +58,7 @@ public class ProcessPermissionRuleTest {
 
     @Before
     public void before() {
-
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
         doReturn([]).when(apiCallContext).getCompoundResourceId()
     }
@@ -179,7 +176,6 @@ public class ProcessPermissionRuleTest {
     def havingResourceId(long deployedBy) {
         doReturn(currentUserId).when(apiSession).getUserId()
         doReturn(true).when(apiCallContext).isGET()
-        doReturn("process").when(apiCallContext).getResourceName()
         doReturn(["45"]).when(apiCallContext).getCompoundResourceId()
 
         def info = mock(ProcessDeploymentInfo.class)
