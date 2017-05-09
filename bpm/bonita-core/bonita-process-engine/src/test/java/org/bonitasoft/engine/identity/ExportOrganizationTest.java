@@ -15,57 +15,23 @@ package org.bonitasoft.engine.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExportOrganizationTest {
-
-    class QueryOptionsMatcher extends ArgumentMatcher<QueryOptions> {
-
-        private final int fromIndex;
-
-        private final int masResults;
-
-        private final long userId;
-
-        public QueryOptionsMatcher(long userId, int fromIndex, int masResults) {
-            this.userId = userId;
-            this.fromIndex = fromIndex;
-            this.masResults = masResults;
-        }
-
-        @Override
-        public boolean matches(Object argument) {
-            SCustomUserInfoValueBuilderFactory keyProvider = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
-            if (!(argument instanceof QueryOptions)) {
-                return false;
-            }
-            QueryOptions options = (QueryOptions) argument;
-            FilterOption filterOption = options.getFilters().get(0);
-            return options.getFromIndex() == fromIndex && options.getNumberOfResults() == masResults
-                    && filterOption.getFieldName().equals(keyProvider.getUserIdKey()) && filterOption.getValue().equals(userId);
-        }
-
-    }
 
     private static final long USER_ID = 15L;
 
@@ -123,9 +89,8 @@ public class ExportOrganizationTest {
     @Test
     public void getAllCustomUserInfoForUser_should_return_elements_from_service() throws Exception {
         // given
-        given(identityService.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(USER_ID, 0, MAX_RESULTS)))).willReturn(
-                Arrays.asList(userInfoVal1, userInfoVal2));
-        given(identityService.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(USER_ID, 2, MAX_RESULTS)))).willReturn(Arrays.asList(userInfoVal3));
+        given(identityService.searchCustomUserInfoValue(any())).willReturn(
+                Arrays.asList(userInfoVal1, userInfoVal2)).willReturn(Collections.singletonList(userInfoVal3));
 
         // when
         List<SCustomUserInfoValue> allCustomUserInfoValues = exportOrganization.getAllCustomUserInfoForUser(USER_ID);
@@ -137,7 +102,7 @@ public class ExportOrganizationTest {
     @Test
     public void addCustomUserInfoValues_should_call_addCustomUserInfoValue_on_builder_for_all_elements() throws Exception {
         // given
-        given(identityService.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(USER_ID, 0, MAX_RESULTS)))).willReturn(
+        given(identityService.searchCustomUserInfoValue(any())).willReturn(
                 Arrays.asList(userInfoVal1));
         ExportedUserBuilder clientUserbuilder = mock(ExportedUserBuilder.class);
 

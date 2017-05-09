@@ -286,7 +286,6 @@ public class ApplicationAPIDelegateTest {
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApplication);
         given(converter.toApplication(sApplication)).willReturn(application);
 

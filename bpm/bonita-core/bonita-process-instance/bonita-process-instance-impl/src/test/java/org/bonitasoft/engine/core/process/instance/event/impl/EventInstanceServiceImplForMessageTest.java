@@ -16,8 +16,9 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -98,14 +99,14 @@ public class EventInstanceServiceImplForMessageTest {
         eventInstanceServiceImpl.createMessageInstance(sMessageInstanceImpl);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), any(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
     }
 
     @Test(expected = SMessageInstanceCreationException.class)
     public final void createMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         eventInstanceServiceImpl.createMessageInstance(sMessageInstanceImpl);
@@ -126,14 +127,14 @@ public class EventInstanceServiceImplForMessageTest {
         eventInstanceServiceImpl.deleteMessageInstance(sMessageInstanceImpl);
 
         // Then
-        verify(recorder).recordDelete(eq(insertRecord), any(SDeleteEvent.class));
+        verify(recorder).recordDelete(eq(insertRecord), nullable(SDeleteEvent.class));
     }
 
     @Test(expected = SMessageModificationException.class)
     public final void deleteMessageInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         eventInstanceServiceImpl.deleteMessageInstance(sMessageInstanceImpl);
@@ -265,7 +266,7 @@ public class EventInstanceServiceImplForMessageTest {
         eventInstanceServiceImpl.updateMessageInstance(sMessageInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
     }
 
     @Test(expected = SMessageModificationException.class)
@@ -273,7 +274,7 @@ public class EventInstanceServiceImplForMessageTest {
         // Given
         final SMessageInstanceImpl sMessageInstanceImpl = new SMessageInstanceImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
 
         // When
         eventInstanceServiceImpl.updateMessageInstance(sMessageInstanceImpl, descriptor);

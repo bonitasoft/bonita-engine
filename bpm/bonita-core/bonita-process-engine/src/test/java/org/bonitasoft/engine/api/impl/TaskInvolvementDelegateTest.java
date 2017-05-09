@@ -85,7 +85,6 @@ public class TaskInvolvementDelegateTest {
         doThrow(SActivityInstanceNotFoundException.class).when(activityInstanceService).getHumanTaskInstance(anyLong());
         doReturn(assignedHumanTaskInstance).when(activityInstanceService).getHumanTaskInstance(ASSIGNED_TASK);
         doReturn(humanTaskInstance).when(activityInstanceService).getHumanTaskInstance(EXISTING_TASK);
-        doReturn(true).when(activityInstanceService).isTaskPendingForUser(ASSIGNED_TASK, ASSIGNED_USER);
         doReturn(true).when(activityInstanceService).isTaskPendingForUser(EXISTING_TASK, USER_PENDING);
     }
 

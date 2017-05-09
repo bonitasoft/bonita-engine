@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.connector.impl;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;

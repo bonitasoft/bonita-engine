@@ -14,7 +14,8 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -159,7 +160,7 @@ public class PlatformQuartzJobListenerTest {
         platformQuartzJobListener.jobWasExecuted(context, null);
 
         // then
-        verify(bonitaJobListeners.get(0)).jobWasExecuted(anyMapOf(String.class, Serializable.class), any(SSchedulerException.class));
+        verify(bonitaJobListeners.get(0)).jobWasExecuted(anyMap(), nullable(SSchedulerException.class));
     }
 
 }

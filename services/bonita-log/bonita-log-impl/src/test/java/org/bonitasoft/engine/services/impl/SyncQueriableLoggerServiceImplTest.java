@@ -14,12 +14,8 @@
 package org.bonitasoft.engine.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +23,9 @@ import java.util.List;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -38,6 +37,8 @@ import org.bonitasoft.engine.services.QueriableLoggerStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -51,25 +52,24 @@ public class SyncQueriableLoggerServiceImplTest {
 
     @Mock
     private PersistenceService persistenceService;
-
     @Mock
     private QueriableLoggerStrategy loggerStrategy;
-
     @Mock
     private QueriableLogSessionProvider sessionProvider;
-
     @Mock
     private TechnicalLoggerService logger;
-
     @Mock
     private SQueriableLogImpl log1;
-
     @Mock
     private SQueriableLogImpl log2;
-
     @Mock
     private PlatformService platformService;
-
+    @Captor
+    private ArgumentCaptor<SelectOneDescriptor<?>> selectOneCaptor;
+    @Captor
+    private ArgumentCaptor<SelectByIdDescriptor<?>> selectByIdCaptor;
+    @Captor
+    private ArgumentCaptor<SelectListDescriptor<?>> selectListCaptor;
     @InjectMocks
     private SyncQueriableLoggerServiceImpl logService;
 
@@ -162,27 +162,30 @@ public class SyncQueriableLoggerServiceImplTest {
     @Test
     public void getNumberOfLogs_should_return_number_of_logs_from_persistence_service() throws Exception {
         // given
-        doReturn(15L).when(persistenceService).selectOne(argThat(new SelectOneMatcher("getNumberOfLogs")));
+        doReturn(15L).when(persistenceService).selectOne(selectOneCaptor.capture());
 
         // when
         int numberOfLogs = logService.getNumberOfLogs();
 
         // then
         assertThat(numberOfLogs).isEqualTo(15);
+        assertThat(selectOneCaptor.getValue().getQueryName()).isEqualTo("getNumberOfLogs");
     }
 
     @Test
     public void getLogs_should_return_logs_from_persitence_service() throws Exception {
         // given
-        SelectListMatcher matcher = new SelectListMatcher("getLogs", 5, 10, "id", OrderByType.ASC);
         List<SQueriableLogImpl> persistenceLogs = Arrays.asList(log1, log2);
-        doReturn(persistenceLogs).when(persistenceService).selectList(argThat(matcher));
+        doReturn(persistenceLogs).when(persistenceService).selectList(selectListCaptor.capture());
 
         // when
         List<SQueriableLog> logs = logService.getLogs(5, 10, "id", OrderByType.ASC);
 
         // then
         assertThat(logs).isEqualTo(persistenceLogs);
+        SelectListDescriptor<?> selectListDescriptor = selectListCaptor.getValue();
+        assertThat(selectListDescriptor.getPageSize()).isEqualTo(10);
+        assertThat(selectListDescriptor.getStartIndex()).isEqualTo(5);
     }
 
     @Test
@@ -215,7 +218,7 @@ public class SyncQueriableLoggerServiceImplTest {
     @Test
     public void getLog_should_return_log_from_persistence_service() throws Exception {
         // given
-        doReturn(log1).when(persistenceService).selectById(argThat(new SelectByIdMatcher(100L)));
+        doReturn(log1).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
 
         // when
         SQueriableLog log = logService.getLog(100L);

@@ -14,21 +14,13 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +35,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -76,18 +67,14 @@ public class JobServiceImplForJobLogTest {
 
     @Mock
     private EventService eventService;
-
     @Mock
     private QueriableLoggerService queriableLoggerService;
-
     @Mock
     private ReadPersistenceService readPersistenceService;
-
     @Mock
     private Recorder recorder;
     @Mock
     private TechnicalLoggerService technicalLoggerService;
-
     @Spy
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
@@ -96,11 +83,9 @@ public class JobServiceImplForJobLogTest {
     public final void createJobLog() throws Exception {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
-        doReturn(1L).when(sJobLog).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         final SJobLog result = jobServiceImpl.createJobLog(sJobLog);
@@ -108,7 +93,7 @@ public class JobServiceImplForJobLogTest {
         // Then
         assertNotNull(result);
         assertEquals(sJobLog, result);
-        verify(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        verify(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -120,11 +105,9 @@ public class JobServiceImplForJobLogTest {
     public final void createJobLog_should_throw_exception_when_recorder_failed() throws SJobLogCreationException, SRecorderException {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
-        doReturn(1L).when(sJobLog).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         jobServiceImpl.createJobLog(sJobLog);
@@ -134,18 +117,16 @@ public class JobServiceImplForJobLogTest {
     public final void deleteJobLog_by_id() throws Exception {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
-        doReturn(3L).when(sJobLog).getId();
 
         doReturn(sJobLog).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         jobServiceImpl.deleteJobLog(3);
 
         // Then
-        verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
     }
 
     @Test
@@ -163,11 +144,10 @@ public class JobServiceImplForJobLogTest {
     @Test(expected = SJobLogDeletionException.class)
     public void deleteJobLog_by_id_should_throw_exception_when_recorder_failed() throws Exception {
         final SJobLog sJobLog = mock(SJobLog.class);
-        doReturn(3L).when(sJobLog).getId();
 
         doReturn(sJobLog).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         jobServiceImpl.deleteJobLog(3);
     }
@@ -176,17 +156,15 @@ public class JobServiceImplForJobLogTest {
     public final void deleteJobLog_by_object() throws SRecorderException, SJobLogDeletionException {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
-        doReturn(3L).when(sJobLog).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         jobServiceImpl.deleteJobLog(sJobLog);
 
         // Then
-        verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -198,10 +176,9 @@ public class JobServiceImplForJobLogTest {
     public void deleteJobLog_by_object_should_throw_exception_when_recorder_failed() throws Exception {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
-        doReturn(3L).when(sJobLog).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         jobServiceImpl.deleteJobLog(sJobLog);
@@ -366,7 +343,7 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog jobLog = new SJobLogImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
 
         // When
         jobServiceImpl.updateJobLog(jobLog, descriptor);

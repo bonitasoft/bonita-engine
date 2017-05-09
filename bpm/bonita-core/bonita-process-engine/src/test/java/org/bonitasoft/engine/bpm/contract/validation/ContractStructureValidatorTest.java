@@ -233,7 +233,6 @@ public class ContractStructureValidatorTest {
                 .withInput(aSimpleInput(INTEGER).withName("anInteger"))
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         final ErrorReporter errorReporter = new ErrorReporter();
-        doReturn(false).when(typeValidator).validate(any(SInputDefinition.class), any(Object.class), any(ErrorReporter.class));
         errorReporter.addError("plop");
         try {
             validator.validate(contract, null);

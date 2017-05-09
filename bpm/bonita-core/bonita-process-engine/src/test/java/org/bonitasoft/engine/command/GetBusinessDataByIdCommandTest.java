@@ -102,9 +102,6 @@ public class GetBusinessDataByIdCommandTest {
     public void executeCommandWithEmptyChildName() throws Exception {
         //given
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "");
-        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
-                PARAMETER_CHILDNAME,
-                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when
         command.execute(parameters, tenantServiceAccessor);

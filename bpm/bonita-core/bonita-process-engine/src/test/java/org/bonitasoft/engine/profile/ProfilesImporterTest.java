@@ -174,7 +174,6 @@ public class ProfilesImporterTest {
 
         final SProfile existingProfile = mock(SProfile.class);
 
-        doReturn(true).when(existingProfile).isDefault();
         doThrow(new SProfileNotFoundException("")).when(profileService).getProfileByName("Mine");
 
         // when

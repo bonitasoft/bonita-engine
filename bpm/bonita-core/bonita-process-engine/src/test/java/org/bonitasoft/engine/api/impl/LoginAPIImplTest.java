@@ -47,8 +47,6 @@ public class LoginAPIImplTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(bonitaHomeServer).when(loginAPI).getBonitaHomeServerInstance();
-
         doReturn(1L).when(sTenant).getId();
 
         properties = new Properties();

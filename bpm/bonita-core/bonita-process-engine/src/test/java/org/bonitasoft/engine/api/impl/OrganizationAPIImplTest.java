@@ -100,7 +100,6 @@ public class OrganizationAPIImplTest {
         given(serviceAccessor.getSupervisorService()).willReturn(supervisorService);
         given(serviceAccessor.getExternalIdentityMappingService()).willReturn(externalIdentityMappingService);
         given(serviceAccessor.getProcessDefinitionService()).willReturn(processDefinitionService);
-        given(serviceAccessor.getBusinessArchiveArtifactsManager()).willReturn(businessArchiveArtifactsManager);
 
         given(userInfoDef1.getId()).willReturn(CUSTOM_USER_INFO_DEF_ID1);
         given(userInfoDef2.getId()).willReturn(CUSTOM_USER_INFO_DEF_ID2);

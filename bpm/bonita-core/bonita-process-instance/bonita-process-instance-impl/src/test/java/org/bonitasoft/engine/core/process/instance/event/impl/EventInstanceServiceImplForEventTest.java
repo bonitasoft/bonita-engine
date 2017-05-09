@@ -15,8 +15,7 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -90,14 +89,14 @@ public class EventInstanceServiceImplForEventTest {
         eventInstanceServiceImpl.createEventInstance(eventInstanceImpl);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), any(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
     }
 
     @Test(expected = SEventInstanceCreationException.class)
     public final void createEventInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SStartEventInstanceImpl eventInstanceImpl = new SStartEventInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         eventInstanceServiceImpl.createEventInstance(eventInstanceImpl);

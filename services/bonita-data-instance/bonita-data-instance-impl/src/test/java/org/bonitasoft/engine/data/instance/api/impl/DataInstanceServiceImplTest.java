@@ -38,7 +38,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Assert;
@@ -71,8 +70,6 @@ public class DataInstanceServiceImplTest {
 
     @Test(expected = SDataInstanceReadException.class)
     public final void should_throw_read_exception_when_persistence_service_has_read_exception() throws SBonitaException {
-        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
-        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SADataInstance>> any());
         dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PROCESS_INSTANCE", parentContainerResolver);
     }
 
@@ -143,8 +140,6 @@ public class DataInstanceServiceImplTest {
         dataInstances.add(createArchDataInstance(3, 66L, "TASK", 1478081000000L, "VALUE3"));
         dataInstances.add(createArchDataInstance(4, 66L, "TASK", 1478087736549L, "VALUE4"));
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
-        doReturn(Arrays.asList(new DataContainer(66L, "TASK"), new DataContainer(65L, "PROC"))).when(parentContainerResolver)
-                .getArchivedContainerHierarchy(new DataContainer(66L, "TASK"));
         //order the retrieved list by container level and by archive date
         SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 1L, "TASK", parentContainerResolver);
         //should return the last version
@@ -160,8 +155,6 @@ public class DataInstanceServiceImplTest {
         dataInstances.add(createArchDataInstance(3, 66L, "TASK", 1475800000002L, "VALUE3"));
         dataInstances.add(createArchDataInstance(4, 66L, "TASK", 1475800000003L, "VALUE4"));
         doReturn(dataInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
-        doReturn(Arrays.asList(new DataContainer(66L, "TASK"), new DataContainer(65L, "PROC"))).when(parentContainerResolver)
-                .getArchivedContainerHierarchy(new DataContainer(66L, "TASK"));
         //order the retrieved list by container level and by archive date
         SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("testData", 1L, "TASK", parentContainerResolver);
         //should return the last version

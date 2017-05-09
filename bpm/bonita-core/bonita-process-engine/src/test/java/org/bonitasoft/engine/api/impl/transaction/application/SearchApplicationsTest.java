@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.transaction.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +29,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -58,12 +56,6 @@ public class SearchApplicationsTest {
 
     @InjectMocks
     private SearchApplications searchApplications;
-
-    @Before
-    public void setUp() throws Exception {
-        when(options.getStartIndex()).thenReturn(START_INDEX);
-        when(options.getMaxResults()).thenReturn(MAX_RESULTS);
-    }
 
     @Test
     public void executeCount_should_return_result_of_applicationService_getNumberOfApplications() throws Exception {

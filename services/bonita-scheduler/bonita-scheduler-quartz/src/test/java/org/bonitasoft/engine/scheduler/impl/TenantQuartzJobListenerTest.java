@@ -248,7 +248,7 @@ public class TenantQuartzJobListenerTest {
         tenantQuartzJobListener.jobWasExecuted(context, null);
 
         // then
-        verify(bonitaJobListeners.get(0)).jobWasExecuted(anyMapOf(String.class, Serializable.class), any(SSchedulerException.class));
+        verify(bonitaJobListeners.get(0)).jobWasExecuted(anyMap(), nullable(SSchedulerException.class));
     }
 
     @Test

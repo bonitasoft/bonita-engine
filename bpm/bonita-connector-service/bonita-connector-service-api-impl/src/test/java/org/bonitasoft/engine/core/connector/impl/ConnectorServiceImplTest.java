@@ -359,8 +359,6 @@ public class ConnectorServiceImplTest {
                         createConnectorImplFile("connectorId", "connectorVersion"))))
                                 .when(processResourcesService)
                                 .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
-        doReturn(new SDependencyImpl("jar1.jar", "jar1.jar", new byte[] { 1 })).when(dependencyService)
-                .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar1.jar");
         doReturn(new SDependencyImpl("jar2.jar", "jar2.jar", new byte[] { 2 })).when(dependencyService)
                 .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, "jar2.jar");
         //when

@@ -16,9 +16,6 @@ package org.bonitasoft.engine.core.process.definition;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
 
@@ -73,12 +70,11 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -413,7 +409,6 @@ public class ProcessDefinitionServiceImplTest {
     public void updateProcessDefinitionDeployInfo() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
 
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
@@ -436,7 +431,6 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         doReturn(true).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
@@ -446,7 +440,8 @@ public class ProcessDefinitionServiceImplTest {
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), "the business log");
 
-        verify(queriableLoggerService).log(anyString(), eq("updateProcessDeploymentInfo"), argThat(new SQueriableLogMatcher("the business log")));
+        verify(queriableLoggerService).log(anyString(), eq("updateProcessDeploymentInfo"),
+                ArgumentMatchers.<SQueriableLog> argThat(logs -> logs.getRawMessage().equals("the business log")));
     }
 
     @Test
@@ -454,28 +449,27 @@ public class ProcessDefinitionServiceImplTest {
         // Given
         doReturn(true).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         // When
-        String string1024 = "";
+        final StringBuilder string1024 = new StringBuilder();
         for (int i = 0; i < 1024; i++) {
-            string1024 += "H";
+            string1024.append("H");
         }
-        processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), string1024);
+        processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), string1024.toString());
 
-        verify(queriableLoggerService).log(anyString(), eq("updateProcessDeploymentInfo"), argThat(new SQueriableLogMatcher(string1024.substring(0, 255))));
+        verify(queriableLoggerService).log(anyString(), eq("updateProcessDeploymentInfo"), ArgumentMatchers
+                .<SQueriableLog> argThat(log -> log.getRawMessage().equals(string1024.substring(0, 255))));
     }
 
     @Test
     public void updateLastUpdateDateInCache_should_update_the_lastUpdateDate_in_cache_if_exists() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
         doReturn(5478L).when(sProcessDefinitionDeployInfo).getLastUpdateDate();
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("a", "b");
         sProcessDefinition.setId(56L);
@@ -490,7 +484,6 @@ public class ProcessDefinitionServiceImplTest {
     public void updateLastUpdateDateInCache_should_update_the_lastUpdateDate_in_cache_if_not_exists() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
         // When
         processDefinitionServiceImpl.updateSProcessDefinitionTimestampInCache(3L, sProcessDefinitionDeployInfo);
         // Then
@@ -512,14 +505,14 @@ public class ProcessDefinitionServiceImplTest {
     public final void updateProcessDefinitionDeployInfoThrowException() throws Exception {
         // Given
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
 
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
 
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(any());
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class),
+                nullable(SUpdateEvent.class));
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done());
@@ -1588,10 +1581,6 @@ public class ProcessDefinitionServiceImplTest {
         final long processDefinitionId = 415L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
         doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
-        doReturn("someXMLContent").when(processDefinitionServiceImpl).getProcessContent(designProcessDefinition);
-
-        doThrow(SBonitaReadException.class).when(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(processDefinitionId),
-                any(EntityUpdateDescriptor.class));
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, 77L, "string");
     }
@@ -1614,10 +1603,7 @@ public class ProcessDefinitionServiceImplTest {
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
         doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
         doReturn(mock(ExpressionImpl.class)).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
-        doReturn("someXMLContent").when(processDefinitionServiceImpl).getProcessContent(designProcessDefinition);
 
-        doThrow(SProcessDeploymentInfoUpdateException.class).when(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(processDefinitionId),
-                any(EntityUpdateDescriptor.class));
 
         processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
     }
@@ -1663,8 +1649,7 @@ public class ProcessDefinitionServiceImplTest {
         final ExpressionImpl expression = mock(ExpressionImpl.class);
         doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
         doReturn("someXMLContent").when(processDefinitionServiceImpl).getProcessContent(designProcessDefinition);
-        doReturn(null).when(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(PROCESS_ID), any(EntityUpdateDescriptor.class));
-        doReturn(true).when(processDefinitionServiceImpl).isValidExpressionTypeToUpdate(anyString());
+        doReturn(true).when(processDefinitionServiceImpl).isValidExpressionTypeToUpdate(nullable(String.class));
 
         processDefinitionServiceImpl.updateExpressionContent(PROCESS_ID, expressionDefinitionId, "string");
 
@@ -1717,22 +1702,4 @@ public class ProcessDefinitionServiceImplTest {
         assertThat(orderByOption.getOrderByType()).isEqualTo(OrderByType.DESC);
     }
 
-    private static class SQueriableLogMatcher extends BaseMatcher<SQueriableLog> {
-
-        private String anObject;
-
-        public SQueriableLogMatcher(String anObject) {
-            this.anObject = anObject;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("expected <" + anObject + "> as raw message");
-        }
-
-        @Override
-        public boolean matches(Object item) {
-            return ((SQueriableLog) item).getRawMessage().equals(anObject);
-        }
-    }
 }

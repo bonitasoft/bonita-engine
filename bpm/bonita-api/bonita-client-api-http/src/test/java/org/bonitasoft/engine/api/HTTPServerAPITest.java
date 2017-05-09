@@ -14,11 +14,7 @@
 package org.bonitasoft.engine.api;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.powermock.api.mockito.PowerMockito.doCallRealMethod;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.doThrow;
-import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -45,22 +41,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.thoughtworks.xstream.XStream;
 
 /**
  * @author Celine Souchet
  */
-/*
- * ignore the ssl because it causes java.security.NoSuchAlgorithmException: class configured for SSLContext: sun.security.ssl.SSLContextImpl not a SSLContext
- * see http://mathieuhicauber-java.blogspot.fr/2013/07/powermock-and-ssl-context.html
- */
-@PowerMockIgnore("javax.net.ssl.*")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ HTTPServerAPI.class })
+
+@RunWith(MockitoJUnitRunner.class)
 public class HTTPServerAPITest {
 
     private XStream xstream;
@@ -79,7 +68,7 @@ public class HTTPServerAPITest {
     }
 
     @Test(expected = ServerWrappedException.class)
-    public void invokeMethodCatchUndeclaredThrowableException() throws Exception {
+    public void invokeMethodCatchUndeclaredThrowableException() throws Throwable {
         final PrintStream printStream = System.err;
         final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
         System.setErr(new PrintStream(myOut));
@@ -98,10 +87,12 @@ public class HTTPServerAPITest {
 
             final HTTPServerAPI httpServerAPI = mock(HTTPServerAPI.class);
             final String response = "response";
-            doReturn(response).when(httpServerAPI, "executeHttpPost", eq(options), eq(apiInterfaceName), eq(methodName), eq(classNameParameters),
+            doReturn(response).when(httpServerAPI).executeHttpPost(eq(options), eq(apiInterfaceName), eq(methodName),
+                    eq(classNameParameters),
                     eq(parametersValues), Matchers.any(XStream.class));
-            doThrow(new UndeclaredThrowableException(new BonitaException("Bonita exception"), "Exception plop")).when(httpServerAPI, "checkInvokeMethodReturn",
-                    eq(response), Matchers.any(XStream.class));
+            doThrow(new UndeclaredThrowableException(new BonitaException("Bonita exception"), "Exception plop"))
+                    .when(httpServerAPI).checkInvokeMethodReturn(
+                            eq(response), any(XStream.class));
 
             // Let's call it for real:
             doCallRealMethod().when(httpServerAPI).invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);

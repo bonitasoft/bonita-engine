@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,8 +40,6 @@ import org.springframework.mock.env.MockEnvironment;
 @RunWith(MockitoJUnitRunner.class)
 public class SpringBeanAccessorTest {
 
-    @Mock
-    private BonitaHomeServer bonitaHomeServer;
     private SpringBeanAccessor springBeanAccessor;
     @Mock
     private BonitaSpringContext context;
@@ -53,7 +50,6 @@ public class SpringBeanAccessorTest {
     @Before
     public void before() throws Exception {
         springBeanAccessor = createSpringBeanAccessor();
-        doReturn(bonitaHomeServer).when(springBeanAccessor).getBonitaHomeServer();
         doReturn(context).when(springBeanAccessor).createContext();
         doReturn(environment).when(context).getEnvironment();
         doReturn(true).when(springBeanAccessor).isCluster();

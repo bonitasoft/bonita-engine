@@ -75,7 +75,6 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(LOGGED_USER_ID).when(processInstance).getStartedBy();
         doReturn(false).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
@@ -88,7 +87,6 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
         Map<String, Serializable> context = buildContext(PROCESS_INSTANCE_ID, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(LOGGED_USER_ID).when(processInstance).getStartedBy();
         doReturn(true).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID, PROCESS_INSTANCE_ID);
 
         final boolean allowed = rule.isAllowed("someKey", context);
@@ -116,10 +114,6 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     public void should_throw_exception_if_process_instance_id_is_missing() throws Exception {
         //given
         Map<String, Serializable> context = new HashMap<>();
-
-        ProcessInstanceNotFoundException processInstanceNotFoundException = new ProcessInstanceNotFoundException("message");
-        doThrow(processInstanceNotFoundException).when(processInvolvementDelegate).isProcessOrArchivedProcessInitiator(LOGGED_USER_ID,
-                PROCESS_INSTANCE_ID);
 
         //expect
         expectedException.expect(IllegalArgumentException.class);

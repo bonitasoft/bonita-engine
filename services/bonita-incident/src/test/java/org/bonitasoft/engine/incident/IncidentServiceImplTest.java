@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.engine.incident;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +54,7 @@ public class IncidentServiceImplTest {
 
     @Test
     public void reportCallAllHandlersEvenIfFirstThrowException() {
-        doThrow(new RuntimeException()).when(handler1).handle(eq(1), any(Incident.class));
+        doThrow(new RuntimeException()).when(handler1).handle(anyLong(), nullable(Incident.class));
         final Incident incident = new Incident("test", "recovery", null, null);
         incidentService.report(1, incident);
         verify(handler2, times(1)).handle(1, incident);

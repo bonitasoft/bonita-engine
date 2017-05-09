@@ -71,7 +71,6 @@ public class FailedStateSetterTest {
     public void setUp() throws Exception {
         given(flowNodeStateManager.getFailedState()).willReturn(failedState);
         given(failedState.getId()).willReturn(FAILED_STATE_ID);
-        given(flowNodeInstance.getProcessDefinitionId()).willReturn(PROCESS_DEFINITION_ID);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
         given(loggerService.isLoggable(Matchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
     }

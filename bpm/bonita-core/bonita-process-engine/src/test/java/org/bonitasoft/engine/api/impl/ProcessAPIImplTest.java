@@ -17,14 +17,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -40,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -83,8 +76,6 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContextEntryImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
@@ -179,8 +170,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
 
@@ -198,6 +187,7 @@ public class ProcessAPIImplTest {
     private static final long FLOW_NODE_DEFINITION_ID = 1664;
     private static final String ACTOR_NAME = "employee";
     @Mock
+    private
     ProcessManagementAPIImplDelegate managementAPIImplDelegate;
     @Mock
     private TenantServiceAccessor tenantAccessor;
@@ -276,7 +266,6 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
         when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
         when(tenantAccessor.getContractDataService()).thenReturn(contractDataService);
-        when(tenantAccessor.getBusinessArchiveService()).thenReturn(businessArchiveService);
         when(tenantAccessor.getTransientDataService()).thenReturn(transientDataService);
         when(tenantAccessor.getExpressionResolverService()).thenReturn(expressionResolverService);
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
@@ -354,7 +343,6 @@ public class ProcessAPIImplTest {
         final ProcessInstanceInterruptor interruptor = mock(ProcessInstanceInterruptor.class);
 
         when(tenantAccessor.getLockService()).thenReturn(lockService);
-        doReturn(userId).when(processAPI).getUserId();
         doReturn(interruptor).when(processAPI).buildProcessInstanceInterruptor(tenantAccessor);
         doThrow(new SProcessInstanceNotFoundException(PROCESS_INSTANCE_ID)).when(interruptor).interruptProcessInstance(PROCESS_INSTANCE_ID,
                 SStateCategory.CANCELLING);
@@ -364,7 +352,7 @@ public class ProcessAPIImplTest {
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
             verify(lockService).lock(PROCESS_INSTANCE_ID, SFlowElementsContainerType.PROCESS.name(), TENANT_ID);
-            verify(lockService).unlock(any(BonitaLock.class), eq(TENANT_ID));
+            verify(lockService).unlock(nullable(BonitaLock.class), eq(TENANT_ID));
         }
     }
 
@@ -392,7 +380,6 @@ public class ProcessAPIImplTest {
     public void updateProcessDataInstances_should_update_data_instances_when_new_value_is_instance_of_data_type() throws Exception {
         // Given
         ClassLoader processClassLoader = mock(ClassLoader.class);
-        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class) SBlobDataInstanceImpl.class);
         when(processClassLoader.loadClass(String.class.getName())).thenReturn((Class) String.class);
         doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
 
@@ -428,10 +415,8 @@ public class ProcessAPIImplTest {
         // Given
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
-        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class) SBlobDataInstanceImpl.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
         doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
 
         final Map<String, Serializable> dataNameValues = singletonMap(dataName, (Serializable) "dataValue");
 
@@ -483,8 +468,6 @@ public class ProcessAPIImplTest {
     @SuppressWarnings("unchecked")
     public void replayingAFailedJobNoParamShouldExecuteAgainSchedulerServiceWithNoParameters() throws Exception {
         final long jobDescriptorId = 25L;
-        doNothing().when(schedulerService).executeAgain(anyLong(), anyList());
-
         processAPI.replayFailedJob(jobDescriptorId, null);
         processAPI.replayFailedJob(jobDescriptorId, Collections.EMPTY_MAP);
 
@@ -546,15 +529,9 @@ public class ProcessAPIImplTest {
 
     @Test
     public void getActivityTransientDataInstances() throws Exception {
-        final String dataValue = "TestOfCourse";
-        final String dataName = "TransientName";
-        doNothing().when(processAPI).updateTransientData(eq(dataName), eq(FLOW_NODE_INSTANCE_ID), eq(dataValue), eq(transientDataService),
-                any(ClassLoader.class));
-
         final int nbResults = 100;
         final int startIndex = 0;
         final SDataInstance sDataInstance = mock(SDataInstance.class);
-        when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         final List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
         when(transientDataService.getDataInstances(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
                 .thenReturn(sDataInstances);
@@ -565,24 +542,20 @@ public class ProcessAPIImplTest {
 
         assertThat(dis).contains(dataInstance);
 
-        verify(processAPI, times(1)).convertModelToDataInstances(sDataInstances);
-        verify(transientDataService, times(1)).getDataInstances(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults);
-        verify(tenantAccessor, times(1)).getTransientDataService();
-        verify(tenantAccessor, times(1)).getClassLoaderService();
-        verify(tenantAccessor, times(1)).getActivityInstanceService();
-        verify(activityInstanceService, times(1)).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        verify(classLoaderService, times(1)).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyInt());
+        verify(processAPI).convertModelToDataInstances(sDataInstances);
+        verify(transientDataService).getDataInstances(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults);
+        verify(tenantAccessor).getTransientDataService();
+        verify(tenantAccessor).getClassLoaderService();
+        verify(tenantAccessor).getActivityInstanceService();
+        verify(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
+        verify(classLoaderService).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyLong());
     }
 
     @Test
     public void getActivityTransientDataInstance() throws Exception {
-        final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
-        doNothing().when(processAPI).updateTransientData(eq(dataName), eq(FLOW_NODE_INSTANCE_ID), eq(dataValue), eq(transientDataService),
-                any(ClassLoader.class));
 
         final SDataInstance sDataInstance = mock(SDataInstance.class);
-        when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         when(transientDataService.getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())).thenReturn(sDataInstance);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(dataInstance).when(processAPI).convertModeltoDataInstance(sDataInstance);
@@ -591,13 +564,13 @@ public class ProcessAPIImplTest {
 
         assertThat(di).isEqualTo(dataInstance);
 
-        verify(processAPI, times(1)).convertModeltoDataInstance(sDataInstance);
-        verify(transientDataService, times(1)).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name());
-        verify(tenantAccessor, times(1)).getTransientDataService();
-        verify(tenantAccessor, times(1)).getClassLoaderService();
-        verify(tenantAccessor, times(1)).getActivityInstanceService();
-        verify(activityInstanceService, times(1)).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        verify(classLoaderService, times(1)).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyInt());
+        verify(processAPI).convertModeltoDataInstance(sDataInstance);
+        verify(transientDataService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        verify(tenantAccessor).getTransientDataService();
+        verify(tenantAccessor).getClassLoaderService();
+        verify(tenantAccessor).getActivityInstanceService();
+        verify(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
+        verify(classLoaderService).getLocalClassLoader(eq(ScopeType.PROCESS.name()), nullable(Long.class));
     }
 
     @Test
@@ -605,9 +578,7 @@ public class ProcessAPIImplTest {
         // Given
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
-        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class) SBlobDataInstanceImpl.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
-        doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
 
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
@@ -636,9 +607,7 @@ public class ProcessAPIImplTest {
         // Given
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
-        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class) SBlobDataInstanceImpl.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
-        doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
 
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
@@ -676,11 +645,11 @@ public class ProcessAPIImplTest {
         // Then
 
         verify(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService, contextClassLoader);
-        verify(tenantAccessor, times(1)).getTransientDataService();
-        verify(tenantAccessor, times(1)).getClassLoaderService();
-        verify(tenantAccessor, times(1)).getActivityInstanceService();
-        verify(activityInstanceService, times(1)).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        verify(classLoaderService, times(1)).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyInt());
+        verify(tenantAccessor).getTransientDataService();
+        verify(tenantAccessor).getClassLoaderService();
+        verify(tenantAccessor).getActivityInstanceService();
+        verify(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
+        verify(classLoaderService).getLocalClassLoader(eq(ScopeType.PROCESS.name()), anyLong());
     }
 
     @Test(expected = UpdateException.class)
@@ -690,7 +659,7 @@ public class ProcessAPIImplTest {
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
         doThrow(new SDataInstanceException("")).when(processAPI).updateTransientData(eq(dataName), eq(FLOW_NODE_INSTANCE_ID), eq(dataValue),
-                eq(transientDataService), any(ClassLoader.class));
+                eq(transientDataService), nullable(ClassLoader.class));
 
         // When
         processAPI.updateActivityTransientDataInstance(dataName, FLOW_NODE_INSTANCE_ID, dataValue);
@@ -712,7 +681,7 @@ public class ProcessAPIImplTest {
 
         // Then
         verify(transientDataService).updateDataInstance(eq(dataInstance), any(EntityUpdateDescriptor.class));
-        verify(transientDataService, times(1)).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID,
+        verify(transientDataService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID,
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString());
     }
 
@@ -734,13 +703,8 @@ public class ProcessAPIImplTest {
 
     @Test
     public void getUserIdsForActor_throws_RetrieveException_when_actorMappingService_throws_SBonitaException() throws Exception {
-        // given
-        final SActor actor = mock(SActor.class);
-        when(actor.getId()).thenReturn(ACTOR_ID);
-
         when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenThrow(new SActorNotFoundException(""));
 
-        // when
         try {
             processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
             fail("Exception expected");
@@ -765,16 +729,8 @@ public class ProcessAPIImplTest {
         final ClassLoader contextClassLoader = mock(ClassLoader.class);
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(contextClassLoader);
         final SProcessDefinition processDef = mock(SProcessDefinition.class);
-        when(processDefinitionService.getProcessDefinition(anyLong())).thenReturn(processDef);
         final SActivityInstance activityInstance = mock(SActivityInstance.class);
         when(activityInstanceService.getActivityInstance(anyLong())).thenReturn(activityInstance);
-        final SFlowElementContainerDefinition flowElementContainerDefinition = mock(SFlowElementContainerDefinition.class);
-        when(processDef.getProcessContainer()).thenReturn(flowElementContainerDefinition);
-        when(flowElementContainerDefinition.getFlowNode(anyLong())).thenReturn(mock(SActivityDefinition.class));
-
-        final SDataInstance dataInstance = mock(SDataInstance.class);
-        when(dataInstanceService.getDataInstances(anyListOf(String.class), anyLong(),
-                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()), any(ParentContainerResolver.class))).thenReturn(Arrays.asList(dataInstance));
 
         final List<Operation> operations = new ArrayList<>();
         operations.add(operation);
@@ -1101,7 +1057,7 @@ public class ProcessAPIImplTest {
         final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
         doReturn(sTimerEventTriggerInstance).when(eventInstanceService).getEventTriggerInstance(STimerEventTriggerInstance.class, timerEventTriggerInstanceId);
 
-        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService).rescheduleJob(anyString(), anyString(), eq(date));
+        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService).rescheduleJob(nullable(String.class), nullable(String.class), eq(date));
 
         // When
         processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, date);
@@ -1289,7 +1245,6 @@ public class ProcessAPIImplTest {
     public void getDesignProcessDefinition_Should_Return_Design() throws Exception {
         //given
         int processDefinitionId = 123;
-        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
         DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
         when(processDefinitionService.getDesignProcessDefinition(processDefinitionId)).thenReturn(designProcessDefinition);
@@ -1303,7 +1258,6 @@ public class ProcessAPIImplTest {
     @Test(expected = ProcessDefinitionNotFoundException.class)
     public void getDesignProcessDefinition_Should_ThrowException_When_No_ProcessDefinition_Exists() throws Exception {
         int processDefinitionId = 123;
-        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
         when(processDefinitionService.getDesignProcessDefinition(processDefinitionId)).thenThrow(
                 new SProcessDefinitionNotFoundException("impossible to found given process definition"));
@@ -1411,9 +1365,9 @@ public class ProcessAPIImplTest {
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
         userTaskDefinition.setUserFilter(sUserFilterDefinition);
         doReturn(new FilterResultImpl(Arrays.asList(4L, 5L), true)).when(userFilterService).executeFilter(anyLong(), eq(sUserFilterDefinition),
-                anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class),
-                any(SExpressionContext.class), anyString());
+                anyMap(),
+                nullable(ClassLoader.class),
+                nullable(SExpressionContext.class), nullable(String.class));
         //when
         processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
         //then
@@ -1431,9 +1385,9 @@ public class ProcessAPIImplTest {
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
         userTaskDefinition.setUserFilter(sUserFilterDefinition);
         doReturn(new FilterResultImpl(Collections.singletonList(4L), true)).when(userFilterService).executeFilter(anyLong(), eq(sUserFilterDefinition),
-                anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class),
-                any(SExpressionContext.class), anyString());
+                anyMap(),
+                nullable(ClassLoader.class),
+                nullable(SExpressionContext.class), nullable(String.class));
         //when
         processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
         //then
@@ -1448,9 +1402,9 @@ public class ProcessAPIImplTest {
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
         userTaskDefinition.setUserFilter(sUserFilterDefinition);
         doReturn(new FilterResultImpl(Collections.singletonList(4L), false)).when(userFilterService).executeFilter(anyLong(), eq(sUserFilterDefinition),
-                anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class),
-                any(SExpressionContext.class), anyString());
+                anyMap(),
+                nullable(ClassLoader.class),
+                nullable(SExpressionContext.class), nullable(String.class));
         //when
         processAPI.updateActorsOfUserTask(FLOW_NODE_INSTANCE_ID);
         //then

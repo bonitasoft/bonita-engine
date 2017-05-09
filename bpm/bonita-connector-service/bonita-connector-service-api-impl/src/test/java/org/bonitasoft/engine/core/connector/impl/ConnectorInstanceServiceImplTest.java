@@ -14,15 +14,10 @@
 package org.bonitasoft.engine.core.connector.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -40,7 +34,6 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -80,16 +73,6 @@ public class ConnectorInstanceServiceImplTest {
     @InjectMocks
     private ConnectorInstanceServiceImpl connectorInstanceServiceImpl;
 
-    @Before
-    public void setUp() {
-        final String bonitaHome = System.getProperty("bonita.home");
-        System.err.println("using bonita_home:" + bonitaHome);
-
-        final SConnectorInstanceWithFailureInfoBuilderFactory fact = mock(SConnectorInstanceWithFailureInfoBuilderFactory.class);
-        when(fact.getExceptionMessageKey()).thenReturn(EXCEPTION_MESSAGE);
-        when(fact.getStackTraceKey()).thenReturn(STACK_TRACE);
-    }
-
     @Test
     public void setConnectorInstanceFailureException() throws Exception {
         final Exception exception = new Exception(message);
@@ -99,7 +82,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -117,7 +100,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -136,7 +119,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -153,7 +136,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -179,7 +162,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 

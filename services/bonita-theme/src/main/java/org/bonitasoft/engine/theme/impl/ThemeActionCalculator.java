@@ -58,7 +58,7 @@ public class ThemeActionCalculator {
     private boolean hasContentChanged(final STheme currentTheme, final byte[] newContent) {
         boolean changed = false;
         try {
-            changed = !IOUtil.md5(currentTheme.getContent()).equals(IOUtil.md5(newContent));
+            changed = !md5(currentTheme.getContent()).equals(md5(newContent));
         } catch (NoSuchAlgorithmException e) {
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
@@ -66,6 +66,11 @@ public class ThemeActionCalculator {
             }
         }
         return changed;
+    }
+
+    //package private for testing purpose
+    String md5(byte[] content) throws NoSuchAlgorithmException {
+        return IOUtil.md5(content);
     }
 
     private boolean hasContent(final byte[] newContent) {

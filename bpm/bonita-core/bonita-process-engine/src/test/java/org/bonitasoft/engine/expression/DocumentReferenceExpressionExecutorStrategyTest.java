@@ -15,7 +15,6 @@ package org.bonitasoft.engine.expression;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -48,42 +47,33 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DocumentReferenceExpressionExecutorStrategyTest {
 
     public static final long PROCESS_INSTANCE_ID = 1L;
-
-    public static final long PARENT_PROCESS_INSTANCE_ID = 2L;
-
-    public static final long A_LONG_TIME_AGO = 1234L;
+    private static final long PARENT_PROCESS_INSTANCE_ID = 2L;
+    private static final long A_LONG_TIME_AGO = 1234L;
 
     @Mock
-    DocumentService documentService;
-
+    private DocumentService documentService;
     @Mock
-    ActivityInstanceService activityInstanceService;
-
+    private ActivityInstanceService activityInstanceService;
     @InjectMocks
-    DocumentReferenceExpressionExecutorStrategy strategy;
-
+    private DocumentReferenceExpressionExecutorStrategy strategy;
     @Mock
-    SMappedDocument document;
-
+    private SMappedDocument document;
     @Mock
-    SMappedDocument parentDocument;
-
+    private SMappedDocument parentDocument;
     @Mock
-    SMappedDocument archivedDocument;
-
+    private SMappedDocument archivedDocument;
     @Mock
     SExpression expression;
-
     @Mock
-    SFlowNodeInstance flowNodeInstance;
+    private SFlowNodeInstance flowNodeInstance;
 
     @Before
     public void setUp() throws Exception {
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(PROCESS_INSTANCE_ID);
         doReturn(PARENT_PROCESS_INSTANCE_ID).when(flowNodeInstance).getParentProcessInstanceId();
-        doReturn(document).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString());
-        doReturn(parentDocument).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
-        doReturn(archivedDocument).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString(), eq(A_LONG_TIME_AGO));
+        doReturn(document).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), nullable(String.class));
+        doReturn(parentDocument).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), nullable(String.class));
+        doReturn(archivedDocument).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), nullable(String.class), eq(A_LONG_TIME_AGO));
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
@@ -121,7 +111,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
-        doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString());
+        doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID),
+                nullable(String.class));
         final Map<String, Object> dependencies = new HashMap<>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
@@ -133,7 +124,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
-        doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
+        doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID),
+                nullable(String.class));
         final Map<String, Object> dependencies = new HashMap<>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
@@ -150,7 +142,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         dependencies.put("containerType", "PROCESS_INSTANCE");
         dependencies.put("time", A_LONG_TIME_AGO);
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
+        final List<Object> result = strategy.evaluate(Collections.singletonList(expression), dependencies, null,
+                ContainerState.ACTIVE);
 
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument, documentService));
     }

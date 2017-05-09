@@ -16,11 +16,6 @@ package org.bonitasoft.engine.operation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -50,7 +45,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -115,7 +109,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final String bizDataName = "employee";
         final int processInstanceId = 457;
         BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
-        when(refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(businessDataContext)))).thenReturn(refInstance);
+        when(refBusinessDataRetriever.getRefBusinessDataInstance(eq(businessDataContext))).thenReturn(refInstance);
         when(refInstance.getDataId()).thenReturn(null);
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
@@ -132,23 +126,13 @@ public class BusinessDataLeftOperandHandlerTest {
         final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
-        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
-        when(refInstance.getDataId()).thenReturn(null);
-        when(refInstance.getDataClassName()).thenReturn("fr.bonitasoft.engine.Employee");
 
         leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
     }
 
     @Test(expected = SBonitaReadException.class)
     public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsAnInterface() throws Exception {
-        final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
-        final String bizDataName = "employee";
-        final int processInstanceId = 457;
-        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
-        when(refInstance.getDataId()).thenReturn(null);
-        when(refInstance.getDataClassName()).thenReturn(List.class.getName());
-
-        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
+        leftOperandHandler.getBusinessData("employee", 457, PROCESS_INSTANCE);
     }
 
     @Test
@@ -157,14 +141,13 @@ public class BusinessDataLeftOperandHandlerTest {
         leftOperand.setName("address");
         final SSimpleRefBusinessDataInstance instance = mock(SSimpleRefBusinessDataInstance.class);
         when(
-                refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(new BusinessDataContext("address", new Container(45,
-                        PROCESS_INSTANCE)))))).thenReturn(instance);
+                refBusinessDataRetriever.getRefBusinessDataInstance(any())).thenReturn(instance);
         when(instance.getDataClassName()).thenReturn(Address.class.getName());
 
         leftOperandHandler.delete(leftOperand, 45, PROCESS_INSTANCE);
 
         verify(refBusinessDataService).updateRefBusinessDataInstance(instance, null);
-        verify(repository).remove(any(Address.class));
+        verify(repository).remove(nullable(Address.class));
     }
 
     @Test
@@ -188,17 +171,14 @@ public class BusinessDataLeftOperandHandlerTest {
         final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName("address");
         final SMultiRefBusinessDataInstance ref = mock(SMultiRefBusinessDataInstance.class);
-        BusinessDataContext employeesContext = new BusinessDataContext("employees", new Container(123l, PROCESS_INSTANCE));
-        BusinessDataContext addressContext = new BusinessDataContext("address", new Container(45, PROCESS_INSTANCE));
-        doReturn(ref).when(refBusinessDataRetriever).getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(employeesContext)));
-        when(refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(addressContext)))).thenReturn(ref);
+        doReturn(ref).when(refBusinessDataRetriever).getRefBusinessDataInstance(any());
         when(ref.getDataClassName()).thenReturn(Address.class.getName());
         when(ref.getDataIds()).thenReturn(Arrays.asList(486L));
 
         leftOperandHandler.delete(leftOperand, 45, PROCESS_INSTANCE);
 
         verify(refBusinessDataService).updateRefBusinessDataInstance(ref, new ArrayList<Long>());
-        verify(repository).remove(any(Address.class));
+        verify(repository).remove(nullable(Address.class));
     }
 
     @Test
@@ -207,7 +187,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final String bizDataName = "employee";
         final int processInstanceId = 457;
         BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
-        when(refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(businessDataContext)))).thenReturn(refInstance);
+        when(refBusinessDataRetriever.getRefBusinessDataInstance(eq(businessDataContext))).thenReturn(refInstance);
         when(refInstance.getDataIds()).thenReturn(Arrays.asList(45l));
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
@@ -223,9 +203,8 @@ public class BusinessDataLeftOperandHandlerTest {
         final long processInstanceId = 457;
         BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId,
                 PROCESS_INSTANCE));
-        when(
-                refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(businessDataContext)))).thenReturn(refInstance);
-        when(refInstance.getDataIds()).thenReturn(new ArrayList<Long>());
+        when(refBusinessDataRetriever.getRefBusinessDataInstance(eq(businessDataContext))).thenReturn(refInstance);
+        when(refInstance.getDataIds()).thenReturn(new ArrayList<>());
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
         final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
@@ -240,7 +219,7 @@ public class BusinessDataLeftOperandHandlerTest {
         long containerId = 1L;
         String containerType = "PROCESS";
         BusinessDataContext businessDataContext = new BusinessDataContext(businessDataName, new Container(containerId, containerType));
-        given(actionsExecutor.executeAction(eq(address), Matchers.argThat(new BusinessDataContextMatcher(businessDataContext)), eq(action)))
+        given(actionsExecutor.executeAction(eq(address), eq(businessDataContext), eq(action)))
                 .willReturn(address);
 
         //when
@@ -259,7 +238,7 @@ public class BusinessDataLeftOperandHandlerTest {
         long containerId = 1L;
         String containerType = "PROCESS";
         BusinessDataContext businessDataContext = new BusinessDataContext(businessDataName, new Container(containerId, containerType));
-        given(actionsExecutor.executeAction(eq(address), Matchers.argThat(new BusinessDataContextMatcher(businessDataContext)), eq(action))).willThrow(
+        given(actionsExecutor.executeAction(eq(address), eq(businessDataContext), eq(action))).willThrow(
                 new SEntityActionExecutionException(""));
 
         //when

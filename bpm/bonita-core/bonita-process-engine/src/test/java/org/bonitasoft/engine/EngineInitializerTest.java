@@ -17,7 +17,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -102,7 +101,6 @@ public class EngineInitializerTest {
     @Test
     public void testUnloadEngine() throws Exception {
         doReturn(true).when(platformAPI).isNodeStarted();
-        doReturn(true).when(platformAPI).isPlatformCreated();
 
         engineInitializer.unloadEngine();
 
@@ -122,9 +120,6 @@ public class EngineInitializerTest {
 
     @Test
     public void should_destroy_accessor_if_exception() throws Exception {
-        doReturn(true).when(platformAPI).isPlatformCreated();
-        doThrow(new StopNodeException("tada")).when(platformAPI).stopNode();
-
         engineInitializer.unloadEngine();
 
         verify(serviceAccessorFactory, times(1)).destroyAccessors();

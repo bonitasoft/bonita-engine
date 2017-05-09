@@ -14,7 +14,9 @@
 package org.bonitasoft.engine.incident;
 
 import static org.junit.Assert.assertTrue;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.logging.FileHandler;
@@ -28,16 +30,13 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BonitaHomeServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class FileLoggerIncidentHandlerTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
     @Mock
     private BonitaHomeServer bonitaHomeServer;
     @Mock
@@ -45,20 +44,18 @@ public class FileLoggerIncidentHandlerTest {
 
     @Test
     public void should_write_into_file_when_handle_incident() throws Exception {
-        mockStatic(BonitaHomeServer.class);
-
         //Given
         long tenantId = 1;
         temporaryFolder.newFolder("logFolder");
         final File incidentFile = new File(temporaryFolder.newFolder("logFolder", String.valueOf(tenantId)), TenantStorage.INCIDENTS_LOG_FILENAME);
         final FileHandler fh = new FileHandler(incidentFile.getAbsolutePath());
 
-        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
         when(bonitaHomeServer.getTenantStorage()).thenReturn(tenantStorage);
         doReturn(fh).when(tenantStorage).getIncidentFileHandler(tenantId);
 
         final Incident incident = new Incident("test", "recovery", new Exception("an unexpected exception"), new Exception("unable to handle failure"));
-        FileLoggerIncidentHandler fileLoggerIncidentHandler = new FileLoggerIncidentHandler();
+        FileLoggerIncidentHandler fileLoggerIncidentHandler = spy(new FileLoggerIncidentHandler());
+        doReturn(bonitaHomeServer).when(fileLoggerIncidentHandler).getBonitaHomeServer();
 
         //When
         fileLoggerIncidentHandler.handle(tenantId, incident);

@@ -13,19 +13,12 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +32,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -93,11 +85,8 @@ public class JobServiceImplForJobParameterTest {
         final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(1L).when(sJobParameter).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final List<SJobParameter> result = jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
         assertNotNull(result);
@@ -139,11 +128,9 @@ public class JobServiceImplForJobParameterTest {
         final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(1L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doReturn(false).when(eventService).hasHandlers(anyString(), nullable(EventActionType.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
@@ -161,11 +148,8 @@ public class JobServiceImplForJobParameterTest {
         final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(1L).when(sJobParameter).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final SJobParameter result = jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
         assertNotNull(result);
@@ -188,11 +172,9 @@ public class JobServiceImplForJobParameterTest {
         final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(1L).when(sJobParameter).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
@@ -211,19 +193,16 @@ public class JobServiceImplForJobParameterTest {
     public final void deleteJobParameter_by_id() throws Exception {
         // Given
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(3L).when(sJobParameter).getId();
 
         doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         // When
         jobServiceImpl.deleteJobParameter(3);
 
         // Then
         verify(jobServiceImpl).deleteJobParameter(sJobParameter);
-        verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
     }
 
     @Test(expected = SJobParameterNotFoundException.class)
@@ -239,11 +218,10 @@ public class JobServiceImplForJobParameterTest {
     public void deleteJobParameter_by_id_should_throw_exception_when_recorder_failed() throws Exception {
         // Given
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(3L).when(sJobParameter).getId();
 
         doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         jobServiceImpl.deleteJobParameter(3);
@@ -258,11 +236,8 @@ public class JobServiceImplForJobParameterTest {
     @Test
     public final void deleteJobParameter_by_object() throws SRecorderException, SJobParameterDeletionException {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(3L).when(sJobParameter).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.deleteJobParameter(sJobParameter);
     }
@@ -275,10 +250,9 @@ public class JobServiceImplForJobParameterTest {
     @Test(expected = SJobParameterDeletionException.class)
     public void deleteJobParameter_by_object_should_throw_exception_when_recorder_failed() throws Exception {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-        doReturn(3L).when(sJobParameter).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         jobServiceImpl.deleteJobParameter(sJobParameter);
     }
@@ -369,9 +343,6 @@ public class JobServiceImplForJobParameterTest {
         doReturn(sJobParameters).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         // When
         final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, sJobParameters);
@@ -440,10 +411,9 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
-                eq((Map<String, Object>) null));
+                eq(null));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
@@ -459,9 +429,8 @@ public class JobServiceImplForJobParameterTest {
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));

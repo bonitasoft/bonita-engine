@@ -102,11 +102,6 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public final void jobWasExecuted_should_not_search_for_event_triggers_when_executed_job_was_not_TimerEventJob() throws Exception {
         // Given
-        final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
-        final List<STimerEventTriggerInstance> timerEventTriggerInstances = Collections.singletonList(sTimerEventTriggerInstance);
-        doReturn(timerEventTriggerInstances).when(eventInstanceService).searchEventTriggerInstances(eq(STimerEventTriggerInstance.class),
-                any(QueryOptions.class));
-
         context.put(AbstractBonitaJobListener.JOB_TYPE, "AnotherJob");
 
         // When

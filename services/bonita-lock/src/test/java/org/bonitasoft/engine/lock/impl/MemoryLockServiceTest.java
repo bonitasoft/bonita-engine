@@ -86,16 +86,11 @@ public class MemoryLockServiceTest {
         @Override
         public void run() {
             try {
-                System.out.println(name2 + " wait to acquire the lock");
-                System.out.println(name2 + " will lock");
                 semaphore.acquire();
                 lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS, tenantId);
-                System.out.println(name2 + " lock obtained, wait to unlock");
                 semaphore.acquire();
-                System.out.println(name2 + " will unlock");
                 memoryLockService.unlock(lock, tenantId);
                 lock = null;
-                System.out.println(name2 + " unlocked");
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }

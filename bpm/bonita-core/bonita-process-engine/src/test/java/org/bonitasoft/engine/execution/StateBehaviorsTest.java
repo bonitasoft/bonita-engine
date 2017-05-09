@@ -17,19 +17,10 @@ package org.bonitasoft.engine.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_RE_EXECUTE;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -107,10 +98,7 @@ public class StateBehaviorsTest {
 
     @Before
     public void setConstants() {
-        when(processDefinition.getProcessContainer()).thenReturn(containerDefinition);
-        when(containerDefinition.getFlowNode(anyLong())).thenReturn(flowNodeDefinition);
         when(flowNodeInstance.getId()).thenReturn(flownodeInstanceId);
-        when(processDefinition.getId()).thenReturn(processDefinitionId);
     }
 
     @Test
@@ -128,8 +116,8 @@ public class StateBehaviorsTest {
                 return true;
             }
         };
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
         //then
@@ -156,8 +144,8 @@ public class StateBehaviorsTest {
                 return true;
             }
         };
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
         //then
@@ -172,8 +160,8 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_do_not_assign_if_only_one_and_auto_assign_is_false() throws Exception {
         //given
         final FilterResult result = getFilterResult(Arrays.asList(1L));
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         //when
         stateBehaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
         //then
@@ -188,8 +176,8 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_throw_exception_when_empty_return() throws Exception {
         //given
         final FilterResult result = getFilterResult(Collections.<Long> emptyList());
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
@@ -200,8 +188,8 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_throw_exception_when_null_return() throws Exception {
         //given
         final FilterResult result = getFilterResult(null);
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
@@ -212,8 +200,8 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_throw_exception_when_return_contains_minus_1() throws Exception {
         //given
         final FilterResult result = getFilterResult(Arrays.asList(-1L));
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
@@ -224,8 +212,8 @@ public class StateBehaviorsTest {
     public void should_mapUsingUserFilters_throw_exception_when_return_contains_0() throws Exception {
         //given
         final FilterResult result = getFilterResult(Arrays.asList(0L));
-        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
-                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMap(),
+                nullable(ClassLoader.class), nullable(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when

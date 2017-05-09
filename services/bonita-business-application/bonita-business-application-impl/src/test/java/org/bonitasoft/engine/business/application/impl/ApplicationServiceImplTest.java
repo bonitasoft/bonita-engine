@@ -440,7 +440,6 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(applicationPageId, 20, 30, "myPage");
         doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
         final long applicationId = 20L;
-        doReturn(application).when(applicationService).getApplication(applicationId);
 
         //when
         applicationService.deleteApplicationPage(applicationPageId);
@@ -463,7 +462,6 @@ public class ApplicationServiceImplTest {
         final long applicationPageId = 10L;
         final long applicationId = 20L;
         final SApplicationPage applicationPage = buildApplicationPage(applicationPageId, applicationId, 30, "myPage");
-        doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
 
         //when
         applicationService.deleteApplicationPage(applicationPage);
@@ -482,7 +480,6 @@ public class ApplicationServiceImplTest {
         final long applicationPageId = 10L;
         final long applicationId = 20L;
         final SApplicationPage applicationPage = buildApplicationPage(applicationPageId, applicationId, 30, "myPage");
-        doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
         doThrow(new SObjectModificationException()).when(applicationPageDestructor).onDeleteApplicationPage(applicationPage);
 
         //when
@@ -551,8 +548,6 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
-                application);
 
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, homePageId)))
                 .willReturn(
@@ -570,9 +565,6 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         updateDescriptor.addField("name", "newName");
         final int applicationId = 17;
-
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
-
         //when
         applicationServiceImpl.updateApplication(applicationId, updateDescriptor);
 
@@ -940,7 +932,6 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectOne(descriptor)).willReturn(lastUsedIndex);
 
         final MenuIndex menuIndex = new MenuIndex(null, indexValue, lastUsedIndex);
-        given(convertor.toMenuIndex(applicationMenu)).willReturn(menuIndex);
 
         //when
         applicationServiceImpl.deleteApplicationMenu(applicationId);

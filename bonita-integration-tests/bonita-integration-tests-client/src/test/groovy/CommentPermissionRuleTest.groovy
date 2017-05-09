@@ -53,10 +53,7 @@ public class CommentPermissionRuleTest {
 
     @Before
     public void before() {
-
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
@@ -135,7 +132,6 @@ public class CommentPermissionRuleTest {
     def havingResourceId(boolean isInvolvedIn, boolean isInvolvedAsManager) {
         doReturn(currentUserId).when(apiSession).getUserId()
         doReturn(true).when(apiCallContext).isGET()
-        doReturn("45").when(apiCallContext).getResourceId()
         doReturn(["processInstanceId":"45"]).when(apiCallContext).getFilters()
         def instance = mock(ProcessInstance.class)
         doReturn(instance).when(processAPI).getProcessInstance(45l);

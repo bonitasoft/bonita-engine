@@ -203,7 +203,6 @@ public class SPageMappingServiceImplTest {
         //given
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setKey("myKey");
-        doReturn(pageMapping).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         //when
         pageMappingService.update(pageMapping, 124l);
@@ -353,11 +352,11 @@ public class SPageMappingServiceImplTest {
         pageMapping.setPageAuthorizationRules(rules);
 
         final AuthorizationRule authorizationRule = spy(new ValidRule(validRuleKey));
-        pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
+        pageMappingService.setAuthorizationRules(Collections.singletonList(authorizationRule));
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
+        pageMappingService.resolvePageURL(pageMapping, Collections.emptyMap(), true);
 
-        verify(authorizationRule).isAllowed(anyString(), anyMap());
+        verify(authorizationRule).isAllowed(nullable(String.class), anyMap());
     }
     
     @Test
@@ -369,11 +368,11 @@ public class SPageMappingServiceImplTest {
         pageMapping.setPageAuthorizationRules(rules);
 
         final AuthorizationRule authorizationRule = spy(new ValidRule(validRuleKey));
-        pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
+        pageMappingService.setAuthorizationRules(Collections.singletonList(authorizationRule));
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), false);
+        pageMappingService.resolvePageURL(pageMapping, Collections.emptyMap(), false);
 
-        verify(authorizationRule, never()).isAllowed(anyString(), anyMap());
+        verify(authorizationRule, never()).isAllowed(nullable(String.class), anyMap());
     }
 
     @Test(expected = SAuthorizationException.class)
@@ -406,10 +405,10 @@ public class SPageMappingServiceImplTest {
         final NeverValidRule neverValidRule2 = spy(new NeverValidRule(invalidRuleKey2));
         pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(neverValidRule, validRule));
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
+        pageMappingService.resolvePageURL(pageMapping, Collections.emptyMap(), true);
 
-        verify(neverValidRule).isAllowed(anyString(), anyMap());
-        verify(validRule).isAllowed(anyString(), anyMap());
+        verify(neverValidRule).isAllowed(nullable(String.class), anyMap());
+        verify(validRule).isAllowed(nullable(String.class), anyMap());
         verifyZeroInteractions(neverValidRule2);
     }
 

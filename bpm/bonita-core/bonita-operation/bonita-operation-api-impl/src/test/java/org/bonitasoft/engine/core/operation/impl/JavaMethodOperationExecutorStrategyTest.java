@@ -54,10 +54,6 @@ public class JavaMethodOperationExecutorStrategyTest {
 
         when(operation.getLeftOperand()).thenReturn(leftOperand);
         when(leftOperand.getName()).thenReturn("unknownData");
-        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
-        when(operation.getRightOperand()).thenReturn(rightOperand);
-        when(operation.getOperator()).thenReturn("=");
-        when(rightOperand.getReturnType()).thenReturn(Object.class.getName());
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         expressionContext.setInputValues(Collections.<String, Object> emptyMap());
@@ -72,7 +68,6 @@ public class JavaMethodOperationExecutorStrategyTest {
 
         when(operation.getLeftOperand()).thenReturn(leftOperand);
         when(leftOperand.getName()).thenReturn("myData");
-        when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
         when(operation.getRightOperand()).thenReturn(rightOperand);
         when(operation.getOperator()).thenReturn("setThing:int");
         when(rightOperand.getReturnType()).thenReturn(Object.class.getName());

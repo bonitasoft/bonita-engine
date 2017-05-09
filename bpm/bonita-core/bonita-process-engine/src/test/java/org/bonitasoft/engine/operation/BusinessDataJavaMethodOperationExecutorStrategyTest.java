@@ -14,12 +14,8 @@
 package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +29,6 @@ import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStra
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -181,19 +176,6 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
 
         //then
         verify(strategy).computeJavaOperation(operation, valuetoSetObjectWith, context, false);
-
-    }
-
-    @Test
-    @Ignore
-    public void shouldSetListOnBusinessDataReplaceTheList() throws Exception {
-        /*
-         * new arrayList(adresses) adresses
-         * client.setAdresses(adresses)
-         */
-        final Object computeNewValueForLeftOperand = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);
-
-        fail("not yet implemented");
 
     }
 

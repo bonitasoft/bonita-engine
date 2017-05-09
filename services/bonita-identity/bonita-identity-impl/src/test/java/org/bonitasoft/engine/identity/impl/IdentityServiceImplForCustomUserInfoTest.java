@@ -15,6 +15,7 @@ package org.bonitasoft.engine.identity.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -128,7 +129,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
             throws Exception {
         // given
         final SRecorderException recorderException = new SRecorderException("");
-        doThrow(recorderException).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(recorderException).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         try {
             // when
@@ -284,7 +285,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
     @Test(expected = SIdentityException.class)
     public void createCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException() throws Exception {
         // given
-        doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // when
         identityServiceImpl.createCustomUserInfoValue(userInfoValue);
@@ -309,7 +310,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
     @Test(expected = SIdentityException.class)
     public void deleteCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException() throws Exception {
         // given
-        doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // when
         identityServiceImpl.deleteCustomUserInfoValue(userInfoValue);

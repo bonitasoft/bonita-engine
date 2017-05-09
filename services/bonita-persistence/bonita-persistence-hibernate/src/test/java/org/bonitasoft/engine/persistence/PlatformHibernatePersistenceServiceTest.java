@@ -13,19 +13,16 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
-import org.hibernate.Filter;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -74,8 +71,6 @@ public class PlatformHibernatePersistenceServiceTest {
 
     @Before
     public void before() throws ConfigurationException {
-        doReturn(mock(Filter.class)).when(session).enableFilter("tenantFilter");
-
         final SessionFactory sessionFactory = mock(SessionFactory.class);
         doReturn(mock(Statistics.class)).when(sessionFactory).getStatistics();
         doReturn(session).when(sessionFactory).getCurrentSession();
@@ -170,8 +165,8 @@ public class PlatformHibernatePersistenceServiceTest {
         buildQueryWithoutOrderByClause();
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.WARNING.name());
 
-        platformHibernatePersistenceService = spy(new PlatformHibernatePersistenceService(name, hbmConfigurationProvider, null,
-                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings));
+        platformHibernatePersistenceService = new PlatformHibernatePersistenceService(name, hbmConfigurationProvider, null,
+                likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 
         // When
@@ -192,7 +187,7 @@ public class PlatformHibernatePersistenceServiceTest {
         // Given
         final Query query = mock(Query.class);
         doReturn("Order by").when(query).getQueryString();
-        doReturn(query).when(session).getNamedQuery(anyString());
+        doReturn(query).when(session).getNamedQuery(nullable(String.class));
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
 
         platformHibernatePersistenceService = spy(new PlatformHibernatePersistenceService(name, hbmConfigurationProvider, null,
@@ -206,7 +201,7 @@ public class PlatformHibernatePersistenceServiceTest {
     private void buildQueryWithoutOrderByClause() {
         final Query query = mock(Query.class);
         doReturn("").when(query).getQueryString();
-        doReturn(query).when(session).getNamedQuery(anyString());
+        doReturn(query).when(session).getNamedQuery(nullable(String.class));
     }
 
 }
