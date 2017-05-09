@@ -539,7 +539,7 @@
         <!-- Technical Logs -->
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-technical-slf4j</artifactId>
+            <artifactId>bonita-log-technical</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -774,8 +774,7 @@
                                     <!-- Transient Data -->
                                     <include>org.bonitasoft.engine.core.data:bonita-data-instance-transient</include>
                                     <!-- Technical Logs -->
-                                    <include>org.bonitasoft.engine.log:bonita-log-technical-api</include>
-                                    <include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
+                                    <include>org.bonitasoft.engine.log:bonita-log-technical</include>
                                     <!-- User Filter -->
                                     <include>org.bonitasoft.engine.core.filter:bonita-user-filter-api</include>
                                     <include>org.bonitasoft.engine.core.filter:bonita-user-filter-impl</include>
