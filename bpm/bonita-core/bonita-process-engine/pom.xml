@@ -185,7 +185,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
-            <artifactId>bonita-external-identity-mapping-api</artifactId>
+            <artifactId>bonita-external-identity-mapping</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

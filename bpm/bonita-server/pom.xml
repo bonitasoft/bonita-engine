@@ -246,7 +246,7 @@
         <!-- External Identity Mapping -->
         <dependency>
             <groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
-            <artifactId>bonita-external-identity-mapping-impl</artifactId>
+            <artifactId>bonita-external-identity-mapping</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -682,8 +682,7 @@
                                     <include>org.bonitasoft.engine.core:bonita-expression-resolver-api</include>
                                     <include>org.bonitasoft.engine.core:bonita-expression-resolver-api-impl</include>
                                     <!-- External Identity Mapping -->
-                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api</include>
-                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl</include>
+                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping</include>
                                     <!-- Form mapping -->
                                     <include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
                                     <include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
