@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.profile</groupId>
-            <artifactId>bonita-profile-api</artifactId>
+            <artifactId>bonita-profile</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
