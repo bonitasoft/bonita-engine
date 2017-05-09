@@ -18,6 +18,7 @@
         <module>bonita-commons</module>
         <module>bonita-resources</module>
         <module>bonita-log</module>
+        <module>bonita-log-technical</module>
         <module>bonita-recorder</module>
         <module>bonita-identity</module>
         <module>bonita-transaction</module>
