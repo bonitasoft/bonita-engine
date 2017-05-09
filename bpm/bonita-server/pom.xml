@@ -573,7 +573,7 @@
         <!-- Web Profile -->
         <dependency>
             <groupId>org.bonitasoft.engine.profile</groupId>
-            <artifactId>bonita-profile-impl</artifactId>
+            <artifactId>bonita-profile</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -783,8 +783,7 @@
                                     <!-- Web Commands -->
                                     <include>org.bonitasoft.engine.external:bonita-web-commands</include>
                                     <!-- Web Profile -->
-                                    <include>org.bonitasoft.engine.profile:bonita-profile-api</include>
-                                    <include>org.bonitasoft.engine.profile:bonita-profile-impl</include>
+                                    <include>org.bonitasoft.engine.profile:bonita-profile</include>
                                     <!-- Web Theme -->
                                     <include>org.bonitasoft.engine.theme:bonita-theme</include>
                                     <!-- Engine -->
