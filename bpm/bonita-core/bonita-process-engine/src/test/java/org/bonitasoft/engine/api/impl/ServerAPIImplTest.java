@@ -20,14 +20,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -40,7 +33,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -120,7 +112,6 @@ public class ServerAPIImplTest {
         doReturn(sessionAccessor).when(serverAPIImpl).beforeInvokeMethod(session, apiInterfaceName);
         final TechnicalLoggerService technicalLogger = mock(TechnicalLoggerService.class);
         doReturn(true).when(technicalLogger).isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG));
-        doThrow(toBeThrown).when(serverAPIImpl).invokeAPI(apiInterfaceName, apiInterfaceName, classNameParameters, parametersValues, session);
 
         serverAPIImpl.setTechnicalLogger(technicalLogger);
         final Map<String, Serializable> options = new HashMap<String, Serializable>();
@@ -145,8 +136,6 @@ public class ServerAPIImplTest {
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(new Object());
         final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doThrow(BonitaRuntimeException.class).when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session),
-                eq(false));
         doReturn(new UserTransactionService() {
 
             @Override
@@ -235,7 +224,6 @@ public class ServerAPIImplTest {
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
         final ServerAPIImpl mockedServerAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
-        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
         doReturn(null).when(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session,
                 apiInterfaceName);
 
@@ -389,8 +377,6 @@ public class ServerAPIImplTest {
 
     @Test
     public void isInAValidModeForAPausedTenantWithAnnotationInOnlyIsValid() {
-        when(annotation.only()).thenReturn(true);
-
         final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, annotation);
 
         assertThat(valid).isTrue();
@@ -398,8 +384,6 @@ public class ServerAPIImplTest {
 
     @Test
     public void isInAValidModeForAPausedTenantWithAnnotationInNotOnlyIsValid() {
-        when(annotation.only()).thenReturn(false);
-
         final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, annotation);
 
         assertThat(valid).isTrue();

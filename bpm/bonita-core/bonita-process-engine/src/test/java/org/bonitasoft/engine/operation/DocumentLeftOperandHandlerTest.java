@@ -13,23 +13,14 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 
-import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -39,11 +30,8 @@ import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -77,11 +65,6 @@ public class DocumentLeftOperandHandlerTest {
         final SLeftOperandImpl sLeftOperand = new SLeftOperandImpl();
         sLeftOperand.setName(name);
         return sLeftOperand;
-    }
-
-    @Before
-    public void before() throws SSessionNotFoundException {
-        when(sessionService.getSession(anyLong())).thenReturn(mock(SSession.class));
     }
 
     @Test
@@ -141,8 +124,6 @@ public class DocumentLeftOperandHandlerTest {
 
     @Test
     public void should_not_update_if_has_change_is_false() throws Exception {
-        //given
-        doReturn(mock(SMappedDocument.class)).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
         //then

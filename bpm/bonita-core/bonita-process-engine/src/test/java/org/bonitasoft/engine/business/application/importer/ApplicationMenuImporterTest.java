@@ -85,10 +85,8 @@ public class ApplicationMenuImporterTest {
         SApplication application = mock(SApplication.class);
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
 
-        SApplicationMenu applicationMenu = mock(SApplicationMenu.class);
         ImportError error = new ImportError("page", ImportError.Type.APPLICATION_PAGE);
         ApplicationMenuImportResult importResult = mock(ApplicationMenuImportResult.class);
-        given(importResult.getApplicationMenu()).willReturn(applicationMenu);
         given(importResult.getError()).willReturn(error);
 
         given(converter.toSApplicationMenu(menuNode, application, null)).willReturn(importResult);
@@ -140,13 +138,11 @@ public class ApplicationMenuImporterTest {
         ImportError error1 = new ImportError("page1", ImportError.Type.APPLICATION_PAGE);
         SApplicationMenu subMenu1 = mock(SApplicationMenu.class);
         ApplicationMenuImportResult subMenuImportResult1 = mock(ApplicationMenuImportResult.class);
-        given(subMenuImportResult1.getApplicationMenu()).willReturn(subMenu1);
         given(subMenuImportResult1.getError()).willReturn(error1);
 
         ImportError error2 = new ImportError("page2", ImportError.Type.APPLICATION_PAGE);
         SApplicationMenu subMenu2 = mock(SApplicationMenu.class);
         ApplicationMenuImportResult subMenuImportResult2 = mock(ApplicationMenuImportResult.class);
-        given(subMenuImportResult2.getApplicationMenu()).willReturn(subMenu2);
         given(subMenuImportResult2.getError()).willReturn(error2);
 
         given(converter.toSApplicationMenu(menuNode, application, null)).willReturn(mainMenuImportResult);

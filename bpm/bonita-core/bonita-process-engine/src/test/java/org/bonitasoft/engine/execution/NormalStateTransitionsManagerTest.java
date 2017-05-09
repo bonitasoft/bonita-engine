@@ -52,14 +52,9 @@ public class NormalStateTransitionsManagerTest {
     @Before
     public void setUp() {
         doReturn(NORMAL_NON_TERMINAL_STATE_ID).when(normalNonTerminalState).getId();
-        doReturn(false).when(normalNonTerminalState).isTerminal();
-        doReturn(SStateCategory.NORMAL).when(normalNonTerminalState).getStateCategory();
 
         doReturn(NORMAL_TERMINAL_STATE_ID).when(normalTerminalState).getId();
-        doReturn(true).when(normalTerminalState).isTerminal();
-        doReturn(SStateCategory.NORMAL).when(normalTerminalState).getStateCategory();
 
-        doReturn(FLOW_NODE_INSTANCE_ID).when(flowNodeInstance).getId();
         doReturn(SStateCategory.NORMAL).when(flowNodeInstance).getStateCategory();
 
         stateTransitions = new HashMap<Integer, FlowNodeState>(2);

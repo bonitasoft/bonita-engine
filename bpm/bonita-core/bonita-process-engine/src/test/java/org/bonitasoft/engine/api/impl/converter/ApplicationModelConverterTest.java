@@ -109,10 +109,6 @@ public class ApplicationModelConverterTest {
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         final long userId = 10;
 
-        SPage theme = mock(SPage.class);
-        given(theme.getId()).willReturn(THEME_ID);
-        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
-
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
 
         //when

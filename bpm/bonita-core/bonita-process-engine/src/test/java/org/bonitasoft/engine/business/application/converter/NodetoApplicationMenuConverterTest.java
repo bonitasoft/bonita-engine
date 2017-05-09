@@ -128,7 +128,6 @@ public class NodetoApplicationMenuConverterTest {
         long applicationId = 3L;
         SApplication application = mock(SApplication.class);
         given(application.getId()).willReturn(applicationId);
-        given(application.getToken()).willReturn("app");
 
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
         menuNode.setDisplayName("Sub");

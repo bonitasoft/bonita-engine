@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -108,7 +109,7 @@ public class ApplicationMenuAPIDelegateTest {
         final SApplicationMenu sAppMenu = mock(SApplicationMenu.class);
         given(sAppMenu.getApplicationId()).willReturn(APPLICATION_ID);
         given(sAppMenu.getId()).willReturn(9811L);
-        given(applicationService.updateApplicationMenu(eq(sAppMenu.getId()), any(EntityUpdateDescriptor.class))).willReturn(sAppMenu);
+        given(applicationService.updateApplicationMenu(eq(sAppMenu.getId()), nullable(EntityUpdateDescriptor.class))).willReturn(sAppMenu);
 
         //when
         delegate.updateApplicationMenu(sAppMenu.getId(), mock(ApplicationMenuUpdater.class));

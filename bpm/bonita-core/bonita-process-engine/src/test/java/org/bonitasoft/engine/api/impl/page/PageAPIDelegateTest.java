@@ -15,18 +15,12 @@ package org.bonitasoft.engine.api.impl.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -147,7 +141,7 @@ public class PageAPIDelegateTest {
         final byte[] content = "content".getBytes();
 
         doReturn(sPage).when(pageAPIDelegate).constructPage(pageCreator, userId);
-        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
+        doReturn(page).when(pageAPIDelegate).convertToPage(nullable(SPage.class));
 
         // when
         pageAPIDelegate.createPage(pageCreator, content);
@@ -162,7 +156,7 @@ public class PageAPIDelegateTest {
         final byte[] content = "content".getBytes();
         final String contentName = "contentName";
 
-        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
+        doReturn(page).when(pageAPIDelegate).convertToPage(nullable(SPage.class));
 
         // when
         pageAPIDelegate.createPage(contentName, content);
@@ -174,8 +168,6 @@ public class PageAPIDelegateTest {
     @Test
     public void testDeletePage() throws Exception {
         final long pageId = 123;
-        final SPage sPage = mock(SPage.class);
-        doReturn(sPage).when(pageService).getPage(pageId);
         final SFormMappingImpl formMapping = new SFormMappingImpl();
         formMapping.setPageMapping(new SPageMappingImpl());
         doReturn(Collections.<SFormMapping> singletonList(formMapping)).when(formMappingService).searchFormMappings(any(QueryOptions.class));
@@ -265,9 +257,6 @@ public class PageAPIDelegateTest {
 
     @Test(expected = UpdateException.class)
     public void testUpdatePageWithEmplyUpdateFileShouldThrowExceptions() throws Exception {
-        doReturn(sPage).when(pageAPIDelegate).constructPage(any(PageUpdater.class), anyLong());
-        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
-
         // given
         final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         doReturn(map).when(pageUpdater).getFields();
@@ -282,7 +271,6 @@ public class PageAPIDelegateTest {
     @Test
     public void testUpdatePageContent() throws Exception {
         doReturn(sPageUpdateBuilder).when(pageAPIDelegate).getPageUpdateBuilder();
-        doReturn(sPageUpdateContentBuilder).when(pageAPIDelegate).getPageUpdateContentBuilder();
         doReturn(mock(SPage.class)).when(pageService).getPage(1);
 
         // given
@@ -295,14 +283,14 @@ public class PageAPIDelegateTest {
         pageAPIDelegate.updatePageContent(pageId, content);
 
         // then
-        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), anyString());
+        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), nullable(String.class));
     }
 
     @Test
     public void testUpdatePage() throws Exception {
         final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
         doReturn(sPage).when(pageAPIDelegate).constructPage(any(PageUpdater.class), anyLong());
-        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
+        doReturn(page).when(pageAPIDelegate).convertToPage(nullable(SPage.class));
         doReturn(sPageUpdateBuilder).when(pageAPIDelegate).getPageUpdateBuilder();
         doReturn(map).when(pageUpdater).getFields();
 
@@ -316,7 +304,7 @@ public class PageAPIDelegateTest {
         pageAPIDelegate.updatePage(1, pageUpdater);
 
         // then
-        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+        verify(pageService, times(1)).updatePage(anyLong(), nullable(EntityUpdateDescriptor.class));
     }
 
     @Test
@@ -336,7 +324,6 @@ public class PageAPIDelegateTest {
         // given
         final PageCreator pageCreator = new PageCreator("name", "content.zip");
         doReturn(sPage).when(pageAPIDelegate).constructPage(pageCreator, userId);
-        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
         doThrow(SObjectAlreadyExistsException.class).when(pageService).addPage(sPage, content);
 
@@ -402,7 +389,6 @@ public class PageAPIDelegateTest {
         final Properties properties = new Properties();
         properties.setProperty(PageService.PROPERTIES_NAME, "MyPage");
         doReturn(properties).when(pageService).readPageZip(content);
-        doReturn(mock(SPage.class)).when(pageService).getPageByName("MyPage");
         // when
         final Properties pageProperties = pageAPIDelegate.getPageProperties(content, false);
 

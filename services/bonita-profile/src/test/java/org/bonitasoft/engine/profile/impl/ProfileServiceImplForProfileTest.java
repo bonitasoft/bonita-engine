@@ -13,17 +13,11 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +59,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -108,13 +101,6 @@ public class ProfileServiceImplForProfileTest {
 
     @InjectMocks
     private ProfileServiceImpl profileServiceImpl;
-
-    @Before
-    public void before() throws Exception {
-        doReturn(sSession).when(sessionService).getSession(anyLong());
-
-        doReturn(1l).when(readSessionAccessor).getSessionId();
-    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfiles(org.bonitasoft.engine.persistence.QueryOptions)}.
@@ -251,12 +237,6 @@ public class ProfileServiceImplForProfileTest {
         assertTrue(profileServiceImpl.getProfiles(null).isEmpty());
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfilesOfUser(long)}.
-     *
-     * @throws SBonitaReadException
-     * @throws SProfileReadException
-     */
     @Test
     public final void getProfilesOfUser() throws SBonitaReadException {
         final List<SProfile> sProfiles = new ArrayList<SProfile>();
@@ -296,7 +276,6 @@ public class ProfileServiceImplForProfileTest {
         doReturn(1L).when(sProfile).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final SProfile result = profileServiceImpl.createProfile(sProfile);
@@ -315,7 +294,7 @@ public class ProfileServiceImplForProfileTest {
         doReturn(1L).when(sProfile).getId();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.createProfile(sProfile);
@@ -366,7 +345,7 @@ public class ProfileServiceImplForProfileTest {
         final SProfileUpdateBuilder sProfileUpdateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
         sProfileUpdateBuilder.setDescription("newDescription").setName("newName");
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
 
         profileServiceImpl.updateProfile(sProfile, sProfileUpdateBuilder.done());
     }
@@ -402,7 +381,6 @@ public class ProfileServiceImplForProfileTest {
         doReturn(sProfileMembers).doReturn(new ArrayList<SProfileMember>()).when(persistenceService)
                 .selectList(SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3l, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfile(1);
@@ -421,13 +399,13 @@ public class ProfileServiceImplForProfileTest {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+        doReturn(sProfile).when(persistenceService).selectById(any());
         doReturn(new ArrayList<SProfileEntry>()).when(persistenceService).selectList(SelectDescriptorBuilder.getEntriesOfProfile(3, 0, 1000));
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);
         doReturn(new ArrayList<SProfileMember>()).when(persistenceService).selectList(
                 SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         profileServiceImpl.deleteProfile(1);
     }
@@ -451,7 +429,6 @@ public class ProfileServiceImplForProfileTest {
         doReturn(sProfileMembers).doReturn(new ArrayList<SProfileMember>()).when(persistenceService)
                 .selectList(SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3l, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfile(1);
@@ -475,7 +452,6 @@ public class ProfileServiceImplForProfileTest {
         doReturn(new ArrayList<SProfileMember>()).when(persistenceService).selectList(
                 SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfile(1);
@@ -509,9 +485,6 @@ public class ProfileServiceImplForProfileTest {
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);
         doReturn(sProfileMembers).doReturn(new ArrayList<SProfileMember>()).when(persistenceService)
                 .selectList(SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3, queryOptions));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfile(sProfile);
     }
@@ -524,13 +497,12 @@ public class ProfileServiceImplForProfileTest {
     @Test(expected = SProfileDeletionException.class)
     public void deleteProfileByObjectThrowException() throws Exception {
         doReturn(3L).when(sProfile).getId();
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
         doReturn(new ArrayList<SProfileEntry>()).when(persistenceService).selectList(SelectDescriptorBuilder.getEntriesOfProfile(3, 0, 1000));
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);
         doReturn(new ArrayList<SProfileMember>()).when(persistenceService).selectList(
                 SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3l, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         profileServiceImpl.deleteProfile(sProfile);
     }
@@ -548,13 +520,11 @@ public class ProfileServiceImplForProfileTest {
         doReturn(4L).when(sProfileMember).getId();
         sProfileMembers.add(sProfileMember);
 
-        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
         doReturn(new ArrayList<SProfileEntry>()).when(persistenceService).selectList(SelectDescriptorBuilder.getEntriesOfProfile(3, 0, 1000));
         final QueryOptions queryOptions = new QueryOptions(0, 10, SProfile.class, "id", OrderByType.ASC);
         doReturn(sProfileMembers).doReturn(new ArrayList<SProfileMember>()).when(persistenceService)
                 .selectList(SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3l, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfile(sProfile);
@@ -576,7 +546,6 @@ public class ProfileServiceImplForProfileTest {
         doReturn(new ArrayList<SProfileMember>()).when(persistenceService).selectList(
                 SelectDescriptorBuilder.getSProfileMembersWithoutDisplayName(3l, queryOptions));
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfile(sProfile);

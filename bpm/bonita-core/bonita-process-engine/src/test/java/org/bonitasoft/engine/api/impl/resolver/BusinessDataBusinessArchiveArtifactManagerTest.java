@@ -52,7 +52,6 @@ public class BusinessDataBusinessArchiveArtifactManagerTest {
         entityClassNames.add("com.bonitasoft.Employee");
         entityClassNames.add("com.bonitasoft.LeaveRequest");
 
-        when(tenantAccessor.getBusinessDataRepository()).thenReturn(businessDataRepository);
         when(businessDataRepository.getEntityClassNames()).thenReturn(entityClassNames);
     }
 

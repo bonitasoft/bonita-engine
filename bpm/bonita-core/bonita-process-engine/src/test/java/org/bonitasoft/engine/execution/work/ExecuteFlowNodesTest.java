@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -42,8 +41,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,36 +51,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ExecuteFlowNodesTest {
 
     private FlowNodeStateManager flownodeStateManager;
-
-    /**
-     * @author Baptiste Mesta
-     */
-    private final class WrapWorkOfType extends BaseMatcher<BonitaWork> {
-
-        private final Class<?> class1;
-
-        public WrapWorkOfType(final Class<?> class1) {
-            this.class1 = class1;
-        }
-
-        @Override
-        public boolean matches(final Object item) {
-            if (item instanceof WrappingBonitaWork) {
-                BonitaWork wrappedWork = ((WrappingBonitaWork) item).getWrappedWork();
-                if (wrappedWork instanceof WrappingBonitaWork) {
-                    WrappingBonitaWork innerWork = (WrappingBonitaWork) wrappedWork;
-                    return new WrapWorkOfType(class1).matches(innerWork);
-                }
-                return class1.isInstance(wrappedWork);
-            }
-            return false;
-        }
-
-        @Override
-        public void describeTo(final Description description) {
-
-        }
-    }
 
     @Mock
     private ActivityInstanceService activityInstanceService;
@@ -127,8 +94,15 @@ public class ExecuteFlowNodesTest {
 
         executeFlowNodes.call();
 
-        verify(workService).registerWork(argThat(new WrapWorkOfType(NotifyChildFinishedWork.class)));
+        verify(workService).registerWork(argThat(work -> getLeaf(work) instanceof NotifyChildFinishedWork));
 
+    }
+
+    private BonitaWork getLeaf(BonitaWork bonitaWork) {
+        if (!(bonitaWork instanceof WrappingBonitaWork)) {
+            return bonitaWork;
+        }
+        return getLeaf(((WrappingBonitaWork) bonitaWork).getWrappedWork());
     }
 
     private SAutomaticTaskInstanceImpl createTask(final long id, final boolean terminal) {
@@ -145,8 +119,7 @@ public class ExecuteFlowNodesTest {
 
         executeFlowNodes.call();
 
-        verify(workService).registerWork(argThat(new WrapWorkOfType(ExecuteFlowNodeWork.class)));
-
+        verify(workService).registerWork(argThat(work -> getLeaf(work) instanceof ExecuteFlowNodeWork));
     }
 
     @Test
@@ -171,7 +144,7 @@ public class ExecuteFlowNodesTest {
         executeFlowNodes.call();
 
         assertThat(list.size()).isEqualTo(21);
-        verify(workService, times(20)).registerWork(argThat(new WrapWorkOfType(ExecuteFlowNodeWork.class)));
+        verify(workService, times(20)).registerWork(argThat(work -> getLeaf(work) instanceof ExecuteFlowNodeWork));
     }
 
     @Test
@@ -190,7 +163,7 @@ public class ExecuteFlowNodesTest {
     @Test
     public void shouldExecuteFlownodeForGatewayWithMatchingMergeCondition() throws Exception {
         SGatewayInstance gatewayInstance = new SGatewayInstanceImpl();
-        when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(true);
+        doReturn(true).when(gatewayInstanceService).checkMergingCondition(nullable(SProcessDefinition.class), eq(gatewayInstance));
 
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
 
@@ -200,7 +173,6 @@ public class ExecuteFlowNodesTest {
     @Test
     public void shouldNotExecuteFlownodeForGatewayWithNonMatchingMergeCondition() throws Exception {
         SGatewayInstance gatewayInstance = new SGatewayInstanceImpl();
-        when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(false);
 
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
 
@@ -253,7 +225,6 @@ public class ExecuteFlowNodesTest {
     public void should_execute_gateway_when_stateCategory_is_ABORTING() throws Exception {
         SGatewayInstanceImpl gatewayInstance = new SGatewayInstanceImpl();
         gatewayInstance.setStateCategory(SStateCategory.ABORTING);
-        when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(false);
 
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
 
@@ -264,7 +235,6 @@ public class ExecuteFlowNodesTest {
     public void should_execute_gateway_when_stateCategory_is_CANCELLING() throws Exception {
         SGatewayInstanceImpl gatewayInstance = new SGatewayInstanceImpl();
         gatewayInstance.setStateCategory(SStateCategory.CANCELLING);
-        when(gatewayInstanceService.checkMergingCondition(any(SProcessDefinition.class), eq(gatewayInstance))).thenReturn(false);
 
         boolean shouldExecuteFlownode = new ExecuteFlowNodes(tenantServiceAccessor, null).shouldExecuteFlownode(gatewayInstance);
 

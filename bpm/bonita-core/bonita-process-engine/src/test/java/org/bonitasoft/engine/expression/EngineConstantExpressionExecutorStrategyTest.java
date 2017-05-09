@@ -273,7 +273,6 @@ public class EngineConstantExpressionExecutorStrategyTest {
     public void should_evaluate_LOGGED_USER_ID_return_what_is_in_context() throws Exception {
         //given
         expression.setContent(LOGGED_USER_ID.getEngineConstantName());
-        doThrow(SBonitaReadException.class).when(activityInstanceService).getFlowNodeInstance(anyLong());
         dependencies.put(TASK_ASSIGNEE_ID.getEngineConstantName(), USER_ID);
         //when
         Serializable loggerUserId = strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),

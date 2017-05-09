@@ -122,11 +122,9 @@ public class TenantAdministrationAPIImplTest {
         when(platformServiceAccessor.getSchedulerService()).thenReturn(schedulerService);
         when(platformServiceAccessor.getPlatformService()).thenReturn(platformService);
         when(platformServiceAccessor.getPlatformConfiguration()).thenReturn(nodeConfiguration);
-        when(platformServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getBusinessArchiveArtifactsManager()).thenReturn(businessArchiveArtifactsManager);
-        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(tenantServiceAccessor.getSessionService()).thenReturn(sessionService);
 
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);

@@ -39,9 +39,7 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -163,7 +161,7 @@ public class PermissionServiceImplTest {
         final boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(new HasName("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        verify(logger).log(argThat(rule->rule.getName().equals("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
 
     @Test
@@ -179,7 +177,7 @@ public class PermissionServiceImplTest {
         final boolean myCustomRule = permissionService.checkAPICallWithScript("test.MyCustomRule", new APICallContext(), false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(new HasName("test.MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        verify(logger).log(argThat(rule->rule.getName().equals("test.MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
 
     /*
@@ -282,23 +280,5 @@ public class PermissionServiceImplTest {
                 .append("}")
                 .append("");
         return content.toString();
-    }
-
-    private static class HasName extends BaseMatcher<Class> {
-
-        private String myCustomRule;
-
-        private HasName(final String myCustomRule) {
-            this.myCustomRule = myCustomRule;
-        }
-
-        @Override
-        public void describeTo(final Description description) {
-        }
-
-        @Override
-        public boolean matches(final Object item) {
-            return item instanceof Class<?> && ((Class) item).getName().equals(myCustomRule);
-        }
     }
 }

@@ -13,13 +13,11 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -201,7 +199,7 @@ public class TenantHibernatePersistenceServiceTest {
         // Given
         final Query query = mock(Query.class);
         doReturn("Order by").when(query).getQueryString();
-        doReturn(query).when(session).getNamedQuery(anyString());
+        doReturn(query).when(session).getNamedQuery(nullable(String.class));
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
@@ -216,6 +214,6 @@ public class TenantHibernatePersistenceServiceTest {
     private void buildQueryWithoutOrderByClause() {
         final Query query = mock(Query.class);
         doReturn("").when(query).getQueryString();
-        doReturn(query).when(session).getNamedQuery(anyString());
+        doReturn(query).when(session).getNamedQuery(nullable(String.class));
     }
 }

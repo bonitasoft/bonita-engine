@@ -64,8 +64,6 @@ public class TaskPermissionRuleTest {
     @Before
     public void before() {
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 

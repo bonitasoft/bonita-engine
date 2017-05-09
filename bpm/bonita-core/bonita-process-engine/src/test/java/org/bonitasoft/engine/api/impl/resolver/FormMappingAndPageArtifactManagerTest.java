@@ -10,6 +10,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.bonitasoft.engine.api.impl.converter.SPageAssert;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
@@ -39,7 +39,6 @@ import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
-import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.impl.SPageImpl;
@@ -52,9 +51,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FormMappingAndPageArtifactManagerTest {
@@ -105,12 +102,6 @@ public class FormMappingAndPageArtifactManagerTest {
                 technicalLoggerService, formMappingService, processDefinitionService));
         formMappings = new ArrayList<>();
 
-        doReturn(pageService).when(tenantServiceAccessor).getPageService();
-        doReturn(formMappingService).when(tenantServiceAccessor).getFormMappingService();
-        doReturn(sessionAccessor).when(tenantServiceAccessor).getSessionAccessor();
-        doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
-        doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
-
         doReturn(PROCESS_DEFINITION_ID).when(sDefinition).getId();
 
         ressources = new HashMap<>();
@@ -126,10 +117,7 @@ public class FormMappingAndPageArtifactManagerTest {
     @Test
     public void deployPageFailure_Should_Not_Interrupt_Deployment() throws Exception {
         //given
-        doThrow(SInvalidPageZipMissingIndexException.class).when(pageService).readPageZip(any(byte[].class));
         formMappings.add(new SFormMappingImpl(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), "task", SFormMapping.TARGET_INTERNAL));
-        doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
-        doReturn(null).when(pageService).getPageByNameAndProcessDefinitionId(PAGE, PROCESS_DEFINITION_ID);
         BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build())
                 .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
         doReturn(new ArrayList<Problem>()).when(formMappingAndPageArtifactManager).checkResolution(any(SProcessDefinition.class));
@@ -186,7 +174,6 @@ public class FormMappingAndPageArtifactManagerTest {
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
-        doReturn(null).when(pageService).getPage(anyLong());
 
         //when
         final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
@@ -239,19 +226,6 @@ public class FormMappingAndPageArtifactManagerTest {
 
         doReturn(DISPLAY_NAME).when(properties).getProperty(PageService.PROPERTIES_DISPLAY_NAME);
         doReturn(DESCRIPTION).when(properties).getProperty(PageService.PROPERTIES_DESCRIPTION);
-
-        Answer<SPage> answer = new Answer<SPage>() {
-
-            @Override
-            public SPage answer(InvocationOnMock invocation) throws Throwable {
-                final SPage pageToAdd = (SPage) invocation.getArguments()[0];
-                SPageAssert.assertThat(pageToAdd).hasDisplayName(DISPLAY_NAME);
-                SPageAssert.assertThat(pageToAdd).hasDescription(DESCRIPTION);
-
-                return pageToAdd;
-            }
-        };
-        when(pageService.addPage(any(sPage.getClass()), any(byte[].class))).then(answer);
 
         //when
         formMappingAndPageArtifactManager.deployProcessPages(businessArchive, PROCESS_DEFINITION_ID, USER_ID);
@@ -404,8 +378,8 @@ public class FormMappingAndPageArtifactManagerTest {
         formMappingAndPageArtifactManager.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), eq(FormMappingType.TASK.getId()), anyString(), anyString());
-        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), eq(FormMappingType.TASK.getId()), anyString(), anyString());
+        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), eq(FormMappingType.TASK.getId()), anyString(), nullable(String.class));
+        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), eq(FormMappingType.TASK.getId()), anyString(), nullable(String.class));
     }
 
     @Test

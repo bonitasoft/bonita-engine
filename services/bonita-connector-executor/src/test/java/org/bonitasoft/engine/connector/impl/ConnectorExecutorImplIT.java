@@ -14,9 +14,6 @@
  */
 package org.bonitasoft.engine.connector.impl;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.bonitasoft.engine.connector.SConnector;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -61,7 +57,6 @@ public class ConnectorExecutorImplIT {
     @Before
     public void setUp() {
         connectorExecutor = new ConnectorExecutorImpl(10, 5, loggerService, 100, 100, sessionAccessor, sessionService, timeTracker);
-        doReturn(true).when(loggerService).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         connectorExecutor.start();
     }
 

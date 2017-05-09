@@ -14,16 +14,12 @@
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyListOf;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
@@ -137,7 +133,7 @@ public class FormRequiredAnalyzerTest {
         contractDefinition.addInput(new InputDefinitionImpl("name", Type.BOOLEAN, "description"));
         doReturn(contractDefinition).when(userTaskDefinition).getContract();
 
-        doReturn(userTaskDefinition).when(spy).findActivityWithName(anyListOf(ActivityDefinition.class), anyString());
+        doReturn(userTaskDefinition).when(spy).findActivityWithName(anyList(), nullable(String.class));
 
         final boolean formRequired = spy.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_TASK, null, ""));
         assertThat(formRequired).isTrue();
@@ -150,10 +146,6 @@ public class FormRequiredAnalyzerTest {
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
 
         final FormRequiredAnalyzer spy = spy(formRequiredAnalyzer);
-        final UserTaskDefinition userTaskDefinition = mock(UserTaskDefinition.class);
-        doReturn(mock(ContractDefinition.class)).when(userTaskDefinition).getContract();
-
-        doReturn(userTaskDefinition).when(spy).findActivityWithName(anyListOf(ActivityDefinition.class), anyString());
 
         final boolean formRequired = spy.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_TASK, null, ""));
         assertThat(formRequired).isFalse();

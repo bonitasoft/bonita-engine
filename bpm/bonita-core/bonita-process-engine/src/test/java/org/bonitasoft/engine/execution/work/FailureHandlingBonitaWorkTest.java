@@ -86,7 +86,6 @@ public class FailureHandlingBonitaWorkTest {
 
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
         doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
     }
@@ -199,10 +198,8 @@ public class FailureHandlingBonitaWorkTest {
     public void handleFailure_should_log_in_error_level_when_an_exception_occurs_in_wrapped_work() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
-        doThrow(seee).when(wrappedWork).work(context);
         // Yes for all log level, in order to simulate a TRACE configuration
         // Since latest change, exception stack trace is logged in the ERROR level message. DEBUG level have no impact
-        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
         when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
 
         txBonitawork.handleFailure(seee, context);

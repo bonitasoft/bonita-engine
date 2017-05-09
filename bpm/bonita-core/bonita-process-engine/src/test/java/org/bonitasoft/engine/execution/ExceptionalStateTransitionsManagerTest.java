@@ -64,8 +64,6 @@ public class ExceptionalStateTransitionsManagerTest {
 
     @Before
     public void setUp() {
-        doReturn(NORMAL_NON_TERMINAL_STATE_ID).when(normalNonTerminalState).getId();
-        doReturn(false).when(normalNonTerminalState).isTerminal();
         doReturn(SStateCategory.NORMAL).when(normalNonTerminalState).getStateCategory();
 
         doReturn(NORMAL_TERMINAL_STATE_ID).when(normalTerminalState).getId();
@@ -73,17 +71,11 @@ public class ExceptionalStateTransitionsManagerTest {
         doReturn(SStateCategory.NORMAL).when(normalTerminalState).getStateCategory();
 
         doReturn(ABORTING_NON_TERMINAL_STATE_ID).when(abortingNonTerminalState).getId();
-        doReturn(false).when(abortingNonTerminalState).isTerminal();
         doReturn(SStateCategory.ABORTING).when(abortingNonTerminalState).getStateCategory();
 
-        doReturn(ABORTING_TERMINAL_STATE_ID).when(abortingTerminalState).getId();
-        doReturn(true).when(abortingTerminalState).isTerminal();
-        doReturn(SStateCategory.ABORTING).when(abortingTerminalState).getStateCategory();
-
-        doReturn(FLOW_NODE_INSTANCE_ID).when(flowNodeInstance).getId();
         doReturn(SStateCategory.NORMAL).when(flowNodeInstance).getStateCategory();
 
-        stateTransitions = new HashMap<Integer, FlowNodeState>(2);
+        stateTransitions = new HashMap<>(2);
         stateTransitions.put(-1, abortingNonTerminalState);
         stateTransitions.put(ABORTING_NON_TERMINAL_STATE_ID, abortingTerminalState);
     }

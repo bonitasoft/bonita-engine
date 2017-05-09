@@ -23,7 +23,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -44,11 +43,6 @@ public class ProfilesUpdaterRestartHandlerTest {
     @Spy
     private ProfilesUpdaterRestartHandler profilesUpdaterRestartHandler;
 
-    @Before
-    public void before() throws Exception {
-        doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
-    }
-
     @Test
     public void should_execute_default_profiles_update_after_service_start() throws Exception {
         doReturn(new TransactionServiceMock()).when(platformServiceAccessor).getTransactionService();
@@ -63,7 +57,6 @@ public class ProfilesUpdaterRestartHandlerTest {
     public void should_execute_in_transaction() throws Exception {
         TransactionService transactionService = mock(TransactionService.class);
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doReturn(defaultProfilesUpdater).when(profilesUpdaterRestartHandler).getProfileUpdater(platformServiceAccessor, tenantServiceAccessor);
 
         profilesUpdaterRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
 

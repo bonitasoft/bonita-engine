@@ -72,7 +72,6 @@ public class StarterThreadTest {
         starterThread = spy(new StarterThread(platformAccessor, tenantServiceAccessor, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)));
         doReturn(tenantServiceAccessor).when(platformAccessor).getTenantServiceAccessor(1L);
         doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
-        doReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)).when(platformConfiguration).getTenantRestartHandlers();
         doReturn(new SSessionImpl(5432L, 231L, "SYSTEM", "", 42352L)).when(sessionService).createSession(anyLong(), anyString());
         doReturn(tenant).when(starterThread).getTenant(1L);
         doReturn(1L).when(tenantServiceAccessor).getTenantId();

@@ -16,8 +16,7 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -108,14 +107,14 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.createEventTriggerInstance(eventTriggerInstance);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), any(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
     }
 
     @Test(expected = SEventTriggerInstanceCreationException.class)
     public final void createEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
 
         // When
         eventInstanceServiceImpl.createEventTriggerInstance(eventTriggerInstance);
@@ -136,14 +135,14 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.deleteEventTriggerInstance(eventTriggerInstance);
 
         // Then
-        verify(recorder).recordDelete(eq(insertRecord), any(SDeleteEvent.class));
+        verify(recorder).recordDelete(eq(insertRecord), nullable(SDeleteEvent.class));
     }
 
     @Test(expected = SEventTriggerInstanceDeletionException.class)
     public final void deleteEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
 
         // When
         eventInstanceServiceImpl.deleteEventTriggerInstance(eventTriggerInstance);
@@ -192,9 +191,6 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.deleteEventTriggerInstances(eventInstanceId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getEventTriggerInstance(long)}.
-     */
     @Test
     public final void getEventTriggerInstance_should_return_event_trigger_instance() throws Exception {
         // Given
@@ -344,11 +340,6 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.searchEventTriggerInstances(STimerEventTriggerInstance.class, queryOptions);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#getNumberOfEventTriggerInstances(java.lang.Class, long, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void getNumberOfEventTriggerInstancesByProcessInstance_should_return_the_number() throws Exception {
         // Given
@@ -371,17 +362,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
         doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions),
-                Matchers.<Map<String, Object>> any());
+                any());
 
         // When
         eventInstanceServiceImpl.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#searchEventTriggerInstances(java.lang.Class, long, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void searchEventTriggerInstancesByProcessInstance_should_return_the_list() throws Exception {
         // Given
@@ -389,7 +375,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
         final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
         doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
-                Matchers.<Map<String, Object>> any());
+               any());
 
         // When
         final List<STimerEventTriggerInstance> result = eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
@@ -404,7 +390,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final int processInstanceId = 2;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
         doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
-                eq(queryOptions), Matchers.<Map<String, Object>> any());
+                eq(queryOptions), any());
 
         // When
         eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
@@ -426,7 +412,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.updateEventTriggerInstance(sTimerEventTriggerInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
     }
 
     @Test
@@ -440,7 +426,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.updateEventTriggerInstance(sThrowMessageEventTriggerInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
     }
 
     @Test
@@ -454,7 +440,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.updateEventTriggerInstance(sThrowErrorEventTriggerInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
     }
 
     @Test(expected = SEventTriggerInstanceModificationException.class)
@@ -462,7 +448,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final SThrowSignalEventTriggerInstanceImpl sThrowSignalEventTriggerInstanceImpl = new SThrowSignalEventTriggerInstanceImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
 
         // When
         eventInstanceServiceImpl.updateEventTriggerInstance(sThrowSignalEventTriggerInstanceImpl, descriptor);

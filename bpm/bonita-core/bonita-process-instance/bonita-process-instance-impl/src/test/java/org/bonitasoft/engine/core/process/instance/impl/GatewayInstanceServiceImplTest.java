@@ -14,10 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -477,13 +474,16 @@ public class GatewayInstanceServiceImplTest {
         transition(2, 666);
         transition(3, 666);
         doNothing().when(gatewayInstanceService).addBackwardReachableTransitions(any(SFlowElementContainerDefinition.class), any(SFlowNodeDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class));
-        doReturn(true).when(gatewayInstanceService).transitionsContainsAToken(anyListOf(STransitionDefinition.class), any(SFlowNodeDefinition.class), anyLong(), any(SFlowElementContainerDefinition.class));
+        doReturn(true).when(gatewayInstanceService).transitionsContainsAToken(anyList(), any(SFlowNodeDefinition.class),
+                anyLong(), any(SFlowElementContainerDefinition.class));
 
         boolean isMerged = gatewayInstanceService.isInclusiveGatewayActivated(processDefinition, gate);
 
         assertThat(isMerged).isFalse();
-        verify(gatewayInstanceService, times(2)).addBackwardReachableTransitions(eq(processContainer), eq(nodeDefinition), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class));
-        verify(gatewayInstanceService).transitionsContainsAToken(anyListOf(STransitionDefinition.class), eq(nodeDefinition), eq(PROCESS_INSTANCE_ID), eq(processContainer));
+        verify(gatewayInstanceService, times(2)).addBackwardReachableTransitions(eq(processContainer),
+                eq(nodeDefinition), anyList(), anyList(), anyList());
+        verify(gatewayInstanceService).transitionsContainsAToken(anyList(), eq(nodeDefinition), eq(PROCESS_INSTANCE_ID),
+                eq(processContainer));
     }
 
     @Test
@@ -508,10 +508,9 @@ public class GatewayInstanceServiceImplTest {
 
         gatewayInstanceService.setState(gate, 12);
 
-        verify(recorder).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
 
         assertThat(updateRecordCaptor.getValue().getFields().keySet()).contains("stateId", "reachedStateDate", "lastUpdateDate");
-
     }
 
     @Test

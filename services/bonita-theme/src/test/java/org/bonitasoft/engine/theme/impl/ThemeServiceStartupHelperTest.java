@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -56,12 +57,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ThemeServiceStartupHelperTest {
 
-    public static final byte[] PORTAL_CONTENT = new byte[] { 6 };
-    public static final byte[] PORTAL_CSS_CONTENT = new byte[] { 1, 2, 3, 4, 5 };
+    private static final byte[] PORTAL_CONTENT = new byte[] { 6 };
+    private static final byte[] PORTAL_CSS_CONTENT = new byte[] { 1, 2, 3, 4, 5 };
     private static final byte[] MOBILE_CONTENT = new byte[] { 5 };
 
     @Captor
-    public ArgumentCaptor<EntityUpdateDescriptor> captor;
+    private ArgumentCaptor<EntityUpdateDescriptor> captor;
 
     @Mock
     private ThemeService themeService;
@@ -115,10 +116,8 @@ public class ThemeServiceStartupHelperTest {
         final SThemeType mobile = SThemeType.MOBILE;
         doNothing().when(themeServiceStartupHelper).createDefaultTheme(MOBILE_CONTENT, mobile);
         final SThemeType portal = SThemeType.PORTAL;
-        doNothing().when(themeServiceStartupHelper).createDefaultTheme(PORTAL_CONTENT, portal);
 
         given(themeActionCalculator.calculateAction(null, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.CREATE);
-        given(themeActionCalculator.calculateAction(portalTheme, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.MOBILE, ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT);
 
@@ -131,7 +130,6 @@ public class ThemeServiceStartupHelperTest {
         SThemeImpl portalTheme = hasThemeWithContentContent(SThemeType.PORTAL, PORTAL_CONTENT);
 
         given(themeActionCalculator.calculateAction(mobileTheme, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.UPDATE);
-        given(themeActionCalculator.calculateAction(portalTheme, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.MOBILE, ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT);
 
@@ -143,7 +141,6 @@ public class ThemeServiceStartupHelperTest {
         SThemeImpl mobileTheme = hasThemeWithContentContent(SThemeType.MOBILE, MOBILE_CONTENT);
         final SThemeImpl portalTheme = hasThemeWithContentContent(SThemeType.PORTAL, new byte[] { 4, 5 });
 
-        given(themeActionCalculator.calculateAction(mobileTheme, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
         given(themeActionCalculator.calculateAction(portalTheme, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.UPDATE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.PORTAL, ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT);
@@ -156,7 +153,6 @@ public class ThemeServiceStartupHelperTest {
         SThemeImpl mobileTheme = hasThemeWithContentContent(SThemeType.MOBILE, MOBILE_CONTENT);
         SThemeImpl portalTheme = hasThemeWithContentContent(SThemeType.PORTAL, PORTAL_CONTENT);
 
-        given(themeActionCalculator.calculateAction(mobileTheme, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
         given(themeActionCalculator.calculateAction(portalTheme, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.PORTAL, ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT);
@@ -196,17 +192,12 @@ public class ThemeServiceStartupHelperTest {
     public final void createOrUpdateDefaultMobileTheme_should_not_call_createDefaultMobileTheme_when_action_is_none() throws Exception {
         SThemeImpl mobileTheme = hasThemeWithContentContent(SThemeType.MOBILE, MOBILE_CONTENT);
         SThemeImpl portalTheme = hasThemeWithContentContent(SThemeType.PORTAL, PORTAL_CONTENT);
-        final SThemeType mobile = SThemeType.MOBILE;
-        doNothing().when(themeServiceStartupHelper).createDefaultTheme(MOBILE_CONTENT, mobile);
-        final SThemeType portal = SThemeType.PORTAL;
-        doNothing().when(themeServiceStartupHelper).createDefaultTheme(PORTAL_CONTENT, portal);
 
         given(themeActionCalculator.calculateAction(mobileTheme, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
-        given(themeActionCalculator.calculateAction(portalTheme, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.MOBILE, ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT);
 
-        verify(themeServiceStartupHelper, times(0)).createDefaultTheme(MOBILE_CONTENT, mobile);
+        verify(themeServiceStartupHelper, times(0)).createDefaultTheme(MOBILE_CONTENT, SThemeType.MOBILE);
     }
 
     @Test
@@ -214,11 +205,9 @@ public class ThemeServiceStartupHelperTest {
         SThemeImpl mobileTheme = hasThemeWithContentContent(SThemeType.MOBILE, MOBILE_CONTENT);
         hasNoTheme(SThemeType.PORTAL);
         final SThemeType mobile = SThemeType.MOBILE;
-        doNothing().when(themeServiceStartupHelper).createDefaultTheme(MOBILE_CONTENT, mobile);
         final SThemeType portal = SThemeType.PORTAL;
         doNothing().when(themeServiceStartupHelper).createDefaultTheme(PORTAL_CONTENT, portal);
 
-        given(themeActionCalculator.calculateAction(mobileTheme, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
         given(themeActionCalculator.calculateAction(null, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.CREATE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.PORTAL, ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT);
@@ -231,11 +220,8 @@ public class ThemeServiceStartupHelperTest {
         SThemeImpl mobileTheme = hasThemeWithContentContent(SThemeType.MOBILE, MOBILE_CONTENT);
         SThemeImpl portalTheme = hasThemeWithContentContent(SThemeType.PORTAL, PORTAL_CONTENT);
         final SThemeType mobile = SThemeType.MOBILE;
-        doNothing().when(themeServiceStartupHelper).createDefaultTheme(MOBILE_CONTENT, mobile);
         final SThemeType portal = SThemeType.PORTAL;
-        doNothing().when(themeServiceStartupHelper).createDefaultTheme(PORTAL_CONTENT, portal);
 
-        given(themeActionCalculator.calculateAction(mobileTheme, MOBILE_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
         given(themeActionCalculator.calculateAction(portalTheme, PORTAL_CONTENT)).willReturn(ThemeActionCalculator.ThemeAction.NONE);
 
         themeServiceStartupHelper.createOrUpdateDefaultTheme(SThemeType.PORTAL, ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT);
@@ -245,9 +231,8 @@ public class ThemeServiceStartupHelperTest {
 
     @Test
     public final void createDefaultMobileTheme_should_create_theme_when_zip_in_classpath() throws Exception {
-        doReturn(new byte[] { 1 }).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT + ".zip");
         final STheme sTheme = mock(STheme.class);
-        doReturn(sTheme).when(themeServiceStartupHelper).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+        doReturn(sTheme).when(themeServiceStartupHelper).buildSTheme(nullable(byte[].class), nullable(byte[].class), nullable(SThemeType.class));
 
         final SThemeType mobile = SThemeType.MOBILE;
         themeServiceStartupHelper.createDefaultTheme(MOBILE_CONTENT, mobile);
@@ -257,9 +242,8 @@ public class ThemeServiceStartupHelperTest {
 
     @Test
     public final void createDefaultPortalTheme_should_create_theme_when_zip_in_classpath() throws Exception {
-        doReturn(new byte[] { 1 }).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT + ".zip");
         final STheme sTheme = mock(STheme.class);
-        doReturn(sTheme).when(themeServiceStartupHelper).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+        doReturn(sTheme).when(themeServiceStartupHelper).buildSTheme(nullable(byte[].class), nullable(byte[].class), nullable(SThemeType.class));
 
         final SThemeType portal = SThemeType.PORTAL;
         themeServiceStartupHelper.createDefaultTheme(PORTAL_CONTENT, portal);

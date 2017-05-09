@@ -24,7 +24,6 @@ import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.document.Document
 import org.bonitasoft.engine.bpm.process.ProcessInstance
 import org.bonitasoft.engine.exception.BonitaException
-import org.bonitasoft.engine.exception.SearchException
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.session.APISession
 import org.junit.Before
@@ -55,10 +54,7 @@ public class DocumentPermissionRuleTest {
 
     @Before
     public void before() {
-
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
@@ -98,7 +94,6 @@ public class DocumentPermissionRuleTest {
 
     def havingResourceId(boolean isInvolvedIn, boolean isInvolvedAsManager) {
         doReturn(currentUserId).when(apiSession).getUserId()
-        doReturn(true).when(apiCallContext).isGET()
         doReturn("77").when(apiCallContext).getResourceId()
         def document = mock(Document.class)
         doReturn(document).when(processAPI).getDocument(77L)

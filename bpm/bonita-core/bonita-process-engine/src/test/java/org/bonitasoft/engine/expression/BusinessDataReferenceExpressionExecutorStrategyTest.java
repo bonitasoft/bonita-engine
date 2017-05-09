@@ -16,7 +16,6 @@ package org.bonitasoft.engine.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -26,18 +25,15 @@ import java.util.Map;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
-import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.operation.BusinessDataContext;
-import org.bonitasoft.engine.operation.BusinessDataContextMatcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -66,8 +62,7 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
         doReturn(createProcessSimpleDataReference("BizDataName", 112l, "com.objects.MyObject", 150l))
                 .when(refBusinessDataRetriever)
                 .getRefBusinessDataInstance(
-                        argThat(new BusinessDataContextMatcher(new BusinessDataContext("BizDataName", new Container(112l,
-                                DataInstanceContainer.PROCESS_INSTANCE.name())))));
+                        any());
 
         final Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
 
@@ -80,8 +75,7 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
         final Map<String, Object> context = createContext(112l, "ACTIVITY_INSTANCE");
         doReturn(createFlowNodeSimpleDataReference("BizDataName", 112l, "com.objects.MyObject", 150l)).when(refBusinessDataRetriever)
                 .getRefBusinessDataInstance(
-                argThat(new BusinessDataContextMatcher(new BusinessDataContext("BizDataName", new Container(112l,
-                                DataInstanceContainer.ACTIVITY_INSTANCE.name())))));
+                any());
         final Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
 
         assertThat(evaluate).isEqualTo(new SimpleBusinessDataReferenceImpl("BizDataName", "com.objects.MyObject", 150l));

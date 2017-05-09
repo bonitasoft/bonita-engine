@@ -19,13 +19,11 @@ import org.bonitasoft.engine.api.IdentityAPI
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
-import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceNotFoundException
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
-import org.bonitasoft.engine.exception.NotFoundException
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.search.SearchOptions
 import org.bonitasoft.engine.search.impl.SearchResultImpl
@@ -64,8 +62,6 @@ public class TaskExecutionPermissionRuleTest {
     @Before
     public void before() {
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
@@ -180,8 +176,6 @@ public class TaskExecutionPermissionRuleTest {
     }
 
     def havingResource(String resourceName) {
-        doReturn(true).when(apiCallContext).isGET()
-        doReturn("458").when(apiCallContext).getResourceId()
         doReturn(Arrays.asList("458", "execution")).when(apiCallContext).getCompoundResourceId()
         doReturn(resourceName).when(apiCallContext).getResourceName()
     }

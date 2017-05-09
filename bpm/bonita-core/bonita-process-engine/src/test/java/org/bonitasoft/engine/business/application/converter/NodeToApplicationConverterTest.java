@@ -71,11 +71,9 @@ public class NodeToApplicationConverterTest {
     @Before
     public void setUp() throws Exception {
         given(defaultLayout.getId()).willReturn(DEFAULT_LAYOUT_ID);
-        given(defaultLayout.getName()).willReturn(ApplicationService.DEFAULT_LAYOUT_NAME);
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
 
         given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
-        given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
     }
 

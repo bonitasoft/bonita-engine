@@ -60,13 +60,18 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
         Logger logger = loggers.get(tenantId);
         if (logger == null) {
             logger = Logger.getLogger("INCIDENT" + tenantId);
-            final FileHandler fh = BonitaHomeServer.getInstance().getTenantStorage().getIncidentFileHandler(tenantId);
+            final FileHandler fh = getBonitaHomeServer().getTenantStorage().getIncidentFileHandler(tenantId);
             logger.addHandler(fh);
             final SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
             loggers.put(tenantId, logger);
         }
         return logger;
+    }
+
+    // For testing purpose
+    BonitaHomeServer getBonitaHomeServer() {
+        return BonitaHomeServer.getInstance();
     }
 
 }

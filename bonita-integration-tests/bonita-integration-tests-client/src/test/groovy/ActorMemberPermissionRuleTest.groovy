@@ -12,12 +12,6 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-
-
-
-
-
-
 import org.bonitasoft.engine.api.APIAccessor
 import org.bonitasoft.engine.api.IdentityAPI
 import org.bonitasoft.engine.api.Logger
@@ -60,8 +54,6 @@ public class ActorMemberPermissionRuleTest {
     @Before
     public void before() {
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 

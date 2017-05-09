@@ -14,10 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +33,11 @@ import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -52,6 +51,9 @@ public class VirtualClassLoaderTest {
 
     private VirtualClassLoader localClassLoader;
     private BonitaClassLoader newClassLoader;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private File tempDir;
 
     @Before
     public void before() throws IOException {
@@ -59,8 +61,9 @@ public class VirtualClassLoaderTest {
         localClassLoader = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
         Thread.currentThread().setContextClassLoader(localClassLoader);
 
-        newClassLoader = new BonitaClassLoader(Collections.<String, byte[]> emptyMap(), "test", 125,
+        newClassLoader = new BonitaClassLoader(Collections.emptyMap(), "test", 125,
                 File.createTempFile("test", ".tmp").toURI(), testClassLoader);
+        tempDir = temporaryFolder.newFolder();
     }
 
     @After
@@ -73,7 +76,6 @@ public class VirtualClassLoaderTest {
         VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
         final Map<String, byte[]> resources = new HashMap<>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
-        final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
@@ -89,7 +91,7 @@ public class VirtualClassLoaderTest {
 
     /**
      * BS-7152 : test the loading of class when calling the JavaMethodInvoker
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -97,7 +99,6 @@ public class VirtualClassLoaderTest {
         final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
         final Map<String, byte[]> resources = new HashMap<>(1);
         resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
-        final File tempDir = new File(System.getProperty("java.io.tmpdir"), "VirtualClassLoaderTest");
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
@@ -172,8 +173,8 @@ public class VirtualClassLoaderTest {
     @Test
     public void should_replaceClassLoader_call_destroy_on_old_classloader() throws Exception {
         //given
-        BonitaClassLoader classLoader1 = mock(BonitaClassLoader.class);
-        BonitaClassLoader classLoader2 = mock(BonitaClassLoader.class);
+        BonitaClassLoader classLoader1 = spy(classloader(1231L));
+        BonitaClassLoader classLoader2 = classloader(53412L);
         //when
         localClassLoader.replaceClassLoader(classLoader1);
         localClassLoader.replaceClassLoader(classLoader2);
@@ -200,7 +201,7 @@ public class VirtualClassLoaderTest {
         //when
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
-        verify(myClassLoaderListener,times(1)).onUpdate(localClassLoader);
+        verify(myClassLoaderListener, times(1)).onUpdate(localClassLoader);
     }
 
     @Test
@@ -211,7 +212,7 @@ public class VirtualClassLoaderTest {
         //when
         localClassLoader.replaceClassLoader(newClassLoader);
         //then
-        verify(myClassLoaderListener,never()).onUpdate(localClassLoader);
+        verify(myClassLoaderListener, never()).onUpdate(localClassLoader);
     }
 
     @Test
@@ -227,4 +228,11 @@ public class VirtualClassLoaderTest {
 
     }
 
+    private BonitaClassLoader classloader(long id) {
+        final Map<String, byte[]> resources = new HashMap<>(1);
+        resources.put("test-1.jar",
+                new byte[] { 1, 2, 3 });
+        return new BonitaClassLoader(resources, "here", id, tempDir.toURI(),
+                BonitaClassLoader.class.getClassLoader());
+    }
 }

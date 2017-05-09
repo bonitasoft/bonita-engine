@@ -56,10 +56,7 @@ public class CaseContextPermissionRuleTest {
 
     @Before
     public void before() {
-
         doReturn(processAPI).when(apiAccessor).getProcessAPI()
-        doReturn(identityAPI).when(apiAccessor).getIdentityAPI()
-        doReturn(user).when(identityAPI).getUser(currentUserId)
         doReturn(currentUserId).when(apiSession).getUserId()
     }
 
@@ -180,18 +177,14 @@ public class CaseContextPermissionRuleTest {
 
     def havingResourceId(boolean isInvolvedIn) {
         doReturn(currentUserId).when(apiSession).getUserId()
-        doReturn(true).when(apiCallContext).isGET()
         doReturn("case").when(apiCallContext).getResourceName()
-        doReturn("45/context").when(apiCallContext).getResourceId()
         doReturn(Arrays.asList("45", "context")).when(apiCallContext).getCompoundResourceId()
         doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l);
     }
 
     def havingArchivedResourceId(boolean isInvolvedIn) {
         doReturn(currentUserId).when(apiSession).getUserId()
-        doReturn(true).when(apiCallContext).isGET()
         doReturn("archivedCase").when(apiCallContext).getResourceName()
-        doReturn("45/context").when(apiCallContext).getResourceId()
         doReturn(Arrays.asList("45", "context")).when(apiCallContext).getCompoundResourceId()
         doReturn(isInvolvedIn).when(processAPI).isInvolvedInProcessInstance(currentUserId, 45l);
     }

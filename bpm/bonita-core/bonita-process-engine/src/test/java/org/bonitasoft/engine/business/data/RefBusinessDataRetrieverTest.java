@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.business.data.DummyBusinessDataRefBuilder.buildArchivedSimpleRefBusinessData;
 import static org.bonitasoft.engine.business.data.DummyBusinessDataRefBuilder.buildSimpleRefBusinessData;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
 
 import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -91,7 +90,6 @@ public class RefBusinessDataRetrieverTest {
         given(flowNodeInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
         given(processInstanceService.getProcessInstance(PROCESS_INSTANCE_ID)).willReturn(processInstance);
         given(processInstanceService.getProcessInstance(EVENT_SUBPROCESS_ID)).willReturn(eventSubProcessInstance);
-        doReturn(archivedProcessInstance).when(processInstanceService).getLastArchivedProcessInstance(PROCESS_INSTANCE_ID);
         given(flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, FLOW_NODE_INSTANCE_ID)).willReturn(archivedFlowNodeInstance);
     }
 
@@ -160,8 +158,6 @@ public class RefBusinessDataRetrieverTest {
         //given
         final SASimpleRefBusinessDataInstance archRefBusinessDataInstance = buildArchivedSimpleRefBusinessData(531L);
         given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID))
-                .willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
-        given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID))
                 .willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
         given(refBusinessDataService.getSAFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willReturn(archRefBusinessDataInstance);
 

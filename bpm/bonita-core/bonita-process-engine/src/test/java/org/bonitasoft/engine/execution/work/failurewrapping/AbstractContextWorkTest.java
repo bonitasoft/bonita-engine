@@ -14,10 +14,7 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +22,6 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
 import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
@@ -65,15 +61,10 @@ public abstract class AbstractContextWorkTest {
 
     @Before
     public void before() throws SBonitaException {
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
-        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
-        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
         doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
 
         doReturn("The description").when(txBonitawork).getDescription();
 
-        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
     }
 
     @Test
@@ -85,7 +76,6 @@ public abstract class AbstractContextWorkTest {
 
     @Test
     public void getDescription() {
-        when(wrappedWork.getDescription()).thenReturn("The description of wrapped work");
         assertEquals("The description", txBonitawork.getDescription());
     }
 

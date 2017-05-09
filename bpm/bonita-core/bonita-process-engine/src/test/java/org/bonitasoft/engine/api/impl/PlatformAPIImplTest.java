@@ -103,7 +103,6 @@ public class PlatformAPIImplTest {
         doReturn(platformConfiguration).when(platformServiceAccessor).getPlatformConfiguration();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(transactionService).when(platformServiceAccessor).getTransactionService();
-        doReturn(transactionService).when(platformServiceAccessor).getTransactionExecutor();
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(anyLong());
         doReturn(platformJobListeners).when(platformConfiguration).getJobListeners();
 
@@ -232,7 +231,6 @@ public class PlatformAPIImplTest {
         doReturn(defaultJobs).when(tenantConfiguration).getJobsToRegister();
         final List<String> scheduledJobNames = Collections.singletonList("existingJob");
         doReturn(scheduledJobNames).when(schedulerService).getJobs();
-        doNothing().when(platformAPI).registerJob(schedulerService, jobRegister);
 
         // When
         platformAPI.registerMissingTenantsDefaultJobs(platformServiceAccessor, sessionAccessor, tenants);
@@ -277,7 +275,6 @@ public class PlatformAPIImplTest {
     public void startScheduler_should_not_register_PlatformJobListeners_and_TenantJobListeners_when_scheduler_should_not_be_started() throws Exception {
         // Given
         doReturn(false).when(platformConfiguration).shouldStartScheduler();
-        doReturn(false).when(schedulerService).isStarted();
 
         // When
         platformAPI.startScheduler(platformServiceAccessor, tenants);
@@ -319,9 +316,6 @@ public class PlatformAPIImplTest {
     public void should_getTenantPortalConfigurationFile_call_bonitaHomeServer() throws Exception {
         //given
         final String configurationFile = "a file";
-        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
-        doReturn(sTenant).when(platformService).getTenant(TENANT_ID);
-        doReturn(TENANT_ID).when(sTenant).getId();
         doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
 
         //when
