@@ -45,7 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-technical-api</artifactId>
+            <artifactId>bonita-log-technical</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
