@@ -3,18 +3,51 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.bonitasoft.engine</groupId>
-		<artifactId>services</artifactId>
-		<version>7.6.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>org.bonitasoft.engine</groupId>
+        <artifactId>services</artifactId>
+        <version>7.6.0-SNAPSHOT</version>
+    </parent>
 
-	<groupId>org.bonitasoft.engine.incident</groupId>
-	<artifactId>bonita-incident</artifactId>
-	<packaging>pom</packaging>
+    <groupId>org.bonitasoft.engine.incident</groupId>
+    <artifactId>bonita-incident</artifactId>
 
-	<modules>
-		<module>bonita-incident-api</module>
-		<module>bonita-incident-log</module>
-	</modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-home-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-technical</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>
