@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.page</groupId>
-            <artifactId>bonita-page-impl</artifactId>
+            <artifactId>bonita-page</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
