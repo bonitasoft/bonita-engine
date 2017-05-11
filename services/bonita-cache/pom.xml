@@ -24,8 +24,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-            <artifactId>bonita-session-accessor-read</artifactId>
+            <groupId>org.bonitasoft.engine.session</groupId>
+            <artifactId>bonita-session</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

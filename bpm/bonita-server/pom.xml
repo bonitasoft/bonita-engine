@@ -481,14 +481,7 @@
         <!-- Session -->
         <dependency>
             <groupId>org.bonitasoft.engine.session</groupId>
-            <artifactId>bonita-session-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Session Accessor -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-            <artifactId>bonita-session-accessor-threadlocal</artifactId>
+            <artifactId>bonita-session</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -753,12 +746,7 @@
                                     <include>org.bonitasoft.engine.persistence:bonita-sequence-api</include>
                                     <include>org.bonitasoft.engine.persistence:bonita-sequence-impl</include>
                                     <!-- Session -->
-                                    <include>org.bonitasoft.engine.session:bonita-session-api</include>
-                                    <include>org.bonitasoft.engine.session:bonita-session-impl</include>
-                                    <!-- Session Accessor -->
-                                    <include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-read</include>
-                                    <include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-threadlocal</include>
-                                    <include>org.bonitasoft.engine.sessionaccessor:bonita-session-accessor-write</include>
+                                    <include>org.bonitasoft.engine.session:bonita-session</include>
                                     <!-- Supervisor Mapping -->
                                     <include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-api</include>
                                     <include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
