@@ -14,11 +14,17 @@
 package org.bonitasoft.engine.commons;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtilsBean;
+import org.apache.commons.beanutils.converters.AbstractConverter;
 import org.apache.commons.beanutils.converters.DateConverter;
 
 /**
@@ -35,6 +41,9 @@ public class TypeConverterUtil {
         dateConverter.setPatterns(datePatterns);
         dateConverter.setTimeZone(TimeZone.getTimeZone("GMT"));
         convertUtilsBean.register(dateConverter, Date.class);
+        convertUtilsBean.register(new LocalDateTimeConverter(), LocalDateTime.class);
+        convertUtilsBean.register(new LocalDateConverter(), LocalDate.class);
+        convertUtilsBean.register(new OffsetDateTimeConverter(), OffsetDateTime.class);
     }
 
     public Object convertToType(Class<? extends Serializable> clazz, Serializable parameterValue) {
@@ -45,4 +54,63 @@ public class TypeConverterUtil {
         }
     }
 
+    private class LocalDateConverter extends AbstractConverter {
+
+        static final int MAX_LOCAL_DATE_LENGTH = 10;
+
+        @Override
+        protected <T> T convertToType(Class<T> type, Object value) throws Throwable {
+            if (!(value instanceof String)) {
+                throw conversionException(type, value);
+            }
+            String valueAsString = (String) value;
+            if (valueAsString.length() > MAX_LOCAL_DATE_LENGTH) {
+                valueAsString = valueAsString.substring(0, MAX_LOCAL_DATE_LENGTH);
+            }
+            return type.cast(LocalDate.parse(valueAsString));
+        }
+
+        @Override
+        protected Class<?> getDefaultType() {
+            return LocalDate.class;
+        }
+    }
+
+    private class LocalDateTimeConverter extends AbstractConverter {
+
+        @Override
+        protected <T> T convertToType(Class<T> type, Object value) throws Throwable {
+            if (!(value instanceof String)) {
+                throw conversionException(type, value);
+            }
+            String paramValueString = (String) value;
+            try {
+                return type.cast(LocalDateTime.parse(paramValueString));
+            } catch (DateTimeParseException e) {
+                //We drop the timezone info from the String:
+                return type.cast(ZonedDateTime.parse(paramValueString).toLocalDateTime());
+            }
+        }
+
+        @Override
+        protected Class<?> getDefaultType() {
+            return LocalDateTime.class;
+        }
+    }
+
+    private class OffsetDateTimeConverter extends AbstractConverter {
+
+        @Override
+        protected <T> T convertToType(Class<T> type, Object value) throws Throwable {
+            if (!(value instanceof String)) {
+                throw conversionException(type, value);
+            }
+            return type.cast(OffsetDateTime.parse((CharSequence) value));
+        }
+
+        @Override
+        protected Class<?> getDefaultType() {
+            return OffsetDateTime.class;
+        }
+    }
 }
