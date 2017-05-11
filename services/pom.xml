@@ -34,7 +34,6 @@
         <module>bonita-session</module>
         <module>bonita-platform-authentication</module>
         <module>bonita-platform-session</module>
-        <module>bonita-session-accessor</module>
         <module>bonita-expression</module>
         <module>bonita-external-identity-mapping</module>
         <module>bonita-data-definition</module>
