@@ -265,17 +265,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.session</groupId>
-            <artifactId>bonita-session-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-            <artifactId>bonita-session-accessor-read</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-            <artifactId>bonita-session-accessor-write</artifactId>
+            <artifactId>bonita-session</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -422,12 +412,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.scheduler</groupId>
             <artifactId>bonita-scheduler-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.session</groupId>
-            <artifactId>bonita-session-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

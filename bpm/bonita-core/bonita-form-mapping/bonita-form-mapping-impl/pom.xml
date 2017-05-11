@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.session</groupId>
-            <artifactId>bonita-session-api</artifactId>
+            <artifactId>bonita-session</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
