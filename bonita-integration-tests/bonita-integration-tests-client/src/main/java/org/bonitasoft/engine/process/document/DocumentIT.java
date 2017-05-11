@@ -526,9 +526,20 @@ public class DocumentIT extends TestWithUser {
         assertThat(getProcessAPI()
                 .searchDocuments(new SearchOptionsBuilder(0, 45).searchTerm("This is").sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC).done())
                 .getResult().get(0).getId()).isEqualTo(document.getId());
+
+        // search document by content storage id
+        String contentStorageId = document.getContentStorageId();
+        final SearchResult<Document> docSearchedByContentStorageId = getProcessAPI().searchDocuments(
+                new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.CONTENT_STORAGE_ID, contentStorageId)
+                        .done());
+        assertThat(docSearchedByContentStorageId.getCount()).isEqualTo(1);
+        assertThat(docSearchedByContentStorageId.getResult().get(0).getContentStorageId()).isEqualTo(contentStorageId);
+
+        // Finalize the process
         getProcessAPI().assignUserTask(step1, user.getId());
         getProcessAPI().executeUserTask(user.getId(), step1, Collections.<String, Serializable> emptyMap());
         waitForProcessToFinish(processInstance);
+
         //search archive document order by archive date
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
@@ -537,6 +548,13 @@ public class DocumentIT extends TestWithUser {
         assertThat(archiveDocumentSearch.getCount()).isEqualTo(2);
         assertThat(archiveDocumentSearch.getResult()).extracting("contentFileName", "processInstanceId", "author").containsOnly(
                 tuple("doc.jpg", processInstance.getId(), user.getId()), tuple("doc2.jpg", processInstance.getId(), user.getId()));
+
+        // search archived document by content storage id
+        final SearchResult<ArchivedDocument> archivedDocSearchedByContentStorageId = getProcessAPI().searchArchivedDocuments(
+                new SearchOptionsBuilder(0, 100).filter(ArchivedDocumentsSearchDescriptor.CONTENT_STORAGE_ID, contentStorageId)
+                        .done());
+        assertThat(archivedDocSearchedByContentStorageId.getCount()).isEqualTo(1);
+        assertThat(archivedDocSearchedByContentStorageId.getResult().get(0).getContentStorageId()).isEqualTo(contentStorageId);
 
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
