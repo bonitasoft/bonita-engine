@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
-			<artifactId>bonita-cache-api</artifactId>
+			<artifactId>bonita-cache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -137,7 +137,7 @@
         <!-- Cache -->
         <dependency>
             <groupId>org.bonitasoft.engine.cache</groupId>
-            <artifactId>bonita-cache-ehcache</artifactId>
+            <artifactId>bonita-cache</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -643,8 +643,7 @@
                                     <inlude>org.bonitasoft.engine.data:bonita-business-data-impl</inlude>
                                     <inlude>org.bonitasoft.engine.data:bonita-business-data-client-resources</inlude>
                                     <!-- Cache -->
-                                    <include>org.bonitasoft.engine.cache:bonita-cache-api</include>
-                                    <include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
+                                    <include>org.bonitasoft.engine.cache:bonita-cache</include>
                                     <!-- Category -->
                                     <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
                                     <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
