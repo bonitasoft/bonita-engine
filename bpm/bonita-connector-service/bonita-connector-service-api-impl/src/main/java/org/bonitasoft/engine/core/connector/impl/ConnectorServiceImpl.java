@@ -36,6 +36,7 @@ import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.connector.Connector;
+import org.bonitasoft.engine.connector.ConnectorCallback;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -131,8 +132,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     @Override
-    public ConnectorResult executeConnector(final long rootDefinitionId, final SConnectorInstance sConnectorInstance, final ClassLoader classLoader,
-            final Map<String, Object> inputParameters) throws SConnectorException {
+    public void executeConnector(final long rootDefinitionId, final SConnectorInstance sConnectorInstance, final ClassLoader classLoader,
+                                 final Map<String, Object> inputParameters, ConnectorCallback connectorCallback) throws SConnectorException {
         final ConnectorResult connectorResult;
         try {
             final String tenantId = String.valueOf(sessionAccessor.getTenantId());
@@ -146,8 +147,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                             + " with version " + sConnectorInstance.getVersion());
                 }
             }
-            final String implementationClassName = descriptor.getImplementationClassName();
-            connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
+            executeConnector(classLoader, descriptor.getImplementationClassName(), inputParameters, connectorCallback);
         } catch (final SCacheException e) {
             throw new SConnectorException(e);
         } catch (final STenantIdNotSetException e) {
@@ -158,8 +158,27 @@ public class ConnectorServiceImpl implements ConnectorService {
                     + buildConnectorInputMessage(inputParameters);
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
-        return connectorResult;
     }
+
+    private void executeConnector(ClassLoader classLoader, String implementationClassName, Map<String, Object> inputParameters, ConnectorCallback connectorCallback) throws SConnectorException {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            final Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
+            connectorExecutor.executeWithCallBack(new SConnectorAdapter(connector), inputParameters, classLoader, connectorCallback);
+        } catch (final ClassNotFoundException e) {
+            throw new SConnectorException(implementationClassName + " can not be found.", e);
+        } catch (final InstantiationException e) {
+            throw new SConnectorException(implementationClassName + " can not be instantiated.", e);
+        } catch (final IllegalAccessException e) {
+            throw new SConnectorException(e);
+        } catch (org.bonitasoft.engine.connector.exception.SConnectorException e) {
+            throw new SConnectorException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
 
     /**
      * Build the log message using the connector instance's context (name, version, connector id, connector instance id, container type, container id)

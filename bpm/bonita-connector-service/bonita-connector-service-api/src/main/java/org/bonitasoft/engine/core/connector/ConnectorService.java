@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.connector.ConnectorCallback;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
@@ -181,7 +182,7 @@ public interface ConnectorService {
      * @return
      * @throws SConnectorException
      */
-    ConnectorResult executeConnector(long rootDefinitionId, SConnectorInstance sConnectorInstance, ClassLoader classLoader, Map<String, Object> inputParameters)
+    void executeConnector(long rootDefinitionId, SConnectorInstance sConnectorInstance, ClassLoader classLoader, Map<String, Object> inputParameters, ConnectorCallback connectorCallback)
             throws SConnectorException;
 
     /**

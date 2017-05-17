@@ -58,6 +58,11 @@
 			<artifactId>bonita-operation-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.connector</groupId>
+			<artifactId>bonita-connector-executor-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

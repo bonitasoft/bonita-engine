@@ -42,6 +42,8 @@ public interface ConnectorExecutor extends TenantLifecycleService {
      */
     Map<String, Object> execute(SConnector sConnector, Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException;
 
+    void executeWithCallBack(SConnector sConnector, Map<String, Object> inputParameters, final ClassLoader classLoader, ConnectorCallback connectorCallback) throws SConnectorException;
+
     /**
      * call disconnect method of the connector
      *

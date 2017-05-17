@@ -20,7 +20,6 @@ import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -86,7 +85,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
+    protected void evaluateOutput(final Map<String, Object> context, final Map<String, Object> result, final SConnectorDefinition sConnectorDefinition)
             throws SBonitaException {
         evaluateOutput(context, result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
     }

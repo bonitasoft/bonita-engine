@@ -27,11 +27,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.connector.ConnectorCallback;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
+import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -107,16 +110,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters, final ClassLoader classLoader)
             throws SConnectorException {
         final long startTime = System.currentTimeMillis();
-        if (executorService == null) {
-            throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
-        }
+        checkStarted();
 
-        long tenantId;
-        try {
-            tenantId = sessionAccessor.getTenantId();
-        } catch (final STenantIdNotSetException tenantIdNotSetException) {
-            throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
-        }
+        long tenantId = getTenantId();
         final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader);
         final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
@@ -134,6 +130,31 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         } finally {
             track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, startTime, sConnector, inputParameters);
         }
+    }
+
+    private void checkStarted() throws SConnectorException {
+        if (executorService == null) {
+            throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
+        }
+    }
+
+    @Override
+    public void executeWithCallBack(SConnector sConnector, Map<String, Object> inputParameters, ClassLoader classLoader, ConnectorCallback connectorCallback) throws SConnectorException {
+        checkStarted();
+
+        long tenantId = getTenantId();
+        final Runnable runnable= new ExecuteConnectorCallableWithCallBack(inputParameters, sConnector, tenantId, classLoader, connectorCallback);
+        executorService.submit(runnable);
+    }
+
+    private long getTenantId() throws SConnectorException {
+        long tenantId;
+        try {
+            tenantId = sessionAccessor.getTenantId();
+        } catch (final STenantIdNotSetException tenantIdNotSetException) {
+            throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
+        }
+        return tenantId;
     }
 
     private void track(final String recordName, final long startTime, final SConnector sConnector, final Map<String, Object> inputParameters) {
@@ -220,6 +241,66 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             }
         }
 
+    }
+
+    /**
+     * @author Baptiste Mesta
+     */
+    final class ExecuteConnectorCallableWithCallBack implements Runnable {
+
+        private final Map<String, Object> inputParameters;
+
+        private final SConnector sConnector;
+
+        private final long tenantId;
+
+        private final ClassLoader loader;
+        private ConnectorCallback connectorCallback;
+
+        private ExecuteConnectorCallableWithCallBack(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId, final ClassLoader loader, ConnectorCallback connectorCallback) {
+            this.inputParameters = inputParameters;
+            this.sConnector = sConnector;
+            this.tenantId = tenantId;
+            this.loader = loader;
+            this.connectorCallback = connectorCallback;
+        }
+
+        @Override
+        public void run() {
+            final long startTime = System.currentTimeMillis();
+
+            //Fix Classloading issue with ThreadLocal implementation of SessionAccessor
+            sessionAccessor.setTenantId(tenantId);
+            Thread.currentThread().setContextClassLoader(loader);
+
+            sConnector.setInputParameters(inputParameters);
+            try {
+                sConnector.validate();
+                sConnector.connect();
+                Map<String, Object> result = sConnector.execute();
+                connectorCallback.connectorFinished(sConnector,result);
+                sConnector.disconnect();
+            } catch (Exception e) {
+                connectorCallback.connectorFailed(sConnector, e);
+                disconnectSilently(sConnector);
+            } catch (Throwable e) {
+                connectorCallback.connectorFailed(sConnector, new SConnectorException(e));
+                disconnectSilently(sConnector);
+            } finally {
+                // in case a session has been created: see ConnectorAPIAccessorImpl
+                try {
+                    final long sessionId = sessionAccessor.getSessionId();
+                    sessionAccessor.deleteSessionId();
+                    sessionService.deleteSession(sessionId);
+                } catch (SessionIdNotSetException e) {
+                    // nothing, no session has been created
+                } catch (SSessionNotFoundException e) {
+                    // nothing, no session has been created
+                }
+                track(TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE, startTime, sConnector, inputParameters);
+            }
+
+        }
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

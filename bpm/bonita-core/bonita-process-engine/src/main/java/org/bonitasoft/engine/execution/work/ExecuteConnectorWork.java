@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.connector.ConnectorCallback;
+import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
-import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
@@ -73,7 +76,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     protected abstract void continueFlow(Map<String, Object> context) throws SBonitaException;
 
-    protected abstract void evaluateOutput(Map<String, Object> context, final ConnectorResult result, SConnectorDefinition sConnectorDefinition)
+    protected abstract void evaluateOutput(Map<String, Object> context, final Map<String, Object> result,
+            SConnectorDefinition sConnectorDefinition)
             throws SBonitaException;
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
@@ -93,14 +97,16 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, Exception);
     }
 
-    protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition,
+    protected void evaluateOutput(final Map<String, Object> context, final Map<String, Object> result,
+            final SConnectorDefinition sConnectorDefinition,
             final Long id, final String containerType) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final List<SOperation> outputs = sConnectorDefinition.getOutputs();
-        final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinitionId);
-        connectorService.executeOutputOperation(outputs, sExpressionContext, result);
+        final SExpressionContext expressionContext = new SExpressionContext(id, containerType, processDefinitionId);
+        expressionContext.setInputValues(new HashMap<String, Object>(result));
+        tenantAccessor.getOperationService().execute(outputs, expressionContext.getContainerId(),
+                expressionContext.getContainerType(), expressionContext);// data is in
         connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connectorInstanceId), ConnectorService.DONE);
     }
 
@@ -122,10 +128,37 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             userTransactionService.executeInTransaction(callable);
             final SConnectorDefinition sConnectorDefinition = callable.getsConnectorDefinition();
             final SConnectorInstance connectorInstance = callable.getConnectorInstance();
-            final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
-                    callable.getInputParameters());
-            // evaluate output and trigger the execution of the flow node
-            userTransactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, context));
+            ConnectorCallback callback = new ConnectorCallback() {
+
+                @Override
+                public void connectorFinished(SConnector sConnector, Map<String, Object> result) {
+
+                    // evaluate output and trigger the execution of the flow node
+                    try {
+                        userTransactionService.executeInTransaction(
+                                new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, context));
+                    } catch (Exception e) {
+                        try {
+                            getParent().handleFailure(e, context);
+                        } catch (Exception e1) {
+                            tenantAccessor.getTechnicalLoggerService().log(getClass(), TechnicalLogSeverity.ERROR,
+                                    "Error handling failure", e1);
+                        }
+                    }
+                }
+
+                @Override
+                public void connectorFailed(SConnector sConnector, Exception e) {
+                    try {
+                        getParent().handleFailure(e, context);
+                    } catch (Exception e1) {
+                        tenantAccessor.getTechnicalLoggerService().log(getClass(), TechnicalLogSeverity.ERROR,
+                                "Error handling failure", e1);
+                    }
+                }
+            };
+            connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
+                    callable.getInputParameters(), callback);
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK)) {
                 final long endTime = System.currentTimeMillis();
@@ -263,13 +296,14 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
      */
     private final class EvaluateConnectorOutputsTxContent implements Callable<Void> {
 
-        private final ConnectorResult result;
+        private final Map<String, Object> result;
 
         private final SConnectorDefinition sConnectorDefinition;
 
         private final Map<String, Object> context;
 
-        private EvaluateConnectorOutputsTxContent(final ConnectorResult result, final SConnectorDefinition sConnectorDefinition,
+        private EvaluateConnectorOutputsTxContent(final Map<String, Object> result,
+                final SConnectorDefinition sConnectorDefinition,
                 final Map<String, Object> context) {
             this.result = result;
             this.sConnectorDefinition = sConnectorDefinition;

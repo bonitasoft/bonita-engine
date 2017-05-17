@@ -106,9 +106,10 @@ public class ConnectorServiceDecorator implements ConnectorService {
     }
 
     @Override
-    public ConnectorResult executeConnector(final long rootDefinitionId, final SConnectorInstance sConnectorInstance, final ClassLoader classLoader,
-            final Map<String, Object> inputParameters) throws SConnectorException {
-        return connectorService.executeConnector(rootDefinitionId, sConnectorInstance, classLoader, inputParameters);
+    public void executeConnector(long rootDefinitionId, SConnectorInstance sConnectorInstance, ClassLoader classLoader,
+            Map<String, Object> inputParameters, ConnectorCallback connectorCallback) throws SConnectorException {
+        connectorService.executeConnector(rootDefinitionId, sConnectorInstance, classLoader, inputParameters,
+                connectorCallback);
     }
 
     @Override
