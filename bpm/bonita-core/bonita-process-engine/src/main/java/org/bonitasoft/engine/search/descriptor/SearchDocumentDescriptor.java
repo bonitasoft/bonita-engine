@@ -37,9 +37,9 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
 
     SearchDocumentDescriptor() {
         final SDocumentBuilderFactory fact = BuilderFactory.get(SDocumentBuilderFactory.class);
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(9);
+        searchEntityKeys = new HashMap<>(9);
 
-        //        searchEntityKeys.put(DocumentsSearchDescriptor.CONTENT_STORAGE_ID, new FieldDescriptor(SDocument.class, fact.geContentStorageIdKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.CONTENT_STORAGE_ID, new FieldDescriptor(SMappedDocument.class, "documentId"));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_AUTHOR, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getAuthorKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_FILENAME,
                 new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getFileNameKey()));
@@ -56,8 +56,8 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getURLKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
 
-        documentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> documentFields = new HashSet<String>(8);
+        documentAllFields = new HashMap<>(1);
+        final Set<String> documentFields = new HashSet<>(8);
         documentFields.add(DOCUMENT_PREFIX + fact.getFileNameKey());
         documentFields.add(DOCUMENT_PREFIX + fact.getMimeTypeKey());
         documentFields.add(fact.getNameKey());

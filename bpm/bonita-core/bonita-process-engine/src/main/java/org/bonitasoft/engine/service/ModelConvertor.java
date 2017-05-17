@@ -1855,7 +1855,7 @@ public class ModelConvertor {
         return new ConnectorImplementationDescriptor(sConnectorImplementationDescriptor.getImplementationClassName(),
                 sConnectorImplementationDescriptor.getId(), sConnectorImplementationDescriptor.getVersion(),
                 sConnectorImplementationDescriptor.getDefinitionId(), sConnectorImplementationDescriptor.getDefinitionVersion(),
-                sConnectorImplementationDescriptor.getJarDependencies().getDependencies());
+                sConnectorImplementationDescriptor.getJarDependencies());
     }
 
     public static List<ArchivedComment> toArchivedComments(final List<SAComment> serverObjects) {
