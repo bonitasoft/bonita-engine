@@ -63,7 +63,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
-import org.bonitasoft.engine.core.connector.parser.JarDependencies;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
@@ -835,7 +834,7 @@ public class ProcessAPIImplTest {
     private List<SConnectorImplementationDescriptor> createConnectorList() {
         final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = new ArrayList<>();
         final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = new SConnectorImplementationDescriptor("className", "id", "version",
-                "definitionId", "definitionVersion", new JarDependencies(Arrays.asList("dep1", "dep2")));
+                "definitionId", "definitionVersion", new ArrayList<>(Arrays.asList("dep1", "dep2")));
         sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
         sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
         sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
