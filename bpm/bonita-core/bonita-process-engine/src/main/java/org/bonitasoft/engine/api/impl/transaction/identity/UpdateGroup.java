@@ -73,7 +73,11 @@ public class UpdateGroup {
             groupChildren = identityService.getGroupChildren(group.getId(), i * BATCH_SIZE, BATCH_SIZE, idKey, OrderByType.ASC);
             i++;
             for (final SGroup child : groupChildren) {
-                updateChildren(child, parentPath + '/' + groupName, idKey, parentPathKey, child.getName());
+                if (parentPath != null) {
+                    updateChildren(child, parentPath + '/' + groupName, idKey, parentPathKey, child.getName());
+                } else {
+                    updateChildren(child, '/' + groupName, idKey, parentPathKey, child.getName());
+                }
             }
         } while (!groupChildren.isEmpty());
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();

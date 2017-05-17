@@ -382,8 +382,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context,
                 expressionContextToEvaluateOperations);
 
-        initializeData(processContainer, sProcessDefinition, sProcessInstance);
         initializeBusinessData(processContainer, sProcessInstance, expressionContext);
+        initializeData(processContainer, sProcessDefinition, sProcessInstance);
 
         createDocuments(sProcessDefinition, processContainer, sProcessInstance, userId, expressionContext, context);
         createDocumentLists(processContainer, sProcessInstance, userId, expressionContext, context);

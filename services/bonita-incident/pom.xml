@@ -3,14 +3,14 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.bonitasoft.engine</groupId>
-        <artifactId>services</artifactId>
+	<parent>
+		<groupId>org.bonitasoft.engine</groupId>
+		<artifactId>services</artifactId>
         <version>7.6.0-SNAPSHOT</version>
-    </parent>
+	</parent>
 
-    <groupId>org.bonitasoft.engine.incident</groupId>
-    <artifactId>bonita-incident</artifactId>
+	<groupId>org.bonitasoft.engine.incident</groupId>
+	<artifactId>bonita-incident</artifactId>
 
     <dependencies>
         <dependency>

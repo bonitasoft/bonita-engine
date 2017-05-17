@@ -7,10 +7,10 @@
         <groupId>org.bonitasoft.engine</groupId>
         <artifactId>services</artifactId>
         <version>7.6.0-SNAPSHOT</version>
-    </parent>
+	</parent>
 
     <groupId>org.bonitasoft.engine.page</groupId>
-    <artifactId>bonita-page</artifactId>
+	<artifactId>bonita-page</artifactId>
 
     <name>Bonita Page Service</name>
 

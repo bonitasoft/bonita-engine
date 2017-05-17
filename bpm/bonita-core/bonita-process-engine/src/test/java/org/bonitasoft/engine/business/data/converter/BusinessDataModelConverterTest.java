@@ -16,6 +16,8 @@ package org.bonitasoft.engine.business.data.converter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
 import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
@@ -41,6 +43,25 @@ public class BusinessDataModelConverterTest {
         assertThat(reference.getType()).isEqualTo("com.bonitasoft.Employee");
     }
 
+    @Test
+    public void convertSMultiBusinessDataReferencetoClientObject_should_Create_a_correct_list_from_a_list_with_a_null(){
+        //given
+        List dataIDs = new LinkedList();
+        dataIDs.add(25L);
+        dataIDs.add(null);
+        dataIDs.add(3L);
+        final SProcessMultiRefBusinessDataInstanceImpl sReference = new SProcessMultiRefBusinessDataInstanceImpl();
+        sReference.setDataIds(dataIDs);
+        
+        //when
+        final MultipleBusinessDataReference reference = BusinessDataModelConverter.toMultipleBusinessDataReference(sReference);
+        
+        //then
+        assertThat(reference).isNotNull();
+        
+    }
+    
+    
     @Test
     public void convertSMultiBusinessDataReferencetoClientObject() throws Exception {
         final SProcessMultiRefBusinessDataInstanceImpl sReference = new SProcessMultiRefBusinessDataInstanceImpl();

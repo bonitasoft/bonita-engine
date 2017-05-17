@@ -617,4 +617,24 @@ public class GroupIT extends TestWithTechnicalUser {
         expectedException.expect(NotFoundException.class);
         getIdentityAPI().getIcon(mainGroup.getIconId());
     }
+    
+    
+    @Test
+    public void should_update_childrens_group_ParentPath_with_correct_value() throws BonitaException {
+        //given
+        Group acme = getIdentityAPI().createGroup("Acme",null);
+        Group site = getIdentityAPI().createGroup("Site", acme.getPath());
+        
+        //when
+        final GroupUpdater group2Updater = new GroupUpdater();
+        group2Updater.updateDescription("laalalala");
+        group2Updater.updateName("Acme2");
+        getIdentityAPI().updateGroup(acme.getId(), group2Updater);
+        
+        //then
+        assertThat(getIdentityAPI().getGroup(acme.getId()).getDescription()).contains("laalalala");
+        assertThat(getIdentityAPI().getGroup(site.getId()).getParentPath()).isEqualTo("/Acme2");
+        deleteGroups(getIdentityAPI().getGroup(acme.getId()));
+        
+    }
 }

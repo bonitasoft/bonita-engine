@@ -116,20 +116,21 @@ public class PlatformSetupDistributionIT {
         Server pgServer = Server.createPgServer("-baseDir", dbFolder.getAbsolutePath());
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArguments("init");
-        DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
-        //when
-        Path databaseProperties = distFolder.toPath().resolve("database.properties");
-        Properties properties = new Properties();
-        properties.load(new ByteArrayInputStream(Files.readAllBytes(databaseProperties)));
-        properties.setProperty("db.vendor", "postgres");
-        properties.setProperty("db.server.name", "localhost");
-        properties.setProperty("db.server.port", String.valueOf(pgServer.getPort()));
-        properties.setProperty("db.database.name", "bonita");
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        properties.store(out, "");
-        Files.write(databaseProperties, out.toByteArray());
         try {
+            //server must be started to have a valid port
             pgServer.start();
+            DefaultExecutor executor = PlatformSetupTestUtils.createExecutor(distFolder);
+            //when
+            Path databaseProperties = distFolder.toPath().resolve("database.properties");
+            Properties properties = new Properties();
+            properties.load(new ByteArrayInputStream(Files.readAllBytes(databaseProperties)));
+            properties.setProperty("db.vendor", "postgres");
+            properties.setProperty("db.server.name", "localhost");
+            properties.setProperty("db.server.port", String.valueOf(pgServer.getPort()));
+            properties.setProperty("db.database.name", "bonita");
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            properties.store(out, "");
+            Files.write(databaseProperties, out.toByteArray());
             int iExitValue = executor.execute(oCmdLine);
             //then
             assertThat(iExitValue).isEqualTo(0);

@@ -848,7 +848,7 @@
                                             <port>db.random.port:5432</port>
                                         </ports>
                                         <wait>
-                                            <time>45000</time>
+                                            <time>${docker-timeout}</time>
                                             <log>PostgreSQL init process complete; ready for start up.</log>
                                         </wait>
                                     </run>
@@ -904,7 +904,7 @@
                                             <port>db.random.port:3306</port>
                                         </ports>
                                         <wait>
-                                            <time>60000</time>
+                                            <time>${docker-timeout}</time>
                                             <log>MySQL init process done. Ready for start up.</log>
                                         </wait>
                                     </run>
@@ -965,7 +965,7 @@
                                             <port>db.random.port:1521</port>
                                         </ports>
                                         <wait>
-                                            <time>380000</time>
+                                            <time>${docker-timeout}</time>
                                             <log>end of customization</log>
                                         </wait>
                                     </run>
@@ -1003,6 +1003,8 @@
                 <docker-oracle-image>ci-01.rd.lan:5000/bonitasoft/oracle:11g</docker-oracle-image>
                 <!-- turns on/off logs from docker image-->
                 <docker.showLogs>true</docker.showLogs>
+                <!-- global timeoout in millis allowed for docker image to start -->
+                <docker-timeout>380000</docker-timeout>
             </properties>
         </profile>
     </profiles>
