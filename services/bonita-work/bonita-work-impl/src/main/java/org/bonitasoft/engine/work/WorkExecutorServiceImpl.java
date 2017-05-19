@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.work;
 
+import static java.lang.String.format;
+
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -38,7 +40,10 @@ public class WorkExecutorServiceImpl implements WorkExecutorService {
     @Override
     public void execute(BonitaWork work) {
         if (!isStopped()) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Submitted work %s", work));
             executor.submit(work);
+        }else{
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Ignored work submission (service stopped) %s", work));
         }
     }
 
@@ -86,7 +91,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService {
     private void awaitTermination() throws SWorkException {
         try {
             if (!executor.awaitTermination(workTerminationTimeout, TimeUnit.SECONDS)) {
-                throw new SWorkException("Waited termination of all work " + workTerminationTimeout + "s but all tasks were not finished");
+                throw new SWorkException(format("Waited termination of all work %ds but all tasks were not finished", workTerminationTimeout));
             }
         } catch (final InterruptedException e) {
             throw new SWorkException("Interrupted while stopping the work service", e);
@@ -105,8 +110,5 @@ public class WorkExecutorServiceImpl implements WorkExecutorService {
 
     @Override
     public void notifyNodeStopped(String nodeName) {
-        if(!isStopped()){
-            executor.notifyNodeStopped(nodeName);
-        }
     }
 }
