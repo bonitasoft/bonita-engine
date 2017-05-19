@@ -120,7 +120,7 @@ public class SPageMappingServiceImplTest {
         verify(recorder).recordInsert(insertRecord.capture(), insertEvent.capture());
 
         assertThat(insertEvent.getValue().getObject()).isEqualTo(sPageMapping);
-        assertThat(insertEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_CREATED");
+        assertThat(insertEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(insertRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
 
@@ -151,7 +151,7 @@ public class SPageMappingServiceImplTest {
         verify(recorder).recordInsert(insertRecord.capture(), insertEvent.capture());
 
         assertThat(insertEvent.getValue().getObject()).isEqualTo(sPageMapping);
-        assertThat(insertEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_CREATED");
+        assertThat(insertEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(insertRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
 
@@ -185,7 +185,7 @@ public class SPageMappingServiceImplTest {
         final ArgumentCaptor<DeleteRecord> deleteRecord = ArgumentCaptor.forClass(DeleteRecord.class);
         verify(recorder).recordDelete(deleteRecord.capture(), deleteEvent.capture());
         assertThat(deleteEvent.getValue().getObject()).isEqualTo(sPageMapping);
-        assertThat(deleteEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_DELETED");
+        assertThat(deleteEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(deleteRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
 
@@ -212,7 +212,7 @@ public class SPageMappingServiceImplTest {
         ArgumentCaptor<UpdateRecord> updateRecord = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder).recordUpdate(updateRecord.capture(), updateEvent.capture());
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
-        assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
+        assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
         assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null),
                 entry("lastUpdatedBy", 0L));
@@ -244,7 +244,7 @@ public class SPageMappingServiceImplTest {
         ArgumentCaptor<UpdateRecord> updateRecord = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder).recordUpdate(updateRecord.capture(), updateEvent.capture());
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
-        assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
+        assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
         assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"),
                 entry("lastUpdatedBy", 0L));

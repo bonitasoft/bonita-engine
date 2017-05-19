@@ -14,20 +14,32 @@
 package org.bonitasoft.engine.events.model;
 
 
+import java.util.Map;
 
 public class SUpdateEvent extends SEvent {
 
     private Object oldObject;
+    private Map<String, Object> updatedFields;
 
     public SUpdateEvent(String type) {
         super(type);
     }
 
+    @Deprecated
     public Object getOldObject() {
         return oldObject;
     }
 
+    public Map<String, Object> getUpdatedFields() {
+        return updatedFields;
+    }
+
+    @Deprecated
     public void setOldObject(Object oldObject) {
         this.oldObject = oldObject;
+    }
+
+    public void setUpdatedFields(Map<String, Object> updatedFields) {
+        this.updatedFields = updatedFields;
     }
 }

@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.recorder.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
+import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -31,6 +33,8 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -49,29 +53,40 @@ public class RecorderImplTest {
     private EventService eventService;
     @InjectMocks
     private RecorderImpl recorder;
+    @Captor
+    private ArgumentCaptor<SEvent> eventCaptor;
 
     @Test
     public void should_fire_event_when_recording_an_insert() throws Exception {
-        SInsertEvent event = insertEvent(entity(), "theEvent");
-        recorder.recordInsert(insertRecord(entity()), event);
+        MyPersistentObject entity = entity();
+        SInsertEvent event = insertEvent(entity, "theEvent");
+        recorder.recordInsert(insertRecord(entity), event);
 
-        verify(eventService).fireEvent(event);
+        verify(eventService).fireEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getType()).isEqualTo("theEvent_CREATED");
+        assertThat(eventCaptor.getValue().getObject()).isEqualTo(entity);
     }
 
     @Test
     public void should_fire_event_when_recording_an_update() throws Exception {
-        SUpdateEvent event = updateEvent(entity(), "theEvent");
-        recorder.recordUpdate(updateRecord(entity()), event);
+        MyPersistentObject entity = entity();
+        SUpdateEvent event = updateEvent(entity, "theEvent");
+        recorder.recordUpdate(updateRecord(entity), event);
 
-        verify(eventService).fireEvent(event);
+        verify(eventService).fireEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getType()).isEqualTo("theEvent_UPDATED");
+        assertThat(eventCaptor.getValue().getObject()).isEqualTo(entity);
     }
 
     @Test
     public void should_fire_event_when_recording_a_delete() throws Exception {
-        SDeleteEvent event = deleteEvent(entity(), "theEvent");
-        recorder.recordDelete(deleteRecord(entity()), event);
+        MyPersistentObject entity = entity();
+        SDeleteEvent event = deleteEvent(entity, "theEvent");
+        recorder.recordDelete(deleteRecord(entity), event);
 
-        verify(eventService).fireEvent(event);
+        verify(eventService).fireEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getType()).isEqualTo("theEvent_DELETED");
+        assertThat(eventCaptor.getValue().getObject()).isEqualTo(entity);
     }
 
     private InsertRecord insertRecord(PersistentObject entity) {

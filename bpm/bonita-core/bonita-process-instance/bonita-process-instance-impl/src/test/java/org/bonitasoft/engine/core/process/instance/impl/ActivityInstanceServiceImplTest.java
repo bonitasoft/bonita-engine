@@ -347,7 +347,7 @@ public class ActivityInstanceServiceImplTest {
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).as("should only update expectedEndDate field with new value")
                 .containsExactly(entry("expectedEndDate", 123L));
         assertThat(sUpdateEventArgumentCaptor.getValue().getType())
-                .isEqualTo(FlowNodeInstanceService.ACTIVITYINSTANCE_EXPECTED_END_DATE + SUpdateEvent.UPDATED);
+                .isEqualTo(FlowNodeInstanceService.ACTIVITYINSTANCE_EXPECTED_END_DATE);
 
     }
 
