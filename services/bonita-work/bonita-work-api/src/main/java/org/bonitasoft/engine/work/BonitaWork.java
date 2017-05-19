@@ -16,6 +16,10 @@ package org.bonitasoft.engine.work;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * 
@@ -26,9 +30,15 @@ public abstract class BonitaWork implements Runnable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String uuid = UUID.randomUUID().toString();
+
     protected long tenantId;
 
     private BonitaWork parentWork;
+
+    public String getUuid() {
+        return uuid;
+    }
 
     public abstract String getDescription();
 
@@ -81,5 +91,26 @@ public abstract class BonitaWork implements Runnable, Serializable {
 
     public BonitaWork getParent() {
         return parentWork;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BonitaWork work = (BonitaWork) o;
+        return new EqualsBuilder()
+                .append(tenantId, work.tenantId)
+                .append(uuid, work.uuid)
+                .append(parentWork, work.parentWork)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(uuid)
+                .append(tenantId)
+                .append(parentWork)
+                .toHashCode();
     }
 }
