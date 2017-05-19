@@ -85,10 +85,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationServiceImplTest {
 
-    private static final String DELETED_SUFFIX = "_DELETED";
-
-    private static final String CREATED_SUFFIX = "_CREATED";
-
     private static final int CREATED_BY = 10;
 
     private static final String APPLICATION_TOKEN = "app";
@@ -449,7 +445,7 @@ public class ApplicationServiceImplTest {
         final ArgumentCaptor<DeleteRecord> deleteRecordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
         verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), deleteEventCaptor.capture());
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationPage);
-        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_PAGE + DELETED_SUFFIX);
+        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_PAGE);
         assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationPage);
     }
 
@@ -678,7 +674,7 @@ public class ApplicationServiceImplTest {
         verify(recorder, times(1)).recordInsert(insertRecordCaptor.capture(), insertEventCaptor.capture());
         assertThat(insertRecordCaptor.getValue().getEntity()).isEqualTo(appMenu);
         assertThat(insertEventCaptor.getValue().getObject()).isEqualTo(appMenu);
-        assertThat(insertEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + CREATED_SUFFIX);
+        assertThat(insertEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU);
     }
 
     private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index, final long applicationId) {
@@ -895,7 +891,7 @@ public class ApplicationServiceImplTest {
         final ArgumentCaptor<DeleteRecord> deleteRecordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
         verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), deleteEventCaptor.capture());
         assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationMenu);
-        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + DELETED_SUFFIX);
+        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU);
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationMenu);
     }
 

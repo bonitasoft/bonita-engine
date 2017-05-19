@@ -30,17 +30,17 @@ public class SEventBuilderFactory {
     }
 
     public SEventBuilder createInsertEvent(final String type) {
-        final SEvent event = new SInsertEvent(type + SEvent.CREATED);
+        final SEvent event = new SInsertEvent(type);
         return new SEventBuilder(event);
     }
 
     public SEventBuilder createDeleteEvent(final String type) {
-        final SEvent event = new SDeleteEvent(type + SEvent.DELETED);
+        final SEvent event = new SDeleteEvent(type);
         return new SEventBuilder(event);
     }
 
     public SEventBuilder createUpdateEvent(final String type) {
-        final SEvent event = new SUpdateEvent(type + SEvent.UPDATED);
+        final SEvent event = new SUpdateEvent(type);
         return new SEventBuilder(event);
     }
 

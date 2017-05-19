@@ -17,13 +17,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.model.SUser;
 
 /**
  * @author Feng Hui
  */
-public class TestUserPasswordUpdateEventHandler extends UserUpdateEventHandler {
+public class TestUserPasswordUpdateEventHandler implements SHandler<SUpdateEvent> {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,20 +48,16 @@ public class TestUserPasswordUpdateEventHandler extends UserUpdateEventHandler {
     @Override
     public boolean isInterested(final SUpdateEvent updateEvent) {
         if (USER_UPDATED.compareToIgnoreCase(updateEvent.getType()) == 0) {
-            final SUser newUser = (SUser) updateEvent.getObject();
-            final SUser oldUser = (SUser) updateEvent.getOldObject();
-
-            return !newUser.getPassword().equals(oldUser.getPassword());
+            Map<String, Object> updatedFields = updateEvent.getUpdatedFields();
+            return updatedFields != null && updatedFields.containsKey("password");
         }
         return false;
     }
 
-    @Override
     public String getPassword(final String userName) {
         return userMap.get(userName);
     }
 
-    @Override
     public void cleanUserMap() {
         userMap.clear();
     }
