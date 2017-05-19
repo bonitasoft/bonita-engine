@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.recorder.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -23,9 +24,9 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
-import org.bonitasoft.engine.recorder.model.BatchInsertRecord;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -57,30 +58,40 @@ public class RecorderImpl implements Recorder {
     public void recordInsert(final InsertRecord record, final SInsertEvent insertEvent) throws SRecorderException {
         try {
             persistenceService.insert(record.getEntity());
-            fireEvent(insertEvent);
+            if (insertEvent != null) {
+                eventService.fireEvent(createInsertEvent(record.getEntity(), insertEvent.getType()));
+            }
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);
         }
     }
 
-    @Override
-    public void recordBatchInsert(final BatchInsertRecord record, final SInsertEvent insertEvent)
-            throws SRecorderException {
-        try {
-            persistenceService.insertInBatch(record.getEntity());
-            fireEvent(insertEvent);
-        } catch (final Exception e) {
-            logExceptionsFromHandlers(e);
-            throw new SRecorderException(e);
-        }
+    private SInsertEvent createInsertEvent(PersistentObject entity, String type) {
+        SInsertEvent sInsertEvent = new SInsertEvent(type + SEvent.CREATED);
+        sInsertEvent.setObject(entity);
+        return sInsertEvent;
+    }
+
+    private SDeleteEvent createDeleteEvent(PersistentObject entity, String type) {
+        SDeleteEvent sDeleteEvent = new SDeleteEvent(type + SEvent.DELETED);
+        sDeleteEvent.setObject(entity);
+        return sDeleteEvent;
+    }
+    private SUpdateEvent createUpdateEvent(PersistentObject entity, Map<String, Object> updatedFields, String type) {
+        SUpdateEvent sUpdateEvent = new SUpdateEvent(type + SEvent.UPDATED);
+        sUpdateEvent.setObject(entity);
+        sUpdateEvent.setUpdatedFields(updatedFields);
+        return sUpdateEvent;
     }
 
     @Override
     public void recordDelete(final DeleteRecord record, final SDeleteEvent deleteEvent) throws SRecorderException {
         try {
             persistenceService.delete(record.getEntity());
-            fireEvent(deleteEvent);
+            if (deleteEvent != null) {
+                eventService.fireEvent(createDeleteEvent(record.getEntity(), deleteEvent.getType()));
+            }
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);
@@ -102,7 +113,9 @@ public class RecorderImpl implements Recorder {
         final UpdateDescriptor desc = UpdateDescriptor.buildSetFields(record.getEntity(), record.getFields());
         try {
             persistenceService.update(desc);
-            fireEvent(updateEvent);
+            if (updateEvent != null) {
+                eventService.fireEvent(createUpdateEvent(record.getEntity(), record.getFields(), updateEvent.getType()));
+            }
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);
@@ -120,9 +133,4 @@ public class RecorderImpl implements Recorder {
         }
     }
 
-    private void fireEvent(final SEvent evt) throws SFireEventException {
-        if (evt != null) {
-            eventService.fireEvent(evt);
-        }
-    }
 }
