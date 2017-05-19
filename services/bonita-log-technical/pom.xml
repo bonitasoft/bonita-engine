@@ -3,11 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>bonita-log</artifactId>
-        <groupId>org.bonitasoft.engine.log</groupId>
+        <artifactId>services</artifactId>
+        <groupId>org.bonitasoft.engine</groupId>
         <version>7.6.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>org.bonitasoft.engine.log</groupId>
     <artifactId>bonita-log-technical</artifactId>
 
     <dependencies>
