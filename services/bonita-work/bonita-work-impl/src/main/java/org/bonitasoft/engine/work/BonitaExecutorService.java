@@ -38,6 +38,4 @@ public interface BonitaExecutorService {
 
     boolean awaitTermination(long workTerminationTimeout, TimeUnit seconds) throws InterruptedException;
 
-    default void notifyNodeStopped(String nodeName){
-    }
 }
