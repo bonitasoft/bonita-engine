@@ -46,7 +46,7 @@ import org.bonitasoft.engine.search.SearchResult;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @see ContactData
- * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita BPM.
+ * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita.
  */
 public interface UserAPI {
 

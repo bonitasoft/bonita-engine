@@ -1,4 +1,4 @@
-Run this init command once to create database structure before launching Bonita BPM.
+Run this init command once to create database structure before launching Bonita.
 
 At execution, it:
  * creates database structure (tables) on target database.

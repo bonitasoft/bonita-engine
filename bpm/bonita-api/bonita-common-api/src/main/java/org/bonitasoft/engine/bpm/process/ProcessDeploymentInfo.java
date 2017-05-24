@@ -57,7 +57,7 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
      * Retrieves the {@link ProcessDefinition} display description. Unlike <code>description</code> that is static, the <code>display description</code> can be
      * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
-     * When set, this field is used by the Bonita BPM Portal in the place of <code>description</code>.
+     * When set, this field is used by the Bonita Portal in the place of <code>description</code>.
      *
      * @return a String representing the {@link ProcessDefinition} display description.
      * @see ProcessDefinition
@@ -74,9 +74,9 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     Date getDeploymentDate();
 
     /**
-     * Retrieves the identifier of the Bonita BPM {@link org.bonitasoft.engine.identity.User} which deployed the {@link ProcessDefinition}
+     * Retrieves the identifier of the Bonita {@link org.bonitasoft.engine.identity.User} which deployed the {@link ProcessDefinition}
      *
-     * @return a long representing the identifier of the <code>Bonita BPM user</code> which deployed the process.
+     * @return a long representing the identifier of the <code>Bonita user</code> which deployed the process.
      * @see org.bonitasoft.engine.identity.User
      * @see ProcessDefinition
      */
@@ -86,7 +86,7 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
      * Retrieves the {@link ProcessDefinition} display name. Unlike <code>name</code> that is static, the <code>display name</code> can be
      * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
-     * When set this field is used by the Bonita BPM Portal in the place of <code>name</code>.
+     * When set this field is used by the Bonita Portal in the place of <code>name</code>.
      *
      * @return a String representing the <code>ProcessDefinition</code> display name.
      * @see ProcessDefinition

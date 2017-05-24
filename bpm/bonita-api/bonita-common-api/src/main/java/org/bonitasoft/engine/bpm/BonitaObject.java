@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm;
 import java.io.Serializable;
 
 /**
- * Interface <code>BonitaObject</code> is the root interface of the client model hierarchy of Bonita BPM.
+ * Interface <code>BonitaObject</code> is the root interface of the client model hierarchy of Bonita.
  *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte

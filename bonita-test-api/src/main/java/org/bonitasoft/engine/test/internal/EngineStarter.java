@@ -60,7 +60,7 @@ public class EngineStarter {
 
     public void start() throws Exception {
         LOGGER.info("=====================================================");
-        LOGGER.info("============  Starting Bonita BPM Engine  ===========");
+        LOGGER.info("============  Starting Bonita Engine  ===========");
         LOGGER.info("=====================================================");
         final long startTime = System.currentTimeMillis();
         if (System.getProperty("org.bonitasoft.engine.api-type") == null) {

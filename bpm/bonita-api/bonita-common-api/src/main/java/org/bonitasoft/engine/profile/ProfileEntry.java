@@ -18,7 +18,7 @@ import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.page.Page;
 
 /**
- * A <code>ProfileEntry</code> represents a menu entry (inside the main top menu bar) in the Bonita BPM Portal. It can be a container (that contains other
+ * A <code>ProfileEntry</code> represents a menu entry (inside the main top menu bar) in the Bonita Portal. It can be a container (that contains other
  * profile entries) or a link to a page in the portal. <code>ProfileEntry</code>s are ordered inside a containing profile entry or at the root level.
  * 
  * @author Celine Souchet

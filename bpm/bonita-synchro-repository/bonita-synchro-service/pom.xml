@@ -9,7 +9,7 @@
 
 	<artifactId>bonita-synchro-service</artifactId>
 
-	<name>BonitaBPM Synchro service</name>
+	<name>Bonita Synchro service</name>
 	<description>Internal Engine event Synchronization mechanism service</description>
 
 </project>

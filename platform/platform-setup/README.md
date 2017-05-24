@@ -1,9 +1,9 @@
-Bonita BPM platform-setup
+Bonita platform-setup
 =============
 
 What it does?
 -------------
-Project **Bonita Platform Setup** sets up Bonita BPM Platform before **Bonita BPM** can be run:
+Project **Bonita Platform Setup** sets up Bonita Platform before **Bonita** can be run:
 
 * it creates the structure of the database (tables, primary / foreign keys, indexes, ...)
 * it inserts the default minimum data 

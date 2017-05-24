@@ -14,8 +14,8 @@
     <version>7.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Bonita BPM Engine</name>
-    <description>BonitaBPM Engine is a workflow engine which can be embedded inside your own applications.</description>
+    <name>Bonita Engine</name>
+    <description>Bonita Engine is a workflow engine which can be embedded inside your own applications.</description>
     <url>http://community.bonitasoft.com/</url>
     <organization>
         <name>Bonitasoft S.A.</name>
