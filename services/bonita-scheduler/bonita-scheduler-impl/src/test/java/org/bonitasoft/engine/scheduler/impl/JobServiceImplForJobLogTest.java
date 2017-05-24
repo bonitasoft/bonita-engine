@@ -27,9 +27,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -84,8 +81,7 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         final SJobLog result = jobServiceImpl.createJobLog(sJobLog);
@@ -93,7 +89,7 @@ public class JobServiceImplForJobLogTest {
         // Then
         assertNotNull(result);
         assertEquals(sJobLog, result);
-        verify(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -106,8 +102,7 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.createJobLog(sJobLog);
@@ -119,14 +114,13 @@ public class JobServiceImplForJobLogTest {
         final SJobLog sJobLog = mock(SJobLog.class);
 
         doReturn(sJobLog).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobLog(3);
 
         // Then
-        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test
@@ -146,8 +140,7 @@ public class JobServiceImplForJobLogTest {
         final SJobLog sJobLog = mock(SJobLog.class);
 
         doReturn(sJobLog).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         jobServiceImpl.deleteJobLog(3);
     }
@@ -157,14 +150,13 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobLog(sJobLog);
 
         // Then
-        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -177,8 +169,7 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog sJobLog = mock(SJobLog.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobLog(sJobLog);
@@ -329,13 +320,12 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog jobLog = new SJobLogImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        when(eventService.hasHandlers("JOB_LOG", EventActionType.UPDATED)).thenReturn(true);
 
         // When
         jobServiceImpl.updateJobLog(jobLog, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(any(UpdateRecord.class), anyString());
     }
 
     @Test(expected = SJobLogUpdatingException.class)
@@ -343,7 +333,7 @@ public class JobServiceImplForJobLogTest {
         // Given
         final SJobLog jobLog = new SJobLogImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.updateJobLog(jobLog, descriptor);

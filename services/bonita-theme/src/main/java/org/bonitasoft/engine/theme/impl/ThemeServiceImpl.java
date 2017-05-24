@@ -19,17 +19,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -99,13 +93,8 @@ public class ThemeServiceImpl implements ThemeService {
         final String methodName = "createTheme";
         logBeforeMethod(methodName);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.CREATED, "Adding a new theme");
-        final InsertRecord insertRecord = new InsertRecord(theme);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(THEME, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(THEME).setObject(theme).done();
-        }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(theme), THEME);
             log(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return theme;
@@ -135,13 +124,8 @@ public class ThemeServiceImpl implements ThemeService {
         final String methodName = "deleteTheme";
         logBeforeMethod(methodName);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.DELETED, "Deleting theme");
-        final DeleteRecord deleteRecord = new DeleteRecord(theme);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(THEME, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(THEME).setObject(theme).done();
-        }
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(theme), THEME);
             log(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
@@ -222,15 +206,8 @@ public class ThemeServiceImpl implements ThemeService {
         logBeforeMethod(methodName);
         NullCheckingUtil.checkArgsNotNull(sTheme);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.UPDATED, "Updating theme");
-        final STheme oldUser = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(sTheme).done();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTheme, descriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(THEME, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(THEME).setObject(sTheme).done();
-            updateEvent.setOldObject(oldUser);
-        }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sTheme, descriptor), THEME);
             log(sTheme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {

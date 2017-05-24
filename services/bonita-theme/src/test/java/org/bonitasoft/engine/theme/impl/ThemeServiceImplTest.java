@@ -16,30 +16,20 @@ package org.bonitasoft.engine.theme.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
@@ -103,9 +93,6 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         doReturn(1L).when(sTheme).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
-
         final STheme result = themeServiceImpl.createTheme(sTheme);
         assertNotNull(result);
         assertEquals(sTheme, result);
@@ -121,9 +108,7 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         doReturn(1L).when(sTheme).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         themeServiceImpl.createTheme(sTheme);
     }
@@ -142,8 +127,6 @@ public class ThemeServiceImplTest {
         doReturn(3L).when(sTheme).getId();
 
         doReturn(sTheme).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<STheme>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         themeServiceImpl.deleteTheme(1);
     }
@@ -161,8 +144,7 @@ public class ThemeServiceImplTest {
         doReturn(3L).when(sTheme).getId();
 
         doReturn(sTheme).when(persistenceService).selectById(any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         themeServiceImpl.deleteTheme(1);
     }
@@ -178,9 +160,6 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
-
         themeServiceImpl.deleteTheme(sTheme);
     }
 
@@ -193,8 +172,7 @@ public class ThemeServiceImplTest {
     public void deleteThemeByObjectThrowException() throws Exception {
         final STheme sTheme = mock(STheme.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         themeServiceImpl.deleteTheme(sTheme);
     }
@@ -385,9 +363,6 @@ public class ThemeServiceImplTest {
         final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
         sThemeUpdateBuilder.setType(SThemeType.MOBILE);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
-
         final STheme result = themeServiceImpl.updateTheme(sTheme, sThemeUpdateBuilder.done());
         assertNotNull(result);
         assertEquals(sTheme, result);
@@ -414,7 +389,7 @@ public class ThemeServiceImplTest {
         final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
         sThemeUpdateBuilder.setType(SThemeType.MOBILE);
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         themeServiceImpl.updateTheme(sTheme, sThemeUpdateBuilder.done());
     }

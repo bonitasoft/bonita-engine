@@ -14,17 +14,14 @@
 
 package org.bonitasoft.engine.recorder.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
 import java.util.UUID;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -33,8 +30,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -53,40 +49,33 @@ public class RecorderImplTest {
     private EventService eventService;
     @InjectMocks
     private RecorderImpl recorder;
-    @Captor
-    private ArgumentCaptor<SEvent> eventCaptor;
 
     @Test
     public void should_fire_event_when_recording_an_insert() throws Exception {
         MyPersistentObject entity = entity();
-        SInsertEvent event = insertEvent(entity, "theEvent");
-        recorder.recordInsert(insertRecord(entity), event);
+        recorder.recordInsert(insertRecord(entity), "theEvent");
 
-        verify(eventService).fireEvent(eventCaptor.capture());
-        assertThat(eventCaptor.getValue().getType()).isEqualTo("theEvent_CREATED");
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(entity);
+        verify(eventService).fireEvent(argThat(match("theEvent_CREATED", entity)));
     }
 
     @Test
     public void should_fire_event_when_recording_an_update() throws Exception {
         MyPersistentObject entity = entity();
-        SUpdateEvent event = updateEvent(entity, "theEvent");
-        recorder.recordUpdate(updateRecord(entity), event);
+        recorder.recordUpdate(updateRecord(entity), "theEvent");
 
-        verify(eventService).fireEvent(eventCaptor.capture());
-        assertThat(eventCaptor.getValue().getType()).isEqualTo("theEvent_UPDATED");
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(entity);
+        verify(eventService).fireEvent(argThat(match("theEvent_UPDATED", entity)));
     }
 
     @Test
     public void should_fire_event_when_recording_a_delete() throws Exception {
         MyPersistentObject entity = entity();
-        SDeleteEvent event = deleteEvent(entity, "theEvent");
-        recorder.recordDelete(deleteRecord(entity), event);
+        recorder.recordDelete(deleteRecord(entity), "theEvent");
 
-        verify(eventService).fireEvent(eventCaptor.capture());
-        assertThat(eventCaptor.getValue().getType()).isEqualTo("theEvent_DELETED");
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(entity);
+        verify(eventService).fireEvent(argThat(match("theEvent_DELETED", entity)));
+    }
+
+    protected ArgumentMatcher<SEvent> match(String type, Object entity) {
+        return sEvent -> sEvent.getType().equals(type) && sEvent.getObject().equals(entity);
     }
 
     private InsertRecord insertRecord(PersistentObject entity) {
@@ -101,21 +90,6 @@ public class RecorderImplTest {
         return new DeleteRecord(entity);
     }
 
-    private SInsertEvent insertEvent(PersistentObject entity, String eventName) {
-        SInsertEvent event = new SInsertEvent(eventName);
-        event.setObject(entity);
-        return event;
-    }
-    private SUpdateEvent updateEvent(PersistentObject entity, String eventName) {
-        SUpdateEvent event = new SUpdateEvent(eventName);
-        event.setObject(entity);
-        return event;
-    }
-    private SDeleteEvent deleteEvent(PersistentObject entity, String eventName) {
-        SDeleteEvent event = new SDeleteEvent(eventName);
-        event.setObject(entity);
-        return event;
-    }
 
     private MyPersistentObject entity() {
         return new MyPersistentObject();

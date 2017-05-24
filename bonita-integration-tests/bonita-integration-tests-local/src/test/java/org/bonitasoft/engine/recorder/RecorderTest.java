@@ -22,12 +22,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.archive.model.TestLogBuilderFactory;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -137,9 +132,7 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         final String firstName = "Laurent";
         final SUserImpl sUserImpl = buildSUserImpl(firstName, "Vaills");
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUSER_IMPL).setObject(sUserImpl)
-                .done();
-        recorder.recordInsert(new InsertRecord(sUserImpl), insertEvent);
+        recorder.recordInsert(new InsertRecord(sUserImpl), SUSER_IMPL);
 
         // set rollback
         getTransactionService().setRollbackOnly();
@@ -165,7 +158,7 @@ public class RecorderTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         final SUserImpl sUserImpl = buildSUserImpl("firstName", "lastName");
-        recorder.recordInsert(new InsertRecord(sUserImpl), null);
+        recorder.recordInsert(new InsertRecord(sUserImpl), SUSER_IMPL);
         getTransactionService().complete();
 
         // update sUserImpl (fail)
@@ -173,10 +166,8 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         final SUserImpl sUserImplToUpdate = getUserByUsername("firstName");
         assertNotNull(sUserImplToUpdate);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(SUSER_IMPL).setObject(sUserImpl)
-                .done();
         final Map<String, Object> stringObjectMap = Collections.<String, Object> singletonMap("userName", "firstName");
-        recorder.recordUpdate(UpdateRecord.buildSetFields(sUserImplToUpdate, stringObjectMap), updateEvent);
+        recorder.recordUpdate(UpdateRecord.buildSetFields(sUserImplToUpdate, stringObjectMap), SUSER_IMPL);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 
@@ -193,7 +184,7 @@ public class RecorderTest extends CommonBPMServicesTest {
         assertEquals(0, retrievedLogs.size());
 
         final SUserImpl addedSUserImpl = getUserByUsername("firstName");
-        recorder.recordDelete(new DeleteRecord(addedSUserImpl), null);
+        recorder.recordDelete(new DeleteRecord(addedSUserImpl), SUSER_IMPL);
 
         getTransactionService().complete();
     }
@@ -203,7 +194,7 @@ public class RecorderTest extends CommonBPMServicesTest {
         // add sUserImpl using persistence service
         getTransactionService().begin();
         final SUserImpl sUserImpl = buildSUserImpl("firstName", "lastName");
-        recorder.recordInsert(new InsertRecord(sUserImpl), null);
+        recorder.recordInsert(new InsertRecord(sUserImpl), SUSER_IMPL);
         getTransactionService().complete();
 
         // delete sUserImpl using recorder
@@ -211,9 +202,7 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         final SUserImpl sUserImplToDelete = getUserByUsername("firstName");
         assertNotNull(sUserImplToDelete);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUSER_IMPL).setObject(sUserImpl)
-                .done();
-        recorder.recordDelete(new DeleteRecord(sUserImplToDelete), deleteEvent);
+        recorder.recordDelete(new DeleteRecord(sUserImplToDelete), SUSER_IMPL);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 
@@ -232,7 +221,7 @@ public class RecorderTest extends CommonBPMServicesTest {
 
         // clean up:
         getTransactionService().begin();
-        recorder.recordDelete(new DeleteRecord(retrievedSUserImpl), null);
+        recorder.recordDelete(new DeleteRecord(retrievedSUserImpl), SUSER_IMPL);
         getTransactionService().complete();
     }
 

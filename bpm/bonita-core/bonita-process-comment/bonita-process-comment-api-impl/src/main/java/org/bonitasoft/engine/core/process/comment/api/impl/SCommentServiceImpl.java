@@ -34,11 +34,7 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.builder.SSystemCommentBuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -95,14 +91,6 @@ public class SCommentServiceImpl implements SCommentService {
         this.archiveService = archiveService;
     }
 
-    private SInsertEvent getInsertEvent(final Object obj) {
-        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(COMMENT).setObject(obj).done();
-    }
-
-    private SDeleteEvent getDeleteEvent(final Object obj) {
-        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMENT).setObject(obj).done();
-    }
-
     @Override
     public List<SComment> searchComments(final QueryOptions options) throws SBonitaReadException {
         return persistenceService.searchEntity(SComment.class, options, null);
@@ -137,12 +125,7 @@ public class SCommentServiceImpl implements SCommentService {
         try {
             final long userId = getUserId();
             final SComment sComment = BuilderFactory.get(SHumanCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, userId).done();
-            final InsertRecord insertRecord = new InsertRecord(sComment);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
-                insertEvent = getInsertEvent(sComment);
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(sComment), COMMENT);
             return sComment;
         } catch (final SRecorderException e) {
             throw new SCommentAddException(processInstanceId, "human", e);
@@ -155,12 +138,7 @@ public class SCommentServiceImpl implements SCommentService {
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
             final SComment sComment = BuilderFactory.get(SSystemCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, null).done();
-            final InsertRecord insertRecord = new InsertRecord(sComment);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
-                insertEvent = getInsertEvent(sComment);
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(sComment), COMMENT);
             return sComment;
         } catch (final SRecorderException e) {
             throw new SCommentAddException(processInstanceId, "system", e);
@@ -171,12 +149,7 @@ public class SCommentServiceImpl implements SCommentService {
     public void delete(final SComment comment) throws SCommentDeletionException {
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(comment);
-            SDeleteEvent deleteEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.DELETED)) {
-                deleteEvent = getDeleteEvent(comment);
-            }
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(comment), COMMENT);
         } catch (final SRecorderException e) {
             throw new SCommentDeletionException("Can't delete the comment " + comment, e);
         }

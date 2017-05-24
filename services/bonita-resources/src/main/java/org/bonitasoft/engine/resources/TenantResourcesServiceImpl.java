@@ -49,7 +49,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     public void add(String name, TenantResourceType type, byte[] content) throws SRecorderException {
         if (content != null && content.length > 0) {
             STenantResource resource = new STenantResource(name, type, content);
-            recorder.recordInsert(new InsertRecord(resource), null);
+            recorder.recordInsert(new InsertRecord(resource), TENANT_RESOURCE);
         } else {
             logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
                     "Tenant resource file contains an empty file " + name + " that will be ignored. Check that this is not a mistake.");
@@ -100,7 +100,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
 
     @Override
     public void remove(STenantResourceLight resource) throws SRecorderException {
-        recorder.recordDelete(new DeleteRecord(resource), null);
+        recorder.recordDelete(new DeleteRecord(resource), TENANT_RESOURCE);
     }
 
 }

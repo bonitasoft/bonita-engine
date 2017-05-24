@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.eq;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -48,9 +47,7 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -415,8 +412,6 @@ public class ProcessDefinitionServiceImplTest {
         updateBuilder.updateDisplayName("newDisplayName");
 
         doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         // When
         final SProcessDefinitionDeployInfo result = processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done());
@@ -435,7 +430,6 @@ public class ProcessDefinitionServiceImplTest {
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
         doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), "the business log");
@@ -453,7 +447,6 @@ public class ProcessDefinitionServiceImplTest {
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
         doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         // When
         final StringBuilder string1024 = new StringBuilder();
@@ -512,7 +505,7 @@ public class ProcessDefinitionServiceImplTest {
 
         doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(any());
         doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class),
-                nullable(SUpdateEvent.class));
+                nullable(String.class));
 
         // When
         processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done());

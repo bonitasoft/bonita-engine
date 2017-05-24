@@ -37,12 +37,7 @@ import org.bonitasoft.engine.command.model.SCommandLogBuilderFactory;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilderImpl;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -134,14 +129,8 @@ public class CommandServiceImpl implements CommandService {
             throw new SCommandAlreadyExistsException("Command '" + command.getName() + "' already exists");
         } catch (final SCommandNotFoundException scmfe) {
             final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new command with name " + command.getName());
-            final InsertRecord insertRecord = new InsertRecord(command);
-
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMAND, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(COMMAND).setObject(command).done();
-            }
             try {
-                recorder.recordInsert(insertRecord, insertEvent);
+                recorder.recordInsert(new InsertRecord(command), COMMAND);
                 log(command.getId(), SQueriableLog.STATUS_OK, logBuilder, "create");
                 if (isTraceEnable) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "create"));
@@ -169,13 +158,8 @@ public class CommandServiceImpl implements CommandService {
 
     protected void delete(final SCommand command, final SCommandLogBuilder logBuilder) throws SCommandDeletionException {
         final boolean isTraceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
-        final DeleteRecord deleteRecord = new DeleteRecord(command);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(COMMAND, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMAND).setObject(command).done();
-        }
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(command), COMMAND);
             if (isTraceEnable) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "delete"));
             }
@@ -290,15 +274,8 @@ public class CommandServiceImpl implements CommandService {
         final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating command with name " + command.getName());
 
         final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(command, updateDescriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(COMMAND, EventActionType.UPDATED)) {
-            final SCommand oldCommand = fact.createNewInstance(command).done();
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(COMMAND).setObject(command).done();
-            updateEvent.setOldObject(oldCommand);
-        }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(command, updateDescriptor), COMMAND);
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "update"));
             }

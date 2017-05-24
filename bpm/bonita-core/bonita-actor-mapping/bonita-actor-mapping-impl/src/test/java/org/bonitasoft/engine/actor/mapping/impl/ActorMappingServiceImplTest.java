@@ -16,7 +16,6 @@ package org.bonitasoft.engine.actor.mapping.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -38,9 +37,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -49,7 +46,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
@@ -443,9 +439,6 @@ public class ActorMappingServiceImplTest {
         final SActor sActor = mock(SActor.class);
         doReturn(1L).when(sActor).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
-
         final SActor result = actorMappingServiceImpl.addActor(sActor);
         assertNotNull(result);
         assertEquals(sActor, result);
@@ -474,8 +467,6 @@ public class ActorMappingServiceImplTest {
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 
         doReturn(sActor).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final SActor result = actorMappingServiceImpl.updateActor(3, sActorUpdateBuilder.done());
         assertNotNull(result);
@@ -499,7 +490,7 @@ public class ActorMappingServiceImplTest {
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 
         doReturn(sActor).when(persistenceService).selectById(any());
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         actorMappingServiceImpl.updateActor(3, sActorUpdateBuilder.done());
     }
@@ -523,8 +514,6 @@ public class ActorMappingServiceImplTest {
         doReturn(Arrays.asList(sActor)).doReturn(new ArrayList<SActor>()).when(persistenceService)
                 .selectList(Matchers.<SelectListDescriptor<SActorMember>> any());
         doReturn(sActorMembers).doReturn(new ArrayList<SActorMember>()).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         actorMappingServiceImpl.deleteActors(scopeId);
     }
@@ -540,8 +529,6 @@ public class ActorMappingServiceImplTest {
         doReturn(Arrays.asList(sActor)).doReturn(new ArrayList<SActor>()).when(persistenceService)
                 .selectList(Matchers.<SelectListDescriptor<SActorMember>> any());
         doReturn(sActorMembers).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         actorMappingServiceImpl.deleteActors(scopeId);
     }

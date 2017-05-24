@@ -24,7 +24,6 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -100,14 +99,14 @@ public class ContractDataServiceImplTest {
 
         contractDataService.addUserTaskData(contractData);
 
-        verify(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test
     public void addUserTaskData_accept_null_inputs() throws Exception {
         contractDataService.addUserTaskData(54L, null);
 
-        verify(recorder, times(0)).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder, times(0)).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test(expected = SContractDataCreationException.class)
@@ -115,7 +114,7 @@ public class ContractDataServiceImplTest {
         final STaskContractData contractData = new STaskContractData(1983L, "id", 54L);
         contractData.setId(10L);
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
-        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         contractDataService.addUserTaskData(contractData);
     }
@@ -129,7 +128,7 @@ public class ContractDataServiceImplTest {
 
         contractDataService.deleteUserTaskData(1983L);
 
-        verify(recorder, times(2)).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder, times(2)).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test(expected = SContractDataDeletionException.class)
@@ -138,7 +137,7 @@ public class ContractDataServiceImplTest {
         data.add(new STaskContractData(1983L, "id", 456478L));
         data.add(new STaskContractData(1983L, "id2", 4564456478L));
         doReturn(data).when(persistenceService).selectList(any());
-        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         contractDataService.deleteUserTaskData(1983L);
     }
@@ -226,14 +225,14 @@ public class ContractDataServiceImplTest {
 
         contractDataService.addProcessData(contractData);
 
-        verify(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test
     public void addProcessData_accept_null_inputs() throws Exception {
         contractDataService.addProcessData(54L, null);
 
-        verify(recorder, times(0)).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder, times(0)).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test(expected = SContractDataCreationException.class)
@@ -241,7 +240,7 @@ public class ContractDataServiceImplTest {
         final SProcessContractData contractData = new SProcessContractData(1983L, "id", 54L);
         contractData.setId(10L);
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
-        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         contractDataService.addProcessData(contractData);
     }
@@ -280,7 +279,7 @@ public class ContractDataServiceImplTest {
 
         contractDataService.deleteProcessData(1983L);
 
-        verify(recorder, times(2)).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder, times(2)).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test(expected = SContractDataDeletionException.class)
@@ -289,7 +288,7 @@ public class ContractDataServiceImplTest {
         data.add(new SProcessContractData(1983L, "id", 456478L));
         data.add(new SProcessContractData(1983L, "id2", 4564456478L));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
-        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         contractDataService.deleteProcessData(1983L);
     }

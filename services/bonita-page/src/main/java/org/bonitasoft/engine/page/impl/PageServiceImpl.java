@@ -33,12 +33,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
@@ -260,15 +255,12 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, "Adding a new page with name " + page.getName());
         try {
             final SPageWithContent pageContent = new SPageWithContentImpl(page, content);
-            final InsertRecord insertContentRecord = new InsertRecord(pageContent);
-            final SInsertEvent insertContentEvent = getInsertEvent(insertContentRecord, PAGE);
-
             final SPage pageByName = checkIfPageAlreadyExists(page);
             if (null != pageByName) {
                 initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
                 throwAlreadyExistsException(pageByName.getName());
             }
-            recorder.recordInsert(insertContentRecord, insertContentEvent);
+            recorder.recordInsert(new InsertRecord(pageContent), PAGE);
             page.setId(pageContent.getId());
             notifyPageInsert(page, content);
             return page;
@@ -374,9 +366,7 @@ public class PageServiceImpl implements PageService {
             for (final PageServiceListener pageServiceListener : pageServiceListeners) {
                 pageServiceListener.pageDeleted(sPage);
             }
-            final DeleteRecord deleteRecord = new DeleteRecord(sPage);
-            final SDeleteEvent deleteEvent = getDeleteEvent(sPage, PAGE);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(sPage), PAGE);
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
         } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException | SProfileEntryDeletionException | SDeletionException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
@@ -428,26 +418,6 @@ public class PageServiceImpl implements PageService {
         logBuilder.setActionType(actionType);
     }
 
-    private SInsertEvent getInsertEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.CREATED)) {
-            return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        }
-        return null;
-    }
-
-    private SDeleteEvent getDeleteEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.DELETED)) {
-            return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        }
-        return null;
-    }
-
-    private SUpdateEvent getUpdateEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.UPDATED)) {
-            return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(type).setObject(object).done();
-        }
-        return null;
-    }
 
     void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
@@ -497,10 +467,7 @@ public class PageServiceImpl implements PageService {
             final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId));
             checkPageDuplicate(sPage, entityUpdateDescriptor, logBuilder, logMethodName);
             final String oldPageName = sPage.getName();
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage, entityUpdateDescriptor);
-
-            final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
-            recorder.recordUpdate(updateRecord, updatePageEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sPage, entityUpdateDescriptor), PAGE);
             updatePageNameInProfileEntry(entityUpdateDescriptor, oldPageName);
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
@@ -586,11 +553,8 @@ public class PageServiceImpl implements PageService {
             final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
                     .createNewInstance(new EntityUpdateDescriptor());
             builder.updateContent(content);
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageContent,
-                    builder.done());
-            final SUpdateEvent updatePageEvent = getUpdateEvent(sPageContent, PAGE);
-
-            recorder.recordUpdate(updateRecord, updatePageEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sPageContent,
+                    builder.done()), PAGE);
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 

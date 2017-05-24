@@ -17,11 +17,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
@@ -79,8 +77,8 @@ public class JobWrapper implements StatelessJob {
         this.transactionService = transactionService;
         this.persistenceService = persistenceService;
         this.jobService = jobService;
-        jobExecuting = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(JOB_EXECUTING).done();
-        jobCompleted = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(JOB_COMPLETED).done();
+        jobExecuting = new SEvent(JOB_EXECUTING);
+        jobCompleted = new SEvent(JOB_COMPLETED);
     }
 
 

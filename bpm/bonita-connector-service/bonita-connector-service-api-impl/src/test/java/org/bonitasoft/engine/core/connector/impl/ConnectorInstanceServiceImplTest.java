@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -82,7 +81,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -100,7 +99,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -119,7 +118,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -136,7 +135,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
@@ -162,7 +161,7 @@ public class ConnectorInstanceServiceImplTest {
 
         //verify
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 

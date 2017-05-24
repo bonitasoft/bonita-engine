@@ -55,12 +55,10 @@ public class RecorderImpl implements Recorder {
     }
 
     @Override
-    public void recordInsert(final InsertRecord record, final SInsertEvent insertEvent) throws SRecorderException {
+    public void recordInsert(final InsertRecord record, String type) throws SRecorderException {
         try {
             persistenceService.insert(record.getEntity());
-            if (insertEvent != null) {
-                eventService.fireEvent(createInsertEvent(record.getEntity(), insertEvent.getType()));
-            }
+            eventService.fireEvent(createInsertEvent(record.getEntity(), type));
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);
@@ -78,6 +76,7 @@ public class RecorderImpl implements Recorder {
         sDeleteEvent.setObject(entity);
         return sDeleteEvent;
     }
+
     private SUpdateEvent createUpdateEvent(PersistentObject entity, Map<String, Object> updatedFields, String type) {
         SUpdateEvent sUpdateEvent = new SUpdateEvent(type + SEvent.UPDATED);
         sUpdateEvent.setObject(entity);
@@ -86,12 +85,10 @@ public class RecorderImpl implements Recorder {
     }
 
     @Override
-    public void recordDelete(final DeleteRecord record, final SDeleteEvent deleteEvent) throws SRecorderException {
+    public void recordDelete(final DeleteRecord record, String type) throws SRecorderException {
         try {
             persistenceService.delete(record.getEntity());
-            if (deleteEvent != null) {
-                eventService.fireEvent(createDeleteEvent(record.getEntity(), deleteEvent.getType()));
-            }
+            eventService.fireEvent(createDeleteEvent(record.getEntity(), type));
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);
@@ -109,13 +106,11 @@ public class RecorderImpl implements Recorder {
     }
 
     @Override
-    public void recordUpdate(final UpdateRecord record, final SUpdateEvent updateEvent) throws SRecorderException {
+    public void recordUpdate(final UpdateRecord record, String type) throws SRecorderException {
         final UpdateDescriptor desc = UpdateDescriptor.buildSetFields(record.getEntity(), record.getFields());
         try {
             persistenceService.update(desc);
-            if (updateEvent != null) {
-                eventService.fireEvent(createUpdateEvent(record.getEntity(), record.getFields(), updateEvent.getType()));
-            }
+            eventService.fireEvent(createUpdateEvent(record.getEntity(), record.getFields(), type));
         } catch (final Exception e) {
             logExceptionsFromHandlers(e);
             throw new SRecorderException(e);

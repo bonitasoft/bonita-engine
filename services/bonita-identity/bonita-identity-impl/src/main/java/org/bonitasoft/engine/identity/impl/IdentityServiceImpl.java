@@ -19,17 +19,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.activation.MimetypesFileTypeMap;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionCreationException;
@@ -155,8 +149,7 @@ public class IdentityServiceImpl implements IdentityService {
                 ((SGroupImpl) group).setIconId(icon.getId());
             }
             final InsertRecord insertRecord = new InsertRecord(group);
-            final SInsertEvent insertEvent = getInsertEvent(group, GROUP);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord, GROUP);
             final int status = SQueriableLog.STATUS_OK;
             log(insertRecord.getEntity().getId(), status, logBuilder, methodName);
         } catch (final SRecorderException re) {
@@ -164,20 +157,6 @@ public class IdentityServiceImpl implements IdentityService {
             log(objectId, status, logBuilder, methodName);
             throw new SGroupCreationException(re);
         }
-    }
-
-    private SInsertEvent getInsertEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.CREATED)) {
-            return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        }
-        return null;
-    }
-
-    private SDeleteEvent getDeleteEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.DELETED)) {
-            return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        }
-        return null;
     }
 
     @Override
@@ -188,9 +167,7 @@ public class IdentityServiceImpl implements IdentityService {
                 + customUserInfo.getName());
         try {
             throwExceptionIfAlreadyExists(customUserInfo);
-            final InsertRecord insertRecord = new InsertRecord(customUserInfo);
-            final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_DEFINITION);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(customUserInfo), CUSTOM_USER_INFO_DEFINITION);
             log(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return customUserInfo;
         } catch (final SRecorderException | SBonitaReadException e) {
@@ -215,9 +192,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public SCustomUserInfoValue createCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
         try {
-            final InsertRecord insertRecord = new InsertRecord(customUserInfo);
-            final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_VALUE);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(customUserInfo), CUSTOM_USER_INFO_VALUE);
             return customUserInfo;
         } catch (final SRecorderException e) {
             throw new SIdentityException("Can't add custom user info value " + customUserInfo, e);
@@ -233,9 +208,7 @@ public class IdentityServiceImpl implements IdentityService {
                 SIcon icon = createIcon(iconFilename, iconContent);
                 (((SRoleImpl) role)).setIconId(icon.getId());
             }
-            final InsertRecord insertRecord = new InsertRecord(role);
-            final SInsertEvent insertEvent = getInsertEvent(role, ROLE);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(role), ROLE);
             log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -264,9 +237,8 @@ public class IdentityServiceImpl implements IdentityService {
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
         try {
-            //no insert event for user login objects
-            SUserLoginImpl sUserLogin = insertUserLogin(hashedUser);
-            insertUser(methodName, hashedUser, logBuilder, sUserLogin);
+            insertUser(hashedUser);
+            insertUserLogin(methodName, hashedUser, logBuilder);
             return hashedUser;
         } catch (final SRecorderException re) {
             log(hashedUser.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -274,21 +246,19 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private void insertUser(String methodName, SUser hashedUser, SUserLogBuilder logBuilder, SUserLoginImpl sUserLogin) throws SRecorderException {
+    private void insertUserLogin(String methodName, SUser hashedUser, SUserLogBuilder logBuilder) throws SRecorderException {
+        SUserLoginImpl sUserLogin = new SUserLoginImpl();
         ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
         sUserLogin.setsUser(hashedUser);
         sUserLogin.setId(hashedUser.getId());
         sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
-        recorder.recordInsert(new InsertRecord(sUserLogin), null);
+        recorder.recordInsert(new InsertRecord(sUserLogin), USER_LOGIN);
         log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
     }
 
-    private SUserLoginImpl insertUserLogin(SUser hashedUser) throws SRecorderException {
+    private void insertUser(SUser hashedUser) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(hashedUser);
-        final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
-        SUserLoginImpl sUserLogin = new SUserLoginImpl();
-        recorder.recordInsert(insertRecord, insertEvent);
-        return sUserLogin;
+        recorder.recordInsert(insertRecord, USER_LOGIN);
     }
 
     @Override
@@ -297,9 +267,7 @@ public class IdentityServiceImpl implements IdentityService {
         final String message = "Adding a new user contact information for user with id " + contactInfo.getUserId();
         final SContactInfoLogBuilder logBuilder = getUserContactInfoLog(ActionType.CREATED, message, contactInfo);
         try {
-            final InsertRecord insertRecord = new InsertRecord(contactInfo);
-            final SInsertEvent insertEvent = getInsertEvent(contactInfo, USER_CONTACT_INFO);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(contactInfo), USER_CONTACT_INFO);
             log(contactInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return contactInfo;
         } catch (final SRecorderException re) {
@@ -316,9 +284,7 @@ public class IdentityServiceImpl implements IdentityService {
 
         final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.CREATED, message, userMembership);
         try {
-            final InsertRecord insertRecord = new InsertRecord(userMembership);
-            final SInsertEvent insertEvent = getInsertEvent(userMembership, USERMEMBERSHIP);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(userMembership), USERMEMBERSHIP);
             log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException re) {
             log(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -339,9 +305,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (group.getIconId() != null) {
                 deleteIcon(group.getIconId());
             }
-            final DeleteRecord deleteRecord = new DeleteRecord(group);
-            final SDeleteEvent deleteEvent = getDeleteEvent(group, GROUP);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(group), GROUP);
             log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteGroup");
         } catch (final SRecorderException | SBonitaReadException re) {
             log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteGroup");
@@ -445,9 +409,7 @@ public class IdentityServiceImpl implements IdentityService {
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.DELETED,
                 "Deleting profile custom user info definition with name " + info.getName());
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(info);
-            final SDeleteEvent deleteEvent = getDeleteEvent(info, CUSTOM_USER_INFO_DEFINITION);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(info), CUSTOM_USER_INFO_DEFINITION);
             log(info.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             log(info.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -463,9 +425,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void deleteCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(customUserInfo);
-            final SDeleteEvent deleteEvent = getDeleteEvent(customUserInfo, CUSTOM_USER_INFO_VALUE);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(customUserInfo), CUSTOM_USER_INFO_VALUE);
         } catch (final SRecorderException e) {
             throw new SIdentityException("Can't delete custom user info value" + customUserInfo, e);
         }
@@ -485,9 +445,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (role.getIconId() != null) {
                 deleteIcon(role.getIconId());
             }
-            final DeleteRecord deleteRecord = new DeleteRecord(role);
-            final SDeleteEvent deleteEvent = getDeleteEvent(role, ROLE);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(role), ROLE);
             log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException | SBonitaReadException re) {
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -526,7 +484,7 @@ public class IdentityServiceImpl implements IdentityService {
         if (icon == null) {
             return;
         }
-        recorder.recordDelete(new DeleteRecord(icon), null);
+        recorder.recordDelete(new DeleteRecord(icon), ICON);
     }
 
     @Override
@@ -534,9 +492,7 @@ public class IdentityServiceImpl implements IdentityService {
         final String methodName = "deleteUser";
         final SUserLogBuilder logBuilder = getUserLog(ActionType.DELETED, "Deleting user with username " + user.getUserName());
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(user);
-            final SDeleteEvent deleteEvent = getDeleteEvent(user, USER);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(user), USER);
             log(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException re) {
             log(user.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -600,9 +556,7 @@ public class IdentityServiceImpl implements IdentityService {
                 + " in group " + userMembership.getGroupName();
         final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.DELETED, message, userMembership);
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(userMembership);
-            final SDeleteEvent deleteEvent = getDeleteEvent(userMembership, USERMEMBERSHIP);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(userMembership), USERMEMBERSHIP);
             log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             log(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -1187,12 +1141,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
                 updateIcon(descriptor, iconUpdater, group);
             }
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(group, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(GROUP, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(GROUP).setObject(group).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(group, descriptor), GROUP);
             log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateGroup");
         } catch (final SRecorderException | SBonitaReadException e) {
             log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateGroup");
@@ -1207,13 +1156,7 @@ public class IdentityServiceImpl implements IdentityService {
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.UPDATED,
                 "Updating the custom user info definition with name " + customUserInfo.getName());
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(customUserInfo, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(CUSTOM_USER_INFO_DEFINITION, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_DEFINITION)
-                        .setObject(customUserInfo).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(customUserInfo, descriptor), CUSTOM_USER_INFO_DEFINITION);
             log(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             log(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -1224,13 +1167,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void updateCustomUserInfoValue(final SCustomUserInfoValue customUserInfo, final EntityUpdateDescriptor descriptor) throws SIdentityException {
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(customUserInfo, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(CUSTOM_USER_INFO_VALUE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_VALUE).setObject(customUserInfo)
-                        .done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(customUserInfo, descriptor), CUSTOM_USER_INFO_VALUE);
         } catch (final SRecorderException e) {
             throw new SIdentityException("Can't update custom user info definition " + customUserInfo, e);
         }
@@ -1244,12 +1181,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (iconUpdater != null && iconUpdater.getFields().containsKey("content")) {
                 updateIcon(descriptor, iconUpdater, role);
             }
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(role, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(ROLE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ROLE).setObject(role).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(role, descriptor), ROLE);
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         } catch (final SRecorderException | SBonitaReadException e) {
             log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -1281,14 +1213,7 @@ public class IdentityServiceImpl implements IdentityService {
                 ", last name " +
                 user.getLastName());
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(user, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(USER, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(USER).setObject(user).done();
-                final SUser oldUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).done();
-                updateEvent.setOldObject(oldUser);
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(user, descriptor), USER);
             log(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException re) {
             log(user.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -1304,14 +1229,7 @@ public class IdentityServiceImpl implements IdentityService {
                         contactInfo.getUserId(),
                 contactInfo);
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(contactInfo, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(USER_CONTACT_INFO, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(USER_CONTACT_INFO).setObject(contactInfo).done();
-                final SContactInfo oldContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(contactInfo).done();
-                updateEvent.setOldObject(oldContactInfo);
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(contactInfo, descriptor), USER_CONTACT_INFO);
             log(contactInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException re) {
             log(contactInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -1329,12 +1247,7 @@ public class IdentityServiceImpl implements IdentityService {
                 " in group " +
                 userMembership.getGroupName(), userMembership);
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(userMembership, descriptor);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(USERMEMBERSHIP, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(USERMEMBERSHIP).setObject(userMembership).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(userMembership, descriptor), USERMEMBERSHIP);
             log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             log(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
@@ -1578,7 +1491,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private SIcon createIcon(String iconFilename, byte[] iconContent) throws SRecorderException {
         SIconImpl entity = new SIconImpl(getContentType(iconFilename), iconContent);
-        recorder.recordInsert(new InsertRecord(entity), null);
+        recorder.recordInsert(new InsertRecord(entity), ICON);
         return entity;
     }
 

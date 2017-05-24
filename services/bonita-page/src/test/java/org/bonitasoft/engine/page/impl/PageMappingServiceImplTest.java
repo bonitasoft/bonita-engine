@@ -3,15 +3,12 @@ package org.bonitasoft.engine.page.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -105,7 +102,7 @@ public class PageMappingServiceImplTest {
         pageMappingService.create("aMappinKey", 1L, newArrayList("rule1"));
         final ArgumentCaptor<InsertRecord> captor = ArgumentCaptor.forClass(InsertRecord.class);
         
-        verify(recorder).recordInsert(captor.capture(), notNull(SInsertEvent.class));
+        verify(recorder).recordInsert(captor.capture(), anyString());
         final InsertRecord insertRecord = captor.getValue();
         final PersistentObject entity = insertRecord.getEntity();
         assertThat(entity).isInstanceOf(SPageMapping.class);
@@ -123,7 +120,7 @@ public class PageMappingServiceImplTest {
         pageMappingService.create("aMappinKey", "http://bonitasoft.com", "adapter", newArrayList("rule1"));
         final ArgumentCaptor<InsertRecord> captor = ArgumentCaptor.forClass(InsertRecord.class);
 
-        verify(recorder).recordInsert(captor.capture(), notNull(SInsertEvent.class));
+        verify(recorder).recordInsert(captor.capture(), anyString());
         final InsertRecord insertRecord = captor.getValue();
         final PersistentObject entity = insertRecord.getEntity();
         assertThat(entity).isInstanceOf(SPageMapping.class);
