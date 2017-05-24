@@ -19,7 +19,7 @@ import org.bonitasoft.engine.theme.Theme;
 import org.bonitasoft.engine.theme.ThemeType;
 
 /**
- * Manage mobile and portal theme. A Theme is a look &amp; feel in Bonita BPM Portal.
+ * Manage mobile and portal theme. A Theme is a look &amp; feel in Bonita Portal.
  * 
  * @author Celine Souchet
  */

@@ -5,4 +5,4 @@ At execution, it:
 
 Important:
 - Only use this command once the current configuration has been pulled from the database with `setup.(bat|sh) pull` script and modified locally.
-- Those modifications will be applied only after you restart Bonita BPM.
+- Those modifications will be applied only after you restart Bonita.

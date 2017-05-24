@@ -3,7 +3,7 @@ bonita-engine
 
 What it does?
 -------------
-This project builds bonita BPM Execution Engine (Community Edition)
+This project builds Bonita Execution Engine (Community Edition)
 
 Requirements
 -------------
@@ -17,7 +17,7 @@ just run the following Maven command:
 mvn clean install
 ```
 
-To be able to successfully build the Bonita BPM components that use the Engine, run:
+To be able to successfully build the Bonita components that use the Engine, run:
 ```
  mvn clean install -Ppackage,javadoc
 ```

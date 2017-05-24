@@ -33,7 +33,7 @@ public class InitCommand extends PlatformSetupCommand {
     private final static Logger LOGGER = LoggerFactory.getLogger(InitCommand.class);
 
     public InitCommand() {
-        super("init", "Initialise the database so that Bonita BPM is ready to run with this database",
+        super("init", "Initialise the database so that Bonita is ready to run with this database",
                 CommandUtils.getFileContentFromClassPath("init_header.txt"), CommandUtils.getFileContentFromClassPath("init_footer.txt"));
     }
 

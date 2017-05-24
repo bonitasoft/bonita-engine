@@ -11,7 +11,7 @@
 	<artifactId>bonita-synchro-repository</artifactId>
 	<packaging>pom</packaging>
 
-	<name>BonitaBPM Synchro-repository</name>
+	<name>Bonita Synchro-repository</name>
 
 	<modules>
 		<module>bonita-synchro-service</module>

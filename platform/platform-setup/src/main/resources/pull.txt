@@ -5,4 +5,4 @@ At execution, it:
 
 Important:
 This step is mandatory before updating the configuration to ensure database consistency.
-For example, when a tenant is created by Bonita BPM, its related configuration files need to be extracted before you can edit the configuration.
+For example, when a tenant is created by Bonita, its related configuration files need to be extracted before you can edit the configuration.

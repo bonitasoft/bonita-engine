@@ -559,6 +559,6 @@ public class BPMLocalIT extends CommonAPILocalIT {
         logger.removeHandler(testHandler);
 
         Assertions.assertThat(log).contains(
-                "You are declaring an API access to Bonita BPM Engine as a remote connection, whereas it looks like you are running in the same JVM.");
+                "You are declaring an API access to Bonita Engine as a remote connection, whereas it looks like you are running in the same JVM.");
     }
 }

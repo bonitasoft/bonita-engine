@@ -26,7 +26,7 @@ public class ConfigureCommand extends PlatformSetupCommand {
 
     public ConfigureCommand() {
         super("configure",
-                "Configure a Bonita BPM bundle to use your specific database configuration (defined in database.properties or via command line parameters)",
+                "Configure a Bonita bundle to use your specific database configuration (defined in database.properties or via command line parameters)",
                 CommandUtils.getFileContentFromClassPath("configure_header.txt"), CommandUtils.getFileContentFromClassPath("configure_footer.txt"));
     }
 

@@ -14,7 +14,7 @@
 /**
  * 
  * <p>
- * Contains classes and interfaces related to the <code>Bonita BPM Platform</code>. 
+ * Contains classes and interfaces related to the <code>Bonita Platform</code>.
  * </p>
  * @since 6.0.0
  * 

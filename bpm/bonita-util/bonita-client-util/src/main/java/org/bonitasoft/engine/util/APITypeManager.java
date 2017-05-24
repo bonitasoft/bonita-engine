@@ -164,7 +164,7 @@ public class APITypeManager {
             try {
                 Thread.currentThread().getContextClassLoader().loadClass("org.bonitasoft.engine.api.impl.ProcessAPIImpl");
                 LOGGER.warning(
-                        "You are declaring an API access to Bonita BPM Engine as a remote connection, whereas it looks like you are running in the same JVM. You should use LOCAL connection, using constant 'ApiAccessType.LOCAL'");
+                        "You are declaring an API access to Bonita Engine as a remote connection, whereas it looks like you are running in the same JVM. You should use LOCAL connection, using constant 'ApiAccessType.LOCAL'");
             } catch (ClassNotFoundException ignored) {
                 //no warning
             }

@@ -105,8 +105,8 @@
 									<goal>jar</goal>
 								</goals>
 								<configuration>
-									<doctitle>Bonita BPM Engine ${project.version} client API</doctitle>
-									<windowtitle>Bonita BPM Engine ${project.version} client API</windowtitle>
+									<doctitle>Bonita Engine ${project.version} client API</doctitle>
+									<windowtitle>Bonita Engine ${project.version} client API</windowtitle>
 									<includeDependencySources>true</includeDependencySources>
 								</configuration>
 							</execution>

@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 
 /**
  * Used to identify tenant-level API methods that can be called if a the tenant is in a pause mode. All other API method calls will be rejected.
- * Used by the BonitaBPM Engine server interceptor.
+ * Used by the Bonita Engine server interceptor.
  * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte

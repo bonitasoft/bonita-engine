@@ -24,7 +24,7 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
- * Accessor class that retrieve APIs in Bonita BPM <b>Community</b> Edition.
+ * Accessor class that retrieve APIs in Bonita <b>Community</b> Edition.
  * <ul>
  * <li>{@link ProcessAPI},</li>
  * <li>{@link CommandAPI},</li>

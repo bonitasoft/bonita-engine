@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * A Page is a way to store, amongst other things, a binary content.
- * It is used by Bonita BPM Portal to display specific custom content
+ * It is used by Bonita Portal to display specific custom content
  * 
  * @author Laurent Leseigneur
  */

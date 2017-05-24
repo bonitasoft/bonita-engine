@@ -21,7 +21,7 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.exception.PlatformException;
 
 /**
- * Give access to Bonita BPM Platform configuration.
+ * Give access to Bonita Platform configuration.
  * Is used by setup mechanism to retrieve configuration before running the Engine + Portal, on a system that does give access to a persistent filesystem.
  * 
  * @author Emmanuel Duchastenier

@@ -102,7 +102,7 @@ public class ScriptExecutor {
             initializePlatformStructure();
             insertPlatform();
         } else {
-            logger.info("Bonita BPM platform already exists. Nothing to do. Stopping.");
+            logger.info("Bonita platform already exists. Nothing to do. Stopping.");
         }
     }
 

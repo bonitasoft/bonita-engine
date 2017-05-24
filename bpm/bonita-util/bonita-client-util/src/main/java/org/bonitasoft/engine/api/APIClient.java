@@ -33,7 +33,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
- * Bonita BPM <b>Community</b> Edition APIs client.<br>
+ * Bonita <b>Community</b> Edition APIs client.<br>
  * <p/>
  * <ul>
  * <li>{@link IdentityAPI},</li>

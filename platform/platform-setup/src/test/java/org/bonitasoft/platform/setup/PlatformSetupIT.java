@@ -326,7 +326,7 @@ public class PlatformSetupIT {
 
         // then
         assertThat(split[split.length - 1]).as("should push new configuration and log message").contains("INFO")
-                .endsWith("Configuration files successfully pushed to database. You can now restart Bonita BPM to reflect your changes.");
+                .endsWith("Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
     }
 
     @Test
@@ -484,7 +484,7 @@ public class PlatformSetupIT {
         Files.createDirectories(licenseFolder);
 
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita BPM Platform subscription edition"
+        expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita Platform subscription edition"
                 + " to start normally.\nPlace your license file");
 
         platformSetup.initProperties();
@@ -502,7 +502,7 @@ public class PlatformSetupIT {
         Files.createFile(licenseFolder.resolve("bonita-file.renamed"));
 
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita BPM Platform subscription edition"
+        expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita Platform subscription edition"
                 + " to start normally.\nPlace your license file");
 
         platformSetup.initProperties();
