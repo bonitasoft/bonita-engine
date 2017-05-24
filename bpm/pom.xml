@@ -12,7 +12,7 @@
     <artifactId>bpm</artifactId>
     <packaging>pom</packaging>
 
-    <name>Bonita BPM modules</name>
+    <name>Bonita modules</name>
 
     <profiles>
         <profile>

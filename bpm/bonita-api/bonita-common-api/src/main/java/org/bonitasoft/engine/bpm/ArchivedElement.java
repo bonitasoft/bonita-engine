@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm;
 import java.util.Date;
 
 /**
- * Interface <code>ArchivedElement</code> is the root interface of the archived client model hierarchy of Bonita BPM.
+ * Interface <code>ArchivedElement</code> is the root interface of the archived client model hierarchy of Bonita.
  *
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte

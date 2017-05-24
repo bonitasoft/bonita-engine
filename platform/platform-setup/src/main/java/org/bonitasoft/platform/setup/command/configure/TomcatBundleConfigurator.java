@@ -59,14 +59,14 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
             newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
             backupAndReplaceContentIfNecessary(setEnvWindowsFile, newContent,
-                    "Setting Bonita BPM internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
+                    "Setting Bonita internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
                             + "' in 'setenv.bat' file");
 
             newContent = readContentFromFile(getTemplateFolderPath("setenv.sh"));
             newContent = updateSetEnvFile(newContent, dbVendor, "sysprop.bonita.db.vendor");
             newContent = updateSetEnvFile(newContent, bdmDbVendor, "sysprop.bonita.bdm.db.vendor");
             backupAndReplaceContentIfNecessary(setEnvUnixFile, newContent,
-                    "Setting Bonita BPM internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
+                    "Setting Bonita internal database vendor to '" + dbVendor + "' and Business Data database vendor to '" + bdmDbVendor
                             + "' in 'setenv.sh' file");
 
             //2. update bonita.xml:
@@ -74,7 +74,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             newContent = updateBonitaXmlFile(newContent, standardConfiguration, "ds1");
             newContent = updateBonitaXmlFile(newContent, bdmConfiguration, "ds2");
             backupAndReplaceContentIfNecessary(bonitaXmlFile, newContent,
-                    "Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita BPM internal database on '" + dbVendor
+                    "Configuring file 'conf/Catalina/localhost/bonita.xml' with your DB values for Bonita internal database on '" + dbVendor
                             + "' and for Business Data database on '" + bdmDbVendor + "'");
 
             // 3. update bitronix-resources.properties
@@ -82,7 +82,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             newContent = updateBitronixFile(newContent, standardConfiguration, "ds1");
             newContent = updateBitronixFile(newContent, bdmConfiguration, "ds2");
             backupAndReplaceContentIfNecessary(bitronixFile, newContent,
-                    "Configuring file 'conf/bitronix-resources.properties' with your DB values for Bonita BPM internal database on " + dbVendor
+                    "Configuring file 'conf/bitronix-resources.properties' with your DB values for Bonita internal database on " + dbVendor
                             + " and for Business Data database on " + bdmDbVendor);
 
             //4. copy the JDBC drivers:

@@ -69,7 +69,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
             newContent = updateStandaloneXmlFile(newContent, standardConfiguration, "");
             newContent = updateStandaloneXmlFile(newContent, bdmConfiguration, "BDM_");
             backupAndReplaceContentIfNecessary(standaloneXmlFile, newContent,
-                    "Configuring file 'standalone/configuration/standalone.xml' with your DB values for Bonita BPM internal database on '" + dbVendor
+                    "Configuring file 'standalone/configuration/standalone.xml' with your DB values for Bonita internal database on '" + dbVendor
                             + "' and for Business Data database on '" + bdmDbVendor + "'");
 
             //2. copy the JDBC drivers:

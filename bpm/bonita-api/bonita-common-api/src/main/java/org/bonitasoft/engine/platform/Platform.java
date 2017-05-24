@@ -16,9 +16,9 @@ package org.bonitasoft.engine.platform;
 import java.io.Serializable;
 
 /**
- * Contains information about the <code>Bonita BPM Platform</code>.
+ * Contains information about the <code>Bonita Platform</code>.
  * <p>
- * The <code>platform</code> is the base on which runs the <code>Bonita BPM Engine</code>. There is only one platform for a running <code>Bonita BPM
+ * The <code>platform</code> is the base on which runs the <code>Bonita Engine</code>. There is only one platform for a running <code>Bonita
  * Engine</code>.
  * <p>
  * In order to perform actions on the platform, please, refer to the {@link org.bonitasoft.engine.api.PlatformAPI}
@@ -39,9 +39,9 @@ public interface Platform extends Serializable {
     String getVersion();
 
     /**
-     * Retrieves the <code>platform</code> previous version. This information only will be set if you have installed the <code>Bonita BPM engine</code> in a
+     * Retrieves the <code>platform</code> previous version. This information only will be set if you have installed the <code>Bonita engine</code> in a
      * previous
-     * version before upgrading to a new version using the <code>Bonita BPM Migration Tool</code>. Otherwise, this method will return an empty string.
+     * version before upgrading to a new version using the <code>Bonita Migration Tool</code>. Otherwise, this method will return an empty string.
      * <p>
      * For instance, if you have migrated from version 6.3.3 to version 6.3.4, <code>getPreviousVersion</code> will return 6.3.3 and {@link #getVersion()} will
      * return 6.3.4.
@@ -53,10 +53,10 @@ public interface Platform extends Serializable {
     String getPreviousVersion();
 
     /**
-     * Retrieves the <code>platform</code> initial version. That is, the Bonita BPM version in which you have initially created the platform before migrating
+     * Retrieves the <code>platform</code> initial version. That is, the Bonita version in which you have initially created the platform before migrating
      * to the current version.
      * <p>
-     * For instance, if you have created your platform in the version 6.1.0 and have migrated to the version 6.3.4 using the <code>Bonita BPM Migration
+     * For instance, if you have created your platform in the version 6.1.0 and have migrated to the version 6.3.4 using the <code>Bonita Migration
      * Tool</code>, {@code getInitialVersion} will return 6.1.0, {@link #getPreviousVersion()} will return 6.3.3 and {@link #getVersion()} will return 6.3.4.
      *
      * @return a String representing the <code>platform</code> initial version

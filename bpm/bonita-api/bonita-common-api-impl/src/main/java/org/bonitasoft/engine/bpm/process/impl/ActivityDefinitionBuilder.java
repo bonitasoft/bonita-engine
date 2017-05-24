@@ -129,7 +129,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Sets the display name on this activity. When set, the display name will replace the name in the Bonita BPM Portal
+     * Sets the display name on this activity. When set, the display name will replace the name in the Bonita Portal
      *
      * @param displayName
      *        expression representing the display name

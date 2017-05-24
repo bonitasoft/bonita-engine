@@ -149,7 +149,7 @@ public class PlatformSetup {
         clean();
         pushFromFolder(currentConfigurationFolder);
         pushLicenses();
-        LOGGER.info("Configuration files successfully pushed to database. You can now restart Bonita BPM to reflect your changes.");
+        LOGGER.info("Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
     }
 
     /**
@@ -390,7 +390,7 @@ public class PlatformSetup {
             final String[] licenseFiles = licensesFolder.toFile().list(new RegexFileFilter(".*\\.lic"));
             if (licenseFiles.length == 0) {
                 throw new PlatformException("No license (.lic file) found.\n"
-                        + "This would prevent Bonita BPM Platform subscription edition to start normally.\n" +
+                        + "This would prevent Bonita Platform subscription edition to start normally.\n" +
                         "Place your license file in '" + licensesFolder.toAbsolutePath().toString() + "' and then try again.");
             }
         }

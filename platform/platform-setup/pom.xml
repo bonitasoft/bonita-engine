@@ -206,8 +206,8 @@
                                     <goal>jar</goal>
                                 </goals>
                                 <configuration>
-                                    <doctitle>Bonita BPM Platform Setup ${project.version}</doctitle>
-                                    <windowtitle>Bonita BPM Platform Setup ${project.version}</windowtitle>
+                                    <doctitle>Bonita Platform Setup ${project.version}</doctitle>
+                                    <windowtitle>Bonita Platform Setup ${project.version}</windowtitle>
                                 </configuration>
                             </execution>
                         </executions>

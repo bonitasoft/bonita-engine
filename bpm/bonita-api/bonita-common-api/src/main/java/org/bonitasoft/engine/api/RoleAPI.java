@@ -37,7 +37,7 @@ import org.bonitasoft.engine.search.SearchResult;
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
  * @author Emmanuel Duchastenier
- * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita BPM.
+ * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita.
  * @see Role
  */
 public interface RoleAPI {

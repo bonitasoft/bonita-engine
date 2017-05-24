@@ -612,7 +612,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     /**
-     * Sets the process display name. When set, It is used to replace the name in the Bonita BPM Portal
+     * Sets the process display name. When set, It is used to replace the name in the Bonita Portal
      *
      * @param name
      *        display name

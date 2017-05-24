@@ -14,7 +14,7 @@
 /**
  * 
  *     <p>
- *         The Bonita BPM project has a clear separation between the API the users should be interacting with and the actual implementation classes.
+ *         The Bonita project has a clear separation between the API the users should be interacting with and the actual implementation classes.
  *         <br>
  *         The public API exposes most of the features we believe "normal" users can safely use and should remain rather stable across releases.
  *         <br>
