@@ -50,7 +50,7 @@ public class PersistenceTest extends CommonBPMServicesTest {
         getTransactionService().begin();
 
         final SUserImpl SUserImpl = buildSUserImpl("SUserImpl1FN", "SUserImpl1LN");
-        recorder.recordInsert(new InsertRecord(SUserImpl), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl), "USER");
         try {
             persistenceService.selectOne(new SelectOneDescriptor<SUserImpl>("wrong query", null, SUserImpl.class));
             fail("Exception expected");
@@ -70,7 +70,7 @@ public class PersistenceTest extends CommonBPMServicesTest {
         final SUserImpl SUserImpl1 = buildSUserImpl("user1Test", "password");
         final SUserImpl SUserImpl2 = buildSUserImpl("user2Test", "password");
         getTransactionService().begin();
-        recorder.recordInsert(new InsertRecord(SUserImpl1), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl1), "USER");
         checkSUserImpl(SUserImpl1, persistenceService.selectById(new SelectByIdDescriptor<>(SUserImpl.class, SUserImpl1.getId())));
         getTransactionService().complete();
 
@@ -83,7 +83,7 @@ public class PersistenceTest extends CommonBPMServicesTest {
         } catch (final AssertionError e) {
             // OK
         }
-        recorder.recordInsert(new InsertRecord(SUserImpl2), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl2), "USER");
         getTransactionService().complete();
 
         changeTenant(tenant1Id);
@@ -107,19 +107,19 @@ public class PersistenceTest extends CommonBPMServicesTest {
         changeTenant(tenant1Id);
         getTransactionService().begin();
         final SUserImpl SUserImpl1 = buildSUserImpl("tenantUserTest", "password");
-        recorder.recordInsert(new InsertRecord(SUserImpl1), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl1), "USER");
         getTransactionService().complete();
 
         changeTenant(tenant2Id);
         getTransactionService().begin();
         final SUserImpl SUserImpl2 = buildSUserImpl("tenantUserTest", "password");
-        recorder.recordInsert(new InsertRecord(SUserImpl2), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl2), "USER");
         getTransactionService().complete();
 
         changeTenant(tenant3Id);
         getTransactionService().begin();
         final SUserImpl SUserImpl3 = buildSUserImpl("tenantUserTest", "password");
-        recorder.recordInsert(new InsertRecord(SUserImpl3), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl3), "USER");
         getTransactionService().complete();
     }
 
@@ -135,7 +135,7 @@ public class PersistenceTest extends CommonBPMServicesTest {
 
         getTransactionService().begin();
         final SUserImpl SUserImpl1 = buildSUserImpl(firstName, lastName);
-        recorder.recordInsert(new InsertRecord(SUserImpl1), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl1), "USER");
         assertEquals(1, SUserImpl1.getId());
         getTransactionService().complete();
         changeTenant(tenant2Id);
@@ -145,14 +145,14 @@ public class PersistenceTest extends CommonBPMServicesTest {
         getTransactionService().complete();
         getTransactionService().begin();
         final SUserImpl SUserImpl2 = buildSUserImpl(firstName, lastName);
-        recorder.recordInsert(new InsertRecord(SUserImpl2), null);
+        recorder.recordInsert(new InsertRecord(SUserImpl2), "USER");
         assertEquals(1, SUserImpl2.getId());// not the same sequence as tenant 1
 
         getTransactionService().complete();
         for (int i = 0; i < 150; i++) {// this should not cause constraint violation
             getTransactionService().begin();
             final SUserImpl SUserImpl = buildSUserImpl(firstName + i, lastName);
-            recorder.recordInsert(new InsertRecord(SUserImpl), null);
+            recorder.recordInsert(new InsertRecord(SUserImpl), "USER");
             getTransactionService().complete();
         }
         getTransactionService().begin();

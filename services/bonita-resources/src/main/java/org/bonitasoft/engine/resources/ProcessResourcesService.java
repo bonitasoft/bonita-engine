@@ -24,6 +24,8 @@ import org.bonitasoft.engine.recorder.SRecorderException;
  */
 public interface ProcessResourcesService {
 
+    String BAR_RESOURCE = "BAR_RESOURCE";
+
     void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException;
 
     void update(SBARResourceLight resource, byte[] content) throws SRecorderException;

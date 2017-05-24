@@ -21,14 +21,9 @@ import java.util.Map.Entry;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -85,13 +80,8 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     protected void addUserTaskData(final STaskContractData taskContractData) throws SContractDataCreationException {
         final SContractDataLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new user task contract data", USERTASK_CONTRACT_DATA);
-        final InsertRecord insertRecord = new InsertRecord(taskContractData);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(USERTASK_CONTRACT_DATA, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(USERTASK_CONTRACT_DATA).setObject(taskContractData).done();
-        }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(taskContractData), USERTASK_CONTRACT_DATA);
             initiateLogBuilder(taskContractData.getId(), SQueriableLog.STATUS_OK, logBuilder, "addUserTaskData");
         } catch (final SRecorderException re) {
             initiateLogBuilder(taskContractData.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addUserTaskData");
@@ -126,13 +116,8 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     protected void deleteUserTaskData(final STaskContractData taskContractData) throws SContractDataDeletionException {
-        final DeleteRecord deleteRecord = new DeleteRecord(taskContractData);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(USERTASK_CONTRACT_DATA, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(USERTASK_CONTRACT_DATA).setObject(taskContractData).done();
-        }
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(taskContractData), USERTASK_CONTRACT_DATA);
         } catch (final SRecorderException sre) {
             throw new SContractDataDeletionException(sre);
         }
@@ -228,14 +213,8 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     protected void addProcessData(SProcessContractData processContractData) throws SContractDataCreationException {
         final SContractDataLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new process contract data", PROCESS_CONTRACT_DATA);
-        final InsertRecord insertRecord = new InsertRecord(processContractData);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(PROCESS_CONTRACT_DATA, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESS_CONTRACT_DATA).setObject(processContractData)
-                    .done();
-        }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(processContractData), PROCESS_CONTRACT_DATA);
             initiateLogBuilder(processContractData.getId(), SQueriableLog.STATUS_OK, logBuilder, "addProcessData");
         } catch (final SRecorderException re) {
             initiateLogBuilder(processContractData.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addProcessData");
@@ -270,14 +249,8 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     protected void deleteProcessData(final SProcessContractData processContractData) throws SContractDataDeletionException {
-        final DeleteRecord deleteRecord = new DeleteRecord(processContractData);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(PROCESS_CONTRACT_DATA, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_CONTRACT_DATA).setObject(processContractData)
-                    .done();
-        }
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(processContractData), PROCESS_CONTRACT_DATA);
         } catch (final SRecorderException sre) {
             throw new SContractDataDeletionException(sre);
         }

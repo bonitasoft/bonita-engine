@@ -14,17 +14,11 @@
 package org.bonitasoft.engine.platform;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +26,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -40,7 +33,6 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -372,7 +364,7 @@ public class PlatformServiceImplTest {
         platformServiceImpl.updateTenant(tenant, updateDescriptor.done());
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), anyString());
     }
 
     @Test(expected = STenantUpdateException.class)

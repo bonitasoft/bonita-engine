@@ -31,9 +31,6 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.page.AuthorizationRule;
 import org.bonitasoft.engine.page.SAuthorizationException;
 import org.bonitasoft.engine.page.SPageMapping;
@@ -115,19 +112,16 @@ public class SPageMappingServiceImplTest {
         assertThat(sPageMapping.getUrl()).isEqualTo(null);
         assertThat(sPageMapping.getPageAuthorizationRules()).isEqualTo(authorizationRules);
 
-        final ArgumentCaptor<SInsertEvent> insertEvent = ArgumentCaptor.forClass(SInsertEvent.class);
         final ArgumentCaptor<InsertRecord> insertRecord = ArgumentCaptor.forClass(InsertRecord.class);
-        verify(recorder).recordInsert(insertRecord.capture(), insertEvent.capture());
+        verify(recorder).recordInsert(insertRecord.capture(), eq("PAGE_MAPPING"));
 
-        assertThat(insertEvent.getValue().getObject()).isEqualTo(sPageMapping);
-        assertThat(insertEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(insertRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
 
     @Test
     public void should_create_throw_creation_exception() throws Exception {
         //given
-        doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), anyString());
         //when
         expectedException.expect(SObjectCreationException.class);
         pageMappingService.create("theKey", PAGE_ID, Collections.<String> emptyList());
@@ -146,12 +140,9 @@ public class SPageMappingServiceImplTest {
         assertThat(sPageMapping.getPageId()).isNull();
         assertThat(sPageMapping.getUrlAdapter()).isEqualTo("myAdapter");
 
-        final ArgumentCaptor<SInsertEvent> insertEvent = ArgumentCaptor.forClass(SInsertEvent.class);
         final ArgumentCaptor<InsertRecord> insertRecord = ArgumentCaptor.forClass(InsertRecord.class);
-        verify(recorder).recordInsert(insertRecord.capture(), insertEvent.capture());
+        verify(recorder).recordInsert(insertRecord.capture(), eq("PAGE_MAPPING"));
 
-        assertThat(insertEvent.getValue().getObject()).isEqualTo(sPageMapping);
-        assertThat(insertEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
         assertThat(insertRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
 
@@ -181,18 +172,15 @@ public class SPageMappingServiceImplTest {
         pageMappingService.delete(sPageMapping);
 
         //then
-        final ArgumentCaptor<SDeleteEvent> deleteEvent = ArgumentCaptor.forClass(SDeleteEvent.class);
         final ArgumentCaptor<DeleteRecord> deleteRecord = ArgumentCaptor.forClass(DeleteRecord.class);
-        verify(recorder).recordDelete(deleteRecord.capture(), deleteEvent.capture());
-        assertThat(deleteEvent.getValue().getObject()).isEqualTo(sPageMapping);
-        assertThat(deleteEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
+        verify(recorder).recordDelete(deleteRecord.capture(), eq("PAGE_MAPPING"));
         assertThat(deleteRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
 
     @Test
     public void should_delete_throw_exception() throws Exception {
         //given
-        doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), anyString());
         //when
         expectedException.expect(SDeletionException.class);
         pageMappingService.delete(new SPageMappingImpl());
@@ -208,11 +196,8 @@ public class SPageMappingServiceImplTest {
         pageMappingService.update(pageMapping, 124l);
 
         //then
-        ArgumentCaptor<SUpdateEvent> updateEvent = ArgumentCaptor.forClass(SUpdateEvent.class);
         ArgumentCaptor<UpdateRecord> updateRecord = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(updateRecord.capture(), updateEvent.capture());
-        assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
-        assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
+        verify(recorder).recordUpdate(updateRecord.capture(), eq("PAGE_MAPPING"));
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
         assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null),
                 entry("lastUpdatedBy", 0L));
@@ -224,7 +209,7 @@ public class SPageMappingServiceImplTest {
         //given
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setKey("myKey");
-        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
         //when
         expectedException.expect(SObjectModificationException.class);
         pageMappingService.update(pageMapping, 124l);
@@ -240,11 +225,8 @@ public class SPageMappingServiceImplTest {
         pageMappingService.update(pageMapping, "myNewUrl", "urlAdapter");
 
         //then
-        ArgumentCaptor<SUpdateEvent> updateEvent = ArgumentCaptor.forClass(SUpdateEvent.class);
         ArgumentCaptor<UpdateRecord> updateRecord = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder).recordUpdate(updateRecord.capture(), updateEvent.capture());
-        assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
-        assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING");
+        verify(recorder).recordUpdate(updateRecord.capture(), eq("PAGE_MAPPING"));
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
         assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"),
                 entry("lastUpdatedBy", 0L));

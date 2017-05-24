@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -38,12 +37,7 @@ import org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingI
 import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
 import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -129,15 +123,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private void updateFields(final SDocumentMapping mappedDocument, final Map<String, Object> params) throws SObjectModificationException {
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(mappedDocument,
-                params);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENTMAPPING).setObject(mappedDocument)
-                    .done();
-        }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(mappedDocument,
+                    params), DOCUMENTMAPPING);
         } catch (final SRecorderException e) {
             throw new SObjectModificationException(e);
         }
@@ -159,13 +147,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private SDocument insertDocument(final SDocument document) throws SRecorderException {
-        final InsertRecord insertRecord = new InsertRecord(document);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(DOCUMENT, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DOCUMENT).setObject(document)
-                    .done();
-        }
-        recorder.recordInsert(insertRecord, insertEvent);
+        recorder.recordInsert(new InsertRecord(document), DOCUMENT);
         return document;
     }
 
@@ -354,29 +336,17 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private void delete(final SLightDocument document) throws SRecorderException {
-        final DeleteRecord deleteDocRecord = new DeleteRecord(document);
-        final SDeleteEvent deleteDocEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocument")
-                .setObject(document)
-                .done();
-        recorder.recordDelete(deleteDocRecord, deleteDocEvent);
+        recorder.recordDelete(new DeleteRecord(document), "SDocument");
     }
 
     private void delete(final SADocumentMapping mappedDocument) throws SRecorderException {
-        final DeleteRecord deleteRecord = new DeleteRecord(mappedDocument);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SADocumentMapping")
-                .setObject(mappedDocument)
-                .done();
-        recorder.recordDelete(deleteRecord, deleteEvent);
+        recorder.recordDelete(new DeleteRecord(mappedDocument), "SADocumentMapping");
     }
 
     @Override
     public void removeDocument(final SMappedDocument mappedDocument) throws SObjectModificationException {
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(mappedDocument);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentMapping")
-                    .setObject(mappedDocument)
-                    .done();
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(mappedDocument), "SDocumentMapping");
         } catch (final SBonitaException e) {
             throw new SObjectModificationException(e.getMessage(), e);
         }
@@ -440,13 +410,7 @@ public class DocumentServiceImpl implements DocumentService {
         documentMapping.setDescription(description);
         documentMapping.setVersion("1");
         documentMapping.setIndex(index);
-        final InsertRecord insertRecord = new InsertRecord(documentMapping);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping)
-                    .done();
-        }
-        recorder.recordInsert(insertRecord, insertEvent);
+        recorder.recordInsert(new InsertRecord(documentMapping), DOCUMENTMAPPING);
         return documentMapping;
     }
 
@@ -476,13 +440,7 @@ public class DocumentServiceImpl implements DocumentService {
     public void deleteContentOfArchivedDocument(final long archivedDocumentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
         final SAMappedDocument archivedDocument = getArchivedDocument(archivedDocumentId);
         final SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null));
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(DOCUMENT, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENT).setObject(document)
-                    .done();
-        }
-        recorder.recordUpdate(updateRecord, updateEvent);
+        recorder.recordUpdate(UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null)), DOCUMENT);
     }
 
     @Override

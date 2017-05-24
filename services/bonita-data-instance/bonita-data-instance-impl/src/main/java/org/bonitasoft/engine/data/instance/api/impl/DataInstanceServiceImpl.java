@@ -44,11 +44,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -418,12 +413,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     private void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
-        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
-        final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_INSTANCE).setObject(dataInstance)
-                .done();
-        final SDeleteEvent deleteEvent = (SDeleteEvent) event;
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(dataInstance), DATA_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SDeleteDataInstanceException("Impossible to delete data instance", e);
         }
@@ -473,24 +464,10 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    private SInsertEvent getInsertEvent(final Object obj) {
-        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_INSTANCE).setObject(obj).done();
-    }
-
-    private SUpdateEvent getUpdateEvent(final Object obj) {
-        return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DATA_INSTANCE).setObject(obj).done();
-    }
-
-    private SDeleteEvent getDeleteEvent(final Object obj) {
-        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_INSTANCE).setObject(obj).done();
-    }
-
     @Override
     public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         try {
-            final InsertRecord insertRecord = new InsertRecord(dataInstance);
-            final SInsertEvent insertEvent = getInsertEvent(dataInstance);
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(dataInstance), DATA_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SCreateDataInstanceException("Impossible to create data instance.", e);
         }
@@ -500,10 +477,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     @Override
     public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, descriptor);
-        final SUpdateEvent updateEvent = getUpdateEvent(dataInstance);
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(dataInstance, descriptor), DATA_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SUpdateDataInstanceException("Impossible to update data instance '" + dataInstance.getName() + "': " + e.getMessage(), e);
         }
@@ -513,10 +488,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     @Override
     public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
-        final SDeleteEvent deleteEvent = getDeleteEvent(dataInstance);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(dataInstance), DATA_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SDeleteDataInstanceException("Impossible to delete data instance", e);
         }

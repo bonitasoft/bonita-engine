@@ -38,11 +38,7 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -89,13 +85,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void createGatewayInstance(final SGatewayInstance gatewayInstance) throws SGatewayCreationException {
-        final InsertRecord insertRecord = new InsertRecord(gatewayInstance);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(GATEWAYINSTANCE, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(GATEWAYINSTANCE).setObject(gatewayInstance).done();
-        }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(gatewayInstance), GATEWAYINSTANCE);
         } catch (final SRecorderException e) {
             throw new SGatewayCreationException(e);
         }
@@ -320,15 +311,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         entityUpdateDescriptor.addField(columnName, columnValue);
         entityUpdateDescriptor.addField("lastUpdateDate", now);
         entityUpdateDescriptor.addField("reachedStateDate", now);
-
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(gatewayInstance, entityUpdateDescriptor);
-
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(event, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(event).setObject(gatewayInstance).done();
-        }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(gatewayInstance, entityUpdateDescriptor), event);
         } catch (final SRecorderException e) {
             throw new SGatewayModificationException(e);
         }

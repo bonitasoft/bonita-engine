@@ -35,11 +35,7 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRef
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectBusinessDataDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -107,14 +103,8 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     @Override
     public SRefBusinessDataInstance addRefBusinessDataInstance(final SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException {
         final SRefBusinessDataInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, NEW_REF_BUSINESS_DATA_INSTANCE_ADDED);
-        final InsertRecord insertRecord = new InsertRecord(instance);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(REF_BUSINESS_DATA_INSTANCE, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(REF_BUSINESS_DATA_INSTANCE).setObject(instance)
-                    .done();
-        }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(instance), REF_BUSINESS_DATA_INSTANCE);
             initiateLogBuilder(instance.getId(), SQueriableLog.STATUS_OK, logBuilder, "addRefBusinessDataInstance");
         } catch (final SBonitaException sbe) {
             initiateLogBuilder(instance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addRefBusinessDataInstance");
@@ -168,13 +158,7 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
     private void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Map<String, Object> fields)
             throws SRefBusinessDataInstanceModificationException {
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(refBusinessDataInstance, fields);
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(REF_BUSINESS_DATA_INSTANCE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(REF_BUSINESS_DATA_INSTANCE)
-                        .setObject(refBusinessDataInstance).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(refBusinessDataInstance, fields), REF_BUSINESS_DATA_INSTANCE);
         } catch (final SRecorderException sre) {
             throw new SRefBusinessDataInstanceModificationException(sre);
         }

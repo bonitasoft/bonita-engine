@@ -18,24 +18,16 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionCreationException;
@@ -112,16 +104,11 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Test
     public void createCustomUserInfoDefinition_should_call_recorder_insert() throws Exception {
-        // given
-        given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_DEFINITION, EventActionType.CREATED)).willReturn(true);
-        final ArgumentCaptor<SInsertEvent> eventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
-
         // when
         identityServiceImpl.createCustomUserInfoDefinition(userInfoDef);
 
         // then
-        verify(recorder, times(1)).recordInsert(eq(new InsertRecord(userInfoDef)), eventCaptor.capture());
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(userInfoDef);
+        verify(recorder, times(1)).recordInsert(eq(new InsertRecord(userInfoDef)), eq(IdentityService.CUSTOM_USER_INFO_DEFINITION));
     }
 
     @Test
@@ -129,7 +116,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
             throws Exception {
         // given
         final SRecorderException recorderException = new SRecorderException("");
-        doThrow(recorderException).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(recorderException).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         try {
             // when
@@ -158,7 +145,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
         } catch (final SCustomUserInfoDefinitionAlreadyExistsException e) {
             // then
             assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
-            verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+            verify(recorder, never()).recordInsert(any(InsertRecord.class), anyString());
         }
 
     }
@@ -269,23 +256,20 @@ public class IdentityServiceImplForCustomUserInfoTest {
     @Test
     public void createCustomUserInfoValue_should_call_recorder_insert() throws Exception {
         // given
-        given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_VALUE, EventActionType.CREATED)).willReturn(true);
         final ArgumentCaptor<InsertRecord> recordCaptor = ArgumentCaptor.forClass(InsertRecord.class);
-        final ArgumentCaptor<SInsertEvent> eventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
 
         // when
         identityServiceImpl.createCustomUserInfoValue(userInfoValue);
 
         // then
-        verify(recorder, times(1)).recordInsert(recordCaptor.capture(), eventCaptor.capture());
+        verify(recorder, times(1)).recordInsert(recordCaptor.capture(), eq(IdentityService.CUSTOM_USER_INFO_VALUE));
         assertThat(recordCaptor.getValue().getEntity()).isEqualTo(userInfoValue);
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(userInfoValue);
     }
 
     @Test(expected = SIdentityException.class)
     public void createCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException() throws Exception {
         // given
-        doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // when
         identityServiceImpl.createCustomUserInfoValue(userInfoValue);
@@ -294,23 +278,20 @@ public class IdentityServiceImplForCustomUserInfoTest {
     @Test
     public void deleteCustomUserInfoValue_should_call_recorder_delete() throws Exception {
         // given
-        given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_VALUE, EventActionType.DELETED)).willReturn(true);
         final ArgumentCaptor<DeleteRecord> recordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
-        final ArgumentCaptor<SDeleteEvent> eventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
 
         // when
         identityServiceImpl.deleteCustomUserInfoValue(userInfoValue);
 
         // then
-        verify(recorder, times(1)).recordDelete(recordCaptor.capture(), eventCaptor.capture());
+        verify(recorder, times(1)).recordDelete(recordCaptor.capture(), eq(IdentityService.CUSTOM_USER_INFO_VALUE));
         assertThat(recordCaptor.getValue().getEntity()).isEqualTo(userInfoValue);
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(userInfoValue);
     }
 
     @Test(expected = SIdentityException.class)
     public void deleteCustomUserInfoValue_should_throw_SIdentityException_when_recorder_throws_SRecorderException() throws Exception {
         // given
-        doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // when
         identityServiceImpl.deleteCustomUserInfoValue(userInfoValue);
@@ -358,18 +339,15 @@ public class IdentityServiceImplForCustomUserInfoTest {
     @Test
     public void updateCustomUserInfoValue_should_call_recorder_update() throws Exception {
         // given
-        given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_VALUE, EventActionType.UPDATED)).willReturn(true);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        final ArgumentCaptor<SUpdateEvent> eventCaptor = ArgumentCaptor.forClass(SUpdateEvent.class);
 
         // when
         identityServiceImpl.updateCustomUserInfoValue(userInfoValue, descriptor);
 
         // then
-        verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), eventCaptor.capture());
+        verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), eq(IdentityService.CUSTOM_USER_INFO_VALUE));
         assertThat(recordCaptor.getValue().getEntity()).isEqualTo(userInfoValue);
-        assertThat(eventCaptor.getValue().getObject()).isEqualTo(userInfoValue);
     }
 
     @Test

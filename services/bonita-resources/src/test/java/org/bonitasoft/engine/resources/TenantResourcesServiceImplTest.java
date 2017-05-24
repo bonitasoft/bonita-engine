@@ -47,7 +47,7 @@ public class TenantResourcesServiceImplTest {
 
     @Before
     public void initMocks() throws Exception {
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), anyString());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class TenantResourcesServiceImplTest {
         tenantResourcesService.add("resourceName", TenantResourceType.BDM, "someValidContent".getBytes());
 
         // then
-        verify(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
         verifyZeroInteractions(logger);
     }
 

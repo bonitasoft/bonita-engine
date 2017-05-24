@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -21,9 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -80,7 +78,7 @@ public class ParameterServiceImplTest {
     @Test
     public void update_shoudl_call_recordUpdate_on_recorder() throws Exception {
         parameterService.update(mock(SParameter.class), "value");
-        verify(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        verify(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
     }
 
     @Test(expected = SParameterNameNotFoundException.class)
@@ -95,7 +93,7 @@ public class ParameterServiceImplTest {
         parameters.put("param2", "value2");
         parameters.put("param3", "value3");
         parameterService.addAll(123L, parameters);
-        verify(recorder, times(3)).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder, times(3)).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test
@@ -104,7 +102,7 @@ public class ParameterServiceImplTest {
         final ParameterServiceImpl spy = spy(parameterService);
         doReturn(Collections.singletonList(new SParameterImpl())).when(spy).get(eq(processDefinitionId), anyInt(), anyInt(), nullable(OrderBy.class));
         spy.deleteAll(processDefinitionId);
-        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test

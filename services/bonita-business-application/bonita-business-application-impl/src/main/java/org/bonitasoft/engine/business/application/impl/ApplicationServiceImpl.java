@@ -43,10 +43,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -119,9 +115,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getToken());
         try {
             validateApplication(application);
-            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION)
-                    .setObject(application).done();
-            recorder.recordInsert(new InsertRecord(application), insertEvent);
+            recorder.recordInsert(new InsertRecord(application), APPLICATION);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectAlreadyExistsException e) {
             return logAndRetrowException(application.getId(), methodName, logBuilder, e);
@@ -218,10 +212,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.DELETED, "Deleting application with id " + applicationId);
         try {
             final SApplication application = getApplication(applicationId);
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
-                    .setObject(application).done();
             applicationDestructor.onDeleteApplication(application);
-            recorder.recordDelete(new DeleteRecord(application), event);
+            recorder.recordDelete(new DeleteRecord(application), APPLICATION);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
             logAndRetrowException(applicationId, methodName, logBuilder, e);
@@ -274,11 +266,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             validateUpdatedFields(updateDescriptor, application);
             updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
 
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
-                    updateDescriptor);
-            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
-                    .setObject(application).done();
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(application,
+                    updateDescriptor), APPLICATION);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
 
@@ -321,10 +310,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 "Creating application page with token " + applicationPage.getToken());
         try {
             validateApplicationPage(applicationPage);
-            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
-                    .createInsertEvent(ApplicationService.APPLICATION_PAGE)
-                    .setObject(applicationPage).done();
-            recorder.recordInsert(new InsertRecord(applicationPage), insertEvent);
+            recorder.recordInsert(new InsertRecord(applicationPage), APPLICATION_PAGE);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectAlreadyExistsException e) {
             return logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
@@ -421,10 +407,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.DELETED, "Deleting application page with id "
                 + applicationPage.getId());
         try {
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
-                    .setObject(applicationPage).done();
             applicationPageDestructor.onDeleteApplicationPage(applicationPage);
-            recorder.recordDelete(new DeleteRecord(applicationPage), event);
+            recorder.recordDelete(new DeleteRecord(applicationPage), APPLICATION_PAGE);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectModificationException e) {
             logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
@@ -466,10 +450,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.CREATED,
                 "Creating application menu with display name " + applicationMenu.getDisplayName());
         try {
-            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
-                    .createInsertEvent(ApplicationService.APPLICATION_MENU)
-                    .setObject(applicationMenu).done();
-            recorder.recordInsert(new InsertRecord(applicationMenu), insertEvent);
+            recorder.recordInsert(new InsertRecord(applicationMenu), APPLICATION_MENU);
             log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             handleCreationException(applicationMenu, logBuilder, e, methodName);
@@ -507,12 +488,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         try {
             organizeIndexesOnUpdate(applicationMenu, updateDescriptor, organizeIndexes);
-            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
-                    .createUpdateEvent(ApplicationService.APPLICATION_MENU)
-                    .setObject(applicationMenu).done();
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(applicationMenu,
-                    updateDescriptor);
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(applicationMenu,
+                    updateDescriptor), APPLICATION_MENU);
             log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return applicationMenu;
         } catch (final SBonitaException e) {
@@ -569,12 +546,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED,
                 "Deleting application menu with id " + applicationMenu.getId());
         try {
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
-                    .setObject(applicationMenu).done();
             applicationMenuDestructor.onDeleteApplicationMenu(applicationMenu);
             final int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
             indexManager.organizeIndexesOnDelete(new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
-            recorder.recordDelete(new DeleteRecord(applicationMenu), event);
+            recorder.recordDelete(new DeleteRecord(applicationMenu), APPLICATION_MENU);
         } catch (final SBonitaException e) {
             throwModificationException(applicationMenu.getId(), logBuilder, methodName, e);
         }

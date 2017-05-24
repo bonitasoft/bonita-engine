@@ -24,6 +24,8 @@ import org.bonitasoft.engine.recorder.SRecorderException;
  */
 public interface TenantResourcesService {
 
+    String TENANT_RESOURCE = "TENANT_RESOURCE";
+
     void add(String name, TenantResourceType type, byte[] content) throws SRecorderException;
 
     void removeAll(TenantResourceType external) throws SBonitaReadException, SRecorderException;

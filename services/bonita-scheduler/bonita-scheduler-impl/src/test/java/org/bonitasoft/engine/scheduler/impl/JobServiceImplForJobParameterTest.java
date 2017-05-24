@@ -15,19 +15,14 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -86,8 +81,6 @@ public class JobServiceImplForJobParameterTest {
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-
         final List<SJobParameter> result = jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -129,8 +122,7 @@ public class JobServiceImplForJobParameterTest {
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), nullable(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
@@ -148,8 +140,6 @@ public class JobServiceImplForJobParameterTest {
         final long tenantId = 2;
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
-
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         final SJobParameter result = jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
         assertNotNull(result);
@@ -173,8 +163,7 @@ public class JobServiceImplForJobParameterTest {
         final long jobDescriptorId = 9;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
@@ -195,14 +184,13 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
         doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         // When
         jobServiceImpl.deleteJobParameter(3);
 
         // Then
         verify(jobServiceImpl).deleteJobParameter(sJobParameter);
-        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test(expected = SJobParameterNotFoundException.class)
@@ -220,8 +208,7 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
         doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobParameter(3);
@@ -237,7 +224,6 @@ public class JobServiceImplForJobParameterTest {
     public final void deleteJobParameter_by_object() throws SRecorderException, SJobParameterDeletionException {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         jobServiceImpl.deleteJobParameter(sJobParameter);
     }
@@ -251,8 +237,7 @@ public class JobServiceImplForJobParameterTest {
     public void deleteJobParameter_by_object_should_throw_exception_when_recorder_failed() throws Exception {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         jobServiceImpl.deleteJobParameter(sJobParameter);
     }
@@ -342,7 +327,6 @@ public class JobServiceImplForJobParameterTest {
         final List<SJobParameter> sJobParameters = Collections.singletonList(sJobParameter);
         doReturn(sJobParameters).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
 
         // When
         final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, sJobParameters);
@@ -412,8 +396,7 @@ public class JobServiceImplForJobParameterTest {
 
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq(null));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
@@ -428,9 +411,8 @@ public class JobServiceImplForJobParameterTest {
 
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));

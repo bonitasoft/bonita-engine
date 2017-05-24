@@ -16,11 +16,7 @@ package org.bonitasoft.engine.supervisor.mapping.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -72,13 +68,8 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     @Override
     public SProcessSupervisor createProcessSupervisor(final SProcessSupervisor supervisor) throws SSupervisorCreationException {
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new supervisor");
-        final InsertRecord insertRecord = new InsertRecord(supervisor);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(SUPERVISOR, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUPERVISOR).setObject(supervisor).done();
-        }
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(supervisor), SUPERVISOR);
             log(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
             return supervisor;
         } catch (final SRecorderException re) {
@@ -109,14 +100,9 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     @Override
     public void deleteProcessSupervisor(final SProcessSupervisor supervisor) throws SSupervisorDeletionException {
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(SUPERVISOR, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUPERVISOR).setObject(supervisor).done();
-        }
-        final DeleteRecord record = new DeleteRecord(supervisor);
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting supervisor");
         try {
-            recorder.recordDelete(record, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(supervisor), SUPERVISOR);
             log(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
         } catch (final SRecorderException e) {
             log(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");

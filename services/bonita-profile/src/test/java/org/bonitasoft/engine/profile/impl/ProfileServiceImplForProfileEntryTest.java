@@ -16,22 +16,14 @@ package org.bonitasoft.engine.profile.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -46,7 +38,6 @@ import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoun
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -95,9 +86,7 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void createProfileEntry() throws SRecorderException, SProfileEntryCreationException {
         final SProfileEntry sProfileEntry = createProfileEntry(1L);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         final SProfileEntry result = profileServiceImpl.createProfileEntry(sProfileEntry);
         assertNotNull(result);
@@ -119,9 +108,7 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void createProfileThrowException() throws SRecorderException, SProfileEntryCreationException {
         final SProfileEntry sProfileEntry = createProfileEntry(1);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         profileServiceImpl.createProfileEntry(sProfileEntry);
     }
@@ -139,8 +126,6 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         profileServiceImpl.deleteProfileEntry(1);
     }
@@ -157,8 +142,7 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
         doReturn(sProfileEntry).when(persistenceService).selectById(any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), nullable(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         profileServiceImpl.deleteProfileEntry(1);
     }
@@ -173,9 +157,6 @@ public class ProfileServiceImplForProfileEntryTest {
     public final void deleteProfileEntryByObject() throws SRecorderException, SProfileEntryDeletionException {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
-
         profileServiceImpl.deleteProfileEntry(sProfileEntry);
     }
 
@@ -188,8 +169,7 @@ public class ProfileServiceImplForProfileEntryTest {
     public void deleteProfileEntryByObjectThrowException() throws Exception {
         final SProfileEntry sProfileEntry = createProfileEntry(6);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         profileServiceImpl.deleteProfileEntry(sProfileEntry);
     }
@@ -350,9 +330,6 @@ public class ProfileServiceImplForProfileEntryTest {
                 .setProfileId(9)
                 .setType("type");
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
-
         final SProfileEntry result = profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
         assertNotNull(result);
     }
@@ -377,7 +354,7 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
         sProfileEntryUpdateBuilder.setDescription("newDescription").setName("newName");
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
     }

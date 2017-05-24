@@ -107,14 +107,14 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.createEventTriggerInstance(eventTriggerInstance);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
     }
 
     @Test(expected = SEventTriggerInstanceCreationException.class)
     public final void createEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.createEventTriggerInstance(eventTriggerInstance);
@@ -135,14 +135,14 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.deleteEventTriggerInstance(eventTriggerInstance);
 
         // Then
-        verify(recorder).recordDelete(eq(insertRecord), nullable(SDeleteEvent.class));
+        verify(recorder).recordDelete(eq(insertRecord), nullable(String.class));
     }
 
     @Test(expected = SEventTriggerInstanceDeletionException.class)
     public final void deleteEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.deleteEventTriggerInstance(eventTriggerInstance);
@@ -412,7 +412,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.updateEventTriggerInstance(sTimerEventTriggerInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
     }
 
     @Test
@@ -426,7 +426,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.updateEventTriggerInstance(sThrowMessageEventTriggerInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
     }
 
     @Test
@@ -440,7 +440,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.updateEventTriggerInstance(sThrowErrorEventTriggerInstanceImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
     }
 
     @Test(expected = SEventTriggerInstanceModificationException.class)
@@ -448,7 +448,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final SThrowSignalEventTriggerInstanceImpl sThrowSignalEventTriggerInstanceImpl = new SThrowSignalEventTriggerInstanceImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.updateEventTriggerInstance(sThrowSignalEventTriggerInstanceImpl, descriptor);

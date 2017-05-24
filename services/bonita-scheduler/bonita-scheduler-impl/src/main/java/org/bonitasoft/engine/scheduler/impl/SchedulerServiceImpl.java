@@ -21,13 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SFireEventException;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -107,9 +105,9 @@ public class SchedulerServiceImpl implements SchedulerService {
         this.logger = logger;
         this.servicesResolver = servicesResolver;
         this.persistenceService = persistenceService;
-        schedulStarted = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STARTED).done();
-        schedulStopped = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STOPPED).done();
-        jobFailed = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(JOB_FAILED).done();
+        schedulStarted = new SEvent(SCHEDULER_STARTED);
+        schedulStopped = new SEvent(SCHEDULER_STOPPED);
+        jobFailed = new SEvent(JOB_FAILED);
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;

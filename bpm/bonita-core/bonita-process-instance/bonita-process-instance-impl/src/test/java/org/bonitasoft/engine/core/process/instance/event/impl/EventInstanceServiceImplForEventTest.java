@@ -16,9 +16,7 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +31,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediat
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -89,14 +86,14 @@ public class EventInstanceServiceImplForEventTest {
         eventInstanceServiceImpl.createEventInstance(eventInstanceImpl);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
     }
 
     @Test(expected = SEventInstanceCreationException.class)
     public final void createEventInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SStartEventInstanceImpl eventInstanceImpl = new SStartEventInstanceImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.createEventInstance(eventInstanceImpl);

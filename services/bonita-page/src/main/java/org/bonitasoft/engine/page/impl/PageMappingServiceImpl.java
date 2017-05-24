@@ -19,16 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.page.AuthorizationRule;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SAuthorizationException;
@@ -105,9 +100,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     SPageMapping insert(final SPageMappingImpl entity) throws SObjectCreationException {
-        final InsertRecord record = new InsertRecord(entity);
         try {
-            recorder.recordInsert(record, getInsertEvent(entity));
+            recorder.recordInsert(new InsertRecord(entity), PAGE_MAPPING);
         } catch (final SRecorderException e) {
             throw new SObjectCreationException(e);
         }
@@ -132,10 +126,6 @@ public class PageMappingServiceImpl implements PageMappingService {
             return insert(entity);
         }
         throw new SObjectCreationException(String.format("Mapping key %s already exists for page with id %s", key, pageMapping.getPageId()));
-    }
-
-    SInsertEvent getInsertEvent(final SPageMappingImpl entity) {
-        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PAGE_MAPPING).setObject(entity).done();
     }
 
     @Override
@@ -197,14 +187,10 @@ public class PageMappingServiceImpl implements PageMappingService {
     @Override
     public void delete(final SPageMapping sPageMapping) throws SDeletionException {
         try {
-            recorder.recordDelete(new DeleteRecord(sPageMapping), getDeleteRecord(sPageMapping));
+            recorder.recordDelete(new DeleteRecord(sPageMapping), PAGE_MAPPING);
         } catch (final SRecorderException e) {
             throw new SDeletionException("Unable to delete the page mapping with key " + sPageMapping.getKey(), e);
         }
-    }
-
-    SDeleteEvent getDeleteRecord(final SPageMapping sPageMapping) {
-        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PAGE_MAPPING).setObject(sPageMapping).done();
     }
 
     @Override
@@ -247,12 +233,7 @@ public class PageMappingServiceImpl implements PageMappingService {
 
     void update(final SPageMapping pageMapping, final EntityUpdateDescriptor descriptor)
             throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(pageMapping, descriptor);
-        recorder.recordUpdate(updateRecord, getUpdateEvent(pageMapping));
-    }
-
-    SUpdateEvent getUpdateEvent(final SPageMapping sPageMapping) {
-        return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PAGE_MAPPING).setObject(sPageMapping).done();
+        recorder.recordUpdate(UpdateRecord.buildSetFields(pageMapping, descriptor), PAGE_MAPPING);
     }
 
     @Override

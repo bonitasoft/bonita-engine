@@ -18,11 +18,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,9 +39,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWa
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -107,14 +102,14 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.createWaitingEvent(sWaitingEventImpl);
 
         // Then
-        verify(recorder).recordInsert(eq(insertRecord), nullable(SInsertEvent.class));
+        verify(recorder).recordInsert(eq(insertRecord), nullable(String.class));
     }
 
     @Test(expected = SWaitingEventCreationException.class)
     public final void createWaitingEvent_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SWaitingMessageEventImpl sWaitingEventImpl = new SWaitingMessageEventImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.createWaitingEvent(sWaitingEventImpl);
@@ -135,14 +130,14 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.deleteWaitingEvent(sWaitingEventImpl);
 
         // Then
-        verify(recorder).recordDelete(eq(insertRecord), nullable(SDeleteEvent.class));
+        verify(recorder).recordDelete(eq(insertRecord), nullable(String.class));
     }
 
     @Test(expected = SWaitingEventModificationException.class)
     public final void deleteWaitingEvent_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final SWaitingSignalEventImpl sWaitingEventImpl = new SWaitingSignalEventImpl();
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.deleteWaitingEvent(sWaitingEventImpl);
@@ -411,7 +406,7 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.updateWaitingMessage(waitingMessageEventImpl, descriptor);
 
         // Then
-        verify(recorder).recordUpdate(eq(updateRecord), nullable(SUpdateEvent.class));
+        verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
     }
 
     @Test(expected = SWaitingEventModificationException.class)
@@ -419,7 +414,7 @@ public class EventInstanceServiceImplForWaitingTest {
         // Given
         final SWaitingMessageEventImpl waitingMessageEventImpl = new SWaitingMessageEventImpl();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(SUpdateEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
 
         // When
         eventInstanceServiceImpl.updateWaitingMessage(waitingMessageEventImpl, descriptor);

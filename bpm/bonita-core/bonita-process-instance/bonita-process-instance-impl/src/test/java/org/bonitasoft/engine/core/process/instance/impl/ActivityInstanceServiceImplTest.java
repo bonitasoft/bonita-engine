@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateC
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -118,7 +117,7 @@ public class ActivityInstanceServiceImplTest {
 
     private void checkFlowNodeUpdate(final String attributeKey, final String expectedValue) throws SRecorderException {
         final ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), anyString());
         final Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
         assertThat(actualValue).isEqualTo(expectedValue);
     }
@@ -339,22 +338,19 @@ public class ActivityInstanceServiceImplTest {
         activityInstanceServiceImpl.updateExpectedEndDate(sFlowNodeInstance, 123L);
 
         ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        ArgumentCaptor<SUpdateEvent> sUpdateEventArgumentCaptor = ArgumentCaptor.forClass(SUpdateEvent.class);
 
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), sUpdateEventArgumentCaptor.capture());
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), eq(FlowNodeInstanceService.ACTIVITYINSTANCE_EXPECTED_END_DATE));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity").isEqualTo(sFlowNodeInstance);
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).as("should only update expectedEndDate field with new value")
                 .containsExactly(entry("expectedEndDate", 123L));
-        assertThat(sUpdateEventArgumentCaptor.getValue().getType())
-                .isEqualTo(FlowNodeInstanceService.ACTIVITYINSTANCE_EXPECTED_END_DATE);
 
     }
 
     @Test
     public void should_updateExpectedEndDate_throw_SFlowNodeModificationException_when_recorder_fails() throws Exception {
         //given
-        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
 
         //expect
         expectedException.expect(SFlowNodeModificationException.class);

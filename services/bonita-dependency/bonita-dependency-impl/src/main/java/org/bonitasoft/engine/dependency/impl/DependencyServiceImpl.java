@@ -37,12 +37,7 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilderFacto
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -186,12 +181,7 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     }
 
     private void delete(PersistentObject object, String eventType) throws SRecorderException {
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(eventType, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(eventType).setObject(object).done();
-        }
-        final DeleteRecord record = new DeleteRecord(object);
-        recorder.recordDelete(record, deleteEvent);
+        recorder.recordDelete(new DeleteRecord(object), eventType);
     }
 
     public void deleteDependencyMapping(final SDependencyMapping dependencyMapping) throws SDependencyException {
@@ -290,12 +280,7 @@ public class DependencyServiceImpl extends AbstractDependencyService {
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("unable to find dependency " + fileName + " on artifact: " + artifactId + " with type " + scopeType);
             }
-            UpdateRecord updateRecord = UpdateRecord.buildSetFields(sDependency, Collections.<String, Object> singletonMap("value_", jarContent));
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(DEPENDENCY, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCY).setObject(sDependency).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sDependency, Collections.singletonMap("value_", jarContent)), DEPENDENCY);
             return sDependency;
         } catch (SBonitaReadException | SRecorderException e) {
             throw new SDependencyException(e);
@@ -318,12 +303,7 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     }
 
     private void insert(PersistentObject object, String eventType) throws SRecorderException {
-        final InsertRecord insertRecord = new InsertRecord(object);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(eventType, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(eventType).setObject(object).done();
-        }
-        recorder.recordInsert(insertRecord, insertEvent);
+        recorder.recordInsert(new InsertRecord(object), eventType);
     }
 
     private void createDependencyMapping(long artifactId, ScopeType scopeType, SDependency sDependency) throws SDependencyException {

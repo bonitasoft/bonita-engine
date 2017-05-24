@@ -46,6 +46,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 public interface ProcessDefinitionService {
 
     String PROCESSDEFINITION = "PROCESSDEFINITION";
+    String PROCESSDEFINITION_CONTENT = "PROCESSDEFINITION_CONTENT";
 
     String PROCESSDEFINITION_IS_ENABLED = "PROCESSDEFINITION_IS_ENABLED";
 
