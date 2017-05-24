@@ -39,12 +39,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInst
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -96,15 +91,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     public void setState(final SConnectorInstance sConnectorInstance, final String state) throws SConnectorInstanceModificationException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getStateKey(), state);
-
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sConnectorInstance, entityUpdateDescriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(CONNECTOR_INSTANCE_STATE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CONNECTOR_INSTANCE_STATE)
-                    .setObject(sConnectorInstance).done();
-        }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sConnectorInstance, entityUpdateDescriptor), CONNECTOR_INSTANCE_STATE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceModificationException(e);
         }
@@ -122,15 +110,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         } catch (final IOException e) {
             throw new SConnectorInstanceModificationException(e);
         }
-
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(connectorInstanceWithFailure, entityUpdateDescriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(CONNECTOR_INSTANCE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CONNECTOR_INSTANCE)
-                    .setObject(connectorInstanceWithFailure).done();
-        }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(connectorInstanceWithFailure, entityUpdateDescriptor), CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceModificationException(e);
         }
@@ -171,14 +152,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     @Override
     public void createConnectorInstance(final SConnectorInstance connectorInstance) throws SConnectorInstanceCreationException {
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(CONNECTOR_INSTANCE, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(CONNECTOR_INSTANCE).setObject(connectorInstance)
-                    .done();
-        }
-        final InsertRecord insertRecord = new InsertRecord(connectorInstance);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(connectorInstance), CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceCreationException(e);
         }
@@ -340,14 +315,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     @Override
     public void deleteConnectorInstance(final SConnectorInstance connectorInstance) throws SConnectorInstanceDeletionException {
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(CONNECTOR_INSTANCE, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(CONNECTOR_INSTANCE).setObject(connectorInstance)
-                    .done();
-        }
-        final DeleteRecord deleteRecord = new DeleteRecord(connectorInstance);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(connectorInstance), CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceDeletionException(e);
         }
@@ -368,10 +337,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     @Override
     public void deleteArchivedConnectorInstance(final SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException {
-        final SDeleteEvent deleteEvent = null;
-        final DeleteRecord deleteRecord = new DeleteRecord(sConnectorInstance);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(sConnectorInstance), CONNECTOR_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SConnectorInstanceDeletionException(e);
         }

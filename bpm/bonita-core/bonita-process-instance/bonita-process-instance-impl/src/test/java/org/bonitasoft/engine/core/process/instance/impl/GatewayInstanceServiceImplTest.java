@@ -508,7 +508,7 @@ public class GatewayInstanceServiceImplTest {
 
         gatewayInstanceService.setState(gate, 12);
 
-        verify(recorder).recordUpdate(updateRecordCaptor.capture(), nullable(SUpdateEvent.class));
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), nullable(String.class));
 
         assertThat(updateRecordCaptor.getValue().getFields().keySet()).contains("stateId", "reachedStateDate", "lastUpdateDate");
     }

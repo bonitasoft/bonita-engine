@@ -19,11 +19,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingCreationException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
@@ -87,13 +83,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         final SExternalIdentityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new ExternalIdentityMapping for external id "
                 + externalIdentityMapping.getExternalId());
         try {
-            final InsertRecord insertRecord = new InsertRecord(externalIdentityMapping);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EXTERNAL_IDENTITY_MAPPING)
-                        .setObject(externalIdentityMapping).done();
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(new InsertRecord(externalIdentityMapping), EXTERNAL_IDENTITY_MAPPING);
             log(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createExternalIdentityMapping");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createExternalIdentityMapping"));
@@ -187,15 +177,9 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteExternalIdentityMapping"));
         }
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EXTERNAL_IDENTITY_MAPPING)
-                    .setObject(externalIdentityMapping).done();
-        }
-        final DeleteRecord record = new DeleteRecord(externalIdentityMapping);
         final SExternalIdentityMappingLogBuilder queriableLog = getQueriableLog(ActionType.DELETED, "deleting external identity mapping");
         try {
-            recorder.recordDelete(record, deleteEvent);
+            recorder.recordDelete(new DeleteRecord(externalIdentityMapping), EXTERNAL_IDENTITY_MAPPING);
             log(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, queriableLog, "deleteExternalIdentityMapping");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteExternalIdentityMapping"));

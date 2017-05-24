@@ -56,12 +56,7 @@ import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuil
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -139,13 +134,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public void createActivityInstance(final SActivityInstance activityInstance) throws SActivityCreationException {
         try {
-            final InsertRecord insertRecord = new InsertRecord(activityInstance);
-            SInsertEvent insertEvent = null;
-            if (getEventService().hasHandlers(ACTIVITYINSTANCE, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance)
-                        .done();
-            }
-            getRecorder().recordInsert(insertRecord, insertEvent);
+            getRecorder().recordInsert(new InsertRecord(activityInstance), ACTIVITYINSTANCE);
         } catch (final SRecorderException e) {
             throw new SActivityCreationException(e);
         }
@@ -174,14 +163,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public void addPendingActivityMappings(final SPendingActivityMapping mapping) throws SActivityCreationException {
-        final InsertRecord insertRecord = new InsertRecord(mapping);
-        final EventService eventService = getEventService();
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
-        }
         try {
-            getRecorder().recordInsert(insertRecord, insertEvent);
+            getRecorder().recordInsert(new InsertRecord(mapping), PENDINGACTIVITYMAPPING);
         } catch (final SRecorderException e) {
             throw new SActivityCreationException(e);
         }
@@ -191,29 +174,19 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public void deletePendingMappings(final long humanTaskInstanceId) throws SActivityModificationException {
         try {
             List<SPendingActivityMapping> mappings = null;
-            final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
             final QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, SPendingActivityMapping.class, "id", OrderByType.ASC);
             while (!(mappings = getPendingMappings(humanTaskInstanceId, queryOptions)).isEmpty()) {
-                deletePendingMappings(mappings, createEvents);
+                deletePendingMappings(mappings);
             }
         } catch (final SBonitaException e) {
             throw new SActivityModificationException(e);
         }
     }
 
-    private void deletePendingMappings(final List<SPendingActivityMapping> mappings, final boolean createEvents) throws SRecorderException {
+    private void deletePendingMappings(final List<SPendingActivityMapping> mappings) throws SRecorderException {
         for (final SPendingActivityMapping mapping : mappings) {
-            deletePendingMapping(mapping, createEvents);
+            getRecorder().recordDelete(new DeleteRecord(mapping), PENDINGACTIVITYMAPPING);
         }
-    }
-
-    private void deletePendingMapping(final SPendingActivityMapping mapping, final boolean createEvents) throws SRecorderException {
-        SDeleteEvent deleteEvent = null;
-        if (createEvents) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PENDINGACTIVITYMAPPING)
-                    .setObject(mapping).done();
-        }
-        getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
     }
 
     @Override
@@ -400,16 +373,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
                 // if this action is a Release action:
                 descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0);
             }
-
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-
-            SUpdateEvent updateEvent = null;
-            if (getEventService().hasHandlers(HUMAN_TASK_INSTANCE_ASSIGNEE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN_TASK_INSTANCE_ASSIGNEE)
-                        .setObject(flowNodeInstance).done();
-            }
             try {
-                getRecorder().recordUpdate(updateRecord, updateEvent);
+                getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor), HUMAN_TASK_INSTANCE_ASSIGNEE);
             } catch (final SRecorderException e) {
                 throw new SActivityModificationException(e);
             }
@@ -576,14 +541,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("loopCounter", loopInstance.getLoopCounter() + 1);
 
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(loopInstance, descriptor);
-        SUpdateEvent updateEvent = null;
-        if (getEventService().hasHandlers(ACTIVITYINSTANCE_STATE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(loopInstance)
-                    .done();
-        }
         try {
-            getRecorder().recordUpdate(updateRecord, updateEvent);
+            getRecorder().recordUpdate(UpdateRecord.buildSetFields(loopInstance, descriptor), ACTIVITYINSTANCE_STATE);
         } catch (final SRecorderException sre) {
             throw new SActivityModificationException(sre);
         }
@@ -722,15 +681,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public void setTokenCount(final SActivityInstance activityInstance, final int tokenCount) throws SFlowNodeModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getTokenCountKey(), tokenCount);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
-
-        SUpdateEvent updateEvent = null;
-        if (getEventService().hasHandlers(ACTIVITY_INSTANCE_TOKEN_COUNT, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITY_INSTANCE_TOKEN_COUNT)
-                    .setObject(activityInstance).done();
-        }
         try {
-            getRecorder().recordUpdate(updateRecord, updateEvent);
+            getRecorder().recordUpdate(UpdateRecord.buildSetFields(activityInstance, descriptor), ACTIVITY_INSTANCE_TOKEN_COUNT);
         } catch (final SRecorderException e) {
             throw new SFlowNodeModificationException(e);
         }
@@ -789,11 +741,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
 
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(STATE_CATEGORY)
-                .setObject(activityInstance).done();
         try {
-            getRecorder().recordUpdate(updateRecord, updateEvent);
+            getRecorder().recordUpdate(UpdateRecord.buildSetFields(activityInstance, descriptor), STATE_CATEGORY);
         } catch (final SRecorderException sre) {
             throw new SActivityModificationException(sre);
         }

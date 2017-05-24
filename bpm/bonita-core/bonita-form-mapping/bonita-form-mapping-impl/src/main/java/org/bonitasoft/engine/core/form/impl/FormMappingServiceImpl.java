@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -28,10 +27,6 @@ import org.bonitasoft.engine.core.form.AuthorizationRuleMapping;
 import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
@@ -152,14 +147,10 @@ public class FormMappingServiceImpl implements FormMappingService {
     }
 
     private void insertFormMapping(SFormMappingImpl sFormMapping, SPageMapping sPageMapping) throws SObjectCreationException {
-        InsertRecord record = new InsertRecord(sFormMapping);
         sFormMapping.setPageMapping(sPageMapping);
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(FORM_MAPPING)
-                .setObject(sFormMapping)
-                .done();
         FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.CREATED);
         try {
-            recorder.recordInsert(record, insertEvent);
+            recorder.recordInsert(new InsertRecord(sFormMapping), FORM_MAPPING);
             log(sFormMapping, SQueriableLog.STATUS_OK, logBuilder, "insertFormMapping", "create");
         } catch (SRecorderException e) {
             log(sFormMapping, SQueriableLog.STATUS_FAIL, logBuilder, "insertFormMapping", "failed to create");
@@ -169,8 +160,6 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
-                .done();
         String target = getFormMappingTarget(url, pageId);
         String urlAdapter = checkAndGetUrlAdapter(url);
         checkThatInternalPageExists(pageId);
@@ -196,8 +185,7 @@ public class FormMappingServiceImpl implements FormMappingService {
                 entityUpdateDescriptor.addField("pageMapping.urlAdapter", urlAdapter);
                 entityUpdateDescriptor.addField("pageMapping.pageId", pageId);
             }
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor);
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor), FORM_MAPPING);
             final String rawMessage = "Previous: pageId=<" + oldPageId + "> urlAdapter=<" + oldUrlAdapter + "> url=<"
                     + oldUrl + ">";
             log(formMapping, SQueriableLog.STATUS_OK, logBuilder, "update", truncate(rawMessage));
@@ -290,12 +278,9 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public void delete(SFormMapping formMapping) throws SObjectModificationException {
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(FORM_MAPPING).setObject(formMapping)
-                .done();
-
         FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.DELETED);
         try {
-            recorder.recordDelete(new DeleteRecord(formMapping), deleteEvent);
+            recorder.recordDelete(new DeleteRecord(formMapping), FORM_MAPPING);
             if (formMapping.getPageMapping() != null) {
                 pageMappingService.delete(formMapping.getPageMapping());
             }

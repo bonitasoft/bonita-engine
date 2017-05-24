@@ -18,15 +18,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
@@ -57,10 +49,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -142,8 +130,6 @@ public class ApplicationServiceImplTest {
     @Test
     public void createApplication_should_call_recordInsert_and_return_created_object() throws Exception {
         //given
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION)
-                .setObject(application).done();
         final InsertRecord record = new InsertRecord(application);
 
         //when
@@ -151,13 +137,13 @@ public class ApplicationServiceImplTest {
 
         //then
         assertThat(createdApplication).isEqualTo(application);
-        verify(recorder, times(1)).recordInsert(record, insertEvent);
+        verify(recorder, times(1)).recordInsert(record, ApplicationService.APPLICATION);
     }
 
     @Test(expected = SObjectCreationException.class)
     public void createApplication_should_throw_SObjectCreationException_when_record_insert_throws_Exception() throws Exception {
         //given
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), anyString());
 
         //when
         applicationServiceImpl.createApplication(application);
@@ -180,7 +166,7 @@ public class ApplicationServiceImplTest {
         } catch (final SObjectAlreadyExistsException e) {
             //then
             assertThat(e.getMessage()).isEqualTo("An application already exists with token '" + APPLICATION_TOKEN + "'.");
-            verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+            verify(recorder, never()).recordInsert(any(InsertRecord.class), anyString());
         }
 
     }
@@ -239,9 +225,7 @@ public class ApplicationServiceImplTest {
         applicationServiceImpl.deleteApplication(applicationId);
 
         //then
-        final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
-                .setObject(application).done();
-        verify(recorder, times(1)).recordDelete(new DeleteRecord(application), event);
+        verify(recorder, times(1)).recordDelete(new DeleteRecord(application), ApplicationService.APPLICATION);
     }
 
     @Test
@@ -279,7 +263,7 @@ public class ApplicationServiceImplTest {
         final long applicationId = 10L;
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplication.class, applicationId))).willReturn(
                 application);
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), anyString());
 
         //when
         applicationServiceImpl.deleteApplication(applicationId);
@@ -342,8 +326,6 @@ public class ApplicationServiceImplTest {
     public void createApplicationPage_should_call_recordInsert_and_return_created_object() throws Exception {
         //given
         final SApplicationPage applicationPage = buildApplicationPage(15, 5, 15, "mainDashBoard");
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION_PAGE)
-                .setObject(applicationPage).done();
         final InsertRecord record = new InsertRecord(applicationPage);
 
         //when
@@ -351,14 +333,14 @@ public class ApplicationServiceImplTest {
 
         //then
         assertThat(createdApplicationPage).isEqualTo(applicationPage);
-        verify(recorder, times(1)).recordInsert(record, insertEvent);
+        verify(recorder, times(1)).recordInsert(record, ApplicationService.APPLICATION_PAGE);
     }
 
     @Test(expected = SObjectCreationException.class)
     public void createApplicationPage_should_throw_SObjectCreationException_when_recorder_throws_SBonitaException() throws Exception {
         //given
         final SApplicationPage applicationPage = buildApplicationPage(15, 5, 15, "mainDashBoard");
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), anyString());
 
         //when
         applicationServiceImpl.createApplicationPage(applicationPage);
@@ -441,12 +423,9 @@ public class ApplicationServiceImplTest {
         applicationService.deleteApplicationPage(applicationPageId);
 
         //then
-        final ArgumentCaptor<SDeleteEvent> deleteEventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
         final ArgumentCaptor<DeleteRecord> deleteRecordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
-        verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), deleteEventCaptor.capture());
+        verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), eq(ApplicationService.APPLICATION_PAGE));
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationPage);
-        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_PAGE);
-        assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationPage);
     }
 
     @Test
@@ -504,7 +483,7 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(27, 20, 30, "myPage");
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationPage.class, applicationPageId)))
                 .willReturn(applicationPage);
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), anyString());
 
         //when
         applicationServiceImpl.deleteApplicationPage(applicationPageId);
@@ -529,9 +508,7 @@ public class ApplicationServiceImplTest {
         //then
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
                 updateDescriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
-                .setObject(application).done();
-        verify(recorder, times(1)).recordUpdate(updateRecord, updateEvent);
+        verify(recorder, times(1)).recordUpdate(updateRecord, ApplicationService.APPLICATION);
         assertThat(updatedApplication).isEqualTo(application);
     }
 
@@ -669,12 +646,9 @@ public class ApplicationServiceImplTest {
         //then
         assertThat(createdAppMenu).isEqualTo(appMenu);
 
-        final ArgumentCaptor<SInsertEvent> insertEventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
         final ArgumentCaptor<InsertRecord> insertRecordCaptor = ArgumentCaptor.forClass(InsertRecord.class);
-        verify(recorder, times(1)).recordInsert(insertRecordCaptor.capture(), insertEventCaptor.capture());
+        verify(recorder, times(1)).recordInsert(insertRecordCaptor.capture(), eq(ApplicationService.APPLICATION_MENU));
         assertThat(insertRecordCaptor.getValue().getEntity()).isEqualTo(appMenu);
-        assertThat(insertEventCaptor.getValue().getObject()).isEqualTo(appMenu);
-        assertThat(insertEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU);
     }
 
     private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index, final long applicationId) {
@@ -686,7 +660,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectCreationException.class)
     public void createApplicationMenu_should_throw_SObjectCreationException_when_recorder_throws_Exception() throws Exception {
         //given
-        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), anyString());
 
         //when
         applicationServiceImpl.createApplicationMenu(buildApplicationMenu("main", 4, 1, 12));
@@ -715,9 +689,7 @@ public class ApplicationServiceImplTest {
         //then
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(appMenu,
                 updateDescriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION_MENU)
-                .setObject(appMenu).done();
-        verify(recorder, times(1)).recordUpdate(updateRecord, updateEvent);
+        verify(recorder, times(1)).recordUpdate(updateRecord, ApplicationService.APPLICATION_MENU);
         assertThat(updatedApplicationMenu).isEqualTo(appMenu);
     }
 
@@ -774,7 +746,7 @@ public class ApplicationServiceImplTest {
 
         //then
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), anyString());
 
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
         assertThat(updateRecord.getFields().get(SApplicationMenuFields.INDEX)).isEqualTo(6);
@@ -834,7 +806,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectById(new SelectByIdDescriptor<>(SApplicationMenu.class, applicationMenuId)))
                 .willReturn(
                         appMenu);
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), anyString());
 
         //when
         applicationServiceImpl.updateApplicationMenu(applicationMenuId, updateDescriptor);
@@ -887,11 +859,8 @@ public class ApplicationServiceImplTest {
         applicationServiceImpl.deleteApplicationMenu(applicationMenuId);
 
         //then
-        final ArgumentCaptor<SDeleteEvent> deleteEventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
         final ArgumentCaptor<DeleteRecord> deleteRecordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
-        verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), deleteEventCaptor.capture());
-        assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationMenu);
-        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU);
+        verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), eq(ApplicationService.APPLICATION_MENU));
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationMenu);
     }
 
@@ -957,7 +926,7 @@ public class ApplicationServiceImplTest {
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(2);
 
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), anyString());
 
         //when
         applicationServiceImpl.deleteApplicationMenu(5);

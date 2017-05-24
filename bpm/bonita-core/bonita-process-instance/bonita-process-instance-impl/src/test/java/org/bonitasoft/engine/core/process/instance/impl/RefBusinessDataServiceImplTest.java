@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
@@ -111,7 +112,7 @@ public class RefBusinessDataServiceImplTest {
 
         service.updateRefBusinessDataInstance(refBusinessDataInstance, dataId);
 
-        verify(recorder).recordUpdate(updateRecord, null);
+        verify(recorder).recordUpdate(updateRecord, RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
     }
 
     @Test(expected = SRefBusinessDataInstanceModificationException.class)
@@ -121,7 +122,7 @@ public class RefBusinessDataServiceImplTest {
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("dataId", dataId);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(refBusinessDataInstance, fields);
-        doThrow(new SRecorderException("ouch!")).when(recorder).recordUpdate(updateRecord, null);
+        doThrow(new SRecorderException("ouch!")).when(recorder).recordUpdate(updateRecord, RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
 
         service.updateRefBusinessDataInstance(refBusinessDataInstance, dataId);
     }
@@ -132,14 +133,14 @@ public class RefBusinessDataServiceImplTest {
 
         service.addRefBusinessDataInstance(refBusinessDataInstance);
 
-        verify(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), null);
+        verify(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
     }
 
     @Test(expected = SRefBusinessDataInstanceCreationException.class)
     public void addRefBusinessDataThrowException() throws Exception {
         final SRefBusinessDataInstance refBusinessDataInstance = buildSRefBusinessDataInstance();
 
-        doThrow(new SRecorderException("ouch!")).when(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), null);
+        doThrow(new SRecorderException("ouch!")).when(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), RefBusinessDataService.REF_BUSINESS_DATA_INSTANCE);
 
         service.addRefBusinessDataInstance(refBusinessDataInstance);
     }

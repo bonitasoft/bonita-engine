@@ -37,19 +37,15 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface IdentityService {
 
-    static final String GROUP = "GROUP";
-
-    static final String CUSTOM_USER_INFO_DEFINITION = "CUSTOM_USER_INFO_DEFINITION";
-
-    static final String CUSTOM_USER_INFO_VALUE = "CUSTOM_USER_INFO_VALUE";
-
-    static final String ROLE = "ROLE";
-
-    static final String USER = "USER";
-
-    static final String USER_CONTACT_INFO = "USER_CONTACT_INFO";
-
-    static final String USERMEMBERSHIP = "USERMEMBERSHIP";
+    String GROUP = "GROUP";
+    String CUSTOM_USER_INFO_DEFINITION = "CUSTOM_USER_INFO_DEFINITION";
+    String CUSTOM_USER_INFO_VALUE = "CUSTOM_USER_INFO_VALUE";
+    String ROLE = "ROLE";
+    String USER = "USER";
+    String USER_LOGIN = "USER_LOGIN";
+    String USER_CONTACT_INFO = "USER_CONTACT_INFO";
+    String USERMEMBERSHIP = "USERMEMBERSHIP";
+    String ICON = "ICON";
 
     /**
      * Gets the {@link SRole} given by its identifier.

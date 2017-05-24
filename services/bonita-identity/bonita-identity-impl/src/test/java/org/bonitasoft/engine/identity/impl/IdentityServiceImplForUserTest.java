@@ -25,9 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -108,7 +105,7 @@ public class IdentityServiceImplForUserTest {
             ((InsertRecord) invocation.getArguments()[0]).getEntity().setId(NEW_ICON_ID);
             return null;
         }).when(recorder).recordInsert(argThat(insertRecord -> insertRecord.getEntity() instanceof SIconImpl),
-                nullable(SInsertEvent.class));
+                nullable(String.class));
     }
 
     /**
@@ -325,7 +322,7 @@ public class IdentityServiceImplForUserTest {
         //when
         SUser user = identityServiceImpl.createUser(sUser, null, null, "test.jpg", "iconContent".getBytes());
         //then
-        verify(recorder, times(3)).recordInsert(insertRecordArgumentCaptor.capture(), nullable(SInsertEvent.class));
+        verify(recorder, times(3)).recordInsert(insertRecordArgumentCaptor.capture(), nullable(String.class));
         SIconImpl sIcon = new SIconImpl("image/jpeg", "iconContent".getBytes());
         sIcon.setId(NEW_ICON_ID);
         assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
@@ -344,7 +341,7 @@ public class IdentityServiceImplForUserTest {
         iconUpdateDescriptor.addField("content", "theContent".getBytes());
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
-        verify(recorder, times(1)).recordInsert(insertRecordArgumentCaptor.capture(), nullable(SInsertEvent.class));
+        verify(recorder, times(1)).recordInsert(insertRecordArgumentCaptor.capture(), nullable(String.class));
         SIconImpl newIcon = new SIconImpl("image/gif", "theContent".getBytes());
         newIcon.setId(NEW_ICON_ID);
         assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
@@ -363,9 +360,9 @@ public class IdentityServiceImplForUserTest {
         iconUpdateDescriptor.addField("content", "updated content".getBytes());
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), nullable(SUpdateEvent.class));
-        verify(recorder).recordInsert(insertRecordArgumentCaptor.capture(), nullable(SInsertEvent.class));
-        verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(SDeleteEvent.class));
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), nullable(String.class));
+        verify(recorder).recordInsert(insertRecordArgumentCaptor.capture(), nullable(String.class));
+        verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(String.class));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sUser);
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("iconId", NEW_ICON_ID));
         assertThat(insertRecordArgumentCaptor.getValue().getEntity()).isEqualToIgnoringGivenFields(new SIconImpl("image/jpeg", "updated content".getBytes()),
@@ -383,9 +380,9 @@ public class IdentityServiceImplForUserTest {
         iconUpdateDescriptor.addField("content", null);
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), nullable(SUpdateEvent.class));
-        verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
-        verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(SDeleteEvent.class));
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), nullable(String.class));
+        verify(recorder, never()).recordInsert(any(InsertRecord.class), nullable(String.class));
+        verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(String.class));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sUser);
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("iconId", null));
         assertThat(deleteRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sIcon);
@@ -406,7 +403,7 @@ public class IdentityServiceImplForUserTest {
         //when
         identityServiceImpl.deleteUser(USER_ID);
         //then
-        verify(recorder, times(2)).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(SDeleteEvent.class));
+        verify(recorder, times(2)).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(String.class));
         assertThat(deleteRecordArgumentCaptor.getAllValues()).extracting("entity").containsOnly(sUser, icon);
     }
 
@@ -417,7 +414,7 @@ public class IdentityServiceImplForUserTest {
         //when
         identityServiceImpl.deleteUser(USER_ID);
         //then
-        verify(recorder, times(1)).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(SDeleteEvent.class));
+        verify(recorder, times(1)).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(String.class));
         assertThat(deleteRecordArgumentCaptor.getAllValues()).extracting("entity").containsOnly(sUser);
     }
 

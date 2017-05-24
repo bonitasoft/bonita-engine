@@ -46,12 +46,12 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
     @Override
     public void add(long processDefinitionId, String name, BARResourceType type, byte[] content) throws SRecorderException {
         SBARResource resource = new SBARResource(name, type, processDefinitionId, content);
-        recorder.recordInsert(new InsertRecord(resource), null);
+        recorder.recordInsert(new InsertRecord(resource), BAR_RESOURCE);
     }
 
     @Override
     public void update(SBARResourceLight resource, byte[] content) throws SRecorderException {
-        recorder.recordUpdate(UpdateRecord.buildSetFields(resource, Collections.<String, Object> singletonMap("content", content)), null);
+        recorder.recordUpdate(UpdateRecord.buildSetFields(resource, Collections.singletonMap("content", content)), BAR_RESOURCE);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ProcessResourcesServiceImpl implements ProcessResourcesService {
 
     @Override
     public void remove(SBARResourceLight resource) throws SRecorderException {
-        recorder.recordDelete(new DeleteRecord(resource), null);
+        recorder.recordDelete(new DeleteRecord(resource), BAR_RESOURCE);
     }
 
 }

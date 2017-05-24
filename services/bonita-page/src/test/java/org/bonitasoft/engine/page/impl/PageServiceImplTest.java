@@ -533,12 +533,12 @@ public class PageServiceImplTest {
                 return null;
             }
 
-        }).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        }).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
         doReturn(expected).when(pageServiceImpl).getPage(pageId);
 
         pageServiceImpl.deletePage(pageId);
 
-        verify(recorder, times(1)).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder, times(1)).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
     }
 
@@ -550,7 +550,7 @@ public class PageServiceImplTest {
         expected.setId(pageId);
 
         doThrow(new SRecorderException("ouch !")).when(recorder).recordDelete(any(DeleteRecord.class),
-                nullable(SDeleteEvent.class));
+                nullable(String.class));
         when(readPersistenceService.selectById(new SelectByIdDescriptor<>(SPage.class, pageId))).thenReturn(expected);
 
         pageServiceImpl.deletePage(pageId);

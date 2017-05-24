@@ -17,7 +17,6 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -25,13 +24,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -88,7 +83,7 @@ public class JobServiceImplForJobDescriptorTest {
         // Given
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         doReturn("plop").when(sJobDescriptor).getJobName();
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
 
         // When
         final SJobDescriptor result = jobServiceImpl.createJobDescriptor(sJobDescriptor, TENANT_ID);
@@ -98,7 +93,7 @@ public class JobServiceImplForJobDescriptorTest {
         assertEquals(sJobDescriptor.getJobName(), result.getJobName());
         assertEquals(sJobDescriptor.getDescription(), result.getDescription());
         assertEquals(sJobDescriptor.getJobClassName(), result.getJobClassName());
-        verify(recorder, times(1)).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        verify(recorder, times(1)).recordInsert(any(InsertRecord.class), nullable(String.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -118,7 +113,7 @@ public class JobServiceImplForJobDescriptorTest {
     @Test(expected = SJobDescriptorCreationException.class)
     public void createJobDescriptor_should_throw_exception_when_recorder_failed() throws Exception {
         //given
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         when(sJobDescriptor.getJobName()).thenReturn("jobName");
 
@@ -135,9 +130,6 @@ public class JobServiceImplForJobDescriptorTest {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
         doReturn(sJobDescriptor).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobDescriptor>> any());
-        doReturn(true).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doReturn(mock(SDeleteEvent.class)).when(jobServiceImpl).createDeleteEvent(any(PersistentObject.class), anyString());
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
         // When
         jobServiceImpl.deleteJobDescriptor(3);
@@ -177,8 +169,7 @@ public class JobServiceImplForJobDescriptorTest {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
         doReturn(sJobDescriptor).when(readPersistenceService).selectById(any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobDescriptor(3);
@@ -245,14 +236,13 @@ public class JobServiceImplForJobDescriptorTest {
         // Given
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
 
         // When
         jobServiceImpl.deleteJobDescriptor(sJobDescriptor);
 
         //Then
-        verify(recorder, times(1)).recordDelete(any(DeleteRecord.class), nullable(SDeleteEvent.class));
+        verify(recorder, times(1)).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
     @Test(expected = IllegalArgumentException.class)

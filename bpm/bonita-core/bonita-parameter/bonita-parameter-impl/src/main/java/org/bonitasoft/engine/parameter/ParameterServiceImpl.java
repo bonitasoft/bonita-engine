@@ -19,15 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -48,7 +42,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 public class ParameterServiceImpl implements ParameterService {
 
     public static final int PAGE_SIZE = 100;
-    public final String PARAMETER = "PARAMETER";
+    public static final String PARAMETER = "PARAMETER";
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
@@ -73,8 +67,8 @@ public class ParameterServiceImpl implements ParameterService {
     void update(SParameter sParameter, String parameterValue) throws SObjectModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("value", parameterValue);
-        try { //TODO Business log
-            recorder.recordUpdate(UpdateRecord.buildSetFields(sParameter, descriptor), getUpdateEvent(sParameter, PARAMETER));
+        try {
+            recorder.recordUpdate(UpdateRecord.buildSetFields(sParameter, descriptor), PARAMETER);
         } catch (SRecorderException e) {
             throw new SObjectModificationException(e);
         }
@@ -100,7 +94,7 @@ public class ParameterServiceImpl implements ParameterService {
     private void add(long processDefinitionId, String name, String value) throws SObjectCreationException {
         final SParameterImpl sParameter = new SParameterImpl(name, value, processDefinitionId);
         try {
-            recorder.recordInsert(new InsertRecord(sParameter), getInsertEvent(sParameter, PARAMETER));
+            recorder.recordInsert(new InsertRecord(sParameter), PARAMETER);
         } catch (SRecorderException e) {
             throw new SObjectCreationException(e);
         }
@@ -129,7 +123,7 @@ public class ParameterServiceImpl implements ParameterService {
             toDelete = get(processDefinitionId, 0, PAGE_SIZE, null);
             for (SParameter sParameter : toDelete) {
                 try {
-                    recorder.recordDelete(new DeleteRecord(sParameter), getDeleteEvent(sParameter, PARAMETER));
+                    recorder.recordDelete(new DeleteRecord(sParameter), PARAMETER);
                 } catch (SRecorderException e) {
                     throw new SObjectModificationException(e);
                 }
@@ -183,26 +177,5 @@ public class ParameterServiceImpl implements ParameterService {
     public boolean containsNullValues(long processDefinitionId) throws SBonitaReadException {
         return !persistenceService.selectList(new SelectListDescriptor<SParameter>("getParametersWithNullValues", Collections.<String, Object> singletonMap(
                 "processDefinitionId", processDefinitionId), SParameter.class, new QueryOptions(0, 1000))).isEmpty();
-    }
-
-    private SInsertEvent getInsertEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.CREATED)) {
-            return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        }
-        return null;
-    }
-
-    private SDeleteEvent getDeleteEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.DELETED)) {
-            return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        }
-        return null;
-    }
-
-    private SUpdateEvent getUpdateEvent(final Object object, final String type) {
-        if (eventService.hasHandlers(type, EventActionType.UPDATED)) {
-            return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(type).setObject(object).done();
-        }
-        return null;
     }
 }

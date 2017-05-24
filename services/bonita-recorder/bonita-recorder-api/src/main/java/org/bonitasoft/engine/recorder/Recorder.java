@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.recorder;
 
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -28,36 +25,33 @@ public interface Recorder {
      * 
      * @param record
      *            the record for insert
-     * @param insertEvent
-     *            the event for insert
+     * @param type
      * @throws SRecorderException
      * @since 6.0
      */
-    void recordInsert(InsertRecord record, SInsertEvent insertEvent) throws SRecorderException;
+    void recordInsert(InsertRecord record, String type) throws SRecorderException;
 
     /**
      * Delete a record from database
      * 
      * @param record
      *            the record for insert
-     * @param deleteEvent
-     *            the event for delete
+     * @param type
      * @throws SRecorderException
      * @since 6.0
      */
-    void recordDelete(DeleteRecord record, SDeleteEvent deleteEvent) throws SRecorderException;
+    void recordDelete(DeleteRecord record, String type) throws SRecorderException;
 
     /**
      * Update a record from database
      * 
      * @param record
      *            the record for insert
-     * @param updateEvent
-     *            the event for update
+     * @param type
      * @throws SRecorderException
      * @since 6.0
      */
-    void recordUpdate(UpdateRecord record, SUpdateEvent updateEvent) throws SRecorderException;
+    void recordUpdate(UpdateRecord record, String type) throws SRecorderException;
 
     /**
      * Delete all records for a table from database, for the connected tenant
