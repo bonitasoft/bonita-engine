@@ -34,7 +34,7 @@ public interface BonitaExecutorService {
      */
     void shutdownAndEmptyQueue();
 
-    void submit(BonitaWork work);
+    void submit(WorkDescriptor work, SuccessCallback onSuccess, FailureCallback onFailure);
 
     boolean awaitTermination(long workTerminationTimeout, TimeUnit seconds) throws InterruptedException;
 

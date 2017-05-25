@@ -19,7 +19,7 @@
 	<!-- <logger name="org.bonitasoft.engine.scheduler.impl.JobWrapper" level="DEBUG" /> -->
 	<!-- Show lock acquire/release -->
 <!-- 	<logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="TRACE" /> -->
-<!-- 	<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="DEBUG" /> -->
+<!-- 	<logger naorg.bonitasoft.engine.execution.work.InSessionBonitaWorkWork" level="DEBUG" /> -->
 
 
 	<!-- Quartz log for job lifecycle -->

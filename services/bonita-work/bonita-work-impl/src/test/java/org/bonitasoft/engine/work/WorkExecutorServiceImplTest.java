@@ -19,6 +19,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -42,6 +43,7 @@ public class WorkExecutorServiceImplTest {
     private BonitaExecutorService bonitaExecutorService;
     @Mock
     private TechnicalLoggerService loggerService;
+    private WorkDescriptor workDescriptor = WorkDescriptor.create("myWork");
     @Mock
     private BonitaWork bonitaWork;
     private WorkExecutorServiceImpl workExecutorService;
@@ -57,9 +59,10 @@ public class WorkExecutorServiceImplTest {
     @Test
     public void should_submit_work_on_the_executor() throws Exception {
 
-        workExecutorService.execute(bonitaWork);
+        workExecutorService.execute(workDescriptor);
 
-        verify(bonitaExecutorService).submit(bonitaWork);
+        verify(bonitaExecutorService).submit(eq(workDescriptor), any(SuccessCallback.class),
+                any(FailureCallback.class));
     }
 
     @Test
@@ -111,10 +114,11 @@ public class WorkExecutorServiceImplTest {
 
         // when
         workExecutorService.resume();
-        workExecutorService.execute(bonitaWork);
+        workExecutorService.execute(workDescriptor);
 
         // then
-        verify(bonitaExecutorService, times(1)).submit(eq(bonitaWork));
+        verify(bonitaExecutorService, times(1)).submit(eq(workDescriptor), any(SuccessCallback.class),
+                any(FailureCallback.class));
     }
 
     @Test
@@ -211,6 +215,22 @@ public class WorkExecutorServiceImplTest {
         // then
         assertThat(workExecutorService.isStopped()).isTrue();
 
+    }
+
+    @Test
+    public void should_reexecute_work_when_it_fails_because_of_lock() throws Exception {
+        workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(),
+                new LockTimeoutException("lock timeout"));
+
+        verify(bonitaExecutorService).submit(eq(workDescriptor), any(SuccessCallback.class),
+                any(FailureCallback.class));
+    }
+
+    @Test
+    public void should_log_on_success() throws Exception {
+        workExecutorService.onSuccess(workDescriptor);
+
+        verify(loggerService).log(any(), eq(TechnicalLogSeverity.DEBUG),contains("Completed work"));
     }
 
 }

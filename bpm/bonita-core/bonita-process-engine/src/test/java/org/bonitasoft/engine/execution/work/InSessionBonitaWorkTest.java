@@ -51,7 +51,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class FailureHandlingBonitaWorkTest {
+public class InSessionBonitaWorkTest {
 
     @Mock
     private BonitaWork wrappedWork;
@@ -77,11 +77,11 @@ public class FailureHandlingBonitaWorkTest {
     @Mock
     private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
 
-    private FailureHandlingBonitaWork txBonitawork;
+    private InSessionBonitaWork txBonitawork;
 
     @Before
     public void before() {
-        txBonitawork = spy(new FailureHandlingBonitaWork(wrappedWork));
+        txBonitawork = spy(new InSessionBonitaWork(wrappedWork));
         doReturn(false).when(loggerService).isLoggable(eq(txBonitawork.getClass()), any(TechnicalLogSeverity.class));
 
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
@@ -101,10 +101,8 @@ public class FailureHandlingBonitaWorkTest {
     public void testWorkFailureIsHandled() throws Throwable {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         final Exception e = new Exception();
-        doThrow(e).when(wrappedWork).work(singletonMap);
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-        verify(wrappedWork, times(1)).handleFailure(e, singletonMap);
+        txBonitawork.handleFailure(e, singletonMap);
+        verify(wrappedWork).handleFailure(e, singletonMap);
     }
 
     @Test
@@ -112,16 +110,14 @@ public class FailureHandlingBonitaWorkTest {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         final Exception e1 = new Exception();
         final Exception e2 = new Exception();
-        doThrow(e1).when(wrappedWork).work(singletonMap);
         doThrow(e2).when(wrappedWork).handleFailure(e1, singletonMap);
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-        verify(wrappedWork, times(1)).handleFailure(e1, singletonMap);
-        verify(incidentService, times(1)).report(eq(0l), any(Incident.class));
+        txBonitawork.handleFailure(e1, singletonMap);
+        verify(wrappedWork).handleFailure(e1, singletonMap);
+        verify(incidentService).report(eq(0l), any(Incident.class));
     }
 
     @Test
-    public void putInMap() {
+    public void putInMap() throws Exception {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
@@ -173,23 +169,21 @@ public class FailureHandlingBonitaWorkTest {
         assertEquals("the to string", txBonitawork.toString());
     }
 
-    @Test
-    public void handleFailureForAllOtherExceptions() throws Throwable {
+    @Test(expected = Exception.class)
+    public void should_throw_the_exception_of_wrapped_work() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(context);
         txBonitawork.work(context);
-        verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 
     @Test
     public void work_should_log_in_error_level_when_an_exception_occurs_in_wrapped_work() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
-        doThrow(seee).when(wrappedWork).work(context);
         when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
 
-        txBonitawork.work(context);
+        txBonitawork.handleFailure(seee, context);
 
         verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""), eq(seee));
     }

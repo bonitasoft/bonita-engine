@@ -79,7 +79,7 @@ public class WorkServiceImpl implements WorkService {
         synchronized (getSynchroLock) {
             WorkSynchronization synchro = synchronizations.get();
             if (synchro == null) {
-                synchro = new WorkSynchronization(workExecutorService, sessionAccessor, workFactory, this);
+                synchro = new WorkSynchronization(workExecutorService, sessionAccessor, this);
                 try {
                     transactionService.registerBonitaSynchronization(synchro);
                 } catch (final STransactionNotFoundException e) {

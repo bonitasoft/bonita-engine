@@ -60,7 +60,7 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
                 connectorInstanceId, connectorDefinitionName);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(wrappedWork, connectorDefinitionName, connectorInstanceId);
         wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
-        return withFailureHandling(wrappedWork);
+        return withSession(wrappedWork);
     }
 
     public WorkDescriptor createExecuteConnectorOfActivityDescriptor(final long processDefinitionId,
@@ -87,7 +87,7 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
                         rootProcessInstanceId,
                         new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
                                 rootProcessInstanceId, activationEvent, ((FlowNodeSelector) workDescriptor.getParameter("flowNodeSelector")))));
-        return withFailureHandling(wrappedWork);
+        return withSession(wrappedWork);
     }
 
     private Long getLongParameter(WorkDescriptor workDescriptor) {
@@ -109,8 +109,8 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
                 .withParameter("flowNodeSelector", flowNodeSelector);
     }
 
-    private FailureHandlingBonitaWork withFailureHandling(BonitaWork wrappedWork) {
-        return new FailureHandlingBonitaWork(wrappedWork);
+    private InSessionBonitaWork withSession(BonitaWork wrappedWork) {
+        return new InSessionBonitaWork(wrappedWork);
     }
 
     private BonitaWork withConnectorContext(long connectorInstanceId, String connectorDefinitionName, ConnectorEvent activationEvent,
@@ -138,7 +138,7 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
         BonitaWork wrappedWork = executeFlowNodeWork;
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(workDescriptor.getLong(PROCESS_DEFINITION_ID), processInstanceId, flowNodeInstanceId, wrappedWork);
-        return withFailureHandling(wrappedWork);
+        return withSession(wrappedWork);
     }
 
     public WorkDescriptor createExecuteReadyHumanTaskWorkDescriptor(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) {
@@ -163,7 +163,7 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
         wrappedWork = new MessageInstanceContextWork(wrappedWork, messageInstance, waitingMessage);
         wrappedWork = withProcessContext(waitingMessage.getProcessDefinitionId(), waitingMessage.getParentProcessInstanceId(),
                 waitingMessage.getRootProcessInstanceId(), waitingMessage.getFlowNodeInstanceId(), wrappedWork);
-        return withFailureHandling(wrappedWork);
+        return withSession(wrappedWork);
     }
 
     private BonitaWork createNotifyChildFinishedWork(WorkDescriptor workDescriptor) {
@@ -173,7 +173,7 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
         BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId, workDescriptor.getLong("parentId"), workDescriptor.getString("parentType"));
         wrappedWork = withLock(processInstanceId, withTx(wrappedWork));
         wrappedWork = withFlowNodeContext(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
-        return withFailureHandling(wrappedWork);
+        return withSession(wrappedWork);
     }
 
     public WorkDescriptor createNotifyChildFinishedWorkDescriptor(final long processDefinitionId,
@@ -225,26 +225,38 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
         if (parentProcessInstanceId > 0) {
             triggerSignalWork = withLock(parentProcessInstanceId, triggerSignalWork);
         }
-        return withFailureHandling(triggerSignalWork);
+        return withSession(triggerSignalWork);
     }
 
     @Override
     public BonitaWork create(WorkDescriptor workDescriptor) {
+        BonitaWork work;
         switch (workDescriptor.getType()) {
             case EXECUTE_ACTIVITY_CONNECTOR:
-                return createExecuteConnectorOfActivity(workDescriptor);
+                work = createExecuteConnectorOfActivity(workDescriptor);
+                break;
             case EXECUTE_PROCESS_CONNECTOR:
-                return createExecuteConnectorOfProcess(workDescriptor);
+                work = createExecuteConnectorOfProcess(workDescriptor);
+                break;
             case EXECUTE_FLOWNODE:
-                return createExecuteFlowNodeWork(workDescriptor);
+                work = createExecuteFlowNodeWork(workDescriptor);
+                break;
             case FINISH_FLOWNODE:
-                return createNotifyChildFinishedWork(workDescriptor);
+                work = createNotifyChildFinishedWork(workDescriptor);
+                break;
             case TRIGGER_SIGNAL:
-                return createTriggerSignalWork(workDescriptor);
+                work = createTriggerSignalWork(workDescriptor);
+                break;
             case EXECUTE_MESSAGE:
-                return createExecuteMessageCoupleWork(workDescriptor);
+                work = createExecuteMessageCoupleWork(workDescriptor);
+                break;
             default:
                 throw new IllegalArgumentException("Unkown type of work:" + workDescriptor.getType());
         }
+        Long tenantId = workDescriptor.getTenantId();
+        if (tenantId != null) {
+            work.setTenantId(tenantId);
+        }
+        return work;
     }
 }

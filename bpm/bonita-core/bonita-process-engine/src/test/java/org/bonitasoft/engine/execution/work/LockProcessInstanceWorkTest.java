@@ -27,6 +27,7 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.LockTimeoutException;
 import org.bonitasoft.engine.work.WorkExecutorService;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,15 +75,6 @@ public class LockProcessInstanceWorkTest {
     }
 
     @Test
-    public void workDidNotLock() throws Exception {
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(null);
-        Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
-        lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
-        verify(wrappedWork, times(0)).work(singletonMap);
-    }
-
-    @Test
     public void getDescription() {
         when(wrappedWork.getDescription()).thenReturn("The description");
         assertEquals("The description", lockProcessInstanceWork.getDescription());
@@ -125,20 +117,13 @@ public class LockProcessInstanceWorkTest {
         assertEquals("the to string", lockProcessInstanceWork.toString());
     }
 
-    @Test
-    public void testRescheduleWorkOnLockTimeout() throws Exception {
+    @Test(expected = LockTimeoutException.class)
+    public void should_thow_exception_when_unable_to_lock() throws Exception {
         // On first try to lock : exception to reschedule the work
         // On the second try : return a correct lock
         when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(null);
-        Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
 
-        LockProcessInstanceWork spiedWork = spy(lockProcessInstanceWork);
-        spiedWork.work(context);
-
-        // in fact we should ensure the rootWork of the lockProcessInstanceWork has been re-executed. We should check the method getRootWork has been called
-        verify(lockService).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
-        verify(workService).execute(spiedWork);
-        verify(spiedWork).getRootWork();
+        lockProcessInstanceWork.work(Collections.singletonMap("tenantAccessor", tenantAccessor));
     }
 
 }

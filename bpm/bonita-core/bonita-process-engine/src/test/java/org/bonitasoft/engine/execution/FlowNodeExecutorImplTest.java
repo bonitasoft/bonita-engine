@@ -44,7 +44,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -70,7 +69,6 @@ public class FlowNodeExecutorImplTest {
     private ArchiveService archiveService;
     @Captor
     private ArgumentCaptor<WorkDescriptor> workDescriptorArgumentCaptor;
-    @InjectMocks
     private FlowNodeExecutorImpl flowNodeExecutor;
     private SkippedFlowNodeStateImpl skippedFlowNodeState;
 
