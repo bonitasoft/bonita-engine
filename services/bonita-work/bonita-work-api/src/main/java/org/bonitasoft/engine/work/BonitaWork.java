@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +24,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Baptiste Mesta
  * 
  */
-public abstract class BonitaWork implements Runnable, Serializable {
+public abstract class BonitaWork {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,15 +57,6 @@ public abstract class BonitaWork implements Runnable, Serializable {
      * @throws Exception
      */
     public abstract void work(Map<String, Object> context) throws Exception;
-
-    @Override
-    public void run() {
-        try {
-            work(new HashMap<String, Object>());
-        } catch (final Exception e) {
-            throw new IllegalStateException("Exception should be handled by works.", e);
-        }
-    }
 
     public abstract void handleFailure(Exception e, Map<String, Object> context) throws Exception;
 

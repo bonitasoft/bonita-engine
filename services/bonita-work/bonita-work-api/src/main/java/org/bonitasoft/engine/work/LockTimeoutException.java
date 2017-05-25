@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,19 +14,12 @@
 
 package org.bonitasoft.engine.work;
 
-import org.bonitasoft.engine.commons.TenantLifecycleService;
-
 /**
- *
- * Trigger the asynchronous execution of a work
- *
- * @author Baptiste Mesta
+ * @author Baptiste Mesta.
  */
-public interface WorkExecutorService extends TenantLifecycleService {
+public class LockTimeoutException extends Exception {
 
-    boolean isStopped();
-
-    void notifyNodeStopped(String nodeName);
-
-    void execute(WorkDescriptor work);
+    public LockTimeoutException(String message) {
+        super(message);
+    }
 }

@@ -47,12 +47,14 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
 
     private final TechnicalLoggerService logger;
 
+    private WorkFactory workFactory;
     private final long tenantId;
 
-    public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, final long tenantId, final int corePoolSize, final int queueCapacity,
+    public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, WorkFactory workFactory, final long tenantId, final int corePoolSize, final int queueCapacity,
             final int maximumPoolSize,
             final long keepAliveTimeSeconds) {
         this.logger = logger;
+        this.workFactory = workFactory;
         this.tenantId = tenantId;
         this.corePoolSize = corePoolSize;
         this.queueCapacity = queueCapacity;
@@ -66,7 +68,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         return new BonitaThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue,
-                threadFactory, handler, logger);
+                threadFactory, handler, workFactory, logger);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

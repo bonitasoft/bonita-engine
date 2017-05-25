@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.work;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -30,18 +31,19 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements BonitaExecutorService {
 
     private final BlockingQueue<Runnable> workQueue;
-
+    private final WorkFactory workFactory;
     private final TechnicalLoggerService logger;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
-            final int maximumPoolSize,
-            final long keepAliveTime,
-            final TimeUnit unit,
-            final BlockingQueue<Runnable> workQueue,
-            final ThreadFactory threadFactory,
-            final RejectedExecutionHandler handler, final TechnicalLoggerService logger) {
+                                    final int maximumPoolSize,
+                                    final long keepAliveTime,
+                                    final TimeUnit unit,
+                                    final BlockingQueue<Runnable> workQueue,
+                                    final ThreadFactory threadFactory,
+                                    final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
+        this.workFactory = workFactory;
         this.logger = logger;
     }
 
@@ -67,7 +69,16 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     }
 
     @Override
-    public void submit(BonitaWork work) {
-        submit((Runnable)work);
+    public void submit(WorkDescriptor work, SuccessCallback onSuccess, FailureCallback onFailure) {
+        submit(() -> {
+            BonitaWork bonitaWork = workFactory.create(work);
+            HashMap<String, Object> context = new HashMap<>();
+            try {
+                bonitaWork.work(context);
+                onSuccess.onSuccess(work);
+            } catch (Exception e) {
+                onFailure.onFailure(work, bonitaWork, context, e);
+            }
+        });
     }
 }

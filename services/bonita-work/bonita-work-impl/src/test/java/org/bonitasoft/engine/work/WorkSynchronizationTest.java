@@ -16,12 +16,10 @@ package org.bonitasoft.engine.work;
 
 import static org.bonitasoft.engine.transaction.TransactionState.COMMITTED;
 import static org.bonitasoft.engine.transaction.TransactionState.ROLLEDBACK;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -37,8 +35,6 @@ public class WorkSynchronizationTest {
     @Mock
     private WorkServiceImpl workService;
     @Mock
-    private WorkFactory workFactory;
-    @Mock
     private WorkExecutorService workExecutorService;
     @Mock
     private SessionAccessor sessionAccessor;
@@ -46,18 +42,9 @@ public class WorkSynchronizationTest {
     private BonitaExecutorService bonitaExecutorService;
     @InjectMocks
     private WorkSynchronization workSynchronization;
-    @Mock
-    private BonitaWork bonitaWork1;
-    @Mock
-    private BonitaWork bonitaWork2;
     private WorkDescriptor workDescriptor1 = WorkDescriptor.create("myWork1");
     private WorkDescriptor workDescriptor2 = WorkDescriptor.create("myWork2");
 
-    @Before
-    public void before() throws Exception {
-        doReturn(bonitaWork1).when(workFactory).create(workDescriptor1);
-        doReturn(bonitaWork2).when(workFactory).create(workDescriptor2);
-    }
 
     @Test
     public void should_submit_work_on_commit() throws Exception {
@@ -65,7 +52,7 @@ public class WorkSynchronizationTest {
 
         workSynchronization.afterCompletion(COMMITTED);
 
-        verify(workExecutorService).execute(bonitaWork1);
+        verify(workExecutorService).execute(workDescriptor1);
     }
 
     @Test
@@ -75,8 +62,8 @@ public class WorkSynchronizationTest {
 
         workSynchronization.afterCompletion(COMMITTED);
 
-        verify(workExecutorService).execute(bonitaWork1);
-        verify(workExecutorService).execute(bonitaWork2);
+        verify(workExecutorService).execute(workDescriptor1);
+        verify(workExecutorService).execute(workDescriptor2);
     }
 
     @Test
@@ -85,7 +72,7 @@ public class WorkSynchronizationTest {
 
         workSynchronization.afterCompletion(ROLLEDBACK);
 
-        verify(workExecutorService, never()).execute(bonitaWork1);
+        verify(workExecutorService, never()).execute(workDescriptor1);
     }
 
 }

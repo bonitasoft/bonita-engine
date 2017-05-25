@@ -22,7 +22,7 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkExecutorService;
+import org.bonitasoft.engine.work.LockTimeoutException;
 
 /**
  * Transactional work that lock the process instance
@@ -65,8 +65,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
                     loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " did not get lock for instance "
                             + processInstanceId + ": " + getWorkStack());
                 }
-                rescheduleWork(getTenantAccessor(context).getWorkExecutorService(), getRootWork());
-                return;
+                throw new LockTimeoutException("Unable to lock process instance "+processInstanceId);
             }
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " obtained lock for instance " + processInstanceId
@@ -92,20 +91,6 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
             return doingWork.getDescription();
         }
         return "nothing";
-    }
-
-    private void rescheduleWork(final WorkExecutorService workService, final BonitaWork rootWork) {
-        // executeWork is called and not registerWork because the registerWork is relying on transaction
-        workService.execute(rootWork);
-
-    }
-
-    BonitaWork getRootWork() {
-        BonitaWork root = this;
-        while (root.getParent() != null) {
-            root = root.getParent();
-        }
-        return root;
     }
 
 }

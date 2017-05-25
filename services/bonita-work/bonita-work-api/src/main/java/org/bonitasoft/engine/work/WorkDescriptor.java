@@ -17,6 +17,7 @@ package org.bonitasoft.engine.work;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -27,12 +28,27 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class WorkDescriptor implements Serializable {
 
+    private String uuid = UUID.randomUUID().toString();
     private String type;
+    private Long tenantId;
     private Map<String, Serializable> parameters;
 
     public WorkDescriptor(String type) {
         this.type = type;
         this.parameters = new HashMap<>();
+    }
+
+    public Long getTenantId() {
+        return tenantId;
+    }
+
+    public WorkDescriptor setTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    public String getUuid() {
+        return uuid;
     }
 
     public String getType() {
@@ -67,10 +83,15 @@ public class WorkDescriptor implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         WorkDescriptor that = (WorkDescriptor) o;
+
         return new EqualsBuilder()
+                .append(uuid, that.uuid)
                 .append(type, that.type)
+                .append(tenantId, that.tenantId)
                 .append(parameters, that.parameters)
                 .isEquals();
     }
@@ -78,7 +99,9 @@ public class WorkDescriptor implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
+                .append(uuid)
                 .append(type)
+                .append(tenantId)
                 .append(parameters)
                 .toHashCode();
     }
@@ -86,7 +109,9 @@ public class WorkDescriptor implements Serializable {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("uuid", uuid)
                 .append("type", type)
+                .append("tenantId", tenantId)
                 .append("parameters", parameters)
                 .toString();
     }

@@ -78,6 +78,7 @@ public class ExecuteFlowNodesTest {
         when(tenantServiceAccessor.getWorkService()).thenReturn(workService);
         when(tenantServiceAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantServiceAccessor.getFlowNodeStateManager()).thenReturn(flownodeStateManager);
+        when(tenantServiceAccessor.getBPMWorkFactory()).thenReturn(new WorkFactory());
     }
 
     private ExecuteFlowNodes createExecutorWith(final SFlowNodeInstance... flowNodes) throws Exception {

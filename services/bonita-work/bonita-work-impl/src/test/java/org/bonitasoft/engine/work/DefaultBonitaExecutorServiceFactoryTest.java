@@ -18,21 +18,23 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultBonitaExecutorServiceFactoryTest {
+    @Mock
+    private WorkFactory workFactory;
 
     @Test
     public void ThreadNameInExecutorServiceShouldContainsTenantId() {
         long tenantId = 999;
-        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, tenantId, 1,
+        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, workFactory, tenantId, 1,
                 20, 15, 10);
 
         BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-            }
+        Runnable r = () -> {
         };
 
         String name = ((ThreadPoolExecutor) createExecutorService).getThreadFactory().newThread(r).getName();

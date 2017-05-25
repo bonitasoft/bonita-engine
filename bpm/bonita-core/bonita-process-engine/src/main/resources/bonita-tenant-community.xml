@@ -1077,6 +1077,7 @@
 
     <bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="workFactory" ref="workFactory" />
         <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="corePoolSize" value="${bonita.tenant.work.corePoolSize}" />
         <constructor-arg name="maximumPoolSize" value="${bonita.tenant.work.maximumPoolSize}" />
