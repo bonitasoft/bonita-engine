@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -29,11 +28,9 @@ import org.bonitasoft.engine.work.BonitaWork;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
-public class FailureHandlingBonitaWork extends WrappingBonitaWork {
+public class InSessionBonitaWork extends WrappingBonitaWork {
 
-    private static final long serialVersionUID = 1L;
-
-    public FailureHandlingBonitaWork(final BonitaWork work) {
+    public InSessionBonitaWork(final BonitaWork work) {
         super(work);
     }
 
@@ -52,23 +49,13 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) {
+    public void work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
         context.put(TENANT_ACCESSOR, tenantAccessor);
         try {
             sessionAccessor.setTenantId(getTenantId());
-
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.TRACE, "Starting work: " + getDescription());
-            }
             getWrappedWork().work(context);
-        } catch (final SExpressionEvaluationException e) {
-            // To do before log, because we want to set the context of the exception.
-            handleFailureWrappedWork(loggerService, e, context);
-        } catch (final Exception e) {
-            handleFailure(e, context);
         } finally {
             sessionAccessor.deleteTenantId();
         }
@@ -77,13 +64,22 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     @Override
     public void handleFailure(final Exception e, final Map<String, Object> context) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
-        // final Edge case we cannot manage
-        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "The work [" + getDescription() + "] failed. The failure will be handled.");
+        final SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
+        sessionAccessor.setTenantId(getTenantId());
+        try {
+
+            final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
+            // final Edge case we cannot manage
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
+                        "The work [" + getDescription() + "] failed. The failure will be handled.");
+            }
+            // To do before log, because we want to set the context of the exception.
+            handleFailureWrappedWork(loggerService, e, context);
+        } finally {
+            sessionAccessor.deleteTenantId();
         }
-        // To do before log, because we want to set the context of the exception.
-        handleFailureWrappedWork(loggerService, e, context);
+
     }
 
     private void logException(final TechnicalLoggerService loggerService, final Throwable e) {

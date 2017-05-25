@@ -16,6 +16,7 @@ package org.bonitasoft.engine.work;
 
 import static java.lang.String.format;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -38,12 +39,32 @@ public class WorkExecutorServiceImpl implements WorkExecutorService {
     }
 
     @Override
-    public void execute(BonitaWork work) {
+    public void execute(WorkDescriptor work) {
         if (!isStopped()) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Submitted work %s", work));
-            executor.submit(work);
-        }else{
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Ignored work submission (service stopped) %s", work));
+            executor.submit(work, this::onSuccess, this::onFailure);
+        } else {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG,
+                    format("Ignored work submission (service stopped) %s", work));
+        }
+    }
+
+    protected void onSuccess(WorkDescriptor work) {
+        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Completed work %s", work));
+    }
+
+    protected void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
+            Exception thrown) {
+        if (thrown instanceof LockTimeoutException) {
+            //retry the work
+            execute(work);
+            return;
+        }
+        try {
+            bonitaWork.handleFailure(thrown, context);
+        } catch (Exception e) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, format("Work failed with error %s", work),
+                    thrown);
         }
     }
 

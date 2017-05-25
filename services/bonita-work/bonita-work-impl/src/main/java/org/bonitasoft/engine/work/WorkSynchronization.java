@@ -26,15 +26,13 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
     private final Collection<WorkDescriptor> works;
 
     private final WorkExecutorService workExecutorService;
-    private WorkFactory workFactory;
     private final WorkServiceImpl workService;
 
     private long tenantId;
 
     WorkSynchronization(final WorkExecutorService workExecutorService, final SessionAccessor sessionAccessor,
-                        WorkFactory workFactory, WorkServiceImpl workService) {
+                        WorkServiceImpl workService) {
         super();
-        this.workFactory = workFactory;
         this.workService = workService;
         works = new HashSet<>();
         try {
@@ -63,9 +61,8 @@ public class WorkSynchronization implements BonitaTransactionSynchronization {
     public void afterCompletion(final TransactionState transactionStatus) {
         if (TransactionState.COMMITTED == transactionStatus) {
             for (WorkDescriptor work : works) {
-                BonitaWork bonitaWork = workFactory.create(work);
-                bonitaWork.setTenantId(tenantId);
-                workExecutorService.execute(bonitaWork);
+                work.setTenantId(tenantId);
+                workExecutorService.execute(work);
             }
         }
         workService.removeSynchronization();
