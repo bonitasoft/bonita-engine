@@ -153,7 +153,8 @@ abstract class BundleConfigurator {
         return content;
     }
 
-    String convertWindowsBackslashes(String value) {
+    // Visible for testing
+    static String convertWindowsBackslashes(String value) {
         // forward slashes is valid in database connection URLs on Windows, and and easier and more homogeneous to manage in
         return value.replaceAll("\\\\", "/");
     }

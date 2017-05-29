@@ -133,7 +133,10 @@ public class PlatformSetupTestUtils {
 
     public static CommandLine createCommandLine() {
         if (OS.isFamilyWindows() || OS.isFamilyWin9x()) {
-            return new CommandLine("setup.bat");
+            CommandLine oCmdLine = new CommandLine("cmd");
+            oCmdLine.addArgument("/c");
+            oCmdLine.addArgument("setup.bat");
+            return oCmdLine;
         } else {
             CommandLine oCmdLine = new CommandLine("sh");
             oCmdLine.addArgument("setup.sh");
