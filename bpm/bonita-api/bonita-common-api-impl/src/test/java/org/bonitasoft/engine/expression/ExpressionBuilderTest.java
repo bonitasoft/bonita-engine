@@ -114,4 +114,16 @@ public class ExpressionBuilderTest {
         assertThat(expression.getInterpreter()).isNull();
     }
 
+    @Test
+    public void createConstantStringExpressionShouldSetADefaultNameIfNotProvided() throws Exception {
+        final Expression expression = new ExpressionBuilder().createConstantStringExpression("constant");
+        assertThat(expression.getName()).isEqualTo("constant");
+    }
+
+    @Test
+    public void createConstantStringExpressionShouldSetADefaultNameIfNotProvidedEvenIfTheExpressionIsEmpty() throws Exception {
+        final Expression expression = new ExpressionBuilder().createConstantStringExpression("");
+        assertThat(expression.getName()).isEqualTo("empty_expression");
+    }
+
 }

@@ -98,7 +98,11 @@ public class ExpressionBuilder {
      * @since 6.0
      */
     public Expression createConstantStringExpression(final String value) throws InvalidExpressionException {
-        return createConstantExpression(value, value, String.class);
+        String name = value;
+        if ("".equals(name)) {
+            name = "empty_expression";
+        }
+        return createConstantExpression(name, value, String.class);
     }
 
     public Expression createConstantBooleanExpression(final boolean value) throws InvalidExpressionException {
@@ -112,7 +116,7 @@ public class ExpressionBuilder {
      * @param value
      *        a date defined with the ISO-8601 format
      * @return The corresponding expression
-     * @throws InvalidExpressionException
+     * @throws InvalidExpressionException if the expression is invalid
      * @since 6.0
      */
     public Expression createConstantDateExpression(final String value) throws InvalidExpressionException {

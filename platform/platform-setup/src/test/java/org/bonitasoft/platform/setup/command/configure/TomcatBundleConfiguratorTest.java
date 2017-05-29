@@ -72,7 +72,7 @@ public class TomcatBundleConfiguratorTest {
         configurator = new TomcatBundleConfigurator(bundleFolder);
         FileUtils.copyDirectory(Paths.get("src/test/resources/tomcat_conf").toFile(), temporaryFolderRoot);
         System.setProperty(BONITA_SETUP_FOLDER, bundleFolder.resolve("setup").toString());
-        databaseAbsolutePath = bundleFolder.resolve("h2_database").normalize().toString();
+        databaseAbsolutePath = BundleConfigurator.convertWindowsBackslashes(bundleFolder.resolve("h2_database").normalize().toString());
         spy = spy(configurator);
     }
 

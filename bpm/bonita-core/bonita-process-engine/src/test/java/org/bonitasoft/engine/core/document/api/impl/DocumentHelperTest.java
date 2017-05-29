@@ -397,7 +397,10 @@ public class DocumentHelperTest {
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
-        assertThat(mimeTypeOrGuessIt == null || mimeTypeOrGuessIt.equals("application/xml")).as("mimetype should be application/xml or null on mac").isTrue();
+        assertThat(mimeTypeOrGuessIt).as("mimetype").isIn( //
+                null, "application/xml" // Mac/Linux
+                , "text/xml" // Windows
+        );
     }
 
     @Test

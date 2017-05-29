@@ -15,16 +15,6 @@ package org.bonitasoft.engine.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.Version;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.time.LocalDate;
@@ -35,6 +25,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.Version;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
@@ -316,11 +316,12 @@ public class EntityCodeGeneratorTest {
         final JAnnotationUse tableAnnotation = getAnnotation(jDefinedClass, Table.class.getCanonicalName());
         assertThat(tableAnnotation).as("should have Table Annotation").isNotNull();
         tableAnnotation.generate(new JFormatter(writer));
+        final String EOL = System.getProperty("line.separator");
         assertThat(writer.toString()).as("should rename relation field to real column name")
-                .isEqualTo("@javax.persistence.Table(name = \"EMPLOYEE\", uniqueConstraints = {\n" +
-                        "    @javax.persistence.UniqueConstraint(name = \"UNIQUE_CONSTRAINT\", columnNames = {\n" +
-                        "        \"UNIQUERELATION_PID\"\n" +
-                        "    })\n" +
+                .isEqualTo("@javax.persistence.Table(name = \"EMPLOYEE\", uniqueConstraints = {" + EOL +
+                        "    @javax.persistence.UniqueConstraint(name = \"UNIQUE_CONSTRAINT\", columnNames = {" + EOL +
+                        "        \"UNIQUERELATION_PID\"" + EOL +
+                        "    })" + EOL +
                         "})");
     }
 
