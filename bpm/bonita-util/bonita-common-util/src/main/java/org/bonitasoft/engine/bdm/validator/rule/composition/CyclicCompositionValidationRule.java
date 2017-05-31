@@ -46,7 +46,7 @@ public class CyclicCompositionValidationRule extends ValidationRule<BusinessObje
         parentBOs.add(bo);
         for (BusinessObject businessObject : bo.getReferencedBusinessObjectsByComposition()) {
             if (parentBOs.contains(businessObject)) {
-                validationStatus.addError("Business object " + businessObject.getQualifiedName() + " has a circular composition reference to itself");
+                validationStatus.addError("Business object " + businessObject.getQualifiedName() + " has a circular composition reference to itself or is referenced several times in the object " + bo.getQualifiedName());
             } else {
                 validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(businessObject, parentBOs));
             }
