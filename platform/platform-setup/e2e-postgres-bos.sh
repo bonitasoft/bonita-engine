@@ -16,7 +16,7 @@ echo "========================================"
 echo "version:${VERSION}"
 echo "========================================"
 export E2E_DIR="target/e2e-postgres-bos"
-export ZIP=Bonita-BPM-platform-setup-${VERSION}.zip
+export ZIP=Bonita-platform-setup-${VERSION}.zip
 
 unzip -q -d ${E2E_DIR} target/${ZIP}
 
