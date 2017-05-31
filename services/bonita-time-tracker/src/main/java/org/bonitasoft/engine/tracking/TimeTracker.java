@@ -33,7 +33,7 @@ public class TimeTracker implements TenantLifecycleService {
 
 
     private final Set<TimeTrackerRecords> activatedRecords;
-    private final FlushThread flushThread;
+    private FlushThread flushThread;
     private final Map<String, FlushEventListener> flushEventListeners;
     private final TechnicalLoggerService logger;
     private final Queue<Record> records;
@@ -90,7 +90,6 @@ public class TimeTracker implements TenantLifecycleService {
                 this.activatedRecords.add(TimeTrackerRecords.valueOf(activatedRecord));
             }
         }
-        flushThread = createFlushThread();
         log(TechnicalLogSeverity.INFO, getStatus());
     }
 
@@ -112,6 +111,7 @@ public class TimeTracker implements TenantLifecycleService {
         flushEventListener.activate();
         return true;
     }
+
     public boolean deactivateFlushEventListener(final String flushEventListenerName) {
         final FlushEventListener flushEventListener = this.flushEventListeners.get(flushEventListenerName);
         if (flushEventListener == null) {
@@ -120,6 +120,7 @@ public class TimeTracker implements TenantLifecycleService {
         flushEventListener.deactivate();
         return true;
     }
+
     public void activateRecord(final TimeTrackerRecords activatedRecord) {
         this.activatedRecords.add(activatedRecord);
     }
@@ -154,9 +155,8 @@ public class TimeTracker implements TenantLifecycleService {
     private void internalStartTracking() {
         if (startTracking) {
             log(TechnicalLogSeverity.WARNING, "Starting Time tracker tracking...");
-            if (!flushThread.isStarted()) {
-                flushThread.start();
-            }
+            flushThread = createFlushThread();
+            flushThread.start();
             for (final FlushEventListener listener : getActiveFlushEventListeners()) {
                 listener.notifyStartTracking();
             }
@@ -169,6 +169,12 @@ public class TimeTracker implements TenantLifecycleService {
             log(TechnicalLogSeverity.WARNING, "Stopping Time tracker tracking...");
             if (flushThread.isStarted()) {
                 flushThread.interrupt();
+                try {
+                    // Wait for the thread to die
+                    flushThread.join();
+                } catch (InterruptedException e) {
+                    // We want this thread to be interrupted. No need to do extra work here, we are in the desired state.
+                }
             }
             for (final FlushEventListener listener : getActiveFlushEventListeners()) {
                 listener.notifyStopTracking();
@@ -178,7 +184,7 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public boolean isTracking() {
-        return flushThread.isStarted();
+        return flushThread != null && flushThread.isStarted();
     }
 
     public long getFlushIntervalInMS() {
