@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TimeTrackerTest extends AbstractTimeTrackerTest {
@@ -202,7 +202,6 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_not_stop_flush_thread_is_running() {
-        doReturn(false).when(flushThread).isStarted();
         tracker = createTimeTracker(true, null, 10, 2);
         tracker.stop();
         verify(flushThread, never()).interrupt();
@@ -210,7 +209,6 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_flush_ignore_flush_listeners_exceptions() throws Exception {
-        when(flushThread.isStarted()).thenReturn(true);
         final Clock clock = mock(Clock.class);
 
         final FlushEventListener listener1 = mock(FlushEventListener.class);
@@ -243,7 +241,6 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_flush_call_all_flush_listeners() throws Exception {
-        when(flushThread.isStarted()).thenReturn(true);
         final Clock clock = mock(Clock.class);
 
         final FlushEventListener listener1 = mock(FlushEventListener.class);
