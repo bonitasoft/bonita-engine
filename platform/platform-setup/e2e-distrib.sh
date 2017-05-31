@@ -9,7 +9,7 @@ echo "version:${VERSION}"
 echo "========================================"
 
 export E2E_DIR="target/e2e-distrib"
-export ZIP=Bonita-BPM-platform-setup-${VERSION}.zip
+export ZIP=Bonita-platform-setup-${VERSION}.zip
 
 rm -rf ${E2E_DIR}
 unzip -q -d ${E2E_DIR} target/${ZIP}
@@ -32,11 +32,6 @@ echo "========================================"
 echo "distribution structure:"
 echo "========================================"
 tree -L 3 ${E2E_DIR}
-
-echo "========================================"
-echo "should contain readme:"
-echo "========================================"
-cat ${E2E_DIR}/README.md
 
 echo "========================================"
 echo "check permissions:"

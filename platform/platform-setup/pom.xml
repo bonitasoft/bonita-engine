@@ -164,7 +164,7 @@
                                     <goal>single</goal>
                                 </goals>
                                 <configuration>
-                                    <finalName>Bonita-BPM-platform-setup-${project.version}</finalName>
+                                    <finalName>Bonita-platform-setup-${project.version}</finalName>
                                     <appendAssemblyId>false</appendAssemblyId>
                                     <descriptors>
                                         <descriptor>assembly.xml</descriptor>

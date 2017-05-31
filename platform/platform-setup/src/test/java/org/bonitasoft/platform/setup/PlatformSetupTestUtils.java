@@ -89,7 +89,7 @@ public class PlatformSetupTestUtils {
 
     public static void extractDistributionTo(File distFolder) throws IOException {
         File target = new File("target");
-        Pattern distribPattern = Pattern.compile("Bonita-BPM-platform-setup-.*\\.zip");
+        Pattern distribPattern = Pattern.compile("Bonita-platform-setup-.*\\.zip");
         File dist = null;
         for (File file : target.listFiles()) {
             if (distribPattern.matcher(file.getName()).matches()) {
