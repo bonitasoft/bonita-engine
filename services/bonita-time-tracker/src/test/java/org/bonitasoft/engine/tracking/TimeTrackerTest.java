@@ -13,22 +13,20 @@
  **/
 package org.bonitasoft.engine.tracking;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -37,21 +35,29 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TimeTrackerTest extends AbstractTimeTrackerTest {
-
     private TimeTracker tracker;
+
     @Mock
     private FlushThread flushThread;
     @Mock
     private TechnicalLoggerService logger;
-
     private static final TimeTrackerRecords REC = TimeTrackerRecords.EVALUATE_EXPRESSION;
+
     private static final TimeTrackerRecords REC1 = TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT;
     private static final TimeTrackerRecords REC2 = TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE;
     private static final TimeTrackerRecords REC3 = TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT;
     private static final TimeTrackerRecords INACTIVATED_REC = TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS;
 
+    @After
+    public void tearDown() {
+        // Make sure to clean tracker threads by stopping tracker.
+        if (tracker != null) {
+            tracker.stop();
+        }
+    }
+
     TimeTracker createTimeTracker(TechnicalLoggerService logger, Clock clock, List<FlushEventListener> listeners, boolean enabled, int maxSize,
-            int flushIntervalInSeconds, TimeTrackerRecords rec) {
+                                  int flushIntervalInSeconds, TimeTrackerRecords rec) {
         return new TimeTracker(logger, clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec.name()) {
 
             @Override
@@ -62,7 +68,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     TimeTracker createTimeTracker(boolean enabled, List<FlushEventListener> flushEventListeners, int maxSize,
-            int flushIntervalInSeconds, TimeTrackerRecords... records) {
+                                  int flushIntervalInSeconds, TimeTrackerRecords... records) {
         final List<String> recordsAsString = new ArrayList<>();
         for (TimeTrackerRecords record : records) {
             recordsAsString.add(record.name());
@@ -183,14 +189,6 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker = createTimeTracker(true, null, 10, 2);
         tracker.start();
         verify(flushThread).start();
-    }
-
-    @Test
-    public void should_not_start_flush_thread_if_thread_is_started() {
-        doReturn(true).when(flushThread).isStarted();
-        tracker = createTimeTracker(true, null, 10, 2);
-        tracker.start();
-        verify(flushThread, never()).start();
     }
 
     @Test
@@ -378,6 +376,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         flushEventListeners.add(listener2);
 
         tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        tracker.start();
         when(this.flushThread.isStarted()).thenReturn(true);
 
         tracker.stopTracking();
@@ -408,5 +407,94 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         verify(flushThread, times(2)).start();
         verify(listener1, times(2)).notifyStartTracking();
         verify(listener2, times(2)).notifyStartTracking();
+    }
+
+    @Test
+    public void should_pause_resume_without_error() {
+
+        //given
+        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+
+        //when
+        tracker.start();
+        int i = 0;
+        try {
+            // Error may not occur on the first execution. I did reproduce it in 4 to 8 executions.
+            // To make myself confident, I execute the test 100 times.
+            // Current implementation is deterministic, but previous one was not. Hence the loop in the test.
+            while (i < 100) {
+                i++;
+                tracker.pause();
+                tracker.resume();
+                //No errors expected
+            }
+        } finally {
+            System.err.println("Test ended after iteration: " + i);
+            tracker.stop();
+        }
+    }
+
+    @Test
+    public void should_start_method_be_reentrant() {
+
+        //given
+        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        Set<Thread> initialThreadSet = Thread.getAllStackTraces().keySet();
+        tracker.start();
+        //expect
+        Set<Thread> runningTimeTrackerThreadSet = Thread.getAllStackTraces().keySet();
+        assertThat(initialThreadSet.size() + 1).isEqualTo(runningTimeTrackerThreadSet.size());
+
+        //when
+        tracker.start();
+
+        //then
+        Set<Thread> stillRunningTimeTrackerThreadSet = Thread.getAllStackTraces().keySet();
+        assertThat(runningTimeTrackerThreadSet).isEqualTo(stillRunningTimeTrackerThreadSet);
+    }
+
+    @Test
+    public void isTracking_should_be_false_if_tracking_not_started() throws Exception {
+        //given
+        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        //when
+        boolean trackingStatus = tracker.isTracking();
+        //then
+        assertThat(trackingStatus).as("Tracking status must be FALSE if tracker has not yet been started.").isFalse();
+    }
+
+    @Test
+    public void isTracking_should_be_true_if_tracking_is_started() throws Exception {
+        //given
+        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        try {
+            tracker.start();
+
+            //when
+            boolean trackingStatus = tracker.isTracking();
+
+            //then
+            assertThat(trackingStatus).as("Tracking status must be TRUE after start method has been called.").isTrue();
+        } finally {
+            tracker.stop();
+        }
+    }
+
+    @Test
+    public void should_not_leave_unused_threads_when_stopped() throws Exception {
+        //given
+        tracker = new TimeTracker(logger, true, new LinkedList<FlushEventListener>(), 500, 1, null);
+        Set<Thread> beforeTimeTrackerStartedThreadSet = Thread.getAllStackTraces().keySet();
+        tracker.start();
+
+        //when
+        tracker.stop();
+
+        //then
+        Set<Thread> afterTimeTrackerStoppedThreadSet = Thread.getAllStackTraces().keySet();
+        afterTimeTrackerStoppedThreadSet.removeAll(beforeTimeTrackerStartedThreadSet);
+        
+        //There should be no more threads than the ones existing prior to tracker startup
+        assertThat(afterTimeTrackerStoppedThreadSet).isEqualTo(Collections.emptySet());
     }
 }
