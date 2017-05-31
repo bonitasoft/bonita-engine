@@ -11,7 +11,6 @@
 
 
     <properties>
-        <bonita.home>${project.build.directory}/bonita_home</bonita.home>
         <bonita.home.ejb3>${project.build.directory}/bonita_home_client_EJB3</bonita.home.ejb3>
         <bonita.home.invalid.api.type>${project.build.directory}/bonita_home_client_invalidAPIType</bonita.home.invalid.api.type>
     </properties>
@@ -245,9 +244,6 @@
                         <configuration>
                             <target>
                                 <!-- Standard -->
-                                <touch file="${bonita.home}/engine-client/conf/bonita-client-custom.properties" mkdirs="true" />
-                                <copy file="${basedir}/bonita-client-local.properties" tofile="${bonita.home}/engine-client/work/bonita-client-community.properties" />
-
                                 <touch file="${bonita.home.ejb3}/engine-client/conf/bonita-client-custom.properties" mkdirs="true" />
                                 <copy file="${basedir}/bonita-client-ejb3.properties" tofile="${bonita.home.ejb3}/engine-client/work/bonita-client-community.properties" />
 
@@ -268,11 +264,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <bonita.home>${bonita.home}</bonita.home>
-                    </systemPropertyVariables>
-                </configuration>
                 <executions>
                     <execution>
                         <phase>integration-test</phase>
