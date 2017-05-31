@@ -38,7 +38,7 @@ public class UniquenessCompositionValidationRule extends ValidationRule<Business
         List<BusinessObject> alreadyComposedBOs = new ArrayList<BusinessObject>();
         for (BusinessObject compositeBO : bom.getReferencedBusinessObjectsByComposition()) {
             if (alreadyComposedBOs.contains(compositeBO)) {
-                validationStatus.addError("Business object " + compositeBO.getQualifiedName() + " is referenced by composition in two business objects");
+                validationStatus.addError("Business object " + compositeBO.getQualifiedName() + " is referenced by composition in two business objects, or is referenced several times in a single business object");
             } else {
                 alreadyComposedBOs.add(compositeBO);
             }
