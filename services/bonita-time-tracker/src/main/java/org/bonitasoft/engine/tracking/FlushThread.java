@@ -39,6 +39,8 @@ public class FlushThread extends Thread {
                 log(TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
                 this.timeTracker.getClock().sleep(sleepTime);
             } catch (InterruptedException e) {
+                // Make sure to propagate the interruption to cleanly stop the current thread.
+                Thread.currentThread().interrupt();
                 break;
             }
             lastFlushTimestamp = flush(now);
@@ -73,7 +75,7 @@ public class FlushThread extends Thread {
         }
     }
 
-    public boolean isStarted(){
+    public boolean isStarted() {
         return isAlive();
     }
 
