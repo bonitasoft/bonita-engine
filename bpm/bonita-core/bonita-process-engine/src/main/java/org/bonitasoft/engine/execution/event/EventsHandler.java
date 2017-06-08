@@ -66,6 +66,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
@@ -105,16 +106,16 @@ public class EventsHandler {
     private final TechnicalLoggerService logger;
 
     private final OperationService operationService;
-    private final WorkService workService;
 
     private ProcessExecutor processExecutor;
 
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger,
+            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService,
+            final TechnicalLoggerService logger,
             OperationService operationService,
-            MessagesHandlingService messagesHandlingService, WorkService workService) {
+            MessagesHandlingService messagesHandlingService, WorkService workService, WorkFactory workFactory) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -122,12 +123,12 @@ public class EventsHandler {
         this.processInstanceService = processInstanceService;
         this.logger = logger;
         this.operationService = operationService;
-        this.workService = workService;
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
                 bpmInstancesCreator, processDefinitionService, messagesHandlingService));
-        handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(eventInstanceService, this.workService));
+        handlers.put(SEventTriggerType.SIGNAL,
+                new SignalEventHandlerStrategy(eventInstanceService, workService, workFactory));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
         handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,

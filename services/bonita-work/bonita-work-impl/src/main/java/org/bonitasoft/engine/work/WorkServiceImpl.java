@@ -39,6 +39,7 @@ public class WorkServiceImpl implements WorkService {
     private final SessionAccessor sessionAccessor;
 
     private final WorkExecutorService workExecutorService;
+    private WorkFactory workFactory;
 
     /**
      * @param transactionService
@@ -48,28 +49,29 @@ public class WorkServiceImpl implements WorkService {
      */
     public WorkServiceImpl(final UserTransactionService transactionService,
                            final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor,
-                           WorkExecutorService workExecutorService) {
+                           WorkExecutorService workExecutorService, WorkFactory workFactory) {
         this.transactionService = transactionService;
         this.loggerService = loggerService;
         this.sessionAccessor = sessionAccessor;
         this.workExecutorService = workExecutorService;
+        this.workFactory = workFactory;
     }
 
     @Override
-    public void registerWork(final BonitaWork work) throws SWorkRegisterException {
+    public void registerWork(WorkDescriptor workDescriptor) throws SWorkRegisterException {
         if (isStopped()) {
-            logExecutorStateWarn(work);
+            logExecutorStateWarn(workDescriptor);
             return;
         }
         final WorkSynchronization synchro = getContinuationSynchronization();
         if (synchro != null) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Registered work " + work.getDescription());
-            synchro.addWork(work);
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Registered work " + workDescriptor);
+            synchro.addWork(workDescriptor);
         }
     }
 
-    private void logExecutorStateWarn(final BonitaWork work) {
-        loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+    private void logExecutorStateWarn(final WorkDescriptor work) {
+        loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work
                 + ", but the work service is stopped.");
     }
 
@@ -77,7 +79,7 @@ public class WorkServiceImpl implements WorkService {
         synchronized (getSynchroLock) {
             WorkSynchronization synchro = synchronizations.get();
             if (synchro == null) {
-                synchro = new WorkSynchronization(workExecutorService, sessionAccessor, this);
+                synchro = new WorkSynchronization(workExecutorService, sessionAccessor, workFactory, this);
                 try {
                     transactionService.registerBonitaSynchronization(synchro);
                 } catch (final STransactionNotFoundException e) {

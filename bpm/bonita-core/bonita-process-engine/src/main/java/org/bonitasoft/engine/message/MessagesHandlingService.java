@@ -67,9 +67,11 @@ public class MessagesHandlingService implements TenantLifecycleService {
     private Long tenantId;
     private UserTransactionService userTransactionService;
     private SessionAccessor sessionAccessor;
+    private WorkFactory workFactory;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
-            LockService lockService, Long tenantId, UserTransactionService userTransactionService, SessionAccessor sessionAccessor) {
+            LockService lockService, Long tenantId, UserTransactionService userTransactionService,
+            SessionAccessor sessionAccessor, WorkFactory workFactory) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.loggerService = loggerService;
@@ -77,6 +79,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
         this.tenantId = tenantId;
         this.userTransactionService = userTransactionService;
         this.sessionAccessor = sessionAccessor;
+        this.workFactory = workFactory;
     }
 
     @Override
@@ -179,7 +182,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
         if (!SBPMEventType.START_EVENT.equals(waitingMsg.getEventType())) {
             markWaitingMessageAsInProgress(waitingMsg);
         }
-        workService.registerWork(WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMsg));
+        workService.registerWork(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMsg));
     }
 
     /**

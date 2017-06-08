@@ -27,11 +27,11 @@ public interface WorkService extends TenantLifecycleService {
     /**
      * This operation MUST be called within an active transaction. If no active transaction is found, a SWorkRegisterException is thrown
      *
-     * @param work
+     * @param workDescriptor
      * @throws SWorkRegisterException
      * @since 6.0
      */
-    void registerWork(final BonitaWork work) throws SWorkRegisterException;
+    void registerWork(WorkDescriptor workDescriptor) throws SWorkRegisterException;
 
     /**
      * @return true if the work service is stopped

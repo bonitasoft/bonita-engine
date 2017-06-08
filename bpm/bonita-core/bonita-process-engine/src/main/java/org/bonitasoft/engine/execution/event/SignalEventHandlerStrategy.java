@@ -48,10 +48,12 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
 
     private final WorkService workService;
+    private final WorkFactory workFactory;
 
-    public SignalEventHandlerStrategy(final EventInstanceService eventInstanceService, WorkService workService) {
+    public SignalEventHandlerStrategy(final EventInstanceService eventInstanceService, WorkService workService, WorkFactory workFactory) {
         super(eventInstanceService);
         this.workService = workService;
+        this.workFactory = workFactory;
     }
 
     @Override
@@ -99,7 +101,7 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
         List<SWaitingSignalEvent> listeningSignals = get100WaitingSignalEvents(signalTrigger, index);
         while (!listeningSignals.isEmpty()) {
             for (final SWaitingSignalEvent listeningSignal : listeningSignals) {
-                workService.registerWork(WorkFactory.createTriggerSignalWork(listeningSignal));
+                workService.registerWork(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
             }
             index++;
             listeningSignals = get100WaitingSignalEvents(signalTrigger, index);

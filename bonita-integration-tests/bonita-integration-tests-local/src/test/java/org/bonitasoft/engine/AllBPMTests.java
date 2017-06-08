@@ -30,7 +30,6 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceServiceTest;
 import org.bonitasoft.engine.cache.CacheServiceTest;
 import org.bonitasoft.engine.classloader.ClassLoaderServiceTest;
 import org.bonitasoft.engine.command.CommandServiceIntegrationTest;
-import org.bonitasoft.engine.continuation.WorkServiceTest;
 import org.bonitasoft.engine.core.form.impl.FormMappingServiceIT;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.data.instance.TransientDataInstanceServiceIT;
@@ -66,8 +65,6 @@ import org.junit.runners.Suite.SuiteClasses;
         DataInstanceServiceTest.class,
         TransientDataInstanceServiceIT.class,
         DependencyServiceTest.class,
-        WorkServiceTest.class,
-
         // -- SqlTest.class,
         // -- Tests using the scheduler
         RecorderTest.class,
