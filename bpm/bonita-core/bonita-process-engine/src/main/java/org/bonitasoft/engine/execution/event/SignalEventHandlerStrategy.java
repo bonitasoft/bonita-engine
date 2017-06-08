@@ -35,7 +35,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -48,9 +48,9 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
 
     private final WorkService workService;
-    private final WorkFactory workFactory;
+    private final BPMWorkFactory workFactory;
 
-    public SignalEventHandlerStrategy(final EventInstanceService eventInstanceService, WorkService workService, WorkFactory workFactory) {
+    public SignalEventHandlerStrategy(final EventInstanceService eventInstanceService, WorkService workService, BPMWorkFactory workFactory) {
         super(eventInstanceService);
         this.workService = workService;
         this.workFactory = workFactory;

@@ -50,7 +50,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
@@ -88,7 +88,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final ClassLoaderService classLoaderService;
 
     private final WorkService workService;
-    private final WorkFactory workFactory;
+    private final BPMWorkFactory workFactory;
 
     private final ContractDataService contractDataService;
 
@@ -99,7 +99,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final SCommentService commentService,
             final ProcessInstanceService processInstanceService,
             final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final WorkService workService, WorkFactory workFactory,
+            final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
             final ContractDataService contractDataService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;

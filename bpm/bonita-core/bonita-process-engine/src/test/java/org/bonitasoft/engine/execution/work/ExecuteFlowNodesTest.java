@@ -63,7 +63,7 @@ public class ExecuteFlowNodesTest {
     private BPMInstancesCreator bpmInstancesCreator;
     @Mock
     private WorkService workService;
-    private WorkFactory workFactory =new WorkFactory();
+    private BPMWorkFactory workFactory =new BPMWorkFactory();
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
@@ -78,7 +78,7 @@ public class ExecuteFlowNodesTest {
         when(tenantServiceAccessor.getWorkService()).thenReturn(workService);
         when(tenantServiceAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantServiceAccessor.getFlowNodeStateManager()).thenReturn(flownodeStateManager);
-        when(tenantServiceAccessor.getBPMWorkFactory()).thenReturn(new WorkFactory());
+        when(tenantServiceAccessor.getBPMWorkFactory()).thenReturn(new BPMWorkFactory());
     }
 
     private ExecuteFlowNodes createExecutorWith(final SFlowNodeInstance... flowNodes) throws Exception {

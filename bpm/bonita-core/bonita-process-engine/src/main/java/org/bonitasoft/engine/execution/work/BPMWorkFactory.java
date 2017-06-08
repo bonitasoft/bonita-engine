@@ -26,6 +26,7 @@ import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceConte
 import org.bonitasoft.engine.execution.work.failurewrapping.TriggerSignalWork;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkDescriptor;
+import org.bonitasoft.engine.work.WorkFactory;
 
 /**
  * Factory to construct works
@@ -34,7 +35,7 @@ import org.bonitasoft.engine.work.WorkDescriptor;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
+public class BPMWorkFactory implements WorkFactory {
 
     private static final String EXECUTE_ACTIVITY_CONNECTOR = "EXECUTE_ACTIVITY_CONNECTOR";
     private static final String EXECUTE_PROCESS_CONNECTOR = "EXECUTE_PROCESS_CONNECTOR";

@@ -37,7 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class WorkFactoryTest {
+public class BPMWorkFactoryTest {
 
     @Mock
     private SMessageInstance messageInstance;
@@ -46,7 +46,7 @@ public class WorkFactoryTest {
     private SWaitingMessageEvent waitingMessageEvent;
 
     @InjectMocks
-    private WorkFactory workFactory;
+    private BPMWorkFactory workFactory;
 
     @Test
     public void createExecuteMessageCoupleWorkHasNoLockProcessInstanceWorkIfNoTargetProcess() {

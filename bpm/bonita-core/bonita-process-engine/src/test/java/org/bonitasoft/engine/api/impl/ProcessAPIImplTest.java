@@ -122,7 +122,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
@@ -234,7 +234,7 @@ public class ProcessAPIImplTest {
     @Mock
     private WorkService workService;
     @Mock
-    private WorkFactory workFactory;
+    private BPMWorkFactory workFactory;
     @Mock
     private BusinessArchiveService businessArchiveService;
     @Mock
