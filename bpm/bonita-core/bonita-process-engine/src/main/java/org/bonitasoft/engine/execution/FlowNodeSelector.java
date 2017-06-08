@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition
  * @author Elias Ricken de Medeiros
  *
  */
-public class FlowNodeSelector {
+public class FlowNodeSelector implements Serializable {
 
     
     private final Filter<SFlowNodeDefinition> selector;
