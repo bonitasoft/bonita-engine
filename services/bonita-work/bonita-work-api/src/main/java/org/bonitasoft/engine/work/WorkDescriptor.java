@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.work;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,10 +25,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 /**
  * @author Baptiste Mesta.
  */
-public class WorkDescriptor {
+public class WorkDescriptor implements Serializable {
 
     private String type;
-    private Map<String, Object> parameters;
+    private Map<String, Serializable> parameters;
 
     public WorkDescriptor(String type) {
         this.type = type;
@@ -38,7 +39,7 @@ public class WorkDescriptor {
         return type;
     }
 
-    public Object getParameter(String key) {
+    public Serializable getParameter(String key) {
         if (!parameters.containsKey(key)) {
             throw new IllegalStateException(
                     String.format("Parameter %s is not set on the work descriptor %s", key, this));
@@ -58,17 +59,15 @@ public class WorkDescriptor {
         return new WorkDescriptor(type);
     }
 
-    public WorkDescriptor withParameter(String key, Object value) {
+    public WorkDescriptor withParameter(String key, Serializable value) {
         parameters.put(key, value);
         return this;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         WorkDescriptor that = (WorkDescriptor) o;
         return new EqualsBuilder()
                 .append(type, that.type)

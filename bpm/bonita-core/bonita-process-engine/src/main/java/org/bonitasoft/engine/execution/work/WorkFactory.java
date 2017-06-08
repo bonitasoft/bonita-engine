@@ -105,6 +105,7 @@ public class WorkFactory implements org.bonitasoft.engine.work.WorkFactory {
                 .withParameter(CONNECTOR_INSTANCE_ID, connectorInstanceId)
                 .withParameter(CONNECTOR_DEFINITION_NAME, connectorDefinitionName)
                 .withParameter("activationEvent", activationEvent)
+                //TODO flowNodeSelector should be constructed on execution, not put in the descriptor
                 .withParameter("flowNodeSelector", flowNodeSelector);
     }
 
