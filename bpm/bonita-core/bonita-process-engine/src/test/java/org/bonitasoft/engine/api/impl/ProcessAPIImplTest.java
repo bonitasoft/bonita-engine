@@ -122,6 +122,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
@@ -155,7 +156,7 @@ import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervis
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.model.impl.SSessionImpl;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -233,6 +234,8 @@ public class ProcessAPIImplTest {
     @Mock
     private WorkService workService;
     @Mock
+    private WorkFactory workFactory;
+    @Mock
     private BusinessArchiveService businessArchiveService;
     @Mock
     private UserFilterService userFilterService;
@@ -241,7 +244,7 @@ public class ProcessAPIImplTest {
     @Captor
     private ArgumentCaptor<List<String>> argument;
     @Captor
-    private ArgumentCaptor<BonitaWork> workArgumentCaptor;
+    private ArgumentCaptor<WorkDescriptor> workArgumentCaptor;
     @Captor
     private ArgumentCaptor<SPendingActivityMapping> pendingMappingArgumentCaptor;
     @Spy
@@ -274,6 +277,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(tenantAccessor.getFlowNodeExecutor()).thenReturn(flowNodeExecutor);
         when(tenantAccessor.getWorkService()).thenReturn(workService);
+        when(tenantAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantAccessor.getUserFilterService()).thenReturn(userFilterService);
 
         sUserTaskInstance = new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID,
@@ -1302,12 +1306,13 @@ public class ProcessAPIImplTest {
         inputValues.put("input2", "value");
         sUserTaskInstance.setStateId(4);
         sUserTaskInstance.setAssigneeId(543L);
+        WorkDescriptor workDescriptor = WorkDescriptor.create("flownode");
+        doReturn(workDescriptor).when(workFactory).createExecuteReadyHumanTaskWorkDescriptor(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, FLOW_NODE_INSTANCE_ID);
         //when
         processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, inputValues);
         //then
         verify(contractDataService).addUserTaskData(1674, inputValues);
-        verify(workService).registerWork(workArgumentCaptor.capture());
-        assertThat(workArgumentCaptor.getValue().getDescription()).contains("flowNodeInstanceId: " + FLOW_NODE_INSTANCE_ID);
+        verify(workService).registerWork(workDescriptor);
     }
 
     @Test

@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import java.util.Map;
-
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -57,7 +55,7 @@ public class WorkServiceImplTest {
     @Test
     public void should_register_work_on_the_transaction_synchronization() throws SBonitaException {
         // given
-        BonitaWork bonitaWork = createBonitaWork();
+        WorkDescriptor bonitaWork = WorkDescriptor.create("MY_WORK");
 
         // when
         workService.registerWork(bonitaWork);
@@ -69,8 +67,8 @@ public class WorkServiceImplTest {
     @Test
     public void should_register_multiple_work_on_the_same_transaction_synchronization() throws SBonitaException {
         // given
-        BonitaWork bonitaWork1 = createBonitaWork();
-        BonitaWork bonitaWork2 = createBonitaWork();
+        WorkDescriptor bonitaWork1 = WorkDescriptor.create("MY_WORK1");
+        WorkDescriptor bonitaWork2 = WorkDescriptor.create("MY_WORK2");
 
         // when
         workService.registerWork(bonitaWork1);
@@ -85,25 +83,5 @@ public class WorkServiceImplTest {
         return synchronizationArgumentCaptor.getValue();
     }
 
-    private BonitaWork createBonitaWork() {
-        return new BonitaWork() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void work(final Map<String, Object> context) {
-            }
-
-            @Override
-            public void handleFailure(final Exception e, final Map<String, Object> context) {
-
-            }
-
-            @Override
-            public String getDescription() {
-                return "fake bonita work";
-            }
-        };
-    }
 
 }

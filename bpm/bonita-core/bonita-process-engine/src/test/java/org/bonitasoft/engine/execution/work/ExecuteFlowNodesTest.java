@@ -39,7 +39,6 @@ import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +63,7 @@ public class ExecuteFlowNodesTest {
     private BPMInstancesCreator bpmInstancesCreator;
     @Mock
     private WorkService workService;
+    private WorkFactory workFactory =new WorkFactory();
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
@@ -76,6 +76,7 @@ public class ExecuteFlowNodesTest {
         when(tenantServiceAccessor.getGatewayInstanceService()).thenReturn(gatewayInstanceService);
         when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(logger);
         when(tenantServiceAccessor.getWorkService()).thenReturn(workService);
+        when(tenantServiceAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantServiceAccessor.getFlowNodeStateManager()).thenReturn(flownodeStateManager);
     }
 
@@ -94,15 +95,8 @@ public class ExecuteFlowNodesTest {
 
         executeFlowNodes.call();
 
-        verify(workService).registerWork(argThat(work -> getLeaf(work) instanceof NotifyChildFinishedWork));
+        verify(workService).registerWork(argThat(work -> work.getType().equals("FINISH_FLOWNODE")));
 
-    }
-
-    private BonitaWork getLeaf(BonitaWork bonitaWork) {
-        if (!(bonitaWork instanceof WrappingBonitaWork)) {
-            return bonitaWork;
-        }
-        return getLeaf(((WrappingBonitaWork) bonitaWork).getWrappedWork());
     }
 
     private SAutomaticTaskInstanceImpl createTask(final long id, final boolean terminal) {
@@ -119,7 +113,7 @@ public class ExecuteFlowNodesTest {
 
         executeFlowNodes.call();
 
-        verify(workService).registerWork(argThat(work -> getLeaf(work) instanceof ExecuteFlowNodeWork));
+        verify(workService).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
 
     @Test
@@ -144,7 +138,7 @@ public class ExecuteFlowNodesTest {
         executeFlowNodes.call();
 
         assertThat(list.size()).isEqualTo(21);
-        verify(workService, times(20)).registerWork(argThat(work -> getLeaf(work) instanceof ExecuteFlowNodeWork));
+        verify(workService, times(20)).registerWork(argThat(work -> work.getType().equals("EXECUTE_FLOWNODE")));
     }
 
     @Test

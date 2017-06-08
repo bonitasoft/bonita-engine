@@ -315,7 +315,6 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
-import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -428,7 +427,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
@@ -5695,6 +5694,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         SCommentService commentService = tenantAccessor.getCommentService();
         FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         WorkService workService = tenantAccessor.getWorkService();
+        WorkFactory workFactory = tenantAccessor.getBPMWorkFactory();
 
         SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         if (shouldBeReadyTask) {
@@ -5736,12 +5736,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecuting(flowNodeInstance);
             activityInstanceService.setExecutedBy(flowNodeInstance, executerUserId);
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
-            BonitaWork work;
+            WorkDescriptor work;
             if (shouldBeReadyTask) {
-                work = WorkFactory.createExecuteReadyHumanTaskWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
+                work = workFactory.createExecuteReadyHumanTaskWorkDescriptor(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
                         flowNodeInstanceId);
             } else {
-                work = WorkFactory.createExecuteFlowNodeWork(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
+                work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
                         flowNodeInstanceId);
             }
             workService.registerWork(work);

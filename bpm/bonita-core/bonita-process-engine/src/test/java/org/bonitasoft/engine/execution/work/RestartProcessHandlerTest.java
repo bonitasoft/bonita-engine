@@ -38,11 +38,13 @@ public class RestartProcessHandlerTest {
     @Mock
     WorkService workService;
     @Mock
+    WorkFactory workFactory;
+    @Mock
     FlowNodeStateManagerImpl flowNodeStateManager;
 
     @Test
     public void handleCompletionShouldDoNothingIfNoCallerId() throws Exception {
-        new RestartProcessHandler().handleCompletion(mock(SProcessInstance.class), logger, activityInstanceService, workService, flowNodeStateManager);
+        new RestartProcessHandler().handleCompletion(mock(SProcessInstance.class), logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
     }
 
     @Test
@@ -54,7 +56,7 @@ public class RestartProcessHandlerTest {
         doReturn(callActivity).when(activityInstanceService).getActivityInstance(anyLong());
         SProcessInstance processInstance = mock(SProcessInstance.class);
         when(processInstance.getCallerId()).thenReturn(5L);
-        new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
+        new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
     }
 
     @Test
@@ -68,6 +70,6 @@ public class RestartProcessHandlerTest {
         SProcessInstance processInstance = mock(SProcessInstance.class);
         //        when(processInstance.getId()).thenReturn(1654534L);
         when(processInstance.getCallerId()).thenReturn(5L);
-        new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
+        new RestartProcessHandler().handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
     }
 }

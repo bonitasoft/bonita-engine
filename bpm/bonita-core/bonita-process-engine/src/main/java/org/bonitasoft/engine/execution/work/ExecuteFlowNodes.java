@@ -44,6 +44,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
     private static final int MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION = 20;
 
     private final WorkService workService;
+    private final WorkFactory workFactory;
 
     private final TechnicalLoggerService logger;
 
@@ -64,6 +65,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         gatewayInstanceService = tenantServiceAccessor.getGatewayInstanceService();
         processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
+        workFactory = tenantServiceAccessor.getBPMWorkFactory();
         this.iterator = iterator;
     }
 
@@ -99,7 +101,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         logInfo(logger, "Restarting flow node (Execute ...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
                 + "> in state = <" + sFlowNodeInstance.getStateName() + ">");
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(),
+        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
                 sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId()));
     }
 
@@ -108,7 +110,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
         logInfo(logger, "Restarting flow node (Notify finished...) with name = <" + sFlowNodeInstance.getName() + ">, and id = <" + sFlowNodeInstance.getId()
                 + " in state = <" + sFlowNodeInstance.getStateName() + ">");
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
-        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
+        workService.registerWork(workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
                 .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
                 .name()));
     }

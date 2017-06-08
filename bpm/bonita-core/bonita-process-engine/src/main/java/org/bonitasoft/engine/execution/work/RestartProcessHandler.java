@@ -63,11 +63,14 @@ public class RestartProcessHandler implements TenantRestartHandler {
         private final ProcessExecutor processExecutor;
 
         private final FlowNodeStateManager flowNodeStateManager;
+        private WorkFactory workFactory;
         private final Iterator<Long> iterator;
 
         public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger, final ActivityInstanceService activityInstanceService,
-                final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager, final Iterator<Long> iterator) {
+                final ProcessDefinitionService processDefinitionService,
+                final ProcessInstanceService processInstanceService,
+                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager,
+                WorkFactory workFactory, final Iterator<Long> iterator) {
             this.workService = workService;
             this.logger = logger;
             this.activityInstanceService = activityInstanceService;
@@ -75,6 +78,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
             this.processInstanceService = processInstanceService;
             this.processExecutor = processExecutor;
             this.flowNodeStateManager = flowNodeStateManager;
+            this.workFactory = workFactory;
             this.iterator = iterator;
         }
 
@@ -88,13 +92,13 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     final ProcessInstanceState state = getState(processInstance.getStateId());
                     switch (state) {
                         case ABORTED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
                             break;
                         case CANCELLED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
                             break;
                         case COMPLETED:
-                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager, workFactory);
                             break;
                         case COMPLETING:
                             restartConnector(processDefinition, processInstance, ConnectorEvent.ON_FINISH, processExecutor);
@@ -174,6 +178,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final WorkService workService = tenantServiceAccessor.getWorkService();
+        final WorkFactory workFactory = tenantServiceAccessor.getBPMWorkFactory();
 
         final List<Long> list = processInstancesByTenant.get(tenantId);
         final Iterator<Long> iterator = list.iterator();
@@ -182,7 +187,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         try {
             do {
                 exec = new ExecuteProcesses(workService, logger, activityInstanceService, processDefinitionService, processInstanceService, processExecutor,
-                        tenantServiceAccessor.getFlowNodeStateManager(), iterator);
+                        tenantServiceAccessor.getFlowNodeStateManager(), workFactory, iterator);
                 transactionService.executeInTransaction(exec);
             } while (iterator.hasNext());
         } catch (final Exception e) {
@@ -192,7 +197,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
     }
 
     protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
-            final ActivityInstanceService activityInstanceService, final WorkService workService, FlowNodeStateManager flowNodeStateManager)
+                                    final ActivityInstanceService activityInstanceService, final WorkService workService, FlowNodeStateManager flowNodeStateManager, WorkFactory workFactory)
             throws SBonitaException {
         // Only Error events set interruptedByEvent on SProcessInstance:
         if (!processInstance.hasBeenInterruptedByEvent()) {
@@ -202,7 +207,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
             if (callerId > 0) {
                 final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
                 if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
-                    workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getProcessDefinitionId(),
+                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(callActivityInstance.getProcessDefinitionId(),
                             callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId()));
                     logInfo(logger, "Restarting notification of finished process '" + processInstance.getName() + "' with id " + processInstance.getId()
                             + " in state " + getState(processInstance.getStateId()));

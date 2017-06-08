@@ -158,15 +158,16 @@ public class StateBehaviors {
     private final WaitingEventsInterrupter waitingEventsInterrupter;
     private final RefBusinessDataService refBusinessDataService;
     private ProcessExecutor processExecutor;
+    private final WorkFactory workFactory;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
-            final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
-            final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
-            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
-            final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
-            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
-            final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
-            final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService) {
+                          final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
+                          final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
+                          final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+                          final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
+                          final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
+                          final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
+                          final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService, WorkFactory workFactory) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -187,6 +188,7 @@ public class StateBehaviors {
         this.parentContainerResolver = parentContainerResolver;
         this.refBusinessDataService = refBusinessDataService;
         this.waitingEventsInterrupter = waitingEventsInterrupter;
+        this.workFactory = workFactory;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -412,7 +414,7 @@ public class StateBehaviors {
                     activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
                 } else {
                     //the called process is finished, next step is stable so we trigger execution of this flownode
-                    workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinition.getId(), flowNodeInstance.getParentProcessInstanceId(),
+                    workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinition.getId(), flowNodeInstance.getParentProcessInstanceId(),
                             flowNodeInstance.getId()));
                 }
             } catch (final SBonitaException e) {
@@ -630,7 +632,7 @@ public class StateBehaviors {
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
-            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId,
+            workService.registerWork(workFactory.createExecuteConnectorOfActivityDescriptor(processDefinitionId, processInstanceId, flowNodeDefinitionId,
                     flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
         } catch (final SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
