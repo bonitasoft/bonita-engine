@@ -42,7 +42,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -80,7 +80,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final WorkService workService = tenantAccessor.getWorkService();
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
-        final BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
+        final WorkDescriptor executeFlowNodeWork = tenantAccessor.getBPMWorkFactory().createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
                 flowNodeInstanceId);
         workService.registerWork(executeFlowNodeWork);
     }

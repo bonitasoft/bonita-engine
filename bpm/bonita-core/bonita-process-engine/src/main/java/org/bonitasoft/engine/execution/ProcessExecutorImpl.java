@@ -161,17 +161,18 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final BusinessDataRepository businessDataRepository;
     private final RefBusinessDataService refBusinessDataService;
     private final DocumentHelper documentHelper;
+    private final WorkFactory workFactory;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
-            final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
-            final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
-            final ProcessResourcesService processResourcesService, final ConnectorService connectorService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
-            final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
-            final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final BusinessDataRepository businessDataRepository,
-            final RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator, final ContractDataService contractDataService) {
+                               final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
+                               final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
+                               final ProcessResourcesService processResourcesService, final ConnectorService connectorService,
+                               final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
+                               final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
+                               final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
+                               final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
+                               final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final BusinessDataRepository businessDataRepository,
+                               final RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator, final ContractDataService contractDataService, WorkFactory workFactory) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -193,6 +194,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
         this.contractDataService = contractDataService;
+        this.workFactory = workFactory;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
@@ -237,7 +239,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (nextConnectorInstance != null) {
                 for (final SConnectorDefinition sConnectorDefinition : connectors) {
                     if (sConnectorDefinition.getName().equals(nextConnectorInstance.getName())) {
-                        workService.registerWork(WorkFactory.createExecuteConnectorOfProcess(processDefinitionId, sProcessInstance.getId(),
+                        workService.registerWork(workFactory.createExecuteConnectorOfProcessDescriptor(processDefinitionId, sProcessInstance.getId(),
                                 sProcessInstance.getRootProcessInstanceId(), nextConnectorInstance.getId(), sConnectorDefinition.getName(), activationEvent,
                                 selectorForConnectorOnEnter));
                         return true;
@@ -938,7 +940,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         for (final SFlowNodeInstance sFlowNodeInstance : flowNodeInstances) {
             try {
-                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sProcessInstance.getProcessDefinitionId(), sProcessInstance.getId(),
+                workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sProcessInstance.getProcessDefinitionId(), sProcessInstance.getId(),
                         sFlowNodeInstance.getId()));
             } catch (final SWorkRegisterException e) {
                 setExceptionContext(sProcessInstance, sFlowNodeInstance, e);
@@ -966,7 +968,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-                    .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId()));
+                    .registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId()));
         }
     }
 

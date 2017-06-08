@@ -59,6 +59,7 @@ import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -507,5 +508,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     public MessagesHandlingService getMessagesHandlingService() {
         return beanAccessor.getService(MessagesHandlingService.class);
+    }
+    public WorkFactory getBPMWorkFactory() {
+        return beanAccessor.getService(WorkFactory.class);
     }
 }

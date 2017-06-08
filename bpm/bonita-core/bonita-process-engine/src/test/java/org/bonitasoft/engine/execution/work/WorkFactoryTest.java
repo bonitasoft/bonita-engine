@@ -23,9 +23,11 @@ import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceConte
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceContextWork;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -43,10 +45,13 @@ public class WorkFactoryTest {
     @Mock
     private SWaitingMessageEvent waitingMessageEvent;
 
+    @InjectMocks
+    private WorkFactory workFactory;
+
     @Test
     public void createExecuteMessageCoupleWorkHasNoLockProcessInstanceWorkIfNoTargetProcess() {
         doReturn(-1L).when(waitingMessageEvent).getParentProcessInstanceId();
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertFalse("A lock Process Instance Work is used although there is no Target process", containsLockProcessInstance);
     }
@@ -54,21 +59,21 @@ public class WorkFactoryTest {
     @Test
     public void createExecuteMessageCoupleWorkWithLockProcessInstanceWork() {
         doReturn(1L).when(waitingMessageEvent).getParentProcessInstanceId();
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertTrue("A lock Process Instance Work is missing although there is a Target process", containsLockProcessInstance);
     }
 
     @Test
     public void createExecuteMessageCoupleWork() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         Assert.assertTrue("A MessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
         Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
     @Test
     public void createExecuteFlowNode() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, 3);
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteFlowNodeWorkDescriptor(1L, 1L, 3));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
@@ -76,21 +81,27 @@ public class WorkFactoryTest {
 
     @Test
     public void createExecuteConnectorOfProcess() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
-                null);
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                null));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
     @Test
     public void createExecuteConnectorOfActivity() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfActivity(1L, 3L, 4L, 5L, 6, "connectorDefName");
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfActivityDescriptor(1L, 3L, 4L, 5L, 6, "connectorDefName"));
+
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void createExecuteConnectorOfActivity_with_missing_parameter() {
+        workFactory.create(WorkDescriptor.create("EXECUTE_ACTIVITY_CONNECTOR"));
+    }
+
     @Test
     public void createNotifyChildFinishedWork() {
-        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createNotifyChildFinishedWork(1L, 2L, 3L, 4L, "parentType");
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createNotifyChildFinishedWorkDescriptor(1L, 2L, 3L, 4L, "parentType"));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));

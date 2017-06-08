@@ -58,6 +58,7 @@ import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -255,4 +256,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TenantResourcesService getTenantResourcesService();
 
     MessagesHandlingService getMessagesHandlingService();
+
+    WorkFactory getBPMWorkFactory();
 }

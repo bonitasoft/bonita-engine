@@ -49,10 +49,12 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
+        <constructor-arg name="workFactory" ref="workFactory" />
     </bean>
 
     <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
         <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="workFactory" ref="workFactory" />
     </bean>
 
     <bean id="parentContainerResolver" class="org.bonitasoft.engine.data.ParentContainerResolverImpl">
@@ -136,6 +138,7 @@
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="messagesHandlingService" ref="messagesHandlingService" />
         <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="workFactory" ref="workFactory" />
     </bean>
 
 
@@ -147,6 +150,7 @@
         <constructor-arg name="tenantId" value="${tenantId}" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="workFactory" ref="workFactory" />
     </bean>
 
     <bean id="transitionConditionEvaluator"
@@ -928,11 +932,14 @@
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
 
+    <bean id="workFactory" class="org.bonitasoft.engine.execution.work.WorkFactory" />
+
     <bean id="workService" class="org.bonitasoft.engine.work.WorkServiceImpl">
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="workExecutorService" ref="workExecutorService" />
+        <constructor-arg name="workFactory" ref="workFactory" />
     </bean>
 
     <bean id="workExecutorService" class="org.bonitasoft.engine.work.WorkExecutorServiceImpl">

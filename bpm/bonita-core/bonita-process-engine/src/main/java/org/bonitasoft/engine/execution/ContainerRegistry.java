@@ -34,10 +34,12 @@ public class ContainerRegistry {
     private final Map<String, ContainerExecutor> executors = new HashMap<String, ContainerExecutor>(2);
 
     private final WorkService workService;
+    private final WorkFactory workFactory;
 
-    public ContainerRegistry(final WorkService workService) {
+    public ContainerRegistry(final WorkService workService, WorkFactory workFactory) {
         super();
         this.workService = workService;
+        this.workFactory = workFactory;
     }
 
     public void addContainerExecutor(final ContainerExecutor containerExecutor) {
@@ -59,7 +61,7 @@ public class ContainerRegistry {
     }
 
     public void executeFlowNode(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId) throws SWorkRegisterException {
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId));
+        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(processDefinitionId, processInstanceId, flowNodeInstanceId));
     }
 
     public void executeFlowNodeInSameThread(final long flowNodeInstanceId,

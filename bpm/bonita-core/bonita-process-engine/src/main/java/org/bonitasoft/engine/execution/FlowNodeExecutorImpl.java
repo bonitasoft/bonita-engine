@@ -88,14 +88,19 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final ClassLoaderService classLoaderService;
 
     private final WorkService workService;
+    private final WorkFactory workFactory;
 
     private final ContractDataService contractDataService;
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
-            final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
-            final ProcessInstanceService processInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final WorkService workService, final ContractDataService contractDataService) {
+            final OperationService operationService, final ArchiveService archiveService,
+            final DataInstanceService dataInstanceService,
+            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
+            final SCommentService commentService,
+            final ProcessInstanceService processInstanceService,
+            final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final WorkService workService, WorkFactory workFactory,
+            final ContractDataService contractDataService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -107,6 +112,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
         this.workService = workService;
+        this.workFactory = workFactory;
         containerRegistry.addContainerExecutor(this);
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
@@ -201,7 +207,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     private void registerExecuteFlowNodeWork(SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(),
+        workService.registerWork(workFactory.createExecuteFlowNodeWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
                 sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId()));
     }
 
@@ -262,7 +268,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private void registerNotifyFinishWork(SFlowNodeInstance sFlowNodeInstance) throws SWorkRegisterException {
         workService.registerWork(
-                WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance.getParentProcessInstanceId(),
+                workFactory.createNotifyChildFinishedWorkDescriptor(sFlowNodeInstance.getProcessDefinitionId(),
+                        sFlowNodeInstance.getParentProcessInstanceId(),
                         sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
     }
 
