@@ -20,7 +20,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -34,9 +34,9 @@ public class ContainerRegistry {
     private final Map<String, ContainerExecutor> executors = new HashMap<String, ContainerExecutor>(2);
 
     private final WorkService workService;
-    private final WorkFactory workFactory;
+    private final BPMWorkFactory workFactory;
 
-    public ContainerRegistry(final WorkService workService, WorkFactory workFactory) {
+    public ContainerRegistry(final WorkService workService, BPMWorkFactory workFactory) {
         super();
         this.workService = workService;
         this.workFactory = workFactory;

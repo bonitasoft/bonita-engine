@@ -66,7 +66,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
@@ -115,7 +115,7 @@ public class EventsHandler {
             final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService,
             final TechnicalLoggerService logger,
             OperationService operationService,
-            MessagesHandlingService messagesHandlingService, WorkService workService, WorkFactory workFactory) {
+            MessagesHandlingService messagesHandlingService, WorkService workService, BPMWorkFactory workFactory) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;

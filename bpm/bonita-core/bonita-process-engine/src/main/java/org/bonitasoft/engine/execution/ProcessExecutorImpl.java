@@ -111,7 +111,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -161,7 +161,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final BusinessDataRepository businessDataRepository;
     private final RefBusinessDataService refBusinessDataService;
     private final DocumentHelper documentHelper;
-    private final WorkFactory workFactory;
+    private final BPMWorkFactory workFactory;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
                                final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
@@ -172,7 +172,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                                final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
                                final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
                                final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final BusinessDataRepository businessDataRepository,
-                               final RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator, final ContractDataService contractDataService, WorkFactory workFactory) {
+                               final RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator, final ContractDataService contractDataService, BPMWorkFactory workFactory) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;

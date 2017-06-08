@@ -63,14 +63,14 @@ public class RestartProcessHandler implements TenantRestartHandler {
         private final ProcessExecutor processExecutor;
 
         private final FlowNodeStateManager flowNodeStateManager;
-        private WorkFactory workFactory;
+        private BPMWorkFactory workFactory;
         private final Iterator<Long> iterator;
 
         public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger, final ActivityInstanceService activityInstanceService,
-                final ProcessDefinitionService processDefinitionService,
-                final ProcessInstanceService processInstanceService,
-                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager,
-                WorkFactory workFactory, final Iterator<Long> iterator) {
+                                final ProcessDefinitionService processDefinitionService,
+                                final ProcessInstanceService processInstanceService,
+                                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager,
+                                BPMWorkFactory workFactory, final Iterator<Long> iterator) {
             this.workService = workService;
             this.logger = logger;
             this.activityInstanceService = activityInstanceService;
@@ -178,7 +178,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final WorkService workService = tenantServiceAccessor.getWorkService();
-        final WorkFactory workFactory = tenantServiceAccessor.getBPMWorkFactory();
+        final BPMWorkFactory workFactory = tenantServiceAccessor.getBPMWorkFactory();
 
         final List<Long> list = processInstancesByTenant.get(tenantId);
         final Iterator<Long> iterator = list.iterator();
@@ -197,7 +197,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
     }
 
     protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
-                                    final ActivityInstanceService activityInstanceService, final WorkService workService, FlowNodeStateManager flowNodeStateManager, WorkFactory workFactory)
+                                    final ActivityInstanceService activityInstanceService, final WorkService workService, FlowNodeStateManager flowNodeStateManager, BPMWorkFactory workFactory)
             throws SBonitaException {
         // Only Error events set interruptedByEvent on SProcessInstance:
         if (!processInstance.hasBeenInterruptedByEvent()) {

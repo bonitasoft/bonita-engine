@@ -38,7 +38,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -67,11 +67,11 @@ public class MessagesHandlingService implements TenantLifecycleService {
     private Long tenantId;
     private UserTransactionService userTransactionService;
     private SessionAccessor sessionAccessor;
-    private WorkFactory workFactory;
+    private BPMWorkFactory workFactory;
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
             LockService lockService, Long tenantId, UserTransactionService userTransactionService,
-            SessionAccessor sessionAccessor, WorkFactory workFactory) {
+            SessionAccessor sessionAccessor, BPMWorkFactory workFactory) {
         this.eventInstanceService = eventInstanceService;
         this.workService = workService;
         this.loggerService = loggerService;

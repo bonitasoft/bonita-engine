@@ -111,7 +111,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -158,7 +158,7 @@ public class StateBehaviors {
     private final WaitingEventsInterrupter waitingEventsInterrupter;
     private final RefBusinessDataService refBusinessDataService;
     private ProcessExecutor processExecutor;
-    private final WorkFactory workFactory;
+    private final BPMWorkFactory workFactory;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
                           final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
@@ -167,7 +167,7 @@ public class StateBehaviors {
                           final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
                           final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
                           final IdentityService identityService, final ParentContainerResolver parentContainerResolver,
-                          final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService, WorkFactory workFactory) {
+                          final WaitingEventsInterrupter waitingEventsInterrupter, final RefBusinessDataService refBusinessDataService, BPMWorkFactory workFactory) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
