@@ -38,7 +38,7 @@ public class RestartProcessHandlerTest {
     @Mock
     WorkService workService;
     @Mock
-    WorkFactory workFactory;
+    BPMWorkFactory workFactory;
     @Mock
     FlowNodeStateManagerImpl flowNodeStateManager;
 

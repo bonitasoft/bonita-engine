@@ -33,7 +33,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.work.BonitaWork;
@@ -56,7 +56,7 @@ public class FlowNodeExecutorImplTest {
     private static final long PROCESS_INSTANCE_ID = 343332L;
     @Mock
     private WorkService workService;
-    private WorkFactory workFactory = new WorkFactory();
+    private BPMWorkFactory workFactory = new BPMWorkFactory();
     @Mock
     private ActivityInstanceService activityInstanceService;
     @Mock

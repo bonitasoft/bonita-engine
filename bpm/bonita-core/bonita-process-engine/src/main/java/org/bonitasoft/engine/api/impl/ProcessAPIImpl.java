@@ -318,7 +318,7 @@ import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -5694,7 +5694,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         SCommentService commentService = tenantAccessor.getCommentService();
         FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         WorkService workService = tenantAccessor.getWorkService();
-        WorkFactory workFactory = tenantAccessor.getBPMWorkFactory();
+        BPMWorkFactory workFactory = tenantAccessor.getBPMWorkFactory();
 
         SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         if (shouldBeReadyTask) {

@@ -932,7 +932,7 @@
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
 
-    <bean id="workFactory" class="org.bonitasoft.engine.execution.work.WorkFactory" />
+    <bean id="workFactory" class="org.bonitasoft.engine.execution.work.BPMWorkFactory" />
 
     <bean id="workService" class="org.bonitasoft.engine.work.WorkServiceImpl">
         <constructor-arg name="transactionService" ref="transactionService" />

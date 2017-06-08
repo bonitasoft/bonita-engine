@@ -44,7 +44,7 @@ public class ExecuteFlowNodes implements Callable<Object> {
     private static final int MAX_FLOWNODES_TO_RESTART_PER_TRANSACTION = 20;
 
     private final WorkService workService;
-    private final WorkFactory workFactory;
+    private final BPMWorkFactory workFactory;
 
     private final TechnicalLoggerService logger;
 
