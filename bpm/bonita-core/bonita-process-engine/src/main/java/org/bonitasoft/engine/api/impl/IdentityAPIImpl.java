@@ -1432,13 +1432,21 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public void importOrganization(final String organizationContent, final ImportPolicy policy) throws OrganizationImportException {
+
+        importOrganizationWithWarnings(organizationContent, policy);
+    }
+
+    @Override
+    public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy) throws OrganizationImportException{
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final SCustomUserInfoValueBuilderFactory creatorFactory = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
             final SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class);
             final SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(), creatorFactory,
                     updaterFactor);
-            new ImportOrganization(tenantAccessor, organizationContent, policy, customUserInfoValueAPI).execute();
+            ImportOrganization importedOrganization = new ImportOrganization(tenantAccessor, organizationContent, policy, customUserInfoValueAPI);
+            importedOrganization.execute();
+            return importedOrganization.getResult();
         } catch (final SBonitaException e) {
             throw new OrganizationImportException(e);
         }
