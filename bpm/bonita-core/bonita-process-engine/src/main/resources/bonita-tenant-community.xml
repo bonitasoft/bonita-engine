@@ -1827,4 +1827,6 @@
 
     <bean id="externalUrlAdapter" class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
 
+    <bean id="engineClock" class="org.bonitasoft.engine.commons.time.DefaultEngineClock" />
+
 </beans>
