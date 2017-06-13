@@ -32,6 +32,7 @@ public class WorkDescriptor implements Serializable {
     private String type;
     private Long tenantId;
     private Map<String, Serializable> parameters;
+    private int retryCount = 0;
 
     public WorkDescriptor(String type) {
         this.type = type;
@@ -80,6 +81,13 @@ public class WorkDescriptor implements Serializable {
         return this;
     }
 
+    public int getRetryCount() {
+        return retryCount;
+    }
+    public void incrementRetryCount() {
+        retryCount++;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -89,6 +97,7 @@ public class WorkDescriptor implements Serializable {
         WorkDescriptor that = (WorkDescriptor) o;
 
         return new EqualsBuilder()
+                .append(retryCount, that.retryCount)
                 .append(uuid, that.uuid)
                 .append(type, that.type)
                 .append(tenantId, that.tenantId)
@@ -103,6 +112,7 @@ public class WorkDescriptor implements Serializable {
                 .append(type)
                 .append(tenantId)
                 .append(parameters)
+                .append(retryCount)
                 .toHashCode();
     }
 
@@ -113,6 +123,7 @@ public class WorkDescriptor implements Serializable {
                 .append("type", type)
                 .append("tenantId", tenantId)
                 .append("parameters", parameters)
+                .append("retryCount", retryCount)
                 .toString();
     }
 }
