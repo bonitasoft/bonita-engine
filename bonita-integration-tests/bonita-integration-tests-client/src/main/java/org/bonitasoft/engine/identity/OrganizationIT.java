@@ -346,6 +346,65 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Test
+    public void importOrganizationWithWarnings_return_no_warnings_on_good_XML() throws IOException, OrganizationImportException, DeletionException {
+        //given
+        List<String> warnings;
+        try (final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganization.xml")) {
+            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
+
+            //when
+            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),ImportPolicy.IGNORE_DUPLICATES);
+        }
+
+        //then
+        assertThat(warnings).isEmpty();
+
+        // clean-up
+        getIdentityAPI().deleteOrganization();
+    }
+
+    @Test(expected = GroupNotFoundException.class)
+    public void importOrganizationWithWarnings_return_warnings_on_faulty_group_names() throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
+        //given
+        List<String> warnings;
+        try(final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
+            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
+
+            //when
+            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent),ImportPolicy.IGNORE_DUPLICATES);
+        }
+        //then
+        try {
+            assertThat(warnings).hasSize(1);
+            assertThat(warnings).contains("The group name RD/Studio contains the character '/' which is not supported. The group has not been imported");
+            getIdentityAPI().getGroupByPath("/RD/Studio");
+        } finally {
+            // clean-up
+            getIdentityAPI().deleteOrganization();
+        }
+    }
+    @Test
+    public void importOrganizationWithWarnings_imports_the_correct_groups_if_the_incorrect_one_is_present() throws DeletionException, OrganizationImportException, IOException, GroupNotFoundException {
+        //given
+        List<String> warnings;
+        try (final InputStream xmlStream = OrganizationIT.class.getResourceAsStream("complexOrganizationWithBadGroup.xml")) {
+            final byte[] organisationContent = IOUtils.toByteArray(xmlStream);
+
+            //when
+            warnings = getIdentityAPI().importOrganizationWithWarnings(new String(organisationContent), ImportPolicy.IGNORE_DUPLICATES);
+        }
+        //then
+        //Should not throw any exception
+        getIdentityAPI().getGroupByPath("/BonitaSoft");
+        getIdentityAPI().getGroupByPath("/BonitaSoft/RD");
+        getIdentityAPI().getGroupByPath("/BonitaSoft/Support");
+        assertThat(getIdentityAPI().getNumberOfGroups()).isEqualTo(3);
+
+        // clean-up
+        getIdentityAPI().deleteOrganization();
+    }
+
+    @Test
     public void importACMEOrganizationTwiceWithDefaultProfile() throws Exception {
         // create XML file
 
