@@ -56,6 +56,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.InvalidGroupNameException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -67,6 +68,7 @@ import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
+import org.bonitasoft.engine.identity.ExportOrganization;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
@@ -75,6 +77,7 @@ import org.bonitasoft.engine.identity.GroupUpdater;
 import org.bonitasoft.engine.identity.GroupUpdater.GroupField;
 import org.bonitasoft.engine.identity.Icon;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.ImportOrganization;
 import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
 import org.bonitasoft.engine.identity.OrganizationExportException;
@@ -122,8 +125,6 @@ import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactor
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.ExportOrganization;
-import org.bonitasoft.engine.identity.ImportOrganization;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -913,6 +914,10 @@ public class IdentityAPIImpl implements IdentityAPI {
     public Group createGroup(final GroupCreator creator) throws CreationException {
         if (creator == null) {
             throw new CreationException("Cannot create a null group");
+        }
+        String groupName = creator.getFields().get(GroupCreator.GroupField.NAME).toString();
+        if(groupName.contains("/")){
+            throw new InvalidGroupNameException("Cannot create a group with '/' in its name");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
