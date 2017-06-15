@@ -9,8 +9,8 @@
             <props>
                 <prop key="db.hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop>
                 <prop key="db.datasource.classname">com.microsoft.sqlserver.jdbc.SQLServerXADataSource</prop>
-                <prop key="db.server.name">sqlserver1.rd.lan</prop>
-                <prop key="db.server.port">1433</prop>
+                <prop key="db.server.name">sqlserver2.rd.lan</prop>
+                <prop key="db.server.port">1533</prop>
                 <prop key="db.database.name">bonita_engine</prop>
                 <prop key="db.user">sa</prop>
                 <prop key="db.password">Bonita12</prop>
