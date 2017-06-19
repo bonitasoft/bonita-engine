@@ -54,7 +54,7 @@ public class PageAPIIT extends CommonAPIIT {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private static final String DISPLAY_NAME = "My Päge";
+    private static final String DISPLAY_NAME = "My P\u00e4ge";
 
     private static final String CONTENT_NAME = "content.zip";
 
