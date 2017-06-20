@@ -248,7 +248,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (transaction == null) {
                 throw new STransactionNotFoundException("No active transaction.");
             }
-            transaction.registerSynchronization(new JTATransactionWrapper(txSync));
+            transaction.registerSynchronization(new JTATransactionWrapper(logger, txSync));
         } catch (final IllegalStateException | SystemException | RollbackException e) {
             throw new STransactionNotFoundException(e);
         }

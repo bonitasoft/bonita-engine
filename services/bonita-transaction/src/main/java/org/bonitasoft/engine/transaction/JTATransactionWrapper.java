@@ -15,11 +15,16 @@ package org.bonitasoft.engine.transaction;
 
 import javax.transaction.Synchronization;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+
 public class JTATransactionWrapper implements Synchronization {
 
+    private TechnicalLoggerService logger;
     private final BonitaTransactionSynchronization bonitaTx;
 
-    public JTATransactionWrapper(final BonitaTransactionSynchronization bonitaTx) {
+    public JTATransactionWrapper(TechnicalLoggerService logger, final BonitaTransactionSynchronization bonitaTx) {
+        this.logger = logger;
         this.bonitaTx = bonitaTx;
     }
 
@@ -30,7 +35,12 @@ public class JTATransactionWrapper implements Synchronization {
 
     @Override
     public void afterCompletion(final int status) {
-        bonitaTx.afterCompletion(JTATransactionServiceImpl.convert(status));
+        try {
+            bonitaTx.afterCompletion(JTATransactionServiceImpl.convert(status));
+        } catch (RuntimeException e) {
+            logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected exception on after completion", e);
+            throw e;
+        }
     }
 
 }
