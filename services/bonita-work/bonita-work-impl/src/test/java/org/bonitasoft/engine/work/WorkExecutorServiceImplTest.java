@@ -37,6 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class WorkExecutorServiceImplTest {
+    public static final int WORK_TERMINATION_TIMEOUT = 5000;
     @Mock
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     @Mock
@@ -51,7 +52,7 @@ public class WorkExecutorServiceImplTest {
     @Before
     public void before() throws Exception {
         doReturn(bonitaExecutorService).when(bonitaExecutorServiceFactory).createExecutorService();
-        workExecutorService = new WorkExecutorServiceImpl(bonitaExecutorServiceFactory, loggerService, 5000);
+        workExecutorService = new WorkExecutorServiceImpl(bonitaExecutorServiceFactory, loggerService, WORK_TERMINATION_TIMEOUT);
         workExecutorService.start();
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
     }
@@ -231,6 +232,15 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.onSuccess(workDescriptor);
 
         verify(loggerService).log(any(), eq(TechnicalLogSeverity.DEBUG),contains("Completed work"));
+    }
+
+
+    @Test
+    public void should_await_specified_time_when_stopping_the_executor() throws Exception {
+
+        workExecutorService.stop();
+
+        verify(bonitaExecutorService).awaitTermination(WORK_TERMINATION_TIMEOUT, TimeUnit.SECONDS);
     }
 
 }
