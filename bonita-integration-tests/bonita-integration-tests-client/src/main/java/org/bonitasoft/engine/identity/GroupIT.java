@@ -24,7 +24,9 @@ import java.util.Map;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.InvalidGroupNameException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.identity.impl.IconImpl;
 import org.bonitasoft.engine.search.Order;
@@ -636,5 +638,17 @@ public class GroupIT extends TestWithTechnicalUser {
         assertThat(getIdentityAPI().getGroup(site.getId()).getParentPath()).isEqualTo("/Acme2");
         deleteGroups(getIdentityAPI().getGroup(acme.getId()));
         
+    }
+
+    @Test(expected = InvalidGroupNameException.class)
+    public void should_not_create_group_when_given_invalid_name() throws CreationException {
+        //when
+        Group acme = getIdentityAPI().createGroup("/Acme",null);
+    }
+
+    @Test(expected = InvalidGroupNameException.class)
+    public void should_not_create_group_when_given_invalid_name_in_creator() throws CreationException {
+        //when
+        Group acme = getIdentityAPI().createGroup(new GroupCreator("Bon/ta"));
     }
 }
