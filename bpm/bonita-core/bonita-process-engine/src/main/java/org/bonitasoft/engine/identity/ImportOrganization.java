@@ -88,6 +88,16 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
+    private void excludeGroupsWithInvalidCharactersInName(List<ExportedGroup> groups) throws OrganizationImportException {
+        for (ExportedGroup group : groups) {
+            String groupName = group.getName();
+            if (groupName.contains("/")) {
+                groups.remove(group);
+                warnings.add("The group name " + groupName + " contains the character '/' which is not supported. The group has not been imported");
+            }
+        }
+    }
+
     private String updateNamespace(String content) {
         if (content != null) {
             if (content.contains(LEGACY_NS)) {
@@ -109,6 +119,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             final List<ExportedUser> users = organization.getUsers();
             final List<ExportedRole> roles = organization.getRoles();
             final List<ExportedGroup> groups = organization.getGroups();
+            //checking if the Group names contain illegal characters
+            excludeGroupsWithInvalidCharactersInName(groups);
             final List<ExportedUserMembership> memberships = organization.getMemberships();
             // custom user info definitions
             final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization
