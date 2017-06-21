@@ -1083,6 +1083,7 @@
         <constructor-arg name="maximumPoolSize" value="${bonita.tenant.work.maximumPoolSize}" />
         <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.work.keepAliveTimeSeconds}" />
         <constructor-arg name="queueCapacity" value="${bonita.tenant.work.queueCapacity}" />
+        <constructor-arg name="engineClock" ref="engineClock" />
     </bean>
 
     <bean id="userFilterService" class="org.bonitasoft.engine.userfilter.UserFilterServiceDecorator">
