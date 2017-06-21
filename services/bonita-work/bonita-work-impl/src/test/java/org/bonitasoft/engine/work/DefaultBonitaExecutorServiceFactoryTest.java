@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.bonitasoft.engine.commons.time.DefaultEngineClock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -31,7 +32,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
     public void ThreadNameInExecutorServiceShouldContainsTenantId() {
         long tenantId = 999;
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, workFactory, tenantId, 1,
-                20, 15, 10);
+                20, 15, 10, new DefaultEngineClock());
 
         BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();
         Runnable r = () -> {

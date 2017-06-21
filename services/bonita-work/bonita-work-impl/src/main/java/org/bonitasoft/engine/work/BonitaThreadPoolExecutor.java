@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -33,6 +34,7 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private final BlockingQueue<Runnable> workQueue;
     private final WorkFactory workFactory;
     private final TechnicalLoggerService logger;
+    private final EngineClock engineClock;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
                                     final int maximumPoolSize,
@@ -40,11 +42,13 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
                                     final TimeUnit unit,
                                     final BlockingQueue<Runnable> workQueue,
                                     final ThreadFactory threadFactory,
-                                    final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger) {
+            final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
+            EngineClock engineClock) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
         this.logger = logger;
+        this.engineClock = engineClock;
     }
 
     @Override
@@ -64,13 +68,20 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     @Override
     public void shutdownAndEmptyQueue() {
         super.shutdown();
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Clearing queue of work, had " + workQueue.size() + " elements");
+        logger.log(getClass(), TechnicalLogSeverity.INFO,
+                "Clearing queue of work, had " + workQueue.size() + " elements");
         workQueue.clear();
     }
 
     @Override
     public void submit(WorkDescriptor work, SuccessCallback onSuccess, FailureCallback onFailure) {
         submit(() -> {
+            if (work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now())) {
+                // Future implementation should use a real delay e.g. using a ScheduledThreadPoolExecutor
+                // Will be executed later
+                submit(work, onSuccess, onFailure);
+                return;
+            }
             BonitaWork bonitaWork = workFactory.create(work);
             HashMap<String, Object> context = new HashMap<>();
             try {
