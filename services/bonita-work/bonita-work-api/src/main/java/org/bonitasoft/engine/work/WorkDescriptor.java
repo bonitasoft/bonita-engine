@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.work;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,6 +34,7 @@ public class WorkDescriptor implements Serializable {
     private Long tenantId;
     private Map<String, Serializable> parameters;
     private int retryCount = 0;
+    private Instant executionThreshold;
 
     public WorkDescriptor(String type) {
         this.type = type;
@@ -81,27 +83,41 @@ public class WorkDescriptor implements Serializable {
         return this;
     }
 
+    public Instant getExecutionThreshold() {
+        return executionThreshold;
+    }
+
+    public void setExecutionThreshold(Instant executionThreshold) {
+        this.executionThreshold = executionThreshold;
+    }
+
+    public WorkDescriptor mustBeExecutedAfter(Instant mustBeExecutedAfter) {
+        this.executionThreshold = mustBeExecutedAfter;
+        return this;
+    }
+
     public int getRetryCount() {
         return retryCount;
     }
+
     public void incrementRetryCount() {
         retryCount++;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         WorkDescriptor that = (WorkDescriptor) o;
-
         return new EqualsBuilder()
                 .append(retryCount, that.retryCount)
                 .append(uuid, that.uuid)
                 .append(type, that.type)
                 .append(tenantId, that.tenantId)
                 .append(parameters, that.parameters)
+                .append(executionThreshold, that.executionThreshold)
                 .isEquals();
     }
 
@@ -113,6 +129,7 @@ public class WorkDescriptor implements Serializable {
                 .append(tenantId)
                 .append(parameters)
                 .append(retryCount)
+                .append(executionThreshold)
                 .toHashCode();
     }
 
@@ -124,6 +141,7 @@ public class WorkDescriptor implements Serializable {
                 .append("tenantId", tenantId)
                 .append("parameters", parameters)
                 .append("retryCount", retryCount)
+                .append("executionThreshold", executionThreshold)
                 .toString();
     }
 }
