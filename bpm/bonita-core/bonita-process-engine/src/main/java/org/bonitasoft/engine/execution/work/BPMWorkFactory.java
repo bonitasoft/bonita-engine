@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
@@ -50,6 +54,8 @@ public class BPMWorkFactory implements WorkFactory {
     private static final String CONNECTOR_INSTANCE_ID = "connectorInstanceId";
     private static final String CONNECTOR_DEFINITION_NAME = "connectorDefinitionName";
     private static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
+
+    private Map<String, Function<WorkDescriptor, BonitaWork>> extensions = new HashMap<>();
 
     private BonitaWork createExecuteConnectorOfActivity(WorkDescriptor workDescriptor) {
         final long processDefinitionId = workDescriptor.getLong(PROCESS_DEFINITION_ID);
@@ -97,8 +103,8 @@ public class BPMWorkFactory implements WorkFactory {
 
 
     public WorkDescriptor createExecuteConnectorOfProcessDescriptor(final long processDefinitionId, final long processInstanceId, final long rootProcessInstanceId,
-                                                             final long connectorInstanceId, final String connectorDefinitionName, final ConnectorEvent activationEvent,
-                                                             final FlowNodeSelector flowNodeSelector) {
+            final long connectorInstanceId, final String connectorDefinitionName, final ConnectorEvent activationEvent,
+            final FlowNodeSelector flowNodeSelector) {
         return WorkDescriptor.create(EXECUTE_PROCESS_CONNECTOR)
                 .withParameter(PROCESS_DEFINITION_ID, processDefinitionId)
                 .withParameter(PROCESS_INSTANCE_ID, processInstanceId)
@@ -252,12 +258,24 @@ public class BPMWorkFactory implements WorkFactory {
                 work = createExecuteMessageCoupleWork(workDescriptor);
                 break;
             default:
-                throw new IllegalArgumentException("Unkown type of work:" + workDescriptor.getType());
+                work = createFromExtension(workDescriptor);
+                break;
         }
         Long tenantId = workDescriptor.getTenantId();
         if (tenantId != null) {
             work.setTenantId(tenantId);
         }
         return work;
+    }
+
+    private BonitaWork createFromExtension(WorkDescriptor workDescriptor) {
+        if (!extensions.containsKey(workDescriptor.getType())) {
+            throw new IllegalArgumentException("Unkown type of work:" + workDescriptor.getType());
+        }
+        return extensions.get(workDescriptor.getType()).apply(workDescriptor);
+    }
+
+    public void addExtension(String workType, Function<WorkDescriptor, BonitaWork> workFactoryOfType) {
+        extensions.put(workType, workFactoryOfType);
     }
 }
