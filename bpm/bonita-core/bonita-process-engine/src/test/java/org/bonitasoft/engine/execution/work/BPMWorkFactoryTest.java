@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
@@ -139,6 +142,28 @@ public class BPMWorkFactoryTest {
             }
         }
         return containsLockProcessInstance;
+    }
+
+    @Test
+    public void should_create_work_using_extensions() throws Exception {
+        BonitaWork bonitaWork = new BonitaWork() {
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public void work(Map<String, Object> context) throws Exception {
+            }
+
+            @Override
+            public void handleFailure(Exception e, Map<String, Object> context) throws Exception {
+            }
+        };
+        workFactory.addExtension("MyWork", workDescriptor -> bonitaWork);
+
+        assertThat(workFactory.create(WorkDescriptor.create("MyWork"))).isEqualTo(bonitaWork);
     }
 
 }
