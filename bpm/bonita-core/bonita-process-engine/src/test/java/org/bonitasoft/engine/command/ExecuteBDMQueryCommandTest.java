@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,12 +13,15 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.command.ExecuteBDMQueryCommand.serializeResult;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -44,9 +47,6 @@ public class ExecuteBDMQueryCommandTest {
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
-    /**
-     * @throws Exception
-     */
     @Before
     public void setUp() {
         doReturn(bdrService).when(command).getBusinessDataRepository(tenantServiceAccessor);
@@ -106,6 +106,15 @@ public class ExecuteBDMQueryCommandTest {
         command.execute(parameters, tenantServiceAccessor);
         parameters.put(ExecuteBDMQueryCommand.RETURN_TYPE, "");
         command.execute(parameters, tenantServiceAccessor);
+    }
+
+    @Test
+    public void should_serialize_json_without_indentation_nor_line_feed() throws SCommandExecutionException {
+        TreeMap<String, String> parameters = new TreeMap<>(); // use a TreeMap type declaration as we need a Serializable and to ensure guaranteed order
+        parameters.put("param1", "value1");
+        parameters.put("param2", "value2");
+        parameters.put("param3", "value3");
+        assertThat(new String(serializeResult(parameters))).isEqualTo("{\"param1\":\"value1\",\"param2\":\"value2\",\"param3\":\"value3\"}");
     }
 
 }
