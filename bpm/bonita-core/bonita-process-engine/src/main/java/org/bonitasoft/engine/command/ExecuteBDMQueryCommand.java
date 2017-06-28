@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,14 +17,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author Romain Bioteau
@@ -43,6 +42,14 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     public static final String START_INDEX = "startIndex";
 
     public static final String MAX_RESULTS = "maxResults";
+
+    // Avoid multiple instantiations for better performance, see BS-16794
+    private static final BusinessDataObjectMapper businessDataObjectMapper;
+    static {
+        businessDataObjectMapper = new BusinessDataObjectMapper();
+        //avoid to fail when serializing proxy (proxy will be recreated client side) see BS-16031
+        businessDataObjectMapper.disableSerializationFeature(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+    }
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
@@ -74,14 +81,10 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
         }
     }
 
-    private byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
-        final BusinessDataObjectMapper mapper = new BusinessDataObjectMapper();
-        mapper.enableSerializationFeature(SerializationFeature.INDENT_OUTPUT);
-        //avoid to fail when serializing proxy (proxy will be recreated client side) see BS-16031
-        mapper.disableSerializationFeature(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-
+    // Visible For Testing
+    static byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
         try {
-            return mapper.writeValueAsBytes(result);
+            return businessDataObjectMapper.writeValueAsBytes(result);
         } catch (final JsonProcessingException jpe) {
             throw new SCommandExecutionException(jpe);
         }
