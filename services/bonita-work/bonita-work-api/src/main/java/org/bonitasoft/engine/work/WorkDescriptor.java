@@ -23,6 +23,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * @author Baptiste Mesta.
@@ -102,6 +103,12 @@ public class WorkDescriptor implements Serializable {
 
     public void incrementRetryCount() {
         retryCount++;
+    }
+
+    public String getDescription() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append(type)
+                .append("parameters", parameters).toString();
     }
 
     @Override
