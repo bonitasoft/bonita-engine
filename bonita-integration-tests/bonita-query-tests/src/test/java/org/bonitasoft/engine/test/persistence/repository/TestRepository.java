@@ -17,7 +17,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
-import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -42,6 +41,9 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMa
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
+import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
+import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -59,6 +61,7 @@ import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
@@ -264,6 +267,18 @@ public class TestRepository {
 
     public void update(final SApplicationImpl application) {
         getSession().update(application);
+    }
+
+    public SDependency add(SDependencyImpl dependency){
+        getSession().save(dependency);
+        return (SDependency)getSession().get(dependency.getClass(),
+                new PersistentObjectId(dependency.getId(), dependency.getTenantId()));
+    }
+
+    public SDependencyMappingImpl add(SDependencyMappingImpl dependencyMapping){
+        getSession().save(dependencyMapping);
+        return (SDependencyMappingImpl) getSession().get(dependencyMapping.getClass(),
+                new PersistentObjectId(dependencyMapping.getId(), dependencyMapping.getTenantId()));
     }
 
 }

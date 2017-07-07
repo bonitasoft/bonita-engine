@@ -86,7 +86,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
 
     @Override
     public void start() {
-        if (businessDataModelRepository.isDBMDeployed()) {
+        if (businessDataModelRepository.isBDMDeployed()) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Create entity factory on tenant " + tenantId);
             entityManagerFactory = createEntityManagerFactory();
         }
@@ -108,7 +108,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     }
 
     private synchronized void recreateEntityManagerFactory(ClassLoader newClassLoader) {
-        if (businessDataModelRepository.isDBMDeployed()) {
+        if (businessDataModelRepository.isBDMDeployed()) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Recreate entity factory for classloader " + newClassLoader + " on tenant " + tenantId);
             final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
             try {

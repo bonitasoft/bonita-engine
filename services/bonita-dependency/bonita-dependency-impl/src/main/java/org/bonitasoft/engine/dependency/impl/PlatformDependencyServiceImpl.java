@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -195,6 +196,12 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
     public SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) {
         return null;
     }
+
+    @Override
+    public Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException {
+        return Optional.empty();
+    }
+
 
     @Override
     protected QueryOptions getDefaultQueryOptionForDependencyMapping() {

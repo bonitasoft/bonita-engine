@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -79,8 +80,8 @@ public class DependencyServiceImpl extends AbstractDependencyService {
     private ReadSessionAccessor readSessionAccessor;
 
     public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
-            BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
+                                 final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
+                                 BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
         super(broadcastService, userTransactionService, persistenceService);
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -335,4 +336,13 @@ public class DependencyServiceImpl extends AbstractDependencyService {
         return persistenceService.selectOne(new SelectOneDescriptor<SDependency>("getDependencyOfArtifact", inputParameters, SDependency.class));
     }
 
+    @Override
+    public Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<>(3);
+        inputParameters.put("artifactId", artifactId);
+        inputParameters.put("artifactType", artifactType);
+        inputParameters.put("fileName", fileName);
+        Long idOfDependencyOfArtifact = persistenceService.selectOne(new SelectOneDescriptor<Long>("getIdOfDependencyOfArtifact", inputParameters, SDependency.class));
+        return Optional.ofNullable(idOfDependencyOfArtifact);
+    }
 }

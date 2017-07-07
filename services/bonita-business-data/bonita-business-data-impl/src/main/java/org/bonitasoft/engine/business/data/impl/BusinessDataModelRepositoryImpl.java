@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -97,43 +99,40 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
         try {
-            final SDependency searchBDMDependencies = getBDMDependency();
-            if (searchBDMDependencies != null) {
-                return String.valueOf(searchBDMDependencies.getId());
+            Optional returnedId = dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
+            if (returnedId.isPresent()) {
+                return String.valueOf(returnedId);
             }
         } catch (SBonitaReadException e) {
             throw new SBusinessDataRepositoryException(e);
-
         }
         return null;
     }
 
     @Override
     public BusinessObjectModel getBusinessObjectModel() throws SBusinessDataRepositoryException {
-        if (isDBMDeployed()) {
+        try {
             byte[] clientBdmZip = getClientBDMZip();
-            try {
-                final Map<String, byte[]> zipContent = IOUtils.unzip(clientBdmZip);
-                if (zipContent.containsKey(BOM_NAME)) {
-                    final byte[] bomZip = zipContent.get(BOM_NAME);
-                    return getBusinessObjectModel(bomZip);
-                }
-            } catch (IOException e) {
-                throw new SBusinessDataRepositoryException(e);
+            final Map<String, byte[]> zipContent = IOUtils.unzip(clientBdmZip);
+            if (zipContent.containsKey(BOM_NAME)) {
+                final byte[] bomZip = zipContent.get(BOM_NAME);
+                return getBusinessObjectModel(bomZip);
             }
+        } catch (SBusinessDataRepositoryException e) {
+            if (isBDMDeployed()) {
+                // This is not a problem of BDM not deployed, let exception go up:
+                throw e;
+            }
+        } catch (IOException e) {
+            throw new SBusinessDataRepositoryException(e);
         }
         return null;
     }
 
-    private SDependency getBDMDependency() throws SBonitaReadException {
-        return dependencyService.getDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
-
-    }
-
     @Override
-    public boolean isDBMDeployed() {
+    public boolean isBDMDeployed() {
         try {
-            return getBDMDependency() != null;
+            return dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME).isPresent();
         } catch (SBonitaReadException e) {
             return false;
         }

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.dependency;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
@@ -132,4 +133,6 @@ public interface DependencyService {
     SDependency updateDependencyOfArtifact(String name, byte[] jarContent, String fileName, long artifactId, ScopeType scopeType) throws SDependencyException;
 
     SDependency getDependencyOfArtifact(long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
+
+    Optional<Long> getIdOfDependencyOfArtifact(Long artifactId, ScopeType artifactType, String fileName) throws SBonitaReadException;
 }

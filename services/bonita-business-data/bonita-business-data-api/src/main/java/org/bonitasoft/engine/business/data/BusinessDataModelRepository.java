@@ -43,7 +43,7 @@ public interface BusinessDataModelRepository {
      */
     void uninstall(long tenantId) throws SBusinessDataRepositoryException;
 
-    boolean isDBMDeployed();
+    boolean isBDMDeployed();
 
     /**
      * Retrieve the client side BDM generated zip.
