@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.BPMLocalIT;
 import org.junit.Test;
@@ -33,7 +34,11 @@ public class TestShades {
 
     @Test
     public void testShades() throws IOException {
-        String mvn = System.getProperty("path.to.mvn", "mvn");// to be overwritten in CI
+        String defaultMavenCommand = "mvn";
+        if(SystemUtils.IS_OS_WINDOWS){
+            defaultMavenCommand = "cmd /c mvn";
+        }
+        String mvn = System.getProperty("path.to.mvn", defaultMavenCommand);// to be overwritten in CI
         String version = BPMLocalIT.getBonitaVersion();
 
         // print properties for debugging purpose

@@ -34,6 +34,10 @@
     <system-properties>
         <property name="sysprop.bonita.db.vendor" value="h2" />
         <property name="sysprop.bonita.bdm.db.vendor" value="h2" />
+        <property name="sysprop.bonita.businessdata.datasource.jndi" value="java:jboss/datasources/BusinessDataDS" />
+        <property name="sysprop.bonita.businessdata.notmanageddatasource.jndi" value="java:jboss/datasources/NotManagedBizDataDS" />
+        <property name="sysprop.bonita.database.journal.datasource.name" value="java:jboss/datasources/bonitaDS" />
+        <property name="sysprop.bonita.database.sequence.manager.datasource.name" value="java:jboss/datasources/bonitaSequenceManagerDS" />
         <property name="sysprop.bonita.hibernate.transaction.jta_platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
         <property name="sysprop.bonita.transaction.manager" value="java:jboss/TransactionManager" />
         <property name="sysprop.bonita.userTransaction" value="java:jboss/UserTransaction" />
