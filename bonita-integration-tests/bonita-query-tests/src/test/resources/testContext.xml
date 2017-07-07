@@ -39,6 +39,9 @@
                 <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
                 <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
 
+                <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>
+                <value>/org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
+
                 <!-- GLUPSSSS Needed by process instance queries -->
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
@@ -119,6 +122,10 @@
         <constructor-arg ref="sessionFactory" />
     </bean>
     <bean id="tenantResourceRepository" class="org.bonitasoft.engine.test.persistence.repository.TenantResourceRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
+
+    <bean id="dependencyRepository" class="org.bonitasoft.engine.test.persistence.repository.DependencyRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
 

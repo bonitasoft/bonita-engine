@@ -113,7 +113,7 @@ public class JPABusinessDataRepositoryImplITest {
                 schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
-        doReturn(true).when(businessDataModelRepositoryImpl).isDBMDeployed();
+        doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();
         ut = TransactionManagerServices.getTransactionManager();
         ut.begin();
 
