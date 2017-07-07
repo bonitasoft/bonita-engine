@@ -75,7 +75,7 @@ public class JPABusinessDataRepositoryImplTest {
         repository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepository, loggerService, configuration, classLoaderService, 1L));
         doReturn(manager).when(repository).getEntityManager();
-        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
+        doReturn(true).when(businessDataModelRepository).isBDMDeployed();
         CriteriaBuilder criteriaBuilder = mock(CriteriaBuilder.class);
         doReturn(criteriaBuilder).when(manager).getCriteriaBuilder();
         CriteriaQuery criteriaQuery = mock(CriteriaQuery.class);
@@ -89,7 +89,7 @@ public class JPABusinessDataRepositoryImplTest {
     @Test
     public void should_start_add_listener_on_classloader() throws Exception {
         //given
-        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
+        doReturn(true).when(businessDataModelRepository).isBDMDeployed();
         doReturn(mock(EntityManagerFactory.class)).when(repository).createEntityManagerFactory();
         //when
         repository.start();

@@ -64,4 +64,14 @@
         AND dependency.fileName = :fileName
     </query>
 
+    <query name="getIdOfDependencyOfArtifact">
+        SELECT dependency.id
+        FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency,
+             org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl AS dependencymapping
+        WHERE dependencymapping.artifactId = :artifactId
+        AND dependencymapping.artifactType = :artifactType
+        AND dependencymapping.dependencyId = dependency.id
+        AND dependency.fileName = :fileName
+    </query>
+
 </hibernate-mapping>

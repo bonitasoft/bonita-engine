@@ -99,7 +99,7 @@ public class BusinessDataModelRepositoryImplTest {
     @Test
     public void should_return_getBusinessObjectModel_return_null_when_no_bdm() throws Exception {
         //given
-        doReturn(false).when(businessDataModelRepository).isDBMDeployed();
+        doReturn(false).when(businessDataModelRepository).isBDMDeployed();
 
         //when then
         assertThat(businessDataModelRepository.getBusinessObjectModel()).isNull();
@@ -111,7 +111,6 @@ public class BusinessDataModelRepositoryImplTest {
         final InputStream resourceAsStream = this.getClass().getResourceAsStream("client-bdm.zip");
         final byte[] clientBDMZip = IOUtil.getAllContentFrom(resourceAsStream);
 
-        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
         doReturn(clientBDMZip).when(businessDataModelRepository).getClientBDMZip();
 
         //when
@@ -128,7 +127,6 @@ public class BusinessDataModelRepositoryImplTest {
         final InputStream resourceAsStream = this.getClass().getResourceAsStream("client-bdm.zip");
         final byte[] clientBDMZip = IOUtil.getAllContentFrom(resourceAsStream);
 
-        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
         doReturn(clientBDMZip).when(businessDataModelRepository).getClientBDMZip();
         doThrow(IOException.class).when(businessDataModelRepository).getBusinessObjectModel(any(clientBDMZip.getClass()));
 
