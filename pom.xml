@@ -821,7 +821,7 @@
                 <dependency>
                     <groupId>com.microsoft.jdbc</groupId>
                     <artifactId>sqlserver</artifactId>
-                    <version>4.0.2206.100</version>
+                    <version>6.0.8112.100_42</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
