@@ -260,7 +260,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.scheduler</groupId>
-            <artifactId>bonita-scheduler-api</artifactId>
+            <artifactId>bonita-scheduler</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -406,12 +406,6 @@
             <!-- because we need the builderfactory impl and it does not make sense to mock them -->
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
             <artifactId>bonita-process-definition-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.scheduler</groupId>
-            <artifactId>bonita-scheduler-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
