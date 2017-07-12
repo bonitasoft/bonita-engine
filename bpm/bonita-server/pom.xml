@@ -460,7 +460,7 @@
         <!-- Scheduler -->
         <dependency>
             <groupId>org.bonitasoft.engine.scheduler</groupId>
-            <artifactId>bonita-scheduler-quartz</artifactId>
+            <artifactId>bonita-scheduler</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -737,9 +737,7 @@
                                     <!-- Resources -->
                                     <include>org.bonitasoft.engine:bonita-resources</include>
                                     <!-- Scheduler -->
-                                    <include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
-                                    <include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
-                                    <include>org.bonitasoft.engine.scheduler:bonita-scheduler-quartz</include>
+                                    <include>org.bonitasoft.engine.scheduler:bonita-scheduler</include>
                                     <!-- Service Commons -->
                                     <include>org.bonitasoft.engine:bonita-commons</include>
                                     <!-- Sequence -->
