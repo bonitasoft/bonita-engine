@@ -140,8 +140,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final String dialect = configuration.getProperty("hibernate.dialect");
         OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
 
+        configuration.registerTypeOverride(new XMLType());
         if (dialect != null) {
-
             if (dialect.toLowerCase().contains("postgresql")) {
                 configuration.setInterceptor(new PostgresInterceptor());
                 configuration.registerTypeOverride(new PostgresMaterializedBlobType());
