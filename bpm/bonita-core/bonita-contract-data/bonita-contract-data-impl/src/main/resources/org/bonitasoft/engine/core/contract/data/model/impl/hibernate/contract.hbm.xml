@@ -14,7 +14,7 @@
         <discriminator column="kind" type="string"/>
         <property name="scopeId" type="long" column="scopeId"/>
         <property name="name" type="java.lang.String" column="name"/>
-        <property name="value" type="serializable" column="val"/>
+        <property name="value" type="xml_blob" column="val"/>
         <filter name="tenantFilter"/>
     </class>
 
@@ -31,7 +31,7 @@
         <discriminator column="kind" type="string"/>
         <property name="scopeId" type="long" column="scopeId"/>
         <property name="name" type="java.lang.String" column="name"/>
-        <property name="value" type="serializable" column="val"/>
+        <property name="value" type="xml_blob" column="val"/>
         <property name="archiveDate" column="archiveDate" type="long"/>
         <property name="sourceObjectId" column="sourceObjectId" type="long"/>
         <filter name="tenantFilter"/>

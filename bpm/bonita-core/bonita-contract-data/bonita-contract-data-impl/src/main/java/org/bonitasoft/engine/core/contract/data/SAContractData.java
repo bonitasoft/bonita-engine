@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 
 /**
@@ -25,7 +24,7 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
 
     protected String name;
 
-    protected String value;
+    protected Serializable value;
 
     protected long scopeId;
 
@@ -35,8 +34,8 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     public SAContractData(long sourceObjectId, String name, Serializable value, long scopeId) {
         super(sourceObjectId);
         this.name = name;
-        this.value = convert(value);
         this.scopeId = scopeId;
+        this.value = value;
     }
 
     public SAContractData(SContractData contractData) {
@@ -60,24 +59,13 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
     }
 
     public Serializable getValue() {
-        return revert(value);
+        return value;
     }
 
     public void setValue(final Serializable value) {
-        this.value = convert(value);
+        this.value = value;
     }
 
-
-    private String convert(final Serializable value) {
-        return XStreamFactory.getXStream().toXML(value);
-    }
-
-    private Serializable revert(final String value) {
-        if (value != null) {
-            return (Serializable) XStreamFactory.getXStream().fromXML(value);
-        }
-        return null;
-    }
     @Override
     public String getDiscriminator() {
         return SAContractData.class.getName();
