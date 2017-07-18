@@ -20,13 +20,11 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -39,7 +37,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
     public final DocumentHelper documentHelper;
-    final DocumentService documentService;
+    private final DocumentService documentService;
 
     public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
@@ -79,17 +77,6 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     @Override
     public void delete(final SLeftOperand leftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
         throw new SOperationExecutionException("Deleting a document is not supported");
-    }
-
-    @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
-        //do nothing
-    }
-
-    @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet)
-            throws SBonitaReadException {
-        //do nothing
     }
 
 }

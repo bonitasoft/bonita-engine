@@ -13,18 +13,15 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
-import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -86,17 +83,5 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
         throw new SOperationExecutionException("Deleting a document is not supported");
     }
 
-    @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
-        //do nothing
-    }
-
-    @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet)
-            throws SBonitaReadException {
-        for (SLeftOperand leftOperand : sLeftOperand) {
-            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
-        }
-    }
 
 }
