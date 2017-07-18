@@ -18,6 +18,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.*;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -66,12 +65,9 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
-import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -106,6 +102,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     private static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
     private static final String ENTITY_CLASS_NAME = "entityClassName";
     private static String bdmDeployedVersion = "0";
+    private static int iterator = 1;
 
     private User testUser;
     private File clientFolder;
@@ -1949,7 +1946,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition1);
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(),
-                Collections.<String, Serializable>singletonMap("employeeName", "Doe"));
+                Collections.<String, Serializable> singletonMap("employeeName", "Doe"));
         //when
         waitForUserTask("userTask");
         assertThat(new String(getProcessAPI().getDocumentContent(getProcessAPI().getLastDocument(processInstance.getId(), "myDoc").getContentStorageId())))
@@ -2035,7 +2032,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         throwProcessBuilder.addActor(ACTOR_NAME);
         IntermediateThrowEventDefinitionBuilder intermediateThrowEvent = throwProcessBuilder.addIntermediateThrowEvent("sendMessage");
         Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("BDM");
-        Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression("Message1");
+        Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression("message1");
         ThrowMessageEventTriggerBuilder messageEventTriggerBuilder = intermediateThrowEvent.addMessageEventTrigger("msg_name", targetProcessExpression, targetFlowNodeExpression);
         messageEventTriggerBuilder.addMessageContentExpression(new ExpressionBuilder().createConstantStringExpression("msg_name"), new ExpressionBuilder().createConstantStringExpression("fabrice"));
         throwProcessBuilder.addTransition("startEvent", "sendMessage");
@@ -2061,9 +2058,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designThrowProcessDefinition);
         ProcessDefinition throwProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
         waitForEventInWaitingState(catchProcessInstance, "message1");
-        getProcessAPI().startProcess(throwProcessDefinition.getId());
+        ProcessInstance throwProcessInstance = getProcessAPI().startProcess(throwProcessDefinition.getId());
 
         // Message should have been received and process should have finished:
+        waitForProcessToFinish(throwProcessInstance);
         waitForProcessToFinish(catchProcessInstance);
 
         disableAndDeleteProcess(catchProcessDefinition);
