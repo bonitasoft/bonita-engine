@@ -136,24 +136,22 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet)
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final long leftOperandContainerId, final String leftOperandContainerType,
+            final SExpressionContext expressionContext)
             throws SBonitaReadException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
         final String businessDataName = sLeftOperand.getName();
-        final Long containerId = expressionContext.getContainerId();
-        final String containerType = expressionContext.getContainerType();
-        if (inputValues.get(businessDataName) == null) {
-            if (!contextToSet.containsKey(businessDataName)) {
-                contextToSet.put(businessDataName, getBusinessData(businessDataName, containerId, containerType));
-            }
+        if (!inputValues.containsKey(businessDataName)) {
+            inputValues.put(businessDataName, getBusinessData(businessDataName, leftOperandContainerId, leftOperandContainerType));
         }
     }
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet)
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final long leftOperandContainerId, final String leftOperandContainerType,
+            final SExpressionContext expressionContext)
             throws SBonitaReadException {
         for (SLeftOperand leftOperand : sLeftOperand) {
-            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+            loadLeftOperandInContext(leftOperand, leftOperandContainerId, leftOperandContainerType, expressionContext);
         }
     }
 
