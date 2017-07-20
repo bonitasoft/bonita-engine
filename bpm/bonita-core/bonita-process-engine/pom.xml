@@ -240,7 +240,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.platform.command</groupId>
-            <artifactId>bonita-platform-command-api</artifactId>
+            <artifactId>bonita-platform-command</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
