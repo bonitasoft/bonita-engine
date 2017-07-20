@@ -52,9 +52,10 @@ abstract class BundleConfigurator {
 
     static final String ORACLE = "oracle";
     private static final String SQLSERVER = "sqlserver";
+    static final String POSTGRES = "postgres";
+
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
-    static final String POSTGRES = "postgres";
     static final String APPSERVER_FOLDERNAME = "server";
 
     private Path rootPath;
@@ -238,7 +239,7 @@ abstract class BundleConfigurator {
             return ".*(ojdbc|oracle).*\\.(jar|zip)";
         }
         if (SQLSERVER.equals(dbVendor)) {
-            return ".*" + dbVendor + ".*|sqljdbc.*\\.jar";
+            return ".*(sqlserver|mssql|sqljdbc).*\\.(jar|zip)";
         }
         return ".*" + dbVendor + ".*";
     }
