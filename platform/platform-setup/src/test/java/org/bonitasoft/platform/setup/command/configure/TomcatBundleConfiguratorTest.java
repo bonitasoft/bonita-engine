@@ -237,10 +237,12 @@ public class TomcatBundleConfiguratorTest {
         assertThat(driverFilter.accept(new File("sqlserver.JAR"))).isTrue();
         assertThat(driverFilter.accept(new File("SQLSERVER-5.jar"))).isTrue();
         assertThat(driverFilter.accept(new File("drivers_SQLServer.zip"))).isTrue();
+        assertThat(driverFilter.accept(new File("old-sqljdbc.jar"))).isTrue();
         assertThat(driverFilter.accept(new File("sqljdbc.jar"))).isTrue();
         assertThat(driverFilter.accept(new File("sqljdbc4.jar"))).isTrue();
         assertThat(driverFilter.accept(new File("sqljdbc41.jar"))).isTrue();
         assertThat(driverFilter.accept(new File("sqljdbc42.jar"))).isTrue();
+        assertThat(driverFilter.accept(new File("mssql-jdbc-6.2.1.jre8.jar"))).isTrue();
     }
 
     @Test
@@ -380,7 +382,7 @@ public class TomcatBundleConfiguratorTest {
     @Test
     public void escapeWindowsBackslashesIfAny_should_double_backslashes() throws Exception {
         // when:
-        final String windowsValue = configurator.convertWindowsBackslashes("C:\\Windows");
+        final String windowsValue = BundleConfigurator.convertWindowsBackslashes("C:\\Windows");
 
         // then:
         assertThat(windowsValue).isEqualTo("C:/Windows");
