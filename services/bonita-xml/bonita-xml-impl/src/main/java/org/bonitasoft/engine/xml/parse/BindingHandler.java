@@ -44,17 +44,17 @@ public class BindingHandler extends DefaultHandler {
 
     public BindingHandler(final List<Class<? extends ElementBinding>> binders) {
         this.binders = this.setBinders(binders);
-        model = new Stack<ElementBinding>();
-        elements = new Stack<String>();
-        tempAttributes = new HashMap<String, String>();
+        model = new Stack<>();
+        elements = new Stack<>();
+        tempAttributes = new HashMap<>();
         bindingsFactory = null;
     }
 
     public BindingHandler(final ElementBindingsFactory bindingsFactory) {
         this.bindingsFactory = bindingsFactory;
-        model = new Stack<ElementBinding>();
-        elements = new Stack<String>();
-        tempAttributes = new HashMap<String, String>();
+        model = new Stack<>();
+        elements = new Stack<>();
+        tempAttributes = new HashMap<>();
         binders = this.setBinders(bindingsFactory);
     }
 
@@ -125,7 +125,7 @@ public class BindingHandler extends DefaultHandler {
                 throw new SAXException(e);
             }
         } else {
-            tempAttributes = new HashMap<String, String>();
+            tempAttributes = new HashMap<>();
             for (int i = 0; i < attributes.getLength(); i++) {
                 final String attributeLocalName = attributes.getLocalName(i);
                 final String attributeValue = attributes.getValue(i);
@@ -167,7 +167,7 @@ public class BindingHandler extends DefaultHandler {
             final ElementBinding binder = model.peek();
             try {
                 if (tempVal != null) {
-                    binder.setChildElement(localName, tempVal.toString(), tempAttributes);
+                    binder.setChildElement(localName, tempVal.toString().trim(), tempAttributes);
                 } else {
                     binder.setChildElement(localName, "", tempAttributes);
                 }
