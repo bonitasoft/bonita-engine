@@ -64,29 +64,18 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private final Map<String, String> classAliasMappings;
 
-    protected final Map<String, String> cacheQueries;
+    private final Map<String, String> cacheQueries;
 
-    protected final List<Class<? extends PersistentObject>> classMapping;
+    private final List<Class<? extends PersistentObject>> classMapping;
 
     protected final Map<String, Class<? extends PersistentObject>> interfaceToClassMapping;
 
-    protected final List<String> mappingExclusions;
-    protected final OrderByBuilder orderByBuilder;
-    Statistics statistics;
-    int stat_display_count;
+    private final List<String> mappingExclusions;
+    final OrderByBuilder orderByBuilder;
+    private Statistics statistics;
+    private int stat_display_count;
     private QueryBuilderFactory queryBuilderFactory = new QueryBuilderFactory();
 
-    // ----
-
-    /**
-     * @param sessionFactory
-     * @param classMapping
-     * @param classAliasMappings
-     * @param enableWordSearch
-     * @param wordSearchExclusionMappings
-     * @param logger
-     * @throws ClassNotFoundException
-     */
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
@@ -103,26 +92,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         orderByBuilder = new DefaultOrderByBuilder();
     }
 
-    // Setter for session
-
-    // ----
-
-    /**
-     * @param name
-     * @param hbmConfigurationProvider
-     * @param likeEscapeCharacter
-     * @param logger
-     * @param sequenceManager
-     * @param datasource
-     * @param enableWordSearch
-     * @param wordSearchExclusionMappings
-     * @throws SPersistenceException
-     * @throws ClassNotFoundException
-     */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties,
-            final char likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
-            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
+            final Properties extraHibernateProperties, final char likeEscapeCharacter, final TechnicalLoggerService logger,
+            final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings)
             throws SPersistenceException, ClassNotFoundException {
         super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
@@ -197,7 +169,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     /**
      * Log synthetic information about cache every 10.000 sessions, if hibernate.gather_statistics, is enabled.
      */
-    protected void logStats() {
+    private void logStats() {
         if (!statistics.isStatisticsEnabled()) {
             return;
         }
@@ -229,22 +201,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected void flushStatements(final boolean useTenant) throws SPersistenceException {
+    void flushStatements(final boolean useTenant) throws SPersistenceException {
         final Session session = getSession(useTenant);
         session.flush();
-    }
-
-    protected <T> void logWarningMessage(final SelectListDescriptor<T> selectDescriptor, final Query query) {
-        final StringBuilder message = new StringBuilder();
-        message.append("selectList call without \"order by\" clause ");
-        message.append("\n");
-        message.append(query.toString());
-        message.append("\n");
-        message.append(String.format("query name:%s\nentity:%s\nstart index:%d\npage size:%d", selectDescriptor.getQueryName(), selectDescriptor
-                .getEntityType().getCanonicalName(), selectDescriptor.getStartIndex(), selectDescriptor.getPageSize()));
-        logger.log(this.getClass(), TechnicalLogSeverity.WARNING, message.toString());
-
-        // throw new IllegalArgumentException("Query " + selectDescriptor.getQueryName());
     }
 
     @Override
@@ -337,14 +296,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final PersistentObject entity = updateDescriptor.getEntity();
         final Session session = getSession(false);
         if (!session.contains(entity)) {
-            throw new SPersistenceException("The object cannot be updated because it's deconnected " + entity);
+            throw new SPersistenceException("The object cannot be updated because it's disconnected " + entity);
         }
         for (final Map.Entry<String, Object> field : updateDescriptor.getFields().entrySet()) {
             setField(entity, field.getKey(), field.getValue());
         }
     }
 
-    void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
+    private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
         Long id = null;
         try {
             id = entity.getId();
@@ -357,14 +316,13 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @Override
     public <T> T selectOne(final SelectOneDescriptor<T> selectDescriptor) throws SBonitaReadException {
         try {
-            final Session session = getSession(true);
-            return this.selectOne(session, selectDescriptor, selectDescriptor.getInputParameters());
+            return selectOne(getSession(true), selectDescriptor);
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
     }
 
-    protected Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+    Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         if (classMapping.contains(entityClass)) {
             return entityClass;
         }
@@ -374,7 +332,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
     }
 
-    protected void checkClassMapping(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+    private void checkClassMapping(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         if (!classMapping.contains(entityClass) && !interfaceToClassMapping.containsKey(entityClass.getName())
                 && !mappingExclusions.contains(entityClass.getName())) {
             throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
@@ -397,7 +355,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     @SuppressWarnings("unchecked")
     <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        Class<? extends PersistentObject> mappedClass = null;
+        Class<? extends PersistentObject> mappedClass;
         try {
             mappedClass = getMappedClass(selectDescriptor.getEntityType());
         } catch (final SPersistenceException e) {
@@ -413,7 +371,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T selectOne(final Session session, final AbstractSelectDescriptor<T> selectDescriptor, final Map<String, Object> parameters)
+    private <T> T selectOne(final Session session, final SelectOneDescriptor<T> selectDescriptor)
             throws SBonitaReadException {
         try {
             checkClassMapping(selectDescriptor.getEntityType());
@@ -422,6 +380,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         final Query query = session.getNamedQuery(selectDescriptor.getQueryName());
         setQueryCache(query, selectDescriptor.getQueryName());
+        final Map<String, Object> parameters = selectDescriptor.getInputParameters();
         if (parameters != null) {
             setParameters(query, parameters);
         }
@@ -435,7 +394,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected void setQueryCache(final Query query, final String name) {
+    private void setQueryCache(final Query query, final String name) {
         if (cacheQueries != null && cacheQueries.containsKey(name)) {
             query.setCacheable(true);
         }
@@ -511,7 +470,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected void setParameters(final Query query, final Map<String, Object> inputParameters) {
+    private void setParameters(final Query query, final Map<String, Object> inputParameters) {
         for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
             final Object value = entry.getValue();
             if (value instanceof Collection<?>) {
