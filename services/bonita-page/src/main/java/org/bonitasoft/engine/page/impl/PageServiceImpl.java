@@ -58,6 +58,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadOnlySelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -418,7 +419,6 @@ public class PageServiceImpl implements PageService {
         logBuilder.setActionType(actionType);
     }
 
-
     void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
@@ -432,8 +432,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         final SPage page = getPage(pageId);
-        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<>(
-                SPageContent.class, pageId));
+        final SPageContent pageContent = persistenceService.selectById(new ReadOnlySelectByIdDescriptor<>(SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
@@ -493,7 +492,7 @@ public class PageServiceImpl implements PageService {
     protected void checkPageDuplicate(final SPage sPage, final EntityUpdateDescriptor entityUpdateDescriptor,
             final SPageLogBuilder logBuilder,
             final String logMethodName)
-                    throws SBonitaReadException, SObjectAlreadyExistsException {
+            throws SBonitaReadException, SObjectAlreadyExistsException {
         if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)
                 || entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_PROCESS_DEFINITION_ID)) {
             String sPageName = sPage.getName();

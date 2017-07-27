@@ -10,13 +10,13 @@
 		WHERE pdependency.name = :name
 	</query>
 
-	<query name="getPlatformDependenciesById">
+	<query name="getPlatformDependenciesById" read-only="true">
 		SELECT pdependency
 		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
 		WHERE pdependency.id IN (:ids)
 	</query>
   
-	<query name="getPlatformDependencies">
+	<query name="getPlatformDependencies" read-only="true">
 		SELECT pdependency
 		FROM org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl AS pdependency
 	</query>

@@ -342,7 +342,12 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     @Override
     public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
         try {
-            return this.selectById(getSession(true), selectDescriptor);
+            final Session session = getSession(true);
+            final T object = this.selectById(session, selectDescriptor);
+            if (selectDescriptor.isReadOnly()) {
+                session.evict(object);
+            }
+            return object;
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
@@ -386,7 +391,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         query.setMaxResults(1);
         try {
-            return (T) query.uniqueResult();
+            return disconnectIfReadOnly((T) query.uniqueResult(), query, session);
         } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
             throw new SRetryableException(e);
         } catch (final HibernateException he) {
@@ -439,6 +444,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             @SuppressWarnings("unchecked")
             final List<T> list = query.list();
             if (list != null) {
+                disconnectIfReadOnly(list, query, session);
                 return list;
             }
             return Collections.emptyList();
@@ -447,6 +453,21 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         } catch (final HibernateException | SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
+    }
+
+    private <T> void disconnectIfReadOnly(List<T> list, Query query, Session session) {
+        if (query.isReadOnly()) {
+            for (T t : list) {
+                session.evict(t);
+            }
+        }
+    }
+
+    private <T> T disconnectIfReadOnly(T object, Query query, Session session) {
+        if (query.isReadOnly()) {
+            session.evict(object);
+        }
+        return object;
     }
 
     private void checkOrderByClause(final Query query) {
