@@ -43,7 +43,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageServiceListener;
@@ -58,6 +57,7 @@ import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageContent;
 import org.bonitasoft.engine.page.SPageLogBuilder;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadOnlySelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -425,8 +425,7 @@ public class PageServiceImplTest {
         page.setId(12);
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new SelectByIdDescriptor<>(
-                        SPageContent.class, 12));
+                new ReadOnlySelectByIdDescriptor<>(SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
         final byte[] result = pageServiceImpl.getPageContent(12);
@@ -455,8 +454,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES,
                         "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new SelectByIdDescriptor<>(
-                        SPageContent.class, 12));
+                new ReadOnlySelectByIdDescriptor<>(SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
         final byte[] result = pageServiceImpl.getPageContent(12);
@@ -685,7 +683,7 @@ public class PageServiceImplTest {
         // given
         final byte[] content = IOUtil.zip(Collections.singletonMap(PAGE_PROPERTIES,
                 "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=apiExtension\napiExtensions=myApi\nmyApi.classFileName=MyController.groovy"
-                                .getBytes()));
+                        .getBytes()));
 
         exception.expect(SInvalidPageZipInconsistentException.class);
         exception.expectMessage("RestAPIController MyController.groovy has not been found in archive.");
@@ -693,7 +691,7 @@ public class PageServiceImplTest {
         // when
         pageServiceImpl.readPageZip(content, false);
     }
-    
+
     @Test
     public void should_throw_an_SInvalidPageZipMissingAPropertyException_for_api_extension_with_empty_classFilename() throws Exception {
         // given
@@ -752,7 +750,7 @@ public class PageServiceImplTest {
     @Test
     public void zipTest_Throws_exception() throws Exception {
         // given
-        final byte[] content = IOUtil.zip(pair("aFile.txt", "hello".getBytes()),pair(PAGE_PROPERTIES,
+        final byte[] content = IOUtil.zip(pair("aFile.txt", "hello".getBytes()), pair(PAGE_PROPERTIES,
                 "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=page"
                         .getBytes()));
         doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMapOf(String.class, byte[].class));
