@@ -9,20 +9,20 @@
         <version>7.6.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bonita-integration-tomcat7</artifactId>
+    <artifactId>bonita-integration-tomcat</artifactId>
 
-    <name>Bonita - Integration Tests on Tomcat 7</name>
+    <name>Bonita - Integration Tests on Tomcat 8.5</name>
 
     <properties>
         <server.port>8384</server.port>
         <server.ajp.port>8313</server.ajp.port>
         <provider.port>8184</provider.port>
-        <tomcat.version>7.0.76</tomcat.version>
+        <tomcat.version>8.5.16</tomcat.version>
         <tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
         <tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
         <tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
         <tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
-        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-8/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
         <tomcat.zip.folder>${java.io.tmpdir}</tomcat.zip.folder>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
         <db.vendor>h2</db.vendor>
@@ -264,7 +264,7 @@
                 <configuration>
                     <skip>${skipTests}</skip>
                     <container>
-                        <containerId>tomcat7x</containerId>
+                        <containerId>tomcat8x</containerId>
                         <type>installed</type>
                         <home>${tomcat.home}</home>
                         <systemProperties>
@@ -273,14 +273,11 @@
                             <db.vendor>${db.vendor}</db.vendor>
 
                             <file.encoding>${project.build.sourceEncoding}</file.encoding>
-                            <javax.xml.parsers.DocumentBuilderFactory>
-                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
-                            </javax.xml.parsers.DocumentBuilderFactory>
+                            <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
 
                             <!-- Bitronix properties -->
                             <btm.root>${tomcat.home}</btm.root>
-                            <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties
-                            </bitronix.tm.configuration>
+                            <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
                         </systemProperties>
                     </container>
                     <configuration>
