@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2017 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -14,31 +14,12 @@
 package org.bonitasoft.engine.persistence;
 
 /**
- * @author Charles Souillard
- * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
-public class SelectByIdDescriptor<T extends PersistentObject> extends AbstractSelectDescriptor<T> {
+public class ReadOnlySelectByIdDescriptor<T extends PersistentObject> extends SelectByIdDescriptor<T> {
 
-    private final long id;
-    private boolean readonly;
-
-    public SelectByIdDescriptor(final Class<T> entityType, final long id) {
-        this(entityType, id, false);
-    }
-
-    public SelectByIdDescriptor(final Class<T> entityType, final long id, final boolean readonly) {
-        super(null, entityType, entityType);
-        this.id = id;
-        this.readonly = readonly;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    boolean isReadOnly() {
-        return readonly;
+    public ReadOnlySelectByIdDescriptor(Class<T> entityType, long id) {
+        super(entityType, id, true);
     }
 
 }

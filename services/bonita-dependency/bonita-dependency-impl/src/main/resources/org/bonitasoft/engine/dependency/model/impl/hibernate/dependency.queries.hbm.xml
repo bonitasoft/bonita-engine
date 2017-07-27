@@ -10,14 +10,14 @@
         WHERE dependency.name = :name
     </query>
 
-    <query name="getDependenciesByIds">
+    <query name="getDependenciesByIds" read-only="true">
         SELECT dependency
         FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
         WHERE dependency.id IN (:ids)
         ORDER BY dependency.id ASC
     </query>
 
-    <query name="getDependencies">
+    <query name="getDependencies" read-only="true">
         SELECT dependency
         FROM org.bonitasoft.engine.dependency.model.impl.SDependencyImpl AS dependency
     </query>
