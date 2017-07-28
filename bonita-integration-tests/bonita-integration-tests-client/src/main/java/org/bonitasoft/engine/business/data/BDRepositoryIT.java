@@ -65,9 +65,12 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
+import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -1350,7 +1353,8 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // when
         ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
-        getCommandAPI().addDependency("temporaryDeps", new byte[] { 0, 1 });
+        getCommandAPI().addDependency("temporaryDeps" + iterator, new byte[] { 0, 1 });
+        iterator++;
         final Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
 
         // then
