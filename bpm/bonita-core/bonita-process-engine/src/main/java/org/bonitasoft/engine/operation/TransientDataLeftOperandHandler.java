@@ -109,14 +109,12 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
-        final Long containerId = expressionContext.getContainerId();
-        final String containerType = expressionContext.getContainerType();
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
         String name = sLeftOperand.getName();
-        SDataInstance dataInstance = retrieve(sLeftOperand, containerId, containerType);
-        contextToSet.put(TRANSIENT_DATA + name, dataInstance);
-        if (!contextToSet.containsKey(name)) {
-            contextToSet.put(name, dataInstance.getValue());
+        SDataInstance dataInstance = retrieve(sLeftOperand, leftOperandContainerId, leftOperandContainerType);
+        expressionContext.getInputValues().put(TRANSIENT_DATA + name, dataInstance);
+        if (!expressionContext.getInputValues().containsKey(name)) {
+            expressionContext.getInputValues().put(name, dataInstance.getValue());
         }
     }
 
@@ -176,9 +174,9 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
         for (SLeftOperand leftOperand : sLeftOperand) {
-            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+            loadLeftOperandInContext(leftOperand,leftOperandContainerId, leftOperandContainerType, expressionContext);
         }
     }
 

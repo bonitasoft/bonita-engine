@@ -18,16 +18,10 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
@@ -102,12 +96,12 @@ public class TransientDataLeftOperandHandlerTest {
         // given
         final SShortTextDataInstanceImpl data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
-        Map<String, Object> contextToSet = new HashMap<String, Object>();
+        SExpressionContext sExpressionContext = new SExpressionContext(42l, "ctype", 12l);
         // when
-        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"), new SExpressionContext(42l, "ctype", 12l), contextToSet);
+        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"),sExpressionContext.getContainerId(),sExpressionContext.getContainerType(), sExpressionContext);
 
         // then
-        assertThat(contextToSet).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
+        assertThat(sExpressionContext.getInputValues()).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
     }
 
     private SShortTextDataInstanceImpl createData() {
@@ -139,13 +133,13 @@ public class TransientDataLeftOperandHandlerTest {
         doReturn(sProcessDefinitionImpl).when(processDefinitionService).getProcessDefinition(processDefId);
         final SShortTextDataInstanceImpl data = createData();
         doThrow(SDataInstanceNotFoundException.class).doReturn(data).when(transientDataService).getDataInstance("myData", taskId, "ctype");
-        Map<String, Object> contextToSet = new HashMap<String, Object>();
+        SExpressionContext sExpressionContext = new SExpressionContext(taskId, "ctype", processDefId);
 
         // when
-        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"), new SExpressionContext(taskId, "ctype", processDefId), contextToSet);
+        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"),sExpressionContext.getContainerId(),sExpressionContext.getContainerType(), sExpressionContext);
 
         // then
-        assertThat(contextToSet).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
+        assertThat(sExpressionContext.getInputValues()).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
         verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition>asList(sTextDefinitionImpl)), eq(taskId),
                 eq(DataInstanceContainer.ACTIVITY_INSTANCE), any(SExpressionContext.class));
         verify(logger).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());

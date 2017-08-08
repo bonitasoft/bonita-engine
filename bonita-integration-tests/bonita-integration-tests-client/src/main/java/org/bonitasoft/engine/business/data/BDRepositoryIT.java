@@ -18,6 +18,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.*;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -66,9 +65,12 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
+import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.StartEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
@@ -103,6 +105,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     private static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
     private static final String ENTITY_CLASS_NAME = "entityClassName";
     private static String bdmDeployedVersion = "0";
+    private static int iterator = 1;
 
     private User testUser;
     private File clientFolder;
@@ -868,7 +871,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
+                        .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
@@ -1350,7 +1353,8 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         // when
         ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
-        getCommandAPI().addDependency("temporaryDeps", new byte[] { 0, 1 });
+        getCommandAPI().addDependency("temporaryDeps" + iterator, new byte[] { 0, 1 });
+        iterator++;
         final Serializable jsonResult = ((BusinessDataQueryResult) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters)).getJsonResults();
 
         // then
@@ -2021,5 +2025,50 @@ public class BDRepositoryIT extends CommonAPIIT {
         parameters.put("entityClassName", EMPLOYEE_QUALIFIED_NAME);
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
         return (String) getCommandAPI().execute("getBusinessDataById", parameters);
+    }
+
+
+    @Test
+    public void shouldRetrieveBDMObjectsInLeftOperandsInCatchMessages() throws Exception {
+
+        ProcessDefinitionBuilder throwProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("MSG", "1.0");
+        throwProcessBuilder.addStartEvent("startEvent");
+        throwProcessBuilder.addActor(ACTOR_NAME);
+        IntermediateThrowEventDefinitionBuilder intermediateThrowEvent = throwProcessBuilder.addIntermediateThrowEvent("sendMessage");
+        Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression("BDM");
+        Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression("message1");
+        ThrowMessageEventTriggerBuilder messageEventTriggerBuilder = intermediateThrowEvent.addMessageEventTrigger("msg_name", targetProcessExpression, targetFlowNodeExpression);
+        messageEventTriggerBuilder.addMessageContentExpression(new ExpressionBuilder().createConstantStringExpression("msg_name"), new ExpressionBuilder().createConstantStringExpression("fabrice"));
+        throwProcessBuilder.addTransition("startEvent", "sendMessage");
+        DesignProcessDefinition designThrowProcessDefinition = throwProcessBuilder.done();
+        ProcessDefinitionBuilder catchProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("BDM", "1.0");
+        catchProcessBuilder.addStartEvent("startEvent");
+        catchProcessBuilder.addActor(ACTOR_NAME);
+        catchProcessBuilder.addBusinessData("myBusinessData", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("initBD",
+                        "import " + EMPLOYEE_QUALIFIED_NAME + "\n" +
+                                "Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'employeeName'; return e;",
+                        EMPLOYEE_QUALIFIED_NAME));
+        CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = catchProcessBuilder.addIntermediateCatchEvent("message1")
+                .addMessageEventTrigger("msg_name");
+        catchMessageEventTriggerDefinitionBuilder.addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("myBusinessData", "setFirstName", String.class.getName(),
+                new ExpressionBuilder().createDataExpression("msg_name", String.class.getName())));
+        catchProcessBuilder.addTransition("startEvent", "message1");
+        DesignProcessDefinition designCatchProcessDefinition = catchProcessBuilder.done();
+
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designCatchProcessDefinition);
+        ProcessDefinition catchProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
+        ProcessInstance catchProcessInstance = getProcessAPI().startProcessWithInputs(catchProcessDefinition.getId(), Collections.emptyMap());
+        businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designThrowProcessDefinition);
+        ProcessDefinition throwProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, testUser);
+        waitForEventInWaitingState(catchProcessInstance, "message1");
+        ProcessInstance throwProcessInstance = getProcessAPI().startProcess(throwProcessDefinition.getId());
+
+        // Message should have been received and process should have finished:
+        waitForProcessToFinish(throwProcessInstance);
+        waitForProcessToFinish(catchProcessInstance);
+
+        disableAndDeleteProcess(catchProcessDefinition);
+        disableAndDeleteProcess(throwProcessDefinition);
     }
 }

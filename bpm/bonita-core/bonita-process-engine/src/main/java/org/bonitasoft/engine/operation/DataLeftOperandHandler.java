@@ -107,18 +107,17 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
         try {
-            putInContext(sLeftOperand, expressionContext, contextToSet);
+            putInContext(sLeftOperand,leftOperandContainerId,leftOperandContainerType, expressionContext);
         } catch (final SDataInstanceException e) {
             throw new SBonitaReadException("Unable to retrieve the data", e);
         }
     }
 
-    private void putInContext(SLeftOperand sLeftOperand, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SDataInstanceException {
-        String name = sLeftOperand.getName();
-        SDataInstance dataInstance = getDataInstance(name, expressionContext.getContainerId(), expressionContext.getContainerType());
-        putDataInContext(contextToSet, dataInstance);
+    private void putInContext(SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, SExpressionContext expressionContext) throws SDataInstanceException {
+        SDataInstance dataInstance = getDataInstance(sLeftOperand.getName(), leftOperandContainerId, leftOperandContainerType);
+        putDataInContext(expressionContext.getInputValues(), dataInstance);
     }
 
     private void putDataInContext(Map<String, Object> contextToSet, SDataInstance dataInstance) {
@@ -131,15 +130,15 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
 
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
         try {
-            ArrayList<String> names = new ArrayList<String>(sLeftOperand.size());
+            ArrayList<String> names = new ArrayList<>(sLeftOperand.size());
             for (SLeftOperand leftOperand : sLeftOperand) {
                 names.add(leftOperand.getName());
             }
-            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(names, expressionContext.getContainerId(), expressionContext.getContainerType(), parentContainerResolver);
+            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(names, leftOperandContainerId, leftOperandContainerType, parentContainerResolver);
             for (SDataInstance dataInstance : dataInstances) {
-                putDataInContext(contextToSet, dataInstance);
+                putDataInContext(expressionContext.getInputValues(), dataInstance);
             }
         } catch (final SDataInstanceException e) {
             throw new SBonitaReadException("Unable to retrieve the data", e);
