@@ -353,7 +353,6 @@ public class EventsHandler {
                     eventInstanceService.deleteWaitingEvent(waitingEvent);
                     executeFlowNode(flowNodeInstanceId, operations);
                 } else {
-                    final long processInstanceId = eventInstanceService.getFlowNodeInstance(flowNodeInstanceId).getParentProcessInstanceId();
                     executeFlowNode(flowNodeInstanceId, operations);
                 }
                 break;

@@ -19,7 +19,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -74,11 +73,11 @@ public class DataLeftOperandHandlerTest {
         SDataInstance data2 = data("data2", "value2");
         doReturn(Arrays.asList(data1, data2)).when(dataInstanceService).getDataInstances(Arrays.asList("data2", "data1"), CONTAINER_ID, CONTAINER_TYPE, parentContainerResolver);
         //when
-        handler.loadLeftOperandInContext(Arrays.asList(leftOperand("data2"), leftOperand("data1")), sExpressionContext, context);
+        handler.loadLeftOperandInContext(Arrays.asList(leftOperand("data2"), leftOperand("data1")),sExpressionContext.getContainerId(),sExpressionContext.getContainerType(), sExpressionContext);
         verify(dataInstanceService).getDataInstances(Arrays.asList("data2", "data1"), CONTAINER_ID, CONTAINER_TYPE, parentContainerResolver);
         verifyNoMoreInteractions(dataInstanceService);
         //then
-        assertThat(context).containsOnly(entry("data1", "value1"), entry("%DATA_INSTANCE%_data1", data1), entry("data2", "value2"), entry("%DATA_INSTANCE%_data2", data2));
+        assertThat(sExpressionContext.getInputValues()).containsOnly(entry("data1", "value1"), entry("%DATA_INSTANCE%_data1", data1), entry("data2", "value2"), entry("%DATA_INSTANCE%_data2", data2));
     }
     @Test
     public void loadLeftOperandInContext_on_single_left_operand() throws Exception {
@@ -88,11 +87,11 @@ public class DataLeftOperandHandlerTest {
         SDataInstance data1 = data("data1", "value1");
         doReturn(data1).when(dataInstanceService).getDataInstance("data1", CONTAINER_ID, CONTAINER_TYPE, parentContainerResolver);
         //when
-        handler.loadLeftOperandInContext(leftOperand("data1"), sExpressionContext, context);
+        handler.loadLeftOperandInContext(leftOperand("data1"),sExpressionContext.getContainerId(),sExpressionContext.getContainerType(), sExpressionContext);
         verify(dataInstanceService).getDataInstance("data1", CONTAINER_ID, CONTAINER_TYPE, parentContainerResolver);
         verifyNoMoreInteractions(dataInstanceService);
         //then
-        assertThat(context).containsOnly(entry("data1", "value1"), entry("%DATA_INSTANCE%_data1", data1));
+        assertThat(sExpressionContext.getInputValues()).containsOnly(entry("data1", "value1"), entry("%DATA_INSTANCE%_data1", data1));
     }
 
 

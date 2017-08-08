@@ -84,12 +84,11 @@ public class BusinessDataLeftOperandHandlerTest {
         final Map<String, Object> inputValues = new HashMap<>(1);
         final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", 987L, inputValues);
         final SLeftOperand leftOperand = createLeftOperand(bizDataName);
-        Map<String, Object> contextToSet = new HashMap<>();
         // when:
-        spy.loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        spy.loadLeftOperandInContext(leftOperand,expressionContext.getContainerId(),expressionContext.getContainerType(), expressionContext);
 
         // then:
-        assertThat(contextToSet).containsOnly(entry("myTravel", myTravel));
+        assertThat(expressionContext.getInputValues()).containsOnly(entry("myTravel", myTravel));
     }
 
     private SLeftOperand createLeftOperand(final String bizDataName) {

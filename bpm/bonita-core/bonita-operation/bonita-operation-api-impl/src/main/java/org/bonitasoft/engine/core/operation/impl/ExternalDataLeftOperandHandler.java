@@ -45,18 +45,18 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) {
         String name = sLeftOperand.getName();
-        if(!contextToSet.containsKey(name)) {
-            contextToSet.put(name, expressionContext.getInputValues().get(name));
+        if(!expressionContext.getInputValues().containsKey(name)) {
+            expressionContext.getInputValues().put(name, expressionContext.getInputValues().get(name));
         }
     }
 
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand,final long leftOperandContainerId, final String leftOperandContainerType, final SExpressionContext expressionContext) throws SBonitaReadException {
         for (SLeftOperand leftOperand : sLeftOperand) {
-            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+            loadLeftOperandInContext(leftOperand, leftOperandContainerId, leftOperandContainerType, expressionContext);
         }
     }
 

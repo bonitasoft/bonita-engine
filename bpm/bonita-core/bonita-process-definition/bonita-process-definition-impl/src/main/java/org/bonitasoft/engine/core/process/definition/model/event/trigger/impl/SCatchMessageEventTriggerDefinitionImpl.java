@@ -74,7 +74,7 @@ public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTrigge
     }
 
     private SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).setType(variableToSet.getType()).done();
     }
 
     @Override
