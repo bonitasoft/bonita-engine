@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -345,11 +345,17 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             final Session session = getSession(true);
             final T object = this.selectById(session, selectDescriptor);
             if (selectDescriptor.isReadOnly()) {
-                session.evict(object);
+                disconnectEntityFromSession(session, object);
             }
             return object;
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
+        }
+    }
+
+    private static <T> void disconnectEntityFromSession(Session session, T object) {
+        if (object != null) {
+            session.evict(object);
         }
     }
 
@@ -455,17 +461,17 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    private <T> void disconnectIfReadOnly(List<T> list, Query query, Session session) {
+    private static <T> void disconnectIfReadOnly(List<T> list, Query query, Session session) {
         if (query.isReadOnly()) {
             for (T t : list) {
-                session.evict(t);
+                disconnectEntityFromSession(session, t);
             }
         }
     }
 
-    private <T> T disconnectIfReadOnly(T object, Query query, Session session) {
+    private static <T> T disconnectIfReadOnly(T object, Query query, Session session) {
         if (query.isReadOnly()) {
-            session.evict(object);
+            disconnectEntityFromSession(session, object);
         }
         return object;
     }

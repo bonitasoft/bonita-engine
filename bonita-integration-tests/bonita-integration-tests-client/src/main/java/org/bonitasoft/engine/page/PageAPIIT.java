@@ -436,6 +436,19 @@ public class PageAPIIT extends CommonAPIIT {
         checkPageContentContainsProperties(pageContent, DISPLAY_NAME, pageDescription);
     }
 
+    @Test
+    public void should_throw_an_exception_if_the_page_content_does_not_exist() throws Exception {
+        // given
+        expectedException.expect(PageNotFoundException.class);
+        expectedException.expectMessage("Page with id 995464654654 not found");
+
+        // when
+        getPageAPI().getPageContent(995464654654L);
+
+        // then
+        // expect exception
+    }
+
     private void checkPageContentContainsProperties(final byte[] content, final String displayName, final String description) throws Exception {
         try {
             Map<String, String> contentAsMap = unzip(content);

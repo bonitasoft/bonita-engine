@@ -56,6 +56,7 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageContent;
 import org.bonitasoft.engine.page.SPageLogBuilder;
+import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadOnlySelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -418,17 +419,18 @@ public class PageServiceImplTest {
     @Test
     public void getPageContent_should_add_properties_in_the_zip() throws SBonitaException, IOException {
         // given: a zip without properties
-        final SPageImpl page = new SPageImpl("mypage", "mypage description", "mypage display name", System.currentTimeMillis(), -1, false,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
+        final SPageWithContentImpl page = new SPageWithContentImpl();
+        page.setName("mypage");
+        page.setDescription("mypage description");
+        page.setDisplayName("mypage display name");
         page.setId(12);
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
-        doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new ReadOnlySelectByIdDescriptor<>(SPageContent.class, 12));
-        doReturn(page).when(pageServiceImpl).getPage(12);
+        page.setContent(content);
+        doReturn(page).when(readPersistenceService).selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, 12));
+
         // when
         final byte[] result = pageServiceImpl.getPageContent(12);
+
         // then
         final Map<String, byte[]> unzip = IOUtil.unzip(result);
         assertThat(unzip.size()).isEqualTo(2);
@@ -443,21 +445,23 @@ public class PageServiceImplTest {
     @Test
     public void getPageContent_should_update_properties_in_the_zip_if_exists_and_keep_others() throws SBonitaException, IOException {
         // given: a zip with outdated properties
-        final SPageImpl page = new SPageImpl("mypageUpdated", "mypageUpdated description", "mypageUpdated display name", System.currentTimeMillis(), -1, false,
-                System.currentTimeMillis(),
-                -1,
-                CONTENT_NAME);
+        final SPageWithContentImpl page = new SPageWithContentImpl();
+        page.setName("mypageUpdated");
+        page.setDescription("mypageUpdated description");
+        page.setDisplayName("mypageUpdated display name");
         page.setId(12);
+
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(
                 pair("Index.groovy", "content of the groovy".getBytes()),
                 pair(PAGE_PROPERTIES,
                         "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
-        doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new ReadOnlySelectByIdDescriptor<>(SPageContent.class, 12));
-        doReturn(page).when(pageServiceImpl).getPage(12);
+        page.setContent(content);
+        doReturn(page).when(readPersistenceService).selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, 12));
+
         // when
         final byte[] result = pageServiceImpl.getPageContent(12);
+
         // then
         final Map<String, byte[]> unzip = IOUtil.unzip(result);
         assertThat(unzip.size()).isEqualTo(2);
