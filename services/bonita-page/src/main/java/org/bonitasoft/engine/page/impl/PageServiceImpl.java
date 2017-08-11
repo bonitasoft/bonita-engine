@@ -337,7 +337,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public SPage getPageByName(final String pageName) throws SBonitaReadException {
         return persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
-                (Object) pageName), SPage.class));
+                pageName), SPage.class));
     }
 
     @Override
@@ -431,12 +431,11 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SPage page = getPage(pageId);
-        final SPageContent pageContent = persistenceService.selectById(new ReadOnlySelectByIdDescriptor<>(SPageContent.class, pageId));
-        if (pageContent == null) {
+        final SPageWithContent page = persistenceService.selectById(new ReadOnlySelectByIdDescriptor<>(SPageWithContent.class, pageId));
+        if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
-        final byte[] content = pageContent.getContent();
+        final byte[] content = page.getContent();
         try {
             final Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
             final byte[] bytes = contentAsMap.get("page.properties");
