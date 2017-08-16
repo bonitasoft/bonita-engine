@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -42,7 +42,7 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
 
     public SearchHumanTaskInstanceDescriptor() {
         final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        humanTaskInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(13);
+        humanTaskInstanceDescriptorKeys = new HashMap<>(13);
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.NAME,
                 new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getNameKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PRIORITY,
@@ -72,8 +72,8 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ROLE_ID,
                 new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
 
-        humanTaskInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> tasksInstanceFields = new HashSet<String>(3);
+        humanTaskInstanceDescriptorAllFields = new HashMap<>(1);
+        final Set<String> tasksInstanceFields = new HashSet<>(3);
         tasksInstanceFields.add(keyProvider.getNameKey());
         tasksInstanceFields.add(keyProvider.getDisplayNameKey());
         humanTaskInstanceDescriptorAllFields.put(SHumanTaskInstance.class, tasksInstanceFields);

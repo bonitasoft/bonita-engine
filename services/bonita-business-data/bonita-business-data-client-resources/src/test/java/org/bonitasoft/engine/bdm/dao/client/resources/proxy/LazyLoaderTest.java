@@ -15,9 +15,7 @@ package org.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -27,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.bdm.dao.client.resources.utils.BDMQueryCommandParameters;
+import org.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.proxy.model.Child;
 import org.bonitasoft.engine.bdm.proxy.model.Parent;
@@ -36,9 +36,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import org.bonitasoft.engine.bdm.dao.client.resources.utils.BDMQueryCommandParameters;
-import org.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LazyLoaderTest {
@@ -91,7 +88,8 @@ public class LazyLoaderTest {
         final Map<String, Serializable> parameters = parameters(getChildren, persistenceId);
 
         //then
-        final HashMap<String, Serializable> queryParameters = new HashMap<>();
+        final HashMap<String, Serializable> queryParameters = new HashMap<>(); // use the concrete type as we need a Serializable object in later in the code
+
         queryParameters.put(Field.PERSISTENCE_ID, persistenceId);
 
         assertThat(parameters).hasSize(6)

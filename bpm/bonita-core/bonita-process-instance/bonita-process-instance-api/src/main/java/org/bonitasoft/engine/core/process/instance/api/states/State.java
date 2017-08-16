@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,11 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  * @author Baptiste Mesta
  */
 public interface State<T> {
+
+    int ID_ACTIVITY_EXECUTING = 1;
+    int ID_ACTIVITY_READY = 4;
+    int ID_ACTIVITY_FAILED = 3;
+
 
     StateCode execute(SProcessDefinition processDefinition, T instance) throws SActivityStateExecutionException;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,8 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -357,6 +356,68 @@ public class ActivityInstanceServiceImplTest {
 
         //when
         activityInstanceServiceImpl.updateExpectedEndDate(sFlowNodeInstance, 123L);
+    }
+
+
+    @Test
+    public void should_search_pending_tasks_assigned_to_a_user() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        List<SHumanTaskInstance> expectedResult = new ArrayList<>();
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 61L)))
+                .thenReturn(expectedResult);
+
+        // When
+        final List<SHumanTaskInstance> result = activityInstanceServiceImpl.searchPendingTasksAssignedTo(61L, options);
+
+        // Then
+        assertThat(result).describedAs("Human tasks list").isSameAs(expectedResult);
+    }
+
+    @Test
+    public void should_search_pending_tasks_assigned_to_a_user_throw_exception_on_persitence_error() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.searchEntity(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 99L)))
+                .thenThrow(new SBonitaReadException("Fake for test"));
+
+        // When
+        Throwable thrown = catchThrowable(() -> { activityInstanceServiceImpl.searchPendingTasksAssignedTo(99L, options); });
+
+        // Then
+        assertThat(thrown)
+                .isInstanceOf(SBonitaReadException.class)
+                .hasMessageContaining("Fake for test");
+    }
+
+    @Test
+    public void should_count_number_of_pending_tasks_assigned_to_user() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 365L)))
+                .thenReturn(14L);
+
+        // When
+        final long count = activityInstanceServiceImpl.getNumberOfPendingTasksAssignedTo(365L, options);
+
+        // Then
+        assertThat(count).describedAs("Number of human tasks").isEqualTo(14L);
+    }
+
+    @Test
+    public void should_count_number_of_pending_tasks_assigned_to_user_throw_exception_on_persitence_error() throws Exception {
+        // Given
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.getNumberOfEntities(SHumanTaskInstance.class, "PendingAssignedTo", options, Collections.singletonMap("userId", 3365L)))
+                .thenThrow(new SBonitaReadException("Fake for test"));
+
+        // When
+        Throwable thrown = catchThrowable(() -> { activityInstanceServiceImpl.getNumberOfPendingTasksAssignedTo(3365L, options); });
+
+        // Then
+        assertThat(thrown)
+                .isInstanceOf(SBonitaReadException.class)
+                .hasMessageContaining("Fake for test");
     }
 
 }
