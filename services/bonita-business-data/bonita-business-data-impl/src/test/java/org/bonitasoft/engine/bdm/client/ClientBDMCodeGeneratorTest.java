@@ -34,7 +34,6 @@ import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JDefinedClass;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
-import org.assertj.core.util.FilesException;
 import org.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.CompilableCode;
@@ -64,7 +63,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         try {
             destDir = Files.newTemporaryFolder();
-        } catch (final FilesException fe) {
+        } catch (final Exception fe) {
             System.err.println("Seems we cannot create temporary folder. Retrying...");
             final String tempFileName = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
             destDir = Files.newFolder(concat(Files.temporaryFolderPath(), tempFileName));
