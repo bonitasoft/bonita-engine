@@ -87,10 +87,11 @@ public class LazyLoaderTest {
         Method getChildren = Parent.class.getMethod("getChildren");
 
         //when
+        // use the concrete type as we need a Serializable object in later in the code
         final Map<String, Serializable> parameters = parameters(getChildren, persistenceId);
 
         //then
-        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final HashMap<String, Serializable> queryParameters = new HashMap<>();
         queryParameters.put(Field.PERSISTENCE_ID, persistenceId);
 
         assertThat(parameters).hasSize(6)
@@ -100,7 +101,7 @@ public class LazyLoaderTest {
                         entry("startIndex", 0),
                         entry("maxResults", Integer.MAX_VALUE),
                         entry("returnType", Child.class.getName()),
-                        entry("queryParameters",queryParameters));
+                        entry("queryParameters", queryParameters));
     }
 
     private Map<String, Serializable> parameters(Method method, long persistenceId) {
