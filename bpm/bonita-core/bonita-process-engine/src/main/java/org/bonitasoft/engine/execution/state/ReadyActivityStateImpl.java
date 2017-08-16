@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -54,9 +54,7 @@ public class ReadyActivityStateImpl extends OnEnterAndFinishConnectorState {
     }
 
     @Override
-    public int getId() {
-        return 4;
-    }
+    public int getId() { return ID_ACTIVITY_READY; }
 
     @Override
     public boolean isInterrupting() {

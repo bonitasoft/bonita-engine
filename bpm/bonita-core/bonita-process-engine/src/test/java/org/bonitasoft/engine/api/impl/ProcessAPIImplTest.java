@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -90,6 +90,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.states.State;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
@@ -126,7 +127,6 @@ import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -341,7 +341,6 @@ public class ProcessAPIImplTest {
 
     @Test
     public void cancelAnUnknownProcessInstanceThrowsANotFoundException() throws Exception {
-        final long userId = 9;
         final LockService lockService = mock(LockService.class);
         final ProcessInstanceInterruptor interruptor = mock(ProcessInstanceInterruptor.class);
 
@@ -368,7 +367,7 @@ public class ProcessAPIImplTest {
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
 
         // Then
-        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.singletonMap("foo", "go")));
     }
 
     @Test(expected = UpdateException.class)
@@ -421,7 +420,7 @@ public class ProcessAPIImplTest {
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
         doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
 
-        final Map<String, Serializable> dataNameValues = singletonMap(dataName, (Serializable) "dataValue");
+        final Map<String, Serializable> dataNameValues = singletonMap(dataName, "dataValue");
 
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
@@ -480,7 +479,7 @@ public class ProcessAPIImplTest {
     @Test
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void replayingAFailedJobShouldExecuteAgainSchedulerServiceWithSomeParameters() throws Exception {
-        final Map<String, Serializable> parameters = Collections.singletonMap("anyparam", (Serializable) Boolean.FALSE);
+        final Map<String, Serializable> parameters = Collections.singletonMap("anyparam", Boolean.FALSE);
         final long jobDescriptorId = 544L;
         doNothing().when(schedulerService).executeAgain(anyLong(), anyList());
         doReturn(new ArrayList()).when(processAPI).getJobParameters(parameters);
@@ -746,7 +745,7 @@ public class ProcessAPIImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void deleteArchivedProcessInstances_by_ids_should_throw_exception_when_list_is_empty() throws Exception {
-        processAPI.deleteArchivedProcessInstancesInAllStates(Collections.<Long> emptyList());
+        processAPI.deleteArchivedProcessInstancesInAllStates(Collections.emptyList());
     }
 
     @Test
@@ -1192,7 +1191,7 @@ public class ProcessAPIImplTest {
         userTaskDefinition.getContext().add(new SContextEntryImpl("key1", e1));
         SExpressionImpl e2 = createExpression("e2");
         userTaskDefinition.getContext().add(new SContextEntryImpl("key2", e2));
-        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression> asList(e1, e2)), any(SExpressionContext.class));
+        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.asList(e1, e2)), any(SExpressionContext.class));
 
         Map<String, Serializable> userTaskExecutionContext = processAPI.getUserTaskExecutionContext(FLOW_NODE_INSTANCE_ID);
 
@@ -1205,7 +1204,7 @@ public class ProcessAPIImplTest {
         processDefinition.getContext().add(new SContextEntryImpl("key1", e1));
         SExpressionImpl e2 = createExpression("e2");
         processDefinition.getContext().add(new SContextEntryImpl("key2", e2));
-        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression> asList(e1, e2)), any(SExpressionContext.class));
+        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.asList(e1, e2)), any(SExpressionContext.class));
 
         Map<String, Serializable> userTaskExecutionContext = processAPI.getProcessInstanceExecutionContext(PROCESS_INSTANCE_ID);
 
@@ -1218,7 +1217,7 @@ public class ProcessAPIImplTest {
         userTaskDefinition.getContext().add(new SContextEntryImpl("key1", e1));
         SExpressionImpl e2 = createExpression("e2");
         userTaskDefinition.getContext().add(new SContextEntryImpl("key2", e2));
-        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression> asList(e1, e2)), any(SExpressionContext.class));
+        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.asList(e1, e2)), any(SExpressionContext.class));
 
         Map<String, Serializable> userTaskExecutionContext = processAPI.getArchivedUserTaskExecutionContext(ARCHIVED_FLOW_NODE_INSTANCE_ID);
 
@@ -1231,7 +1230,7 @@ public class ProcessAPIImplTest {
         processDefinition.getContext().add(new SContextEntryImpl("key1", e1));
         SExpressionImpl e2 = createExpression("e2");
         processDefinition.getContext().add(new SContextEntryImpl("key2", e2));
-        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression> asList(e1, e2)), any(SExpressionContext.class));
+        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.asList(e1, e2)), any(SExpressionContext.class));
 
         Map<String, Serializable> userTaskExecutionContext = processAPI.getArchivedProcessInstanceExecutionContext(ARCHIVED_PROCESS_INSTANCE_ID);
 
@@ -1304,7 +1303,7 @@ public class ProcessAPIImplTest {
         Map<String, Serializable> inputValues = new HashMap<>();
         inputValues.put("input1", 456);
         inputValues.put("input2", "value");
-        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
         sUserTaskInstance.setAssigneeId(543L);
         WorkDescriptor workDescriptor = WorkDescriptor.create("flownode");
         doReturn(workDescriptor).when(workFactory).createExecuteReadyHumanTaskWorkDescriptor(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, FLOW_NODE_INSTANCE_ID);
@@ -1318,32 +1317,32 @@ public class ProcessAPIImplTest {
     @Test
     public void executeUserTask_should_throw_exception_if_user_task_not_in_ready() throws Exception {
         //given
-        sUserTaskInstance.setStateId(1);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_EXECUTING);
         sUserTaskInstance.setAssigneeId(543L);
         //when
         expectedEx.expect(FlowNodeExecutionException.class);
         expectedEx.expectMessage("Unable to execute flow node 1674 because it is in an incompatible state");
-        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.<String, Serializable> emptyMap());
+        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap());
         //then exception
     }
 
     @Test
     public void executeUserTask_should_throw_exception_if_user_task_is_ready_but_executing() throws Exception {
         //given
-        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(true);
         sUserTaskInstance.setAssigneeId(543L);
         //when
         expectedEx.expect(FlowNodeExecutionException.class);
         expectedEx.expectMessage("Unable to execute flow node 1674 because it is in an incompatible state");
-        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.<String, Serializable> emptyMap());
+        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap());
         //then exception
     }
 
     @Test
     public void should_not_be_able_to_update_mapping_when_task_is_not_ready() throws Exception {
-        //given
-        sUserTaskInstance.setStateId(3);
+        //given)
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_FAILED);
         //when
         expectedEx.expect(UpdateException.class);
         expectedEx.expectMessage("Unable to update actors of the task 1674 because it is not in ready state");
@@ -1353,7 +1352,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_not_be_able_to_update_mapping_when_task_is_ready_but_with_executing_flag() throws Exception {
         //given
-        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(true);
         //when
         expectedEx.expect(UpdateException.class);
@@ -1364,7 +1363,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_update_mapping_when_task_is_ready() throws Exception {
         //given
-        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(false);
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
         userTaskDefinition.setUserFilter(sUserFilterDefinition);
@@ -1384,7 +1383,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_update_mapping_auto_assign_if_flag_is_set() throws Exception {
         //given
-        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(false);
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
         userTaskDefinition.setUserFilter(sUserFilterDefinition);
@@ -1401,7 +1400,7 @@ public class ProcessAPIImplTest {
     @Test
     public void should_update_mapping_not_auto_assign_if_flag_is_not_set() throws Exception {
         //given
-        sUserTaskInstance.setStateId(4);
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
         sUserTaskInstance.setStateExecuting(false);
         SUserFilterDefinitionImpl sUserFilterDefinition = new SUserFilterDefinitionImpl(new UserFilterDefinitionImpl("myUserFilter", "def", "version"));
         userTaskDefinition.setUserFilter(sUserFilterDefinition);

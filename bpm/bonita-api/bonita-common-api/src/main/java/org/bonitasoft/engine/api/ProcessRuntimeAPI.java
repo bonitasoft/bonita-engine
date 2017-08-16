@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -1323,6 +1323,21 @@ public interface ProcessRuntimeAPI {
     SearchResult<HumanTaskInstance> searchPendingTasksForUser(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
+     * Search the pending human tasks assigned to a specified user.
+     *
+     * @param userId
+     *        The identifier of the user.
+     * @param searchOptions
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     * @return The pending human tasks that match the search conditions and are assigned to the user.
+     * @throws SearchException
+     *         If there is an error in the search conditions.
+     * @since 7.5.5
+     */
+    SearchResult<HumanTaskInstance> searchPendingTasksAssignedToUser(long userId, SearchOptions searchOptions) throws SearchException;
+
+    /**
      * Search the pending human tasks for tasks that match the search options and are managed by the specified user.
      *
      * @param managerUserId
@@ -1892,7 +1907,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.4.2
      * @see #isInvolvedInProcessInstance(long, long)
      */
-    boolean isManagerOfUserInvolvedInProcessInstance(long managerUserId, long processInstanceId) throws ProcessInstanceNotFoundException, BonitaException;
+    boolean isManagerOfUserInvolvedInProcessInstance(long managerUserId, long processInstanceId) throws BonitaException;
 
     /**
      * Get the process instance id from an activity instance id.

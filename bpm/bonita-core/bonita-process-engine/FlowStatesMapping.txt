@@ -12,7 +12,7 @@ PROCESS
 11 AbortingProcessInstanceStateImpl
 12 ToMigrateProcessInstanceStateImpl
 
-ACTIVITY
+ACTIVITY (some constants are defined in the State interface)
 0 InitializingActivityStateImpl
 1 ExecutingFlowNodeStateImpl
 2 CompletedActivityStateImpl

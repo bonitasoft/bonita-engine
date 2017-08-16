@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -649,6 +649,16 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @since 6.0
      */
     List<SHumanTaskInstance> searchPendingTasksForUser(long userId, QueryOptions searchOptions) throws SBonitaReadException;
+
+    /**
+     * @since 7.5.5
+     */
+    long getNumberOfPendingTasksAssignedTo(long userId, QueryOptions searchOptions) throws SBonitaReadException;
+
+    /**
+     * @since 7.5.5
+     */
+    List<SHumanTaskInstance> searchPendingTasksAssignedTo(long userId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * @param humanTaskInstanceId

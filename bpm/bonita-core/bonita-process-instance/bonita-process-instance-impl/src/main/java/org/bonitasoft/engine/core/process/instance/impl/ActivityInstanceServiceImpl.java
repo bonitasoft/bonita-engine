@@ -107,6 +107,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     private static final String PENDING_OR_ASSIGNED = "PendingOrAssigned";
 
+    private static final String PENDING_ASSIGNED_TO = "PendingAssignedTo";
+
     private static final String HUMAN_TASK_INSTANCE_ASSIGNEE = "HUMAN_TASK_INSTANCE_ASSIGNEE";
 
     private static final String WHOCANSTART_PENDING_TASK_SUFFIX = "WhoCanStartPendingTask";
@@ -261,7 +263,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public List<SActivityInstance> getOpenActivityInstances(final long rootContainerId, final int pageIndex, final int maxResults, final String sortingField,
             final OrderByType orderbyType) throws SActivityReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", rootContainerId);
         final QueryOptions queryOptions = new QueryOptions(pageIndex * maxResults, maxResults, SActivityInstance.class, sortingField, orderbyType);
         final SelectListDescriptor<SActivityInstance> elements = SelectDescriptorBuilder.getSpecificQueryWithParameters(SActivityInstance.class,
                 "getOpenActivitiesFromProcessInstance", parameters, queryOptions);
@@ -411,33 +413,33 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public long getNumberOfArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = getArchiveService().getDefinitiveArchiveReadPersistenceService();
-        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", managerUserId);
         return persistenceService.getNumberOfEntities(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
     public List<SAHumanTaskInstance> searchArchivedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = getArchiveService().getDefinitiveArchiveReadPersistenceService();
-        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", managerUserId);
         return persistenceService.searchEntity(SAHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
     public long getNumberOfArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
         return getPersistenceService().getNumberOfEntities(SAHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
     public long getNumberOfAssignedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
         queryOptions.getFilters().add(new FilterOption(SHumanTaskInstance.class, "assigneeId", 0, FilterOperationType.GREATER));
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
     public List<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
         queryOptions.getFilters().add(new FilterOption(SHumanTaskInstance.class, "assigneeId", 0, FilterOperationType.GREATER));
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
@@ -455,7 +457,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public List<SAHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions)
             throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
         return getPersistenceService().searchEntity(SAHumanTaskInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -473,20 +475,20 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public long getNumberOfAssignedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", managerUserId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
     public List<SHumanTaskInstance> searchAssignedTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", managerUserId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
     public List<SHumanTaskInstance> searchPendingTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", supervisorId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaReadException(bre);
@@ -495,7 +497,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public long getNumberOfPendingTasksSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) supervisorId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", supervisorId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -525,13 +527,13 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public long searchNumberOfPendingTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", managerUserId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
     public List<SHumanTaskInstance> searchPendingTasksManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", managerUserId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_MANAGED_BY, searchOptions, parameters);
     }
 
@@ -690,25 +692,37 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public long getNumberOfPendingTasksForUser(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_FOR_USER, searchOptions, parameters);
     }
 
     @Override
     public List<SHumanTaskInstance> searchPendingTasksForUser(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_FOR_USER, searchOptions, parameters);
     }
 
     @Override
     public long getNumberOfPendingOrAssignedTasks(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_OR_ASSIGNED, searchOptions, parameters);
     }
 
     @Override
+    public List<SHumanTaskInstance> searchPendingTasksAssignedTo(long userId, QueryOptions searchOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
+        return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_ASSIGNED_TO, searchOptions, parameters);
+    }
+
+    @Override
+    public long getNumberOfPendingTasksAssignedTo(long userId, QueryOptions searchOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
+        return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_ASSIGNED_TO, searchOptions, parameters);
+    }
+
+    @Override
     public List<SHumanTaskInstance> searchPendingOrAssignedTasks(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_OR_ASSIGNED, searchOptions, parameters);
     }
 
@@ -777,7 +791,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public long getNumberOfArchivedActivityInstancesSupervisedBy(final long supervisorId, final Class<? extends SAActivityInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
             return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
@@ -788,7 +802,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(final long supervisorId, final Class<? extends SAActivityInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
             return (List<SAActivityInstance>) getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaReadException(bre);
@@ -798,7 +812,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     @Override
     public long getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(final long humanTaskInstanceId, final QueryOptions searchOptions)
             throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", (Object) humanTaskInstanceId);
+        final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", humanTaskInstanceId);
         return getPersistenceService().getNumberOfEntities(SUser.class, WHOCANSTART_PENDING_TASK_SUFFIX, searchOptions, parameters);
     }
 
@@ -806,7 +820,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public List<SUser> searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(final long humanTaskInstanceId, final QueryOptions searchOptions)
             throws SBonitaReadException {
         try {
-        final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", (Object) humanTaskInstanceId);
+        final Map<String, Object> parameters = Collections.singletonMap("humanTaskInstanceId", humanTaskInstanceId);
         return getPersistenceService().searchEntity(SUser.class, WHOCANSTART_PENDING_TASK_SUFFIX, searchOptions, parameters);
         } catch (final SBonitaReadException bre) {
             throw new SBonitaReadException(bre);
@@ -833,14 +847,14 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public long getNumberOfAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", rootProcessDefinitionId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, ASSIGNED_AND_PENDING_BY_ROOT_PROCESS, queryOptions, parameters);
     }
 
     @Override
     public List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final QueryOptions queryOptions)
             throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", (Object) rootProcessDefinitionId);
+        final Map<String, Object> parameters = Collections.singletonMap("rootProcessDefinitionId", rootProcessDefinitionId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, ASSIGNED_AND_PENDING_BY_ROOT_PROCESS, queryOptions, parameters);
     }
 
