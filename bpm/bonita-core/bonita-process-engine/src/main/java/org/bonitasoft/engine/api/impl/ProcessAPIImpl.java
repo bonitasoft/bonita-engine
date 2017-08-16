@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Bonitasoft S.A.
+ * Copyright (C) 2015-2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -268,6 +268,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.states.State;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -415,6 +416,7 @@ import org.bonitasoft.engine.search.task.SearchAssignedAndPendingHumanTasks;
 import org.bonitasoft.engine.search.task.SearchAssignedAndPendingHumanTasksFor;
 import org.bonitasoft.engine.search.task.SearchAssignedTaskManagedBy;
 import org.bonitasoft.engine.search.task.SearchHumanTaskInstances;
+import org.bonitasoft.engine.search.task.SearchPendingTasksAssignedTo;
 import org.bonitasoft.engine.search.task.SearchPendingTasksForUser;
 import org.bonitasoft.engine.search.task.SearchPendingTasksSupervisedBy;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -3977,7 +3979,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         return sProcessSupervisorBuilderFactory.createNewInstance(processDefinitionId);
     }
 
-    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException, AlreadyExistsException {
+    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException {
         final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
         final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
@@ -4194,6 +4196,24 @@ public class ProcessAPIImpl implements ProcessAPI {
             return searchPendingTasksForUser.getResult();
         } catch (final SBonitaException sbe) {
             throw new SearchException(sbe);
+        }
+    }
+
+    @Override
+    public SearchResult<HumanTaskInstance> searchPendingTasksAssignedToUser(final long userId, final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+
+        final SearchPendingTasksAssignedTo search = new SearchPendingTasksAssignedTo(activityInstanceService, flowNodeStateManager,
+                searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), userId, searchOptions);
+        try {
+            search.execute();
+            return search.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new BonitaRuntimeException(sbe);
         }
     }
 
@@ -5664,7 +5684,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SFlowNodeExecutionException(
                     "Unable to execute flownode " + flowNodeInstance.getId() + " because is not a user task");
         }
-        if (flowNodeInstance.getStateId() != 4 || flowNodeInstance.isStateExecuting()) {
+        if (flowNodeInstance.getStateId() != State.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
             throw new SFlowNodeExecutionException(
                     "Unable to execute flow node " + flowNodeInstance.getId()
                             + " because it is in an incompatible state (" + (flowNodeInstance.isStateExecuting() ? "transitioning from state " : "on state ")
