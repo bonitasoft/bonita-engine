@@ -61,11 +61,47 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.identity.*;
+import org.bonitasoft.engine.identity.ContactData;
+import org.bonitasoft.engine.identity.ContactDataUpdater;
 import org.bonitasoft.engine.identity.ContactDataUpdater.ContactDataField;
+import org.bonitasoft.engine.identity.CustomUserInfo;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
+import org.bonitasoft.engine.identity.CustomUserInfoValue;
+import org.bonitasoft.engine.identity.ExportOrganization;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.GroupCreator;
+import org.bonitasoft.engine.identity.GroupCriterion;
+import org.bonitasoft.engine.identity.GroupNotFoundException;
+import org.bonitasoft.engine.identity.GroupUpdater;
 import org.bonitasoft.engine.identity.GroupUpdater.GroupField;
+import org.bonitasoft.engine.identity.Icon;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.ImportOrganization;
+import org.bonitasoft.engine.identity.ImportPolicy;
+import org.bonitasoft.engine.identity.MembershipNotFoundException;
+import org.bonitasoft.engine.identity.OrganizationExportException;
+import org.bonitasoft.engine.identity.OrganizationImportException;
+import org.bonitasoft.engine.identity.Role;
+import org.bonitasoft.engine.identity.RoleCreator;
+import org.bonitasoft.engine.identity.RoleCriterion;
+import org.bonitasoft.engine.identity.RoleNotFoundException;
+import org.bonitasoft.engine.identity.RoleUpdater;
 import org.bonitasoft.engine.identity.RoleUpdater.RoleField;
+import org.bonitasoft.engine.identity.SGroupCreationException;
+import org.bonitasoft.engine.identity.SGroupNotFoundException;
+import org.bonitasoft.engine.identity.SIdentityException;
+import org.bonitasoft.engine.identity.SRoleNotFoundException;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.UserCreator;
+import org.bonitasoft.engine.identity.UserCriterion;
+import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.identity.UserMembershipCriterion;
+import org.bonitasoft.engine.identity.UserNotFoundException;
+import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.identity.UserUpdater.UserField;
+import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -94,12 +130,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.identity.SearchGroups;
@@ -910,24 +943,9 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public Group updateGroup(final long groupId, final GroupUpdater updater) throws GroupNotFoundException, UpdateException, AlreadyExistsException {
+    public Group updateGroup(final long groupId, final GroupUpdater updater) throws GroupNotFoundException, UpdateException {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
-        }
-
-        final Serializable updatedName = updater.getFields().get(GroupUpdater.GroupField.NAME);
-        if (updatedName != null) {
-            SearchResult<Group> alreadyExistingGroups;
-            try {
-                alreadyExistingGroups = searchGroups(new SearchOptionsBuilder(0,1)
-                        .differentFrom(GroupSearchDescriptor.ID,groupId)
-                        .filter(GroupSearchDescriptor.NAME,updatedName).done());
-                if (alreadyExistingGroups.getCount() > 0) {
-                    throw new AlreadyExistsException("A group with the name '" + updatedName + "' already exists");
-                }
-            } catch (final SearchException e) {
-                throw new UpdateException("Cannot check if a group with the name '" + updatedName + "' already exists", e);
-            }
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
