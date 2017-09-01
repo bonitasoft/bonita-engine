@@ -49,7 +49,8 @@ public class InitCommand extends PlatformSetupCommand {
             properties.load(this.getClass().getResourceAsStream("/database.properties"));
             final PropertyReader propertyReader = new PropertyReader(properties);
             if (H2_DB_VENDOR.equals(propertyReader.getPropertyAndFailIfNull("db.vendor"))
-                    && H2_DB_VENDOR.equals(propertyReader.getPropertyAndFailIfNull("bdm.db.vendor"))) {
+                    && H2_DB_VENDOR.equals(propertyReader.getPropertyAndFailIfNull("bdm.db.vendor"))
+                    && System.getProperty("h2.noconfirm") == null) {
                 warn("Default H2 configuration detected. This is not recommended for production. If this is not the required configuration, change file 'database.properties' and run again.");
                 System.out.print("Are you sure you want to continue? (y/n): ");
                 final String answer = readAnswer();
