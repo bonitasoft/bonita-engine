@@ -179,8 +179,10 @@ public interface PageAPI {
 
     /**
      * create a page using the given content
-     * the content must contain a page.properties file that contains informations on the page:
-     * name, displayName and description
+     * the content must contain a page.properties file that contains information on the page:
+     * name, displayName and description. Be aware that this method does not update your web permission-mappings.
+     * It means that rest api extensions created with this method will not be accessible from the portal.
+     * To avoid the problem, either use the <a href="https://documentation.bonitasoft.com/?page=portal-api#toc0">create page rest api</a> or upload the extensions directly from Bonita Portal.
      *
      * @param contentName
      *        name of the zip file containing the page
