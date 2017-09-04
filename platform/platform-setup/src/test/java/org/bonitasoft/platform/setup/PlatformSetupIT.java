@@ -289,7 +289,7 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_do_nothing_when_already_created() throws Exception {
+    public void init_method_should_upgrade_default_configuration_when_already_created() throws Exception {
         //given
         platformSetup.init();
 
@@ -301,11 +301,9 @@ public class PlatformSetupIT {
         assertThat(platformSetup.isPlatformAlreadyCreated()).isTrue();
 
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
-        final String[] split = log.split("\n");
-        assertThat(log).as("should setup log message").doesNotContain("Platform created.");
-        assertThat(split).as("should setup log message").isNotEmpty();
-        assertThat(split[split.length - 1]).as("should setup platform and log message").contains("INFO")
-                .endsWith("Platform is already created. Nothing to do.");
+        assertThat(log).doesNotContain("Platform created.");
+        assertThat(log).contains("Platform is already created.");
+        assertThat(log).contains("Upgrading default configuration");
 
     }
 
@@ -509,4 +507,28 @@ public class PlatformSetupIT {
         platformSetup.preventFromPushingZeroLicense();
     }
 
+    @Test
+    public void init_method_should_update_configuration_files() throws Exception {
+        //given
+        File setupFolder = temporaryFolder.newFolder("conf");
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
+        final File permissionFile = setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("tenant_template_portal")
+                .resolve("resources-permissions-mapping.properties").toFile();
+        FileUtils.write(permissionFile, "default 7.5.4 content", Charset.defaultCharset());
+        configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
+        platformSetup.init();
+
+        // Simulate new 7.6.0 configuration file content:
+        final String new_7_6_0_content = "default 7.6.0 content";
+        FileUtils.write(permissionFile, new_7_6_0_content, Charset.defaultCharset());
+
+        //when
+        platformSetup.init();
+
+        //then
+        List<Map<String, Object>> rows = jdbcTemplate
+                .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
+        assertThat(rows).hasSize(1);
+        assertThat(rows.get(0).get("resource_content")).isEqualTo(new_7_6_0_content.getBytes());
+    }
 }

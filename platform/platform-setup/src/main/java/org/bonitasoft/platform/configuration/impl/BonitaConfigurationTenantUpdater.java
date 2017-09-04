@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,50 +23,40 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.support.lob.TemporaryLobCreator;
 
 /**
- * @author Laurent Leseigneur
+ * @author Emmanuel Duchastenier
  */
-public class BonitaConfigurationPreparedStatementSetter implements BatchPreparedStatementSetter, ConfigurationColumns {
+public class BonitaConfigurationTenantUpdater implements BatchPreparedStatementSetter {
 
-    public static final String INSERT_CONFIGURATION = "INSERT into configuration(tenant_id, content_type, resource_name, resource_content) values (?,?,?,?)";
+    public static final String UPDATE_ALL_TENANTS_CONFIGURATION = "UPDATE configuration SET resource_content=? WHERE content_type=? AND resource_name=?";
+
     private final List<BonitaConfiguration> bonitaConfigurations;
-
     private String dbVendor;
     private ConfigurationType type;
-    private long tenantId;
 
-    public BonitaConfigurationPreparedStatementSetter(List<BonitaConfiguration> bonitaConfigurations, String dbVendor, ConfigurationType type, long tenantId) {
+    public BonitaConfigurationTenantUpdater(List<BonitaConfiguration> bonitaConfigurations, String dbVendor, ConfigurationType type) {
         this.bonitaConfigurations = bonitaConfigurations;
         this.dbVendor = dbVendor;
-        if (this.dbVendor == null) {
-            this.dbVendor = System.getProperty("sysprop.bonita.db.vendor");
-        }
         this.type = type;
-        this.tenantId = tenantId;
     }
 
     @Override
     public void setValues(PreparedStatement ps, int i) throws SQLException {
-        final TemporaryLobCreator temporaryLobCreator = new TemporaryLobCreator();
-
         final BonitaConfiguration bonitaConfiguration = bonitaConfigurations.get(i);
-        ps.setLong(COLUMN_INDEX_TENANT_ID, tenantId);
-        ps.setString(COLUMN_INDEX_TYPE, type.toString());
-        ps.setString(COLUMN_INDEX_RESOURCE_NAME, bonitaConfiguration.getResourceName());
+        ps.setString(2, type.toString());
+        ps.setString(3, bonitaConfiguration.getResourceName());
         switch (dbVendor) {
             case "h2":
             case "postgres":
-                ps.setBytes(COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
+                ps.setBytes(1, bonitaConfiguration.getResourceContent());
                 break;
             case "oracle":
             case "mysql":
             case "sqlserver":
-                temporaryLobCreator.setBlobAsBytes(ps, COLUMN_INDEX_RESOURCE_CONTENT, bonitaConfiguration.getResourceContent());
+                new TemporaryLobCreator().setBlobAsBytes(ps, 1, bonitaConfiguration.getResourceContent());
                 break;
             default:
                 throw new IllegalArgumentException("unsupported db vendor:" + dbVendor);
-
         }
-
     }
 
     @Override

@@ -88,13 +88,18 @@ public class PlatformSetup {
 
     /**
      * Entry point that create the tables and insert the default configuration
-     *
-     * @throws PlatformException
      */
     public void init() throws PlatformException {
         initPlatformSetup();
         if (isPlatformAlreadyCreated()) {
-            LOGGER.info("Platform is already created. Nothing to do.");
+            LOGGER.info("Platform is already created.");
+            if (Files.isDirectory(initialConfigurationFolder)) {
+                LOGGER.info("Upgrading default configuration with files from folder: " + initialConfigurationFolder.toString());
+                updateDefaultConfigurationFromFolder(initialConfigurationFolder);
+            } else {
+                LOGGER.info("Upgrading default configuration with files from classpath");
+                updateDefaultConfigurationFromClasspath();
+            }
             return;
         }
         preventFromPushingZeroLicense();
@@ -116,7 +121,7 @@ public class PlatformSetup {
     }
 
     private void pushFromFolder(Path folderToPush) throws PlatformException {
-        configurationService.storeAllConfiguration(folderToPush.toFile());
+        configurationService.storeAllConfiguration(folderToPush);
     }
 
     private void checkPushFolderExists(Path folderToPush) throws PlatformException {
@@ -134,8 +139,6 @@ public class PlatformSetup {
 
     /**
      * push all configuration files and licenses
-     *
-     * @throws PlatformException
      */
     public void push() throws PlatformException {
         initPlatformSetup();
@@ -157,8 +160,6 @@ public class PlatformSetup {
      * each file will be located under sub folder according to its purpose. See {@link org.bonitasoft.platform.configuration.type.ConfigurationType} for all
      * available values
      * For tenant specific files, a tenants/[TENANT_ID] folder is created prior to configuration type
-     *
-     * @throws PlatformException
      */
     public void pull() throws PlatformException {
         initPlatformSetup();
@@ -216,8 +217,6 @@ public class PlatformSetup {
 
     /**
      * lookup for license file and push them to database
-     *
-     * @throws PlatformException
      */
     private void pushLicenses() throws PlatformException {
         if (!Files.isDirectory(licensesFolder)) {
@@ -259,6 +258,22 @@ public class PlatformSetup {
             return Paths.get(bonita_client_home);
         }
         return platformConfFolder.resolve("licenses");
+    }
+
+    private void updateDefaultConfigurationFromFolder(Path folderToPush) throws PlatformException {
+        configurationService.updateDefaultConfigurationForAllTenantsAndTemplate(folderToPush);
+    }
+
+    private void updateDefaultConfigurationFromClasspath() throws PlatformException {
+        List<BonitaConfiguration> portalTenant = new ArrayList<>(3);
+        try {
+            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
+            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
+            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
+        } catch (IOException e) {
+            throw new PlatformException(e);
+        }
+        configurationService.updateTenantPortalConfForAllTenantsAndTemplate(portalTenant);
     }
 
     private void initConfigurationWithClasspath() throws PlatformException {

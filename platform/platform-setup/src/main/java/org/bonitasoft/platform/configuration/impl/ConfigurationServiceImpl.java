@@ -29,6 +29,7 @@ import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 import org.bonitasoft.platform.configuration.util.AllConfigurationResourceVisitor;
+import org.bonitasoft.platform.configuration.util.AutoUpdateConfigurationVisitor;
 import org.bonitasoft.platform.configuration.util.CleanAndStoreAllConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.CleanAndStoreConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.ConfigurationResourceVisitor;
@@ -39,6 +40,7 @@ import org.bonitasoft.platform.configuration.util.GetConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetConfigurationsInTransaction;
 import org.bonitasoft.platform.configuration.util.LicensesResourceVisitor;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationInTransaction;
+import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransactionForAllTenants;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,16 +157,26 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
-    public void storeAllConfiguration(File configurationRootFolder) throws PlatformException {
-        final Path path = configurationRootFolder.toPath();
+    public void storeAllConfiguration(Path configurationRootFolder) throws PlatformException {
         List<FullBonitaConfiguration> fullBonitaConfigurations = new ArrayList<>();
         AllConfigurationResourceVisitor allConfigurationResourceVisitor = new AllConfigurationResourceVisitor(fullBonitaConfigurations);
         try {
-            Files.walkFileTree(path, allConfigurationResourceVisitor);
+            Files.walkFileTree(configurationRootFolder, allConfigurationResourceVisitor);
             transactionTemplate.execute(new CleanAndStoreAllConfigurationInTransaction(jdbcTemplate, dbVendor, fullBonitaConfigurations));
         } catch (IOException e) {
             throw new PlatformException(e);
         }
+    }
+
+    @Override
+    public void updateDefaultConfigurationForAllTenantsAndTemplate(Path configurationRootFolder) throws PlatformException {
+        List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
+        try {
+            Files.walkFileTree(configurationRootFolder, new AutoUpdateConfigurationVisitor(bonitaConfigurations));
+        } catch (IOException e) {
+            throw new PlatformException(e);
+        }
+        updateTenantPortalConfForAllTenantsAndTemplate(bonitaConfigurations);
     }
 
     @Override
@@ -175,7 +187,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId) {
         storeConfiguration(bonitaConfigurations, ConfigurationType.TENANT_PORTAL, tenantId);
+    }
 
+    @Override
+    public void updateTenantPortalConfForAllTenantsAndTemplate(List<BonitaConfiguration> bonitaConfigurations) {
+        // update default configuration at TENANT_TEMPLATE_PORTAL level:
+        transactionTemplate.execute(
+                new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations, ConfigurationType.TENANT_TEMPLATE_PORTAL));
+        // Also update default configuration at TENANT_PORTAL level for all existing tenants:
+        transactionTemplate
+                .execute(new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations, ConfigurationType.TENANT_PORTAL));
     }
 
     @Override
