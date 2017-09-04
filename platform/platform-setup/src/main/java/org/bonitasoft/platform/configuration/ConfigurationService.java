@@ -15,6 +15,7 @@
 package org.bonitasoft.platform.configuration;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
@@ -141,6 +142,15 @@ public interface ConfigurationService {
     void storeTenantPortalConf(List<BonitaConfiguration> bonitaConfigurations, long tenantId);
 
     /**
+     * updates tenant configurations for portal, for all tenants and for tenant template.
+     *
+     * @param bonitaConfigurations list of configurations to store
+     */
+    void updateTenantPortalConfForAllTenantsAndTemplate(List<BonitaConfiguration> bonitaConfigurations);
+
+    void updateDefaultConfigurationForAllTenantsAndTemplate(Path configurationRootFolder) throws PlatformException;
+
+    /**
      * store platform configuration files for portal
      *
      * @param bonitaConfigurations list of files
@@ -192,10 +202,10 @@ public interface ConfigurationService {
     /**
      * store whole configuration files for engine and portal, excluding licenses files
      *
-     * @param configurationRootFolder list of files
+     * @param configurationRootFolder path to root folder
      * @throws PlatformException
      */
-    void storeAllConfiguration(File configurationRootFolder) throws PlatformException;
+    void storeAllConfiguration(Path configurationRootFolder) throws PlatformException;
 
     /**
      * write all configuration files

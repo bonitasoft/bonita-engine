@@ -8,6 +8,13 @@ testReturnCode() {
   fi
 }
 
+testValue() {
+  if [ "$1" != "$2" ]; then
+    echo "ERROR: $1 should be equal to $2"
+    exit -17
+  fi
+}
+
 mvn clean install -DskipTests -f ../pom.xml
 
 export VERSION=`cat ../platform-setup/target/classes/PLATFORM_ENGINE_VERSION`
@@ -23,6 +30,7 @@ unzip -q -d ${E2E_DIR} target/${ZIP}
 echo "Setting 'org.bonitasoft.platform.setup' log level to DEBUG"
 # Activate in debug development phase:
 #sed -i "s/org.bonitasoft.platform.setup\" level=\"INFO/org.bonitasoft.platform.setup\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
+#sed -i "s/org.bonitasoft.platform\" level=\"INFO/org.bonitasoft.platform\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
 #sed -i "s/PlatformSetupApplication\" level=\"WARN/PlatformSetupApplication\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
 
 
@@ -179,11 +187,37 @@ INSERT
 EOF
 
 
+echo "================================================================================"
+echo "simulate a version upgrade (configuration files have changed in folder initial/)"
+echo "================================================================================"
+
+echo "dynamic-permissions-checks" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/dynamic-permissions-checks.properties
+echo "resources-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/resources-permissions-mapping.properties
+echo "compound-permissions-mapping" > ${E2E_DIR}/platform_conf/initial/tenant_template_portal/compound-permissions-mapping.properties
+
+${E2E_DIR}/setup.sh init
+testReturnCode $? "setup.sh init"
+
 echo "==========================================="
 echo "retrieve configuration (to default folder) "
 echo "==========================================="
 
 ${E2E_DIR}/setup.sh pull
+
+echo "=================================================================================="
+echo "verify version upgrade has updated configuration file changes (in folder current/)"
+echo "=================================================================================="
+
+dyn=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/dynamic-permissions-checks.properties`
+testValue $dyn "dynamic-permissions-checks"
+
+res_mapp=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/resources-permissions-mapping.properties`
+testValue $res_mapp "resources-permissions-mapping"
+
+compound=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/compound-permissions-mapping.properties`
+testValue $compound "compound-permissions-mapping"
+
+echo "=> Verification Ok"
 
 echo "========================================"
 echo "modify & push"
