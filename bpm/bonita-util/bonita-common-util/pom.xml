@@ -93,6 +93,7 @@
                 <artifactId>jaxb2-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>bdm-schemagen</id>
                         <goals>
                             <goal>schemagen</goal>
                         </goals>
@@ -149,9 +150,9 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/bdm-schemas/schema1.xsd"
-                                      toFile="${project.build.directory}/schemas/bom.xsd"/>
+                                      toFile="${project.build.directory}/schemas/bom.xsd" />
                                 <copy file="${project.build.directory}/application-schemas/schema1.xsd"
-                                      toFile="${project.build.directory}/schemas/application.xsd"/>
+                                      toFile="${project.build.directory}/schemas/application.xsd" />
                                 <copy file="${project.build.directory}/profiles-schemas/schema1.xsd"
                                       toFile="${project.build.directory}/schemas/profiles.xsd" />
                             </target>
