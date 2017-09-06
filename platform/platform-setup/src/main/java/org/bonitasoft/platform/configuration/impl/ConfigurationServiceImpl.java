@@ -207,8 +207,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             File confFile = new File(folderResolver.getFolder(fullBonitaConfiguration), fullBonitaConfiguration.getResourceName());
             writtenFiles.add(confFile);
             LOGGER.debug(String.format("writing file %s to folder %s", confFile.getName(), confFile.getParentFile().getAbsolutePath()));
-            try {
-                IOUtils.write(fullBonitaConfiguration.getResourceContent(), new FileOutputStream(confFile));
+            try (FileOutputStream output = new FileOutputStream(confFile);){
+                IOUtils.write(fullBonitaConfiguration.getResourceContent(), output);
             } catch (IOException e) {
                 throw new PlatformException(e);
             }
