@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2016-2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,12 +16,11 @@ package org.bonitasoft.platform.setup.command.configure;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
+import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
+import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileDoesNotContain;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -36,7 +35,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier
@@ -59,9 +58,6 @@ public class WildflyBundleConfiguratorTest {
 
     private Path bundleFolder;
     private Path wildflyFolder;
-
-    public WildflyBundleConfiguratorTest() throws PlatformException {
-    }
 
     @Before
     public void setupTempConfFolder() throws Exception {
@@ -240,20 +236,6 @@ public class WildflyBundleConfiguratorTest {
         // then:
         assertThat(h2Module.toFile()).doesNotExist();
         assertThat(h2JarFile.toFile()).doesNotExist();
-    }
-
-    private void checkFileContains(Path file, String... expectedTexts) throws IOException {
-        final String content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
-        for (String text : expectedTexts) {
-            assertThat(content).contains(text);
-        }
-    }
-
-    private void checkFileDoesNotContain(Path file, String... expectedTexts) throws IOException {
-        final String content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
-        for (String text : expectedTexts) {
-            assertThat(content).doesNotContain(text);
-        }
     }
 
     @Test
