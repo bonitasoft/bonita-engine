@@ -34,6 +34,12 @@ echo "Setting 'org.bonitasoft.platform.setup' log level to DEBUG"
 #sed -i "s/PlatformSetupApplication\" level=\"WARN/PlatformSetupApplication\" level=\"DEBUG/g" ${E2E_DIR}/logback.xml
 
 
+echo "=================================================================================================="
+echo "Default H2 configuration detected should NOT ask for confirmation if sysprop 'h2.noconfirm' is set"
+echo "=================================================================================================="
+${E2E_DIR}/setup.sh init -Dh2.noconfirm
+testReturnCode $? "setup.sh init with default H2 configuration auto-confirmed with System property"
+
 echo "============================================================="
 echo "Default H2 configuration detected should ask for confirmation"
 echo "============================================================="

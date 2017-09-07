@@ -120,4 +120,18 @@ public class InitCommandTest {
         // then:
         verify(platformSetup).init();
     }
+
+    @Test
+    public void execute_should_continue_if_H2_YES_property_is_defined() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "h2");
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("h2.noconfirm", "");
+
+        // when:
+        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+
+        // then:
+        verify(platformSetup).init();
+    }
 }
