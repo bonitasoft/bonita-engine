@@ -278,7 +278,8 @@ abstract class BundleConfigurator {
         return build;
     }
 
-    String escapeXmlCharacters(String url) throws PlatformException {
+    // Visible for testing
+    static String escapeXmlCharacters(String url) throws PlatformException {
         return StringEscapeUtils.escapeXml11(url);
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2016-2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,12 +16,10 @@ package org.bonitasoft.platform.setup.command.configure;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
+import static org.bonitasoft.platform.setup.command.configure.BundleConfiguratorTest.checkFileContains;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -36,7 +34,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Emmanuel Duchastenier
@@ -60,9 +58,6 @@ public class TomcatBundleConfiguratorTest {
     private Path bundleFolder;
     private Path tomcatFolder;
     private String databaseAbsolutePath;
-
-    public TomcatBundleConfiguratorTest() throws PlatformException {
-    }
 
     @Before
     public void setupTempConfFolder() throws Exception {
@@ -198,75 +193,6 @@ public class TomcatBundleConfiguratorTest {
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/business_data.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
     }
 
-    private void checkFileContains(Path file, String... expectedTexts) throws IOException {
-        final String content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
-        for (String text : expectedTexts) {
-            assertThat(content).contains(text);
-        }
-    }
-
-    @Test
-    public void getDriverFilter_should_detect_Oracle_drivers() throws Exception {
-        // when:
-        final RegexFileFilter driverFilter = configurator.getDriverFilter("oracle");
-
-        // then:
-        assertThat(driverFilter.accept(new File("myFavoriteOjdbc1.4drivers.JAR"))).isTrue();
-        assertThat(driverFilter.accept(new File("OraCLE-4.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("OraCLE.zip"))).isTrue();
-        assertThat(driverFilter.accept(new File("OJdbc-1.4.2.ZIP"))).isTrue();
-    }
-
-    @Test
-    public void getDriverFilter_should_detect_Postgres_drivers() throws Exception {
-        // when:
-        final RegexFileFilter driverFilter = configurator.getDriverFilter("postgres");
-
-        // then:
-        assertThat(driverFilter.accept(new File("postgres.JAR"))).isTrue();
-        assertThat(driverFilter.accept(new File("POSTGRESsql-5.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("drivers_postgres.LAST.zip"))).isTrue();
-    }
-
-    @Test
-    public void getDriverFilter_should_detect_SQLSERVER_drivers() throws Exception {
-        // when:
-        final RegexFileFilter driverFilter = configurator.getDriverFilter("sqlserver");
-
-        // then:
-        assertThat(driverFilter.accept(new File("sqlserver.JAR"))).isTrue();
-        assertThat(driverFilter.accept(new File("SQLSERVER-5.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("drivers_SQLServer.zip"))).isTrue();
-        assertThat(driverFilter.accept(new File("old-sqljdbc.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("sqljdbc.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("sqljdbc4.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("sqljdbc41.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("sqljdbc42.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("mssql-jdbc-6.2.1.jre8.jar"))).isTrue();
-    }
-
-    @Test
-    public void getDriverFilter_should_detect_MySQL_drivers() throws Exception {
-        // when:
-        final RegexFileFilter driverFilter = configurator.getDriverFilter("mysql");
-
-        // then:
-        assertThat(driverFilter.accept(new File("MySQL.JAR"))).isTrue();
-        assertThat(driverFilter.accept(new File("mySQL-5.jar"))).isTrue();
-        assertThat(driverFilter.accept(new File("drivers_mysql.zIp"))).isTrue();
-    }
-
-    @Test
-    public void getDriverFilter_should_detect_H2_drivers() throws Exception {
-        // when:
-        final RegexFileFilter driverFilter = configurator.getDriverFilter("h2");
-
-        // then:
-        assertThat(driverFilter.accept(new File("h2-1.4.JAR"))).isTrue();
-        assertThat(driverFilter.accept(new File("drivers-H2.ZIP"))).isTrue();
-        assertThat(driverFilter.accept(new File("my-custom-h2_package.jar"))).isTrue();
-    }
-
     @Test
     public void should_copy_both_drivers_if_not_the_same_dbVendor_for_bdm() throws Exception {
         // when:
@@ -379,26 +305,4 @@ public class TomcatBundleConfiguratorTest {
         assertThat(numberOfBackups("setenv.sh")).isEqualTo(2);
     }
 
-    @Test
-    public void escapeWindowsBackslashesIfAny_should_double_backslashes() throws Exception {
-        // when:
-        final String windowsValue = BundleConfigurator.convertWindowsBackslashes("C:\\Windows");
-
-        // then:
-        assertThat(windowsValue).isEqualTo("C:/Windows");
-    }
-
-    @Test
-    public void xml_chars_in_URLs_should_be_escaped_before_replacing() throws Exception {
-        // given:
-        String url = "jdbc:mysql://${bdm.db.server.name}:${bdm.db.server.port}/${bdm.db.database.name}?dontTrackOpenResources=true&useUnicode=true&characterEncoding=UTF-8";
-
-        // when:
-        final String escapedXmlCharacters = configurator.escapeXmlCharacters(url);
-
-        // then:
-        assertThat(escapedXmlCharacters)
-                .isEqualTo(
-                        "jdbc:mysql://${bdm.db.server.name}:${bdm.db.server.port}/${bdm.db.database.name}?dontTrackOpenResources=true&amp;useUnicode=true&amp;characterEncoding=UTF-8");
-    }
 }
