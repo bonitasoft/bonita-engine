@@ -194,6 +194,66 @@ public class TomcatBundleConfiguratorTest {
     }
 
     @Test
+    public void configureApplicationServer_should_support_special_characters() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "h2");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
+        System.setProperty("db.user", "_bonita_with$dollar\\andBackSlash");
+        System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
+
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX.db");
+        System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
+        System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+
+        checkFileContains(bitronixFile, "resource.ds1.driverProperties.user=_bonita_with$dollar\\andBackSlash",
+                "resource.ds1.driverProperties.password=bpm_With$dollar\\andBackSlash",
+                "resource.ds1.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
+                        + "/bonita_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
+
+        checkFileContains(bitronixFile, "resource.ds2.driverProperties.user=_bdmWith$dollar\\andBackSlash",
+                "resource.ds2.driverProperties.password=bdm_bpm_With$dollar\\andBackSlash",
+                "resource.ds2.driverProperties.password=",
+                "resource.ds2.driverProperties.URL=jdbc:h2:file:" + databaseAbsolutePath
+                        + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;");
+
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"_bonita_with$dollar\\andBackSlash\""
+                , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"org.h2.Driver\"",
+                "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
+    }
+
+    @Test
+    public void configureApplicationServer_should_support_special_characters_for_postgre_specific_properties() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "postgres");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
+        System.setProperty("db.user", "user");
+        System.setProperty("db.password", "password");
+
+        System.setProperty("bdm.db.vendor", "postgres");
+        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX.db");
+        System.setProperty("bdm.db.user", "bdm_user");
+        System.setProperty("bdm.db.password", "bdm_password");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+
+        checkFileContains(bitronixFile, "resource.ds1.driverProperties.databaseName=bonita_with$dollarXXX.db",
+                "resource.ds2.driverProperties.databaseName=bonita_bdm_with$dollarXXX.db");
+    }
+
+    @Test
     public void should_copy_both_drivers_if_not_the_same_dbVendor_for_bdm() throws Exception {
         // when:
         spy.configureApplicationServer();
