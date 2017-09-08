@@ -58,6 +58,7 @@ public class WildflyBundleConfiguratorTest {
 
     private Path bundleFolder;
     private Path wildflyFolder;
+    private String databaseAbsolutePath;
 
     @Before
     public void setupTempConfFolder() throws Exception {
@@ -67,6 +68,7 @@ public class WildflyBundleConfiguratorTest {
         FileUtils.copyDirectory(Paths.get("src/test/resources/wildfly_conf").toFile(), temporaryFolderRoot);
         System.setProperty(BONITA_SETUP_FOLDER, bundleFolder.resolve("setup").toString());
         configurator = new WildflyBundleConfigurator(bundleFolder);
+        databaseAbsolutePath = BundleConfigurator.convertWindowsBackslashes(bundleFolder.resolve("h2_database").normalize().toString());
         spy = spy(configurator);
     }
 
@@ -314,6 +316,65 @@ public class WildflyBundleConfiguratorTest {
             // then:
             verify(spy).restorePreviousConfiguration(any(Path.class));
         }
+    }
+
+    @Test
+    public void configureApplicationServer_should_support_special_characters() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "h2");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
+        System.setProperty("db.user", "_bonita_with$dollar\\andBackSlash");
+        System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
+
+        System.setProperty("bdm.db.vendor", "h2");
+        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX.db");
+        System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
+        System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        final String bonitaJdbcUrl = "jdbc:h2:file:" + databaseAbsolutePath
+                + "/bonita_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;";
+        checkFileContains(configFile,
+                "<connection-url>" + bonitaJdbcUrl + "</connection-url>",
+                "<user-name>_bonita_with$dollar\\andBackSlash</user-name>",
+                "<password>bpm_With$dollar\\andBackSlash</password>",
+                "<xa-datasource-property name=\"URL\">" + bonitaJdbcUrl + "</xa-datasource-property>");
+
+        final String bdmJdbcUrl = "jdbc:h2:file:" + databaseAbsolutePath
+                + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;";
+        checkFileContains(configFile, "<connection-url>" + bdmJdbcUrl + "</connection-url>",
+                "<user-name>_bdmWith$dollar\\andBackSlash</user-name>",
+                "<password>bdm_bpm_With$dollar\\andBackSlash</password>",
+                "<xa-datasource-property name=\"URL\">" + bdmJdbcUrl + "</xa-datasource-property>");
+    }
+
+    @Test
+    public void configureApplicationServer_should_support_special_characters_for_postgre_specific_properties()
+            throws Exception {
+        // given:
+        System.setProperty("db.vendor", "postgres");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
+        System.setProperty("db.user", "user");
+        System.setProperty("db.password", "password");
+
+        System.setProperty("bdm.db.vendor", "postgres");
+        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX.db");
+        System.setProperty("bdm.db.user", "bdm_user");
+        System.setProperty("bdm.db.password", "bdm_password");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+
+        checkFileContains(configFile,
+                "<xa-datasource-property name=\"DatabaseName\">bonita_with$dollarXXX.db</xa-datasource-property>",
+                "<xa-datasource-property name=\"DatabaseName\">bonita_bdm_with$dollarXXX.db</xa-datasource-property>");
     }
 
 }

@@ -147,9 +147,9 @@ abstract class BundleConfigurator {
         }
     }
 
-    String replaceValues(String content, Map<String, String> replacementMap) throws PlatformException {
+    static String replaceValues(String content, Map<String, String> replacementMap) throws PlatformException {
         for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
-            content = replace(content, entry.getKey(), entry.getValue());
+            content = content.replaceAll(entry.getKey(), entry.getValue());
         }
         return content;
     }
@@ -242,11 +242,6 @@ abstract class BundleConfigurator {
             return ".*(sqlserver|mssql|sqljdbc).*\\.(jar|zip)";
         }
         return ".*" + dbVendor + ".*";
-    }
-
-    private String replace(String content, String originalValue, String replacement) {
-        LOGGER.debug("Replacing '" + originalValue + "' with '" + replacement + "'");
-        return content.replaceAll(originalValue, replacement);
     }
 
     /**

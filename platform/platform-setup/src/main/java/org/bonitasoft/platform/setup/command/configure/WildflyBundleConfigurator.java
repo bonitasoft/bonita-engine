@@ -116,35 +116,35 @@ class WildflyBundleConfigurator extends BundleConfigurator {
 
     private String updateModuleFile(String moduleFileContent, DatabaseConfiguration configuration, Path driverFilename) throws PlatformException {
         Map<String, String> replacements = new HashMap<>(2);
-        replacements.put("@@MODULE_NAME@@", Matcher.quoteReplacement(wildflyModules.get(configuration.getDbVendor()).replaceAll("/", ".")));
-        replacements.put("@@DRIVERFILE_NAME@@", Matcher.quoteReplacement(convertWindowsBackslashes(driverFilename.getFileName().toString())));
+        replacements.put("@@MODULE_NAME@@", wildflyModules.get(configuration.getDbVendor()).replaceAll("/", "."));
+        replacements.put("@@DRIVERFILE_NAME@@", driverFilename.getFileName().toString());
         return replaceValues(moduleFileContent, replacements);
     }
 
     private String updateStandaloneXmlFile(String content, DatabaseConfiguration configuration, final String databasePrefix) throws PlatformException {
         Map<String, String> replacements = new HashMap<>(12);
 
-        replacements.put("@@" + databasePrefix + "MODULE_NAME@@", Matcher.quoteReplacement(wildflyModules.get(configuration.getDbVendor()).replaceAll("/", ".")));
-        replacements.put("@@" + databasePrefix + "XA_DRIVER_CLASSNAME@@", Matcher.quoteReplacement(configuration.getXaDriverClassName()));
+        replacements.put("@@" + databasePrefix + "MODULE_NAME@@", wildflyModules.get(configuration.getDbVendor()).replaceAll("/", "."));
+        replacements.put("@@" + databasePrefix + "XA_DRIVER_CLASSNAME@@", configuration.getXaDriverClassName());
 
         // We can have only once a driver declaration for each DB Vendor:
         if (!standardConfiguration.getDbVendor().equals(bdmConfiguration.getDbVendor())) {
             replacements.put("<!-- BDM_DRIVER_TEMPLATE (.*) BDM_DRIVER_TEMPLATE -->", "<$1>");
         }
 
-        replacements.put("@@" + databasePrefix + "DB_VENDOR@@", Matcher.quoteReplacement(configuration.getDbVendor()));
+        replacements.put("@@" + databasePrefix + "DB_VENDOR@@", configuration.getDbVendor());
         replacements.put("@@" + databasePrefix + "USERNAME@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
         replacements.put("@@" + databasePrefix + "PASSWORD@@", Matcher.quoteReplacement(configuration.getDatabasePassword()));
-        replacements.put("@@" + databasePrefix + "TESTQUERY@@", Matcher.quoteReplacement(configuration.getTestQuery()));
-        replacements.put("<connection-url>@@" + databasePrefix + "DB_URL@@", "<connection-url>" + convertWindowsBackslashes(escapeXmlCharacters(configuration.getUrl())));
+        replacements.put("@@" + databasePrefix + "TESTQUERY@@", configuration.getTestQuery());
+        replacements.put("<connection-url>@@" + databasePrefix + "DB_URL@@", "<connection-url>" + Matcher.quoteReplacement(convertWindowsBackslashes(escapeXmlCharacters(configuration.getUrl()))));
 
         // Let's uncomment and replace dbvendor-specific values:
         if (POSTGRES.equals(configuration.getDbVendor())) {
-            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_SERVER_NAME@@", Matcher.quoteReplacement(configuration.getServerName())));
-            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_SERVER_PORT@@", Matcher.quoteReplacement(configuration.getServerPort())));
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_SERVER_NAME@@", configuration.getServerName()));
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_SERVER_PORT@@", configuration.getServerPort()));
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_DATABASE_NAME@@", Matcher.quoteReplacement(configuration.getDatabaseName())));
         } else {
-            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", Matcher.quoteReplacement(escapeXmlCharacters(convertWindowsBackslashes(configuration.getUrl())))));
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", Matcher.quoteReplacement(convertWindowsBackslashes(escapeXmlCharacters(configuration.getUrl())))));
         }
         if (ORACLE.equals(configuration.getDbVendor())) {
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "IS_SAME_RM_OVERRIDE@@", "false"));//forced to false
