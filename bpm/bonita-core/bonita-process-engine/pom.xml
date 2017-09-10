@@ -285,7 +285,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.work</groupId>
-            <artifactId>bonita-work-api</artifactId>
+            <artifactId>bonita-work</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
