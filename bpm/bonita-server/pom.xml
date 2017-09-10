@@ -552,7 +552,7 @@
         <!-- Work -->
         <dependency>
             <groupId>org.bonitasoft.engine.work</groupId>
-            <artifactId>bonita-work-impl</artifactId>
+            <artifactId>bonita-work</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -761,8 +761,7 @@
                                     <include>org.bonitasoft.engine.core.filter:bonita-user-filter-api</include>
                                     <include>org.bonitasoft.engine.core.filter:bonita-user-filter-impl</include>
                                     <!-- Work -->
-                                    <include>org.bonitasoft.engine.work:bonita-work-api</include>
-                                    <include>org.bonitasoft.engine.work:bonita-work-impl</include>
+                                    <include>org.bonitasoft.engine.work:bonita-work</include>
                                     <!-- Web Commands -->
                                     <include>org.bonitasoft.engine.external:bonita-web-commands</include>
                                     <!-- Web Profile -->
