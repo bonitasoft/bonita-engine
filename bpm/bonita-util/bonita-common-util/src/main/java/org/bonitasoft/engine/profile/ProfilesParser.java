@@ -14,53 +14,27 @@
 
 package org.bonitasoft.engine.profile;
 
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
-import javax.xml.XMLConstants;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
+import org.bonitasoft.engine.xml.parser.AbstractParser;
 
 /**
  * @author Baptiste Mesta
  */
-public class ProfilesParser {
+public class ProfilesParser extends AbstractParser<ProfilesNode> {
 
-    private final JAXBContext jaxbContext;
-    private final Schema schema;
-
-    public ProfilesParser() {
-        try {
-            jaxbContext = JAXBContext.newInstance(ProfilesNode.class);
-            URL schemaURL = ProfilesParser.class.getResource("/profiles.xsd");
-            final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schema = sf.newSchema(schemaURL);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    protected JAXBContext initJAXBContext() throws JAXBException {
+        return JAXBContext.newInstance(ProfilesNode.class);
     }
 
-    public ProfilesNode convert(String profilesXml) throws JAXBException {
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(schema);
-        return (ProfilesNode) unmarshaller.unmarshal(new StringReader(profilesXml));
+    @Override
+    protected URL initSchemaURL() {
+        return ProfilesParser.class.getResource("/profiles.xsd");
     }
 
-    private Marshaller getMarshaller() throws JAXBException {
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        return marshaller;
-    }
-
-    public String convert(ProfilesNode profiles) throws JAXBException {
-        StringWriter writer = new StringWriter();
-        getMarshaller().marshal(profiles, writer);
-        return writer.toString();
-    }
 }
