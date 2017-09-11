@@ -290,7 +290,7 @@
         <!-- Identity -->
         <dependency>
             <groupId>org.bonitasoft.engine.identity</groupId>
-            <artifactId>bonita-identity-impl</artifactId>
+            <artifactId>bonita-identity</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -683,8 +683,7 @@
                                     <!-- Incident -->
                                     <include>org.bonitasoft.engine.incident:bonita-incident</include>
                                     <!-- Identity -->
-                                    <include>org.bonitasoft.engine.identity:bonita-identity-api</include>
-                                    <include>org.bonitasoft.engine.identity:bonita-identity-impl</include>
+                                    <include>org.bonitasoft.engine.identity:bonita-identity</include>
                                     <!-- Lock -->
                                     <include>org.bonitasoft.engine.lock:bonita-lock</include>
                                     <!-- Login -->

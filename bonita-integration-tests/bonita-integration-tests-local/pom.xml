@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.identity</groupId>
-            <artifactId>bonita-identity-impl</artifactId>
+            <artifactId>bonita-identity</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
