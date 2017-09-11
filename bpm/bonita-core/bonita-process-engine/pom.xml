@@ -190,7 +190,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.identity</groupId>
-            <artifactId>bonita-identity-api</artifactId>
+            <artifactId>bonita-identity</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -371,13 +371,6 @@
             <!-- because we need the builderfactory impl and it does not make sense to mock them -->
             <groupId>org.bonitasoft.engine.expression</groupId>
             <artifactId>bonita-expression-api-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!-- because we need the builderfactory impl and it does not make sense to mock them -->
-            <groupId>org.bonitasoft.engine.identity</groupId>
-            <artifactId>bonita-identity-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
