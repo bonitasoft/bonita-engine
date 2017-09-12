@@ -103,7 +103,7 @@ public class IOUtils {
 
     public static Map<String, byte[]> unzip(final byte[] zippedContent) throws IOException {
         final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zippedContent));
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Map<String, byte[]> resources = new HashMap<>();
         try {
             ZipEntry entry = zis.getNextEntry();
             while (entry != null) {

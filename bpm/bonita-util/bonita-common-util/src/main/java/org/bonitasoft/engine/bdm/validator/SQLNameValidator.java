@@ -27,8 +27,9 @@ public class SQLNameValidator {
     private final int maxLength;
 
     static Set<String> sqlKeywords;
+
     static {
-        sqlKeywords = new HashSet<String>();
+        sqlKeywords = new HashSet<>();
     }
 
     public SQLNameValidator() {
@@ -43,28 +44,14 @@ public class SQLNameValidator {
     }
 
     private void initializeSQLKeywords() {
-        InputStream resourceAsStream = null;
-        Scanner scanner = null;
-        try {
-            resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords");
-            scanner = new Scanner(resourceAsStream);
+        try (InputStream resourceAsStream = SQLNameValidator.class.getResourceAsStream("/sql_keywords"); Scanner scanner = new Scanner(resourceAsStream)) {
             while (scanner.hasNext()) {
                 final String word = scanner.nextLine();
                 sqlKeywords.add(word.trim());
             }
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-            if (resourceAsStream != null) {
-                try {
-                    resourceAsStream.close();
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     public boolean isValid(final String name) {
