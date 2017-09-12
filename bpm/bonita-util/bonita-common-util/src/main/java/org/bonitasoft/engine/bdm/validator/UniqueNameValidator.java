@@ -35,8 +35,8 @@ public class UniqueNameValidator {
     }
     
     private Set<String> findDuplicateNames(Collection<? extends NamedElement> list) {
-        Set<String> duplicates = new LinkedHashSet<String>();
-        Set<String> uniqueNames = new HashSet<String>();
+        Set<String> duplicates = new LinkedHashSet<>();
+        Set<String> uniqueNames = new HashSet<>();
 
         for (NamedElement t : list) {
             if (!uniqueNames.add(t.getName())) {

@@ -36,7 +36,7 @@ public class CyclicCompositionValidationRule extends ValidationRule<BusinessObje
     protected ValidationStatus validate(BusinessObjectModel bom) {
         ValidationStatus validationStatus = new ValidationStatus();
         for (BusinessObject bo : bom.getBusinessObjects()) {
-            validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(bo, new ArrayList<BusinessObject>()));
+            validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(bo, new ArrayList<>()));
         }
         return validationStatus;
     }
