@@ -45,7 +45,7 @@ public class BusinessObjectModelValidationRule extends ValidationRule<BusinessOb
     private void validateQueries(final BusinessObjectModel bom, final ValidationStatus status) {
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final List<Query> lazyQueries = BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo);
-            final Set<String> lazyQueryNames = new HashSet<String>();
+            final Set<String> lazyQueryNames = new HashSet<>();
             for(final Query query : lazyQueries){
                 lazyQueryNames.add(query.getName());
             }

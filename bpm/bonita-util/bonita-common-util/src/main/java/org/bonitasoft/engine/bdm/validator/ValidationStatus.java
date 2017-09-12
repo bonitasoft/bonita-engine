@@ -24,7 +24,7 @@ public class ValidationStatus {
     private final List<String> errorList;
 
     public ValidationStatus() {
-        errorList = new ArrayList<String>();
+        errorList = new ArrayList<>();
     }
 
     public void addError(final String errorMessage) {

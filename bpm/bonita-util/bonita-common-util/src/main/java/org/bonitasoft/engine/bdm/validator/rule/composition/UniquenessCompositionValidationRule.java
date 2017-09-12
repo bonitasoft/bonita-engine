@@ -35,7 +35,7 @@ public class UniquenessCompositionValidationRule extends ValidationRule<Business
     @Override
     protected ValidationStatus validate(BusinessObjectModel bom) {
         ValidationStatus validationStatus = new ValidationStatus();
-        List<BusinessObject> alreadyComposedBOs = new ArrayList<BusinessObject>();
+        List<BusinessObject> alreadyComposedBOs = new ArrayList<>();
         for (BusinessObject compositeBO : bom.getReferencedBusinessObjectsByComposition()) {
             if (alreadyComposedBOs.contains(compositeBO)) {
                 validationStatus.addError("Business object " + compositeBO.getQualifiedName() + " is referenced by composition in two business objects, or is referenced several times in a single business object");

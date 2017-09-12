@@ -34,13 +34,13 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
 
     private static final String[] RESERVED_PACKAGE_PREFIX = { "com.bonitasoft.", "org.bonitasoft." };
 
-    private static final int MAX_TABLENAME_LENGTH = 30;
+    private static final int MAX_TABLE_NAME_LENGTH = 30;
 
     private final SQLNameValidator sqlNameValidator;
 
     public BusinessObjectValidationRule() {
         super(BusinessObject.class);
-        sqlNameValidator = new SQLNameValidator(MAX_TABLENAME_LENGTH);
+        sqlNameValidator = new SQLNameValidator(MAX_TABLE_NAME_LENGTH);
     }
 
     @Override
@@ -54,14 +54,13 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
 
         for (String reservedPrefix : RESERVED_PACKAGE_PREFIX) {
             if (qualifiedName.startsWith(reservedPrefix)) {
-                status.addError(
-                        new StringBuilder().append("Package ").append(reservedPrefix).append(" is reserved. Please choose another package name").toString());
+                status.addError("Package " + reservedPrefix + " is reserved. Please choose another package name");
             }
         }
 
         final String simpleName = bo.getSimpleName();
         if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
-            status.addError(new StringBuilder().append(qualifiedName).append(" is not a valid Java qualified name").toString());
+            status.addError(qualifiedName + " is not a valid Java qualified name");
             return status;
         }
 
@@ -90,7 +89,7 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
     }
 
     private void validateConstraints(final BusinessObject bo, final ValidationStatus status) {
-        final Set<String> constraintNames = new HashSet<String>();
+        final Set<String> constraintNames = new HashSet<>();
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
             String name = uc.getName();
             if (constraintNames.contains(name)) {

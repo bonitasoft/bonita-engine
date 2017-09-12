@@ -71,7 +71,7 @@ public class BusinessObjectModel {
     private String productVersion;
 
     public BusinessObjectModel() {
-        businessObjects = new ArrayList<BusinessObject>();
+        businessObjects = new ArrayList<>();
     }
 
     public void setModelVersion(final String modelVersion) {
@@ -103,7 +103,7 @@ public class BusinessObjectModel {
     }
 
     public Set<String> getBusinessObjectsClassNames() {
-        final HashSet<String> set = new HashSet<String>();
+        final HashSet<String> set = new HashSet<>();
         for (final BusinessObject o : businessObjects) {
             set.add(o.getQualifiedName());
         }
@@ -111,7 +111,7 @@ public class BusinessObjectModel {
     }
 
     public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
-        final List<BusinessObject> refs = new ArrayList<BusinessObject>();
+        final List<BusinessObject> refs = new ArrayList<>();
         for (final BusinessObject bo : businessObjects) {
             refs.addAll(bo.getReferencedBusinessObjectsByComposition());
         }
@@ -119,7 +119,7 @@ public class BusinessObjectModel {
     }
 
     public List<UniqueConstraint> getUniqueConstraints() {
-        final List<UniqueConstraint> constraints = new ArrayList<UniqueConstraint>();
+        final List<UniqueConstraint> constraints = new ArrayList<>();
         for (final BusinessObject bo : businessObjects) {
             constraints.addAll(bo.getUniqueConstraints());
         }
@@ -127,7 +127,7 @@ public class BusinessObjectModel {
     }
 
     public List<Index> getIndexes() {
-        final List<Index> indexes = new ArrayList<Index>();
+        final List<Index> indexes = new ArrayList<>();
         for (final BusinessObject bo : businessObjects) {
             indexes.addAll(bo.getIndexes());
         }
