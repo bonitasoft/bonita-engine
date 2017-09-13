@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -943,19 +944,38 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public Group updateGroup(final long groupId, final GroupUpdater updater) throws GroupNotFoundException, UpdateException {
+    public Group updateGroup(final long groupId, final GroupUpdater updater) throws GroupNotFoundException, UpdateException, AlreadyExistsException {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
+            checkPathUnicity(groupId, updater, identityService);
             final EntityUpdateDescriptor changeDescriptor = getGroupUpdateDescriptor(updater, tenantAccessor.getTechnicalLoggerService());
             return ModelConvertor.toGroup(new UpdateGroup(groupId, changeDescriptor, identityService, getIconUpdater(updater)).update());
         } catch (final SGroupNotFoundException e) {
             throw new GroupNotFoundException(e);
         } catch (final SIdentityException sbe) {
             throw new UpdateException(sbe);
+        }
+    }
+
+    private void checkPathUnicity(long groupId, GroupUpdater updater, IdentityService identityService) throws SGroupNotFoundException, AlreadyExistsException {
+        final Serializable updatedName = updater.getFields().get(GroupField.NAME);
+        SGroup sGroupToBeUpdated = identityService.getGroup(groupId);
+        String name = updatedName != null ? updatedName.toString() : sGroupToBeUpdated.getName();
+        StringBuilder sb = new StringBuilder();
+        String parentPath = updater.getFields().get(GroupField.PARENT_PATH) != null ? updater.getFields().get(GroupField.PARENT_PATH).toString() : "";
+        sb.append(parentPath).append("/").append(name);
+        try {
+            if(updatedName != null) {
+                SGroup group = identityService.getGroupByPath(sb.toString());
+                if(group.getId() != groupId) {
+                    throw new AlreadyExistsException("Group named \"" + name + "\" already exists");
+                }
+            }
+        } catch (final SGroupNotFoundException e) {
         }
     }
 
@@ -1131,7 +1151,7 @@ public class IdentityAPIImpl implements IdentityAPI {
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
     private void updateActorProcessDependencies(final TenantServiceAccessor tenantAccessor, final ActorMappingService actorMappingService,
-            final Set<Long> removedActorIds) throws SBonitaException {
+                                                final Set<Long> removedActorIds) throws SBonitaException {
         final Set<Long> processDefinitionIds = new HashSet<>(removedActorIds.size());
         for (final Long actorId : removedActorIds) {
             final GetActor getActor = new GetActor(actorMappingService, actorId);

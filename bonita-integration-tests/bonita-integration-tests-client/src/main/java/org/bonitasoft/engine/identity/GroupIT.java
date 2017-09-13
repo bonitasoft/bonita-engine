@@ -380,6 +380,43 @@ public class GroupIT extends TestWithTechnicalUser {
         getIdentityAPI().deleteGroup(newRootGroup.getId());
     }
 
+    @Test(expected = AlreadyExistsException.class)
+    public void should_throw_AlreadyExistException_when_update_group_with_group_name_already_exist() throws BonitaException{
+        Group groupToUpdate = getIdentityAPI().createGroup("England", defaultGroup.getPath());
+        final GroupUpdater groupUpdater = new GroupUpdater();
+        groupUpdater.updateName("test");
+
+        getIdentityAPI().updateGroup(groupToUpdate.getId(), groupUpdater);
+
+        getIdentityAPI().deleteGroup(groupToUpdate.getId());
+    }
+
+    @Test
+    public void should_updated_group_when_name_already_exist_but_path_dont_exist() throws BonitaException{
+        final Group newRootGroup = createGroup("Country", "Country", "Country company");
+        final String groupFranceName = "France";
+        Group groupFrance = getIdentityAPI().createGroup(groupFranceName, newRootGroup.getPath());
+
+        final String groupEnglandName = "England";
+        Group groupEngland = getIdentityAPI().createGroup(groupEnglandName, newRootGroup.getPath());
+
+        final GroupUpdater groupUpdater = new GroupUpdater();
+        groupUpdater.updateName("France");
+        groupUpdater.updateParentPath(null);
+
+        getIdentityAPI().updateGroup(groupEngland.getId(), groupUpdater);
+
+        // Asset
+        Group group = getIdentityAPI().getGroup(groupEngland.getId());
+        assertEquals("France", group.getName());
+        assertEquals("/France", group.getPath());
+
+        // Clean
+        getIdentityAPI().deleteGroup(groupFrance.getId());
+        getIdentityAPI().deleteGroup(groupEngland.getId());
+        getIdentityAPI().deleteGroup(newRootGroup.getId());
+    }
+
     @Test
     public void updateGroupNameAndParenthAlsoUpdateAllChildrenInfos() throws BonitaException {
         // arrange

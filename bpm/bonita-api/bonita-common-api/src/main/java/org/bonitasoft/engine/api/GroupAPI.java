@@ -102,7 +102,7 @@ public interface GroupAPI {
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
-    Group updateGroup(long groupId, GroupUpdater updater) throws GroupNotFoundException, UpdateException;
+    Group updateGroup(long groupId, GroupUpdater updater) throws GroupNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Deletes the group.
