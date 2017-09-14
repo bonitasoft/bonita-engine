@@ -21,11 +21,8 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.model.Index;
 import org.bonitasoft.engine.bdm.model.Query;
-import org.bonitasoft.engine.bdm.model.QueryParameter;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
-import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.FieldValidationRule;
@@ -43,7 +40,7 @@ import org.bonitasoft.engine.bdm.validator.rule.composition.UniquenessCompositio
  */
 public class BusinessObjectModelValidator {
 
-    private final List<ValidationRule<?>> rules = new ArrayList<ValidationRule<?>>();
+    private final List<ValidationRule<?>> rules = new ArrayList<>();
 
     public BusinessObjectModelValidator() {
         rules.add(new BusinessObjectModelValidationRule());
@@ -72,27 +69,19 @@ public class BusinessObjectModelValidator {
     }
 
     private Set<Object> buildModelTree(final BusinessObjectModel bom) {
-        final Set<Object> objectsToValidate = new HashSet<Object>();
+        final Set<Object> objectsToValidate = new HashSet<>();
         objectsToValidate.add(bom);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             objectsToValidate.add(bo);
-            for (final Field f : bo.getFields()) {
-                objectsToValidate.add(f);
-            }
+            objectsToValidate.addAll(bo.getFields());
             final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
-            for (final UniqueConstraint uc : uniqueConstraints) {
-                objectsToValidate.add(uc);
-            }
+            objectsToValidate.addAll(uniqueConstraints);
             final List<Query> queries = bo.getQueries();
             for (final Query q : queries) {
                 objectsToValidate.add(q);
-                for (final QueryParameter p : q.getQueryParameters()) {
-                    objectsToValidate.add(p);
-                }
+                objectsToValidate.addAll(q.getQueryParameters());
             }
-            for (final Index index : bo.getIndexes()) {
-                objectsToValidate.add(index);
-            }
+            objectsToValidate.addAll(bo.getIndexes());
         }
         return objectsToValidate;
     }
