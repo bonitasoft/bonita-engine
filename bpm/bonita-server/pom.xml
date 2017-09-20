@@ -92,7 +92,7 @@
         <!-- Archive -->
         <dependency>
             <groupId>org.bonitasoft.engine.archive</groupId>
-            <artifactId>bonita-archive-impl</artifactId>
+            <artifactId>bonita-archive</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -623,8 +623,7 @@
                                     <!-- API -->
                                     <include>org.bonitasoft.engine.api:bonita-server-api-http</include>
                                     <!-- Archive -->
-                                    <include>org.bonitasoft.engine.archive:bonita-archive-api</include>
-                                    <include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
+                                    <include>org.bonitasoft.engine.archive:bonita-archive</include>
                                     <!-- Authentication -->
                                     <include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
                                     <include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
