@@ -45,7 +45,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
-			<artifactId>bonita-archive-api</artifactId>
+			<artifactId>bonita-archive</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
