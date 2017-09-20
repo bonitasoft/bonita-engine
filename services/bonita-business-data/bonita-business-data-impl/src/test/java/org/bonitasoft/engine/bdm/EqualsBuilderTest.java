@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,17 +19,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import org.bonitasoft.engine.commons.io.IOUtil;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Romain Bioteau
@@ -53,11 +51,6 @@ public class EqualsBuilderTest extends CompilableCode {
         destDir = temporaryFolder.newFolder();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        IOUtil.deleteDir(destDir);
-    }
-
     @Test
     public void shouldGenerate_AddEqualsJMethodInDefinedClass() throws Exception {
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
@@ -78,7 +71,7 @@ public class EqualsBuilderTest extends CompilableCode {
         codeGenerator.getModel().build(destDir);
         File generatedFile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "Entity.java");
         assertCompilationSuccessful(generatedFile);
-        assertThat(generatedFile).hasContentEqualTo(new File(getClass().getResource("Entity_equals.java.txt").toURI()));
+        assertThat(generatedFile).hasSameContentAs(new File(getClass().getResource("Entity_equals.java.txt").toURI()));
     }
 
 }
