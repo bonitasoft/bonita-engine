@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,23 +17,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
-import org.assertj.core.util.Files;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-import com.sun.codemodel.JDefinedClass;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Romain Bioteau
@@ -47,27 +45,15 @@ public class ServerBDMCodeGeneratorTest {
 
     private ServerBDMCodeGenerator serverBDMCodeGenerator;
 
-    @Mock
-    private BusinessObject bo;
-
-    @Mock
-    private JDefinedClass entity;
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private File destDir;
 
     @Before
     public void setUp() throws Exception {
         serverBDMCodeGenerator = new ServerBDMCodeGenerator();
-        final File tmpFolder = File.createTempFile(ServerBDMCodeGeneratorTest.class.getSimpleName(), "", Files.temporaryFolder());
-        tmpFolder.delete();
-        destDir = Files.newFolder(tmpFolder.getAbsolutePath());
-    }
-
-    @After
-    public void tearDown() {
-        if (destDir != null) {
-            Files.delete(destDir);
-        }
+        destDir = temporaryFolder.newFolder();
     }
 
     @Test
@@ -193,7 +179,7 @@ public class ServerBDMCodeGeneratorTest {
 
     private String readGeneratedServerDAOImpl() throws IOException {
         final File daoImplem = new File(destDir, SERVER_EMPLOYEE_DAO_IMPL_FILE);
-        return FileUtils.readFileToString(daoImplem);
+        return FileUtils.readFileToString(daoImplem, StandardCharsets.UTF_8);
     }
 
 }

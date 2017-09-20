@@ -15,8 +15,6 @@ package org.bonitasoft.engine.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.bdm.CodeGenerator;
-import org.bonitasoft.engine.bdm.RelationFieldAnnotator;
 import org.junit.Before;
 import org.junit.Test;
 
