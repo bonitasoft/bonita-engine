@@ -15,14 +15,10 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -53,7 +49,7 @@ public class TxBonitaWorkTest {
     public void testWork() throws Exception {
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         txBonitawork.work(singletonMap);
-        verify(userTransactionService, times(1)).executeInTransaction(any(Callable.class));
+        verify(userTransactionService, times(1)).executeInTransaction(any());
     }
 
     @Test

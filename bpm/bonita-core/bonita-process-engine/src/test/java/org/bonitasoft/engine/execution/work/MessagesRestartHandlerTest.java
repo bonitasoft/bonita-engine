@@ -17,8 +17,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-import java.util.concurrent.Callable;
-
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -88,7 +86,7 @@ public class MessagesRestartHandlerTest {
         //when
         messagesRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
         //then
-        verify(userTransactionService).executeInTransaction(any(Callable.class));
+        verify(userTransactionService).executeInTransaction(any());
     }
 
 }

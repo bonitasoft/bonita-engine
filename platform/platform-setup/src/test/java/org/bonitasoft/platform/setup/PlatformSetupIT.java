@@ -172,33 +172,35 @@ public class PlatformSetupIT {
     }
 
     @Test
-    public void init_method_should_store_security_scripts_from_classpath() throws Exception {
+    public void init_method_should_store_sample_security_script_from_classpath() throws Exception {
         //when
         platformSetup.init();
         //then
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList(
                         "SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(19);
-        assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("ActorMemberPermissionRule.groovy");
-        assertThat(rows.get(1).get("RESOURCE_NAME")).isEqualTo("ActorPermissionRule.groovy");
-        assertThat(rows.get(2).get("RESOURCE_NAME")).isEqualTo("CaseContextPermissionRule.groovy");
-        assertThat(rows.get(3).get("RESOURCE_NAME")).isEqualTo("CasePermissionRule.groovy");
-        assertThat(rows.get(4).get("RESOURCE_NAME")).isEqualTo("CaseVariablePermissionRule.groovy");
-        assertThat(rows.get(5).get("RESOURCE_NAME")).isEqualTo("CommentPermissionRule.groovy");
-        assertThat(rows.get(6).get("RESOURCE_NAME")).isEqualTo("ConnectorInstancePermissionRule.groovy");
-        assertThat(rows.get(7).get("RESOURCE_NAME")).isEqualTo("DocumentPermissionRule.groovy");
-        assertThat(rows.get(8).get("RESOURCE_NAME")).isEqualTo("ProcessConfigurationPermissionRule.groovy");
-        assertThat(rows.get(9).get("RESOURCE_NAME")).isEqualTo("ProcessConnectorDependencyPermissionRule.groovy");
-        assertThat(rows.get(10).get("RESOURCE_NAME")).isEqualTo("ProcessInstantiationPermissionRule.groovy");
-        assertThat(rows.get(11).get("RESOURCE_NAME")).isEqualTo("ProcessPermissionRule.groovy");
-        assertThat(rows.get(12).get("RESOURCE_NAME")).isEqualTo("ProcessResolutionProblemPermissionRule.groovy");
-        assertThat(rows.get(13).get("RESOURCE_NAME")).isEqualTo("ProcessSupervisorPermissionRule.groovy");
-        assertThat(rows.get(14).get("RESOURCE_NAME")).isEqualTo("ProfileEntryPermissionRule.groovy");
-        assertThat(rows.get(15).get("RESOURCE_NAME")).isEqualTo("ProfilePermissionRule.groovy");
-        assertThat(rows.get(16).get("RESOURCE_NAME")).isEqualTo("TaskExecutionPermissionRule.groovy");
-        assertThat(rows.get(17).get("RESOURCE_NAME")).isEqualTo("TaskPermissionRule.groovy");
-        assertThat(rows.get(18).get("RESOURCE_NAME")).isEqualTo("UserPermissionRule.groovy");
+        assertThat(rows).hasSize(1);
+        assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("SamplePermissionRule.groovy.sample");
+    }
+
+    @Test
+    public void init_method_should_store_security_scripts_from_folder_if_exists() throws Exception {
+        //when
+        final Path confFolder = temporaryFolder.newFolder().toPath();
+        configurationFolderUtil.buildInitialFolder(confFolder);
+        configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
+
+        System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
+
+        FileUtils.write(confFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("tenant_template_security_scripts")
+                .resolve("SomeCustomScript.groovy").toFile(), "custom content", Charset.defaultCharset());
+        platformSetup.init();
+        //then
+        List<Map<String, Object>> rows = jdbcTemplate
+                .queryForList(
+                        "SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
+        assertThat(rows).hasSize(1);
+        assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("SomeCustomScript.groovy");
     }
 
     @Test
@@ -243,27 +245,8 @@ public class PlatformSetupIT {
                 "resources-permissions-mapping.properties",
                 "resources-permissions-mapping-custom.properties",
                 "resources-permissions-mapping-internal.properties",
-                "ActorMemberPermissionRule.groovy",
-                "ActorPermissionRule.groovy",
-                "CaseContextPermissionRule.groovy",
-                "CasePermissionRule.groovy",
-                "CaseVariablePermissionRule.groovy",
-                "CommentPermissionRule.groovy",
-                "ConnectorInstancePermissionRule.groovy",
-                "DocumentPermissionRule.groovy",
-                "ProcessConfigurationPermissionRule.groovy",
-                "ProcessConnectorDependencyPermissionRule.groovy",
-                "ProcessInstantiationPermissionRule.groovy",
-                "ProcessPermissionRule.groovy",
-                "ProcessResolutionProblemPermissionRule.groovy",
-                "ProcessSupervisorPermissionRule.groovy",
-                "ProfileEntryPermissionRule.groovy",
-                "ProfilePermissionRule.groovy",
-                "TaskExecutionPermissionRule.groovy",
-                "TaskPermissionRule.groovy",
-                "UserPermissionRule.groovy",
+                "SamplePermissionRule.groovy.sample",
                 "autologin-v6.json");
-
     }
 
     @Test

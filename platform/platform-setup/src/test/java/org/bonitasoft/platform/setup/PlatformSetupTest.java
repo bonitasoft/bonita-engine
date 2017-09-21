@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.ConfigurationService;
@@ -37,7 +38,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
@@ -58,7 +59,7 @@ public class PlatformSetupTest {
     @Mock
     private VersionService versionService;
     @InjectMocks
-    public PlatformSetup platformSetup;
+    private PlatformSetup platformSetup;
 
     private ConfigurationFolderUtil configurationFolderUtil = new ConfigurationFolderUtil();
 

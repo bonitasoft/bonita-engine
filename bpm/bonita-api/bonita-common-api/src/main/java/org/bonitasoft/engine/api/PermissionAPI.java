@@ -25,12 +25,19 @@ import org.bonitasoft.engine.exception.NotFoundException;
 public interface PermissionAPI {
 
     /**
-     * Execute a groovy class stored in bonita-home/server/tenants/&lt;tenant id&gt;/conf/security-scripts/ using it's class name
+     * Execute a groovy class, identified by it's class name, stored either in the classpath for default provided scripts, or in database for custom scripts.
+     * You can also add a jar containing a class implementing {@link org.bonitasoft.engine.api.permission.PermissionRule} and execute it using its
+     * fully qualified class name.
      * <p>
-     * The class MUST implements {@link org.bonitasoft.engine.api.permission.PermissionRule} If the script is executed without exceptions it means that the user
-     * is authorized to access the resource.
-     * The class must be put by hand in the bonita home folder bonita-home/server/tenants/&lt;tenant id&gt;/conf/security-scripts/&lt;scriptName&gt;.groovy
-     * You can also add jar containing class implementing {@link org.bonitasoft.engine.api.permission.PermissionRule} and execute them using their class name.
+     * The class MUST implements {@link org.bonitasoft.engine.api.permission.PermissionRule}.
+     * The class must implement method isAllowed() that returns TRUE to authorize access, or FALSE to forbid access.
+     * If the script throws exception, it is up to the calling application to decide if the access should be granted or not.
+     * </p>
+     * <p>
+     * To store your custom class in database, you must use the Setup Tool.
+     * Your custom groovy script must be placed in folder platform_conf/current/tenants/&lt;tenant id&gt;/tenant_security_scripts/.
+     * For more information on using the setup tool, refer to <a href="https://documentation.bonitasoft.com/?page=BonitaBPM_platform_setup">the Platform setup
+     * tool documentation page</a>
      * </p>
      *
      * @param className
@@ -39,9 +46,10 @@ public interface PermissionAPI {
      *        the context of the api call
      * @param reload
      *        reload class when calling this method, warning if some class were called with reload set to false, they will never be reloadable
-     * @return true if the user is permitted to make the api call
+     * @return true if the user is permitted to make the api call, false otherwise.
      * @throws ExecutionException
      *         If there is an exception while executing the script
+     * @throws NotFoundException if the script cannot be found under name <quote>className</quote> neither in the classpath, nor in the custom script folder.
      * @since 6.4.0
      */
     boolean checkAPICallWithScript(String className, APICallContext apiCallContext, boolean reload) throws ExecutionException, NotFoundException;
