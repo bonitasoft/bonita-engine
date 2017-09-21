@@ -11,7 +11,7 @@ testReturnCode() {
 testValue() {
   if [ "$1" != "$2" ]; then
     echo "ERROR: $1 should be equal to $2"
-    exit -17
+    exit 114
   fi
 }
 
@@ -214,8 +214,8 @@ echo "==========================================================================
 echo "verify version upgrade has updated configuration file changes (in folder current/)"
 echo "=================================================================================="
 
-dyn=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/dynamic-permissions-checks.properties`
-testValue $dyn "dynamic-permissions-checks"
+new_content=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/dynamic-permissions-checks.properties`
+testValue $new_content "dynamic-permissions-checks"
 
 res_mapp=`cat ${E2E_DIR}/platform_conf/current/tenant_template_portal/resources-permissions-mapping.properties`
 testValue $res_mapp "resources-permissions-mapping"
@@ -229,12 +229,10 @@ echo "========================================"
 echo "modify & push"
 echo "========================================"
 
-echo "new content" > ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/UserPermissionRule.groovy
-
-echo "========================================"
-echo "new content of file ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/UserPermissionRule.groovy is now:"
-cat ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/UserPermissionRule.groovy
-echo "========================================"
+echo "new content" > ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/SamplePermissionRule.groovy.sample
+# create custom groovy script and verify it is in database
+CUSTOM_FILE=${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/MyCustomRule.groovy
+touch ${CUSTOM_FILE}
 
 ${E2E_DIR}/setup.sh push
 
@@ -246,8 +244,17 @@ rm -rf ${E2E_DIR}/platform_conf/current/*
 
 ${E2E_DIR}/setup.sh pull
 
-echo "------------------ Retrieved content should be 'new content' ---------"
-cat ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/UserPermissionRule.groovy
+echo "========================================"
+echo "------------------ Retrieved content from database should be 'new content' ---------"
+echo "new content of file ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/SamplePermissionRule.groovy.sample is now:"
+new_content=`cat ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/SamplePermissionRule.groovy.sample`
+echo ${new_content}
+testValue "${new_content}" "new content"
+
+echo "Custom groovy script file MyCustomRule.groovy should have been pushed and retrieved:"
+ls ${E2E_DIR}/platform_conf/current/tenants/456/tenant_security_scripts/
+
+echo "========================================"
 
 echo "========================================"
 echo "remove some files & push"

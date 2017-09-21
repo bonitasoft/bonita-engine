@@ -147,13 +147,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public void storeTenantConfiguration(File configurationRootFolder, long tenantId) throws PlatformException {
         storeConfiguration(configurationRootFolder, TENANT_PORTAL, tenantId);
-
     }
 
     @Override
     public void storePlatformConfiguration(File configurationRootFolder) throws PlatformException {
         storeConfiguration(configurationRootFolder, PLATFORM_ENGINE, NON_TENANT_RESOURCE);
-
     }
 
     @Override

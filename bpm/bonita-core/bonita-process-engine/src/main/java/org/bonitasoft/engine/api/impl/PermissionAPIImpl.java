@@ -37,8 +37,7 @@ public class PermissionAPIImpl implements PermissionAPI {
             throw new ExecutionException("Unable to execute the security rule " + className + " for the api call " + context, e);
         } catch (ClassNotFoundException e) {
             throw new NotFoundException("Unable to execute the security rule " + className + " for the api call " + context + "because the class " + className
-                    + " is not found",
-                    e);
+                    + " is not found", e);
         }
     }
 

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.service.impl;
 import java.io.File;
 import java.io.IOException;
 
-import groovy.lang.GroovyClassLoader;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
@@ -33,6 +32,8 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+
+import groovy.lang.GroovyClassLoader;
 
 /**
  * Permission service implementation
@@ -61,7 +62,6 @@ public class PermissionServiceImpl implements PermissionService {
     public boolean checkAPICallWithScript(final String className, final APICallContext context, final boolean reload) throws SExecutionException,
             ClassNotFoundException {
         checkStarted();
-        SSession session;
         //groovy class loader load class from files and cache then when loaded, no need to do some lazy loading or load all class on start
         Class<?> aClass;
         if (reload) {
@@ -74,12 +74,12 @@ public class PermissionServiceImpl implements PermissionService {
             throw new SExecutionException("The class " + aClass.getName() + " does not implements org.bonitasoft.engine.api.permission.PermissionRule");
         }
         try {
-            session = sessionService.getSession(sessionAccessor.getSessionId());
+            SSession session = sessionService.getSession(sessionAccessor.getSessionId());
             final APISession apiSession = ModelConvertor.toAPISession(session, null);
             final PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
             return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(), new ServerLoggerWrapper(permissionRule.getClass(), logger));
         } catch (final Throwable e) {
-            throw new SExecutionException("The permission rule thrown an exception", e);
+            throw new SExecutionException("The permission rule " + aClass.getName() + " threw an exception", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class PermissionServiceImpl implements PermissionService {
         try {
             start();
         } catch (SBonitaException e) {
-            throw new SExecutionException("The permission rule could not be reloaded", e);
+            throw new SExecutionException("The permission rule service could not be reloaded", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     private void checkStarted() throws SExecutionException {
         if (groovyClassLoader == null) {
-            throw new SExecutionException("The service is not started");
+            throw new SExecutionException("The permission rule service is not started");
         }
     }
 

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
@@ -47,7 +48,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionServiceImplTest {
@@ -153,7 +154,7 @@ public class PermissionServiceImplTest {
     public void should_checkAPICallWithScript_run_the_class_in_script_folder() throws SBonitaException, ClassNotFoundException, IOException {
         //given
         final String methodBody = "        return true\n";
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody));
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent(methodBody), Charset.defaultCharset());
 
         permissionService.start();
 
@@ -161,7 +162,7 @@ public class PermissionServiceImplTest {
         final boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(rule->rule.getName().equals("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        verify(logger).log(argThat(rule -> rule.getName().equals("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
 
     @Test
@@ -169,7 +170,7 @@ public class PermissionServiceImplTest {
         //given
         File test = new File(securityFolder, "test");
         test.mkdir();
-        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), getRuleContent("test", "        return true\n"));
+        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), getRuleContent("test", "        return true\n"), Charset.defaultCharset());
 
         permissionService.start();
 
@@ -177,7 +178,7 @@ public class PermissionServiceImplTest {
         final boolean myCustomRule = permissionService.checkAPICallWithScript("test.MyCustomRule", new APICallContext(), false);
 
         assertThat(myCustomRule).isTrue();
-        verify(logger).log(argThat(rule->rule.getName().equals("test.MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+        verify(logger).log(argThat(rule -> rule.getName().equals("test.MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
 
     /*
@@ -214,13 +215,13 @@ public class PermissionServiceImplTest {
     public void should_checkAPICallWithScript_reload_classes() throws Exception {
         //given
         permissionService.start();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return true\n"));
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return true\n"), Charset.defaultCharset());
 
         //when
         boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
         assertThat(myCustomRule).isTrue();
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return false\n"));
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        return false\n"), Charset.defaultCharset());
 
         myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
@@ -232,7 +233,8 @@ public class PermissionServiceImplTest {
     @Test
     public void should_checkAPICallWithScript_that_throw_exception() throws Exception {
         //given
-        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        throw new RuntimeException()\n"));
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), getRuleContent("        throw new RuntimeException()\n"),
+                Charset.defaultCharset());
 
         permissionService.start();
 
