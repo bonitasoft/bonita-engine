@@ -16,10 +16,7 @@ package org.bonitasoft.engine.profile;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.concurrent.Callable;
-
 import org.bonitasoft.engine.execution.TransactionServiceMock;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -38,8 +35,6 @@ public class ProfilesUpdaterRestartHandlerTest {
     public TenantServiceAccessor tenantServiceAccessor;
     @Mock
     private DefaultProfilesUpdater defaultProfilesUpdater;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
     @Spy
     private ProfilesUpdaterRestartHandler profilesUpdaterRestartHandler;
 
@@ -60,7 +55,7 @@ public class ProfilesUpdaterRestartHandlerTest {
 
         profilesUpdaterRestartHandler.afterServicesStart(platformServiceAccessor, tenantServiceAccessor);
 
-        verify(transactionService).executeInTransaction(any(Callable.class));
+        verify(transactionService).executeInTransaction(any());
     }
 
 }

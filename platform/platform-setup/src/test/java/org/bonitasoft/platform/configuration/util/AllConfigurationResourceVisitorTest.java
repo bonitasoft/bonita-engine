@@ -23,7 +23,7 @@ public class AllConfigurationResourceVisitorTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(ConfigurationResourceVisitor.class);
 
     @Test
-    public void should_read_configuration_folder() throws Exception {
+    public void should_store_files_from_configuration_folder() throws Exception {
         //given
         Path rootFolder = Paths.get(getClass().getResource("/allConfiguration").toURI());
         LOGGER.info("folder:" + rootFolder);
@@ -46,7 +46,7 @@ public class AllConfigurationResourceVisitorTest {
         assertThat(bonitaConfigurations).as("should add all configuration files and skip licenses")
                 .extracting("resourceName")
                 .containsOnly("bonita-platform-init-custom.xml", "cache-config.xml", "compound-permissions-mapping.properties",
-                        "ActorMemberPermissionRule.groovy", "authenticationManager-config.properties", "bonita-tenant-community.properties",
+                        "SamplePermissionRule.groovy.sample", "authenticationManager-config.properties", "bonita-tenant-community.properties",
                         "bonita-platform-community.properties");
 
     }

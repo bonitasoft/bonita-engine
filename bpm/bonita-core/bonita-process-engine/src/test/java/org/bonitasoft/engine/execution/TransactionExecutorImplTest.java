@@ -16,8 +16,6 @@ package org.bonitasoft.engine.execution;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.concurrent.Callable;
-
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -38,7 +36,7 @@ public class TransactionExecutorImplTest {
 
         executor.execute(transactionContent);
 
-        verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
+        verify(transactionService, times(1)).executeInTransaction(any());
     }
 
     @SuppressWarnings("unchecked")
@@ -58,7 +56,7 @@ public class TransactionExecutorImplTest {
 
         executor.execute(transactionContent);
 
-        verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
+        verify(transactionService, times(1)).executeInTransaction(any());
     }
 
 }

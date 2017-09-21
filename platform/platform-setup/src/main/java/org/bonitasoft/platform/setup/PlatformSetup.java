@@ -303,26 +303,8 @@ public class PlatformSetup {
             addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml");
             configurationService.storeTenantTemplateEngineConf(tenantTemplateConfigurations);
 
-            List<BonitaConfiguration> securityScripts = new ArrayList<>(19);
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ActorMemberPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ActorPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "CaseContextPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "CasePermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "CaseVariablePermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "CommentPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ConnectorInstancePermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "DocumentPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProcessConfigurationPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProcessConnectorDependencyPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProcessInstantiationPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProcessPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProcessResolutionProblemPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProcessSupervisorPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProfileEntryPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "ProfilePermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "TaskExecutionPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "TaskPermissionRule.groovy");
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "UserPermissionRule.groovy");
+            List<BonitaConfiguration> securityScripts = new ArrayList<>(1);
+            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "SamplePermissionRule.groovy.sample");
             configurationService.storeTenantTemplateSecurityScripts(securityScripts);
 
             List<BonitaConfiguration> portalTenantTemplate = new ArrayList<>(14);

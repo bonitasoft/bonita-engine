@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
@@ -74,7 +75,7 @@ public class PermissionAPIIT extends CommonAPILocalIT {
             }
         };
         //when
-        boolean processPermissionRule = getPermissionAPI().checkAPICallWithScript("ProcessPermissionRule", apiCallContext, false);
+        boolean processPermissionRule = getPermissionAPI().checkAPICallWithScript("org.bonitasoft.permissions.ProcessPermissionRule", apiCallContext, false);
 
         //then
         assertThat(processPermissionRule).isTrue();

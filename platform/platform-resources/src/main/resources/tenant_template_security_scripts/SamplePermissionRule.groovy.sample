@@ -1,0 +1,55 @@
+/**
+ * Copyright (C) 2017 Acme Corp
+ * ...
+ **/
+
+// Ensure this .groovy class uses the default package declaration.
+// Ensure this .groovy file is placed in the default directory, under 'initial/tenant_template_security_scripts/' or
+//                                                   under 'current/tenants/TENANT_ID/tenant_security_scripts/'
+// Then map your custom rule in 'dynamic-permissions-checks-custom.properties' file by writing something like:
+// GET|bpm/caseVariable=[profile|User, check|SamplePermissionRule]
+
+import org.bonitasoft.engine.api.APIAccessor
+import org.bonitasoft.engine.api.Logger
+import org.bonitasoft.engine.api.permission.APICallContext
+import org.bonitasoft.engine.api.permission.PermissionRule
+import org.bonitasoft.engine.session.APISession
+import org.bonitasoft.permissions.CaseVariablePermissionRule
+
+/**
+ * This is a code sample of a Groovy Permission rule.
+ *
+ * Let a user get and update a variable of a case only if he is the process owner,
+ * or for other Business conditions... (to be implemented by the final Customer).
+ * This script reuses logic from superclass ActorPermissionRule, and enriches the
+ * behavior by also allowing other users under certain conditions...
+ * Find more examples of default scripts provided by Bonitasoft at
+ * https://github.com/bonitasoft/bonita-engine/tree/master/bpm/bonita-core/bonita-process-engine/src/main/groovy/org/bonitasoft/permissions
+ *
+ * A permission rule must inherit from an existing rule, or implement the PermissionRule interface, by overriding the isAllowed() method.
+ *
+ * @author John Doe
+ */
+class SamplePermissionRule extends CaseVariablePermissionRule {
+
+    @Override
+    public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
+        boolean actorAllowed = super.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
+
+        // If superclass CaseVariablePermissionRule returned false, check additional business rules from my company:
+        return actorAllowed || someExtraBusinessChecks(...)
+
+    }
+
+    private boolean someExtraBusinessChecks(APIAccessor apiAccessor, String actorId, long currentUserId) {
+        // return custom business checks...
+        try {
+            ...
+        } catch()
+            ...
+            // in case of exception, decide whether to return true (grant access), false (deny access), or throw exception.
+            // if you decide to throw exception, the web layer will log the exception and deny access automatically.
+        }
+    }
+
+}
