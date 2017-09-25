@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2017 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2017 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,18 +11,21 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.business.data;
 
-import java.util.List;
+public class SBusinessDataRepositorySerializationException extends SBusinessDataRepositoryException {
 
-import org.bonitasoft.engine.bdm.Entity;
+    public SBusinessDataRepositorySerializationException(final String message) {
+        super(message);
+    }
 
-public interface JsonBusinessDataSerializer {
+    public SBusinessDataRepositorySerializationException(final Throwable cause) {
+        super(cause);
+    }
 
-    String EMPTY_OBJECT = "{}";
-
-    String serializeEntity(Entity entity, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
-
-    String serializeEntity(List<? extends Entity> entities, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
+    public SBusinessDataRepositorySerializationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }
