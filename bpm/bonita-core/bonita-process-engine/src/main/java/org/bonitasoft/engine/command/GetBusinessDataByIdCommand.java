@@ -16,6 +16,7 @@ package org.bonitasoft.engine.command;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -43,10 +44,10 @@ public class GetBusinessDataByIdCommand extends CommandWithParameters {
         final String businessDataURIPattern = getStringMandadoryParameter(parameters, BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
         try {
-            if (childName != null && !childName.isEmpty()) {
-                return businessDataService.getJsonChildEntity(entityClassName, identifier, childName, businessDataURIPattern);
-            }
-            else {
+            if (StringUtils.isNotEmpty(childName)) {
+                return businessDataService.getJsonChildEntity(entityClassName, identifier, childName,
+                        businessDataURIPattern);
+            } else {
                 return businessDataService.getJsonEntity(entityClassName, identifier, businessDataURIPattern);
             }
         } catch (final SBusinessDataNotFoundException e) {

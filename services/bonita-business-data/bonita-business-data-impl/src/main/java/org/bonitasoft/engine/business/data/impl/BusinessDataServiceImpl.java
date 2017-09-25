@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -250,35 +248,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final Entity entity = businessDataRepository.findById(entityClass, identifier);
-        return buildJsonRepresentation(entity, businessDataURIPattern);
+        return jsonBusinessDataSerializer.serializeEntity(entity, businessDataURIPattern);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Serializable getJsonEntities(final String entityClassName, final List<Long> identifiers, final String businessDataURIPattern)
             throws SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final List<? extends Entity> entities = businessDataRepository.findByIdentifiers(entityClass, identifiers);
-        return buildJsonRepresentation((List<Entity>) entities, businessDataURIPattern);
-    }
-
-    private Serializable buildJsonRepresentation(final Entity entity, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
-        try {
-            return serializeJson(entity, businessDataURIPattern);
-        } catch (final IOException e) {
-            throw new SBusinessDataRepositoryException(e);
-        }
-    }
-
-    private String serializeJson(Entity entity, String businessDataURIPattern) throws IOException {
-        return jsonBusinessDataSerializer.serializeEntity(entity, businessDataURIPattern);
-    }
-
-    private Serializable buildJsonRepresentation(final List<Entity> entities, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
-        try {
-            return jsonBusinessDataSerializer.serializeEntity(entities, businessDataURIPattern);
-        } catch (final IOException e) {
-            throw new SBusinessDataRepositoryException(e);
-        }
+        return jsonBusinessDataSerializer.serializeEntity(entities, businessDataURIPattern);
     }
 
     @SuppressWarnings("unchecked")
@@ -304,11 +283,11 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
         if (childEntity instanceof Entity) {
             final Entity unwrap = businessDataRepository.unwrap((Entity) childEntity);
-            return buildJsonRepresentation(unwrap, businessDataURIPattern);
+            return jsonBusinessDataSerializer.serializeEntity(unwrap, businessDataURIPattern);
         } else if (childEntity instanceof List) {
             final Class<?> type = (Class<?>) ((ParameterizedType) getterReturnType).getActualTypeArguments()[0];
             if (Entity.class.isAssignableFrom(type)) {
-                return buildJsonRepresentation((List<Entity>) childEntity, businessDataURIPattern);
+                return jsonBusinessDataSerializer.serializeEntity((List<Entity>) childEntity, businessDataURIPattern);
             }
         }
         return null;
@@ -335,7 +314,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 throw new SBusinessDataRepositoryException("unable to count results for query " + queryName);
             }
         }
-        return new BusinessDataQueryResultImpl(buildJsonRepresentation((List<Entity>) list, businessDataURIPattern), businessDataQueryMetadata);
+        Serializable jsonResults = jsonBusinessDataSerializer.serializeEntity((List<Entity>) list, businessDataURIPattern);
+        return new BusinessDataQueryResultImpl(jsonResults, businessDataQueryMetadata);
     }
 
     private Query getCountQueryDefinition(Class<? extends Entity> businessDataClass, BusinessObject businessObject, Query queryDefinition) {

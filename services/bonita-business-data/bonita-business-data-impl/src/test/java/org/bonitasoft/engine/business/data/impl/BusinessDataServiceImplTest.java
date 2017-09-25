@@ -22,7 +22,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +42,7 @@ import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositorySerializationException;
 import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
 import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
@@ -54,8 +54,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataServiceImplTest {
@@ -419,7 +417,7 @@ public class BusinessDataServiceImplTest {
     public void should_getJsonEntity_throw_exception() throws Exception {
         //given
         doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
-        doThrow(JsonGenerationException.class).when(jsonEntitySerializer).serializeEntity(pojo, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        doThrow(SBusinessDataRepositorySerializationException.class).when(jsonEntitySerializer).serializeEntity(pojo, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //when then exception
         businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
@@ -641,7 +639,8 @@ public class BusinessDataServiceImplTest {
         pojos.add(pojo1);
         pojos.add(pojo2);
         when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
-        when(jsonEntitySerializer.serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE)).thenThrow(new IOException("exception"));
+        when(jsonEntitySerializer.serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
+                .thenThrow(new SBusinessDataRepositorySerializationException("exception"));
 
         businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
