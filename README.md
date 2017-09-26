@@ -8,7 +8,7 @@ This project builds Bonita Execution Engine (Community Edition)
 Requirements
 -------------
 >     Java JDK 1.8 or higher
->     Maven 3.x or higher
+>     Maven 3.3.9 or higher
 
 Building the Engine
 -----------------
