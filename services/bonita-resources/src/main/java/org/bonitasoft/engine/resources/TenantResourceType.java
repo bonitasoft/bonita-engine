@@ -18,5 +18,5 @@ package org.bonitasoft.engine.resources;
  * @author Baptiste Mesta
  */
 public enum TenantResourceType {
-    BDM
+    BDM, BDM_ACCESS_CONTROL_MODEL
 }
