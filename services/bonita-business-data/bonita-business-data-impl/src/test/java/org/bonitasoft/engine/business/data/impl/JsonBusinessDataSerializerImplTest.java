@@ -21,9 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bdm.Entity;
@@ -32,53 +33,61 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.company.model.Address;
 import com.company.model.Person;
+import com.company.model.PersonWithDetails;
 import com.company.model.Phone;
+
+import javassist.util.proxy.MethodHandler;
 
 public class JsonBusinessDataSerializerImplTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
-    JsonBusinessDataSerializer jsonBusinessDataSerializer;
-
-    Entity person;
-
-    List<Entity> personList;
+    private JsonBusinessDataSerializer jsonBusinessDataSerializer;
 
     private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
 
     @Before
     public void setUp() throws Exception {
         jsonBusinessDataSerializer = new JsonBusinessDataSerializerImpl(classLoaderService);
-
     }
 
     @Test
-    public void testSerializeEntity() throws Exception {
+    public void entity_should_be_serialized() throws Exception {
         // given
-        this.person = initPerson(1L);
+        Entity person = initPerson(1L);
 
         // when
         final String jsonPerson = jsonBusinessDataSerializer.serializeEntity(person, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         // then
-        assertThatJson(jsonPerson).as("should get employee count ").isEqualTo(getJsonContent("singlePerson.json"));
+        assertThatJson(jsonPerson).as("entity serialization").isEqualTo(getJsonContent("singlePerson.json"));
     }
 
     @Test
-    public void testSerializeEntityList() throws Exception {
-
+    public void entity_with_nested_entity_fields_should_be_serialized() throws Exception {
         // given
-        this.personList = new ArrayList<Entity>();
-        for (long i = 1L; i < 3L; i++) {
-            personList.add(initPerson(i));
-        }
+        PersonWithDetails person = initPersonWithDetails(666L);
 
         // when
-        final String jsonPersonList = jsonBusinessDataSerializer.serializeEntity(personList, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        final String jsonPerson = jsonBusinessDataSerializer.serializeEntity(person, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         // then
-        assertThatJson(jsonPersonList).as("should get employee count ").isEqualTo(getJsonContent("multiplePerson.json"));
+        assertThatJson(jsonPerson).as("entity with nested entity fields serialization")
+                .isEqualTo(getJsonContent("personWithDetails.json"));
+    }
+
+    @Test
+    public void entity_list_should_be_serialized() throws Exception {
+        // given
+        List<Entity> persons = IntStream.range(1, 3).mapToObj(i -> initPerson(i)).collect(Collectors.toList());
+
+        // when
+        final String jsonPersonList = jsonBusinessDataSerializer.serializeEntity(persons, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        // then
+        assertThatJson(jsonPersonList).as("entity list serialization").isEqualTo(getJsonContent("multiplePerson.json"));
     }
 
     @Test
@@ -94,7 +103,11 @@ public class JsonBusinessDataSerializerImplTest {
         assertThatJson(serializedEntity).as("should replace field value").isEqualTo(expectedJson);
     }
 
-    protected EntitySerializerPojo createPojo() {
+    // =================================================================================================================
+    // UTILS
+    // =================================================================================================================
+
+    private static EntitySerializerPojo createPojo() {
         final EntitySerializerPojo entitySerializerPojo = new EntitySerializerPojo();
 
         entitySerializerPojo.setPersistenceId(Long.MAX_VALUE);
@@ -118,7 +131,7 @@ public class JsonBusinessDataSerializerImplTest {
         return entitySerializerPojo;
     }
 
-    private Person initPerson(long persistenceId) {
+    private static Person initPerson(long persistenceId) {
         Person person;
         person = new Person();
         person.setPersistenceId(persistenceId);
@@ -143,8 +156,54 @@ public class JsonBusinessDataSerializerImplTest {
     }
 
     private String getJsonContent(String jsonFileName) throws IOException {
-        final String json;
-        json = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
-        return json;
+        return new String(IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
+    }
+
+    private static PersonWithDetails initPersonWithDetails(long persistenceId) {
+        PersonWithDetails person = new PersonWithDetails();
+        person.setPersistenceId(persistenceId);
+        person.setPersistenceVersion(2L);
+        person.setName("John");
+        person.setAge(50);
+        person.setBirthday(new Date(123456789L));
+        person.setHasMobile(Boolean.TRUE);
+
+        for (int i = 0; i < 3; i++) {
+            Phone ph = new Phone();
+            ph.setPersistenceVersion(365L + i);
+            ph.setPersistenceId(22365L + i);
+            ph.setNumber("123456" + i);
+            person.addToPhones(ph);
+        }
+
+        person.addToBools(true);
+        person.addToBools(false);
+        person.addToBools(true);
+        person.addToBools(false);
+
+        person.addToIgnores(1L);
+        person.addToIgnores(3L);
+        person.addToIgnores(5L);
+        person.addToIgnores(6L);
+
+        Phone secretPhone = new Phone();
+        secretPhone.setPersistenceId(3615L);
+        secretPhone.setNumber("999999");
+        person.setSecretPhone(secretPhone);
+
+        person.addToIncludes(1235L);
+        person.addToIncludes(6666L);
+        person.addToIncludes(7777L);
+
+        Address address = new Address();
+        address.setPersistenceId(2598L);
+        address.setPersistenceVersion(99992598L);
+        address.setStreet("Rue Gustave Eiffel");
+        address.setDoorCode("my-secret-password");
+        person.setAddress(address);
+
+        person.setMethodHandlerObject(mock(MethodHandler.class));
+
+        return person;
     }
 }
