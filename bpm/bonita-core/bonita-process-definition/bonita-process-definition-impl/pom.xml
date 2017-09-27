@@ -80,7 +80,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-api</artifactId>
+			<artifactId>bonita-expression</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -116,12 +116,6 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -55,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-api</artifactId>
+			<artifactId>bonita-expression</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -84,12 +84,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
 			<artifactId>bonita-operation-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
