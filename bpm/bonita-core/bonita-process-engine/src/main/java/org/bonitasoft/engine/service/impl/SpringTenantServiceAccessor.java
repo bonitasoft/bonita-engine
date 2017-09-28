@@ -14,7 +14,6 @@
 
 package org.bonitasoft.engine.service.impl;
 
-import com.bonitasoft.engine.business.data.impl.BDMAccessControlService;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
@@ -514,7 +513,4 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return beanAccessor.getService(BPMWorkFactory.class);
     }
 
-    public BDMAccessControlService getBDMAccessControlService() {
-        return beanAccessor.getService(BDMAccessControlService.class);
-    }
 }

@@ -14,7 +14,6 @@
 
 package org.bonitasoft.engine.service;
 
-import com.bonitasoft.engine.business.data.impl.BDMAccessControlService;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
@@ -259,6 +258,4 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     MessagesHandlingService getMessagesHandlingService();
 
     BPMWorkFactory getBPMWorkFactory();
-
-    BDMAccessControlService getBDMAccessControlService();
 }
