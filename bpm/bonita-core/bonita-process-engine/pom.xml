@@ -441,11 +441,6 @@
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.bonitasoft.engine.data</groupId>
-            <artifactId>bonita-business-data</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
