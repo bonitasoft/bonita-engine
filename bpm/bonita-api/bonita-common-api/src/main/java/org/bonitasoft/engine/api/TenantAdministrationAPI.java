@@ -19,7 +19,7 @@ import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.exception.UpdateException;
 
 /**
- * This API gives access to tenant management.
+ * This API gives access to tenant administration tasks.
  * 
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
