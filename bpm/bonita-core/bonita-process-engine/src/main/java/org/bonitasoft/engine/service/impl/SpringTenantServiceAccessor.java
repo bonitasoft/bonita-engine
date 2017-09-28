@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.service.impl;
 
+import com.bonitasoft.engine.business.data.impl.BDMAccessControlService;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
@@ -91,8 +92,8 @@ import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.work.WorkExecutorService;
+import org.bonitasoft.engine.work.WorkService;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
@@ -110,7 +111,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         this.beanAccessor = beanAccessor;
         this.tenantId = tenantId;
     }
-
 
     @Override
     public ParentContainerResolver getParentContainerResolver() {
@@ -509,7 +509,12 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     public MessagesHandlingService getMessagesHandlingService() {
         return beanAccessor.getService(MessagesHandlingService.class);
     }
+
     public BPMWorkFactory getBPMWorkFactory() {
         return beanAccessor.getService(BPMWorkFactory.class);
+    }
+
+    public BDMAccessControlService getBDMAccessControlService() {
+        return beanAccessor.getService(BDMAccessControlService.class);
     }
 }
