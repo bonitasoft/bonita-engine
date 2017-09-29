@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
@@ -25,6 +21,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDelet
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.SHumanTaskAlreadyAssignedException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -39,6 +36,10 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -269,6 +270,31 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     void assignHumanTask(long userTaskId, long userId) throws SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException;
 
     /**
+     * Assign the specific human task to the user if it is not currently assigned
+     * <p>Use a more restrictive mechanism than assignHumanTask method to assign
+     * human task:
+     * <ul>
+     * <li>exception when task is already assign to a different user</li>
+     * <li>only update claimed date when assign to same user</li>
+     * <li>remove claimed date when assign to user with id 0 (un-assign)</li>
+     * </ul>
+     * </p>
+     * <p>
+     * <p>under high load, getting pending tasks could return tasks that are being assign in a previous transaction in a
+     * separate thread, and thus assignee is override </p>
+     * @since 7.6
+     * @param userTaskId
+     *        identifier of human task instance
+     * @param userId
+     *        identifier of user
+     * @throws SFlowNodeNotFoundException
+     * @throws SFlowNodeReadException
+     * @throws SActivityModificationException
+     * @throws SHumanTaskAlreadyAssignedException
+     */
+    void assignHumanTaskIfNotAssigned(long userTaskId, long userId) throws SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException, SHumanTaskAlreadyAssignedException;
+
+
     /**
      * Get the number of UserTask instances assigned to a specific user
      *

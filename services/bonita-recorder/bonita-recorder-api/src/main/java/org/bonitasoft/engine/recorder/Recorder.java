@@ -54,6 +54,22 @@ public interface Recorder {
     void recordUpdate(UpdateRecord record, String type) throws SRecorderException;
 
     /**
+     * Update a record from database with a named query
+     * If no rows have been updated the event is not thrown
+     *
+     * @param record
+     *              the record for insert
+     * @param type
+     *              Object type
+     * @param query
+     *              NamedQuery to be used
+     * @return number of updated rows
+     * @throws SRecorderException
+     * @since 7.6
+     */
+    int recordUpdateWithQuery(final UpdateRecord record, String type, String query) throws SRecorderException;
+
+    /**
      * Delete all records for a table from database, for the connected tenant
      * 
      * @param record
