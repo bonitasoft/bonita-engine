@@ -58,7 +58,7 @@ import org.bonitasoft.engine.transaction.STransactionNotFoundException;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-@AvailableWhenTenantIsPaused
+
 public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
@@ -79,6 +79,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
+    @AvailableWhenTenantIsPaused
     public boolean isPaused() {
         final long tenantId = getTenantId();
         final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformAccessorNoException().getPlatformService());
@@ -91,11 +92,13 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
+    @AvailableWhenTenantIsPaused
     public void pause() throws UpdateException {
         setTenantPaused(true);
     }
 
     @Override
+    @AvailableWhenTenantIsPaused
     public void resume() throws UpdateException {
         setTenantPaused(false);
         resolveDependenciesForAllProcesses();
@@ -133,6 +136,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
+    @AvailableWhenTenantIsPaused
     protected void pauseServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
             throws UpdateException {
         // clustered services
@@ -274,6 +278,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     }
 
     @Override
+    @AvailableWhenTenantIsPaused
     public byte[] getClientBDMZip() throws BusinessDataRepositoryException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
