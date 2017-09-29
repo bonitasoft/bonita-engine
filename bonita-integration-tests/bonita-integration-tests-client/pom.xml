@@ -117,7 +117,10 @@
             <artifactId>bonita-common-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>concurrentunit</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

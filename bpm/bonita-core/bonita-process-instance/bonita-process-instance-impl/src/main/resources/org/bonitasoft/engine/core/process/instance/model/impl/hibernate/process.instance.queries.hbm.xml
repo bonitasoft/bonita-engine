@@ -99,6 +99,19 @@
 		AND f.terminal = FALSE
 	</query>
 
+	<query name="updateStrictHuman">
+		UPDATE
+		org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl
+		SET assigneeId = :assigneeId,
+		claimedDate = :claimedDate
+		WHERE id = :id
+		AND (
+			:assigneeId = 0
+			OR assigneeId = 0
+			OR :assigneeId = assigneeId
+		)
+	</query>
+
 	<query name="getAssignedUserTasks">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
