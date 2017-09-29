@@ -16,7 +16,6 @@ package org.bonitasoft.engine.xml.parser;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -24,23 +23,20 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
+import org.xml.sax.SAXException;
+
 /**
- * @author Adrien
+ * @author Adrien Lachambre
  */
 public abstract class AbstractParser<T> {
 
-    private final Unmarshaller unmarshaller;
-    private final Marshaller marshaller;
+    private final JAXBContext jaxbContext;
 
     public AbstractParser() {
         try {
-            JAXBContext jaxbContext = initJAXBContext();
-            unmarshaller = jaxbContext.createUnmarshaller();
-            unmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(initSchemaURL()));
-            marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbContext = initJAXBContext();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to create an instance of class " + getClass().getName(), e);
         }
     }
 
@@ -49,10 +45,19 @@ public abstract class AbstractParser<T> {
     protected abstract URL initSchemaURL();
 
     public T convert(String xml) throws JAXBException {
+        final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        URL schemaURL = initSchemaURL();
+        try {
+            unmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(schemaURL));
+        } catch (SAXException e) {
+            throw new JAXBException("Error while initializing schema from URL " + schemaURL, e);
+        }
         return (T) unmarshaller.unmarshal(new StringReader(xml));
     }
 
     public String convert(T model) throws JAXBException {
+        final Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         StringWriter writer = new StringWriter();
         marshaller.marshal(model, writer);
         return writer.toString();
