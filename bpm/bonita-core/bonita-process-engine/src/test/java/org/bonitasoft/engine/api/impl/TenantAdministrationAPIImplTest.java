@@ -379,11 +379,5 @@ public class TenantAdministrationAPIImplTest {
         verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
-    @Test
-    public void tenantManagementAPI_should_have_class_annotation() {
-        // then:
-        assertThat(TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
-                "Annotation @AvailableWhenTenantIsPaused should be present on API class TenantManagementAPIExt").isTrue();
-    }
 
 }
