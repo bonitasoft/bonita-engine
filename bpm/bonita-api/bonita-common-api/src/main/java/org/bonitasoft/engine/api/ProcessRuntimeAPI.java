@@ -783,6 +783,21 @@ public interface ProcessRuntimeAPI {
     void assignUserTask(long userTaskId, long userId) throws UpdateException;
 
     /**
+     * Assign a task to a user with given user identifier if the task is not currently assigned to another user.
+     *
+     * @param userTaskId
+     *        The identifier of the user task.
+     * @param userId
+     *        The identifier of the user.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *         If an error occurs while updating the activity instance.
+     * @since 7.6
+     */
+    void assignUserTaskIfNotAssigned(long userTaskId, long userId) throws UpdateException;
+
+    /**
      * Updates the actors of the user task. It evaluates again the eligible users for that task.
      *
      * @param userTaskId

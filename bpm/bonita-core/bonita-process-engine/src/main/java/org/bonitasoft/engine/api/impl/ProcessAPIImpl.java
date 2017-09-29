@@ -14,26 +14,6 @@
 
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Collections.singletonMap;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -96,6 +76,7 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDe
 import org.bonitasoft.engine.api.impl.transaction.process.SetProcessInstanceState;
 import org.bonitasoft.engine.api.impl.transaction.process.UpdateProcessDeploymentInfo;
 import org.bonitasoft.engine.api.impl.transaction.task.AssignOrUnassignUserTask;
+import org.bonitasoft.engine.api.impl.transaction.task.AssignUserTaskIfNotAssigned;
 import org.bonitasoft.engine.api.impl.transaction.task.GetAssignedTasks;
 import org.bonitasoft.engine.api.impl.transaction.task.GetHumanTaskInstance;
 import org.bonitasoft.engine.api.impl.transaction.task.GetNumberOfAssignedUserTaskInstances;
@@ -433,6 +414,26 @@ import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
+import static java.util.Collections.singletonMap;
 
 /**
  * @author Baptiste Mesta
@@ -2018,8 +2019,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
-            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor
-                    .getFlowNodeStateManager().getStateBehaviors());
+            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId,
+                    activityInstanceService, tenantAccessor.getFlowNodeStateManager().getStateBehaviors());
             assignUserTask.execute();
         } catch (final SUserNotFoundException sunfe) {
             throw new UpdateException(sunfe);
@@ -2027,6 +2028,19 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException(sainfe);
         } catch (final SBonitaException sbe) {
             throw new UpdateException(sbe);
+        }
+    }
+    @Override
+    public void assignUserTaskIfNotAssigned(final long userTaskId, final long userId) throws UpdateException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        try {
+            final AssignUserTaskIfNotAssigned assignUserTask = new AssignUserTaskIfNotAssigned(userId, userTaskId,
+                    activityInstanceService, tenantAccessor.getFlowNodeStateManager().getStateBehaviors());
+            assignUserTask.execute();
+        } catch (final SBonitaException sbe) {
+            throw new UpdateException("Unable to assign user task (id: " + userTaskId + ")"
+                    + " to user (id: " + userId + ") | " + sbe.getMessage(), sbe);
         }
     }
 

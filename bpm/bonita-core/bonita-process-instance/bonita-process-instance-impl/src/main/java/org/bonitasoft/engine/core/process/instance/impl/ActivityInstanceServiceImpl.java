@@ -13,14 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -37,6 +29,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDelet
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.SHumanTaskAlreadyAssignedException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -80,7 +73,17 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 
-/**
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
+
+ /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
@@ -110,6 +113,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     private static final String PENDING_ASSIGNED_TO = "PendingAssignedTo";
 
     private static final String HUMAN_TASK_INSTANCE_ASSIGNEE = "HUMAN_TASK_INSTANCE_ASSIGNEE";
+
+     private static final String QUERY_HUMAN_TASK_INSTANCE_ASSIGNEE = "updateStrictHuman";
 
     private static final String WHOCANSTART_PENDING_TASK_SUFFIX = "WhoCanStartPendingTask";
 
@@ -377,6 +382,41 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             }
             try {
                 getRecorder().recordUpdate(UpdateRecord.buildSetFields(flowNodeInstance, descriptor), HUMAN_TASK_INSTANCE_ASSIGNEE);
+            } catch (final SRecorderException e) {
+                throw new SActivityModificationException(e);
+            }
+        } else {
+            throw new SActivityReadException("the activity with id " + userTaskId + " is not a user task");
+        }
+    }
+
+    @Override
+    public void assignHumanTaskIfNotAssigned(final long userTaskId, final long userId) throws SFlowNodeNotFoundException,
+            SFlowNodeReadException, SActivityModificationException, SHumanTaskAlreadyAssignedException {
+        final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance(userTaskId);
+        if (flowNodeInstance instanceof SHumanTaskInstance) {
+            Long assigneeId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
+            if(assigneeId > 0 && assigneeId!= userId && userId>0){
+                throw new SHumanTaskAlreadyAssignedException("The task with id "+ userTaskId +" is currently assigned to" +
+                        " user with id " + assigneeId + ". Try to unassign before assigning it again.", null);
+            }
+            final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+            descriptor.addField(sUserTaskInstanceBuilder.getIdKey(), userTaskId);
+            descriptor.addField(sUserTaskInstanceBuilder.getAssigneeIdKey(), userId);
+            if (userId > 0) {
+                // if this action is a Assign action:
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), System.currentTimeMillis());
+            } else {
+                // if this action is a Release action:
+                descriptor.addField(sUserTaskInstanceBuilder.getClaimedDateKey(), 0L);
+            }
+            try {
+                int updatedRows = getRecorder().recordUpdateWithQuery(UpdateRecord.buildSetFields(flowNodeInstance, descriptor),
+                        HUMAN_TASK_INSTANCE_ASSIGNEE, QUERY_HUMAN_TASK_INSTANCE_ASSIGNEE );
+                if (updatedRows != 1) {
+                    throw new SHumanTaskAlreadyAssignedException("The task with id "+ userTaskId +" is currently assigned." +
+                             " Try to unassign before assigning it again.", null);
+                }
             } catch (final SRecorderException e) {
                 throw new SActivityModificationException(e);
             }
