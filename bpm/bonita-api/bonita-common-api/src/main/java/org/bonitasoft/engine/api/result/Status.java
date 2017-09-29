@@ -40,7 +40,7 @@ public class Status implements Serializable {
     private StatusCode code;
 
     public static Status okStatus() {
-        return new Status(Level.OK, StatusCode.OK, null, null);
+        return new Status(Level.OK, StatusCode.OK, "", null);
     }
 
     public static Status errorStatus(StatusCode code, String message) {
