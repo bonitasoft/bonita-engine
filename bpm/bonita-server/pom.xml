@@ -317,7 +317,7 @@
         <!-- Logs -->
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-impl</artifactId>
+            <artifactId>bonita-log</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -688,8 +688,7 @@
                                     <include>org.bonitasoft.engine.core.login:bonita-login-api</include>
                                     <include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
                                     <!-- Logs -->
-                                    <include>org.bonitasoft.engine.log:bonita-log-api</include>
-                                    <include>org.bonitasoft.engine.log:bonita-log-impl</include>
+                                    <include>org.bonitasoft.engine.log:bonita-log</include>
                                     <!-- Operation -->
                                     <include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
                                     <include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>

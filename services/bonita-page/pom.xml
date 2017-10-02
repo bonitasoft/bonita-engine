@@ -17,12 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-api</artifactId>
+            <artifactId>bonita-log</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
