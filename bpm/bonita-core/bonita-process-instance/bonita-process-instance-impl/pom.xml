@@ -35,7 +35,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api</artifactId>
+			<artifactId>bonita-events</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -94,11 +94,6 @@
             <version>${project.version}</version>
         </dependency>
 		<dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-builder</artifactId>
             <version>${project.version}</version>
@@ -114,13 +109,6 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-		</dependency>
-		<dependency>
-			<!-- because we need the builderfactory impl and it does not make sense to mock them -->
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
