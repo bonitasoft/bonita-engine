@@ -15,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl</artifactId>
+			<artifactId>bonita-events</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

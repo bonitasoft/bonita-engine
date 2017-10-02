@@ -219,7 +219,7 @@
         <!-- Event -->
         <dependency>
             <groupId>org.bonitasoft.engine.events</groupId>
-            <artifactId>bonita-events-api-impl</artifactId>
+            <artifactId>bonita-events</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -664,8 +664,7 @@
                                     <include>org.bonitasoft.engine.core.document:bonita-document-api</include>
                                     <include>org.bonitasoft.engine.core.document:bonita-document-impl</include>
                                     <!-- Event -->
-                                    <include>org.bonitasoft.engine.events:bonita-events-api</include>
-                                    <include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
+                                    <include>org.bonitasoft.engine.events:bonita-events</include>
                                     <!-- Expression -->
                                     <include>org.bonitasoft.engine.expression:bonita-expression</include>
                                     <!-- Expression Resolver -->

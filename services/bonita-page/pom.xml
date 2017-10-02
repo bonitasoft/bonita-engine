@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.events</groupId>
-            <artifactId>bonita-events-api</artifactId>
+            <artifactId>bonita-events</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -54,12 +54,6 @@
             <groupId>org.bonitasoft.engine.profile</groupId>
             <artifactId>bonita-profile</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.events</groupId>
-            <artifactId>bonita-events-api-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
