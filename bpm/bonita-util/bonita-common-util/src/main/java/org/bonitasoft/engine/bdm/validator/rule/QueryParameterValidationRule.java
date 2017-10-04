@@ -27,7 +27,7 @@ import org.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.bonitasoft.engine.bdm.model.QueryParameter;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 
-public class QueryParameterValidationRule extends ValidationRule<QueryParameter> {
+public class QueryParameterValidationRule extends ValidationRule<QueryParameter, ValidationStatus> {
 
     public static final List<String> FORBIDDEN_PARAMETER_NAMES = Arrays.asList(BDMQueryUtil.START_INDEX_PARAM_NAME, BDMQueryUtil.MAX_RESULTS_PARAM_NAME);
 

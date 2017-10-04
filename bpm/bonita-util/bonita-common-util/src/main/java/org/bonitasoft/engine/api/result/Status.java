@@ -1,23 +1,22 @@
 /**
  * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.api.result;
 
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * A status represents a generic result of some action.
@@ -35,7 +34,7 @@ public class Status implements Serializable {
 
     private String message;
 
-    private String context;
+    private Map<String, Serializable> context;
 
     private StatusCode code;
 
@@ -47,7 +46,7 @@ public class Status implements Serializable {
         return new Status(Level.ERROR, code, message, null);
     }
 
-    public static Status errorStatus(StatusCode code, String message, String context) {
+    public static Status errorStatus(StatusCode code, String message, Map<String, Serializable> context) {
         return new Status(Level.ERROR, code, message, context);
     }
 
@@ -55,7 +54,7 @@ public class Status implements Serializable {
         return new Status(Level.WARNING, code, message, null);
     }
 
-    public static Status warningStatus(StatusCode code, String message, String context) {
+    public static Status warningStatus(StatusCode code, String message, Map<String, Serializable> context) {
         return new Status(Level.WARNING, code, message, context);
     }
 
@@ -63,11 +62,11 @@ public class Status implements Serializable {
         return new Status(Level.INFO, code, message, null);
     }
 
-    public static Status infoStatus(StatusCode code, String message, String context) {
+    public static Status infoStatus(StatusCode code, String message, Map<String, Serializable> context) {
         return new Status(Level.INFO, code, message, context);
     }
 
-    private Status(Level level, StatusCode code, String message, String context) {
+    private Status(Level level, StatusCode code, String message, Map<String, Serializable> context) {
         this.level = level;
         this.code = code;
         this.message = requireNonNull(message);
@@ -86,8 +85,8 @@ public class Status implements Serializable {
         return level;
     }
 
-    public Optional<String> getContext() {
-        return Optional.ofNullable(context);
+    public Map<String, Serializable> getContext() {
+        return context;
     }
 
 }

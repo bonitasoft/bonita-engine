@@ -13,27 +13,30 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
-import org.bonitasoft.engine.bdm.validator.ValidationStatus;
-
 /**
+ * Validates an object of type T and returns a validation result of type R
+ *
+ * @param <T> the type of element that this validation rule supports
+ * @param <R> the type of the result of the validation
  * @author Romain Bioteau
+ * @author Emmanuel Duchastenier
  */
-public abstract class ValidationRule<T> {
+public abstract class ValidationRule<T, R> {
 
     private Class<T> classToApply;
 
     public ValidationRule(Class<T> classToApply) {
         this.classToApply = classToApply;
     }
-    
+
     public boolean appliesTo(Object modelElement) {
         return modelElement != null && classToApply.isAssignableFrom(modelElement.getClass());
     }
 
-    protected abstract ValidationStatus validate(T modelElement);
-    
+    protected abstract R validate(T modelElement);
+
     @SuppressWarnings("unchecked")
-    public ValidationStatus checkRule(Object modelElement) {
+    public R checkRule(Object modelElement) {
         if (!appliesTo(modelElement)) {
             throw new IllegalArgumentException(this.getClass().getName() + " doesn't handle validation for " + modelElement.getClass().getName());
         }

@@ -34,7 +34,11 @@ public class ExecutionResult implements Serializable {
     private List<Status> statuses = new ArrayList<>();
 
     public ExecutionResult(Status... statuses) {
-        this.statuses.addAll(asList(requireNonNull(statuses)));
+        this(asList(requireNonNull(statuses)));
+    }
+
+    public ExecutionResult(List<Status> statusList) {
+        this.statuses.addAll(requireNonNull(statusList));
     }
 
     public boolean isOk() {

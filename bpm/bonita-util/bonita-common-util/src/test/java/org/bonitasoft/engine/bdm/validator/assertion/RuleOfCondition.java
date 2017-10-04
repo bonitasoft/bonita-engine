@@ -14,15 +14,15 @@
 package org.bonitasoft.engine.bdm.validator.assertion;
 
 import org.assertj.core.api.Condition;
-
+import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 import org.bonitasoft.engine.bdm.validator.rule.ValidationRule;
 
 /**
  * @author Colin PUY
  */
-public class RuleOfCondition extends Condition<ValidationRule<?>> {
+public class RuleOfCondition extends Condition<ValidationRule<?, ValidationStatus>> {
 
-    public static RuleOfCondition ruleOf(Class<? extends ValidationRule<?>> ruleClass) {
+    public static RuleOfCondition ruleOf(Class<? extends ValidationRule<?, ValidationStatus>> ruleClass) {
         return new RuleOfCondition(ruleClass);
     }
 
@@ -33,7 +33,7 @@ public class RuleOfCondition extends Condition<ValidationRule<?>> {
     }
 
     @Override
-    public boolean matches(ValidationRule<?> rule) {
+    public boolean matches(ValidationRule<?, ValidationStatus> rule) {
         return rule.getClass().equals(ruleClass);
     }
 }

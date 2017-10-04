@@ -26,7 +26,7 @@ import org.bonitasoft.engine.bdm.validator.rule.ValidationRule;
  * 
  * @author Colin PUY
  */
-public class UniquenessCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
+public class UniquenessCompositionValidationRule extends ValidationRule<BusinessObjectModel, ValidationStatus> {
 
     public UniquenessCompositionValidationRule() {
         super(BusinessObjectModel.class);
@@ -38,7 +38,8 @@ public class UniquenessCompositionValidationRule extends ValidationRule<Business
         List<BusinessObject> alreadyComposedBOs = new ArrayList<>();
         for (BusinessObject compositeBO : bom.getReferencedBusinessObjectsByComposition()) {
             if (alreadyComposedBOs.contains(compositeBO)) {
-                validationStatus.addError("Business object " + compositeBO.getQualifiedName() + " is referenced by composition in two business objects, or is referenced several times in a single business object");
+                validationStatus.addError("Business object " + compositeBO.getQualifiedName()
+                        + " is referenced by composition in two business objects, or is referenced several times in a single business object");
             } else {
                 alreadyComposedBOs.add(compositeBO);
             }
