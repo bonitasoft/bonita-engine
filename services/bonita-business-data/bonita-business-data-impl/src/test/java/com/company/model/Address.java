@@ -14,6 +14,8 @@
 
 package com.company.model;
 
+import java.util.List;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
@@ -31,6 +33,10 @@ public class Address implements Entity {
     private Long persistenceVersion;
 
     private String street;
+
+    private Float number;
+
+    private List<Double> floors;
 
     @JsonIgnore
     private String doorCode;
@@ -67,6 +73,22 @@ public class Address implements Entity {
 
     public void setDoorCode(String doorCode) {
         this.doorCode = doorCode;
+    }
+
+    public Float getNumber() {
+        return number;
+    }
+
+    public void setNumber(Float number) {
+        this.number = number;
+    }
+
+    public List<Double> getFloors() {
+        return floors;
+    }
+
+    public void setFloors(List<Double> floors) {
+        this.floors = floors;
     }
 
 }

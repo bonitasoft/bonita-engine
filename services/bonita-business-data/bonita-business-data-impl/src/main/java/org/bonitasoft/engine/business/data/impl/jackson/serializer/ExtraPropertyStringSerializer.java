@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2017 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,29 +11,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.data.impl;
 
-/**
- * @author Matthieu Chaffotte
- */
-public class Link {
+package org.bonitasoft.engine.business.data.impl.jackson.serializer;
 
-    private final String rel;
+import java.util.Objects;
 
-    private final String href;
+public class ExtraPropertyStringSerializer extends ExtraPropertyStringAbstractSerializer<Object> {
 
-    public Link(final String rel, final String href) {
-        super();
-        this.rel = rel;
-        this.href = href;
-    }
-
-    public String getRel() {
-        return rel;
-    }
-
-    public String getHref() {
-        return href;
+    @Override
+    protected Object convert(Object value) {
+        return Objects.toString(value, null);
     }
 
 }
