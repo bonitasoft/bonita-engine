@@ -26,7 +26,7 @@ import org.bonitasoft.engine.bdm.validator.rule.ValidationRule;
  * 
  * @author Colin PUY
  */
-public class CyclicCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
+public class CyclicCompositionValidationRule extends ValidationRule<BusinessObjectModel, ValidationStatus> {
 
     public CyclicCompositionValidationRule() {
         super(BusinessObjectModel.class);

@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Colin PUY
  */
-public class SimpleFieldValidationRule extends ValidationRule<SimpleField> {
+public class SimpleFieldValidationRule extends ValidationRule<SimpleField, ValidationStatus> {
 
     public SimpleFieldValidationRule() {
         super(SimpleField.class);

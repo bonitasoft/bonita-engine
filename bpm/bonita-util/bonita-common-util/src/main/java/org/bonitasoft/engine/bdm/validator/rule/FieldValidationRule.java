@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class FieldValidationRule extends ValidationRule<Field> {
+public class FieldValidationRule extends ValidationRule<Field, ValidationStatus> {
 
     private static final int MAX_COLUMNAME_LENGTH = 50;
 
