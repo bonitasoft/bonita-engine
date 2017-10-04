@@ -15,9 +15,8 @@ package org.bonitasoft.engine.bdm.validator.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Test;
 
 /**
  * @author Colin PUY
@@ -82,7 +81,7 @@ public class ValidationRuleTest {
      * 
      * @author Colin PUY
      */
-    private class ExceptionRule extends ValidationRule<Exception> {
+    private class ExceptionRule extends ValidationRule<Exception, ValidationStatus> {
 
         private ValidationStatus validationStatus;
 

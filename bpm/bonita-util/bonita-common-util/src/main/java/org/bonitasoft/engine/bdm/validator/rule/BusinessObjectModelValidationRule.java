@@ -26,7 +26,7 @@ import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel> {
+public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel, ValidationStatus> {
 
     public BusinessObjectModelValidationRule() {
         super(BusinessObjectModel.class);

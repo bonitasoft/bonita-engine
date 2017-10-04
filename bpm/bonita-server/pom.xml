@@ -274,11 +274,6 @@
             <groupId>org.bonitasoft.engine.incident</groupId>
             <artifactId>bonita-incident</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.incident</groupId>
-            <artifactId>bonita-incident</artifactId>
-            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bonita-common-api</artifactId>

@@ -30,7 +30,7 @@ import org.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
-public class BusinessObjectValidationRule extends ValidationRule<BusinessObject> {
+public class BusinessObjectValidationRule extends ValidationRule<BusinessObject, ValidationStatus> {
 
     private static final String[] RESERVED_PACKAGE_PREFIX = { "com.bonitasoft.", "org.bonitasoft." };
 
