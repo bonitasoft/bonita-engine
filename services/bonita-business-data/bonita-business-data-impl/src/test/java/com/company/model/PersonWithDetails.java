@@ -28,12 +28,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.company.model.javassist.MethodHandlerImpl;
+import com.company.model.javassist.ProxyImpl;
+import com.company.model.javassist.ProxyObjectImpl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javassist.util.proxy.MethodHandler;
@@ -86,11 +90,19 @@ public class PersonWithDetails implements org.bonitasoft.engine.bdm.Entity {
     @JsonIgnore
     private List<Long> toIgnores = new ArrayList<>(10);
 
-    private Address address;
+    @OneToOne(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "PERSON_PID", nullable = false)
+    private Address address1;
+
+    @OneToOne(orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "PERSON_PID", nullable = false)
+    private Address address2;
 
     private List<Long> toIncludes = new ArrayList<>(10);
 
     private MethodHandler methodHandlerObject;
+
+    private List<Object> proxys = new ArrayList<>(10);
 
     public PersonWithDetails() {
         // needed by jackson (otherwise, add an annotation for constructor)
@@ -226,12 +238,20 @@ public class PersonWithDetails implements org.bonitasoft.engine.bdm.Entity {
         this.secretPhone = secretPhone;
     }
 
-    public Address getAddress() {
-        return address;
+    public Address getAddress1() {
+        return address1;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setAddress1(Address address1) {
+        this.address1 = address1;
+    }
+
+    public Address getAddress2() {
+        return address2;
+    }
+
+    public void setAddress2(Address address2) {
+        this.address2 = address2;
     }
 
     public MethodHandler getMethodHandlerObject() {
@@ -242,60 +262,16 @@ public class PersonWithDetails implements org.bonitasoft.engine.bdm.Entity {
         this.methodHandlerObject = methodHandlerObject;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        PersonWithDetails that = (PersonWithDetails) o;
-
-        if (persistenceId != null ? !persistenceId.equals(that.persistenceId) : that.persistenceId != null)
-            return false;
-        if (persistenceVersion != null ? !persistenceVersion.equals(that.persistenceVersion)
-                : that.persistenceVersion != null)
-            return false;
-        if (name != null ? !name.equals(that.name) : that.name != null)
-            return false;
-        if (age != null ? !age.equals(that.age) : that.age != null)
-            return false;
-        if (secretPhone != null ? !secretPhone.equals(that.secretPhone) : that.secretPhone != null)
-            return false;
-        if (phones != null ? !phones.equals(that.phones) : that.phones != null)
-            return false;
-        if (birthday != null ? !birthday.equals(that.birthday) : that.birthday != null)
-            return false;
-        if (hasMobile != null ? !hasMobile.equals(that.hasMobile) : that.hasMobile != null)
-            return false;
-        if (bools != null ? !bools.equals(that.bools) : that.bools != null)
-            return false;
-        if (toIgnores != null ? !toIgnores.equals(that.toIgnores) : that.toIgnores != null)
-            return false;
-        if (address != null ? !address.equals(that.address) : that.address != null)
-            return false;
-        if (toIncludes != null ? !toIncludes.equals(that.toIncludes) : that.toIncludes != null)
-            return false;
-        return methodHandlerObject != null ? methodHandlerObject.equals(that.methodHandlerObject)
-                : that.methodHandlerObject == null;
+    public void addToProxysAsMethodHandler(Object object) {
+        proxys.add(new MethodHandlerImpl(object));
     }
 
-    @Override
-    public int hashCode() {
-        int result = persistenceId != null ? persistenceId.hashCode() : 0;
-        result = 31 * result + (persistenceVersion != null ? persistenceVersion.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (age != null ? age.hashCode() : 0);
-        result = 31 * result + (secretPhone != null ? secretPhone.hashCode() : 0);
-        result = 31 * result + (phones != null ? phones.hashCode() : 0);
-        result = 31 * result + (birthday != null ? birthday.hashCode() : 0);
-        result = 31 * result + (hasMobile != null ? hasMobile.hashCode() : 0);
-        result = 31 * result + (bools != null ? bools.hashCode() : 0);
-        result = 31 * result + (toIgnores != null ? toIgnores.hashCode() : 0);
-        result = 31 * result + (address != null ? address.hashCode() : 0);
-        result = 31 * result + (toIncludes != null ? toIncludes.hashCode() : 0);
-        result = 31 * result + (methodHandlerObject != null ? methodHandlerObject.hashCode() : 0);
-        return result;
+    public void addToProxysAsProxyImpl(Object object) {
+        proxys.add(new ProxyImpl(object));
+    }
+
+    public void addToProxysAsProxyObjectImpl(Object object) {
+        proxys.add(new ProxyObjectImpl(object));
     }
 
 }

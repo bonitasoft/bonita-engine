@@ -19,11 +19,11 @@
     "links": [
       {
         "rel": "address",
-        "href": "/businessdata/org.bonita.pojo.Employee/1/address"
+        "href": "/businessdata/com.company.model.Employee/1/address"
       },
       {
-        "rel": "cat",
-        "href": "/businessdata/com.company.model.Employee/1/cat"
+        "rel": "Cat",
+        "href": "/businessdata/com.company.model.Employee/1/Cat"
       }
     ]
   }

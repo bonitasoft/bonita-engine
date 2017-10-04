@@ -23,25 +23,20 @@ import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 
 public class BusinessDataObjectMapper {
 
-    private ObjectMapper objectMapper;
-    private SimpleModule module;
+    protected ObjectMapper objectMapper;
 
     public BusinessDataObjectMapper() {
-        init();
-    }
-
-    public void init() {
         objectMapper = new ObjectMapper();
-        module = new SimpleModule();
+        // avoid to fail when serializing proxy (proxy will be recreated client side) see BS-16031
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
+        SimpleModule module = new SimpleModule();
         module.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
         module.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
         module.addSerializer(OffsetDateTime.class, new CustomOffsetDateTimeSerializer());
@@ -49,10 +44,6 @@ public class BusinessDataObjectMapper {
         module.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer());
         module.addDeserializer(OffsetDateTime.class, new CustomOffsetDateTimeDeserializer());
         objectMapper.registerModule(module);
-    }
-
-    public void addSerializer(JsonSerializer serializer) {
-        module.addSerializer(serializer);
     }
 
     public void writeValue(StringWriter writer, Entity entity) throws IOException {
@@ -71,17 +62,8 @@ public class BusinessDataObjectMapper {
         return objectMapper.readValue(result, loadClass);
     }
 
-    public void enableSerializationFeature(SerializationFeature serializationFeature) {
-        objectMapper.enable(serializationFeature);
-        ((DefaultSerializerProvider) objectMapper.getSerializerProvider()).flushCachedSerializers();
-    }
-
-    public void disableSerializationFeature(SerializationFeature serializationFeature) {
-        objectMapper.disable(serializationFeature);
-        ((DefaultSerializerProvider) objectMapper.getSerializerProvider()).flushCachedSerializers();
-    }
-
-    public byte[] writeValueAsBytes(Serializable result) throws JsonProcessingException {
+    public byte[] writeValueAsBytes(Serializable result) throws IOException {
         return objectMapper.writeValueAsBytes(result);
     }
+
 }
