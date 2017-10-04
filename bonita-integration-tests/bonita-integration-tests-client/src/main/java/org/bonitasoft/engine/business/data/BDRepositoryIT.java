@@ -18,7 +18,6 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.*;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -1246,8 +1246,6 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Test
     public void getBusinessDataCommand_should_return_json_entities() throws Exception {
-        final ProcessDefinition processDefinition;
-        final ProcessDefinitionBuilder processDefinitionBuilder;
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployee",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME).append("; import ").append(ADDRESS_QUALIFIED_NAME)
@@ -1265,7 +1263,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                         .append(" c;").toString(),
                 COUNTRY_QUALIFIED_NAME);
 
-        processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "rest", "1.0");
         final String bizDataName = "myEmployee";
         processDefinitionBuilder.addBusinessData("myCountry", COUNTRY_QUALIFIED_NAME, null);
@@ -1279,7 +1277,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step2");
 

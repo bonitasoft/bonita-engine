@@ -21,30 +21,28 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.company.model.Address;
 import com.company.model.Person;
 import com.company.model.PersonWithDetails;
 import com.company.model.Phone;
-
 import javassist.util.proxy.MethodHandler;
+import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JsonBusinessDataSerializerImplTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
-    private JsonBusinessDataSerializer jsonBusinessDataSerializer;
+    private JsonBusinessDataSerializerImpl jsonBusinessDataSerializer;
 
     private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
 
@@ -91,16 +89,17 @@ public class JsonBusinessDataSerializerImplTest {
     }
 
     @Test
-    public void patternUri_should_replace_field_value() throws Exception {
+    public void serialization_of_entity_should_use_fields_and_not_getters() throws Exception {
         //given
         EntitySerializerPojo value = createPojo();
 
         //when
-        final String serializedEntity = jsonBusinessDataSerializer.serializeEntity(value, null);
+        final String serializedEntity = jsonBusinessDataSerializer.serializeEntity(value,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        final String expectedJson = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream("EntitySerializerPojo.json")));
-        assertThatJson(serializedEntity).as("should replace field value").isEqualTo(expectedJson);
+        assertThatJson(serializedEntity).as("serialization uses fields instead of getters to compute json properties")
+                .isEqualTo(getJsonContent("EntitySerializerPojo.json"));
     }
 
     // =================================================================================================================
@@ -195,15 +194,27 @@ public class JsonBusinessDataSerializerImplTest {
         person.addToIncludes(6666L);
         person.addToIncludes(7777L);
 
-        Address address = new Address();
-        address.setPersistenceId(2598L);
-        address.setPersistenceVersion(99992598L);
-        address.setStreet("Rue Gustave Eiffel");
-        address.setDoorCode("my-secret-password");
-        person.setAddress(address);
+        Address address1 = new Address();
+        address1.setPersistenceId(2598L);
+        address1.setPersistenceVersion(99992598L);
+        address1.setStreet("Rue Gustave Eiffel");
+        address1.setNumber(32f);
+        address1.setFloors(Arrays.asList(1d, 4d));
+        address1.setDoorCode("my-secret-password");
+        person.setAddress1(address1);
+
+        Address address2 = new Address();
+        address2.setPersistenceId(358L);
+        address2.setPersistenceVersion(118L);
+        address2.setDoorCode(null);
+        person.setAddress2(address2);
 
         person.setMethodHandlerObject(mock(MethodHandler.class));
+        person.addToProxysAsMethodHandler("I love Maths");
+        person.addToProxysAsProxyImpl(365L);
+        person.addToProxysAsProxyObjectImpl(secretPhone);
 
         return person;
     }
+
 }

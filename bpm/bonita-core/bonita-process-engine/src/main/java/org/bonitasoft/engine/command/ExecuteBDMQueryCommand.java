@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.command;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -44,12 +43,7 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     public static final String MAX_RESULTS = "maxResults";
 
     // Avoid multiple instantiations for better performance, see BS-16794
-    private static final BusinessDataObjectMapper businessDataObjectMapper;
-    static {
-        businessDataObjectMapper = new BusinessDataObjectMapper();
-        //avoid to fail when serializing proxy (proxy will be recreated client side) see BS-16031
-        businessDataObjectMapper.disableSerializationFeature(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-    }
+    private static final BusinessDataObjectMapper businessDataObjectMapper = new BusinessDataObjectMapper();
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
@@ -85,7 +79,7 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     static byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
         try {
             return businessDataObjectMapper.writeValueAsBytes(result);
-        } catch (final JsonProcessingException jpe) {
+        } catch (final IOException jpe) {
             throw new SCommandExecutionException(jpe);
         }
     }
