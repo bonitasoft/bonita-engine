@@ -19,9 +19,11 @@ import org.bonitasoft.engine.business.data.impl.jackson.writer.LinkPropertyWrite
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonAppend;
 
-@JsonAppend(
-        props = {@JsonAppend.Prop(value = LinkPropertyWriter.class, name = "links", include = JsonInclude.Include.NON_EMPTY)}
-)
+@JsonAppend(props = {
+        @JsonAppend.Prop(value = LinkPropertyWriter.class, name = EntityMixin.PROPERTY_LINK, include = JsonInclude.Include.NON_EMPTY)
+})
 public abstract class EntityMixin {
-    // define json annotation that will be used on Entity instances
+
+    public static final String PROPERTY_LINK = "links";
+
 }
