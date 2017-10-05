@@ -64,6 +64,7 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
     public String serializeEntity(final Entity entity, final String businessDataURIPattern)
             throws SBusinessDataRepositorySerializationException {
         try {
+            LOG.trace("Serializing entity");
             String json = newObjectWriter(businessDataURIPattern).writeValueAsString(entity);
             LOG.trace("Serialization result: {}", json);
             return json;
@@ -74,9 +75,10 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
     }
 
     @Override
-    public String serializeEntity(final List<? extends Entity> entities, final String businessDataURIPattern) throws
-            SBusinessDataRepositorySerializationException {
+    public String serializeEntity(final List<? extends Entity> entities, final String businessDataURIPattern)
+            throws SBusinessDataRepositorySerializationException {
         try {
+            LOG.trace("Serializing a list of entities");
             String json = newObjectWriter(businessDataURIPattern).writeValueAsString(entities);
             LOG.trace("Serialization result: {}", json);
             return json;
@@ -92,4 +94,5 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
     @Override
     public void onDestroy(ClassLoader oldClassLoader) {
     }
+
 }
