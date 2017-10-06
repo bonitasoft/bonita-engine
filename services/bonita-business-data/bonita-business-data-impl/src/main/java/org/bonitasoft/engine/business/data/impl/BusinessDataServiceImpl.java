@@ -257,7 +257,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             throws SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         final List<? extends Entity> entities = businessDataRepository.findByIdentifiers(entityClass, identifiers);
-        return jsonBusinessDataSerializer.serializeEntity(entities, businessDataURIPattern);
+        return jsonBusinessDataSerializer.serializeEntities(entities, businessDataURIPattern);
     }
 
     @SuppressWarnings("unchecked")
@@ -287,7 +287,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         } else if (childEntity instanceof List) {
             final Class<?> type = (Class<?>) ((ParameterizedType) getterReturnType).getActualTypeArguments()[0];
             if (Entity.class.isAssignableFrom(type)) {
-                return jsonBusinessDataSerializer.serializeEntity((List<Entity>) childEntity, businessDataURIPattern);
+                return jsonBusinessDataSerializer.serializeEntities((List<Entity>) childEntity, businessDataURIPattern);
             }
         }
         return null;
@@ -314,7 +314,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 throw new SBusinessDataRepositoryException("unable to count results for query " + queryName);
             }
         }
-        Serializable jsonResults = jsonBusinessDataSerializer.serializeEntity((List<Entity>) list, businessDataURIPattern);
+        Serializable jsonResults = jsonBusinessDataSerializer.serializeEntities((List<Entity>) list, businessDataURIPattern);
         return new BusinessDataQueryResultImpl(jsonResults, businessDataQueryMetadata);
     }
 
