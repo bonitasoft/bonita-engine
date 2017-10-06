@@ -75,7 +75,7 @@ public class JsonBusinessDataSerializerImpl extends BusinessDataObjectMapper
     }
 
     @Override
-    public String serializeEntity(final List<? extends Entity> entities, final String businessDataURIPattern)
+    public String serializeEntities(final List<? extends Entity> entities, final String businessDataURIPattern)
             throws SBusinessDataRepositorySerializationException {
         try {
             LOG.trace("Serializing a list of entities");

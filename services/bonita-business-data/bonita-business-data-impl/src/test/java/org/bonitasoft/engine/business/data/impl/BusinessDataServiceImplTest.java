@@ -477,7 +477,7 @@ public class BusinessDataServiceImplTest {
         //then
         final List<Entity> list = new ArrayList<>();
         list.add(childEntity);
-        verify(jsonEntitySerializer).serializeEntity(list, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(jsonEntitySerializer).serializeEntities(list, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
     }
 
@@ -505,7 +505,7 @@ public class BusinessDataServiceImplTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        verify(jsonEntitySerializer).serializeEntity(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(jsonEntitySerializer).serializeEntities(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
     @Test
@@ -623,7 +623,7 @@ public class BusinessDataServiceImplTest {
 
         businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
-        verify(jsonEntitySerializer).serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        verify(jsonEntitySerializer).serializeEntities(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
     @Test(expected = SBusinessDataRepositoryException.class)
@@ -639,7 +639,7 @@ public class BusinessDataServiceImplTest {
         pojos.add(pojo1);
         pojos.add(pojo2);
         when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
-        when(jsonEntitySerializer.serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
+        when(jsonEntitySerializer.serializeEntities(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE))
                 .thenThrow(new SBusinessDataRepositorySerializationException("exception"));
 
         businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
