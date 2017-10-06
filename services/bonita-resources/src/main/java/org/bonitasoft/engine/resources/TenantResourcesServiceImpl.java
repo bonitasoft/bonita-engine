@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2016-2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -88,6 +88,15 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
         Map<String, Object> inputParameters = new HashMap<>(2);
         inputParameters.put("type", type);
         return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfType", inputParameters, STenantResource.class));
+    }
+
+    @Override
+    public long count(TenantResourceType type, String name) throws SBonitaReadException {
+        Map<String, Object> inputParameters = new HashMap<>(2);
+        inputParameters.put("type", type);
+        inputParameters.put("name", name);
+        return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfTypeAndName",
+                inputParameters, STenantResource.class));
     }
 
     @Override
