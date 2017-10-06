@@ -82,7 +82,7 @@ public class JsonBusinessDataSerializerImplTest {
         List<Entity> persons = IntStream.range(1, 3).mapToObj(i -> initPerson(i)).collect(Collectors.toList());
 
         // when
-        final String jsonPersonList = jsonBusinessDataSerializer.serializeEntity(persons, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        final String jsonPersonList = jsonBusinessDataSerializer.serializeEntities(persons, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         // then
         assertThatJson(jsonPersonList).as("entity list serialization").isEqualTo(getJsonContent("multiplePerson.json"));

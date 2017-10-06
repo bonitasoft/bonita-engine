@@ -23,6 +23,6 @@ public interface JsonBusinessDataSerializer {
 
     String serializeEntity(Entity entity, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
 
-    String serializeEntity(List<? extends Entity> entities, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
+    String serializeEntities(List<? extends Entity> entities, String businessDataURIPattern) throws SBusinessDataRepositorySerializationException;
 
 }
