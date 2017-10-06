@@ -46,6 +46,12 @@
         FROM org.bonitasoft.engine.resources.STenantResource AS r
         WHERE r.type = :type
     </query>
+    <query name="getNumberOfTenantResourcesOfTypeAndName">
+        SELECT count(r)
+        FROM org.bonitasoft.engine.resources.STenantResource AS r
+        WHERE r.type = :type
+        AND r.name = :name
+    </query>
 
     <query name="getTenantResource">
         SELECT r
