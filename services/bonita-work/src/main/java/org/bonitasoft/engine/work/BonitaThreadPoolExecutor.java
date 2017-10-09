@@ -35,20 +35,22 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private final WorkFactory workFactory;
     private final TechnicalLoggerService logger;
     private final EngineClock engineClock;
+    private final WorkExecutionCallback workExecutionCallback;
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
-                                    final int maximumPoolSize,
-                                    final long keepAliveTime,
-                                    final TimeUnit unit,
-                                    final BlockingQueue<Runnable> workQueue,
-                                    final ThreadFactory threadFactory,
+            final int maximumPoolSize,
+            final long keepAliveTime,
+            final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue,
+            final ThreadFactory threadFactory,
             final RejectedExecutionHandler handler, WorkFactory workFactory, final TechnicalLoggerService logger,
-            EngineClock engineClock) {
+            EngineClock engineClock, WorkExecutionCallback workExecutionCallback) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         this.workQueue = workQueue;
         this.workFactory = workFactory;
         this.logger = logger;
         this.engineClock = engineClock;
+        this.workExecutionCallback = workExecutionCallback;
     }
 
     @Override
@@ -74,22 +76,23 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     }
 
     @Override
-    public void submit(WorkDescriptor work, SuccessCallback onSuccess, FailureCallback onFailure) {
+    public void submit(WorkDescriptor work) {
         submit(() -> {
             if (work.getExecutionThreshold() != null && work.getExecutionThreshold().isAfter(engineClock.now())) {
                 // Future implementation should use a real delay e.g. using a ScheduledThreadPoolExecutor
                 // Will be executed later
-                submit(work, onSuccess, onFailure);
+                submit(work);
                 return;
             }
             BonitaWork bonitaWork = workFactory.create(work);
             HashMap<String, Object> context = new HashMap<>();
             try {
                 bonitaWork.work(context);
-                onSuccess.onSuccess(work);
+                workExecutionCallback.onSuccess(work);
             } catch (Exception e) {
-                onFailure.onFailure(work, bonitaWork, context, e);
+                workExecutionCallback.onFailure(work, bonitaWork, context, e);
             }
         });
     }
+
 }

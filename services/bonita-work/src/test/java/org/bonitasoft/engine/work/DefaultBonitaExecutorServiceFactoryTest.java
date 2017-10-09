@@ -27,6 +27,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class DefaultBonitaExecutorServiceFactoryTest {
     @Mock
     private WorkFactory workFactory;
+    @Mock
+    private WorkExecutionCallback workExecutionCallback;
 
     @Test
     public void ThreadNameInExecutorServiceShouldContainsTenantId() {
@@ -34,7 +36,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
         DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(null, workFactory, tenantId, 1,
                 20, 15, 10, new DefaultEngineClock());
 
-        BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();
+        BonitaExecutorService createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService(workExecutionCallback);
         Runnable r = () -> {
         };
 
