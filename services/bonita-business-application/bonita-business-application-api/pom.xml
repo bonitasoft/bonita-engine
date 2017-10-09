@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.recorder</groupId>
-            <artifactId>bonita-recorder-api</artifactId>
+            <artifactId>bonita-recorder</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
