@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta.
@@ -51,7 +51,7 @@ public class WorkExecutorServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(bonitaExecutorService).when(bonitaExecutorServiceFactory).createExecutorService();
+        doReturn(bonitaExecutorService).when(bonitaExecutorServiceFactory).createExecutorService(any());
         workExecutorService = new WorkExecutorServiceImpl(bonitaExecutorServiceFactory, loggerService, WORK_TERMINATION_TIMEOUT);
         workExecutorService.start();
         doReturn(true).when(bonitaExecutorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -62,8 +62,7 @@ public class WorkExecutorServiceImplTest {
 
         workExecutorService.execute(workDescriptor);
 
-        verify(bonitaExecutorService).submit(eq(workDescriptor), any(SuccessCallback.class),
-                any(FailureCallback.class));
+        verify(bonitaExecutorService).submit(eq(workDescriptor));
     }
 
     @Test
@@ -118,8 +117,7 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.execute(workDescriptor);
 
         // then
-        verify(bonitaExecutorService, times(1)).submit(eq(workDescriptor), any(SuccessCallback.class),
-                any(FailureCallback.class));
+        verify(bonitaExecutorService, times(1)).submit(eq(workDescriptor));
     }
 
     @Test
@@ -131,7 +129,7 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.start();
 
         // then: will only be started one time
-        verify(bonitaExecutorServiceFactory, times(1)).createExecutorService();
+        verify(bonitaExecutorServiceFactory, times(1)).createExecutorService(workExecutorService);
     }
 
     @Test
@@ -223,8 +221,7 @@ public class WorkExecutorServiceImplTest {
         workExecutorService.onFailure(workDescriptor, bonitaWork, Collections.emptyMap(),
                 new LockTimeoutException("lock timeout"));
 
-        verify(bonitaExecutorService).submit(eq(workDescriptor), any(SuccessCallback.class),
-                any(FailureCallback.class));
+        verify(bonitaExecutorService).submit(eq(workDescriptor));
     }
 
     @Test
