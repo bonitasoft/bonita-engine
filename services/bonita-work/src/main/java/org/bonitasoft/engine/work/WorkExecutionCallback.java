@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2017 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,21 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.work;
 
+import java.util.Map;
 
 /**
- * A factory to create executor service that will be given to the WorkService
- * 
- * @author Baptiste Mesta
+ * this a callback called when a work finish.
+ *
+ * @author Baptiste Mesta.
  */
-public interface BonitaExecutorServiceFactory {
+public interface WorkExecutionCallback {
 
-    /**
-     * Create a bonita executor service with the given {@link WorkExecutionCallback}
-     * @param workExecutionCallback this callback will be executed when a work complete.
-     * @return the {@link BonitaExecutorService}
-     */
-    BonitaExecutorService createExecutorService(WorkExecutionCallback workExecutionCallback);
+
+    void onSuccess(WorkDescriptor workDescriptor);
+
+    void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
+                   Exception thrown);
 
 }

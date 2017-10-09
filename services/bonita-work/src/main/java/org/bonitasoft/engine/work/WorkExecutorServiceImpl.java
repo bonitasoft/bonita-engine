@@ -25,7 +25,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 /**
  * @author Baptiste Mesta
  */
-public class WorkExecutorServiceImpl implements WorkExecutorService {
+public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecutionCallback {
 
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private BonitaExecutorService executor;
@@ -42,19 +42,18 @@ public class WorkExecutorServiceImpl implements WorkExecutorService {
     public void execute(WorkDescriptor work) {
         if (!isStopped()) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Submitted work %s", work));
-            executor.submit(work, this::onSuccess, this::onFailure);
+            executor.submit(work);
         } else {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG,
                     format("Ignored work submission (service stopped) %s", work));
         }
     }
 
-    protected void onSuccess(WorkDescriptor work) {
+    public void onSuccess(WorkDescriptor work) {
         loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Completed work %s", work));
     }
 
-    protected void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
-            Exception thrown) {
+    public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Exception thrown) {
         if (thrown instanceof LockTimeoutException) {
             //retry the work
             execute(work);
@@ -89,7 +88,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService {
     @Override
     public synchronized void start() {
         if (isStopped()) {
-            executor = bonitaExecutorServiceFactory.createExecutorService();
+            executor = bonitaExecutorServiceFactory.createExecutorService(this);
         }
     }
 

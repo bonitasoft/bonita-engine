@@ -44,6 +44,7 @@ public class BonitaThreadPoolExecutorTest {
 
     @Mock
     private TechnicalLoggerService technicalLoggerService;
+    private MyWorkExecutionCallback workExecutionCallback = new MyWorkExecutionCallback();
     private BonitaThreadPoolExecutor bonitaThreadPoolExecutor;
     private FixedEngineClock engineClock = new FixedEngineClock(Instant.now());
     private WorkFactory workFactory = workDescriptor -> new BonitaWork() {
@@ -77,55 +78,68 @@ public class BonitaThreadPoolExecutorTest {
         bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(3, 3, 1000, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(1000), threadFactory,
                 (r, executor) -> {
-                }, workFactory, technicalLoggerService, engineClock);
+                }, workFactory, technicalLoggerService, engineClock, workExecutionCallback);
     }
 
     @Test
     public void should_call_on_success_callback_when_work_executed_properly() throws Exception {
-        AtomicBoolean onSuccessCalled = new AtomicBoolean(false);
-        AtomicBoolean onFailureCalled = new AtomicBoolean(false);
+        WorkDescriptor workDescriptor = WorkDescriptor.create("NORMAL");
 
-        bonitaThreadPoolExecutor.submit(WorkDescriptor.create("NORMAL"),
-                workDescriptor -> onSuccessCalled.set(true),
-                (workDescriptor, bonitaWork, context, thrown) -> onFailureCalled.set(true));
+        bonitaThreadPoolExecutor.submit(workDescriptor);
 
-        await().until((Runnable) onSuccessCalled::get);
-        assertThat(onFailureCalled.get()).isFalse();
-        assertThat(onSuccessCalled.get()).isTrue();
+        await().until(() -> workExecutionCallback.isOnSuccessCalled());
+        assertThat(workExecutionCallback.isOnFailureCalled()).isFalse();
     }
 
     @Test
     public void should_call_on_failure_callback_when_work_executed_properly() throws Exception {
-        AtomicBoolean onSuccessCalled = new AtomicBoolean(false);
-        AtomicBoolean onFailureCalled = new AtomicBoolean(false);
+        WorkDescriptor workDescriptor = WorkDescriptor.create("EXCEPTION");
 
-        bonitaThreadPoolExecutor.submit(WorkDescriptor.create("EXCEPTION"),
-                workDescriptor -> onSuccessCalled.set(true),
-                (workDescriptor, bonitaWork, context, thrown) -> onFailureCalled.set(true));
+        bonitaThreadPoolExecutor.submit(workDescriptor);
 
-        await().until((Runnable) onFailureCalled::get);
-        assertThat(onFailureCalled.get()).isTrue();
-        assertThat(onSuccessCalled.get()).isFalse();
+        await().until(() -> workExecutionCallback.isOnFailureCalled());
+        assertThat(workExecutionCallback.isOnSuccessCalled()).isFalse();
     }
 
     @Test
     public void should_execute_work_after_specified_date() throws Exception {
-        AtomicBoolean onSuccessCalled = new AtomicBoolean(false);
-        WorkDescriptor myWorkDescriptor = WorkDescriptor.create("NORMAL");
-        myWorkDescriptor.mustBeExecutedAfter(Instant.now().plus(5, SECONDS));
+        WorkDescriptor workDescriptor = WorkDescriptor.create("NORMAL");
+        workDescriptor.mustBeExecutedAfter(Instant.now().plus(5, SECONDS));
 
-        bonitaThreadPoolExecutor.submit(myWorkDescriptor,
-                workDescriptor -> onSuccessCalled.set(true),
-                (workDescriptor, bonitaWork, context, thrown) -> {});
+        bonitaThreadPoolExecutor.submit(workDescriptor);
 
         //should still not be executed
         engineClock.addTime(1, SECONDS);
         Thread.sleep(50);
-        assertThat(onSuccessCalled.get()).isFalse();
+        assertThat(workExecutionCallback.isOnSuccessCalled()).isFalse();
 
         //add time, work should be executed
         engineClock.addTime(5, SECONDS);
-        await().until((Runnable) onSuccessCalled::get);
+        await().until(() -> workExecutionCallback.isOnSuccessCalled());
     }
 
+    private static class MyWorkExecutionCallback implements WorkExecutionCallback {
+
+        private final AtomicBoolean onSuccessCalled = new AtomicBoolean(false);
+        private final AtomicBoolean onFailureCalled = new AtomicBoolean(false);
+
+        @Override
+        public void onSuccess(WorkDescriptor workDescriptor) {
+            onSuccessCalled.set(true);
+        }
+
+        @Override
+        public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
+                Exception thrown) {
+            onFailureCalled.set(true);
+        }
+
+        public boolean isOnSuccessCalled() {
+            return onSuccessCalled.get();
+        }
+
+        public boolean isOnFailureCalled() {
+            return onFailureCalled.get();
+        }
+    }
 }

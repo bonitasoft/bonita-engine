@@ -34,7 +34,12 @@ public interface BonitaExecutorService {
      */
     void shutdownAndEmptyQueue();
 
-    void submit(WorkDescriptor work, SuccessCallback onSuccess, FailureCallback onFailure);
+
+    /**
+     * Execute the work described by the work descriptor
+     * @param work
+     */
+    void submit(WorkDescriptor work);
 
     boolean awaitTermination(long workTerminationTimeout, TimeUnit seconds) throws InterruptedException;
 
