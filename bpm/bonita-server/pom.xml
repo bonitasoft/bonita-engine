@@ -453,7 +453,7 @@
         <!-- Recorder -->
         <dependency>
             <groupId>org.bonitasoft.engine.recorder</groupId>
-            <artifactId>bonita-recorder-impl</artifactId>
+            <artifactId>bonita-recorder</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -726,8 +726,7 @@
                                     <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                                     <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
                                     <!-- Recorder -->
-                                    <include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
-                                    <include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
+                                    <include>org.bonitasoft.engine.recorder:bonita-recorder</include>
                                     <!-- Resources -->
                                     <include>org.bonitasoft.engine:bonita-resources</include>
                                     <!-- Scheduler -->
