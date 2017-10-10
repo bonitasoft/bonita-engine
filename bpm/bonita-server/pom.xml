@@ -365,7 +365,7 @@
         <!-- Platform Authentication -->
         <dependency>
             <groupId>org.bonitasoft.engine.platform.authentication</groupId>
-            <artifactId>bonita-platform-authentication-api-impl</artifactId>
+            <artifactId>bonita-platform-authentication</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -702,8 +702,7 @@
                                     <include>org.bonitasoft.engine.platform:bonita-platform-api</include>
                                     <include>org.bonitasoft.engine.platform:bonita-platform-impl</include>
                                     <!-- Platform Authentication -->
-                                    <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api</include>
-                                    <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication-api-impl</include>
+                                    <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication</include>
                                     <!-- Platform Command -->
                                     <include>org.bonitasoft.engine.platform.command:bonita-platform-command</include>
                                     <!-- Platform Login -->
