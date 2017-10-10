@@ -13,24 +13,25 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.command.ExecuteBDMQueryCommand.serializeResult;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.bonitasoft.engine.command.ExecuteBDMQueryCommandTest.ParametersBuilder.parameters;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.operation.pojo.Employee;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Romain Bioteau
@@ -42,79 +43,156 @@ public class ExecuteBDMQueryCommandTest {
     private ExecuteBDMQueryCommand command;
 
     @Mock
-    private BusinessDataRepository bdrService;
+    private BusinessDataRepository bdmRepository;
 
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
     @Before
     public void setUp() {
-        doReturn(bdrService).when(command).getBusinessDataRepository(tenantServiceAccessor);
+        when(tenantServiceAccessor.getBusinessDataRepository()).thenReturn(bdmRepository);
     }
 
     @Test
-    public void should_Execute_call_findByNamedQuery() throws Exception {
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Class<? extends Serializable> resultClass = String.class;
-        String queryName = "testQuery";
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
-        boolean returnsList = false;
+    public void execute_should_return_an_instance() throws Exception {
+        // given
+        Map<String, Serializable> queryParameters = new HashMap<>();
+        when(bdmRepository.findByNamedQuery("a_query", Employee.class, queryParameters))
+                .thenReturn(new Employee());
+        Map<String, Serializable> parameters = parameters().withQueryName("a_query")
+                .withReturnType(Employee.class.getName())
+                .withQueryParameters(queryParameters)
+                .withIsReturnList(false)
+                .build();
 
-        parameters.put(ExecuteBDMQueryCommand.QUERY_NAME, queryName);
-        parameters.put(ExecuteBDMQueryCommand.RETURN_TYPE, String.class.getName());
-        parameters.put(ExecuteBDMQueryCommand.QUERY_PARAMETERS, (Serializable) queryParameters);
-        parameters.put(ExecuteBDMQueryCommand.RETURNS_LIST, returnsList);
+        // when
+        byte[] result = (byte[]) command.execute(parameters, tenantServiceAccessor);
 
-        command.execute(parameters, tenantServiceAccessor);
-
-        verify(bdrService).findByNamedQuery(queryName, resultClass, queryParameters);
+        // then
+        assertThat(new String(result)).isEqualTo(
+                "{\"persistenceId\":null,\"persistenceVersion\":null,\"firstName\":null,\"lastName\":null}");
     }
 
     @Test
-    public void should_Execute_call_findListByNamedQuery() throws Exception {
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Class<? extends Serializable> resultClass = String.class;
-        String queryName = "testQuery";
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
-        boolean returnsList = true;
+    public void execute_should_return_an_instance_when_the_returnsList_parameter_is_not_set() throws Exception {
+        // given
+        Map<String, Serializable> queryParameters = new HashMap<>();
+        when(bdmRepository.findByNamedQuery("a_query", Employee.class, queryParameters))
+                .thenReturn(new Employee());
+        Map<String, Serializable> parameters = parameters().withQueryName("a_query")
+                .withReturnType(Employee.class.getName())
+                .withQueryParameters(queryParameters)
+                .build();
 
-        parameters.put(ExecuteBDMQueryCommand.QUERY_NAME, queryName);
-        parameters.put(ExecuteBDMQueryCommand.RETURN_TYPE, String.class.getName());
-        parameters.put(ExecuteBDMQueryCommand.QUERY_PARAMETERS, (Serializable) queryParameters);
-        parameters.put(ExecuteBDMQueryCommand.RETURNS_LIST, returnsList);
-        parameters.put(ExecuteBDMQueryCommand.START_INDEX, 0);
-        parameters.put(ExecuteBDMQueryCommand.MAX_RESULTS, 10);
+        // when
+        byte[] result = (byte[]) command.execute(parameters, tenantServiceAccessor);
 
-        command.execute(parameters, tenantServiceAccessor);
-
-        verify(bdrService).findListByNamedQuery(queryName, resultClass, queryParameters, 0, 10);
-    }
-
-    @Test(expected = SCommandParameterizationException.class)
-    public void should_Execute_throw_SCommandParameterizationException_if_no_query_name() throws Exception {
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(ExecuteBDMQueryCommand.QUERY_NAME, null);
-        command.execute(parameters, tenantServiceAccessor);
-        parameters.put(ExecuteBDMQueryCommand.QUERY_NAME, "");
-        command.execute(parameters, tenantServiceAccessor);
-    }
-
-    @Test(expected = SCommandParameterizationException.class)
-    public void should_Execute_throw_SCommandParameterizationException_if_no_return_type() throws Exception {
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(ExecuteBDMQueryCommand.RETURN_TYPE, null);
-        command.execute(parameters, tenantServiceAccessor);
-        parameters.put(ExecuteBDMQueryCommand.RETURN_TYPE, "");
-        command.execute(parameters, tenantServiceAccessor);
+        // then
+        assertThat(new String(result)).isEqualTo(
+                "{\"persistenceId\":null,\"persistenceVersion\":null,\"firstName\":null,\"lastName\":null}");
     }
 
     @Test
-    public void should_serialize_json_without_indentation_nor_line_feed() throws SCommandExecutionException {
-        TreeMap<String, String> parameters = new TreeMap<>(); // use a TreeMap type declaration as we need a Serializable and to ensure guaranteed order
-        parameters.put("param1", "value1");
-        parameters.put("param2", "value2");
-        parameters.put("param3", "value3");
-        assertThat(new String(serializeResult(parameters))).isEqualTo("{\"param1\":\"value1\",\"param2\":\"value2\",\"param3\":\"value3\"}");
+    public void execute_should_return_an_list() throws Exception {
+        // given
+        Map<String, Serializable> queryParameters = new HashMap<>();
+        when(bdmRepository.findListByNamedQuery("a_query", Employee.class, queryParameters, 0, 10))
+                .thenReturn(asList(new Employee(1L, 0L, "Walter", "Bates"), new Employee(2L, 0L, "Helen", "Kelly")));
+        Map<String, Serializable> parameters = parameters().withQueryName("a_query")
+                .withReturnType(Employee.class.getName())
+                .withQueryParameters(queryParameters)
+                .withIsReturnList(true)
+                .withStartIndex(0)
+                .withMaxResults(10)
+                .build();
+
+        // when
+        byte[] result = (byte[]) command.execute(parameters, tenantServiceAccessor);
+
+        // then
+        assertThat(new String(result)).as("json result").isEqualTo(
+                "[{\"persistenceId\":1,\"persistenceVersion\":0,\"firstName\":\"Walter\",\"lastName\":\"Bates\"}"
+                        + ",{\"persistenceId\":2,\"persistenceVersion\":0,\"firstName\":\"Helen\",\"lastName\":\"Kelly\"}]");
+    }
+
+    @Test
+    public void execute_should_fail_if_the_query_name_is_null() throws Exception {
+        // given
+        Map<String, Serializable> parameters = parameters().withQueryName(null)
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> command.execute(parameters, tenantServiceAccessor));
+
+        // then
+        assertThat(thrown).isInstanceOf(SCommandParameterizationException.class)
+                .hasMessageContaining("queryName");
+    }
+
+    @Test
+    public void execute_should_fail_if_the_return_type_is_empty() throws Exception {
+        // given
+        Map<String, Serializable> parameters = parameters().withQueryName("a_query")
+                .withReturnType(null)
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> command.execute(parameters, tenantServiceAccessor));
+
+        // then
+        assertThat(thrown).isInstanceOf(SCommandParameterizationException.class)
+                .hasMessageContaining("returnType");
+    }
+
+    // =================================================================================================================
+    // UTILS
+    // =================================================================================================================
+
+    static class ParametersBuilder {
+
+        private Map<String, Serializable> parameters = new HashMap<>();
+
+        private ParametersBuilder() {
+            // hidden
+        }
+
+        public static ParametersBuilder parameters() {
+            return new ParametersBuilder();
+        }
+
+        private ParametersBuilder withParameter(String name, Serializable value) {
+            parameters.put(name, value);
+            return this;
+        }
+
+        public ParametersBuilder withQueryName(String name) {
+            return withParameter(ExecuteBDMQueryCommand.QUERY_NAME, name);
+        }
+
+        public ParametersBuilder withReturnType(String className) {
+            return withParameter(ExecuteBDMQueryCommand.RETURN_TYPE, className);
+        }
+
+        public ParametersBuilder withQueryParameters(Map<String, Serializable> queryParameters) {
+            return withParameter(ExecuteBDMQueryCommand.QUERY_PARAMETERS, (Serializable) queryParameters);
+        }
+
+        public ParametersBuilder withIsReturnList(boolean isReturnList) {
+            return withParameter(ExecuteBDMQueryCommand.RETURNS_LIST, isReturnList);
+        }
+
+        public ParametersBuilder withStartIndex(int startIndex) {
+            return withParameter(ExecuteBDMQueryCommand.START_INDEX, startIndex);
+        }
+
+        public ParametersBuilder withMaxResults(int maxResults) {
+            return withParameter(ExecuteBDMQueryCommand.MAX_RESULTS, maxResults);
+        }
+
+        private Map<String, Serializable> build() {
+            return new HashMap<>(parameters);
+        }
+
     }
 
 }
