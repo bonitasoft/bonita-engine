@@ -30,6 +30,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
+        TestShades.class,
         BPMLocalSuiteTests.class,
         BPMRemoteTestsLocal.class,
         FormMappingIT.class,

@@ -29,7 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
-        TestShades.class,
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventIT.class,
         InterruptingTimerBoundaryEventIT.class,
