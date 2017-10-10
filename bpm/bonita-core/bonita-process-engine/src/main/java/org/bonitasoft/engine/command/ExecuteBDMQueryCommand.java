@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.command;
 
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
+
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bdm.serialization.BusinessDataObjectMapper;
@@ -48,35 +49,31 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final BusinessDataRepository businessDataRepository = getBusinessDataRepository(serviceAccessor);
         final String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
         @SuppressWarnings("unchecked")
         final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
         final String returnType = getStringMandadoryParameter(parameters, RETURN_TYPE);
-        Class<? extends Serializable> resultClass = null;
-        try {
-            resultClass = loadClass(returnType);
-        } catch (final ClassNotFoundException e) {
-            throw new SCommandParameterizationException(e);
-        }
+        Class<? extends Serializable> resultClass = loadClass(returnType);
+        final BusinessDataRepository businessDataRepository = serviceAccessor.getBusinessDataRepository();
         final Boolean returnsList = (Boolean) parameters.get(RETURNS_LIST);
-        if (returnsList != null && returnsList) {
+
+        final Serializable result;
+        if (toBoolean(returnsList)) {
             final Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
             final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
-            final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters, startIndex,
-                    maxResults);
-            return serializeResult((Serializable) list);
+            result = (Serializable) businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters,
+                    startIndex, maxResults);
+        } else {
+            try {
+                result = businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
+            } catch (final NonUniqueResultException e) {
+                throw new SCommandExecutionException(e);
+            }
         }
-        try {
-            final Serializable result = businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
-            return serializeResult(result);
-        } catch (final NonUniqueResultException e) {
-            throw new SCommandExecutionException(e);
-        }
+        return serializeResult(result);
     }
 
-    // Visible For Testing
-    static byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
+    private static byte[] serializeResult(final Serializable result) throws SCommandExecutionException {
         try {
             return businessDataObjectMapper.writeValueAsBytes(result);
         } catch (final IOException jpe) {
@@ -84,13 +81,13 @@ public class ExecuteBDMQueryCommand extends CommandWithParameters {
         }
     }
 
-    protected BusinessDataRepository getBusinessDataRepository(final TenantServiceAccessor serviceAccessor) {
-        return serviceAccessor.getBusinessDataRepository();
-    }
-
     @SuppressWarnings("unchecked")
-    protected Class<? extends Serializable> loadClass(final String returnType) throws ClassNotFoundException {
-        return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(returnType);
+    private Class<? extends Serializable> loadClass(final String returnType) throws SCommandParameterizationException {
+        try {
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(returnType);
+        } catch (final ClassNotFoundException e) {
+            throw new SCommandParameterizationException("Unable to load class for type " + returnType, e);
+        }
     }
 
 }

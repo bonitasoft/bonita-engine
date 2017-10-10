@@ -148,7 +148,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildCustomBOM());
 
-        assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
+        assertThat(getTenantAdministrationAPI().isPaused()).as("Tenant is paused?").isFalse();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().installBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
@@ -163,7 +163,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
         addEmployee("Matthieu", "Chaffotte", null);
     }
 
-    protected void loadClientJars() throws Exception {
+    private void loadClientJars() throws Exception {
         contextClassLoader = Thread.currentThread().getContextClassLoader();
         final byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
         final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader,
@@ -172,7 +172,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
     }
 
     @After
-    public void afterTest() throws BonitaException {
+    public void cleanClassLoader_and_uninstall_bdm() throws BonitaException {
         // reset previous classloader:
         if (contextClassLoader != null) {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
