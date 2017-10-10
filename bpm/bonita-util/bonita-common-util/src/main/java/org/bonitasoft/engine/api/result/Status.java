@@ -34,7 +34,7 @@ public class Status implements Serializable {
 
     private String message;
 
-    private Map<String, Serializable> context;
+    private StatusContext context;
 
     private StatusCode code;
 
@@ -43,7 +43,7 @@ public class Status implements Serializable {
     }
 
     public static Status errorStatus(StatusCode code, String message) {
-        return new Status(Level.ERROR, code, message, null);
+        return errorStatus(code, message, null);
     }
 
     public static Status errorStatus(StatusCode code, String message, Map<String, Serializable> context) {
@@ -51,7 +51,7 @@ public class Status implements Serializable {
     }
 
     public static Status warningStatus(StatusCode code, String message) {
-        return new Status(Level.WARNING, code, message, null);
+        return warningStatus(code, message, null);
     }
 
     public static Status warningStatus(StatusCode code, String message, Map<String, Serializable> context) {
@@ -59,7 +59,7 @@ public class Status implements Serializable {
     }
 
     public static Status infoStatus(StatusCode code, String message) {
-        return new Status(Level.INFO, code, message, null);
+        return infoStatus(code, message, null);
     }
 
     public static Status infoStatus(StatusCode code, String message, Map<String, Serializable> context) {
@@ -70,7 +70,7 @@ public class Status implements Serializable {
         this.level = level;
         this.code = code;
         this.message = requireNonNull(message);
-        this.context = context;
+        this.context = (context != null ? new StatusContext(context) : new StatusContext());
     }
 
     public StatusCode getCode() {
@@ -85,7 +85,7 @@ public class Status implements Serializable {
         return level;
     }
 
-    public Map<String, Serializable> getContext() {
+    public StatusContext getContext() {
         return context;
     }
 
