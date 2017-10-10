@@ -19,8 +19,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.bonitasoft.engine.io.IOUtil;
@@ -34,21 +32,8 @@ public class TestShades {
 
     @Test
     public void testShades() throws IOException {
-        String defaultMavenCommand = "mvn";
-        if(SystemUtils.IS_OS_WINDOWS){
-            defaultMavenCommand = "cmd /c mvn";
-        }
-        String mvn = System.getProperty("path.to.mvn", defaultMavenCommand);// to be overwritten in CI
         String version = BPMLocalIT.getBonitaVersion();
 
-        // print properties for debugging purpose
-        System.out.println("mvn path used: " + mvn);
-        System.out.println("bonita version detected: " + version);
-
-        Properties properties = System.getProperties();
-        for (Entry<Object, Object> prop : properties.entrySet()) {
-            System.out.println(prop.getKey() + ": " + prop.getValue());
-        }
 
         String thePom = getPom(version);
         File file = new File("shadeTester");
@@ -57,15 +42,14 @@ public class TestShades {
         try {
             File file2 = new File(file, "pom.xml");
             IOUtil.writeContentToFile(thePom, file2);
+            String mvn = getMavenExecutable();
+            System.out.println("mvn path used: " + mvn);
+            System.out.println("bonita version detected: " + version);
             System.out.println("building " + file2.getAbsolutePath());
             System.out.println("Run mvn in " + file.getAbsolutePath());
             Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", null, file);
-            InputStream inputStream = exec.getInputStream();
-            exec.getOutputStream().close();
-            exec.getErrorStream().close();
-            outputOfMaven = IOUtil.read(inputStream);
+            outputOfMaven = getOutputOfProcess(exec);
             System.out.println(outputOfMaven);
-            inputStream.close();
         } finally {
             IOUtil.deleteDir(file);
         }
@@ -82,6 +66,34 @@ public class TestShades {
             fail("the dependency tree contains other modules than server/client/common: \"" + part1 + " =====>>>>>" + part2 + " <<<<<=====" + part3);
         }
 
+    }
+
+    private String getMavenExecutable() throws IOException {
+        String pathToRoot = getPathToRoot();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return "cmd /c " + pathToRoot + File.separator + "mvnw.cmd";
+        } else {
+            return pathToRoot + File.separator + "mvnw";
+        }
+
+    }
+
+    protected String getPathToRoot() {
+        File file = new File("pom.xml");
+        return file.getAbsoluteFile().getParentFile().getParentFile().getParentFile().getAbsolutePath();
+    }
+
+    private String getOutputOfProcess(Process exec) throws IOException {
+        InputStream inputStream = exec.getInputStream();
+        exec.getOutputStream().close();
+        InputStream errorStream = exec.getErrorStream();
+        System.err.println(IOUtil.read(errorStream));
+        errorStream.close();
+
+        String outputOfMaven;
+        outputOfMaven = IOUtil.read(inputStream);
+        inputStream.close();
+        return outputOfMaven;
     }
 
     protected String removedIgnoredBonitaDeps(String outputOfMaven) {
