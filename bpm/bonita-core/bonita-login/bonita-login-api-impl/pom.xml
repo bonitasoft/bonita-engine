@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.authentication</groupId>
-			<artifactId>bonita-authentication-api</artifactId>
+			<artifactId>bonita-authentication</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

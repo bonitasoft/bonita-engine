@@ -99,7 +99,7 @@
         <!-- Authentication -->
         <dependency>
             <groupId>org.bonitasoft.engine.authentication</groupId>
-            <artifactId>bonita-authentication-api-impl</artifactId>
+            <artifactId>bonita-authentication</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -620,8 +620,7 @@
                                     <!-- Archive -->
                                     <include>org.bonitasoft.engine.archive:bonita-archive</include>
                                     <!-- Authentication -->
-                                    <include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
-                                    <include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
+                                    <include>org.bonitasoft.engine.authentication:bonita-authentication</include>
                                     <!-- Business application -->
                                     <inlude>org.bonitasoft.engine.application:bonita-business-application-api</inlude>
                                     <inlude>org.bonitasoft.engine.application:bonita-business-application-impl</inlude>
