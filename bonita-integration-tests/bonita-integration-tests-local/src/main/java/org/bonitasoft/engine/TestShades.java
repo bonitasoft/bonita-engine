@@ -47,7 +47,13 @@ public class TestShades {
             System.out.println("bonita version detected: " + version);
             System.out.println("building " + file2.getAbsolutePath());
             System.out.println("Run mvn in " + file.getAbsolutePath());
-            Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", null, file);
+            String localRepository = System.getProperty("localRepository");
+            String jvmProperties = "";
+            if (localRepository != null) {
+                System.out.println("Using overridden localRepository: " + localRepository);
+                jvmProperties += " \"-DlocalRepository=" + localRepository + "\"";
+            }
+            Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree" + jvmProperties, null, file);
             outputOfMaven = getOutputOfProcess(exec);
             System.out.println(outputOfMaven);
         } finally {
