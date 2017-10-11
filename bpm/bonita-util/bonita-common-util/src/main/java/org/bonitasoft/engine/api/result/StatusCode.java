@@ -48,6 +48,11 @@ public enum StatusCode {
     /**
      * A BDM Access Control rule refers to an unknown Business Object
      */
-    BDM_ACCESS_CONTROL_UNKNOWN_BUSINESS_OBJECT_REFERENCE
+    BDM_ACCESS_CONTROL_UNKNOWN_BUSINESS_OBJECT_REFERENCE,
+
+    /**
+     * A BDM Access Control rule refers to an unknown profile
+     */
+    BDM_ACCESS_CONTROL_UNKNOWN_PROFILE_REFERENCE
 
 }
