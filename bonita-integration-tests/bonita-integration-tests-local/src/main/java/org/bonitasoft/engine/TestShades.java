@@ -51,9 +51,11 @@ public class TestShades {
             String jvmProperties = "";
             if (localRepository != null) {
                 System.out.println("Using overridden localRepository: " + localRepository);
-                jvmProperties += " \"-Dmaven.repo.local==" + localRepository + "\"";
+                jvmProperties += " -Dmaven.repo.local=" + localRepository;
             }
-            Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree" + jvmProperties, null, file);
+            String command = mvn + " dependency:tree" + jvmProperties;
+            System.out.println("executing "+command);
+            Process exec = Runtime.getRuntime().exec(command, null, file);
             outputOfMaven = getOutputOfProcess(exec);
             System.out.println(outputOfMaven);
         } finally {
