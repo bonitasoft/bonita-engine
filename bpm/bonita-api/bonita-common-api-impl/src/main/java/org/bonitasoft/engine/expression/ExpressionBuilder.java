@@ -151,6 +151,13 @@ public class ExpressionBuilder {
                 .done();
     }
 
+    /**
+     * Creates an expression that will return an instance of {@link BusinessDataReference}
+     * 
+     * @param businessDataName the name of an already declared business data in the current process.
+     * @return an Expression representing the retrieval of a {@link BusinessDataReference} from the provided business data name
+     * @throws InvalidExpressionException if the expression is invalid
+     */
     public Expression createBusinessDataReferenceExpression(final String businessDataName) throws InvalidExpressionException {
         return createNewInstance(businessDataName).setContent(businessDataName).setExpressionType(ExpressionType.TYPE_BUSINESS_DATA_REFERENCE)
                 .setReturnType(BusinessDataReference.class.getName())
