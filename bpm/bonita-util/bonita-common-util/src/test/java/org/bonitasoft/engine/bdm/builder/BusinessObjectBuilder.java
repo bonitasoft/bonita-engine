@@ -46,6 +46,11 @@ public class BusinessObjectBuilder {
         return this;
     }
 
+    public BusinessObjectBuilder withField(final FieldBuilder fieldBuilder) {
+        businessObject.addField(fieldBuilder.build());
+        return this;
+    }
+
     public BusinessObjectBuilder withUniqueConstraint(final UniqueConstraint uniqueConstraint) {
         businessObject.addUniqueConstraint(uniqueConstraint);
         return this;

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -72,6 +73,11 @@ public class BusinessObject {
         uniqueConstraints = new ArrayList<>();
         queries = new ArrayList<>();
         indexes = new ArrayList<>();
+    }
+
+    public BusinessObject(String qualifiedName) {
+        this();
+        this.qualifiedName = qualifiedName;
     }
 
     public String getQualifiedName() {

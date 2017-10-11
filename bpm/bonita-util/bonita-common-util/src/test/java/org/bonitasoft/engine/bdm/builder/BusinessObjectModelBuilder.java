@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.bdm.builder;
 
+import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.*;
+
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
-import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
-import static org.bonitasoft.engine.bdm.builder.FieldBuilder.*;
 
 /**
  * @author Colin PUY
@@ -34,6 +35,11 @@ public class BusinessObjectModelBuilder {
 
     public BusinessObjectModelBuilder withBO(final BusinessObject bo) {
         businessObjectModel.addBusinessObject(bo);
+        return this;
+    }
+
+    public BusinessObjectModelBuilder withBO(final BusinessObjectBuilder boBuilder) {
+        businessObjectModel.addBusinessObject(boBuilder.build());
         return this;
     }
 
