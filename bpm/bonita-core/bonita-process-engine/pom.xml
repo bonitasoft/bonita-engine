@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.filter</groupId>
-            <artifactId>bonita-user-filter-api</artifactId>
+            <artifactId>bonita-user-filter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -410,12 +410,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
             <artifactId>bonita-form-mapping-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.core.filter</groupId>
-            <artifactId>bonita-user-filter-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
