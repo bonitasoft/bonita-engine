@@ -53,6 +53,11 @@ public enum StatusCode {
     /**
      * A BDM Access Control rule grants access to no attribute at all
      */
-    BDM_ACCESS_CONTROL_ZERO_ATTRIBUTE_GRANTED
+    BDM_ACCESS_CONTROL_ZERO_ATTRIBUTE_GRANTED,
+
+    /**
+     * A Business Object has no rule defined at all
+     */
+    BDM_ACCESS_CONTROL_BUSINESS_OBJECT_WITHOUT_RULE
 
 }
