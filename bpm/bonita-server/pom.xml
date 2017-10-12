@@ -393,7 +393,7 @@
         <!-- Process Comment -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.comment</groupId>
-            <artifactId>bonita-process-comment-api-impl</artifactId>
+            <artifactId>bonita-process-comment</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -710,8 +710,7 @@
                                     <!-- Platform Session -->
                                     <include>org.bonitasoft.engine.platform.session:bonita-platform-session</include>
                                     <!-- Process Comment -->
-                                    <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api</include>
-                                    <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment-api-impl</include>
+                                    <include>org.bonitasoft.engine.core.process.comment:bonita-process-comment</include>
                                     <!-- Process Definition -->
                                     <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
                                     <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
