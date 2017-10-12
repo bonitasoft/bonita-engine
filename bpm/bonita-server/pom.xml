@@ -379,7 +379,7 @@
         <!-- Platform Login -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.platform.login</groupId>
-            <artifactId>bonita-platform-login-api-impl</artifactId>
+            <artifactId>bonita-platform-login</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -705,8 +705,7 @@
                                     <!-- Platform Command -->
                                     <include>org.bonitasoft.engine.platform.command:bonita-platform-command</include>
                                     <!-- Platform Login -->
-                                    <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api</include>
-                                    <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login-api-impl</include>
+                                    <include>org.bonitasoft.engine.core.platform.login:bonita-platform-login</include>
                                     <!-- Platform Session -->
                                     <include>org.bonitasoft.engine.platform.session:bonita-platform-session</include>
                                     <!-- Process Comment -->

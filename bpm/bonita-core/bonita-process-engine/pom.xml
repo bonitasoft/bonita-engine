@@ -81,7 +81,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.platform.login</groupId>
-            <artifactId>bonita-platform-login-api</artifactId>
+            <artifactId>bonita-platform-login</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
