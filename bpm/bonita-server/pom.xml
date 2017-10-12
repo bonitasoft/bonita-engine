@@ -534,7 +534,7 @@
         <!-- User Filter -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.filter</groupId>
-            <artifactId>bonita-user-filter-impl</artifactId>
+            <artifactId>bonita-user-filter</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -745,8 +745,7 @@
                                     <!-- Technical Logs -->
                                     <include>org.bonitasoft.engine.log:bonita-log-technical</include>
                                     <!-- User Filter -->
-                                    <include>org.bonitasoft.engine.core.filter:bonita-user-filter-api</include>
-                                    <include>org.bonitasoft.engine.core.filter:bonita-user-filter-impl</include>
+                                    <include>org.bonitasoft.engine.core.filter:bonita-user-filter</include>
                                     <!-- Work -->
                                     <include>org.bonitasoft.engine.work:bonita-work</include>
                                     <!-- Web Commands -->
