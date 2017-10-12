@@ -483,7 +483,7 @@
         <!-- Supervisor Mapping -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-            <artifactId>bonita-supervisor-mapping-impl</artifactId>
+            <artifactId>bonita-supervisor-mapping</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -732,8 +732,7 @@
                                     <!-- Session -->
                                     <include>org.bonitasoft.engine.session:bonita-session</include>
                                     <!-- Supervisor Mapping -->
-                                    <include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-api</include>
-                                    <include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping-impl</include>
+                                    <include>org.bonitasoft.engine.core.supervisor.mapping:bonita-supervisor-mapping</include>
                                     <!-- Synchro-repository -->
                                     <include>org.bonitasoft.engine.synchro:bonita-synchro-service</include>
                                     <include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
