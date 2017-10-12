@@ -34,11 +34,6 @@
 			<version>${project.version}</version>
 		</dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-builder</artifactId>
             <version>${project.version}</version>

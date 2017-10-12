@@ -39,11 +39,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-common-api</artifactId>
 			<version>${project.version}</version>
