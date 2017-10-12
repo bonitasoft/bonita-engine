@@ -96,7 +96,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-            <artifactId>bonita-supervisor-mapping-api</artifactId>
+            <artifactId>bonita-supervisor-mapping</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -352,13 +352,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-        </dependency>
-        <dependency>
-            <!-- because we need the builderfactory impl and it does not make sense to mock them -->
-            <groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-            <artifactId>bonita-supervisor-mapping-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <!-- because we need the builderfactory impl and it does not make sense to mock them -->
