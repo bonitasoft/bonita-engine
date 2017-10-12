@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.comment</groupId>
-            <artifactId>bonita-process-comment-api</artifactId>
+            <artifactId>bonita-process-comment</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
