@@ -36,11 +36,6 @@ public enum StatusCode {
     BDM_ACCESS_CONTROL_RULE_NAME_DUPLICATION_ERROR,
 
     /**
-     * BDM Access Control: Several set of rules apply to the same Business Object. Solution: centralize them in the same set of rules
-     */
-    BDM_ACCESS_CONTROL_BUSINESS_OBJECT_REFERENCE_DUPLICATION_ERROR,
-
-    /**
      * A BDM Access Control rule refers to an unknown Business Object attribute
      */
     BDM_ACCESS_CONTROL_UNKNOWN_ATTRIBUTE_REFERENCE,
