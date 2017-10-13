@@ -220,7 +220,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
-            <artifactId>bonita-parameter-api</artifactId>
+            <artifactId>bonita-parameter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

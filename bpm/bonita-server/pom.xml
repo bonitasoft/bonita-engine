@@ -344,7 +344,7 @@
         <!-- Parameter -->
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
-            <artifactId>bonita-parameter-impl</artifactId>
+            <artifactId>bonita-parameter</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -690,8 +690,7 @@
                                     <!-- Page -->
                                     <include>org.bonitasoft.engine.page:bonita-page</include>
                                     <!-- Parameter -->
-                                    <include>org.bonitasoft.engine.core:bonita-parameter-api</include>
-                                    <include>org.bonitasoft.engine.core:bonita-parameter-impl</include>
+                                    <include>org.bonitasoft.engine.core:bonita-parameter</include>
                                     <!-- Persistence -->
                                     <include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
                                     <include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>
