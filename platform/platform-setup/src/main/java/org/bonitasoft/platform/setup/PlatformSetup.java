@@ -303,7 +303,7 @@ public class PlatformSetup {
             addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml");
             configurationService.storeTenantTemplateEngineConf(tenantTemplateConfigurations);
 
-            List<BonitaConfiguration> securityScripts = new ArrayList<>(1);
+            List<BonitaConfiguration> securityScripts = new ArrayList<>();
             addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "SamplePermissionRule.groovy.sample");
             configurationService.storeTenantTemplateSecurityScripts(securityScripts);
 

@@ -62,6 +62,7 @@ public class APICallContext implements Serializable {
      */
     private String body;
     private Map<String, String> filters = new HashMap<String, String>();
+    private Map<String, String[]> parameters = new HashMap<String, String[]>();
     private String searchTerm;
 
     /**
@@ -116,6 +117,14 @@ public class APICallContext implements Serializable {
                     addFilter(value);
                 } else if (SEARCH_TERM_KEY.equals(key)) {
                     searchTerm = value;
+                }
+                if (parameters.containsKey(key)) {
+                    String[] currentValue = parameters.get(key);
+                    String[] newValue = Arrays.copyOf(currentValue, currentValue.length + 1);
+                    newValue[currentValue.length] = value;
+                    parameters.put(key, newValue);
+                } else {
+                    parameters.put(key, new String[] { value });
                 }
             }
         }
@@ -247,6 +256,13 @@ public class APICallContext implements Serializable {
     public String getSearchTerm() {
         return searchTerm;
     }
+    
+    /**
+     * @return a Map containing the parameters of the request as they are set in the query string (including the filters and search terms)
+     */
+    public Map<String, String[]> getParameters() {
+        return parameters;
+    }
 
     @Override
     public String toString() {
@@ -275,6 +291,8 @@ public class APICallContext implements Serializable {
             return false;
         if (filters != null ? !filters.equals(that.filters) : that.filters != null)
             return false;
+        if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null)
+            return false;
         if (method != null ? !method.equals(that.method) : that.method != null)
             return false;
         if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null)
@@ -298,6 +316,7 @@ public class APICallContext implements Serializable {
         result = 31 * result + (queryString != null ? queryString.hashCode() : 0);
         result = 31 * result + (body != null ? body.hashCode() : 0);
         result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
         result = 31 * result + (searchTerm != null ? searchTerm.hashCode() : 0);
         return result;
     }
