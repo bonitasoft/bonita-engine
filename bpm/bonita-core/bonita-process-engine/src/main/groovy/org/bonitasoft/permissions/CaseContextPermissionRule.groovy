@@ -35,19 +35,25 @@ class CaseContextPermissionRule implements PermissionRule {
 
     @Override
     public boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
-        long currentUserId = apiSession.getUserId();
+        long currentUserId = apiSession.getUserId()
         def processAPI = apiAccessor.getProcessAPI()
         try {
             def caseId = getCaseId(apiCallContext)
             if (caseId <= 0) {
                 return true
             }
-            // isInvolvedInProcessInstance() already checks the archived and non-archived involvement:
-            def isInvolved = processAPI.isInvolvedInProcessInstance(currentUserId, caseId) || processAPI.isManagerOfUserInvolvedInProcessInstance(currentUserId, caseId)
-            if (isInvolved) {
-                return true;
+            def originalCaseId
+            if (apiCallContext.getResourceName().startsWith("archived")) {
+                originalCaseId = processAPI.getArchivedProcessInstance(caseId).getSourceObjectId()
+            } else {
+                originalCaseId = caseId
             }
-            def processDefinitionId;
+            // isInvolvedInProcessInstance() already checks the archived and non-archived involvement
+            def isInvolved = processAPI.isInvolvedInProcessInstance(currentUserId, originalCaseId) || processAPI.isManagerOfUserInvolvedInProcessInstance(currentUserId, originalCaseId)
+            if (isInvolved) {
+                return true
+            }
+            def processDefinitionId
             if (apiCallContext.getResourceName().startsWith("archived")) {
                 processDefinitionId = processAPI.getArchivedProcessInstance(caseId).getProcessDefinitionId()
             } else {
