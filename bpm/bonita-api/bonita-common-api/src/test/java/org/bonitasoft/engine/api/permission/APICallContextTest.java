@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.permission;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -92,9 +93,24 @@ public class APICallContextTest {
 
         assertThat(searchTerm).isEqualTo("toto");
     }
+    
+    @Test
+    public void should_return_allparameters() {
+        final APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d3&d=processId&param=1");
+
+        final Map<String, String[]> parameters = apiCallContext.getParameters();
+
+        assertThat(parameters).contains(entry("p", new String[]{ "0" }));
+        assertThat(parameters).contains(entry("c", new String[]{ "10" }));
+        assertThat(parameters).contains(entry("o", new String[]{ "priority%20DESC" }));
+        assertThat(parameters).contains(entry("f", new String[]{ "state%3dready", "user_id%3d3" }));
+        assertThat(parameters).contains(entry("d", new String[]{ "processId" }));
+        assertThat(parameters).contains(entry("param", new String[]{ "1" }));
+    }
 
     @Test
-    public void getSearchTerm_with_corrupt_earch_term() {
+    public void getSearchTerm_with_corrupt_search_term() {
         final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d104&d=processId&s=");
 
