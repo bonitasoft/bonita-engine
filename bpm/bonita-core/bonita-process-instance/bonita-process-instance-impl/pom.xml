@@ -85,7 +85,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.document</groupId>
-			<artifactId>bonita-document-api</artifactId>
+			<artifactId>bonita-document</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>
