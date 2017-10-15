@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-api</artifactId>
+			<artifactId>bonita-dependency</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -139,14 +139,6 @@
 				to mock them -->
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<!-- because we need the builderfactory impl and it does not make sense
-				to mock them -->
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
