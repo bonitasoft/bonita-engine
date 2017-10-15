@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.dependency</groupId>
-            <artifactId>bonita-dependency-api</artifactId>
+            <artifactId>bonita-dependency</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
