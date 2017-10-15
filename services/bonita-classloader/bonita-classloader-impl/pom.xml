@@ -68,11 +68,5 @@
 			<version>${slf4j.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 </project>
