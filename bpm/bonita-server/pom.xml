@@ -205,7 +205,7 @@
         <!-- Data Instance -->
         <dependency>
             <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <artifactId>bonita-data-instance-impl</artifactId>
+            <artifactId>bonita-data-instance</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -630,8 +630,7 @@
                                     <!-- Data Definition -->
                                     <include>org.bonitasoft.engine.data.definition:bonita-data-definition</include>
                                     <!-- Data Instance -->
-                                    <include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
-                                    <include>org.bonitasoft.engine.data.instance:bonita-data-instance-impl</include>
+                                    <include>org.bonitasoft.engine.data.instance:bonita-data-instance</include>
                                     <!-- Dependency -->
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
