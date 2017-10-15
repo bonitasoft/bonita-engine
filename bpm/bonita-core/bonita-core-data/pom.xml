@@ -1,18 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>bonita-core</artifactId>
-		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>7.6.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>bonita-core</artifactId>
+        <groupId>org.bonitasoft.engine.core</groupId>
+        <version>7.6.0-SNAPSHOT</version>
+    </parent>
 
-	<groupId>org.bonitasoft.engine.core.data</groupId>
-	<artifactId>bonita-core-data</artifactId>
-	<packaging>pom</packaging>
+    <groupId>org.bonitasoft.engine.core.data</groupId>
+    <artifactId>bonita-core-data</artifactId>
 
-	<modules>
-		<module>bonita-data-instance-transient</module>
-	</modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.bonitasoft.engine.data.instance</groupId>
+            <artifactId>bonita-data-instance-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.expression</groupId>
+            <artifactId>bonita-expression</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.cache</groupId>
+            <artifactId>bonita-cache</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.data.instance</groupId>
+            <artifactId>bonita-data-instance-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.recorder</groupId>
+            <artifactId>bonita-recorder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-read</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>

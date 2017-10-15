@@ -91,7 +91,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.data</groupId>
-            <artifactId>bonita-data-instance-transient</artifactId>
+            <artifactId>bonita-core-data</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
