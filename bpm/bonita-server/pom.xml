@@ -233,7 +233,7 @@
         <!-- Expression Resolver -->
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
-            <artifactId>bonita-expression-resolver-api-impl</artifactId>
+            <artifactId>bonita-expression-resolver</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -642,8 +642,7 @@
                                     <!-- Expression -->
                                     <include>org.bonitasoft.engine.expression:bonita-expression</include>
                                     <!-- Expression Resolver -->
-                                    <include>org.bonitasoft.engine.core:bonita-expression-resolver-api</include>
-                                    <include>org.bonitasoft.engine.core:bonita-expression-resolver-api-impl</include>
+                                    <include>org.bonitasoft.engine.core:bonita-expression-resolver</include>
                                     <!-- External Identity Mapping -->
                                     <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping</include>
                                     <!-- Form mapping -->
