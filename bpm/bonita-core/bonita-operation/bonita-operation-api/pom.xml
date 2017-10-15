@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <artifactId>bonita-data-instance-api</artifactId>
+            <artifactId>bonita-data-instance</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
