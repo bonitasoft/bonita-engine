@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-impl</artifactId>
+            <artifactId>bonita-process-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -34,11 +34,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-builder</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
