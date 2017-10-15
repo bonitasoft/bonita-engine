@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.contract.data</groupId>
-            <artifactId>bonita-contract-data-api</artifactId>
+            <artifactId>bonita-contract-data</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
