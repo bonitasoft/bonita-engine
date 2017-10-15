@@ -412,7 +412,7 @@
         <!-- Process Document -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.document</groupId>
-            <artifactId>bonita-document-impl</artifactId>
+            <artifactId>bonita-document</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -636,8 +636,7 @@
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
                                     <!-- Document -->
-                                    <include>org.bonitasoft.engine.core.document:bonita-document-api</include>
-                                    <include>org.bonitasoft.engine.core.document:bonita-document-impl</include>
+                                    <include>org.bonitasoft.engine.core.document:bonita-document</include>
                                     <!-- Event -->
                                     <include>org.bonitasoft.engine.events:bonita-events</include>
                                     <!-- Expression -->
