@@ -56,7 +56,7 @@
         <!-- Actor Mapping -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
-            <artifactId>bonita-actor-mapping-impl</artifactId>
+            <artifactId>bonita-actor-mapping</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -613,8 +613,7 @@
                                     <!-- Time Tracker -->
                                     <include>org.bonitasoft.engine:bonita-time-tracker</include>
                                     <!-- Actor Mapping -->
-                                    <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
-                                    <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
+                                    <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping</include>
                                     <!-- API -->
                                     <include>org.bonitasoft.engine.api:bonita-server-api-http</include>
                                     <!-- Archive -->
