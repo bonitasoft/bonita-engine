@@ -538,7 +538,7 @@
         <!-- Web Command (???) -->
         <dependency>
             <groupId>org.bonitasoft.engine.external</groupId>
-            <artifactId>bonita-web-commands</artifactId>
+            <artifactId>bonita-external</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -719,7 +719,7 @@
                                     <!-- Work -->
                                     <include>org.bonitasoft.engine.work:bonita-work</include>
                                     <!-- Web Commands -->
-                                    <include>org.bonitasoft.engine.external:bonita-web-commands</include>
+                                    <include>org.bonitasoft.engine.external:bonita-external</include>
                                     <!-- Web Profile -->
                                     <include>org.bonitasoft.engine.profile:bonita-profile</include>
                                     <!-- Web Theme -->
