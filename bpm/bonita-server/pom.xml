@@ -294,7 +294,7 @@
         <!-- Login -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.login</groupId>
-            <artifactId>bonita-login-api-impl</artifactId>
+            <artifactId>bonita-login</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -658,8 +658,7 @@
                                     <!-- Lock -->
                                     <include>org.bonitasoft.engine.lock:bonita-lock</include>
                                     <!-- Login -->
-                                    <include>org.bonitasoft.engine.core.login:bonita-login-api</include>
-                                    <include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
+                                    <include>org.bonitasoft.engine.core.login:bonita-login</include>
                                     <!-- Logs -->
                                     <include>org.bonitasoft.engine.log:bonita-log</include>
                                     <!-- Operation -->
