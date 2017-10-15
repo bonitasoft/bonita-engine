@@ -314,7 +314,7 @@
         <!-- Operation -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.operation</groupId>
-            <artifactId>bonita-operation-api-impl</artifactId>
+            <artifactId>bonita-operation-api</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -325,7 +325,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.operation</groupId>
-            <artifactId>bonita-operation-model-impl</artifactId>
+            <artifactId>bonita-operation-model</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -675,9 +675,7 @@
                                     <include>org.bonitasoft.engine.log:bonita-log</include>
                                     <!-- Operation -->
                                     <include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
-                                    <include>org.bonitasoft.engine.core.operation:bonita-operation-model-impl</include>
                                     <include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
-                                    <include>org.bonitasoft.engine.core.operation:bonita-operation-api-impl</include>
                                     <!-- Page -->
                                     <include>org.bonitasoft.engine.page:bonita-page</include>
                                     <!-- Parameter -->

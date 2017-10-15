@@ -16,8 +16,6 @@
 
 	<modules>
 		<module>bonita-operation-api</module>
-		<module>bonita-operation-api-impl</module>
 		<module>bonita-operation-model</module>
-		<module>bonita-operation-model-impl</module>
 	</modules>
 </project>  
