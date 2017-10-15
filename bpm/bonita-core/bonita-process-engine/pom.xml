@@ -86,7 +86,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core</groupId>
-            <artifactId>bonita-expression-resolver-api</artifactId>
+            <artifactId>bonita-expression-resolver</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
