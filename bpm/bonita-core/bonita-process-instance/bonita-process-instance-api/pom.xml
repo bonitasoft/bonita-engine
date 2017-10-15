@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-api</artifactId>
+            <artifactId>bonita-process-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

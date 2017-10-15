@@ -56,19 +56,13 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-api</artifactId>
+            <artifactId>bonita-process-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-api</artifactId>
+            <artifactId>bonita-process-definition</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -366,13 +366,6 @@
             <!-- because we need the builderfactory impl and it does not make sense to mock them -->
             <artifactId>bonita-data-instance-impl</artifactId>
             <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!-- because we need the builderfactory impl and it does not make sense to mock them -->
-            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
