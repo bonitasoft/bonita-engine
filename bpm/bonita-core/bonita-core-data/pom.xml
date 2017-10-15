@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <artifactId>bonita-data-instance-impl</artifactId>
+            <artifactId>bonita-data-instance</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -34,11 +34,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.cache</groupId>
             <artifactId>bonita-cache</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <artifactId>bonita-data-instance-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
