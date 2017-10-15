@@ -144,7 +144,7 @@
         <!-- Category -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.category</groupId>
-            <artifactId>bonita-category-api-impl</artifactId>
+            <artifactId>bonita-category</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -630,8 +630,7 @@
                                     <!-- Cache -->
                                     <include>org.bonitasoft.engine.cache:bonita-cache</include>
                                     <!-- Category -->
-                                    <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
-                                    <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
+                                    <include>org.bonitasoft.engine.core.category:bonita-category</include>
                                     <!-- Classloader -->
                                     <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
                                     <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
