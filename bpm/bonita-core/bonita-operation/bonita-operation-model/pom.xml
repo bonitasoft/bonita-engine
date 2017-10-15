@@ -19,5 +19,5 @@
 			<artifactId>bonita-expression</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 </project>
