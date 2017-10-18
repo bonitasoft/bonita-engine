@@ -58,6 +58,11 @@ public enum StatusCode {
     /**
      * A Business Object has no rule defined at all
      */
-    BDM_ACCESS_CONTROL_BUSINESS_OBJECT_WITHOUT_RULE
+    BDM_ACCESS_CONTROL_BUSINESS_OBJECT_WITHOUT_RULE,
+
+    /**
+     * A Business Object has empty rules
+     */
+    BDM_ACCESS_CONTROL_BUSINESS_OBJECT_WITH_EMPTY_RULES
 
 }
