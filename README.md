@@ -5,38 +5,42 @@ What it does?
 -------------
 This project builds Bonita Execution Engine (Community Edition)
 
+
 Requirements
 -------------
 >     Java JDK 1.8 or higher
->     Maven 3.3.9 or higher
+
+This project bundles the [Maven Wrapper](https://github.com/takari/maven-wrapper), so the `mvnw` script is available at
+the project root.
+
 
 Building the Engine
 -----------------
-just run the following Maven command:
+Just run the following Maven command:
 ```
-mvn clean install
+mvnw install
 ```
 
 To be able to successfully build the Bonita components that use the Engine, run:
 ```
- mvn clean install -Ppackage,javadoc
+ mvnw install -Ppackage,javadoc
 ```
 
 The command above runs all unit tests. To skip them, add "-DskipTests" option.
 
 To run all **unit + integration tests**, run the following command:
 ```
-mvn clean verify -Ptests
+mvnw verify -Ptests
 ```
 
-To run all **unit + integration tests**  on H2 run the following command:
+To run all **unit + integration tests** on H2 run the following command:
 ```
-mvn clean verify -Ptests
+mvnw verify -Ptests
 ```
 
-To run all **unit + integration tests**  on mysql, postgres or oracle using a _Docker_ container run the following command:
+To run all **unit + integration tests** on mysql, postgres or oracle using a _Docker_ container run the following command:
 ```
-mvn clean verify -Ptests,mysql
-mvn clean verify -Ptests,oracle
-mvn clean verify -Ptests,postgres
+mvnw verify -Ptests,mysql
+mvnw verify -Ptests,oracle
+mvnw verify -Ptests,postgres
 ```
