@@ -62,8 +62,11 @@ public class TestShades {
             jvmProperties += " -Dmaven.repo.local=" + localRepository;
         }
 
-        LOG.info("Get the dependency tree"); // they are supposed to have been built before running the test
-        final String mvnCommand = mvn + " -o dependency:tree" + jvmProperties;
+        LOG.info("Download the dependency plugin");
+        executeCommand(mvn + " dependency:help" + jvmProperties, workingDirectory, 1);
+
+        LOG.info("Run the dependency tree - offline"); // they are supposed to have been built before running the test
+        final String mvnCommand = mvn + " --offline dependency:tree --legacy-local-repository" + jvmProperties;
         String mavenOutput = executeCommand(mvnCommand, workingDirectory, 1);
         LOG.debug("Maven output: {}", mavenOutput);
 
@@ -135,6 +138,11 @@ public class TestShades {
         pom += "<groupId>test</groupId>\n";
         pom += "<artifactId>shadeTester</artifactId>\n";
         pom += "<version>0.0.1-SNAPSHOT</version>\n";
+        pom += "<build>\n<pluginManagement>\n<plugins>\n<plugin>\n";
+        pom += "<groupId>org.apache.maven.plugins</groupId>\n";
+        pom += "<artifactId>maven-dependency-plugin</artifactId>\n";
+        pom += "<version>2.8</version>\n";
+        pom += "</plugin>\n</plugins>\n</pluginManagement>\n</build>";
         pom += "<dependencies>\n";
         pom += generateDependencies(version);
         pom += "</dependencies>\n";
