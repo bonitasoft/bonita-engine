@@ -1,4 +1,4 @@
-bonita-engine
+bonita-engine [![Build Status](https://travis-ci.org/bonitasoft/bonita-engine.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-engine)
 =============
 
 What it does?
