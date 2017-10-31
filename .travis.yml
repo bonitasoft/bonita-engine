@@ -10,7 +10,7 @@ before_cache:
   # ensure that we do not keep bonitasoft artifacts accross builds
   - rm -f $HOME/.m2/repository/org/bonitasoft
 
-script: ./mvnw --show-version --errors clean verify -Ptests
+script: ./mvnw --show-version --errors test
 
 branches:
   only:
