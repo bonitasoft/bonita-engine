@@ -15,7 +15,9 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemErrRule;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -38,5 +40,20 @@ public class XStreamFactoryTest {
 
         //then
         assertThat(xStream2).as("should provide the xstream instance when we are in the same classloader").isSameAs(xStream);
+    }
+
+    @Rule
+    public SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+
+    @Test
+    public void xStream_should_not_warn_about_security() throws Exception {
+        // given:
+        final XStream xStream = XStreamFactory.getXStream();
+
+        // when:
+        xStream.fromXML("<org.bonitasoft.engine.commons.Container><id>17</id><type>executable</type></org.bonitasoft.engine.commons.Container>");
+
+        // then:
+        assertThat(systemErrRule.getLog()).doesNotContain("XStream is probably vulnerable");
     }
 }
