@@ -44,3 +44,8 @@ mvnw verify -Ptests,mysql
 mvnw verify -Ptests,oracle
 mvnw verify -Ptests,postgres
 ```
+
+How to contribute
+-----------------
+
+In order to contribute to the project, read the [guide](https://github.com/bonitasoft/bonita-developer-resources/blob/master/CONTRIBUTING.MD).
