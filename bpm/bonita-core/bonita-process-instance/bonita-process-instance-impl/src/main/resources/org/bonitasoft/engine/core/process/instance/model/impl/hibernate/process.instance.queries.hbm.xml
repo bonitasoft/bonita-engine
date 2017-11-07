@@ -697,7 +697,7 @@
 	</query>
 
 	<query name="searchSHumanTaskInstanceSupervisedBy">
-		SELECT a
+		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE a.logicalGroup1 =  supervisor.processDefId
