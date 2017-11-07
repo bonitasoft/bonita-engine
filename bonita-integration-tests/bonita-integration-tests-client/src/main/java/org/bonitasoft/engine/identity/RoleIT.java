@@ -305,6 +305,69 @@ public class RoleIT extends TestWithTechnicalUser {
     }
 
     @Test
+    public void getActiveUsersOfARole_should_return_all_active_users_of_the_role() throws BonitaException {
+        final String developer = "developer";
+        final Role role = getIdentityAPI().createRole(developer);
+
+        final User user1 = getIdentityAPI().createUser(new UserCreator("user1", "bpm").setEnabled(true));
+        final User user2 = getIdentityAPI().createUser(new UserCreator("user2", "bpm").setEnabled(true));
+        final User user3 = getIdentityAPI().createUser(new UserCreator("user3", "bpm").setEnabled(false));
+        final User user4 = getIdentityAPI().createUser(new UserCreator("user4", "bpm").setEnabled(true));
+        final List<Long> userIds = new ArrayList<>();
+        userIds.add(user1.getId());
+        userIds.add(user2.getId());
+        userIds.add(user3.getId());
+
+        final Group group = getIdentityAPI().createGroup("R&D", null);
+        getIdentityAPI().addUserMemberships(userIds, group.getId(), role.getId());
+
+        final List<User> users = getIdentityAPI().getActiveUsersInRole(role.getId(), 0, 10, UserCriterion.USER_NAME_ASC);
+        assertNotNull(users);
+        assertEquals(2, users.size());
+        assertEquals(user1, users.get(0));
+        assertEquals(user2, users.get(1));
+
+        getIdentityAPI().deleteUserMemberships(userIds, group.getId(), role.getId());
+        getIdentityAPI().deleteRole(role.getId());
+        getIdentityAPI().deleteGroup(group.getId());
+
+        getIdentityAPI().deleteUsers(userIds);
+        getIdentityAPI().deleteUser(user3.getId());
+        getIdentityAPI().deleteUser(user4.getId());
+    }
+
+    @Test
+    public void getInactiveUsersOfARole_should_return_all_inactive_users_of_the_role() throws BonitaException {
+        final String developer = "developer";
+        final Role role = getIdentityAPI().createRole(developer);
+
+        final User user1 = getIdentityAPI().createUser(new UserCreator("user1", "bpm").setEnabled(true));
+        final User user2 = getIdentityAPI().createUser(new UserCreator("user2", "bpm").setEnabled(true));
+        final User user3 = getIdentityAPI().createUser(new UserCreator("user3", "bpm").setEnabled(false));
+        final User user4 = getIdentityAPI().createUser(new UserCreator("user4", "bpm").setEnabled(false));
+        final List<Long> userIds = new ArrayList<>();
+        userIds.add(user1.getId());
+        userIds.add(user2.getId());
+        userIds.add(user3.getId());
+
+        final Group group = getIdentityAPI().createGroup("R&D", null);
+        getIdentityAPI().addUserMemberships(userIds, group.getId(), role.getId());
+
+        final List<User> users = getIdentityAPI().getInactiveUsersInRole(role.getId(), 0, 10, UserCriterion.USER_NAME_ASC);
+        assertNotNull(users);
+        assertEquals(1, users.size());
+        assertEquals(user3, users.get(0));
+
+        getIdentityAPI().deleteUserMemberships(userIds, group.getId(), role.getId());
+        getIdentityAPI().deleteRole(role.getId());
+        getIdentityAPI().deleteGroup(group.getId());
+
+        getIdentityAPI().deleteUsers(userIds);
+        getIdentityAPI().deleteUser(user3.getId());
+        getIdentityAPI().deleteUser(user4.getId());
+    }
+
+    @Test
     public void getNumberOfUsersInRole() throws BonitaException {
         final String developer = "developer";
         final Role role = getIdentityAPI().createRole(developer);
