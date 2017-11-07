@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine;
 
+import org.bonitasoft.engine.activity.ContractIT;
 import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.business.application.ApplicationIT;
 import org.bonitasoft.engine.business.data.BDRepositoryIT;
@@ -40,6 +41,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+        ContractIT.class,
         PlatformLoginIT.class,
         RemoteEngineIT.class, // this class is only in remote (we test that server stack trace are reported in client side)
         ImportActorMappingIT.class,
