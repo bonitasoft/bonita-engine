@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2017 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,10 +24,8 @@ import org.bonitasoft.engine.bdm.serialization.CustomLocalDateDeserializer;
 import org.bonitasoft.engine.bdm.serialization.CustomLocalDateTimeDeserializer;
 import org.bonitasoft.engine.bdm.serialization.CustomOffsetDateTimeDeserializer;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -52,12 +50,12 @@ public class BusinessObjectDeserializer {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T deserialize(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
+    public <T> T deserialize(final byte[] serializedResult, final Class<T> targetType) throws IOException {
         return (T) mapper.readValue(serializedResult, createJavaType(targetType));
     }
 
     @SuppressWarnings("unchecked")
-    public <T> List<T> deserializeList(final byte[] serializedResult, final Class<T> targetType) throws JsonParseException, JsonMappingException, IOException {
+    public <T> List<T> deserializeList(final byte[] serializedResult, final Class<T> targetType) throws IOException {
         return (List<T>) mapper.readValue(serializedResult, createListJavaType(targetType));
     }
 
