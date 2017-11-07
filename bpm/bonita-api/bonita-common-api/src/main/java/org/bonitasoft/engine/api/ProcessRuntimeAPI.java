@@ -1419,7 +1419,7 @@ public interface ProcessRuntimeAPI {
      * Cancels the process instance and all of its active flow nodes.
      *
      * @param processInstanceId
-     *        The identifier of the process instance.
+     *        The identifier of the root process instance.
      * @throws ProcessInstanceNotFoundException
      *         If the process instance identifier does not refer to a process instance.
      * @throws UpdateException
@@ -1642,8 +1642,8 @@ public interface ProcessRuntimeAPI {
     /**
      * List the named human tasks belonging to the specified process instance.
      *
-     * @param processInstanceId
-     *        The identifier of the process instance.
+     * @param rootProcessInstanceId
+     *        The identifier of the root process instance.
      * @param taskName
      *        The name of the required human tasks.
      * @param startIndex
@@ -1655,13 +1655,13 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    List<HumanTaskInstance> getHumanTaskInstances(long processInstanceId, String taskName, int startIndex, int maxResults);
+    List<HumanTaskInstance> getHumanTaskInstances(long rootProcessInstanceId, String taskName, int startIndex, int maxResults);
 
     /**
      * Return the last created human task instance with the specified name for the given process instance.
      *
-     * @param processInstanceId
-     *        The identifier of the process instance.
+     * @param rootProcessInstanceId
+     *        The identifier of the root process instance.
      * @param taskName
      *        The name of the required human task.
      * @return A HumanTaskInstance, in its latest state.
@@ -1671,7 +1671,7 @@ public interface ProcessRuntimeAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
-    HumanTaskInstance getLastStateHumanTaskInstance(long processInstanceId, String taskName) throws NotFoundException;
+    HumanTaskInstance getLastStateHumanTaskInstance(long rootProcessInstanceId, String taskName) throws NotFoundException;
 
     /**
      * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are not considered.
@@ -1840,7 +1840,7 @@ public interface ProcessRuntimeAPI {
      * It does not return the process instance of the given id (itself).
      *
      * @param processInstanceId
-     *        The identifier of the process definition.
+     *        The identifier of the process instance.
      * @param startIndex
      *        The index of the page to be returned (starting at 0).
      * @param maxResults
