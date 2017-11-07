@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -44,8 +43,6 @@ import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembership;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembershipsOfGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetUserMembershipsOfRole;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersInGroup;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetUsersInRole;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateGroup;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateMembershipByRoleIdAndGroupId;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -580,40 +577,74 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SUserBuilderFactory sUserfactory = BuilderFactory.get(SUserBuilderFactory.class);
-        String field = null;
-        OrderByType order = null;
-        switch (criterion) {
-            case FIRST_NAME_ASC:
-                field = sUserfactory.getFirstNameKey();
-                order = OrderByType.ASC;
-                break;
-            case LAST_NAME_ASC:
-                field = sUserfactory.getLastNameKey();
-                order = OrderByType.ASC;
-                break;
-            case USER_NAME_ASC:
-                field = sUserfactory.getUserNameKey();
-                order = OrderByType.ASC;
-                break;
-            case FIRST_NAME_DESC:
-                field = sUserfactory.getFirstNameKey();
-                order = OrderByType.DESC;
-                break;
-            case LAST_NAME_DESC:
-                field = sUserfactory.getLastNameKey();
-                order = OrderByType.DESC;
-                break;
-            case USER_NAME_DESC:
-                field = sUserfactory.getUserNameKey();
-                order = OrderByType.DESC;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
+        Sort sort = getSortFromCriterion(criterion, sUserfactory);
         try {
-            final GetUsersInRole getUsersInRole = new GetUsersInRole(roleId, startIndex, maxResults, field, order, identityService);
-            getUsersInRole.execute();
-            return ModelConvertor.toUsers(getUsersInRole.getResult());
+            return ModelConvertor.toUsers(identityService.getUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getActiveUsersInRole(long roleId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserfactory = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserfactory);
+        try {
+            return ModelConvertor.toUsers(identityService.getActiveUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getInactiveUsersInRole(long roleId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserfactory = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserfactory);
+        try {
+            return ModelConvertor.toUsers(identityService.getInactiveUsersWithRole(roleId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserfactory = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserfactory);
+        try {
+            return ModelConvertor.toUsers(identityService.getUsersWithManager(managerId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getActiveUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserfactory = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserfactory);
+        try {
+            return ModelConvertor.toUsers(identityService.getActiveUsersWithManager(managerId, startIndex, maxResults, sort.getField(), sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getInactiveUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserfactory = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserfactory);
+        try {
+            return ModelConvertor.toUsers(identityService.getInactiveUsersWithManager(managerId, startIndex, maxResults, sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -633,44 +664,42 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public List<User> getUsersInGroup(final long groupId, final int startIndex, final int maxResults, final UserCriterion crterion) {
+    public List<User> getUsersInGroup(final long groupId, final int startIndex, final int maxResults, final UserCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SUserBuilderFactory sUserFact = BuilderFactory.get(SUserBuilderFactory.class);
-        String field = null;
-        OrderByType order = null;
-        switch (crterion) {
-            case FIRST_NAME_ASC:
-                field = sUserFact.getFirstNameKey();
-                order = OrderByType.ASC;
-                break;
-            case LAST_NAME_ASC:
-                field = sUserFact.getLastNameKey();
-                order = OrderByType.ASC;
-                break;
-            case USER_NAME_ASC:
-                field = sUserFact.getUserNameKey();
-                order = OrderByType.ASC;
-                break;
-            case FIRST_NAME_DESC:
-                field = sUserFact.getFirstNameKey();
-                order = OrderByType.DESC;
-                break;
-            case LAST_NAME_DESC:
-                field = sUserFact.getLastNameKey();
-                order = OrderByType.DESC;
-                break;
-            case USER_NAME_DESC:
-                field = sUserFact.getUserNameKey();
-                order = OrderByType.DESC;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
+        Sort sort = getSortFromCriterion(criterion, sUserFact);
         try {
-            final GetUsersInGroup getUsersOfGroup = new GetUsersInGroup(groupId, startIndex, maxResults, order, field, identityService);
-            getUsersOfGroup.execute();
-            return ModelConvertor.toUsers(getUsersOfGroup.getResult());
+            return ModelConvertor.toUsers(identityService.getUsersInGroup(groupId, startIndex, maxResults, sort.getField(),
+                    sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getActiveUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserFact = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserFact);
+        try {
+            return ModelConvertor.toUsers(identityService.getActiveUsersInGroup(groupId, startIndex, maxResults, sort.getField(),
+                    sort.getOrder()));
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+
+    }
+
+    @Override
+    public List<User> getInactiveUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final SUserBuilderFactory sUserFact = BuilderFactory.get(SUserBuilderFactory.class);
+        Sort sort = getSortFromCriterion(criterion, sUserFact);
+        try {
+            return ModelConvertor.toUsers(identityService.getInactiveUsersInGroup(groupId, startIndex, maxResults, sort.getField(), sort.getOrder()));
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -917,7 +946,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             throw new CreationException("Cannot create a null group");
         }
         String groupName = creator.getFields().get(GroupCreator.GroupField.NAME).toString();
-        if(groupName.contains("/")){
+        if (groupName.contains("/")) {
             throw new InvalidGroupNameException("Cannot create a group with '/' in its name");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -969,9 +998,9 @@ public class IdentityAPIImpl implements IdentityAPI {
         String parentPath = updater.getFields().get(GroupField.PARENT_PATH) != null ? updater.getFields().get(GroupField.PARENT_PATH).toString() : "";
         sb.append(parentPath).append("/").append(name);
         try {
-            if(updatedName != null) {
+            if (updatedName != null) {
                 SGroup group = identityService.getGroupByPath(sb.toString());
-                if(group.getId() != groupId) {
+                if (group.getId() != groupId) {
                     throw new AlreadyExistsException("Group named \"" + name + "\" already exists");
                 }
             }
@@ -1151,7 +1180,7 @@ public class IdentityAPIImpl implements IdentityAPI {
      * Check / update process resolution information, for all processes in a list of actor IDs.
      */
     private void updateActorProcessDependencies(final TenantServiceAccessor tenantAccessor, final ActorMappingService actorMappingService,
-                                                final Set<Long> removedActorIds) throws SBonitaException {
+            final Set<Long> removedActorIds) throws SBonitaException {
         final Set<Long> processDefinitionIds = new HashSet<>(removedActorIds.size());
         for (final Long actorId : removedActorIds) {
             final GetActor getActor = new GetActor(actorMappingService, actorId);
@@ -1457,7 +1486,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy) throws OrganizationImportException{
+    public List<String> importOrganizationWithWarnings(String organizationContent, ImportPolicy policy) throws OrganizationImportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final SCustomUserInfoValueBuilderFactory creatorFactory = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
@@ -1533,6 +1562,52 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
+    @Override
+    public Icon getIcon(long id) throws NotFoundException {
+        try {
+            SIcon icon = getTenantAccessor().getIdentityService().getIcon(id);
+            if (icon == null) {
+                throw new NotFoundException("unable to find icon with id " + id);
+            }
+            return ModelConvertor.toIcon(icon);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    private Sort getSortFromCriterion(UserCriterion criterion, SUserBuilderFactory sUserFact) {
+        Sort sort = new Sort();
+        switch (criterion) {
+            case FIRST_NAME_ASC:
+                sort.setField(sUserFact.getFirstNameKey());
+                sort.setOrder(OrderByType.ASC);
+                break;
+            case LAST_NAME_ASC:
+                sort.setField(sUserFact.getLastNameKey());
+                sort.setOrder(OrderByType.ASC);
+                break;
+            case USER_NAME_ASC:
+                sort.setField(sUserFact.getUserNameKey());
+                sort.setOrder(OrderByType.ASC);
+                break;
+            case FIRST_NAME_DESC:
+                sort.setField(sUserFact.getFirstNameKey());
+                sort.setOrder(OrderByType.DESC);
+                break;
+            case LAST_NAME_DESC:
+                sort.setField(sUserFact.getLastNameKey());
+                sort.setOrder(OrderByType.DESC);
+                break;
+            case USER_NAME_DESC:
+                sort.setField(sUserFact.getUserNameKey());
+                sort.setOrder(OrderByType.DESC);
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+        return sort;
+    }
+
     private CustomUserInfoAPIDelegate createCustomUserInfoAPI() {
         return new CustomUserInfoAPIDelegate(getTenantAccessor().getIdentityService());
     }
@@ -1546,16 +1621,35 @@ public class IdentityAPIImpl implements IdentityAPI {
                 BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class));
     }
 
-    @Override
-    public Icon getIcon(long id) throws NotFoundException {
-        try {
-            SIcon icon = getTenantAccessor().getIdentityService().getIcon(id);
-            if (icon == null) {
-                throw new NotFoundException("unable to find icon with id " + id);
-            }
-            return ModelConvertor.toIcon(icon);
-        } catch (SBonitaReadException e) {
-            throw new RetrieveException(e);
+    private class Sort {
+
+        private String field = null;
+        private OrderByType order = null;
+
+        private Sort() {
+
+        }
+
+        private Sort(String field, OrderByType order) {
+            this.field = field;
+            this.order = order;
+        }
+
+        private String getField() {
+            return field;
+        }
+
+        private void setField(String field) {
+            this.field = field;
+        }
+
+        private OrderByType getOrder() {
+            return order;
+        }
+
+        private void setOrder(OrderByType order) {
+            this.order = order;
         }
     }
+
 }

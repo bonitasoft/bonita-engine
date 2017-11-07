@@ -15,9 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.Arrays;
@@ -32,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IdentityAPIImplTest {
@@ -73,5 +71,4 @@ public class IdentityAPIImplTest {
         //when
         identityAPI.getUserIdsWithCustomUserInfo("skills", "Java", true, 0, 10);
     }
-
 }
