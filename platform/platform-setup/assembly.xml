@@ -8,7 +8,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
             <directory>src/main/standalone</directory>
             <includes>
                 <include>*.sh</include>
@@ -17,7 +17,7 @@
             <fileMode>740</fileMode>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
             <directory>src/main/standalone</directory>
             <fileMode>0640</fileMode>
         </fileSet>
@@ -28,7 +28,7 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <unpack>false</unpack>
             <scope>runtime</scope>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
             <directoryMode>640</directoryMode>
             <fileMode>640</fileMode>
         </dependencySet>
@@ -48,7 +48,7 @@
                 </excludes>
             </unpackOptions>
             <scope>test</scope>
-            <outputDirectory>/platform_conf/initial</outputDirectory>
+            <outputDirectory>platform_conf/initial</outputDirectory>
             <includes>
                 <include>org.bonitasoft.platform:platform-resources</include>
             </includes>
@@ -65,7 +65,7 @@
                 </includes>
             </unpackOptions>
             <scope>test</scope>
-            <outputDirectory>/platform_conf</outputDirectory>
+            <outputDirectory>platform_conf</outputDirectory>
             <includes>
                 <include>org.bonitasoft.platform:platform-resources</include>
             </includes>
