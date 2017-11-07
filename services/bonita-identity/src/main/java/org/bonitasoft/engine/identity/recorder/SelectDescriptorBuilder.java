@@ -223,7 +223,43 @@ public class SelectDescriptorBuilder {
     private static SelectListDescriptor<SUser> getUsersByGroup(final long groupId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("groupId", groupId);
-        return new SelectListDescriptor<SUser>("getUsersByGroup", parameters, SUser.class, queryOptions);
+        return new SelectListDescriptor<SUser>("getUsersInGroup", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getActiveUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers);
+        return getActiveUsersByGroup(groupId, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getInactiveUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers);
+        return getInactiveUsersByGroup(groupId, queryOptions);
+    }
+
+    private static SelectListDescriptor<SUser> getInactiveUsersByGroup(final long groupId, final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("groupId", groupId);
+        parameters.put("enabled", false);
+        return new SelectListDescriptor<>("getUsersInGroupWithEnabledParameter", parameters, SUser.class, queryOptions);
+    }
+
+    private static SelectListDescriptor<SUser> getActiveUsersByGroup(final long groupId, final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("groupId", groupId);
+        parameters.put("enabled", true);
+        return new SelectListDescriptor<>("getUsersInGroupWithEnabledParameter", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getActiveUsersByGroup(final long groupId, final String field, final OrderByType order, final int fromIndex,
+            final int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers, SUser.class, field, order);
+        return getActiveUsersByGroup(groupId, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getInactiveUsersByGroup(final long groupId, final String field, final OrderByType order, final int fromIndex,
+            final int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers, SUser.class, field, order);
+        return getInactiveUsersByGroup(groupId, queryOptions);
     }
 
     public static SelectListDescriptor<SUser> getUsersByGroup(final long groupId, final String field, final OrderByType order, final int fromIndex,
@@ -232,10 +268,24 @@ public class SelectDescriptorBuilder {
         return getUsersByGroup(groupId, queryOptions);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByManager(final long managerUserId, final QueryOptions queryOptions) {
+    public static SelectListDescriptor<SUser> getUsersWithManager(final long managerUserId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("managerUserId", managerUserId);
-        return new SelectListDescriptor<SUser>("getUsersByManager", parameters, SUser.class, queryOptions);
+        return new SelectListDescriptor<SUser>("getUsersWithManager", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getActiveUsersWithManager(long managerUserId, QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("managerUserId", managerUserId);
+        parameters.put("enabled", true);
+        return new SelectListDescriptor<>("getUsersWithManagerWithEnabledParameter", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getInactiveUsersWithManager(long managerUserId, QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("managerUserId", managerUserId);
+        parameters.put("enabled", false);
+        return new SelectListDescriptor<>("getUsersWithManagerWithEnabledParameter", parameters, SUser.class, queryOptions);
     }
 
     public static SelectListDescriptor<SUser> getUsersByMembership(final long groupId, final long roleId) {
@@ -260,24 +310,59 @@ public class SelectDescriptorBuilder {
         return getUsersByMembership(groupId, roleId, queryOptions);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByRole(final long roleId) {
-        return getUsersByRole(roleId, null);
+    public static SelectListDescriptor<SUser> getUsersWithRole(final long roleId) {
+        return getUsersWithRole(roleId, null);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByRole(final long roleId, final int fromIndex, final int numberOfUsers) {
+    public static SelectListDescriptor<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers);
-        return getUsersByRole(roleId, queryOptions);
+        return getUsersWithRole(roleId, queryOptions);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByRole(final long roleId, final QueryOptions queryOptions) {
-        final Map<String, Object> parameters = Collections.singletonMap("roleId", (Object) roleId);
-        return new SelectListDescriptor<SUser>("getUsersByRole", parameters, SUser.class, queryOptions);
+    public static SelectListDescriptor<SUser> getActiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers);
+        return getActiveUsersWithRole(roleId, queryOptions);
     }
 
-    public static SelectListDescriptor<SUser> getUsersByRole(final long roleId, final String field, final OrderByType order, final int fromIndex,
+    public static SelectListDescriptor<SUser> getInactiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers);
+        return getInactiveUsersWithRole(roleId, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getUsersWithRole(final long roleId, final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = Collections.singletonMap("roleId", roleId);
+        return new SelectListDescriptor<>("getUsersWithRole", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getActiveUsersWithRole(long roleId, final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("roleId", roleId);
+        parameters.put("enabled", true);
+        return new SelectListDescriptor<>("getUsersWithRoleWithEnabledParameter", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getInactiveUsersWithRole(long roleId, final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("roleId", roleId);
+        parameters.put("enabled", false);
+        return new SelectListDescriptor<>("getUsersWithRoleWithEnabledParameter", parameters, SUser.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getUsersWithRole(final long roleId, final String field, final OrderByType order, final int fromIndex,
             final int numberOfUsers) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers, SUser.class, field, order);
-        return getUsersByRole(roleId, queryOptions);
+        return getUsersWithRole(roleId, queryOptions);
     }
 
+    public static SelectListDescriptor<SUser> getActiveUsersWithRole(final long roleId, final String field, final OrderByType order, final int fromIndex,
+            final int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers, SUser.class, field, order);
+        return getActiveUsersWithRole(roleId, queryOptions);
+    }
+
+    public static SelectListDescriptor<SUser> getInactiveUsersWithRole(final long roleId, final String field, final OrderByType order, final int fromIndex,
+            final int numberOfUsers) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfUsers, SUser.class, field, order);
+        return getInactiveUsersWithRole(roleId, queryOptions);
+    }
 }
