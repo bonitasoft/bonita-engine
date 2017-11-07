@@ -1085,52 +1085,169 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
-        try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, fromIndex, numberOfUsers));
-        } catch (final SBonitaReadException e) {
-            throw new SIdentityException("Can't get the users having the group " + groupId, e);
-        }
-    }
-
-    @Override
-    public List<SUser> getUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
             throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex,
-                    numberOfUsers));
+            if (order != null) {
+                return persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex,
+                        numberOfUsers));
+            } else {
+                return persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, fromIndex, numberOfUsers));
+            }
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users having the group " + groupId, e);
         }
     }
 
     @Override
-    public List<SUser> getUsersByManager(final long managerId, final int fromIndex, final int numberMaxOfUsers) throws SIdentityException {
+    public List<SUser> getActiveUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+            throws SIdentityException {
         try {
-            final QueryOptions queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
-            return persistenceService.selectList(SelectDescriptorBuilder.getUsersByManager(managerId, queryOptions));
+            if (order != null) {
+                return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersByGroup(groupId, field, order, fromIndex,
+                        numberOfUsers));
+            } else {
+                return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersByGroup(groupId, fromIndex, numberOfUsers));
+            }
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the active users having the group " + groupId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getInactiveUsersInGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+            throws SIdentityException {
+
+        try {
+            if (order != null) {
+                return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersByGroup(groupId, field, order, fromIndex,
+                        numberOfUsers));
+            } else {
+                return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersByGroup(groupId, fromIndex, numberOfUsers));
+            }
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the inactive users having the group " + groupId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field, OrderByType order) throws SIdentityException {
+        try {
+            final QueryOptions queryOptions;
+            if (order != null) {
+                queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, field, order);
+            } else {
+                queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
+            }
+            return persistenceService.selectList(SelectDescriptorBuilder.getUsersWithManager(managerId, queryOptions));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users having the manager " + managerId, e);
         }
     }
 
     @Override
-    public List<SUser> getUsersByRole(final long roleId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
+    public List<SUser> getActiveUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field, OrderByType order)
+            throws SIdentityException {
         try {
-            return persistenceService.selectList(SelectDescriptorBuilder.getUsersByRole(roleId, fromIndex, numberOfUsers));
+            final QueryOptions queryOptions;
+            if (order != null) {
+                queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, field, order);
+            } else {
+                queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
+            }
+            return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersWithManager(managerId, queryOptions));
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the active users having the manager " + managerId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getInactiveUsersWithManager(long managerId, int fromIndex, int numberMaxOfUsers, String field, OrderByType order)
+            throws SIdentityException {
+        try {
+            final QueryOptions queryOptions;
+            if (order != null) {
+                queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, field, order);
+            } else {
+                queryOptions = new QueryOptions(fromIndex, numberMaxOfUsers, SUser.class, "id", OrderByType.DESC);
+            }
+            return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersWithManager(managerId, queryOptions));
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the inactive users having the manager " + managerId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
+        try {
+            return persistenceService.selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, fromIndex, numberOfUsers));
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users having the role " + roleId, e);
         }
     }
 
     @Override
-    public List<SUser> getUsersByRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+    public List<SUser> getActiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers) throws SIdentityException {
+        try {
+            return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the active users having the role " + roleId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getInactiveUsersWithRole(long roleId, int fromIndex, int numberOfUsers) throws SIdentityException {
+        try {
+            return persistenceService.selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the inactive users having the role " + roleId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
             throws SIdentityException {
         try {
-            return persistenceService
-                    .selectList(SelectDescriptorBuilder.getUsersByRole(roleId, field, order, fromIndex, numberOfUsers));
+            if (order != null) {
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, field, order, fromIndex, numberOfUsers));
+            } else {
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getUsersWithRole(roleId, fromIndex, numberOfUsers));
+            }
         } catch (final SBonitaReadException e) {
             throw new SIdentityException("Can't get the users having the role " + roleId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getActiveUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+            throws SIdentityException {
+        try {
+            if (order != null) {
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, field, order, fromIndex, numberOfUsers));
+            } else {
+                return persistenceService.selectList(SelectDescriptorBuilder.getActiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+            }
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the active users having the role " + roleId, e);
+        }
+    }
+
+    @Override
+    public List<SUser> getInactiveUsersWithRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
+            throws SIdentityException {
+        try {
+            if (order != null) {
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, field, order, fromIndex, numberOfUsers));
+            } else {
+                return persistenceService
+                        .selectList(SelectDescriptorBuilder.getInactiveUsersWithRole(roleId, fromIndex, numberOfUsers));
+            }
+        } catch (final SBonitaReadException e) {
+            throw new SIdentityException("Can't get the inactive users having the role " + roleId, e);
         }
     }
 
