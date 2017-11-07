@@ -14,6 +14,26 @@
 
 package org.bonitasoft.engine.api.impl;
 
+import static java.util.Collections.singletonMap;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -414,26 +434,6 @@ import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
-import static java.util.Collections.singletonMap;
 
 /**
  * @author Baptiste Mesta
@@ -2030,6 +2030,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException(sbe);
         }
     }
+
     @Override
     public void assignUserTaskIfNotAssigned(final long userTaskId, final long userId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -5138,9 +5139,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<HumanTaskInstance> getHumanTaskInstances(final long processInstanceId, final String taskName, final int startIndex, final int maxResults) {
+    public List<HumanTaskInstance> getHumanTaskInstances(final long rootProcessInstanceId, final String taskName, final int startIndex, final int maxResults) {
         try {
-            final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, startIndex, maxResults,
+            final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(rootProcessInstanceId, taskName, startIndex, maxResults,
                     HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
             if (humanTaskInstances == null) {
                 return Collections.emptyList();
@@ -5152,9 +5153,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public HumanTaskInstance getLastStateHumanTaskInstance(final long processInstanceId, final String taskName) throws NotFoundException {
+    public HumanTaskInstance getLastStateHumanTaskInstance(final long rootProcessInstanceId, final String taskName) throws NotFoundException {
         try {
-            final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, 0, 1,
+            final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(rootProcessInstanceId, taskName, 0, 1,
                     HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, Order.DESC);
             if (humanTaskInstances == null || humanTaskInstances.isEmpty()) {
                 throw new NotFoundException("Task '" + taskName + "' not found");
@@ -5772,7 +5773,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setExecutedBySubstitute(flowNodeInstance, executerSubstituteUserId);
             WorkDescriptor work;
             if (shouldBeReadyTask) {
-                work = workFactory.createExecuteReadyHumanTaskWorkDescriptor(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),
+                work = workFactory.createExecuteReadyHumanTaskWorkDescriptor(flowNodeInstance.getProcessDefinitionId(),
+                        flowNodeInstance.getParentProcessInstanceId(),
                         flowNodeInstanceId);
             } else {
                 work = workFactory.createExecuteFlowNodeWorkDescriptor(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(),

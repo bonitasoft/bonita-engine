@@ -44,6 +44,7 @@ import org.mockito.Matchers;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * @author Celine Souchet
@@ -59,6 +60,8 @@ public class HTTPServerAPITest {
     @Before
     public void initialize() {
         xstream = new XStream();
+        XStream.setupDefaultSecurity(xstream);
+        xstream.addPermission(AnyTypePermission.ANY);
         xstream.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
         HashMap<String, String> map = new HashMap<String, String>();
         map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
@@ -123,7 +126,8 @@ public class HTTPServerAPITest {
         MultipartEntity entity = (MultipartEntity) httpServerAPI.buildEntity(Collections.<String, Serializable> emptyMap(),
                 Arrays.asList(String.class.getName(), "java.util.Map", byte[].class.getName()),
                 new Object[] {
-                        "Välue1", Collections.singletonMap("key", "välue"), new byte[] {} }, xstream);
+                        "Välue1", Collections.singletonMap("key", "välue"), new byte[] {} },
+                xstream);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         entity.writeTo(outputStream);
         byte[] content = outputStream.toByteArray();
