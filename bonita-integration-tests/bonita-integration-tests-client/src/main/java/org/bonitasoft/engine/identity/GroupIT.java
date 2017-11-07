@@ -381,7 +381,7 @@ public class GroupIT extends TestWithTechnicalUser {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void should_throw_AlreadyExistException_when_update_group_with_group_name_already_exist() throws BonitaException{
+    public void should_throw_AlreadyExistException_when_update_group_with_group_name_already_exist() throws BonitaException {
         Group groupToUpdate = getIdentityAPI().createGroup("England", defaultGroup.getPath());
         final GroupUpdater groupUpdater = new GroupUpdater();
         groupUpdater.updateName("test");
@@ -392,7 +392,7 @@ public class GroupIT extends TestWithTechnicalUser {
     }
 
     @Test
-    public void should_updated_group_when_name_already_exist_but_path_dont_exist() throws BonitaException{
+    public void should_updated_group_when_name_already_exist_but_path_dont_exist() throws BonitaException {
         final Group newRootGroup = createGroup("Country", "Country", "Country company");
         final String groupFranceName = "France";
         Group groupFrance = getIdentityAPI().createGroup(groupFranceName, newRootGroup.getPath());
@@ -477,6 +477,87 @@ public class GroupIT extends TestWithTechnicalUser {
         assertEquals(2, users.size());
         assertEquals("testnameA", users.get(0).getUserName());
         assertEquals("testnameB", users.get(1).getUserName());
+
+        getIdentityAPI().deleteUserMemberships(userIds, defaultGroup.getId(), testRoleA.getId());
+        getIdentityAPI().deleteUserMemberships(testIds, group.getId(), testRoleB.getId());
+        getIdentityAPI().deleteUser(aUserInRoleA.getId());
+        getIdentityAPI().deleteUser(bUserInRoleA.getId());
+        getIdentityAPI().deleteUser(cUserInRoleB.getId());
+        getIdentityAPI().deleteUser(dUser.getId());
+        getIdentityAPI().deleteRole(testRoleA.getId());
+        getIdentityAPI().deleteRole(testRoleB.getId());
+        getIdentityAPI().deleteGroup(group.getId());
+    }
+
+    @Test
+    public void getActiveUsersInGroup() throws BonitaException {
+        final User aUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameA", "bpm").setEnabled(true));
+        final User bUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameB", "bpm").setEnabled(false));
+        final User cUserInRoleB = getIdentityAPI().createUser(new UserCreator("testnameC", "bpm").setEnabled(true));
+        final User dUser = getIdentityAPI().createUser(new UserCreator("testnameD", "bpm").setEnabled(true));
+
+        final Group group = createGroup("group", "testLabel", "description");
+        final List<Long> userIds = new ArrayList<>();
+        userIds.add(aUserInRoleA.getId());
+        userIds.add(bUserInRoleA.getId());
+        final RoleCreator roleCreatorA = new RoleCreator("RoleA");
+        roleCreatorA.setDisplayName("LabelA").setDescription("DescriptionA");
+        final Role testRoleA = getIdentityAPI().createRole(roleCreatorA);
+        getIdentityAPI().addUserMemberships(userIds, defaultGroup.getId(), testRoleA.getId());
+
+        final List<Long> testIds = new ArrayList<>();
+        testIds.add(cUserInRoleB.getId());
+        final RoleCreator roleCreatorB = new RoleCreator("RoleB");
+        roleCreatorB.setDisplayName("LabelB").setDescription("DescriptionB");
+        final Role testRoleB = getIdentityAPI().createRole(roleCreatorB);
+        getIdentityAPI().addUserMemberships(testIds, group.getId(), testRoleB.getId());
+
+        final List<User> users = getIdentityAPI().getActiveUsersInGroup(defaultGroup.getId(), 0, 5000, UserCriterion.USER_NAME_ASC);
+        assertNotNull(users);
+        assertEquals(1, users.size());
+        assertEquals("testnameA", users.get(0).getUserName());
+
+        getIdentityAPI().deleteUserMemberships(userIds, defaultGroup.getId(), testRoleA.getId());
+        getIdentityAPI().deleteUserMemberships(testIds, group.getId(), testRoleB.getId());
+        getIdentityAPI().deleteUser(aUserInRoleA.getId());
+        getIdentityAPI().deleteUser(bUserInRoleA.getId());
+        getIdentityAPI().deleteUser(cUserInRoleB.getId());
+        getIdentityAPI().deleteUser(dUser.getId());
+        getIdentityAPI().deleteRole(testRoleA.getId());
+        getIdentityAPI().deleteRole(testRoleB.getId());
+        getIdentityAPI().deleteGroup(group.getId());
+    }
+
+    @Test
+    public void getInactiveUsersInGroup() throws BonitaException {
+        final User aUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameA", "bpm").setEnabled(true));
+        final User bUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameB", "bpm").setEnabled(false));
+         final User cUserInRoleA = getIdentityAPI().createUser(new UserCreator("testnameE", "bpm").setEnabled(false));
+        final User cUserInRoleB = getIdentityAPI().createUser(new UserCreator("testnameC", "bpm").setEnabled(true));
+        final User dUser = getIdentityAPI().createUser(new UserCreator("testnameD", "bpm").setEnabled(true));
+
+        final Group group = createGroup("group", "testLabel", "description");
+        final List<Long> userIds = new ArrayList<>();
+        userIds.add(aUserInRoleA.getId());
+        userIds.add(bUserInRoleA.getId());
+        userIds.add(cUserInRoleA.getId());
+        final RoleCreator roleCreatorA = new RoleCreator("RoleA");
+        roleCreatorA.setDisplayName("LabelA").setDescription("DescriptionA");
+        final Role testRoleA = getIdentityAPI().createRole(roleCreatorA);
+        getIdentityAPI().addUserMemberships(userIds, defaultGroup.getId(), testRoleA.getId());
+
+        final List<Long> testIds = new ArrayList<>();
+        testIds.add(cUserInRoleB.getId());
+        final RoleCreator roleCreatorB = new RoleCreator("RoleB");
+        roleCreatorB.setDisplayName("LabelB").setDescription("DescriptionB");
+        final Role testRoleB = getIdentityAPI().createRole(roleCreatorB);
+        getIdentityAPI().addUserMemberships(testIds, group.getId(), testRoleB.getId());
+
+        final List<User> users = getIdentityAPI().getInactiveUsersInGroup(defaultGroup.getId(), 0, 5000, UserCriterion.USER_NAME_ASC);
+        assertNotNull(users);
+        assertEquals(2, users.size());
+        assertEquals("testnameB", users.get(0).getUserName());
+        assertEquals("testnameE", users.get(1).getUserName());
 
         getIdentityAPI().deleteUserMemberships(userIds, defaultGroup.getId(), testRoleA.getId());
         getIdentityAPI().deleteUserMemberships(testIds, group.getId(), testRoleB.getId());
@@ -656,31 +737,30 @@ public class GroupIT extends TestWithTechnicalUser {
         expectedException.expect(NotFoundException.class);
         getIdentityAPI().getIcon(mainGroup.getIconId());
     }
-    
-    
+
     @Test
     public void should_update_childrens_group_ParentPath_with_correct_value() throws BonitaException {
         //given
-        Group acme = getIdentityAPI().createGroup("Acme",null);
+        Group acme = getIdentityAPI().createGroup("Acme", null);
         Group site = getIdentityAPI().createGroup("Site", acme.getPath());
-        
+
         //when
         final GroupUpdater group2Updater = new GroupUpdater();
         group2Updater.updateDescription("laalalala");
         group2Updater.updateName("Acme2");
         getIdentityAPI().updateGroup(acme.getId(), group2Updater);
-        
+
         //then
         assertThat(getIdentityAPI().getGroup(acme.getId()).getDescription()).contains("laalalala");
         assertThat(getIdentityAPI().getGroup(site.getId()).getParentPath()).isEqualTo("/Acme2");
         deleteGroups(getIdentityAPI().getGroup(acme.getId()));
-        
+
     }
 
     @Test(expected = InvalidGroupNameException.class)
     public void should_not_create_group_when_given_invalid_name() throws CreationException {
         //when
-        Group acme = getIdentityAPI().createGroup("/Acme",null);
+        Group acme = getIdentityAPI().createGroup("/Acme", null);
     }
 
     @Test(expected = InvalidGroupNameException.class)

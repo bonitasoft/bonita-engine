@@ -121,6 +121,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
 
         // add supervisor group
         group = getIdentityAPI().createGroup("R&D", null);
+        getIdentityAPI().addUserMembership(matti.getId(), group.getId(), role.getId());
         supervisorForGroup = getProcessAPI().createProcessSupervisorForGroup(definition.getId(), group.getId());
 
         // add supervisor membership

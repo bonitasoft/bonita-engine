@@ -40,7 +40,7 @@ import org.bonitasoft.engine.search.SearchResult;
  * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Users: creation, deletion, certain
  * specific getXXX() methods, generic search methods, etc...
  * It also to retrieve user ContactData.
- * 
+ *
  * @author Feng Hui
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
@@ -53,7 +53,7 @@ public interface UserAPI {
     /**
      * Creates a user.
      * The password can't be empty.
-     * 
+     *
      * @param userName
      *        The name of the user
      * @param password
@@ -138,17 +138,17 @@ public interface UserAPI {
      * <p>Use this method with caution: some artifacts like {@link Application}s and {@link DesignProcessDefinition}s may present display problems in the Bonita
      * BPM Portal if the referenced user was deleted. Note that you can disable a user instead of deleting it. To do so, use the method
      * {@link #updateUser(long, UserUpdater)} to set the attribute 'enabled' to false</p>.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @throws DeletionException
      *         If an exception occurs during the user deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0
      * @see #updateUser(long, UserUpdater)
      * @see Application
      * @see DesignProcessDefinition
+     * @since 6.0
      */
     void deleteUser(long userId) throws DeletionException;
 
@@ -165,10 +165,10 @@ public interface UserAPI {
      *         If an exception occurs during the user deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0
      * @see #updateUser(long, UserUpdater)
      * @see Application
      * @see DesignProcessDefinition
+     * @since 6.0
      */
     void deleteUser(String userName) throws DeletionException;
 
@@ -185,10 +185,10 @@ public interface UserAPI {
      *         If an exception occurs during the user deletion
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @since 6.0
      * @see #updateUser(long, UserUpdater)
      * @see Application
      * @see DesignProcessDefinition
+     * @since 6.0
      */
     void deleteUsers(List<Long> userIds) throws DeletionException;
 
@@ -348,7 +348,7 @@ public interface UserAPI {
     long getNumberOfUsersInRole(long roleId);
 
     /**
-     * Retrieves the paginated list of roles.
+     * Retrieves the paginated list of users, regardless if they are active or not, in a given role.
      * It retrieves from the startIndex to the startIndex + maxResults.
      *
      * @param roleId
@@ -356,17 +356,59 @@ public interface UserAPI {
      * @param startIndex
      *        The start index
      * @param maxResults
-     *        The max number of roles
+     *        The max number of users
      * @param criterion
      *        The sorting criterion
-     * @return The paginated list of roles
+     * @return The paginated list of users
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *         If an exception occurs during the role retrieving
+     *         If an exception occurs during the retrieving of users
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     List<User> getUsersInRole(long roleId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
+     * Retrieves the paginated list of active users in role.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param roleId
+     *        The identifier of the role
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getActiveUsersInRole(long roleId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
+     * Retrieves the paginated list of inactive users in role.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param roleId
+     *        The identifier of the role
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getInactiveUsersInRole(long roleId, int startIndex, int maxResults, UserCriterion criterion);
 
     /**
      * Returns the total number of users of the group.
@@ -384,7 +426,7 @@ public interface UserAPI {
     long getNumberOfUsersInGroup(long groupId) throws BonitaException;
 
     /**
-     * Retrieves the paginated list of groups.
+     * Retrieves the paginated list of users, both active and inactive, in a given group.
      * It retrieves from the startIndex to the startIndex + maxResults.
      *
      * @param groupId
@@ -392,12 +434,12 @@ public interface UserAPI {
      * @param startIndex
      *        The start index
      * @param maxResults
-     *        The max number of groups
+     *        The max number of users
      * @param criterion
      *        The sorting criterion
-     * @return The paginated list of groups
+     * @return The paginated list of users
      * @throws org.bonitasoft.engine.exception.RetrieveException
-     *         If an exception occurs during the group retrieving
+     *         If an exception occurs during the retrieving of users
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
@@ -405,8 +447,113 @@ public interface UserAPI {
     List<User> getUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion);
 
     /**
+     * Retrieves the paginated list of active users in groups.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param groupId
+     *        The identifier of the group
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getActiveUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
+     * Retrieves the paginated list of inactive users in groups.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param groupId
+     *        The identifier of the group
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getInactiveUsersInGroup(long groupId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
+     * Retrieves the paginated list of users of a manager.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param managerId
+     *        The identifier of the manager
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
+     * Retrieves the paginated list of active users of a manager.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param managerId
+     *        The identifier of the manager
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getActiveUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
+     * Retrieves the paginated list of inactive users of a manager.
+     * It retrieves from the startIndex to the startIndex + maxResults.
+     *
+     * @param managerId
+     *        The identifier of the manager
+     * @param startIndex
+     *        The start index
+     * @param maxResults
+     *        The max number of users
+     * @param criterion
+     *        The sorting criterion
+     * @return The paginated list of users
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the retrieving of users
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6
+     */
+    List<User> getInactiveUsersWithManager(long managerId, int startIndex, int maxResults, UserCriterion criterion);
+
+    /**
      * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
-     * 
+     *
      * @param infoName
      *        The custom user information name
      * @param infoValue
@@ -424,8 +571,9 @@ public interface UserAPI {
 
     /**
      * get the icon having specified id
-     * 
-     * @param id the id of the icon
+     *
+     * @param id
+     *        the id of the icon
      * @return the icon with its content
      * @throws NotFoundException
      * @since 7.3.0
