@@ -7,7 +7,7 @@
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
 		WHERE user.userName = :userName
 	</query>
-	
+
 	<query name="getAllUsers">
 		SELECT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
@@ -83,7 +83,7 @@
 		WHERE user.id IN (:ids)
 		ORDER BY user.userName
 	</query>
-	
+
 	<query name="getUsersByName">
 		SELECT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
@@ -95,7 +95,7 @@
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
 	</query>
 
-	<query name="getUsersByRole">
+	<query name="getUsersWithRole">
 		SELECT DISTINCT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
 		     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
@@ -103,40 +103,65 @@
 		AND user_membership.roleId = :roleId
  	</query>
 
-	<query name="getUsersByGroup">
-		SELECT DISTINCT user
-		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-		     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
-		WHERE user_membership.groupId = :groupId
-		AND user.id = user_membership.userId
-	</query>
+	<query name="getUsersWithRoleWithEnabledParameter">
+        SELECT DISTINCT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+        WHERE user.id = user_membership.userId
+        AND user.enabled = :enabled
+        AND user_membership.roleId = :roleId
+    </query>
 
-	<query name="getUsersByMembership">
-		SELECT DISTINCT user
-		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-		     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
-		WHERE user_membership.groupId = :groupId
-		AND user_membership.roleId = :roleId
-		AND user.id = user_membership.userId
-	</query>
+    <query name="getUsersInGroup">
+        SELECT DISTINCT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+        WHERE user_membership.groupId = :groupId
+        AND user.id = user_membership.userId
+    </query>
 
-	<query name="getUsersByManager">
-		SELECT user
-		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-		WHERE user.managerUserId = :managerUserId
-	</query>
+    <query name="getUsersInGroupWithEnabledParameter">
+        SELECT DISTINCT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+        WHERE user_membership.groupId = :groupId
+        AND user.enabled = :enabled
+        AND user.id = user_membership.userId
+    </query>
 
-	<query name="getUserContactInfo">
-		SELECT contactinfo
-		FROM org.bonitasoft.engine.identity.model.impl.SContactInfoImpl as contactinfo
-		WHERE userId = :userId
-		AND personal = :personal
-	</query>
+    <query name="getUsersByMembership">
+        SELECT DISTINCT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+        WHERE user_membership.groupId = :groupId
+        AND user_membership.roleId = :roleId
+        AND user.id = user_membership.userId
+    </query>
+
+    <query name="getUsersWithManager">
+        SELECT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+        WHERE user.managerUserId = :managerUserId
+    </query>
+
+	<query name="getUsersWithManagerWithEnabledParameter">
+        SELECT user
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+        WHERE user.managerUserId = :managerUserId
+        AND user.enabled = :enabled
+    </query>
+
+    <query name="getUserContactInfo">
+        SELECT contactinfo
+        FROM org.bonitasoft.engine.identity.model.impl.SContactInfoImpl as contactinfo
+        WHERE userId = :userId
+        AND personal = :personal
+    </query>
 
 	<!--	 Roles -->
 	<query name="getRoles">
 		SELECT role
-		FROM org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role 
+		FROM org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role
 	</query>
 
 
@@ -172,9 +197,9 @@
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
 			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-		WHERE user_membership.roleId = role.id 
-		AND user_membership.groupId = group_.id 
-		AND user_membership.userId = user.id 
+		WHERE user_membership.roleId = role.id
+		AND user_membership.groupId = group_.id
+		AND user_membership.userId = user.id
 		AND user_membership.groupId = :groupId
 
 	</query>
@@ -185,9 +210,9 @@
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
 			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-		WHERE user_membership.roleId = role.id 
-		AND user_membership.groupId = group_.id 
-		AND user_membership.userId = user.id 
+		WHERE user_membership.roleId = role.id
+		AND user_membership.groupId = group_.id
+		AND user_membership.userId = user.id
 		AND user_membership.roleId = :roleId
 	</query>
 
@@ -197,9 +222,9 @@
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
 			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-		WHERE user_membership.roleId = role.id 
-		AND user_membership.groupId = group_.id 
-		AND user_membership.userId = user.id 
+		WHERE user_membership.roleId = role.id
+		AND user_membership.groupId = group_.id
+		AND user_membership.userId = user.id
 		AND user_membership.userId = :userId
 	</query>
 
@@ -209,9 +234,9 @@
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
 			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-		WHERE user_membership.roleId = role.id 
-		AND user_membership.groupId = group_.id 
-		AND user_membership.userId = user.id 
+		WHERE user_membership.roleId = role.id
+		AND user_membership.groupId = group_.id
+		AND user_membership.userId = user.id
 		AND user_membership.roleId = :roleId
 		AND user_membership.groupId = :groupId
 		AND user_membership.userId = :userId
@@ -290,13 +315,13 @@
 		SELECT COUNT(user_membership)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
 	</query>
-	
+
 	<query name="getNumberOfUserMembershipsOfUser">
 		SELECT COUNT(user_membership)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
 		WHERE user_membership.userId = :userId
 	</query>
-	
+
 	<query name="getNumberOfUsersByMembership">
 		SELECT COUNT(user_membership)
 		FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
@@ -329,7 +354,7 @@
         SELECT COUNT(custom_usr_inf_val)
         FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS custom_usr_inf_val
     </query>
-	
+
 	<query name="searchSUser">
 		SELECT user
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
@@ -375,18 +400,18 @@
 			org.bonitasoft.engine.identity.model.impl.SRoleImpl AS role,
 			org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_,
 			org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
-		WHERE user_membership.roleId = role.id 
-		AND user_membership.groupId = group_.id 
+		WHERE user_membership.roleId = role.id
+		AND user_membership.groupId = group_.id
 		AND user_membership.userId = user.id
 	</query>
-	
+
 	<query name="getUserIdsWithCustomUserInfo">
 		SELECT user.id
   		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS infoDef, 
+  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS infoDef,
   			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS infoValue
  		WHERE infoValue.userId = user.id
- 			AND infoValue.definitionId = infoDef.id  
+ 			AND infoValue.definitionId = infoDef.id
  			AND infoDef.name = :userInfoName
  			AND infoValue.value = :userInfoValue
  		ORDER BY user.id
@@ -395,10 +420,10 @@
 	<query name="getUserIdsWithCustomUserInfoContains">
 		SELECT user.id
   		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS infoDef, 
+  			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS infoDef,
   			org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS infoValue
  		WHERE infoValue.userId = user.id
- 			AND infoValue.definitionId = infoDef.id  
+ 			AND infoValue.definitionId = infoDef.id
  			AND infoDef.name = :userInfoName
  			AND infoValue.value like :userInfoValue
  		ORDER BY user.id
