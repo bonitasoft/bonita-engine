@@ -36,6 +36,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * @author Julien Mege
@@ -58,6 +59,11 @@ public class HttpAPIServletCall extends ServletCall {
     private static final String OPTIONS = "options";
 
     private static final XStream XSTREAM = new XStream();
+
+    static {
+        XStream.setupDefaultSecurity(XSTREAM);
+        XSTREAM.addPermission(AnyTypePermission.ANY);
+    }
 
     public HttpAPIServletCall(final HttpServletRequest request, final HttpServletResponse response) throws FileUploadException, IOException {
         super(request, response);

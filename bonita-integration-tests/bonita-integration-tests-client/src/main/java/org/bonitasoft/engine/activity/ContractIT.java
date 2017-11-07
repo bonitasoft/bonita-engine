@@ -583,11 +583,9 @@ public class ContractIT extends CommonAPIIT {
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME);
-        designProcessDefinition.addData("processData", BigInteger.class.getName(), null);
         final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("task3", ACTOR_NAME);
         userTaskBuilder.addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
-                .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
-                .addOutput(new OperationBuilder().createSetDataOperation("processData", outputExpression));
+                .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression);
         userTaskBuilder.addContract().addInput("inputVersion", Type.TEXT, null).addInput("processInputId", Type.INTEGER, null)
                 .addInput("LocalDateInput", Type.LOCALDATE, null).addInput("LocalDateTimeInput", Type.LOCALDATETIME, null)
                 .addInput("LocalDateTimeNullInput", Type.LOCALDATETIME, null)
@@ -617,6 +615,7 @@ public class ContractIT extends CommonAPIIT {
         assertThat(localDate).isNotNull().isEqualTo(LocalDate.of(2017, 4, 12));
         assertThat(localDateTime).isNotNull().isEqualTo(LocalDateTime.of(2017, 4, 12, 19, 45, 22));
         assertThat(nullLocalDateTime).isNull();
+        // Dates must always be converted to UTC:
         assertThat(offsetDateTime).isEqualTo(OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 17, 42, 0), ZoneOffset.UTC));
 
         disableAndDeleteProcess(processDefinition);

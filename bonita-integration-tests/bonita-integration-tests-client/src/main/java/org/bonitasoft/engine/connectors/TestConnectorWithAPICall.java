@@ -27,7 +27,6 @@ public class TestConnectorWithAPICall extends AbstractConnector {
 
     @Override
     public void validateInputParameters() {
-
     }
 
     @Override
@@ -38,13 +37,8 @@ public class TestConnectorWithAPICall extends AbstractConnector {
         final String userTransactionJNDIName = System.getProperty("sysprop.bonita.transaction.manager", "java:comp/UserTransaction");
         long processId = -1;
         try {
-            if (propValue == null) {
-                throw new RuntimeException("Unable to find the system property: " + Context.INITIAL_CONTEXT_FACTORY);
-            }
-
-            final InitialContext ctxt = new InitialContext();
-            ctxt.lookup(userTransactionJNDIName);
-
+            final InitialContext ctx = new InitialContext();
+            ctx.lookup(userTransactionJNDIName);
             processId = getAPIAccessor().getProcessAPI().getProcessDefinitionId(name, version);
         } catch (ProcessDefinitionNotFoundException e) {
             throw new RuntimeException("Unable to get Process with name and version: " + name + ", " + version);

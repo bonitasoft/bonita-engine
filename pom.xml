@@ -17,7 +17,7 @@
         <!-- use an empty value as workaround to ensure that maven resolves the parent pom from a repository -->
         <!-- otherwise, if this project is a subdirectory of a directory that contains a pom.xml, maven emits a project
         structure warning -->
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <groupId>org.bonitasoft.engine</groupId>
@@ -58,7 +58,7 @@
     <properties>
         <slf4j.version>1.6.1</slf4j.version>
         <httpclient.version>4.5.2</httpclient.version>
-        <xstream.version>1.4.2</xstream.version>
+        <xstream.version>1.4.10</xstream.version>
         <hibernate.version>4.3.11.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

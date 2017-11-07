@@ -13,15 +13,12 @@
  **/
 package org.bonitasoft.engine.data.instance.model.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 public class XStreamFactory {
 
@@ -32,9 +29,10 @@ public class XStreamFactory {
         XStream xStream = XSTREAM_MAP.get(classLoader);
         if (xStream == null) {
             xStream = new XStream(new StaxDriver());
+            XStream.setupDefaultSecurity(xStream);
+            xStream.addPermission(AnyTypePermission.ANY);
             XSTREAM_MAP.put(classLoader, xStream);
-            xStream.registerConverter(new LocalDateXStreamConverter());
-            xStream.registerConverter(new LocalDateTimeXStreamConverter());
+            // Even though xStream now supports Java 8 date types, Bonita needs to convert offset date-time to UTC, by contract:
             xStream.registerConverter(new OffsetDateTimeXStreamConverter());
         }
 
@@ -48,44 +46,6 @@ public class XStreamFactory {
      */
     public static void remove(ClassLoader classLoader) {
         XSTREAM_MAP.remove(classLoader);
-    }
-
-    private static class LocalDateXStreamConverter extends AbstractSingleValueConverter {
-
-        public boolean canConvert(Class type) {
-            return LocalDate.class.equals(type);
-        }
-
-        public String toString(Object source) {
-            return source.toString();
-        }
-
-        public Object fromString(String str) {
-            try {
-                return LocalDate.parse(str);
-            } catch (DateTimeParseException e) {
-                throw new RuntimeException("LocalDate failed to parse the incoming string", e);
-            }
-        }
-    }
-
-    private static class LocalDateTimeXStreamConverter extends AbstractSingleValueConverter {
-
-        public boolean canConvert(Class type) {
-            return LocalDateTime.class.equals(type);
-        }
-
-        public String toString(Object source) {
-            return source.toString();
-        }
-
-        public Object fromString(String str) {
-            try {
-                return LocalDateTime.parse(str);
-            } catch (DateTimeParseException e) {
-                throw new RuntimeException("LocalDateTime failed to parse the incoming string", e);
-            }
-        }
     }
 
 }

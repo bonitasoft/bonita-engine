@@ -40,6 +40,19 @@ public class OffsetDateTimeXStreamConverterTest {
     }
 
     @Test
+    public void fromString_should_reset_offset_to_UTC() throws Exception {
+        // given:
+        String dateAsString = "1973-10-17T11:50:00-02:00";
+        final OffsetDateTimeXStreamConverter offsetDateTimeConverter = new OffsetDateTimeXStreamConverter();
+
+        // when:
+        final Object offsetDateTime = offsetDateTimeConverter.fromString(dateAsString);
+
+        // then:
+        assertThat(offsetDateTime).isEqualTo(OffsetDateTime.of(LocalDateTime.of(1973, 10, 17, 13, 50, 0), ZoneOffset.UTC));
+    }
+
+    @Test
     public void toString_should_return_null_for_null_input() throws Exception {
         // given:
         final OffsetDateTimeXStreamConverter offsetDateTimeConverter = new OffsetDateTimeXStreamConverter();

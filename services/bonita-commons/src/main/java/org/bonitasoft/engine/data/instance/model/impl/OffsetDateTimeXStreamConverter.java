@@ -35,7 +35,7 @@ public class OffsetDateTimeXStreamConverter extends AbstractSingleValueConverter
 
     public Object fromString(String str) {
         try {
-            return OffsetDateTime.parse(str);
+            return OffsetDateTime.parse(str).withOffsetSameInstant(ZoneOffset.UTC);
         } catch (DateTimeParseException e) {
             throw new RuntimeException("OffsetDateTime failed to parse the incoming string", e);
         }

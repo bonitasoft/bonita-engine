@@ -52,6 +52,7 @@ import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * @author Baptiste Mesta
@@ -111,6 +112,8 @@ public class HTTPServerAPI implements ServerAPI {
 
     static {
         XSTREAM = new XStream();
+        XStream.setupDefaultSecurity(XSTREAM);
+        XSTREAM.addPermission(AnyTypePermission.ANY);
         XSTREAM.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
     }
 
