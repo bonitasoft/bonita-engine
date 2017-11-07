@@ -20,7 +20,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
@@ -33,12 +32,8 @@ public class CustomOffsetDateTimeDeserializer extends StdDeserializer<OffsetDate
         super(LocalDateTime.class);
     }
 
-    public CustomOffsetDateTimeDeserializer(Class<?> vc) {
-        super(vc);
-    }
-
     @Override
-    public OffsetDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public OffsetDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
         final String value = jp.readValueAs(String.class);
         if (value == null) {
             return null;

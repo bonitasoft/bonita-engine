@@ -19,7 +19,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -38,7 +37,7 @@ public class CustomOffsetDateTimeSerializer extends StdSerializer<OffsetDateTime
     }
 
     @Override
-    public void serialize(OffsetDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+    public void serialize(OffsetDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         jgen.writeString((value != null) ? DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value.withOffsetSameInstant(ZoneOffset.UTC)) : null);
     }
 }
