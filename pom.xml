@@ -1038,9 +1038,9 @@
             <!-- profile used to pull docker image from bonita internal repository: -->
             <id>bonita-internal</id>
             <properties>
-                <docker-postgres-image>ci-01.rd.lan:5000/bonitasoft/postgres:9.3</docker-postgres-image>
-                <docker-mysql-image>ci-01.rd.lan:5000/bonitasoft/mysql:5.5.49</docker-mysql-image>
-                <docker-oracle-image>ci-01.rd.lan:5000/bonitasoft/oracle:11g</docker-oracle-image>
+                <docker-postgres-image>registry.rd.lan/bonitasoft/postgres:9.3</docker-postgres-image>
+                <docker-mysql-image>registry.rd.lan/bonitasoft/mysql:5.5.49</docker-mysql-image>
+                <docker-oracle-image>registry.rd.lan/bonitasoft/oracle:11g</docker-oracle-image>
                 <!-- turns on/off logs from docker image-->
                 <docker.showLogs>true</docker.showLogs>
                 <!-- global timeoout in millis allowed for docker image to start -->
