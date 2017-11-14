@@ -18,6 +18,20 @@
 		SELECT profile
 		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile
 	</query>
+	
+	<query name="searchSProfilewithSProfileEntry">
+		SELECT DISTINCT profile
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile , 
+		 	org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+		WHERE profile.id = profileentry.profileId
+	</query>
+	
+	<query name="getNumberOfSProfilewithSProfileEntry">
+		SELECT COUNT(DISTINCT profile)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile ,  
+			org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+		WHERE profile.id = profileentry.profileId
+	</query>
 
 	<query name="getNumberOfSProfileEntry">
 		SELECT COUNT(profileentry)
