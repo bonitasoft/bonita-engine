@@ -276,8 +276,8 @@
             </dependency>
             <dependency>
                 <groupId>net.javacrumbs.json-unit</groupId>
-                <artifactId>json-unit-assertj</artifactId>
-                <version>0.0.15</version>
+                <artifactId>json-unit-fluent</artifactId>
+                <version>1.25.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
