@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;

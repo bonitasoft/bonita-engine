@@ -13,7 +13,7 @@
  */
 package org.bonitasoft.engine.business.data;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.*;
