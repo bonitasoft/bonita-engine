@@ -14,7 +14,7 @@
 
 package org.bonitasoft.engine.bdm.serialization;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 
 import java.io.IOException;
 import java.io.StringWriter;
