@@ -123,11 +123,33 @@ public interface ProfileService {
      * Get all profiles of the user by userId
      *
      * @param userId
+     * @param fromIndex
+     *        first result to be considered(>=0)
+     * @param numberOfProfileEntry
+     *        the max number of profileEntry to be returned (>=0)
+     * @param field
+     * @param order
      * @return A list of sProfile
      * @throws SBonitaReadException
      * @since 6.0
      */
     List<SProfile> searchProfilesOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
+    
+    /**
+     * Get all profiles with portal navigation for a user
+     *
+     * @param userId 
+     * @param fromIndex
+     *        first result to be considered(>=0)
+     * @param numberOfProfileEntry
+     *        the max number of profileEntry to be returned (>=0)
+     * @param field
+     * @param order
+     * @return A list of sProfile
+     * @throws SBonitaReadException
+     * @since 7.6.1
+     */
+    List<SProfile> searchProfilesWithNavigationOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
 
     /**
      * Get profile entry by its id
