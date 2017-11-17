@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,43 +10,37 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
 
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
+import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
 
 /**
- * @author Danila Mazour
+ * @author Emmanuel Duchastenier
  */
-public class RoleBuilder extends PersistentObjectBuilder<SRoleImpl, RoleBuilder> {
+public class ProfileEntryBuilder extends PersistentObjectBuilder<SProfileEntryImpl, ProfileEntryBuilder> {
 
-    private String name;
+    private long profileId;
 
-    public static RoleBuilder aRole() {
-        return new RoleBuilder();
+    public static ProfileEntryBuilder aProfileEntry() {
+        return new ProfileEntryBuilder();
     }
 
     @Override
-    RoleBuilder getThisBuilder() {
+    ProfileEntryBuilder getThisBuilder() {
         return this;
     }
 
     @Override
-    SRoleImpl _build() {
-        SRoleImpl role = new SRoleImpl();
-        role.setName(this.name);
-        role.setId(this.id);
-        return role;
+    SProfileEntryImpl _build() {
+        SProfileEntryImpl profileEntry = new SProfileEntryImpl();
+        profileEntry.setProfileId(profileId);
+        return profileEntry;
     }
 
-    public RoleBuilder forRoleName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public RoleBuilder forRoleId(Long id) {
-        this.id = id;
+    public ProfileEntryBuilder withProfileId(long profileId) {
+        this.profileId = profileId;
         return this;
     }
 }

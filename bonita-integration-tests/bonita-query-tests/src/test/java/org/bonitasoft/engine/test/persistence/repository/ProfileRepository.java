@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,43 +10,27 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
+package org.bonitasoft.engine.test.persistence.repository;
 
-package org.bonitasoft.engine.test.persistence.builder;
+import java.util.List;
 
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
 
 /**
- * @author Danila Mazour
+ * @author Emmanuel Duchastenier
  */
-public class RoleBuilder extends PersistentObjectBuilder<SRoleImpl, RoleBuilder> {
+public class ProfileRepository extends TestRepository {
 
-    private String name;
-
-    public static RoleBuilder aRole() {
-        return new RoleBuilder();
+    public ProfileRepository(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
-    @Override
-    RoleBuilder getThisBuilder() {
-        return this;
-    }
-
-    @Override
-    SRoleImpl _build() {
-        SRoleImpl role = new SRoleImpl();
-        role.setName(this.name);
-        role.setId(this.id);
-        return role;
-    }
-
-    public RoleBuilder forRoleName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public RoleBuilder forRoleId(Long id) {
-        this.id = id;
-        return this;
+    public List<SProfile> getProfilesWithNavigationOfUser(long userId) {
+        final Query namedQuery = getNamedQuery("getProfilesWithNavigationOfUser");
+        namedQuery.setParameter("userId", userId);
+        return namedQuery.list();
     }
 }
