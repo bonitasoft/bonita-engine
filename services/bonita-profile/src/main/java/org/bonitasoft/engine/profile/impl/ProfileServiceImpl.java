@@ -524,6 +524,12 @@ public class ProfileServiceImpl implements ProfileService {
             throw bre;
         }
     }
+    
+    @Override
+    public List<SProfile> searchProfilesWithNavigationOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field, final OrderByType order)
+            throws SBonitaReadException {
+        return persistenceService.selectList(SelectDescriptorBuilder.getProfilesWithNavigationOfUser(userId, fromIndex, numberOfElements, field, order));
+    }
 
     @Override
     public List<SProfileMember> getProfileMembers(final long profileId, final QueryOptions queryOptions) throws SProfileMemberNotFoundException {
