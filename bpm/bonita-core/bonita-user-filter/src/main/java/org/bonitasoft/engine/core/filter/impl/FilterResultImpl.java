@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.filter.impl;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.bonitasoft.engine.core.filter.FilterResult;
@@ -28,9 +30,14 @@ public class FilterResultImpl implements FilterResult {
 
     private final boolean shouldAutoAssignTaskIfSingleResult;
 
-    public FilterResultImpl(final List<Long> userIds, final boolean shouldAutoAssignTaskIfSingleResult2) {
-        result = userIds;
-        shouldAutoAssignTaskIfSingleResult = shouldAutoAssignTaskIfSingleResult2;
+    public FilterResultImpl(final List<Long> userIds, final boolean shouldAutoAssignTaskIfSingleResult) {
+        //To avoid errors due to duplicates see BS-16189
+        if (userIds != null) {
+            result = new ArrayList<>(new LinkedHashSet<>(userIds));
+        } else {
+            result = null;
+        }
+        this.shouldAutoAssignTaskIfSingleResult = shouldAutoAssignTaskIfSingleResult;
     }
 
     @Override
