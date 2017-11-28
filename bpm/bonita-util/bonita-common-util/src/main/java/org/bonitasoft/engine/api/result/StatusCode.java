@@ -68,6 +68,11 @@ public enum StatusCode {
     /**
      * A BDM Access Control rule grants access to no profile at all
      */
-    BDM_ACCESS_CONTROL_ZERO_PROFILE_GRANTED
+    BDM_ACCESS_CONTROL_ZERO_PROFILE_GRANTED,
+
+    /**
+     * There is no BDM installed
+     */
+    BDM_NOT_INSTALLED
 
 }
