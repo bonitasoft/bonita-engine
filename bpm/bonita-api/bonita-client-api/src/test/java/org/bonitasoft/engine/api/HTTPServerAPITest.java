@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -23,8 +26,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,34 +41,22 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * @author Celine Souchet
  */
-
 @RunWith(MockitoJUnitRunner.class)
 public class HTTPServerAPITest {
-
-    private XStream xstream;
 
     private HTTPServerAPI httpServerAPI;
 
     @Before
     public void initialize() {
-        xstream = new XStream();
-        XStream.setupDefaultSecurity(xstream);
-        xstream.addPermission(AnyTypePermission.ANY);
-        xstream.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         map.put(HTTPServerAPI.SERVER_URL, "localhost:8080");
         map.put(HTTPServerAPI.APPLICATION_NAME, "bonita");
         httpServerAPI = new HTTPServerAPI(map);
-
     }
 
     @Test(expected = ServerWrappedException.class)
@@ -82,20 +71,19 @@ public class HTTPServerAPITest {
         logger.addHandler(ch);
 
         try {
-            final Map<String, Serializable> options = new HashMap<String, Serializable>();
+            final Map<String, Serializable> options = new HashMap<>();
             final String apiInterfaceName = "apiInterfaceName";
             final String methodName = "methodName";
-            final List<String> classNameParameters = new ArrayList<String>();
+            final List<String> classNameParameters = new ArrayList<>();
             final Object[] parametersValues = null;
 
             final HTTPServerAPI httpServerAPI = mock(HTTPServerAPI.class);
             final String response = "response";
             doReturn(response).when(httpServerAPI).executeHttpPost(eq(options), eq(apiInterfaceName), eq(methodName),
                     eq(classNameParameters),
-                    eq(parametersValues), Matchers.any(XStream.class));
+                    eq(parametersValues));
             doThrow(new UndeclaredThrowableException(new BonitaException("Bonita exception"), "Exception plop"))
-                    .when(httpServerAPI).checkInvokeMethodReturn(
-                            eq(response), any(XStream.class));
+                    .when(httpServerAPI).checkInvokeMethodReturn(eq(response));
 
             // Let's call it for real:
             doCallRealMethod().when(httpServerAPI).invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
@@ -111,30 +99,27 @@ public class HTTPServerAPITest {
 
     @Test
     public void serializeSimpleParameters() throws Exception {
-
-        HttpEntity entity = httpServerAPI.buildEntity(Collections.<String, Serializable> emptyMap(), Arrays.asList("param1", "param2"), new Object[] {
-                "Välue1", Collections.singletonMap("key", "välue") }, xstream);
+        HttpEntity entity = httpServerAPI.buildEntity(emptyMap(),
+                asList("param1", "param2"),
+                new Object[] {"Välue1", singletonMap("key", "välue") });
         String content = IOUtil.read(entity.getContent());
         String decodedContent = URLDecoder.decode(content, "UTF-8");
         assertTrue(decodedContent.contains("välue"));
         assertTrue(decodedContent.contains("Välue1"));
-
     }
 
     @Test
     public void serializeByteArrayParameters() throws Exception {
-        MultipartEntity entity = (MultipartEntity) httpServerAPI.buildEntity(Collections.<String, Serializable> emptyMap(),
-                Arrays.asList(String.class.getName(), "java.util.Map", byte[].class.getName()),
-                new Object[] {
-                        "Välue1", Collections.singletonMap("key", "välue"), new byte[] {} },
-                xstream);
+        MultipartEntity entity = (MultipartEntity) httpServerAPI.buildEntity(emptyMap(),
+                asList(String.class.getName(), "java.util.Map", byte[].class.getName()),
+                new Object[] {"Välue1", singletonMap("key", "välue"), new byte[] {} }
+        );
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         entity.writeTo(outputStream);
         byte[] content = outputStream.toByteArray();
         String contentAsString = new String(content, Charset.forName("UTF-8"));
         assertTrue(contentAsString.contains("välue"));
         assertTrue(contentAsString.contains("Välue1"));
-
     }
 
 }
