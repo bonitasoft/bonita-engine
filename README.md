@@ -18,31 +18,29 @@ Building the Engine
 -----------------
 Just run the following Maven command:
 ```
-mvnw install
+./mvnw install
 ```
 
 To be able to successfully build the Bonita components that use the Engine, run:
 ```
- mvnw install -Ppackage,javadoc
+ ./mvnw install -Ppackage,javadoc
 ```
 
-The command above runs all unit tests. To skip them, add "-DskipTests" option.
+The command above runs all unit tests. To skip them, add the `-DskipTests`
+option.
 
-To run all **unit + integration tests**, run the following command:
+To run all **unit + integration tests** (on the default embedded H2
+database), run the following command:
 ```
-mvnw verify -Ptests
-```
-
-To run all **unit + integration tests** on H2 run the following command:
-```
-mvnw verify -Ptests
+./mvnw verify -Ptests
 ```
 
-To run all **unit + integration tests** on mysql, postgres or oracle using a _Docker_ container run the following command:
+To run all **unit + integration tests** on mysql, postgres or oracle using
+a _Docker_ container, run one of the following commands:
 ```
-mvnw verify -Ptests,mysql
-mvnw verify -Ptests,oracle
-mvnw verify -Ptests,postgres
+./mvnw verify -Ptests,mysql
+./mvnw verify -Ptests,oracle
+./mvnw verify -Ptests,postgres
 ```
 
 How to contribute
