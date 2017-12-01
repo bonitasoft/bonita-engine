@@ -100,6 +100,26 @@ public interface ProfileAPI {
     List<Profile> getProfilesForUser(long userId, int startIndex, int maxResults, ProfileCriterion criterion);
 
     /**
+     * Retrieves the profiles with portal navigation for the user.
+     *
+     * @param userId
+     *        The identifier of the user
+     * @param startIndex
+     *        The index of the first result (starting from 0).
+     * @param maxResults
+     *        The maximum number of elements to get per page.
+     * @param criterion
+     *        The criterion for sorting the items over pages.
+     * @return The paginated and ordered profiles of the user
+     * @throws org.bonitasoft.engine.exception.RetrieveException
+     *         If an exception occurs during the profile retrieving
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid (expired, unknown, ...)
+     * @since 7.6.1
+     */
+    List<Profile> getProfilesWithNavigationForUser(long userId, int startIndex, int maxResults, ProfileCriterion criterion);
+
+    /**
      * Searches for {@link Profile}s with specific search criteria. Use {@link org.bonitasoft.engine.profile.ProfileSearchDescriptor} to
      * know the available filters.
      * 

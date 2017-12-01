@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -917,7 +918,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
-                        .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
+                        .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = '저는 7년 동안 한국에서 살았어요';")
                         .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(),
                 List.class.getName());
 
@@ -937,12 +938,13 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final long step1Id = waitForUserTask(instance, "step1");
         String employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, 저는 7년 동안 한국에서 살았어요]]");
 
         assignAndExecuteStep(step1Id, testUser);
         waitForUserTask(instance, "step2");
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John, Jack], lastName=[Doe, Doe, Doe]]");
+        assertThat(employeeToString)
+                .isEqualTo("Employee [firstName=[Jane, John, Jack], lastName=[Doe, 저는 7년 동안 한국에서 살았어요, Doe]]");
 
         disableAndDeleteProcess(definition.getId());
     }

@@ -115,6 +115,18 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
+    public List<Profile> getProfilesWithNavigationForUser(final long userId, final int startIndex, final int maxResults, final ProfileCriterion criterion) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProfileService profileService = tenantAccessor.getProfileService();
+        try {
+            return ModelConvertor.toProfiles(profileService.searchProfilesWithNavigationOfUser(userId, startIndex, maxResults, criterion.getField(),
+                    OrderByType.valueOf(criterion.getOrder().name())));
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    @Override
     public SearchResult<Profile> searchProfiles(final SearchOptions options) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();

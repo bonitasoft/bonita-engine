@@ -47,4 +47,11 @@ public final class ProfileSearchDescriptor {
      */
     public static final String IS_DEFAULT = "isDefault";
 
+    /**
+     * Used to filter or order by the flag {@link ProfileEntry#getName()}
+     *
+     * @see ProfileEntry
+     */
+    public static final String PROFILE_ENTRY_NAME = "profileentry.name";
+
 }

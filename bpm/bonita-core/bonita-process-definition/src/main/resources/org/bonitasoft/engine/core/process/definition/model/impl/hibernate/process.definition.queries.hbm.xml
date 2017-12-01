@@ -739,7 +739,7 @@
     </sql-query>
     <sql-query name="searchSUserWhoCanStartProcess">
         <return alias="user_" class="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
-        SELECT user_.*
+        SELECT DISTINCT user_.*
         from
         actormember
         join actor on (

@@ -42,7 +42,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
@@ -83,7 +83,7 @@ public class UserFilterServiceImplTest {
     public void executeFilter_should_work_for_existing_descriptor() throws Exception {
         doReturn(userFilterImplementationDescriptor).when(cacheService).get(eq("USER_FILTER"), eq("" + PROCESS_DEFINITION_ID + ":filterId-version"));
 
-        userFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.<String, SExpression> emptyMap(),
+        userFilterService.executeFilter(PROCESS_DEFINITION_ID, sUserFilterDefinition, Collections.emptyMap(),
                 new URLClassLoader(new URL[] {}, Thread.currentThread().getContextClassLoader()), new SExpressionContext(), "actorName");
     }
 
