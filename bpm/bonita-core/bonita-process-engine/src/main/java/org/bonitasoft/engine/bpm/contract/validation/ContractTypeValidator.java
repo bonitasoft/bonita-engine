@@ -29,12 +29,17 @@ public class ContractTypeValidator {
     public boolean validate(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
         if (definition.hasChildren() && definition.getType() == null) {
             if (!isValidForComplexType(definition, object, errorReporter)) {
-                errorReporter.addError(object + " cannot be assigned to COMPLEX type");
+                errorReporter.addError(object + " cannot be assigned to "
+                        + (definition.isMultiple() ? "multiple " : "")
+                        + "COMPLEX type");
                 return false;
             }
         } else {
             if (!isValidForSimpleType(definition, object)) {
-                errorReporter.addError(object + " cannot be assigned to " + definition.getType());
+                errorReporter.addError(object 
+                        + " cannot be assigned to " 
+                        + (definition.isMultiple() ? "multiple " : "")
+                        + definition.getType());
                 return false;
             }
         }

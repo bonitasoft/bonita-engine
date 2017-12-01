@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2017 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,43 +10,25 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
+package org.bonitasoft.engine.persistence;
 
-package org.bonitasoft.engine.test.persistence.builder;
+import java.sql.Types;
 
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
+import org.hibernate.dialect.SQLServer2012Dialect;
 
 /**
- * @author Danila Mazour
+ * @author Emmanuel Duchastenier
  */
-public class RoleBuilder extends PersistentObjectBuilder<SRoleImpl, RoleBuilder> {
+public class SQLServerExtendedDialect extends SQLServer2012Dialect {
 
-    private String name;
-
-    public static RoleBuilder aRole() {
-        return new RoleBuilder();
+    public SQLServerExtendedDialect() {
+        super();
+        registerColumnType(Types.CHAR, "nchar(1)");
+        registerColumnType(Types.VARCHAR, "nvarchar($l)");
+        registerColumnType(Types.VARCHAR, 8000, "nvarchar($l)");
+        registerColumnType(Types.LONGVARCHAR, "nvarchar($l)");
+        registerColumnType(Types.CLOB, "ntext");
     }
 
-    @Override
-    RoleBuilder getThisBuilder() {
-        return this;
-    }
-
-    @Override
-    SRoleImpl _build() {
-        SRoleImpl role = new SRoleImpl();
-        role.setName(this.name);
-        role.setId(this.id);
-        return role;
-    }
-
-    public RoleBuilder forRoleName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public RoleBuilder forRoleId(Long id) {
-        this.id = id;
-        return this;
-    }
 }

@@ -45,6 +45,10 @@ public class BusinessArchiveBuilder {
 
     private BusinessArchive entity;
 
+    public static BusinessArchiveBuilder aBusinessArchive() {
+        return new BusinessArchiveBuilder().createNewBusinessArchive();
+    }
+
     public BusinessArchiveBuilder createNewBusinessArchive() {
         entity = new BusinessArchive();
         return this;

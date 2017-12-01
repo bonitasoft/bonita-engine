@@ -163,7 +163,7 @@ public class ContractTypeValidatorTest {
         contractTypeValidator.validate(definition, Collections.singletonList("not a number"), errorReporter);
 
         assertThat(errorReporter.hasError()).isTrue();
-        assertThat(errorReporter.getErrors()).containsExactly("[not a number] cannot be assigned to DECIMAL");
+        assertThat(errorReporter.getErrors()).containsExactly("[not a number] cannot be assigned to multiple DECIMAL");
     }
 
     @Test
@@ -176,7 +176,7 @@ public class ContractTypeValidatorTest {
 
         // then
         assertThat(errorReporter.hasError()).isTrue();
-        assertThat(errorReporter.getErrors()).containsExactly("i am not a list cannot be assigned to TEXT");
+        assertThat(errorReporter.getErrors()).containsExactly("i am not a list cannot be assigned to multiple TEXT");
     }
 
     @Test
@@ -192,7 +192,7 @@ public class ContractTypeValidatorTest {
 
         // then
         assertThat(errorReporter.hasError()).isTrue();
-        assertThat(errorReporter.getErrors()).containsExactly("i am not a list cannot be assigned to COMPLEX type");
+        assertThat(errorReporter.getErrors()).containsExactly("i am not a list cannot be assigned to multiple COMPLEX type");
     }
 
     @Test
@@ -268,7 +268,7 @@ public class ContractTypeValidatorTest {
         // then
         assertThat(errorReporter.hasError()).isTrue();
         assertThat(errorReporter.getErrors()).containsExactly(
-                "{complexInComplex=[{simpleInput=not a date}, {simpleInput=not a date}, {simpleInput=not a date}]} cannot be assigned to COMPLEX type");
+                "{complexInComplex=[{simpleInput=not a date}, {simpleInput=not a date}, {simpleInput=not a date}]} cannot be assigned to multiple COMPLEX type");
 
     }
 

@@ -184,6 +184,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-hibernate</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.util</groupId>
             <artifactId>bonita-common-util</artifactId>
             <version>${project.version}</version>
