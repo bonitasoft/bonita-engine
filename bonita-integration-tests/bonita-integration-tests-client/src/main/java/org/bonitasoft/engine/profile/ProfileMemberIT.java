@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -132,10 +133,15 @@ public class ProfileMemberIT extends AbstractProfileIT {
     public void getProfileForUser() throws BonitaException {
         // Get Profile For User
         final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
-        assertEquals(1, profiles.size());
-        assertEquals("Administrator", profiles.get(0).getName());
+        assertThat(profiles).hasSize(1).extracting("name").contains("Administrator");
     }
 
+    @Test
+    public void getProfileWithNavigationForUser() throws BonitaException {
+        final List<Profile> profiles = getProfileAPI().getProfilesWithNavigationForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
+        assertThat(profiles).hasSize(1).extracting("name").contains("Administrator");
+    }
+    
     @Test
     public void getProfileForUserReturnDisctinctProfiles() throws BonitaException {
         // user 1 is mapped to profile "Administrator" through direct "userName1" mapping + through "role1" mapping:

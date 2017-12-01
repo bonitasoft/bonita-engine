@@ -201,6 +201,14 @@ public class SelectDescriptorBuilder {
         final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
         return new SelectListDescriptor<SProfile>("getProfilesOfUser", parameters, SProfile.class, queryOptions);
     }
+    
+    public static SelectListDescriptor<SProfile> getProfilesWithNavigationOfUser(long userId, int fromIndex,
+            int numberOfElements, String field, OrderByType order) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfile.class, field, order);
+        final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+        return new SelectListDescriptor<SProfile>("getProfilesWithNavigationOfUser", parameters, SProfile.class, queryOptions);
+    }
+
 
     public static SelectListDescriptor<SProfileMember> getSProfileMembersWithoutDisplayName(final long profileId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap(PROFILE_ID, (Object) profileId);
@@ -216,4 +224,5 @@ public class SelectDescriptorBuilder {
         return new SelectByIdDescriptor<SProfileMember>(SProfileMember.class, profileMemberId);
     }
 
+   
 }

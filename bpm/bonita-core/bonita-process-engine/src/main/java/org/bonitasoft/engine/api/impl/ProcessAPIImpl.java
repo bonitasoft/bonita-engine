@@ -566,7 +566,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             try {
                 lockService.unlock(lock, tenantId);
             } catch (final SLockException e) {
-                log(tenantAccessor, e);
+                logError(tenantAccessor, e);
             }
         }
     }
@@ -585,12 +585,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     private void deleteProcessInstancesInTransaction(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
             final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        deleteProcessInstances(processInstanceService, logger, ignoreProcessInstanceNotFound, activityInstanceService, processInstanceIds);
+        deleteProcessInstances(processInstanceService, tenantAccessor, ignoreProcessInstanceNotFound, activityInstanceService, processInstanceIds);
     }
 
-    private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
+    private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TenantServiceAccessor tenantAccessor,
             final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService, final List<Long> processInstanceIds)
             throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         for (final Long processInstanceId : processInstanceIds) {
@@ -598,9 +597,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
             } catch (final SProcessInstanceNotFoundException e) {
                 if (ignoreProcessInstanceNotFound) {
-                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It has probably completed.");
-                    }
+                    logInstanceNotFound(tenantAccessor, e);
                 } else {
                     throw e;
                 }
@@ -846,10 +843,17 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
+    private void logError(final TenantServiceAccessor tenantAccessor, final Exception e) {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+            logger.log(getClass(), TechnicalLogSeverity.ERROR, e);
+        }
+    }
+    
+    private void logInstanceNotFound(final TenantServiceAccessor tenantAccessor, final SBonitaException e) {
+        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It may have been completed.");
         }
     }
 
@@ -884,7 +888,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             getProcessInstanceList.execute();
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+            logError(tenantAccessor, e);
             throw new RetrieveException(e);
         }
         return getProcessInstanceList.getResult();
@@ -925,10 +929,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             getProcessInstance.execute();
         } catch (final SProcessInstanceNotFoundException e) {
-            log(tenantAccessor, e);
+            logInstanceNotFound(tenantAccessor, e);
             throw new ArchivedProcessInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+            logError(tenantAccessor, e);
             throw new RetrieveException(e);
         }
         return getProcessInstance.getResult();
@@ -1535,7 +1539,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     filterOptions, null);
             return processInstanceService.getNumberOfArchivedProcessInstances(queryOptions);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+            logError(tenantAccessor, e);
             throw new RetrieveException(e);
         }
     }
@@ -1614,7 +1618,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             getActivityInstances.execute();
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+            logError(tenantAccessor, e);
             throw new RetrieveException(e);
         }
         return ModelConvertor.toArchivedActivityInstances(getActivityInstances.getResult(), flowNodeStateManager);
@@ -2625,9 +2629,12 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             return sActivityInstance.getRootContainerId();
+        } catch (final SActivityInstanceNotFoundException e) {
+            logInstanceNotFound(tenantAccessor, e);
+            throw new ProcessInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
-            throw new ProcessInstanceNotFoundException(e.getMessage());
+            logError(tenantAccessor, e);
+            throw new ProcessInstanceNotFoundException(e);
         }
     }
 
@@ -2652,9 +2659,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ProcessInstance processInstance = ModelConvertor.toProcessInstances(Collections.singletonList(sProcessInstance),
                     processDefinitionService).get(0);
             return processInstance.getProcessDefinitionId();
+        } catch (final SProcessInstanceNotFoundException e) {
+            logInstanceNotFound(tenantAccessor, e);
+            throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
-            throw new ProcessDefinitionNotFoundException(e.getMessage());
+            logError(tenantAccessor, e);
+            throw new ProcessDefinitionNotFoundException(e);
         }
     }
 
@@ -2793,9 +2803,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             final ActivityInstance activityInstance = ModelConvertor.toActivityInstance(sActivityInstance, flowNodeStateManager);
             return activityInstance.getState();
-        } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+        } catch (final SActivityInstanceNotFoundException e) {
+            logInstanceNotFound(tenantAccessor, e);
             throw new ActivityInstanceNotFoundException(activityInstanceId);
+        } catch (final SBonitaException e) {
+            logError(tenantAccessor, e);
+            throw new ActivityInstanceNotFoundException(e);
         }
     }
 
@@ -2833,7 +2846,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SActivityInstanceNotFoundException e) {
             throw new ActivityInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+            logError(tenantAccessor, e);
             throw new UpdateException(e);
         }
     }
@@ -4378,7 +4391,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             return activityInstanceService.getNumberOfOverdueOpenTasksForUsers(userIds);
         } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
+            logError(tenantAccessor, e);
             throw new RetrieveException(e.getMessage());
         }
     }

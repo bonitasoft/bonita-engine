@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder.aBusinessArchive;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
@@ -501,6 +502,22 @@ public class APITestUtil extends PlatformTestUtil {
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         for (final Group group : groups) {
             getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
+        }
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition,
+            final String actorName,
+            final List<Group> groups, final List<User> users)
+            throws BonitaException {
+        final ProcessDefinition processDefinition = deployProcess(
+                aBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+        for (final Group group : groups) {
+            getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
+        }
+        for (User user : users) {
+            getProcessAPI().addUserToActor(actorName, processDefinition, user.getId());
         }
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;

@@ -18,6 +18,20 @@
 		SELECT profile
 		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile
 	</query>
+	
+	<query name="searchSProfilewithSProfileEntry">
+		SELECT DISTINCT profile
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile , 
+		 	org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+		WHERE profile.id = profileentry.profileId
+	</query>
+	
+	<query name="getNumberOfSProfilewithSProfileEntry">
+		SELECT COUNT(DISTINCT profile)
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile ,  
+			org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
+		WHERE profile.id = profileentry.profileId
+	</query>
 
 	<query name="getNumberOfSProfileEntry">
 		SELECT COUNT(profileentry)
@@ -242,6 +256,29 @@
 		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile,
 		     org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
 		WHERE pm.profileId = profile.id
+		AND (
+			pm.userId = :userId
+			OR pm.id IN (
+				SELECT pm.id
+				FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm,
+				     org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+				WHERE um.userId = :userId 
+				AND (
+					(pm.groupId = um.groupId AND pm.roleId &lt;= 0)
+					OR (pm.roleId = um.roleId AND pm.groupId &lt;= 0)
+					OR (pm.groupId = um.groupId AND pm.roleId = um.roleId)
+				)
+			)
+		)
+	</query>
+	
+	<query name="getProfilesWithNavigationOfUser">
+		SELECT DISTINCT profile
+		FROM org.bonitasoft.engine.profile.model.impl.SProfileImpl AS profile,
+		     org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry,
+		     org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
+		WHERE pm.profileId = profile.id
+		AND profile.id = profileentry.profileId
 		AND (
 			pm.userId = :userId
 			OR pm.id IN (
