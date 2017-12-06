@@ -319,7 +319,7 @@ public class WildflyBundleConfiguratorTest {
     }
 
     @Test
-    public void configureApplicationServer_should_support_special_characters() throws Exception {
+    public void configureApplicationServer_should_support_special_characters_for_h2_database() throws Exception {
         // given:
         System.setProperty("db.vendor", "h2");
         System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
@@ -346,6 +346,38 @@ public class WildflyBundleConfiguratorTest {
 
         final String bdmJdbcUrl = "jdbc:h2:file:" + databaseAbsolutePath
                 + "/bonita_bdm_with$dollarXXX.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;";
+        checkFileContains(configFile, "<connection-url>" + bdmJdbcUrl + "</connection-url>",
+                "<user-name>_bdmWith$dollar\\andBackSlash</user-name>",
+                "<password>bdm_bpm_With$dollar\\andBackSlash</password>",
+                "<xa-datasource-property name=\"URL\">" + bdmJdbcUrl + "</xa-datasource-property>");
+    }
+
+    @Test
+    public void configureApplicationServer_should_support_special_characters_for_oracle_database() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "oracle");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX\\myInstance.of.bonita&perf=good");
+        System.setProperty("db.user", "_bonita_with$dollar\\andBackSlash");
+        System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
+
+        System.setProperty("bdm.db.vendor", "oracle");
+        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good");
+        System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
+        System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path configFile = wildflyFolder.resolve("standalone").resolve("configuration").resolve("standalone.xml");
+        final String bonitaJdbcUrl = "jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good";
+        checkFileContains(configFile,
+                "<connection-url>" + bonitaJdbcUrl + "</connection-url>",
+                "<user-name>_bonita_with$dollar\\andBackSlash</user-name>",
+                "<password>bpm_With$dollar\\andBackSlash</password>",
+                "<xa-datasource-property name=\"URL\">" + bonitaJdbcUrl + "</xa-datasource-property>");
+
+        final String bdmJdbcUrl = "jdbc:oracle:thin:@ora1.rd.lan:1521:bonita_bdm_with$dollarXXX\\myInstance.of.bdm&amp;perf=good";
         checkFileContains(configFile, "<connection-url>" + bdmJdbcUrl + "</connection-url>",
                 "<user-name>_bdmWith$dollar\\andBackSlash</user-name>",
                 "<password>bdm_bpm_With$dollar\\andBackSlash</password>",

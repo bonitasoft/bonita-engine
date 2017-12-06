@@ -36,11 +36,11 @@ class WildflyBundleConfigurator extends BundleConfigurator {
     private static final Map<String, String> wildflyModules = new HashMap<>(5);
 
     static {
-        WildflyBundleConfigurator.wildflyModules.put("h2", "com/h2database/h2");
-        WildflyBundleConfigurator.wildflyModules.put("postgres", "org/postgresql");
-        WildflyBundleConfigurator.wildflyModules.put("oracle", "com/oracle");
-        WildflyBundleConfigurator.wildflyModules.put("sqlserver", "com/sqlserver");
-        WildflyBundleConfigurator.wildflyModules.put("mysql", "com/mysql");
+        WildflyBundleConfigurator.wildflyModules.put(H2, "com/h2database/h2");
+        WildflyBundleConfigurator.wildflyModules.put(POSTGRES, "org/postgresql");
+        WildflyBundleConfigurator.wildflyModules.put(ORACLE, "com/oracle");
+        WildflyBundleConfigurator.wildflyModules.put(SQLSERVER, "com/sqlserver");
+        WildflyBundleConfigurator.wildflyModules.put(MYSQL, "com/mysql");
     }
 
     WildflyBundleConfigurator(Path rootPath) throws PlatformException {
@@ -136,7 +136,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
         replacements.put("@@" + databasePrefix + "USERNAME@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
         replacements.put("@@" + databasePrefix + "PASSWORD@@", Matcher.quoteReplacement(configuration.getDatabasePassword()));
         replacements.put("@@" + databasePrefix + "TESTQUERY@@", configuration.getTestQuery());
-        replacements.put("<connection-url>@@" + databasePrefix + "DB_URL@@", "<connection-url>" + Matcher.quoteReplacement(convertWindowsBackslashes(escapeXmlCharacters(configuration.getUrl()))));
+        replacements.put("<connection-url>@@" + databasePrefix + "DB_URL@@", "<connection-url>" + getDatabaseConnectionUrlForXmlFile(configuration));
 
         // Let's uncomment and replace dbvendor-specific values:
         if (POSTGRES.equals(configuration.getDbVendor())) {
@@ -144,7 +144,7 @@ class WildflyBundleConfigurator extends BundleConfigurator {
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_SERVER_PORT@@", configuration.getServerPort()));
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_DATABASE_NAME@@", Matcher.quoteReplacement(configuration.getDatabaseName())));
         } else {
-            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", Matcher.quoteReplacement(convertWindowsBackslashes(escapeXmlCharacters(configuration.getUrl())))));
+            replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "DB_URL@@", getDatabaseConnectionUrlForXmlFile(configuration)));
         }
         if (ORACLE.equals(configuration.getDbVendor())) {
             replacements.putAll(uncommentXmlLineAndReplace("@@" + databasePrefix + "IS_SAME_RM_OVERRIDE@@", "false"));//forced to false
