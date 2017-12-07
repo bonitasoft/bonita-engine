@@ -56,7 +56,7 @@
     </scm>
 
     <properties>
-        <slf4j.version>1.6.1</slf4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <httpclient.version>4.5.2</httpclient.version>
         <xstream.version>1.4.10</xstream.version>
         <hibernate.version>4.3.11.Final</hibernate.version>
