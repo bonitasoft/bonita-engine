@@ -26,4 +26,7 @@ public class SFlowNodeModificationException extends SBonitaException {
         super(cause);
     }
 
+    public SFlowNodeModificationException(String message) {
+        super(message);
+    }
 }
