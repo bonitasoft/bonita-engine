@@ -134,8 +134,8 @@ public class WildflyBundleConfiguratorTest {
 
         checkFileContains(configFile,
                 "<driver>oracle</driver>", "<user-name>bizUser</user-name>", "<password>bizPwd</password>",
-                "<xa-datasource-property name=\"URL\">jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL</xa-datasource-property>",
-                "<connection-url>jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL</connection-url>",
+                "<xa-datasource-property name=\"URL\">jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash</xa-datasource-property>",
+                "<connection-url>jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash</connection-url>",
                 "<check-valid-connection-sql>SELECT 1 FROM DUAL</check-valid-connection-sql>");
         checkFileDoesNotContain(configFile, "<xa-datasource-property name=\"ServerName\">ora1.rd.lan</xa-datasource-property>",
                 "<xa-datasource-property name=\"portNumber\">1521</xa-datasource-property>",
