@@ -114,7 +114,7 @@ public class TomcatBundleConfiguratorTest {
                 "url=\"jdbc:postgresql://localhost:5432/bonita\"");
         checkFileContains(bonita_xml,
                 "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"", "driverClassName=\"oracle.jdbc.OracleDriver\"",
-                "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL\"");
+                "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash\"");
 
         assertThat(numberOfBackups("bonita.xml")).isEqualTo(1);
     }
@@ -162,7 +162,7 @@ public class TomcatBundleConfiguratorTest {
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1\"", "username=\"myUser\"", "password=\"myPwd\"", "driverClassName=\"org.h2.Driver\"",
                 "url=\"jdbc:h2:file:" + databaseAbsolutePath + "/internal_database.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTO_SERVER=TRUE;\"");
         checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"bizUser\"", "password=\"bizPwd\"",
-                "driverClassName=\"oracle.jdbc.OracleDriver\"", "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL\"");
+                "driverClassName=\"oracle.jdbc.OracleDriver\"", "url=\"jdbc:oracle:thin:@ora1.rd.lan:1521:ORCL_with\\backslash\"");
     }
 
     @Test
