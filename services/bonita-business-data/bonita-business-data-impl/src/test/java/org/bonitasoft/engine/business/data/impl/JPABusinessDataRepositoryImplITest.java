@@ -313,6 +313,18 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test
+    public void findList_should_return_an_empty_list_when_asked_for_no_result() {
+        addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").build());
+        addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
+        addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
+
+        final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
+                null, 0, 0);
+
+        assertThat(employees).isEmpty();
+    }
+
+    @Test
     public void findListShouldReturnEmptyListIfNoResults() {
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) "Jaakko");
         final List<Employee> employees = businessDataRepository.findList(Employee.class,

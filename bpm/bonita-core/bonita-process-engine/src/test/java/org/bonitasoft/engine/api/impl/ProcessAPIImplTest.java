@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import com.google.common.collect.Lists;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -46,11 +47,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.*;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
@@ -155,7 +152,10 @@ import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -168,7 +168,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
@@ -253,6 +253,8 @@ public class ProcessAPIImplTest {
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
     private SUserTaskInstanceImpl sUserTaskInstance;
+    private TestUserTransactionService userTransactionService;
+
 
     @Before
     public void setup() throws Exception {
@@ -279,6 +281,8 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getWorkService()).thenReturn(workService);
         when(tenantAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantAccessor.getUserFilterService()).thenReturn(userFilterService);
+        userTransactionService = new TestUserTransactionService();
+        when(tenantAccessor.getUserTransactionService()).thenReturn(userTransactionService);
 
         sUserTaskInstance = new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID,
                 ACTOR_ID, STaskPriority.ABOVE_NORMAL, PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID);
@@ -1318,23 +1322,40 @@ public class ProcessAPIImplTest {
     public void executeUserTask_should_throw_exception_if_user_task_not_in_ready() throws Exception {
         //given
         sUserTaskInstance.setStateId(State.ID_ACTIVITY_EXECUTING);
+        sUserTaskInstance.setStateName("executing");
         sUserTaskInstance.setAssigneeId(543L);
         //when
-        expectedEx.expect(FlowNodeExecutionException.class);
-        expectedEx.expectMessage("Unable to execute flow node 1674 because it is in an incompatible state");
+        expectedEx.expect(UserTaskNotFoundException.class);
+        expectedEx.expectMessage("User task is not executable (currently in state 'executing'), this might be because someone else already executed it.");
         processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap());
         //then exception
+    }
+
+    @Test
+    public void should_verify_if_the_task_was_in_fact_in_a_wrong_state_when_executing_it() throws Exception {
+        //with some concurrency, we might have some commit exceptions when executing a task.
+        // in that case if there is a commit exception we then open an other transaction to verify if the state of the task was ok
+        sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateName("ready");
+        sUserTaskInstance.setStateExecuting(true);
+        sUserTaskInstance.setAssigneeId(543L);
+        userTransactionService.failFirstTx();
+        //when
+        expectedEx.expect(UserTaskNotFoundException.class);
+        expectedEx.expectMessage("User task is not executable (currently in state 'executing ready'), this might be because someone else already executed it.");
+        processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap());
     }
 
     @Test
     public void executeUserTask_should_throw_exception_if_user_task_is_ready_but_executing() throws Exception {
         //given
         sUserTaskInstance.setStateId(State.ID_ACTIVITY_READY);
+        sUserTaskInstance.setStateName("ready");
         sUserTaskInstance.setStateExecuting(true);
         sUserTaskInstance.setAssigneeId(543L);
         //when
-        expectedEx.expect(FlowNodeExecutionException.class);
-        expectedEx.expectMessage("Unable to execute flow node 1674 because it is in an incompatible state");
+        expectedEx.expect(UserTaskNotFoundException.class);
+        expectedEx.expectMessage("User task is not executable (currently in state 'executing ready'), this might be because someone else already executed it.");
         processAPI.executeUserTask(FLOW_NODE_INSTANCE_ID, Collections.emptyMap());
         //then exception
     }
@@ -1467,5 +1488,30 @@ public class ProcessAPIImplTest {
     @Test(expected = ProcessInstanceNotFoundException.class)
     public void getProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID() throws ProcessInstanceNotFoundException,ExpressionEvaluationException {
         processAPI.getProcessInstanceExecutionContext(935);
+    }
+
+    private static class TestUserTransactionService implements UserTransactionService {
+        private boolean failOnce = false;
+        @Override
+        public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+            if (failOnce) {
+                failOnce = false;
+                throw new STransactionCommitException("commit exception");
+            }
+            return callable.call();
+        }
+
+        @Override
+        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+
+        }
+
+        @Override
+        public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
+
+        }
+        public void failFirstTx() {
+            failOnce = true;
+        }
     }
 }

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
@@ -50,9 +51,11 @@ abstract class BundleConfigurator {
 
     protected final static Logger LOGGER = LoggerFactory.getLogger(BundleConfigurator.class);
 
+    static final String H2 = "h2";
+    static final String MYSQL = "mysql";
     static final String ORACLE = "oracle";
-    private static final String SQLSERVER = "sqlserver";
     static final String POSTGRES = "postgres";
+    static final String SQLSERVER = "sqlserver";
 
     private static final String TOMCAT_TEMPLATES_FOLDER = "tomcat-templates";
 
@@ -285,4 +288,17 @@ abstract class BundleConfigurator {
     protected Path getPathUnderAppServer(String path, boolean failIfNotExist) throws PlatformException {
         return getPath(APPSERVER_FOLDERNAME + "/" + path, failIfNotExist);
     }
+
+    protected static String getDatabaseConnectionUrlForXmlFile(DatabaseConfiguration configuration) throws PlatformException {
+        return escapeXmlCharacters(getDatabaseConnectionUrl(configuration));
+    }
+
+    protected static String getDatabaseConnectionUrl(DatabaseConfiguration configuration) {
+        String url = configuration.getUrl();
+        if (H2.equals(configuration.getDbVendor())) {
+            url = convertWindowsBackslashes(url);
+        }
+        return Matcher.quoteReplacement(url);
+    }
+
 }
