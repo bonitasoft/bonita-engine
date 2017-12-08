@@ -308,14 +308,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         if (query == null) {
             throw new IllegalArgumentException("query is null");
         }
-        if (parameters != null) {
-            for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
-                query.setParameter(parameter.getKey(), parameter.getValue());
+        if (maxResults > 0) {
+            if (parameters != null) {
+                for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
+                    query.setParameter(parameter.getKey(), parameter.getValue());
+                }
             }
+            query.setFirstResult(startIndex);
+            query.setMaxResults(maxResults);
+            return query.getResultList();
         }
-        query.setFirstResult(startIndex);
-        query.setMaxResults(maxResults);
-        return query.getResultList();
+        return Collections.emptyList();
     }
 
     @Override

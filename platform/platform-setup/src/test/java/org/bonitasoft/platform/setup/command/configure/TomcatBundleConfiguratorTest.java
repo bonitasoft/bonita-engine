@@ -194,7 +194,7 @@ public class TomcatBundleConfiguratorTest {
     }
 
     @Test
-    public void configureApplicationServer_should_support_special_characters() throws Exception {
+    public void configureApplicationServer_should_support_special_characters_for_h2_database() throws Exception {
         // given:
         System.setProperty("db.vendor", "h2");
         System.setProperty("db.database.name", "bonita_with$dollarXXX.db");
@@ -230,6 +230,39 @@ public class TomcatBundleConfiguratorTest {
     }
 
     @Test
+    public void configureApplicationServer_should_support_special_characters_for_oracle_database() throws Exception {
+        // given:
+        System.setProperty("db.vendor", "oracle");
+        System.setProperty("db.database.name", "bonita_with$dollarXXX\\myInstance.of.bonita&perf=good");
+        System.setProperty("db.user", "_bonita_with$dollar\\andBackSlash");
+        System.setProperty("db.password", "bpm_With$dollar\\andBackSlash");
+
+        System.setProperty("bdm.db.vendor", "oracle");
+        System.setProperty("bdm.db.database.name", "bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good");
+        System.setProperty("bdm.db.user", "_bdmWith$dollar\\andBackSlash");
+        System.setProperty("bdm.db.password", "bdm_bpm_With$dollar\\andBackSlash");
+
+        // when:
+        configurator.configureApplicationServer();
+
+        // then:
+        final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
+        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
+
+        checkFileContains(bitronixFile, "resource.ds1.driverProperties.user=_bonita_with$dollar\\andBackSlash",
+                "resource.ds1.driverProperties.password=bpm_With$dollar\\andBackSlash",
+                "resource.ds1.driverProperties.URL=jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&perf=good");
+
+        checkFileContains(bitronixFile, "resource.ds2.driverProperties.user=_bdmWith$dollar\\andBackSlash",
+                "resource.ds2.driverProperties.password=bdm_bpm_With$dollar\\andBackSlash",
+                "resource.ds2.driverProperties.URL=jdbc:oracle:thin:@ora1.rd.lan:1521:bonita_bdm_with$dollarXXX\\myInstance.of.bdm&perf=good");
+
+        checkFileContains(bonita_xml, "validationQuery=\"SELECT 1 FROM DUAL\"", "username=\"_bonita_with$dollar\\andBackSlash\""
+                , "password=\"bpm_With$dollar\\andBackSlash\"", "driverClassName=\"oracle.jdbc.OracleDriver\""
+                , "url=\"jdbc:oracle:thin:@localhost:5432:bonita_with$dollarXXX\\myInstance.of.bonita&amp;perf=good\"");
+    }
+
+    @Test
     public void configureApplicationServer_should_support_special_characters_for_postgre_specific_properties() throws Exception {
         // given:
         System.setProperty("db.vendor", "postgres");
@@ -247,7 +280,6 @@ public class TomcatBundleConfiguratorTest {
 
         // then:
         final Path bitronixFile = tomcatFolder.resolve("conf").resolve("bitronix-resources.properties");
-        final Path bonita_xml = tomcatFolder.resolve("conf").resolve("Catalina").resolve("localhost").resolve("bonita.xml");
 
         checkFileContains(bitronixFile, "resource.ds1.driverProperties.databaseName=bonita_with$dollarXXX.db",
                 "resource.ds2.driverProperties.databaseName=bonita_bdm_with$dollarXXX.db");

@@ -849,7 +849,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             logger.log(getClass(), TechnicalLogSeverity.ERROR, e);
         }
     }
-    
+
     private void logInstanceNotFound(final TenantServiceAccessor tenantAccessor, final SBonitaException e) {
         TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -5689,6 +5689,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void executeUserTask(final long flownodeInstanceId, final Map<String, Serializable> inputs) throws FlowNodeExecutionException,
             ContractViolationException,
             UserTaskNotFoundException {
@@ -5696,15 +5697,43 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    @CustomTransactions
     public void executeUserTask(final long userId, final long flownodeInstanceId, final Map<String, Serializable> inputs) throws FlowNodeExecutionException,
             ContractViolationException, UserTaskNotFoundException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, inputs, true);
+            inTx(() -> {
+                executeFlowNode(userId, flownodeInstanceId, inputs, true);
+                return null;
+            });
+        } catch (final ContractViolationException e) {
+            throw e;
         } catch (final SFlowNodeNotFoundException e) {
-            throw new UserTaskNotFoundException(e);
-        } catch (final SBonitaException e) {
+            throw new UserTaskNotFoundException(String.format("User task %s is not found, it might already be executed", flownodeInstanceId));
+        } catch (final Exception e) {
+            verifyIfTheActivityWasInTheCorrectStateAndThrowException(flownodeInstanceId, e);
+        }
+    }
+
+    private void verifyIfTheActivityWasInTheCorrectStateAndThrowException(long flownodeInstanceId, Exception e) throws UserTaskNotFoundException, FlowNodeExecutionException {
+        SFlowNodeInstance flowNodeInstance;
+        try {
+            flowNodeInstance = inTx(() -> getTenantAccessor().getActivityInstanceService().getFlowNodeInstance(flownodeInstanceId));
+        } catch (SActivityInstanceNotFoundException e1) {
+            throw new UserTaskNotFoundException(String.format("User task %s is not found, it might already be executed", flownodeInstanceId));
+        } catch (Exception e1) {
             throw new FlowNodeExecutionException(e);
         }
+        if (flowNodeInstance.getStateId() != State.ID_ACTIVITY_READY || flowNodeInstance.isStateExecuting()) {
+            //this in a not found because that task was not visible anymore
+            throw new UserTaskNotFoundException(
+                    String.format("User task is not executable (currently in state '%s'), this might be because someone else already executed it.",
+                            (flowNodeInstance.isStateExecuting() ? "executing " : "") + flowNodeInstance.getStateName()));
+        }
+        throw new FlowNodeExecutionException(e);
+    }
+
+    private <T> T inTx(Callable<T> booleanCallable) throws Exception {
+        return getTenantAccessor().getUserTransactionService().executeInTransaction(booleanCallable);
     }
 
     private void checkIsHumanTaskInReadyState(SFlowNodeInstance flowNodeInstance) throws SFlowNodeExecutionException {
