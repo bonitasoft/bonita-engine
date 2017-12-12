@@ -471,7 +471,7 @@
                         mvn assertj:generate-assertions -Dassertj.packages=org.bonitasoft.package -->
                     <groupId>org.assertj</groupId>
                     <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>2.1.0</version>
                     <configuration>
                         <targetDir>src/test/java</targetDir>
                         <generateAssertions>false</generateAssertions>
