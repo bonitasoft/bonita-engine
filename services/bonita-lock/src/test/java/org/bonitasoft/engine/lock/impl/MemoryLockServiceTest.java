@@ -220,6 +220,8 @@ public class MemoryLockServiceTest {
         final StringBuilder detailsOnLock = spiedLockService.getDetailsOnLock(objectToLockId, "objectType", tenantId);
 
         // then:
-        assertThat(detailsOnLock).describedAs("detailsOnLock should contain 'held by thread main'").contains("held by thread main");
+        String threadName = Thread.currentThread().getName();
+        long threadId = Thread.currentThread().getId();
+        assertThat(detailsOnLock).describedAs("detailsOnLock should contain 'held by thread main'").contains("held by thread " + threadName + " with id " + threadId);
     }
 }
