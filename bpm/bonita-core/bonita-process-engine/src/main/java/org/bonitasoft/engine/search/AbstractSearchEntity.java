@@ -15,6 +15,7 @@ package org.bonitasoft.engine.search;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -109,6 +110,20 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
     }
 
     /**
+     * execute this search and return the result
+     *
+     * @return the result of the search
+     */
+    public SearchResult<C> search() throws SearchException {
+        try {
+            execute();
+        } catch (SBonitaException e) {
+            throw new SearchException(e);
+        }
+        return getResult();
+    }
+
+    /**
      * Execute the count here
      *
      * @param queryOptions
@@ -139,7 +154,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
 
     @Override
     public SearchResult<C> getResult() {
-        return new SearchResultImpl<C>(count, clientObjects);
+        return new SearchResultImpl<>(count, clientObjects);
     }
 
     protected SearchFilter getSearchFilter(final SearchOptions searchOptions, final String searchedKey) {
