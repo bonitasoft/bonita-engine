@@ -73,6 +73,11 @@ public enum StatusCode {
     /**
      * There is no BDM installed
      */
-    BDM_NOT_INSTALLED
+    BDM_NOT_INSTALLED,
+
+    /**
+     * An object in the BDM is referenced as if it was in a composition relationship, when it is not.
+     */
+    BDM_ACCESS_CONTROL_NON_COMPOSED_OBJECT_REFERENCED_IN_COMPOSITION
 
 }
