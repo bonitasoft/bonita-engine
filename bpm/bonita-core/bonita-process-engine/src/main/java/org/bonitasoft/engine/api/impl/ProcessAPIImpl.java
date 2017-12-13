@@ -5624,6 +5624,22 @@ public class ProcessAPIImpl implements ProcessAPI {
                 (queryOptions) -> activityInstanceService.searchAssignedAndPendingHumanTasks(rootProcessDefinitionId, queryOptions)).search();
     }
 
+
+    @Override
+    public SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final SearchHumanTaskInstanceDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor();
+        return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(searchDescriptor,
+                searchOptions,
+                flowNodeStateManager,
+                activityInstanceService::getNumberOfAssignedAndPendingHumanTasks,
+                activityInstanceService::searchAssignedAndPendingHumanTasks).search();
+    }
+
     @Override
     public ContractDefinition getUserTaskContract(final long userTaskId) throws UserTaskNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();

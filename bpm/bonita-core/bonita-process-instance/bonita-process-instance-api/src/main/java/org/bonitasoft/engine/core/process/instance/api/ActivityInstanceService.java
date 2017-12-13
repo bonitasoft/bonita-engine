@@ -844,6 +844,27 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(long rootProcessDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
+     * Get the total number of the assigned and pending human tasks for any user corresponding to the
+     * options.
+     *
+     * @param queryOptions
+     *        The search conditions and the options for sorting and paging the results.
+     * @return The assigned and pending human tasks
+     * @since 7.6.1
+     */
+    long getNumberOfAssignedAndPendingHumanTasks(QueryOptions queryOptions) throws SBonitaReadException;
+
+    /**
+     * Search the assigned and pending human tasks for any user corresponding to the options.
+     *
+     * @param queryOptions
+     *        The search conditions and the options for sorting and paging the results.
+     * @return The assigned and pending human tasks
+     * @since 7.6.1
+     */
+    List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(QueryOptions queryOptions) throws SBonitaReadException;
+
+    /**
      * Delete archived flow node instances and their elements
      *
      * @param processInstanceId

@@ -1625,6 +1625,20 @@
 			)
 		)
     </query>
+
+	<query name="getNumberOfSHumanTaskInstanceAssignedAndPending">
+		SELECT COUNT(a)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+		WHERE a.stateExecuting = FALSE
+		AND a.stateId = 4
+	</query>
+
+	<query name="searchSHumanTaskInstanceAssignedAndPending">
+		SELECT a
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+		WHERE a.stateExecuting = FALSE
+		AND a.stateId = 4
+	</query>
     
     <query name="countProcessInstancesOfProcessDefinition">
         SELECT COUNT(DISTINCT p)
