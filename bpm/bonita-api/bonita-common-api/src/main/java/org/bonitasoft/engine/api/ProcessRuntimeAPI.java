@@ -1404,6 +1404,17 @@ public interface ProcessRuntimeAPI {
             throws SearchException;
 
     /**
+     * Search the assigned and pending human tasks for any user corresponding to the options.
+     *
+     * @param searchOptions The search conditions and the options for sorting and paging the results. See
+     *                      {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     * @return The assigned and pending human tasks
+     * @throws SearchException If there is an error in the search conditions.
+     * @since 7.6.1
+     */
+    SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final SearchOptions searchOptions) throws SearchException;
+
+    /**
      * Get the number of assigned and pending overdue tasks for the specified users.
      *
      * @param userIds
