@@ -32,4 +32,6 @@ public final class ConnectorInstancesSearchDescriptor {
 
     public static final String CONNECTOR_DEFINITION_VERSION = "connectorDefinitionVersion";
 
+    public static final String EXECUTION_ORDER = "executionOrder";
+
 }

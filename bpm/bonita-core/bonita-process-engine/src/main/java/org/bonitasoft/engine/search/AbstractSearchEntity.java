@@ -15,7 +15,9 @@ package org.bonitasoft.engine.search;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -30,6 +32,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Abstract class to allow to search server object and convert them to client object
@@ -164,6 +167,32 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
             }
         }
         return null;
+    }
+
+
+    public static <C extends Serializable, S extends PersistentObject> SearchResult<C> search(
+            SearchEntityDescriptor searchDescriptor,
+            SearchOptions options,
+            BonitaReadFunction<List<S>, List<C>> converter,
+            BonitaReadFunction<QueryOptions, Long> count,
+            BonitaReadFunction<QueryOptions, List<S>> search) throws SearchException {
+        return new AbstractSearchEntity<C, S>(searchDescriptor, options) {
+            @Override
+            public long executeCount(QueryOptions queryOptions) throws SBonitaReadException {
+                return count.apply(queryOptions);
+            }
+
+            @Override
+            public List<S> executeSearch(QueryOptions queryOptions) throws SBonitaReadException {
+                return search.apply(queryOptions);
+            }
+
+
+            @Override
+            public List<C> convertToClientObjects(List<S> serverObjects) throws SBonitaException {
+                return converter.apply(serverObjects);
+            }
+        }.search();
     }
 
 }
