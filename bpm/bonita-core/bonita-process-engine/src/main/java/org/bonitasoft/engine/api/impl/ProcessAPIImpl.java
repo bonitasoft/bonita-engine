@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
+import static org.bonitasoft.engine.search.AbstractSearchEntity.search;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,12 +124,7 @@ import org.bonitasoft.engine.bpm.category.CategoryUpdater;
 import org.bonitasoft.engine.bpm.category.CategoryUpdater.CategoryField;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
-import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
-import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
-import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
-import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
-import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
-import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.connector.*;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
@@ -372,7 +368,6 @@ import org.bonitasoft.engine.search.comment.SearchComments;
 import org.bonitasoft.engine.search.comment.SearchCommentsInvolvingUser;
 import org.bonitasoft.engine.search.comment.SearchCommentsManagedBy;
 import org.bonitasoft.engine.search.connector.SearchArchivedConnectorInstance;
-import org.bonitasoft.engine.search.connector.SearchConnectorInstances;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
@@ -5091,17 +5086,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ConnectorInstance> searchConnectorInstances(final SearchOptions searchOptions) throws RetrieveException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final SearchConnectorInstances searchConnector = new SearchConnectorInstances(connectorInstanceService,
-                searchEntitiesDescriptor.getSearchConnectorInstanceDescriptor(), searchOptions);
+        if (searchOptions.getSorts().isEmpty()) {
+            searchOptions.getSorts().add(new Sort(Order.ASC, ConnectorInstancesSearchDescriptor.EXECUTION_ORDER));
+        }
         try {
-            searchConnector.execute();
-        } catch (final SBonitaException e) {
+            return search(searchEntitiesDescriptor.getSearchConnectorInstanceDescriptor(),
+                    searchOptions,
+                    sConnectorInstances -> ModelConvertor.toConnectorInstances(sConnectorInstances),
+                    connectorInstanceService::getNumberOfConnectorInstances,
+                    connectorInstanceService::searchConnectorInstances
+            );
+        } catch (SearchException e) {
             throw new RetrieveException(e);
         }
-        return searchConnector.getResult();
     }
 
     @Override
