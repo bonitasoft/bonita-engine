@@ -83,5 +83,10 @@ public enum StatusCode {
     /**
      * An object used in composition in the BDM has rules on the first level of the Access Control file.
      */
-    BDM_ACCESS_CONTROL_FIRST_LEVEL_RULES_ON_COMPOSED_OBJECT
+    BDM_ACCESS_CONTROL_FIRST_LEVEL_RULES_ON_COMPOSED_OBJECT,
+
+    /**
+     * The naming of rules and objects in the access control file is inconsistent
+     */
+    BDM_ACCESS_CONTROL_INCONSISTENT_NAME_IN_FILE
 }
