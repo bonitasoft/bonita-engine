@@ -78,6 +78,10 @@ public enum StatusCode {
     /**
      * An object in the BDM is referenced as if it was in a composition relationship, when it is not.
      */
-    BDM_ACCESS_CONTROL_NON_COMPOSED_OBJECT_REFERENCED_IN_COMPOSITION
+    BDM_ACCESS_CONTROL_NON_COMPOSED_OBJECT_REFERENCED_IN_COMPOSITION,
 
+    /**
+     * An object used in composition in the BDM has rules on the first level of the Access Control file.
+     */
+    BDM_ACCESS_CONTROL_FIRST_LEVEL_RULES_ON_COMPOSED_OBJECT
 }
