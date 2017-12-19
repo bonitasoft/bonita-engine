@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-persistence-api</artifactId>
+            <artifactId>bonita-persistence</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -42,11 +42,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-technical</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-persistence-read</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

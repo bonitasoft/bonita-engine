@@ -346,7 +346,7 @@
         <!-- Persistence -->
         <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-persistence-hibernate</artifactId>
+            <artifactId>bonita-persistence</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -444,18 +444,6 @@
         </dependency>
 
         <!-- Service Commons -->
-
-        <!-- Sequence -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-sequence-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-sequence-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Session -->
         <dependency>
@@ -665,10 +653,7 @@
                                     <!-- Parameter -->
                                     <include>org.bonitasoft.engine.core:bonita-parameter</include>
                                     <!-- Persistence -->
-                                    <include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
-                                    <include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>
-                                    <include>org.bonitasoft.engine.persistence:bonita-persistence-hibernate</include>
-                                    <include>org.bonitasoft.engine.persistence:bonita-persistence-read</include>
+                                    <include>org.bonitasoft.engine.persistence:bonita-persistence</include>
                                     <!-- Platform -->
                                     <include>org.bonitasoft.engine.platform:bonita-platform-api</include>
                                     <include>org.bonitasoft.engine.platform:bonita-platform-impl</include>
@@ -695,9 +680,6 @@
                                     <include>org.bonitasoft.engine.scheduler:bonita-scheduler</include>
                                     <!-- Service Commons -->
                                     <include>org.bonitasoft.engine:bonita-commons</include>
-                                    <!-- Sequence -->
-                                    <include>org.bonitasoft.engine.persistence:bonita-sequence-api</include>
-                                    <include>org.bonitasoft.engine.persistence:bonita-sequence-impl</include>
                                     <!-- Session -->
                                     <include>org.bonitasoft.engine.session:bonita-session</include>
                                     <!-- Supervisor Mapping -->
