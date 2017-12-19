@@ -88,6 +88,15 @@ public class BuildTestUtil {
         stb.append("</implementation:connectorImplementation>");
         return stb.toString().getBytes();
     }
+
+    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion, Class<? extends Connector> connectorClass) {
+        return new BarResource(
+                connectorClass.getSimpleName() + ".impl",
+                BuildTestUtil.buildConnectorImplementationFile(definitionId,
+                        definitionVersion,
+                        definitionId + "-impl",
+                        "generated", connectorClass.getName()));
+    }
     /*
      * <?xml version="1.0" encoding="UTF-8"?>
      * <implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
