@@ -250,6 +250,8 @@ public class MemoryLockService implements LockService {
                     Thread ownerThread = (Thread) getOwnerMethod.invoke(reentrantLock);
                     details.append(", held by thread ");
                     details.append(ownerThread.getName());
+                    details.append(" with id ");
+                    details.append(ownerThread.getId());
                 } catch (Exception e) {
                     logger.log(getClass(), TechnicalLogSeverity.INFO, "Error while fetching exception details on lock.", e);
                 }

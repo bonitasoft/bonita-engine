@@ -19,9 +19,15 @@ import static org.bonitasoft.engine.test.TestStates.SKIPPED;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -47,8 +53,12 @@ import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ConnectorDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
+import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -304,6 +314,74 @@ public class SearchActivityInstanceIT extends TestWithUser {
         disableAndDeleteProcess(processDef1, processDef2);
         deleteGroups(group);
         deleteRoles(role);
+    }
+
+    @Test
+    public void searchAssignedAndPendingHumanTaskInstances() throws Exception {
+        BusinessArchive bar1 = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("p1", "1.0")
+                        .addActor("a")
+                        .addUserTask("p1task1", "a")
+                        .addUserTask("p1task2", "a")
+                        .addUserTask("p1task3", "a")
+                        .addConnector("c1", "cid", "1.0", ConnectorEvent.ON_FINISH).getProcess())
+                .addConnectorImplementation(BuildTestUtil.generateConnectorImplementation("cid", "1.0", SlowConnector.class))
+                .done();
+        BusinessArchive bar2 = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("p2", "1.0")
+                        .addActor("a")
+                        .addUserTask("p2task1", "a")
+                        .addUserTask("p2task2", "a")
+                        .addUserTask("p2task3", "a")
+                        .addConnector("c1", "cid", "1.0", ConnectorEvent.ON_FINISH).getProcess())
+                .addConnectorImplementation(BuildTestUtil.generateConnectorImplementation("cid", "1.0", SlowConnector.class))
+                .done();
+        ProcessDefinition p1 = deployAndEnableProcessWithActor(bar1, "a", user);
+        ProcessDefinition p2 = deployAndEnableProcessWithActor(bar2, "a", user);
+
+        getProcessAPI().startProcess(p1.getId());
+        getProcessAPI().startProcess(p2.getId());
+        waitForUserTask("p1task1");
+        long p1task2 = waitForUserTask("p1task2");
+        long p1task3 = waitForUserTask("p1task3");
+        waitForUserTask("p2task1");
+        long p2task2 = waitForUserTask("p2task2");
+        long p2task3 = waitForUserTask("p2task3");
+
+        getProcessAPI().assignUserTask(p1task2, user.getId());
+        getProcessAPI().assignUserTask(p1task3, user.getId());
+        getProcessAPI().assignUserTask(p2task2, user.getId());
+        getProcessAPI().assignUserTask(p2task3, user.getId());
+        getProcessAPI().executeUserTask(p1task3, Collections.emptyMap());
+        getProcessAPI().executeUserTask(p2task3, Collections.emptyMap());
+
+
+        SearchResult<HumanTaskInstance> searchResult = getProcessAPI().searchAssignedAndPendingHumanTasks(
+                new SearchOptionsBuilder(0, 100)
+                        .sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC).done());
+        assertThat(searchResult).matches(haveTasks("p1task1", "p1task2", "p2task1", "p2task2"), toDescription(searchResult));
+
+        searchResult = getProcessAPI().searchAssignedAndPendingHumanTasks(new SearchOptionsBuilder(0, 100)
+                .searchTerm("p1")
+                .sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC).done());
+        assertThat(searchResult).matches(haveTasks("p1task2", "p1task1"), toDescription(searchResult));
+
+        searchResult = getProcessAPI().searchAssignedAndPendingHumanTasks(new SearchOptionsBuilder(0, 100)
+                .filter("name", "p1task3").done());
+        assertThat(searchResult).matches(haveTasks(), toDescription(searchResult));
+
+        disableAndDeleteProcess(p1, p2);
+    }
+
+    private String toDescription(SearchResult<HumanTaskInstance> searchResult) {
+        return "had tasks: " + searchResult.getResult().stream().map(NamedElement::getName).collect(Collectors.joining(", "));
+    }
+
+    private Predicate<? super SearchResult<HumanTaskInstance>> haveTasks(String... tasks) {
+        return result -> result.getCount() == tasks.length
+                && IntStream.range(0, tasks.length)
+                .mapToObj(i -> tasks[i].equals(result.getResult().get(i).getName()))
+                .allMatch(b -> b);
     }
 
     private void searchHumanTaskInstancesFilteredByUser(final long userId, final long processDefinitionId) throws Exception {

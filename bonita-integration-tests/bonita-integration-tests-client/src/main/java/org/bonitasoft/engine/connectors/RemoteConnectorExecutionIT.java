@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.connectors;
 
+import static org.assertj.core.api.Assertions.tuple;
+import static org.awaitility.Awaitility.await;
+import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -39,10 +42,7 @@ import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.*;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -75,6 +75,8 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -1022,28 +1024,39 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     @Test
-    public void searchConnectorInstances() throws Exception {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("searchConnector", "1.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
-        processDefinitionBuilder.addConnector("onEnterConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME,
-                new ExpressionBuilder().createConstantStringExpression("test"));
-        processDefinitionBuilder.addConnector("onFinishConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH).addInput(CONNECTOR_INPUT_NAME,
-                new ExpressionBuilder().createConstantStringExpression("test"));
+    public void should_order_connectors_by_execution_order_when_no_filter_are_set() throws Exception {
+        AutomaticTaskDefinitionBuilder automaticTask = new ProcessDefinitionBuilder().createNewInstance("processWithConnectors", " 1.0")
+                .addAutomaticTask("step");
+        automaticTask.addConnector("enter1", "connectorDef1", "1.0", ConnectorEvent.ON_ENTER);
+        automaticTask.addConnector("enter2", "failingConnector", "1.0", ConnectorEvent.ON_ENTER);
+        automaticTask.addConnector("enter3", "connectorDef1", "1.0", ConnectorEvent.ON_ENTER);
+        automaticTask.addConnector("finish1", "connectorDef1", "1.0", ConnectorEvent.ON_FINISH);
+        automaticTask.addConnector("finish2", "connectorDef1", "1.0", ConnectorEvent.ON_FINISH);
+        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(automaticTask
+                        .getProcess())
+                .addConnectorImplementation(
+                        generateConnectorImplementation("connectorDef1", "1.0", DoNothingConnector.class))
+                .addConnectorImplementation(
+                        generateConnectorImplementation("failingConnector", "1.0", FailingConnector.class))
+                .done();
+        ProcessDefinition processDefinition = getProcessAPI().deploy(bar);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        FlowNodeInstance failedTask = waitForFlowNodeInFailedState(processInstance, "step");
 
-        final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(processInstance.getId(), "step0");
-        SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS).done();
-        SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
-        assertEquals(2, connectorInstances.getCount());
-        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("onEnterConnector", "onFinishConnector");
+        SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(
+                new SearchOptionsBuilder(0, 100)
+                        .filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, failedTask.getId())
+                        .done());
 
-        final SearchOptionsBuilder searchOptionsBuilder = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS);
-        searchOptionsBuilder.searchTerm("onEnter");
-        searchOptions = searchOptionsBuilder.done();
-        connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
-        assertEquals(1, connectorInstances.getCount());
-        Assertions.assertThat(connectorInstances.getResult()).extracting("name").containsExactly("onEnterConnector");
+        Assertions.assertThat(connectorInstances.getResult()).extracting("name", "state")
+                .containsExactly(
+                        tuple("enter1", ConnectorState.DONE),
+                        tuple("enter2", ConnectorState.FAILED),
+                        tuple("enter3", ConnectorState.TO_BE_EXECUTED),
+                        tuple("finish1", ConnectorState.TO_BE_EXECUTED),
+                        tuple("finish2", ConnectorState.TO_BE_EXECUTED));
 
         disableAndDeleteProcess(processDefinition);
     }
