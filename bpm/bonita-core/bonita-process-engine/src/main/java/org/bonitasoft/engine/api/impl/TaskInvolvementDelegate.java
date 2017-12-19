@@ -36,10 +36,10 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.search.AbstractHumanTaskInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.task.SearchPendingTasksManagedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -119,15 +119,11 @@ public class TaskInvolvementDelegate {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantServiceAccessor.getSearchEntitiesDescriptor();
         final FlowNodeStateManager flowNodeStateManager = tenantServiceAccessor.getFlowNodeStateManager();
-
-        final SearchPendingTasksManagedBy searchPendingTasksManagedBy = new SearchPendingTasksManagedBy(activityInstanceService, flowNodeStateManager,
-                searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), managerUserId, searchOptions);
-        try {
-            searchPendingTasksManagedBy.execute();
-        } catch (final SBonitaException e) {
-            throw new SearchException(e);
-        }
-        return searchPendingTasksManagedBy.getResult();
+        return AbstractHumanTaskInstanceSearchEntity.searchHumanTaskInstance(searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(),
+                searchOptions,
+                flowNodeStateManager,
+                (queryOptions) -> activityInstanceService.searchNumberOfPendingTasksManagedBy(managerUserId, queryOptions),
+                (queryOptions) -> activityInstanceService.searchPendingTasksManagedBy(managerUserId, queryOptions)).search();
     }
 
 }
