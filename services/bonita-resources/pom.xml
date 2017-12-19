@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-persistence-read</artifactId>
+            <artifactId>bonita-persistence</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

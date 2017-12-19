@@ -21,7 +21,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.model.impl.SSessionImpl;
@@ -47,9 +46,6 @@ public class SessionServiceImplTest {
     public static final String APPLICATION_NAME = "bonita";
 
     public static final long USER_ID = 58l;
-
-    @Mock
-    private PlatformService platformService;
 
     @Mock
     private TechnicalLoggerService logger;
