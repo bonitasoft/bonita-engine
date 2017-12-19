@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
+
 import java.util.List;
 import java.util.Map;
 
