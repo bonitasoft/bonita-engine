@@ -21,6 +21,11 @@ public enum StatusCode {
     OK,
 
     /**
+     * Uploaded file is a null byte array. Not supported.
+     */
+    BDM_ACCESS_CONTROL_FILE_EMPTY,
+
+    /**
      * Detected a duplication of attributes in a BDM Access Control rule
      */
     BDM_ACCESS_CONTROL_ATTRIBUTES_DUPLICATION_ERROR,
