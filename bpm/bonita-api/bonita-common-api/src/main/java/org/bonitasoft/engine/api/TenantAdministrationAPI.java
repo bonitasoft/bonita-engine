@@ -17,6 +17,8 @@ import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentExcep
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryException;
 import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.tenant.TenantResource;
+import org.bonitasoft.engine.tenant.TenantResourceType;
 
 /**
  * This API gives access to tenant administration tasks.
@@ -96,4 +98,16 @@ public interface TenantAdministrationAPI {
      *         if the BDM version cannot be retrieved properly.
      */
     String getBusinessDataModelVersion() throws BusinessDataRepositoryException;
+
+    /**
+     * Retrieves a general purpose tenant-level resource. Up to now there can be only one resource of a certain type.
+     * If no result is found, returns TenantResourceType.NONE
+     *
+     * @param type the type of the tenant resource to retrieve.
+     * @return a <code>TenantResource</code> representing any resource at tenant-level, or TenantResourceType.NONE if
+     *         no resource of this type is found.
+     * @since 7.7
+     */
+    TenantResource getTenantResource(TenantResourceType type) throws BusinessDataRepositoryException;
+
 }
