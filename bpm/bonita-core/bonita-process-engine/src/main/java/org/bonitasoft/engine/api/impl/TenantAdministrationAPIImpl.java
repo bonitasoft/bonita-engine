@@ -52,6 +52,9 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.tenant.TenantResource;
+import org.bonitasoft.engine.tenant.TenantResourceState;
+import org.bonitasoft.engine.tenant.TenantResourceType;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 
 /**
@@ -216,6 +219,12 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         } catch (final SBonitaException e) {
             throw new UpdateException("Could not update the tenant pause mode", e);
         }
+    }
+
+    public TenantResource getTenantResource(TenantResourceType type) throws BusinessDataRepositoryException {
+        // FIXME: use org.bonitasoft.engine.service.ModelConvertor.toTenantResource() instead:gd
+        return new TenantResource(-1, "dummy", TenantResourceType.BDM_ACCESS_CTRL, 0, -1,
+                TenantResourceState.INSTALLING);
     }
 
     public TenantServiceAccessor getTenantAccessor() {
