@@ -72,7 +72,7 @@ public class BusinessDataModelRepositoryImplTest {
 
         businessDataModelRepository.createAndDeployClientBDMZip(bom);
 
-        verify(tenantResourcesService).add("client-bdm.zip", TenantResourceType.BDM, "some bytes".getBytes());
+        verify(tenantResourcesService).add("client-bdm.zip", TenantResourceType.BDM, "some bytes".getBytes(), -1);
     }
 
     @Test

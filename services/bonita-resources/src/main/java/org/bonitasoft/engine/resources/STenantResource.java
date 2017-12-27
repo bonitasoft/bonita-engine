@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.resources;
 
 /**
@@ -24,9 +23,9 @@ public class STenantResource extends STenantResourceLight {
     public STenantResource() {
     }
 
-    public STenantResource(String name, TenantResourceType type, byte[] content) {
-        this.name = name;
-        this.type = type;
+    public STenantResource(String name, TenantResourceType type, byte[] content, long lastUpdatedBy,
+            long lastUpdateDate, STenantResourceState state) {
+        super(name, type, lastUpdatedBy, lastUpdateDate, state);
         this.content = content;
     }
 

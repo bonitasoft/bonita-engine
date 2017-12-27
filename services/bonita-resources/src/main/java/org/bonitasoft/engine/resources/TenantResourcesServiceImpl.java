@@ -14,6 +14,9 @@
 
 package org.bonitasoft.engine.resources;
 
+import static org.bonitasoft.engine.resources.STenantResourceState.INSTALLED;
+
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +49,10 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     }
 
     @Override
-    public void add(String name, TenantResourceType type, byte[] content) throws SRecorderException {
+    public void add(String name, TenantResourceType type, byte[] content, long userId) throws SRecorderException {
         if (content != null && content.length > 0) {
-            STenantResource resource = new STenantResource(name, type, content);
+            STenantResource resource = new STenantResource(name, type, content, userId, Instant.now().toEpochMilli(),
+                    INSTALLED);
             recorder.recordInsert(new InsertRecord(resource), TENANT_RESOURCE);
         } else {
             logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
@@ -67,7 +71,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
     }
 
     public List<STenantResourceLight> getLight(TenantResourceType type, int from, int numberOfElements) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>(2);
+        Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService
                 .selectList(new SelectListDescriptor<STenantResourceLight>("getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class,
@@ -76,7 +80,7 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
 
     @Override
     public List<STenantResource> get(TenantResourceType type, int from, int numberOfElements) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>(2);
+        Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService.selectList(
                 new SelectListDescriptor<STenantResource>("getTenantResourcesOfType", inputParameters, STenantResource.class,
@@ -85,14 +89,14 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
 
     @Override
     public long count(TenantResourceType type) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>(2);
+        Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfType", inputParameters, STenantResource.class));
     }
 
     @Override
     public long count(TenantResourceType type, String name) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>(2);
+        Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         inputParameters.put("name", name);
         return persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenantResourcesOfTypeAndName",
@@ -101,10 +105,18 @@ public class TenantResourcesServiceImpl implements TenantResourcesService {
 
     @Override
     public STenantResource get(TenantResourceType type, String name) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>(2);
+        Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("type", type);
         inputParameters.put("name", name);
         return persistenceService.selectOne(new SelectOneDescriptor<STenantResource>("getTenantResource", inputParameters, STenantResource.class));
+    }
+
+    @Override
+    public STenantResourceLight getSingleLightResource(TenantResourceType type) throws SBonitaReadException {
+        Map<String, Object> inputParameters = new HashMap<>();
+        inputParameters.put("type", type);
+        return persistenceService.selectOne(new SelectOneDescriptor<STenantResourceLight>(
+                "getTenantResourcesLightOfType", inputParameters, STenantResourceLight.class));
     }
 
     @Override

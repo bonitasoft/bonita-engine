@@ -29,8 +29,6 @@
         AND bar.name = :name
     </query>
 
-
-
     <query name="getTenantResourcesLightOfType">
         SELECT r
         FROM org.bonitasoft.engine.resources.STenantResourceLight AS r

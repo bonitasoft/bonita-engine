@@ -14,18 +14,12 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -44,6 +38,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -51,12 +46,17 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.STenantResourceState;
+import org.bonitasoft.engine.resources.TenantResourceType;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.tenant.TenantResource;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.SWorkException;
 import org.junit.Before;
@@ -65,7 +65,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
@@ -73,41 +73,33 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TenantAdministrationAPIImplTest {
 
-    @Spy
-    @InjectMocks
-    private TenantAdministrationAPIImpl tenantManagementAPI;
-
+    private final long tenantId = 17;
     @Mock
     private TransactionService transactionService;
-
+    @Mock
+    private TenantResourcesService tenantResourcesService;
     @Mock
     private PlatformService platformService;
-
     @Mock
     private SchedulerService schedulerService;
-
     @Mock
     private PlatformServiceAccessor platformServiceAccessor;
-
     @Mock
     private SessionService sessionService;
-
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
-
     @Mock
     private NodeConfiguration nodeConfiguration;
-
     @Mock
     private BroadcastService broadcastService;
-
     @Mock
     private BusinessArchiveArtifactsManager businessArchiveArtifactsManager;
-
     @Mock
     private TechnicalLoggerService technicalLoggerService;
 
-    private final long tenantId = 17;
+    @Spy
+    @InjectMocks
+    private TenantAdministrationAPIImpl tenantManagementAPI;
 
     private STenantImpl sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
 
@@ -116,6 +108,7 @@ public class TenantAdministrationAPIImplTest {
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
+        doReturn(tenantResourcesService).when(tenantServiceAccessor).getTenantResourcesService();
 
         when(platformServiceAccessor.getTransactionService()).thenReturn(transactionService);
         when(platformServiceAccessor.getBroadcastService()).thenReturn(broadcastService);
@@ -379,5 +372,42 @@ public class TenantAdministrationAPIImplTest {
         verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
+    @Test
+    public void getTenantResource_should_retrieve_resource_from_tenantResourceService() throws Exception {
+        // Given
+        final STenantResource toBeReturned = new STenantResource("some name",
+                TenantResourceType.BDM, null, 111L, 222L, STenantResourceState.INSTALLED);
+        doReturn(toBeReturned).when(tenantResourcesService).getSingleLightResource(TenantResourceType.BDM);
 
+        // When
+        tenantManagementAPI.getTenantResource(BDM);
+
+        // Then
+        verify(tenantResourcesService).getSingleLightResource(TenantResourceType.BDM);
+    }
+
+    @Test
+    public void getTenantResource_should_return_NONE_if_exception() throws Exception {
+        // Given
+        doThrow(SBonitaReadException.class).when(tenantResourcesService).getSingleLightResource(any(TenantResourceType.class));
+
+        // When
+        final TenantResource tenantResource = tenantManagementAPI.getTenantResource(BDM);
+
+        // Then
+        assertThat(tenantResource).isEqualTo(TenantResource.NONE);
+    }
+
+    @Test
+    public void getBusinessDataModelResource_should_get_resource_for_BDM_type() {
+        // given:
+        doReturn(mock(TenantResource.class)).when(tenantManagementAPI)
+                .getTenantResource(any(org.bonitasoft.engine.tenant.TenantResourceType.class));
+
+        // when:
+        tenantManagementAPI.getBusinessDataModelResource();
+
+        // then:
+        verify(tenantManagementAPI).getTenantResource(BDM);
+    }
 }

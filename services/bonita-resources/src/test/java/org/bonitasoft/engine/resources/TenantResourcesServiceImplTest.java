@@ -16,7 +16,6 @@ package org.bonitasoft.engine.resources;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -53,7 +52,7 @@ public class TenantResourcesServiceImplTest {
     @Test
     public void add_should_log_message_and_ignore_null_file_content() throws Exception {
         // when
-        tenantResourcesService.add("resourceName", TenantResourceType.BDM, null);
+        tenantResourcesService.add("resourceName", TenantResourceType.BDM, null, -1);
 
         // then
         verifyZeroInteractions(recorder);
@@ -64,7 +63,7 @@ public class TenantResourcesServiceImplTest {
     @Test
     public void add_should_log_message_and_ignore_empty_file_content() throws Exception {
         // when
-        tenantResourcesService.add("resourceName", TenantResourceType.BDM, new byte[] {});
+        tenantResourcesService.add("resourceName", TenantResourceType.BDM, new byte[] {}, -1);
 
         // then
         verifyZeroInteractions(recorder);
@@ -75,7 +74,7 @@ public class TenantResourcesServiceImplTest {
     @Test
     public void add_should_work_for_valid_file_content() throws Exception {
         // when
-        tenantResourcesService.add("resourceName", TenantResourceType.BDM, "someValidContent".getBytes());
+        tenantResourcesService.add("resourceName", TenantResourceType.BDM, "someValidContent".getBytes(), -1);
 
         // then
         verify(recorder).recordInsert(any(InsertRecord.class), nullable(String.class));

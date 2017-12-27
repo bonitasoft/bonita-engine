@@ -24,6 +24,21 @@ public class STenantResourceLight implements PersistentObject {
     protected TenantResourceType type;
     private long tenantId;
     private long id;
+    protected long lastUpdatedBy;
+    protected long lastUpdateDate;
+    protected STenantResourceState state;
+
+    public STenantResourceLight() {
+    }
+
+    public STenantResourceLight(String name, TenantResourceType type, long lastUpdatedBy, long lastUpdateDate,
+                                STenantResourceState state) {
+        this.name = name;
+        this.type = type;
+        this.lastUpdatedBy = lastUpdatedBy;
+        this.lastUpdateDate = lastUpdateDate;
+        this.state = state;
+    }
 
     public long getTenantId() {
         return tenantId;
@@ -63,5 +78,29 @@ public class STenantResourceLight implements PersistentObject {
 
     public void setType(TenantResourceType type) {
         this.type = type;
+    }
+
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public long getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(long lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public STenantResourceState getState() {
+        return state;
+    }
+
+    public void setState(STenantResourceState state) {
+        this.state = state;
     }
 }

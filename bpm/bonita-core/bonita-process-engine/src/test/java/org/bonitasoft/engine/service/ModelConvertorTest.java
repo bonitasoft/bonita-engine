@@ -15,9 +15,12 @@ package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
+import static org.bonitasoft.engine.tenant.TenantResourceState.INSTALLED;
+import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -89,6 +92,10 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
+import org.bonitasoft.engine.resources.STenantResourceLight;
+import org.bonitasoft.engine.resources.STenantResourceState;
+import org.bonitasoft.engine.resources.TenantResourceType;
+import org.bonitasoft.engine.tenant.TenantResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -558,7 +565,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_gateways() throws Exception {
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_gateways() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -569,7 +576,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_receivetask() throws Exception {
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_receivetask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -578,7 +585,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_sendtask() throws Exception {
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_sendtask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -587,7 +594,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_usertask() throws Exception {
+    public void toArchivedFlownodeInstance_should_convert_reachStateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -597,7 +604,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFlownodeInstance_should_convert_reachStateDate_for_usertask() throws Exception {
+    public void toFlownodeInstance_should_convert_reachStateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -607,7 +614,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedFlownodeInstance_should_convert_lastUpdateDate_for_usertask() throws Exception {
+    public void toArchivedFlownodeInstance_should_convert_lastUpdateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -619,7 +626,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toFlownodeInstance_should_convert_lastUpdateDate_for_usertask() throws Exception {
+    public void toFlownodeInstance_should_convert_lastUpdateDate_for_usertask() {
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
 
@@ -630,7 +637,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_convert_expected_end_date() throws Exception {
+    public void should_convert_expected_end_date() {
         //given
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
@@ -652,7 +659,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void should_convert_archived_expected_end_date() throws Exception {
+    public void should_convert_archived_expected_end_date() {
         //given
         final FlowNodeStateManager flowNodeStateManager = mock(FlowNodeStateManager.class);
         doReturn(mock(FlowNodeState.class)).when(flowNodeStateManager).getState(anyInt());
@@ -674,7 +681,7 @@ public class ModelConvertorTest {
     }
     
     @Test
-    public void should_set_the_parentPath_when_creating_a_UserMembership(){
+    public void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
         SUserMembershipImpl sUserMembership = new SUserMembershipImpl(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
         
@@ -686,4 +693,22 @@ public class ModelConvertorTest {
         assertThat(userMembership.getGroupParentPath()).isEqualToIgnoringCase("Bonita/dummy");
     }
 
+    @Test
+    public void toTenantResource_should_convert_all_fields() {
+        // given:
+        final OffsetDateTime offsetDateTime = OffsetDateTime.parse("1970-01-01T00:00:15Z");
+        String resourceName = "any";
+        STenantResourceLight sTenantResource = new STenantResourceLight(resourceName,
+                TenantResourceType.BDM, 12L, offsetDateTime.toInstant().toEpochMilli(), STenantResourceState.INSTALLED);
+
+        // when:
+        TenantResource tenantResource = ModelConvertor.toTenantResource(sTenantResource);
+
+        // then:
+        assertThat(tenantResource.getName()).isEqualTo(resourceName);
+        assertThat(tenantResource.getLastUpdatedBy()).isEqualTo(12L);
+        assertThat(tenantResource.getLastUpdateDate()).isEqualTo(offsetDateTime);
+        assertThat(tenantResource.getState()).isEqualTo(INSTALLED);
+        assertThat(tenantResource.getType()).isEqualTo(BDM);
+    }
 }

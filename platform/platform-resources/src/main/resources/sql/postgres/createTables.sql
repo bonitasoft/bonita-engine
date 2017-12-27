@@ -1046,6 +1046,9 @@ CREATE TABLE tenant_resource (
   name VARCHAR(255) NOT NULL,
   type VARCHAR(16) NOT NULL,
   content BYTEA NOT NULL,
+  lastUpdatedBy INT8 NOT NULL,
+  lastUpdateDate INT8,
+  state VARCHAR(50) NOT NULL,
   CONSTRAINT UK_tenant_resource UNIQUE (tenantId, name, type),
   PRIMARY KEY (tenantId, id)
 );
