@@ -37,14 +37,18 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestarter;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
+import org.bonitasoft.engine.resources.STenantResourceLight;
+import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -53,7 +57,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.tenant.TenantResource;
-import org.bonitasoft.engine.tenant.TenantResourceState;
 import org.bonitasoft.engine.tenant.TenantResourceType;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 
@@ -221,22 +224,25 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    public TenantResource getTenantResource(TenantResourceType type) throws BusinessDataRepositoryException {
-        // FIXME: use org.bonitasoft.engine.service.ModelConvertor.toTenantResource() instead:gd
-        return new TenantResource(-1, "dummy", TenantResourceType.BDM_ACCESS_CTRL, 0, -1,
-                TenantResourceState.INSTALLING);
+    @Override
+    @AvailableWhenTenantIsPaused
+    public TenantResource getBusinessDataModelResource() {
+        return getTenantResource(TenantResourceType.BDM);
     }
 
-    public TenantServiceAccessor getTenantAccessor() {
+    protected TenantResource getTenantResource(TenantResourceType type) {
+        TenantResourcesService tenantResourcesService = getTenantAccessor().getTenantResourcesService();
+        org.bonitasoft.engine.resources.TenantResourceType resourceType = org.bonitasoft.engine.resources.TenantResourceType
+                .valueOf(type.name());
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
+            STenantResourceLight tenantResource = tenantResourcesService.getSingleLightResource(resourceType);
+            return ModelConvertor.toTenantResource(tenantResource);
+        } catch (SBonitaReadException e) {
+            return TenantResource.NONE;
         }
     }
 
+    //visible for testing
     @Override
     @AvailableWhenTenantIsPaused
     public String getBusinessDataModelVersion() throws BusinessDataRepositoryException {
@@ -298,4 +304,13 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
+    TenantServiceAccessor getTenantAccessor() {
+        try {
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            final long tenantId = sessionAccessor.getTenantId();
+            return TenantServiceSingleton.getInstance(tenantId);
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
 }

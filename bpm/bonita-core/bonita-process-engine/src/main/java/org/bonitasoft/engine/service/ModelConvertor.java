@@ -301,7 +301,7 @@ import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
@@ -2260,10 +2260,13 @@ public class ModelConvertor {
         return new IconImpl(icon.getId(), icon.getMimeType(), icon.getContent());
     }
 
-    public static TenantResource toTenantResource(STenantResource r) {
+    public static TenantResource toTenantResource(STenantResourceLight r) {
+        if (r == null) {
+            return TenantResource.NONE;
+        }
         return new TenantResource(r.getId(), r.getName(),
-                org.bonitasoft.engine.tenant.TenantResourceType.valueOf(r.getType().name()), System.currentTimeMillis(),
-                -1, TenantResourceState.INSTALLED);
+                org.bonitasoft.engine.tenant.TenantResourceType.valueOf(r.getType().name()), r.getLastUpdateDate(),
+                r.getLastUpdatedBy(), TenantResourceState.valueOf(r.getState().name()));
     }
 
 }

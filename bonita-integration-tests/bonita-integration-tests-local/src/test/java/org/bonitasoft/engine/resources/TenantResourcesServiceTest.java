@@ -54,7 +54,7 @@ public class TenantResourcesServiceTest extends CommonBPMServicesTest {
     public void should_create_and_get_resource_work() throws Exception {
         transactionService.begin();
         //given
-        tenantResourcesService.add("myResource", TenantResourceType.BDM, "theResourceContent".getBytes());
+        tenantResourcesService.add("myResource", TenantResourceType.BDM, "theResourceContent".getBytes(), -1);
         //when
         transactionService.complete();
         transactionService.begin();
