@@ -26,7 +26,7 @@ public interface TenantResourcesService {
 
     String TENANT_RESOURCE = "TENANT_RESOURCE";
 
-    void add(String name, TenantResourceType type, byte[] content) throws SRecorderException;
+    void add(String name, TenantResourceType type, byte[] content, long userId) throws SRecorderException;
 
     void removeAll(TenantResourceType external) throws SBonitaReadException, SRecorderException;
 
@@ -37,6 +37,17 @@ public interface TenantResourcesService {
     long count(TenantResourceType type, String name) throws SBonitaReadException;
 
     STenantResource get(TenantResourceType type, String name) throws SBonitaReadException;
+
+    /**
+     * Returns a single STenantResourceLight of the given type. This is the responsibility of the caller to only call
+     * this method when he / she is sure that there are not more than one result of the query.
+     * If the result is non unique, a SBonitaReadException is thrown.
+     * 
+     * @param type the type of the resource to filter
+     * @return the found resource if unique, null if none found
+     * @throws SBonitaReadException if non unique result, or other Hibernate exception is issued
+     */
+    STenantResourceLight getSingleLightResource(TenantResourceType type) throws SBonitaReadException;
 
     void remove(STenantResourceLight resource) throws SRecorderException;
 }

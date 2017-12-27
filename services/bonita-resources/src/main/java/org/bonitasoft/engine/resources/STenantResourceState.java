@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016-2018 Bonitasoft S.A.
+ * Copyright (C) 2017-2018 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.resources;
 
 /**
- * @author Baptiste Mesta
+ * @author Danila Mazour
  */
-public enum TenantResourceType {
-    //max 16 chars (DB)
-    BDM, BDM_ACCESS_CTRL;
-
+public enum STenantResourceState {
+    INSTALLED, INSTALLING
 }

@@ -16,6 +16,8 @@ package org.bonitasoft.engine.business.data;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.CommonAPIIT;
@@ -27,6 +29,7 @@ import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.tenant.TenantResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,15 +38,10 @@ import org.xml.sax.SAXException;
 public class BDMUpdateIT extends CommonAPIIT {
 
     public static final String DOT = ".";
-
-    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
-
     public static final String PARENT_BO = "ParentBO";
-
     public static final String CHILD_BO = "ChildBO";
-
     public static final String OTHER_CHILD_BO = "OtherChildBO";
-
+    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
     private TenantAdministrationAPI tenantAdministrationAPI;
 
     @Before
@@ -83,6 +81,7 @@ public class BDMUpdateIT extends CommonAPIIT {
         final BusinessObject businessObject = getBusinessObject(PARENT_BO);
         businessObject.addField(getSingleRelationField(getBusinessObject(CHILD_BO), relationType));
         final String version = installBusinessDataModel(getBusinessObjectModel(businessObject));
+        ensureBDMIsInstalled();
 
         // when
         uninstallBusinessDataModel();
@@ -92,7 +91,6 @@ public class BDMUpdateIT extends CommonAPIIT {
 
         // then
         assertThat(newVersion).isNotNull().isNotEqualTo(version);
-
     }
 
     protected void checkMultipleRelation(RelationField.Type relationType) throws Exception {
@@ -100,6 +98,7 @@ public class BDMUpdateIT extends CommonAPIIT {
         final BusinessObject businessObject = getBusinessObject(PARENT_BO);
         businessObject.addField(getMultipleRelationField(getBusinessObject(CHILD_BO), relationType));
         final String version = installBusinessDataModel(getBusinessObjectModel(businessObject));
+        ensureBDMIsInstalled();
 
         // when
         uninstallBusinessDataModel();
@@ -206,6 +205,11 @@ public class BDMUpdateIT extends CommonAPIIT {
         assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
 
         return businessDataModelVersion;
+    }
+
+    private void ensureBDMIsInstalled() {
+        TenantResource tenantResource = tenantAdministrationAPI.getBusinessDataModelResource();
+        assertThat(tenantResource.getLastUpdateDate()).isAfter(OffsetDateTime.now().minusMinutes(1));
     }
 
 }

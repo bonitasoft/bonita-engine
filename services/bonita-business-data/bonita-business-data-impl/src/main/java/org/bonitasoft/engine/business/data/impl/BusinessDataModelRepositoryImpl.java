@@ -168,7 +168,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     void createAndDeployClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         try {
-            tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model));
+            tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model), -1);
         } catch (IOException | SRecorderException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }

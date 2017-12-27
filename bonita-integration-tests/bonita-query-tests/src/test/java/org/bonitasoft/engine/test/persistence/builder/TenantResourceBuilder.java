@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.STenantResourceState;
 import org.bonitasoft.engine.resources.TenantResourceType;
 
 public class TenantResourceBuilder extends PersistentObjectBuilder<STenantResource, TenantResourceBuilder> {
@@ -23,13 +24,17 @@ public class TenantResourceBuilder extends PersistentObjectBuilder<STenantResour
     private byte[] content;
     private TenantResourceType type;
 
+    private long lastUpdatedBy;
+    private long lastUpdateDate;
+    private STenantResourceState state;
+
     public static TenantResourceBuilder aTenantResource() {
         return new TenantResourceBuilder();
     }
 
     @Override
     public STenantResource _build() {
-        return new STenantResource(name, type, content);
+        return new STenantResource(name, type, content, lastUpdatedBy, lastUpdateDate, state);
     }
 
     public TenantResourceBuilder withName(final String name) {
@@ -44,6 +49,21 @@ public class TenantResourceBuilder extends PersistentObjectBuilder<STenantResour
 
     public TenantResourceBuilder withContent(final byte[] content) {
         this.content = content;
+        return this;
+    }
+
+    public TenantResourceBuilder lastUpdatedBy(final long userId) {
+        this.lastUpdatedBy = userId;
+        return this;
+    }
+
+    public TenantResourceBuilder withState(STenantResourceState state) {
+        this.state = state;
+        return this;
+    }
+
+    public TenantResourceBuilder withLastUpdateDate(long date) {
+        this.lastUpdateDate = date;
         return this;
     }
 

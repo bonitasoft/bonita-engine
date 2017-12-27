@@ -38,13 +38,16 @@ public class TenantResourceServiceQueriesTest {
     @Test
     public void getTenantResource_should_get_one_resource() {
         // given
-        STenantResource resource = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).build());
+        STenantResource resource = repository.add(aTenantResource().withName("MyResource").withContent("The content".getBytes()).withType(TenantResourceType.BDM).withState(STenantResourceState.INSTALLED).lastUpdatedBy(135L).withLastUpdateDate(1973L).build());
         repository.add(aTenantResource().withName("MyResource2").withContent("The content@".getBytes()).withType(TenantResourceType.BDM).build());
 
         //when
         STenantResource myResource = repository.getTenantResource(TenantResourceType.BDM, "MyResource");
         // //then
         assertThat(myResource.getContent()).isEqualTo("The content".getBytes());
+        assertThat(myResource.lastUpdateDate).isEqualTo(1973L);
+        assertThat(myResource.lastUpdatedBy).isEqualTo(135L);
+        assertThat(myResource.state).isEqualTo(STenantResourceState.INSTALLED);
         assertThat(myResource.getId()).isEqualTo(resource.getId());
     }
 
