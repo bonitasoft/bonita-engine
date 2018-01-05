@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -24,7 +25,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -42,15 +43,16 @@ import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
@@ -69,9 +71,6 @@ public class ServerAPIImplTest {
     private Session session;
 
     @Mock
-    private ServerWrappedException serverWrappedException;
-
-    @Mock
     private TechnicalLoggerService technicalLoggerService;
 
     @Mock
@@ -85,27 +84,15 @@ public class ServerAPIImplTest {
         serverAPIImpl.setTechnicalLogger(technicalLoggerService);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.api.impl.ServerAPIImpl#invokeMethod(java.util.Map, java.lang.String, java.lang.String, java.util.List, java.lang.Object[])}.
-     * 
-     * @throws Throwable
-     */
-    @Test(expected = ServerWrappedException.class)
-    public void invokeMethodCatchUndeclaredThrowableException() throws Throwable {
-        testCatchAndLogged((new UndeclaredThrowableException(null, "")));
-    }
-
     @Test(expected = ServerWrappedException.class)
     public void invokeMethodCatchThrowable() throws Throwable {
-        testCatchAndLogged(new Throwable(""));
+        testCatchAndLogged();
     }
 
-    private void testCatchAndLogged(final Throwable toBeThrown)
-            throws Throwable {
+    private void testCatchAndLogged() throws Throwable {
         final String apiInterfaceName = "apiInterfaceName";
         final String methodName = "methodName";
-        final List<String> classNameParameters = new ArrayList<String>();
+        final List<String> classNameParameters = new ArrayList<>();
         final Object[] parametersValues = null;
 
         ServerAPIImpl serverAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
@@ -114,7 +101,7 @@ public class ServerAPIImplTest {
         doReturn(true).when(technicalLogger).isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG));
 
         serverAPIImpl.setTechnicalLogger(technicalLogger);
-        final Map<String, Serializable> options = new HashMap<String, Serializable>();
+        final Map<String, Serializable> options = new HashMap<>();
         options.put("session", session);
         try {
             serverAPIImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
@@ -129,7 +116,7 @@ public class ServerAPIImplTest {
         final String apiInterfaceName = "apiInterfaceName";
         // must be an existing method name (on Object):
         final String methodName = "toString";
-        final List<String> classNameParameters = new ArrayList<String>();
+        final List<String> classNameParameters = new ArrayList<>();
         final Object[] parametersValues = null;
         Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
 
@@ -144,11 +131,11 @@ public class ServerAPIImplTest {
             }
 
             @Override
-            public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+            public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) {
             }
 
             @Override
-            public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
+            public void registerBeforeCommitCallable(Callable<Void> callable) {
             }
         }).when(mockedServerAPIImpl).selectUserTransactionService(any(Session.class), any(ServerAPIImpl.SessionType.class));
         try {
@@ -165,7 +152,7 @@ public class ServerAPIImplTest {
         // given:
         final String apiInterfaceName = "apiInterfaceName";
         final String methodName = "customTxAPIMethod";
-        final List<String> classNameParameters = new ArrayList<String>();
+        final List<String> classNameParameters = new ArrayList<>();
         final Object[] parametersValues = null;
         Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
 
@@ -190,7 +177,7 @@ public class ServerAPIImplTest {
         // given:
         final String apiInterfaceName = "apiInterfaceName";
         final String methodName = "noSessionRequiredMethod";
-        final List<String> classNameParameters = new ArrayList<String>();
+        final List<String> classNameParameters = new ArrayList<>();
         final Object[] parametersValues = null;
         Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
 
@@ -216,7 +203,7 @@ public class ServerAPIImplTest {
         // given:
         final String apiInterfaceName = "apiInterfaceName";
         final String methodName = "notAnnotatedMethod";
-        final List<String> classNameParameters = new ArrayList<String>();
+        final List<String> classNameParameters = new ArrayList<>();
         final Object[] parametersValues = null;
         Session session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", 25L);
 
@@ -435,6 +422,32 @@ public class ServerAPIImplTest {
                 "The API method " + this.getClass().getName()
                         + "$MyObject.callMeOld is deprecated. It will be deleted in a future release. Please plan to update your code to use the replacement method instead. Check the Javadoc for more details.");
 
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void should_handle_BonitaRuntimeException() throws Throwable {
+        // given:
+        final String apiInterfaceName = "apiInterfaceName";
+        final String methodName = "methodName";
+
+        ServerAPIImpl serverAPIImpl = spy(new ServerAPIImpl(true, accessResolver));
+        doReturn(sessionAccessor).when(serverAPIImpl).beforeInvokeMethod(session, apiInterfaceName);
+        final Map<String, Serializable> options = new HashMap<>();
+        options.put("session", session);
+
+        final ArrayList<String> classNameParameters = new ArrayList<>();
+        doThrow(BonitaRuntimeException.class).when(serverAPIImpl).invokeAPI(apiInterfaceName, methodName,
+                classNameParameters, null, session);
+
+        // then:
+        expectedException.expect(ServerWrappedException.class);
+        expectedException.expectCause(instanceOf(BonitaRuntimeException.class));
+
+        // when:
+        serverAPIImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, null);
     }
 
     interface MyObject {

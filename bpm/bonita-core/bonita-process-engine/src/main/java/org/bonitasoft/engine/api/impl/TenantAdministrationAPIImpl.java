@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,8 @@ import org.bonitasoft.engine.business.data.InvalidBusinessDataModelException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -77,8 +80,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     protected long getTenantId() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            return sessionAccessor.getTenantId();
+            return getSessionAccessor().getTenantId();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -258,9 +260,15 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused(only = true)
     public String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final long userId;
+        try {
+            userId = getUserId();
+        } catch (IllegalStateException e) {
+            throw new BusinessDataRepositoryDeploymentException("Unable to determine user ID");
+        }
         try {
             final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
-            return bdmRepository.install(zip, tenantAccessor.getTenantId());
+            return bdmRepository.install(zip, tenantAccessor.getTenantId(), userId);
         } catch (final IllegalStateException e) {
             throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {
@@ -295,8 +303,7 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @Override
     @AvailableWhenTenantIsPaused
     public byte[] getClientBDMZip() throws BusinessDataRepositoryException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final BusinessDataModelRepository bdmRepository = tenantAccessor.getBusinessDataModelRepository();
+        final BusinessDataModelRepository bdmRepository = getTenantAccessor().getBusinessDataModelRepository();
         try {
             return bdmRepository.getClientBDMZip();
         } catch (final SBusinessDataRepositoryException e) {
@@ -304,13 +311,23 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
         }
     }
 
-    TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return TenantServiceSingleton.getInstance(getTenantId());
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
+        }
+    }
+
+    private SessionAccessor getSessionAccessor() throws IllegalAccessException, InstantiationException, IOException, ClassNotFoundException, BonitaHomeConfigurationException, BonitaHomeNotSetException {
+        return ServiceAccessorFactory.getInstance().createSessionAccessor();
+    }
+
+    protected long getUserId() throws IllegalStateException {
+        try {
+            return getTenantAccessor().getSessionService().getSession(getSessionAccessor().getSessionId()).getUserId();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e.getMessage());
         }
     }
 }

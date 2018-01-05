@@ -27,11 +27,12 @@ public interface BusinessDataModelRepository {
      *        the Business Data Model, as a jar containing the Business Object classes to deploy.
      * @param tenantId
      *        the ID of the tenant to deploy the Business Data Model to.
+     * @param userId the ID of the user installing the BDM, typically tenant admin (id=-1)
      * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
      *         if a deployment exception occurs.
      */
-    String install(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
+    String install(byte[] bdmArchive, long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException;
 
     /**
      * Undeploy Business Data Model from specified tenant
