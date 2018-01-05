@@ -24,6 +24,10 @@ public class BusinessDataRepositoryDeploymentException extends BusinessDataRepos
 
     private static final long serialVersionUID = 1L;
 
+    public BusinessDataRepositoryDeploymentException(String message) {
+        super(message);
+    }
+
     /**
      * Constructs a BusinessDataRepositoryDeploymentException with the specified cause.
      *
@@ -32,5 +36,4 @@ public class BusinessDataRepositoryDeploymentException extends BusinessDataRepos
     public BusinessDataRepositoryDeploymentException(final Throwable cause) {
         super(cause);
     }
-
 }

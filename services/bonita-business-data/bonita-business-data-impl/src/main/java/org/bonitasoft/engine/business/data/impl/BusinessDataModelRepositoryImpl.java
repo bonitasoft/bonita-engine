@@ -139,10 +139,10 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     @Override
-    public String install(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
+    public String install(final byte[] bdmZip, final long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
-        createAndDeployClientBDMZip(model);
+        createAndDeployClientBDMZip(model, userId);
         final long bdmVersion = createAndDeployServerBDMJar(tenantId, model);
         return String.valueOf(bdmVersion);
     }
@@ -166,9 +166,9 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    void createAndDeployClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+    void createAndDeployClientBDMZip(final BusinessObjectModel model, long userId) throws SBusinessDataRepositoryDeploymentException {
         try {
-            tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model), -1);
+            tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model), userId);
         } catch (IOException | SRecorderException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
