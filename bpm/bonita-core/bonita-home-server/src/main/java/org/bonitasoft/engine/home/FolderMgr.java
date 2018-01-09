@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.home;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
@@ -38,7 +37,7 @@ class FolderMgr {
     }
 
     private static void warnIfSomeTempFolderAlreadyExists(File systemTempFolder) {
-        File[] files = systemTempFolder.listFiles(new BonitaTempFolderFilter());
+        File[] files = systemTempFolder.listFiles((dir, name) -> dir.isDirectory() && name.startsWith(TEMP_FOLDER_NAME_PREFIX));
         List<File> temporaryFolders = Arrays.asList(files != null ? files : new File[0]);
         if (!temporaryFolders.isEmpty()) {
             LOGGER.warn("The following temporary folders were not deleted on the previous shutdown. " +
@@ -96,10 +95,4 @@ class FolderMgr {
         return artifactIdFolder;
     }
 
-    private static class BonitaTempFolderFilter implements FilenameFilter {
-        @Override
-        public boolean accept(File dir, String name) {
-            return dir.isDirectory() && name.startsWith(TEMP_FOLDER_NAME_PREFIX);
-        }
-    }
 }
