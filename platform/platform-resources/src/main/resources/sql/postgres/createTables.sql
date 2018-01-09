@@ -700,9 +700,9 @@ CREATE TABLE group_ (
   creationDate INT8,
   lastUpdate INT8,
   iconid INT8,
-  UNIQUE (tenantid, parentPath, name),
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_group_name ON group_ (tenantid, parentPath, name);
 
 CREATE TABLE role (
   tenantid INT8 NOT NULL,
