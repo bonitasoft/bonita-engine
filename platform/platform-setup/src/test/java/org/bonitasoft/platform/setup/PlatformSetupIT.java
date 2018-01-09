@@ -204,12 +204,13 @@ public class PlatformSetupIT {
 
     @Test
     public void should_extract_configuration() throws Exception {
-        final File destinationFolder = temporaryFolder.newFolder("setup");
         //given
+        final File destinationFolder = temporaryFolder.newFolder("setup");
         platformSetup.init();
 
         //when
         System.setProperty(BONITA_SETUP_FOLDER, destinationFolder.getAbsolutePath());
+        platformSetup.initProperties();
         platformSetup.pull();
 
         //then
@@ -294,6 +295,7 @@ public class PlatformSetupIT {
         platformSetup.init();
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
+        platformSetup.initProperties();
         configurationFolderUtil.buildCurrentFolder(setupFolder.toPath());
 
         // when
@@ -369,10 +371,12 @@ public class PlatformSetupIT {
 
         System.setProperty(BONITA_SETUP_FOLDER, initPath.toString());
         configurationFolderUtil.buildSqlFolder(initPath.toFile().toPath(), dbVendor);
+        platformSetup.initProperties();
         platformSetup.init();
 
         //when
         System.setProperty(BONITA_SETUP_FOLDER, pushPath.toString());
+        platformSetup.initProperties();
         platformSetup.push();
 
         //then
@@ -391,6 +395,7 @@ public class PlatformSetupIT {
         configurationFolderUtil.buildSqlFolder(confFolder, dbVendor);
 
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
+        platformSetup.initProperties();
         platformSetup.init();
         Path current = confFolder.resolve("platform_conf").resolve("current");
 
@@ -428,6 +433,7 @@ public class PlatformSetupIT {
         final Path confFolder = temporaryFolder.newFolder().toPath();
         configurationFolderUtil.buildCurrentFolder(confFolder);
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toFile().getAbsolutePath());
+        platformSetup.initProperties();
         platformSetup.push();
     }
 
