@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
@@ -57,6 +57,7 @@ public class EngineStarter {
     private Map<String, byte[]> overrideConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
     private boolean dropOnStop = true;
+    private ClassPathXmlApplicationContext applicationContext;
 
     public void start() throws Exception {
         LOGGER.info("=====================================================");
@@ -86,7 +87,7 @@ public class EngineStarter {
 
     //--------------  engine life cycle methods
 
-    protected void prepareEnvironment() throws Exception {
+    protected void prepareEnvironment() {
         LOGGER.info("=========  PREPARE ENVIRONMENT =======");
         String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
         //is h2 and not started outside
@@ -94,12 +95,13 @@ public class EngineStarter {
             setSystemPropertyIfNotSet(DATABASE_DIR, "target/database");
         }
         //init jndi
-        new ClassPathXmlApplicationContext("classpath:local-server.xml").refresh();
+        applicationContext = new ClassPathXmlApplicationContext("classpath:local-server.xml");
+        applicationContext.refresh();
     }
 
-    protected void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
-            undeployCommands();
-            deleteTenantAndPlatform();
+    protected void shutdown() throws BonitaException {
+        undeployCommands();
+        deleteTenantAndPlatform();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
@@ -273,6 +275,11 @@ public class EngineStarter {
         LOGGER.info("=====================================================");
 
         shutdown();
+
+        if (applicationContext != null) {
+            applicationContext.close();
+        }
+
         checkTempFoldersAreCleaned();
         checkThreadsAreStopped();
     }
