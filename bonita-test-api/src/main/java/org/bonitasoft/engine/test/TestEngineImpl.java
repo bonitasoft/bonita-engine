@@ -77,11 +77,6 @@ public class TestEngineImpl implements TestEngine {
     }
 
     @Override
-    public void overrideConfiguration(String path, byte[] file) {
-        engineStarter.overrideConfiguration(path, file);
-    }
-
-    @Override
     public void setDropOnStart(boolean dropOnStart) {
         engineStarter.setDropOnStart(dropOnStart);
     }
