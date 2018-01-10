@@ -1,10 +1,7 @@
 package org.bonitasoft.engine.test.junit;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.test.TestEngine;
 import org.bonitasoft.engine.test.TestEngineImpl;
 import org.bonitasoft.engine.test.annotation.Engine;
@@ -36,28 +33,21 @@ public class BonitaEngineRule implements MethodRule {
         return new BonitaEngineRule(testEngine);
     }
 
+    // Used by bonita-web-sp:
     public BonitaEngineRule withCleanAfterTest() {
         cleanAfterTest = true;
         return this;
     }
 
+    // Used by Migration:
     public BonitaEngineRule reuseExistingPlatform() {
         testEngine.setDropOnStart(false);
         return this;
     }
 
+    // Used by Migration:
     public BonitaEngineRule keepPlatformOnShutdown() {
         testEngine.setDropOnStop(false);
-        return this;
-    }
-
-    public BonitaEngineRule addCustomConfig(String path, String file) {
-        try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file)) {
-            final byte[] bytes = IOUtils.toByteArray(resourceAsStream);
-            testEngine.overrideConfiguration(path, bytes);
-        } catch (IOException e) {
-            throw new IllegalStateException("error while fetching the custom configuration", e);
-        }
         return this;
     }
 

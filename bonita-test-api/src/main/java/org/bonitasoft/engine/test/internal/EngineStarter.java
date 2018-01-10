@@ -9,13 +9,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
@@ -54,7 +51,6 @@ public class EngineStarter {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(EngineStarter.class.getName());
 
-    private Map<String, byte[]> overrideConfiguration = new HashMap<>();
     private boolean dropOnStart = true;
     private boolean dropOnStop = true;
     private ClassPathXmlApplicationContext applicationContext;
@@ -329,10 +325,6 @@ public class EngineStarter {
                 }
             }
         }
-    }
-
-    public void overrideConfiguration(String path, byte[] file) {
-        overrideConfiguration.put(path, file);
     }
 
     public void setDropOnStart(boolean dropOnStart) {
