@@ -2,16 +2,11 @@ package org.bonitasoft.engine.test;
 
 import org.bonitasoft.engine.test.internal.EngineCommander;
 import org.bonitasoft.engine.test.internal.EngineStarter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
  */
 public class TestEngineImpl implements TestEngine {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineImpl.class.getName());
 
     private static TestEngineImpl INSTANCE = createTestEngine();
 
@@ -79,11 +74,6 @@ public class TestEngineImpl implements TestEngine {
     @Override
     public void clearData() throws Exception {
         engineCommander.clearData();
-    }
-
-    @Override
-    public void overrideConfiguration(String path, byte[] file) {
-        engineStarter.overrideConfiguration(path, file);
     }
 
     @Override

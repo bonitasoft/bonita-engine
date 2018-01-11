@@ -27,6 +27,7 @@
                 <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
                 <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
                 <property name="idleTimeout" value="1800000" />
+                <property name="maxLifetime" value="2000000" />
             </bean>
         </constructor-arg>
     </bean>
@@ -50,6 +51,7 @@
                 <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
                 <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
                 <property name="idleTimeout" value="1800000" />
+                <property name="maxLifetime" value="2000000" />
             </bean>
         </constructor-arg>
     </bean>

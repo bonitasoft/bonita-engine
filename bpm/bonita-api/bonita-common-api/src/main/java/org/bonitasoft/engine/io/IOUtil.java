@@ -202,20 +202,18 @@ public class IOUtil {
 
         try {
 
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-
-                @Override
-                public void run() {
-                    try {
-                        final boolean deleted = deleteDir(tmpDir);
-                        if (!deleted) {
-                            System.err.println("Unable to delete the directory: " + tmpDir);
-                        }
-                    } catch (final IOException e) {
-                        throw new BonitaRuntimeException(e);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    final boolean deleted = deleteDir(tmpDir);
+                    if (!deleted) {
+                        System.err.println(
+                                "Unable to delete directory: " + tmpDir + ". Trying with an alternative force delete.");
+                        FileUtils.forceDelete(tmpDir);
                     }
+                } catch (final IOException e) {
+                    throw new BonitaRuntimeException(e);
                 }
-            });
+            }));
         } catch (IllegalStateException ignored) {
             // happen in case of hook already registered and when shutting down
         }
@@ -278,10 +276,6 @@ public class IOUtil {
      * Create a structured zip archive recursively.
      * The string must be OS specific String to represent path.
      *
-     * @param dir2zip
-     * @param zos
-     * @param root
-     * @throws IOException
      */
     public static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {
         final File zipDir = new File(dir2zip);
@@ -305,14 +299,14 @@ public class IOUtil {
         }
     }
 
-    private static int copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file) throws IOException {
+    private static void copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file)
+            throws IOException {
         int bytesIn;
         try (FileInputStream fis = new FileInputStream(file)) {
             while ((bytesIn = fis.read(readBuffer)) != -1) {
                 zos.write(readBuffer, 0, bytesIn);
             }
         }
-        return bytesIn;
     }
 
     /**
@@ -367,8 +361,10 @@ public class IOUtil {
         }
     }
 
-    private static boolean mkdirs(final File file) {
-        return file.exists() || file.mkdirs();
+    private static void mkdirs(final File file) {
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 
     private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws IOException {
