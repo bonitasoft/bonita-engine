@@ -58,6 +58,7 @@ public class PlatformSetupTest {
     private ConfigurationService configurationService;
     @Mock
     private VersionService versionService;
+
     @InjectMocks
     private PlatformSetup platformSetup;
 
