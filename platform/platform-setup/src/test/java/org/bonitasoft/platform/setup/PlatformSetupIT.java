@@ -164,11 +164,10 @@ public class PlatformSetupIT {
         //then
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL + "' ORDER BY resource_name");
-        assertThat(rows).hasSize(4);
+        assertThat(rows).hasSize(3);
         assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("cache-config.xml");
-        assertThat(rows.get(1).get("RESOURCE_NAME")).isEqualTo("jaas-standard.cfg");
-        assertThat(rows.get(2).get("RESOURCE_NAME")).isEqualTo("platform-tenant-config.properties");
-        assertThat(rows.get(3).get("RESOURCE_NAME")).isEqualTo("security-config.properties");
+        assertThat(rows.get(1).get("RESOURCE_NAME")).isEqualTo("platform-tenant-config.properties");
+        assertThat(rows.get(2).get("RESOURCE_NAME")).isEqualTo("security-config.properties");
     }
 
     @Test
@@ -228,7 +227,6 @@ public class PlatformSetupIT {
                 "bonita-platform-custom.xml",
                 "bonita-platform-init-custom.xml",
                 "cache-config.xml",
-                "jaas-standard.cfg",
                 "platform-tenant-config.properties",
                 "security-config.properties",
                 "bonita-tenant-community-custom.properties",
