@@ -692,9 +692,9 @@ CREATE TABLE group_ (
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
   iconid NUMBER(19, 0),
-  CONSTRAINT UK_Group UNIQUE (tenantid, parentPath, name),
   PRIMARY KEY (tenantid, id)
 );
+CREATE INDEX idx_group_name ON group_ (tenantid, parentPath, name);
 
 CREATE TABLE role (
   tenantid NUMBER(19, 0) NOT NULL,
