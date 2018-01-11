@@ -140,7 +140,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.classloader</groupId>
-            <artifactId>bonita-classloader-api</artifactId>
+            <artifactId>bonita-classloader</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
