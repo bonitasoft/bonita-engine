@@ -796,11 +796,11 @@ CREATE TABLE group_ (
   creationDate NUMERIC(19, 0),
   lastUpdate NUMERIC(19, 0),
   iconid NUMERIC(19, 0),
-  UNIQUE (tenantid, parentPath, name),
   PRIMARY KEY (tenantid, id)
 )
 GO
-
+CREATE INDEX idx_group_name ON group_ (tenantid, parentPath, name);
+GO
 CREATE TABLE role (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

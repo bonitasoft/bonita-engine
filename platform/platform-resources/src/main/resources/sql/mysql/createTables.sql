@@ -700,9 +700,9 @@ CREATE TABLE group_ (
   creationDate BIGINT,
   lastUpdate BIGINT,
   iconid BIGINT,
-  UNIQUE (tenantid, parentPath, name),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE INDEX idx_group_name ON group_ (tenantid, parentPath, name);
 
 CREATE TABLE role (
   tenantid BIGINT NOT NULL,
