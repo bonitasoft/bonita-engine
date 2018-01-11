@@ -151,7 +151,7 @@
         <!-- Classloader -->
         <dependency>
             <groupId>org.bonitasoft.engine.classloader</groupId>
-            <artifactId>bonita-classloader-impl</artifactId>
+            <artifactId>bonita-classloader</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -604,8 +604,7 @@
                                     <!-- Category -->
                                     <include>org.bonitasoft.engine.core.category:bonita-category</include>
                                     <!-- Classloader -->
-                                    <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
-                                    <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
+                                    <include>org.bonitasoft.engine.classloader:bonita-classloader</include>
                                     <!-- Command -->
                                     <include>org.bonitasoft.engine.command:bonita-command</include>
                                     <!-- Contract Data -->
