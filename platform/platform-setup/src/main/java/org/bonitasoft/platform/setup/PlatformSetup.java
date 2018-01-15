@@ -77,7 +77,6 @@ public class PlatformSetup {
     private Path initialConfigurationFolder;
     private Path currentConfigurationFolder;
     private Path licensesFolder;
-    private boolean setupAlreadyInitialized = false;
 
     @Autowired
     PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService, VersionService versionService, DataSource dataSource) {
@@ -232,7 +231,7 @@ public class PlatformSetup {
         scriptExecutor.createAndInitializePlatformIfNecessary();
     }
 
-    public void initProperties() {
+    void initProperties() {
         if (dbVendor == null) {
             dbVendor = System.getProperty("sysprop.bonita.db.vendor");
         }
@@ -372,15 +371,11 @@ public class PlatformSetup {
         if (isPlatformAlreadyCreated()) {
             scriptExecutor.deleteTables();
         }
-        setupAlreadyInitialized = false;
     }
 
     public void initPlatformSetup() throws PlatformException {
-        if (!setupAlreadyInitialized) {
-            initProperties();
-            initDataSource();
-            setupAlreadyInitialized = true;
-        }
+        initProperties();
+        initDataSource();
     }
 
     public ConfigurationService getConfigurationService() {
