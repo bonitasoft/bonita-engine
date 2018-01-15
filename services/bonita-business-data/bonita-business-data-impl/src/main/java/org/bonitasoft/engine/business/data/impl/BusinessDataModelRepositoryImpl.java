@@ -49,6 +49,7 @@ import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.resources.STenantResource;
+import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.TenantResourceType;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.xml.sax.SAXException;
@@ -75,7 +76,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     private long tenantId;
 
     public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager,
-                                           TenantResourcesService tenantResourcesService, long tenantId) {
+            TenantResourcesService tenantResourcesService, long tenantId) {
         this.dependencyService = dependencyService;
         this.schemaManager = schemaManager;
         this.tenantResourcesService = tenantResourcesService;
@@ -150,7 +151,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
-            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_FILENAME, tenantId, ScopeType.TENANT);
+            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_FILENAME, tenantId,
+                    ScopeType.TENANT);
             dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
             update(model.getBusinessObjectsClassNames());
             return mappedDependency.getId();
@@ -167,6 +169,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     }
 
     void createAndDeployClientBDMZip(final BusinessObjectModel model, long userId) throws SBusinessDataRepositoryDeploymentException {
+        STenantResourceLight accessControl;
+        try {
+            accessControl = tenantResourcesService.getSingleLightResource(TenantResourceType.BDM_ACCESS_CTRL);
+        } catch (SBonitaReadException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+        if (accessControl != null) {
+            throw new SBusinessDataRepositoryDeploymentException("A BDM Access Control file is installed. Uninstall it before deploying the BDM");
+        }
         try {
             tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model), userId);
         } catch (IOException | SRecorderException e) {
