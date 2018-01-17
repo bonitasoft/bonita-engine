@@ -68,11 +68,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.core</groupId>
-            <artifactId>bonita-expression-resolver</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine.core.connector</groupId>
             <artifactId>bonita-connector-service-api</artifactId>
             <version>${project.version}</version>

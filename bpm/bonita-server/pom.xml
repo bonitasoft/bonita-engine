@@ -230,18 +230,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Expression Resolver -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.core</groupId>
-            <artifactId>bonita-expression-resolver</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>bonita-common-api</artifactId>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!-- External Identity Mapping -->
         <dependency>
@@ -310,25 +298,6 @@
             <artifactId>bonita-log</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Operation -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.core.operation</groupId>
-            <artifactId>bonita-operation-api</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.core.operation</groupId>
-            <artifactId>bonita-operation-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Page -->
         <dependency>
             <groupId>org.bonitasoft.engine.page</groupId>
@@ -626,8 +595,6 @@
                                     <include>org.bonitasoft.engine.events:bonita-events</include>
                                     <!-- Expression -->
                                     <include>org.bonitasoft.engine.expression:bonita-expression</include>
-                                    <!-- Expression Resolver -->
-                                    <include>org.bonitasoft.engine.core:bonita-expression-resolver</include>
                                     <!-- External Identity Mapping -->
                                     <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping</include>
                                     <!-- Form mapping -->
@@ -644,9 +611,6 @@
                                     <include>org.bonitasoft.engine.core.login:bonita-login</include>
                                     <!-- Logs -->
                                     <include>org.bonitasoft.engine.log:bonita-log</include>
-                                    <!-- Operation -->
-                                    <include>org.bonitasoft.engine.core.operation:bonita-operation-model</include>
-                                    <include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
                                     <!-- Page -->
                                     <include>org.bonitasoft.engine.page:bonita-page</include>
                                     <!-- Parameter -->

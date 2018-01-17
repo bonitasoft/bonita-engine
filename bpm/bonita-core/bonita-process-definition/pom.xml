@@ -43,11 +43,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.core.operation</groupId>
-            <artifactId>bonita-operation-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine.recorder</groupId>
             <artifactId>bonita-recorder</artifactId>
             <version>${project.version}</version>
@@ -60,6 +55,36 @@
         <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
             <artifactId>bonita-persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-time-tracker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.data.instance</groupId>
+            <artifactId>bonita-data-instance</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.classloader</groupId>
+            <artifactId>bonita-classloader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-technical</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -33,7 +33,6 @@
                 <module>bonita-api</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
-                <module>bonita-expression-resolver</module>
                 <module>bonita-external</module>
                 <module>bonita-util</module>
                 <module>bonita-synchro-repository</module>
@@ -49,7 +48,6 @@
                 <module>bonita-api</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
-                <module>bonita-expression-resolver</module>
                 <module>bonita-external</module>
                 <module>bonita-util</module>
                 <module>bonita-synchro-repository</module>
@@ -68,7 +66,6 @@
                 <module>bonita-api</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
-                <module>bonita-expression-resolver</module>
                 <module>bonita-external</module>
                 <module>bonita-util</module>
                 <module>bonita-synchro-repository</module>
@@ -84,7 +81,6 @@
                 <module>bonita-api</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
-                <module>bonita-expression-resolver</module>
                 <module>bonita-external</module>
                 <module>bonita-util</module>
                 <module>bonita-synchro-repository</module>
@@ -100,7 +96,6 @@
                 <module>bonita-api</module>
                 <module>bonita-deploy</module>
                 <module>bonita-connector-service</module>
-                <module>bonita-expression-resolver</module>
                 <module>bonita-external</module>
                 <module>bonita-util</module>
                 <module>bonita-synchro-repository</module>
