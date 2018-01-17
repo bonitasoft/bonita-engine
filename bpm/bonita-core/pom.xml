@@ -24,7 +24,6 @@
 		<module>bonita-actor-mapping</module>
 		<module>bonita-core-data</module>
 		<module>bonita-category</module>
-		<module>bonita-operation</module>
 		<module>bonita-document</module>
 		<module>bonita-supervisor-mapping</module>
 		<module>bonita-process-comment</module>
