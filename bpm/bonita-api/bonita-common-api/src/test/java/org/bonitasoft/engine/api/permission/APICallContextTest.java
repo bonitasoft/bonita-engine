@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.permission;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +81,26 @@ public class APICallContextTest {
         final Map<String, String> filters = apiCallContext.getFilters();
 
         assertThat(filters).containsOnly(entry("state", "ready"));
+    }
+    
+    @Test
+    public void getFilters_with_corrupt_filters_not_encoded() {
+        final APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id=&d=processId");
+
+        final Map<String, String> filters = apiCallContext.getFilters();
+
+        assertThat(filters).containsOnly(entry("state", "ready"));
+    }
+    
+    @Test
+    public void getFilters_with_value_not_encoded() {
+        final APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id=101&d=processId");
+
+        final Map<String, String> filters = apiCallContext.getFilters();
+
+        assertThat(filters).containsOnly(entry("state", "ready"), entry("user_id", "101"));
     }
 
     @Test
