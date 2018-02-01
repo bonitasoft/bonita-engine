@@ -133,13 +133,13 @@ public class APICallContext implements Serializable {
     private void addFilter(String value) {
         int indexOfEncodedEquals = Math.max(value.indexOf("%3d"), value.indexOf("%3D"));
         if (indexOfEncodedEquals > 0) {
-            addFilterIfNecessary(value, indexOfEncodedEquals, 3);
+            addFilterIfValueNotBlank(value, indexOfEncodedEquals, 3);
         } else if (value.indexOf("=") > 0) {
-            addFilterIfNecessary(value, value.indexOf("="), 1);
+            addFilterIfValueNotBlank(value, value.indexOf("="), 1);
         }
     }
 
-    private void addFilterIfNecessary(String value, int indexOfEquals, int separatorSize) {
+    private void addFilterIfValueNotBlank(String value, int indexOfEquals, int separatorSize) {
         if (indexOfEquals + separatorSize < value.length()) {
             filters.put(value.substring(0, indexOfEquals), value.substring(indexOfEquals + separatorSize, value.length()));
         }
