@@ -62,6 +62,7 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateThrowEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
@@ -266,9 +267,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         for (final EndEventDefinition endEventDefinition : endEvents) {
             final SEndEventDefinitionImpl sEndEvent = new SEndEventDefinitionImpl(endEventDefinition, transitionsMap);
             sEndEvents.add(sEndEvent);
-            allElements.add(sEndEvent);
-            allElementsMap.put(sEndEvent.getId(), sEndEvent);
-            allElementsMapString.put(sEndEvent.getName(), sEndEvent);
+            addFlowNode(sEndEvent);
         }
         return sEndEvents;
     }
@@ -279,9 +278,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         for (final StartEventDefinition startEventDefinition : startEvents) {
             final SStartEventDefinitionImpl sStartEventDefinitionImpl = new SStartEventDefinitionImpl(startEventDefinition, transitionsMap);
             sStartEvents.add(sStartEventDefinitionImpl);
-            allElements.add(sStartEventDefinitionImpl);
-            allElementsMap.put(sStartEventDefinitionImpl.getId(), sStartEventDefinitionImpl);
-            allElementsMapString.put(sStartEventDefinitionImpl.getName(), sStartEventDefinitionImpl);
+            addFlowNode(sStartEventDefinitionImpl);
         }
         return sStartEvents;
     }
@@ -294,9 +291,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             final SIntermediateCatchEventDefinitionImpl sIntermediateCatchEvent = new SIntermediateCatchEventDefinitionImpl(intermediateCatchEventDefinition,
                     transitionsMap);
             sIntermediateCatchEvents.add(sIntermediateCatchEvent);
-            allElements.add(sIntermediateCatchEvent);
-            allElementsMap.put(sIntermediateCatchEvent.getId(), sIntermediateCatchEvent);
-            allElementsMapString.put(sIntermediateCatchEvent.getName(), sIntermediateCatchEvent);
+            addFlowNode(sIntermediateCatchEvent);
         }
         return sIntermediateCatchEvents;
     }
@@ -309,9 +304,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             final SIntermediateThrowEventDefinitionImpl sIntermediateThrowEvent = new SIntermediateThrowEventDefinitionImpl(intermediateThrowEventDefinition,
                     transitionsMap);
             sIntermediateThrowEvents.add(sIntermediateThrowEvent);
-            allElements.add(sIntermediateThrowEvent);
-            allElementsMap.put(sIntermediateThrowEvent.getId(), sIntermediateThrowEvent);
-            allElementsMapString.put(sIntermediateThrowEvent.getName(), sIntermediateThrowEvent);
+            addFlowNode(sIntermediateThrowEvent);
         }
         return sIntermediateThrowEvents;
     }
@@ -329,13 +322,20 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             allElementsMap.put(boundary.getId(), boundary);
         }
         activities.add(activity);
-        allElements.add(activity);
-        allElementsMap.put(activity.getId(), activity);
-        allElementsMapString.put(activity.getName(), activity);
-
+        addFlowNode(activity);
         if (activity instanceof SSubProcessDefinition) {
             addSubProcess((SSubProcessDefinition) activity);
         }
+    }
+
+    public void addEvent(SEventDefinition eventDefinition) {
+        addFlowNode(eventDefinition);
+    }
+
+    private void addFlowNode(SFlowNodeDefinition flowNodeDefinition) {
+        allElements.add(flowNodeDefinition);
+        allElementsMap.put(flowNodeDefinition.getId(), flowNodeDefinition);
+        allElementsMapString.put(flowNodeDefinition.getName(), flowNodeDefinition);
     }
 
     public void addSubProcess(final SSubProcessDefinition sSubProcessDefinition) {
@@ -348,9 +348,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             containsInclusiveGateway = true;
         }
         gatewaysMap.put(gateway.getName(), gateway);
-        allElements.add(gateway);
-        allElementsMap.put(gateway.getId(), gateway);
-        allElementsMapString.put(gateway.getName(), gateway);
+        addFlowNode(gateway);
     }
 
     public void addBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
