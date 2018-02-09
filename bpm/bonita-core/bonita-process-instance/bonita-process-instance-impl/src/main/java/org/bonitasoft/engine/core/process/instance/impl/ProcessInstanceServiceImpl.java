@@ -41,6 +41,7 @@ import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -484,7 +485,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
         if (flowNodeInstance instanceof SEventInstance) {
-            bpmEventInstanceService.deleteEventTriggerInstances(flowNodeInstance.getId());
+            SFlowNodeDefinition flowNodeDefinition = getFlowNode(flowNodeInstance, processDefinition);
+            //There is no flownode definition when the event was dynamically added (e.g. throw error when a connector fails)
+            // in that case we still try to delete the event triggers
+            if (flowNodeDefinition == null || !((SEventDefinition) flowNodeDefinition).getEventTriggers().isEmpty()) {
+                bpmEventInstanceService.deleteEventTriggerInstances(flowNodeInstance.getId());
+            }
         } else if (flowNodeInstance instanceof SActivityInstance) {
             deleteActivityInstanceElements((SActivityInstance) flowNodeInstance, processDefinition);
         }
@@ -547,6 +553,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private SFlowNodeDefinition getFlowNode(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) {
+        if (processDefinition == null) {
+            return null;
+        }
         return processDefinition.getProcessContainer().getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
     }
 
