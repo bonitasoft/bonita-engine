@@ -36,9 +36,9 @@ import javax.persistence.Version;
 import org.apache.commons.beanutils.converters.DateTimeConverter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.bonitasoft.engine.bdm.DateConverter;
 import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.OffsetDateTimeConverter;
+import org.bonitasoft.engine.business.data.generator.DateConverter;
+import org.bonitasoft.engine.business.data.generator.OffsetDateTimeConverter;
 
 public class EntitySerializerPojo implements Entity {
 

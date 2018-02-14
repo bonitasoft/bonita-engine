@@ -27,19 +27,20 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import org.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
-import org.bonitasoft.engine.bdm.client.ResourcesLoader;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.impl.filter.OnlyDAOImplementationFileFilter;
-import org.bonitasoft.engine.business.data.impl.filter.WithoutDAOImplementationFileFilter;
+import org.bonitasoft.engine.business.data.generator.AbstractBDMJarBuilder;
+import org.bonitasoft.engine.business.data.generator.BDMJarGenerationException;
+import org.bonitasoft.engine.business.data.generator.client.ClientBDMJarBuilder;
+import org.bonitasoft.engine.business.data.generator.client.ResourcesLoader;
+import org.bonitasoft.engine.business.data.generator.compiler.JDTCompiler;
+import org.bonitasoft.engine.business.data.generator.filter.OnlyDAOImplementationFileFilter;
+import org.bonitasoft.engine.business.data.generator.filter.WithoutDAOImplementationFileFilter;
+import org.bonitasoft.engine.business.data.generator.server.ServerBDMJarBuilder;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.compiler.JDTCompiler;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -100,7 +101,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public String getInstalledBDMVersion() throws SBusinessDataRepositoryException {
         try {
-            Optional returnedId = dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME);
+            Optional returnedId = dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT,
+                    BDR_DEPENDENCY_FILENAME);
             if (returnedId.isPresent()) {
                 return String.valueOf(returnedId);
             }
@@ -133,14 +135,16 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     @Override
     public boolean isBDMDeployed() {
         try {
-            return dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME).isPresent();
+            return dependencyService.getIdOfDependencyOfArtifact(tenantId, ScopeType.TENANT, BDR_DEPENDENCY_FILENAME)
+                    .isPresent();
         } catch (SBonitaReadException e) {
             return false;
         }
     }
 
     @Override
-    public String install(final byte[] bdmZip, final long tenantId, long userId) throws SBusinessDataRepositoryDeploymentException {
+    public String install(final byte[] bdmZip, final long tenantId, long userId)
+            throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
         createAndDeployClientBDMZip(model, userId);
@@ -148,10 +152,12 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         return String.valueOf(bdmVersion);
     }
 
-    protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+    protected long createAndDeployServerBDMJar(final long tenantId, final BusinessObjectModel model)
+            throws SBusinessDataRepositoryDeploymentException {
         final byte[] serverBdmJar = generateServerBDMJar(model);
         try {
-            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar, BDR_DEPENDENCY_FILENAME, tenantId,
+            final SDependency mappedDependency = dependencyService.createMappedDependency(BDR_DEPENDENCY_NAME, serverBdmJar,
+                    BDR_DEPENDENCY_FILENAME, tenantId,
                     ScopeType.TENANT);
             dependencyService.refreshClassLoaderAfterUpdate(ScopeType.TENANT, tenantId);
             update(model.getBusinessObjectsClassNames());
@@ -168,7 +174,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    void createAndDeployClientBDMZip(final BusinessObjectModel model, long userId) throws SBusinessDataRepositoryDeploymentException {
+    void createAndDeployClientBDMZip(final BusinessObjectModel model, long userId)
+            throws SBusinessDataRepositoryDeploymentException {
         STenantResourceLight accessControl;
         try {
             accessControl = tenantResourcesService.getSingleLightResource(TenantResourceType.BDM_ACCESS_CTRL);
@@ -176,7 +183,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
         if (accessControl != null) {
-            throw new SBusinessDataRepositoryDeploymentException("A BDM Access Control file is installed. Uninstall it before deploying the BDM");
+            throw new SBusinessDataRepositoryDeploymentException(
+                    "A BDM Access Control file is installed. Uninstall it before deploying the BDM");
         }
         try {
             tenantResourcesService.add(CLIENT_BDM_ZIP, TenantResourceType.BDM, generateClientBDMZip(model), userId);
@@ -185,7 +193,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    protected BusinessObjectModel getBusinessObjectModel(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
+    protected BusinessObjectModel getBusinessObjectModel(final byte[] bdmZip)
+            throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         try {
             return converter.unzip(bdmZip);
@@ -194,26 +203,37 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    protected byte[] generateServerBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
+    protected byte[] generateServerBDMJar(final BusinessObjectModel model)
+            throws SBusinessDataRepositoryDeploymentException {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler);
         final IOFileFilter classFileAndXmlFilefilter = new SuffixFileFilter(Arrays.asList(".class", ".xml"));
-        return builder.build(model, classFileAndXmlFilefilter);
+        try {
+            return builder.build(model, classFileAndXmlFilefilter);
+        } catch (BDMJarGenerationException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
     }
 
-    protected byte[] generateClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException, IOException {
+    protected byte[] generateClientBDMZip(final BusinessObjectModel model)
+            throws SBusinessDataRepositoryDeploymentException, IOException {
         final JDTCompiler compiler = new JDTCompiler();
         AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader());
 
         final Map<String, byte[]> resources = new HashMap<>();
-        // Build jar with Model
-        final byte[] modelJarContent = builder.build(model, new WithoutDAOImplementationFileFilter());
-        resources.put(MODEL_JAR_NAME, modelJarContent);
 
-        // Build jar with DAO
-        builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader());
-        final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
-        resources.put(DAO_JAR_NAME, daoJarContent);
+        try {
+            // Build jar with Model
+            byte[] modelJarContent = builder.build(model, new WithoutDAOImplementationFileFilter());
+            resources.put(MODEL_JAR_NAME, modelJarContent);
+
+            // Build jar with DAO
+            builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader());
+            final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
+            resources.put(DAO_JAR_NAME, daoJarContent);
+        } catch (BDMJarGenerationException e1) {
+            throw new SBusinessDataRepositoryDeploymentException(e1);
+        }
 
         //Add bom.xml
         try {
