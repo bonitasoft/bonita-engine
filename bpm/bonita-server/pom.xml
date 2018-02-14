@@ -547,7 +547,6 @@
                                     <!-- Business Data -->
                                     <inlude>org.bonitasoft.engine.data:bonita-business-data-api</inlude>
                                     <inlude>org.bonitasoft.engine.data:bonita-business-data-impl</inlude>
-                                    <inlude>org.bonitasoft.engine.data:bonita-business-data-generator</inlude>
                                     <inlude>org.bonitasoft.engine.data:bonita-business-data-client-resources</inlude>
                                     <!-- Cache -->
                                     <include>org.bonitasoft.engine.cache:bonita-cache</include>
