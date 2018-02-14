@@ -14,11 +14,12 @@
 
 package org.bonitasoft.engine.business.data.impl;
 
+import static org.bonitasoft.engine.bdm.model.assertion.QueryAssert.assertThat;
+
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.Query;
-import org.bonitasoft.engine.bdm.model.assertion.QueryAssert;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.junit.Before;
@@ -48,8 +49,8 @@ public class CountQueryProviderTest {
         Query countQueryDefinition = provider.getCountQueryDefinition(bo, find);
 
         //then
-        QueryAssert.assertThat(countQueryDefinition).isNotNull();
-        QueryAssert.assertThat(countQueryDefinition).hasName("countForFind");
+        assertThat(countQueryDefinition).isNotNull();
+        assertThat(countQueryDefinition).hasName("countForFind");
     }
 
     @Test
@@ -62,7 +63,7 @@ public class CountQueryProviderTest {
         Query countQueryDefinition = provider.getCountQueryDefinition(bo, find);
 
         //then
-        QueryAssert.assertThat(countQueryDefinition).isNull();
+        assertThat(countQueryDefinition).isNull();
     }
 
     @Test
@@ -80,8 +81,8 @@ public class CountQueryProviderTest {
         Query countQueryDefinition = provider.getCountQueryDefinition(bo, secondMultiCustomQuery);
 
         //then
-        QueryAssert.assertThat(countQueryDefinition).isNotNull();
-        QueryAssert.assertThat(countQueryDefinition).hasName(countForSecondMultiCustomQuery.getName());
+        assertThat(countQueryDefinition).isNotNull();
+        assertThat(countQueryDefinition).hasName(countForSecondMultiCustomQuery.getName());
     }
 
     @Test
@@ -95,7 +96,7 @@ public class CountQueryProviderTest {
         Query countQueryDefinition = provider.getCountQueryDefinition(bo, secondMultiCustomQuery);
 
         //then
-        QueryAssert.assertThat(countQueryDefinition).isNull();
+        assertThat(countQueryDefinition).isNull();
     }
 
     @Test
@@ -109,7 +110,7 @@ public class CountQueryProviderTest {
         Query countQueryDefinition = provider.getCountQueryDefinition(bo, secondMultiCustomQuery);
 
         //then
-        QueryAssert.assertThat(countQueryDefinition).isNull();
+        assertThat(countQueryDefinition).isNull();
     }
 
     private BusinessObject buildBusinessObject() {
