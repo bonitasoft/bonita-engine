@@ -182,19 +182,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Connector -->
-        <dependency>
-            <artifactId>bonita-connector-service-api-impl</artifactId>
-            <groupId>org.bonitasoft.engine.core.connector</groupId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Data Definition -->
         <dependency>
             <groupId>org.bonitasoft.engine.data.definition</groupId>
@@ -378,17 +365,10 @@
             </exclusions>
         </dependency>
 
-        <!-- Process Document -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.core.document</groupId>
-            <artifactId>bonita-document</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Process Instance -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
-            <artifactId>bonita-process-instance-impl</artifactId>
+            <artifactId>bonita-process-instance</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -580,17 +560,12 @@
                                     <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data</include>
                                     <!-- Connector Executor -->
                                     <include>org.bonitasoft.engine.connector:bonita-connector-executor</include>
-                                    <!-- Connector -->
-                                    <include>org.bonitasoft.engine.core.connector:bonita-connector-service-api</include>
-                                    <include>org.bonitasoft.engine.core.connector:bonita-connector-service-api-impl</include>
                                     <!-- Data Definition -->
                                     <include>org.bonitasoft.engine.data.definition:bonita-data-definition</include>
                                     <!-- Data Instance -->
                                     <include>org.bonitasoft.engine.data.instance:bonita-data-instance</include>
                                     <!-- Dependency -->
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency</include>
-                                    <!-- Document -->
-                                    <include>org.bonitasoft.engine.core.document:bonita-document</include>
                                     <!-- Event -->
                                     <include>org.bonitasoft.engine.events:bonita-events</include>
                                     <!-- Expression -->
@@ -633,8 +608,7 @@
                                     <!-- Process Definition -->
                                     <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition</include>
                                     <!-- Process Instance -->
-                                    <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
-                                    <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
+                                    <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance</include>
                                     <!-- Recorder -->
                                     <include>org.bonitasoft.engine.recorder:bonita-recorder</include>
                                     <!-- Resources -->
