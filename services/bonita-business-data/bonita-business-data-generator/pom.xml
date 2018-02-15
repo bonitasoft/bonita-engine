@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-              <!-- We only need  org.hibernate.annotations.Table annotation for indexes so we exclude transitive dependencies -->
+            <!-- We only need org.hibernate.annotations.Table annotation for indexes so we exclude transitive dependencies -->
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -131,18 +131,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <!-- Remove jdt from jar, JDT is already part of the Studio -->
+                        <descriptor>studio-assembly.xml</descriptor>
+                    </descriptors>
+                    <classifier>studio</classifier>
                 </configuration>
                 <executions>
-                  <execution>
-                    <id>make-assembly</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                  </execution>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
