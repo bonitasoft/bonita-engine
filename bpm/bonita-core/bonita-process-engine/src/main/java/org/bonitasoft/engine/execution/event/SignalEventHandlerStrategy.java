@@ -29,12 +29,10 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -88,15 +86,11 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final long eventInstanceId = eventInstance.getId();
-        handleThrowSignal(sEventTriggerDefinition, eventInstanceId);
+        handleThrowSignal(sEventTriggerDefinition);
     }
 
-    private void handleThrowSignal(final SEventTriggerDefinition sEventTriggerDefinition, final long eventInstanceId) throws SBonitaException {
+    private void handleThrowSignal(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final SSignalEventTriggerDefinition signalTrigger = (SSignalEventTriggerDefinition) sEventTriggerDefinition;
-        final SThrowSignalEventTriggerInstance signalEventTriggerInstance = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
-                .createNewInstance(eventInstanceId, signalTrigger.getSignalName()).done();
-        getEventInstanceService().createEventTriggerInstance(signalEventTriggerInstance);
         int index = 0;
         List<SWaitingSignalEvent> listeningSignals = get100WaitingSignalEvents(signalTrigger, index);
         while (!listeningSignals.isEmpty()) {
@@ -120,7 +114,7 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     @Override
     public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        handleThrowSignal(sEventTriggerDefinition, -1);
+        handleThrowSignal(sEventTriggerDefinition);
     }
 
     @Override
