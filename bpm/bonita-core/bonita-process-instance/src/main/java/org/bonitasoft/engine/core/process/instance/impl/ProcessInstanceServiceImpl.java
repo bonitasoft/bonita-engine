@@ -483,9 +483,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 || type.equals(SFlowNodeType.START_EVENT)) {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
-        if (flowNodeInstance instanceof SEventInstance) {
-            bpmEventInstanceService.deleteEventTriggerInstances(flowNodeInstance.getId());
-        } else if (flowNodeInstance instanceof SActivityInstance) {
+        if (flowNodeInstance instanceof SActivityInstance) {
             deleteActivityInstanceElements((SActivityInstance) flowNodeInstance, processDefinition);
         }
     }

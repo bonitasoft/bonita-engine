@@ -49,13 +49,11 @@ import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -188,12 +186,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (targetFlowNode != null) {
             stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode, expressionContext);
         }
-
-        final SThrowMessageEventTriggerInstance messageEventTriggerInstance = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
-                .createNewInstance(eventInstanceId, messageName, stringTargetProcess, stringTargetFlowNode).done();
-        getEventInstanceService().createEventTriggerInstance(messageEventTriggerInstance);
-        final SMessageInstanceBuilder builder = BuilderFactory.get(SMessageInstanceBuilderFactory.class).createNewInstance(messageEventTriggerInstance,
-                processDefinitionId, eventInstanceName);
+        final SMessageInstanceBuilder builder = BuilderFactory.get(SMessageInstanceBuilderFactory.class)
+                .createNewInstance(messageName, stringTargetProcess, stringTargetFlowNode, processDefinitionId, eventInstanceName);
         final List<SCorrelationDefinition> correlations = messageTrigger.getCorrelations();
         fillCorrelation(builder, correlations, expressionContext);
         final SMessageInstance messageInstance = builder.done();

@@ -23,6 +23,9 @@ public interface SMessageInstanceBuilderFactory {
 
     SMessageInstanceBuilder createNewInstance(final SThrowMessageEventTriggerInstance throwMessage, long processDefinitionId, String flowNodeName);
 
+    SMessageInstanceBuilder createNewInstance(final String messageName, final String targetProcess, final String targetFlowNode, final long processDefinitionId,
+                                              final String flowNodeName);
+
     SMessageInstanceBuilder createNewInstance(final SMessageInstance message);
 
     String getTargetProcessKey();

@@ -626,7 +626,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_and_deleteEventTriggerInstances_when_flownode_is_type_INTERMEDIATE_CATCH_EVENT()
+    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_INTERMEDIATE_CATCH_EVENT()
             throws Exception {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SIntermediateCatchEventInstanceImpl();
@@ -637,7 +637,6 @@ public class ProcessInstanceServiceImplTest {
 
         // Then
         verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
-        verify(eventInstanceService).deleteEventTriggerInstances(flowNodeInstance.getId());
     }
 
     @Test
@@ -669,7 +668,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_and_deleteEventTriggerInstances_when_flownode_is_type_BOUNDARY_EVENT()
+    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_BOUNDARY_EVENT()
             throws Exception {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SBoundaryEventInstanceImpl();
@@ -680,7 +679,6 @@ public class ProcessInstanceServiceImplTest {
 
         // Then
         verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
-        verify(eventInstanceService).deleteEventTriggerInstances(flowNodeInstance.getId());
     }
 
     @Test
