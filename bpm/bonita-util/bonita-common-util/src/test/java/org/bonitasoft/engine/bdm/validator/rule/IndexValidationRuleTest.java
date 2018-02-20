@@ -27,8 +27,8 @@ public class IndexValidationRuleTest {
         final Index index = anIndex().withName("nameIndex").build();
 
         ValidationStatus status = new IndexValidationRule().checkRule(index);
-        
+
         assertThat(status.getErrors()).contains("nameIndex index must have at least one field declared");
     }
-    
+
 }

@@ -15,10 +15,9 @@ package org.bonitasoft.engine.bdm.validator.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
-
 import org.bonitasoft.engine.bdm.model.QueryParameter;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Duchastenier
