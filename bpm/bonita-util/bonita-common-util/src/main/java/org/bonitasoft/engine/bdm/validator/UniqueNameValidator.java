@@ -33,7 +33,7 @@ public class UniqueNameValidator {
         }
         return status;
     }
-    
+
     private Set<String> findDuplicateNames(Collection<? extends NamedElement> list) {
         Set<String> duplicates = new LinkedHashSet<>();
         Set<String> uniqueNames = new HashSet<>();

@@ -13,25 +13,17 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
 import static org.bonitasoft.engine.bdm.builder.IndexBuilder.anIndex;
 import static org.bonitasoft.engine.bdm.builder.UniqueConstraintBuilder.aUniqueConstraint;
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -40,6 +32,11 @@ import org.bonitasoft.engine.bdm.model.Index;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.validator.UniqueNameValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Colin PUY
