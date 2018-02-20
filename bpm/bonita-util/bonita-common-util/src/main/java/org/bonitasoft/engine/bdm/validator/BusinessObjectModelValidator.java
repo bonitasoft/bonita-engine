@@ -32,6 +32,7 @@ import org.bonitasoft.engine.bdm.validator.rule.QueryValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.SimpleFieldValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.UniqueConstraintValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.ValidationRule;
+import org.bonitasoft.engine.bdm.validator.rule.composition.AggregationAndCompositionValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.composition.CyclicCompositionValidationRule;
 import org.bonitasoft.engine.bdm.validator.rule.composition.UniquenessCompositionValidationRule;
 
@@ -53,6 +54,7 @@ public class BusinessObjectModelValidator {
         rules.add(new QueryParameterValidationRule());
         rules.add(new UniquenessCompositionValidationRule());
         rules.add(new CyclicCompositionValidationRule());
+        rules.add(new AggregationAndCompositionValidationRule());
     }
 
     public ValidationStatus validate(final BusinessObjectModel bom) {

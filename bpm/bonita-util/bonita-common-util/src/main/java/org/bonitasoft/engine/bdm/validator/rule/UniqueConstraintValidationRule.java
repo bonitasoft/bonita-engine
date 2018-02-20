@@ -42,7 +42,7 @@ public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstra
         if (!isValid) {
             status.addError(name + " is not a valid SQL identifier");
         }
-        
+
         List<String> fieldNames = uc.getFieldNames();
         if (fieldNames == null || fieldNames.isEmpty()) {
             status.addError(name + " unique constraint must have at least one field declared");
