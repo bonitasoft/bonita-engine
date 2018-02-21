@@ -901,10 +901,7 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="e" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" value="e" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="t" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="t" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="t" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="t" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="t" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="t" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="s" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="s" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="s" />
@@ -1218,11 +1215,8 @@
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />

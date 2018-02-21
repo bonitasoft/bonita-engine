@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.model.event.handling.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObjectImpl;
 
 /**
@@ -50,15 +49,6 @@ public class SMessageInstanceImpl extends SPersistenceObjectImpl implements SMes
 
     public SMessageInstanceImpl() {
     }
-
-    public SMessageInstanceImpl(final SThrowMessageEventTriggerInstance throwMessageTrigger, final long processDefinitionId, final String flowNodeName) {
-        messageName = throwMessageTrigger.getMessageName();
-        targetProcess = throwMessageTrigger.getTargetProcess();
-        targetFlowNode = throwMessageTrigger.getTargetFlowNode();
-        this.processDefinitionId = processDefinitionId;
-        this.flowNodeName = flowNodeName;
-    }
-
     public SMessageInstanceImpl(final String messageName, final String targetProcess, final String targetFlowNode, final long processDefinitionId,
             final String flowNodeName) {
         this.messageName = messageName;

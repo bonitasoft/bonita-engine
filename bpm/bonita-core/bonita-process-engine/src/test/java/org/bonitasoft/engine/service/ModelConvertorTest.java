@@ -17,8 +17,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.ModelConvertor.toUserMembership;
 import static org.bonitasoft.engine.tenant.TenantResourceState.INSTALLED;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -37,7 +46,6 @@ import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -51,7 +59,6 @@ import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
@@ -65,15 +72,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTask
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
@@ -241,73 +240,12 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toEventTriggerInstance_cant_convert_ERROR_Type() {
-        // Given
-        final SThrowErrorEventTriggerInstance sEventTriggerInstance = new SThrowErrorEventTriggerInstanceImpl();
-
-        // Then
-        final EventTriggerInstance eventTriggerInstance = ModelConvertor.toEventTriggerInstance(sEventTriggerInstance);
-
-        // When
-        assertNull(eventTriggerInstance);
-    }
-
-    @Test
-    public void toEventTriggerInstance_cant_convert_SIGNAL_Type() {
-        // Given
-        final SThrowMessageEventTriggerInstance sEventTriggerInstance = new SThrowMessageEventTriggerInstanceImpl();
-
-        // Then
-        final EventTriggerInstance eventTriggerInstance = ModelConvertor.toEventTriggerInstance(sEventTriggerInstance);
-
-        // When
-        assertNull(eventTriggerInstance);
-    }
-
-    @Test
-    public void toEventTriggerInstance_cant_convert_MESSAGE_Type() {
-        // Given
-        final SThrowSignalEventTriggerInstance sEventTriggerInstance = new SThrowSignalEventTriggerInstanceImpl();
-
-        // Then
-        final EventTriggerInstance eventTriggerInstance = ModelConvertor.toEventTriggerInstance(sEventTriggerInstance);
-
-        // When
-        assertNull(eventTriggerInstance);
-    }
-
-    @Test
-    public void toEventTriggerInstance_cant_convert_TERMINATE_Type() {
-        // Given
-        final SEventTriggerInstance sEventTriggerInstance = new SEventTriggerInstanceImpl() {
-
-            private static final long serialVersionUID = 514899463254242741L;
-
-            @Override
-            public String getDiscriminator() {
-                return null;
-            }
-
-            @Override
-            public SEventTriggerType getEventTriggerType() {
-                return SEventTriggerType.TERMINATE;
-            }
-        };
-
-        // Then
-        final EventTriggerInstance eventTriggerInstance = ModelConvertor.toEventTriggerInstance(sEventTriggerInstance);
-
-        // When
-        assertNull(eventTriggerInstance);
-    }
-
-    @Test
     public void toEventTriggerInstance_can_convert_TIMER_Type() {
         // Given
         final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstanceImpl(2, "eventInstanceName", 69, "jobTriggerName");
 
         // Then
-        final TimerEventTriggerInstance eventTriggerInstance = (TimerEventTriggerInstance) ModelConvertor.toEventTriggerInstance(sTimerEventTriggerInstance);
+        final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor.toTimerEventTriggerInstance(sTimerEventTriggerInstance);
 
         // When
         assertNotNull(eventTriggerInstance);

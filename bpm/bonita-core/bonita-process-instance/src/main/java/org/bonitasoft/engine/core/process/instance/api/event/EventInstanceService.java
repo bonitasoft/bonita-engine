@@ -38,12 +38,12 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.search.SearchOptions;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -60,7 +60,12 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     void createEventInstance(SEventInstance eventInstance) throws SEventInstanceCreationException;
 
-    void createEventTriggerInstance(SEventTriggerInstance sEventTriggerInstance) throws SEventTriggerInstanceCreationException;
+    /**
+     *
+     * STimerEventTriggerInstance is used to keep track of currently running timers
+     * using {@link org.bonitasoft.engine.api.ProcessAPI#searchTimerEventTriggerInstances(long, SearchOptions)}
+     */
+    void createEventTriggerInstance(STimerEventTriggerInstance sEventTriggerInstance) throws SEventTriggerInstanceCreationException;
 
     void createMessageInstance(SMessageInstance messageInstance) throws SMessageInstanceCreationException;
 
@@ -88,9 +93,9 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @throws SEventTriggerInstanceReadException
      * @since 6.4.0
      */
-    <T extends SEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass, long eventTriggerInstanceId) throws SEventTriggerInstanceReadException;
+    <T extends STimerEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass, long eventTriggerInstanceId) throws SEventTriggerInstanceReadException;
 
-    List<SEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, QueryOptions queryOptions) throws SEventTriggerInstanceReadException;
+    List<STimerEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, QueryOptions queryOptions) throws SEventTriggerInstanceReadException;
 
     void deleteMessageInstance(SMessageInstance messageInstance) throws SMessageModificationException;
 
@@ -129,12 +134,12 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
-    <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
+    <T extends STimerEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
 
     SWaitingSignalEvent getWaitingSignalEvent(long id)
             throws SEventTriggerInstanceReadException, SEventTriggerInstanceNotFoundException;
 
-    long getNumberOfEventTriggerInstances(Class<? extends SEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaReadException;
+    long getNumberOfEventTriggerInstances(Class<? extends STimerEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
     /**
      * @param eventInstanceId
@@ -149,7 +154,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @throws SEventTriggerInstanceDeletionException
      * @since 6.1
      */
-    void deleteEventTriggerInstance(SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException;
+    void deleteEventTriggerInstance(STimerEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException;
 
     /**
      * @param flowNodeInstance
@@ -203,14 +208,14 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     /**
      * Update an event trigger instance.
      *
-     * @param sEventTriggerInstance
+     * @param sTimerEventTriggerInstance
      *        The event trigger instance to update
      * @param descriptor
      *        The fields to update
      * @throws SEventTriggerModificationException
      * @since 6.4.0
      */
-    void updateEventTriggerInstance(SEventTriggerInstance sEventTriggerInstance, EntityUpdateDescriptor descriptor)
+    void updateEventTriggerInstance(STimerEventTriggerInstance sTimerEventTriggerInstance, EntityUpdateDescriptor descriptor)
             throws SEventTriggerInstanceModificationException;
 
 }

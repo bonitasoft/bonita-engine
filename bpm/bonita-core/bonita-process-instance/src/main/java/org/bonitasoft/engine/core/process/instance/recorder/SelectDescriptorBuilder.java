@@ -35,7 +35,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -200,9 +200,9 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<>("getActivityBoundaryEventInstances", parameters, SBoundaryEventInstance.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final QueryOptions queryOptions) {
+    public static SelectListDescriptor<STimerEventTriggerInstance> getEventTriggers(final long eventInstanceId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap("eventInstanceId", (Object) eventInstanceId);
-        return new SelectListDescriptor<>("getEventTriggerInstances", parameters, SEventTriggerInstance.class, queryOptions);
+        return new SelectListDescriptor<>("getEventTriggerInstances", parameters, STimerEventTriggerInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<Long> getChildInstanceIdsOfProcessInstance(final Class<SProcessInstance> class1, final long processInstanceId,

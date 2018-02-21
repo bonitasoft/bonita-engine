@@ -13,12 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger;
 
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
- * @author Celine Souchet
- * @version 6.4.0
- * @since 6.4.0
+ * @author Elias Ricken de Medeiros
  */
-public interface STimerEventTriggerInstance extends SEventTriggerInstance {
+public interface STimerEventTriggerInstance extends PersistentObject {
+
+    String EXECUTION_DATE = "executionDate";
+
+    long getEventInstanceId();
 
     /**
      * @return The date of the execution of the trigger
@@ -38,5 +42,4 @@ public interface STimerEventTriggerInstance extends SEventTriggerInstance {
      * @since 6.4.0
      */
     String getEventInstanceName();
-
 }

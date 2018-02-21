@@ -13,42 +13,42 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger.impl;
 
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObjectImpl;
 
 /**
+ * @author Elias Ricken de Medeiros
  * @author Celine Souchet
- * @version 6.4.0
- * @since 6.4.0
  */
-public class STimerEventTriggerInstanceImpl extends SEventTriggerInstanceImpl implements STimerEventTriggerInstance {
+public class STimerEventTriggerInstanceImpl extends SPersistenceObjectImpl implements STimerEventTriggerInstance {
 
-    private static final long serialVersionUID = -5079198882177095287L;
-
+    private long eventInstanceId;
     private long executionDate;
-
     private String jobTriggerName;
-
     private String eventInstanceName;
 
     public STimerEventTriggerInstanceImpl() {
     }
 
     public STimerEventTriggerInstanceImpl(final long eventInstanceId, final String eventInstanceName, final long executionDate, final String jobTriggerName) {
-        super(eventInstanceId);
+        this.eventInstanceId = eventInstanceId;
         this.eventInstanceName = eventInstanceName;
         this.setExecutionDate(executionDate);
         this.setJobTriggerName(jobTriggerName);
     }
 
     @Override
-    public String getDiscriminator() {
-        return STimerEventTriggerInstance.class.getName();
+    public long getEventInstanceId() {
+        return this.eventInstanceId;
+    }
+
+    protected void setEventInstanceId(final long eventInstanceId) {
+        this.eventInstanceId = eventInstanceId;
     }
 
     @Override
-    public SEventTriggerType getEventTriggerType() {
-        return SEventTriggerType.TIMER;
+    public String getDiscriminator() {
+        return STimerEventTriggerInstance.class.getName();
     }
 
     @Override
@@ -73,5 +73,4 @@ public class STimerEventTriggerInstanceImpl extends SEventTriggerInstanceImpl im
     public String getEventInstanceName() {
         return eventInstanceName;
     }
-
 }
