@@ -185,13 +185,13 @@
 
 	<query name="getEventTriggerInstances">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
 		WHERE t.eventInstanceId = :eventInstanceId
 	</query>
 
 	<query name="getEventTriggerInstanceById">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
 		WHERE t.id = :id
 	</query>
 
@@ -569,43 +569,43 @@
 	
 	<query name="getNumberOfSEventTriggerInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
 	</query>
 	
 	<query name="searchSEventTriggerInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
 	</query>	
 	
 	<query name="getNumberOfSTimerEventTriggerInstanceByProcessInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
-			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
-		WHERE t.eventInstanceId = e.id 
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
 	</query>
 	
 	<query name="searchSTimerEventTriggerInstanceByProcessInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
-			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
-		WHERE t.eventInstanceId = e.id 
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
 	</query>	
 	
 	<query name="getNumberOfSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
 		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
-			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
-		WHERE t.eventInstanceId = e.id 
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
 	</query>
 	
 	<query name="searchSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
 		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
-			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
-		WHERE t.eventInstanceId = e.id 
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t,
+		org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id
 		AND e.logicalGroup4 = :processInstanceId
 	</query>	
 	
@@ -618,37 +618,6 @@
 		SELECT t
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t
 	</query>	
-	
-	<query name="getNumberOfSThrowMessageEventTriggerInstance">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl AS t
-	</query>
-	
-	<query name="searchSThrowMessageEventTriggerInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl AS t
-	</query>	
-	
-	<query name="getNumberOfSThrowSignalEventTriggerInstance">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl AS t
-	</query>
-	
-	<query name="searchSThrowSignalEventTriggerInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl AS t
-	</query>	
-	
-	<query name="getNumberOfSThrowErrorEventTriggerInstance">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl AS t
-	</query>
-	
-	<query name="searchSThrowErrorEventTriggerInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl AS t
-	</query>	
-	
 
 	<!-- External Service Queries -->
 	<query name="getNumberOfSHumanTaskInstance">

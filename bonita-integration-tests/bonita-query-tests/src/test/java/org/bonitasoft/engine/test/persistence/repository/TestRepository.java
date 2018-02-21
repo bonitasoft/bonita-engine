@@ -34,7 +34,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
@@ -193,10 +193,10 @@ public class TestRepository {
         return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
     }
 
-    public SEventTriggerInstanceImpl add(final SEventTriggerInstanceImpl sEventTriggerInstanceImpl) {
-        getSession().save(sEventTriggerInstanceImpl);
-        return (SEventTriggerInstanceImpl) getSession().get(sEventTriggerInstanceImpl.getClass(),
-                new PersistentObjectId(sEventTriggerInstanceImpl.getId(), sEventTriggerInstanceImpl.getTenantId()));
+    public STimerEventTriggerInstanceImpl add(final STimerEventTriggerInstanceImpl sTimerEventTriggerInstanceImpl) {
+        getSession().save(sTimerEventTriggerInstanceImpl);
+        return (STimerEventTriggerInstanceImpl) getSession().get(sTimerEventTriggerInstanceImpl.getClass(),
+                new PersistentObjectId(sTimerEventTriggerInstanceImpl.getId(), sTimerEventTriggerInstanceImpl.getTenantId()));
     }
 
     public SCustomUserInfoDefinition add(final SCustomUserInfoDefinitionImpl infoDef) {

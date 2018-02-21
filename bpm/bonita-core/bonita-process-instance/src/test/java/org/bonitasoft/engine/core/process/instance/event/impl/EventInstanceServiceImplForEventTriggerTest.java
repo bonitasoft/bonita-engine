@@ -16,7 +16,9 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -30,20 +32,11 @@ import java.util.Map;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -94,7 +87,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#createEventTriggerInstance(org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#createEventTriggerInstance(STimerEventTriggerInstance)}
      * .
      */
     @Test
@@ -122,7 +115,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#deleteEventTriggerInstance(org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#deleteEventTriggerInstance(STimerEventTriggerInstance)}
      * .
      */
     @Test
@@ -196,12 +189,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final long eventTriggerInstanceId = 63L;
         final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
-        final SelectByIdDescriptor<SEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class,
-                SEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
+        final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(STimerEventTriggerInstance.class,
+                STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doReturn(eventTriggerInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final SEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(SEventTriggerInstance.class, eventTriggerInstanceId);
+        final STimerEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertEquals("Should return the result of the mock.", eventTriggerInstance, result);
@@ -216,23 +209,10 @@ public class EventInstanceServiceImplForEventTriggerTest {
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final SEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
+        final STimerEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertNull("Should return the result of the mock.", result);
-    }
-
-    @Test(expected = SEventTriggerInstanceReadException.class)
-    public final void getEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
-        // Given
-        final long eventTriggerInstanceId = 63L;
-        final SelectByIdDescriptor<SThrowErrorEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
-                SThrowErrorEventTriggerInstance.class,
-                SThrowErrorEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectById(selectByIdDescriptor);
-
-        // When
-        eventInstanceServiceImpl.getEventTriggerInstance(SThrowErrorEventTriggerInstance.class, eventTriggerInstanceId);
     }
 
     /**
@@ -244,13 +224,13 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getEventTriggerInstances_should_return_event_trigger_instances() throws Exception {
         // Given
         final long eventInstanceId = 63L;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
-        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
+        final SelectListDescriptor<STimerEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
         doReturn(triggerInstanceImpls).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SEventTriggerInstance> result = eventInstanceServiceImpl.getEventTriggerInstances(eventInstanceId, queryOptions);
+        final List<STimerEventTriggerInstance> result = eventInstanceServiceImpl.getEventTriggerInstances(eventInstanceId, queryOptions);
 
         // Then
         assertEquals("Should return the result of the mock.", triggerInstanceImpls, result);
@@ -260,12 +240,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getEventTriggerInstances_should_return_empty_list_if_doesnt_exist() throws Exception {
         // Given
         final long eventInstanceId = 63L;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
-        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
+        final SelectListDescriptor<STimerEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
         doReturn(Arrays.asList()).when(persistenceService).selectList(selectDescriptor);
 
         // When
-        final List<SEventTriggerInstance> result = eventInstanceServiceImpl.getEventTriggerInstances(eventInstanceId, queryOptions);
+        final List<STimerEventTriggerInstance> result = eventInstanceServiceImpl.getEventTriggerInstances(eventInstanceId, queryOptions);
 
         // Then
         assertTrue("The result must be empty.", result.isEmpty());
@@ -275,8 +255,8 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final long eventInstanceId = 63L;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
-        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
+        final SelectListDescriptor<STimerEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(selectDescriptor);
 
         // When
@@ -291,7 +271,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test
     public final void getNumberOfEventTriggerInstances_should_return_the_number() throws Exception {
         // Given
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         doReturn(2L).when(persistenceService).getNumberOfEntities(STimerEventTriggerInstance.class, queryOptions, null);
 
         // When
@@ -304,7 +284,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test(expected = SBonitaReadException.class)
     public final void getNumberOfEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(STimerEventTriggerInstance.class, queryOptions, null);
 
         // When
@@ -319,7 +299,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test
     public final void searchEventTriggerInstances_should_return_the_list() throws Exception {
         // Given
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
         doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(STimerEventTriggerInstance.class, queryOptions, null);
 
@@ -333,7 +313,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     @Test(expected = SBonitaReadException.class)
     public final void searchEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
         // Given
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(STimerEventTriggerInstance.class, queryOptions, null);
 
         // When
@@ -344,7 +324,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getNumberOfEventTriggerInstancesByProcessInstance_should_return_the_number() throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         doReturn(3L).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
                 Matchers.<Map<String, Object>> any());
 
@@ -359,7 +339,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getNumberOfEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions),
                 any());
@@ -372,7 +352,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void searchEventTriggerInstancesByProcessInstance_should_return_the_list() throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
         doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
                any());
@@ -388,7 +368,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void searchEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final int processInstanceId = 2;
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
         doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions), any());
 
@@ -398,7 +378,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#updateEventTriggerInstance(SEventTriggerInstance, EntityUpdateDescriptor)}
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#updateEventTriggerInstance(STimerEventTriggerInstance, EntityUpdateDescriptor)}
      * .
      */
     @Test
@@ -413,44 +393,5 @@ public class EventInstanceServiceImplForEventTriggerTest {
 
         // Then
         verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
-    }
-
-    @Test
-    public final void updateEventTriggerInstance_should_update_throw_message_event_trigger_instance() throws Exception {
-        // Given
-        final SThrowMessageEventTriggerInstanceImpl sThrowMessageEventTriggerInstanceImpl = new SThrowMessageEventTriggerInstanceImpl();
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sThrowMessageEventTriggerInstanceImpl, descriptor);
-
-        // When
-        eventInstanceServiceImpl.updateEventTriggerInstance(sThrowMessageEventTriggerInstanceImpl, descriptor);
-
-        // Then
-        verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
-    }
-
-    @Test
-    public final void updateEventTriggerInstance_should_update_throw_error_event_trigger_instance() throws Exception {
-        // Given
-        final SThrowErrorEventTriggerInstanceImpl sThrowErrorEventTriggerInstanceImpl = new SThrowErrorEventTriggerInstanceImpl();
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sThrowErrorEventTriggerInstanceImpl, descriptor);
-
-        // When
-        eventInstanceServiceImpl.updateEventTriggerInstance(sThrowErrorEventTriggerInstanceImpl, descriptor);
-
-        // Then
-        verify(recorder).recordUpdate(eq(updateRecord), nullable(String.class));
-    }
-
-    @Test(expected = SEventTriggerInstanceModificationException.class)
-    public final void updateEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
-        // Given
-        final SThrowSignalEventTriggerInstanceImpl sThrowSignalEventTriggerInstanceImpl = new SThrowSignalEventTriggerInstanceImpl();
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
-
-        // When
-        eventInstanceServiceImpl.updateEventTriggerInstance(sThrowSignalEventTriggerInstanceImpl, descriptor);
     }
 }

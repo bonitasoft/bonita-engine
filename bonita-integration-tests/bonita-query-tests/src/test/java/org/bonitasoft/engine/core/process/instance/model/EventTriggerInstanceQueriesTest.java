@@ -20,8 +20,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
@@ -48,13 +47,12 @@ public class EventTriggerInstanceQueriesTest {
                 .add(buildSIntermediateCatchEventInstanceImpl(101L, "name", processInstanceId));
 
         repository.add(buildSTimerEventTriggerInstance(87L, eventInstanceImpl.getId(), "name", "jobTriggerName"));
-        repository.add(buildSThrowErrorEventTriggerInstanceImpl(89L, eventInstanceImpl.getId()));
 
         // Then
         final long numberOfEventTriggerInstances = repository.getNumberOfTimerEventTriggerInstances(processInstanceId, null);
 
         // When
-        assertEquals(2, numberOfEventTriggerInstances);
+        assertEquals(1, numberOfEventTriggerInstances);
     }
 
     @Test
@@ -86,13 +84,12 @@ public class EventTriggerInstanceQueriesTest {
                 .add(buildSIntermediateCatchEventInstanceImpl(101L, "name", processInstanceId));
 
         repository.add(buildSTimerEventTriggerInstance(87L, eventInstanceImpl.getId(), "name", "jobTriggerName"));
-        repository.add(buildSThrowErrorEventTriggerInstanceImpl(89L, eventInstanceImpl.getId()));
 
         // Then
-        final List<SEventTriggerInstance> sEventTriggerInstances = repository.searchTimerEventTriggerInstances(processInstanceId, null);
+        final List<STimerEventTriggerInstance> sTimerEventTriggerInstances = repository.searchTimerEventTriggerInstances(processInstanceId, null);
 
         // When
-        assertEquals(2, sEventTriggerInstances.size());
+        assertEquals(1, sTimerEventTriggerInstances.size());
     }
 
     @Test
@@ -109,11 +106,11 @@ public class EventTriggerInstanceQueriesTest {
         repository.add(buildSTimerEventTriggerInstance(98L, eventInstanceImpl2.getId(), "toto", "plop"));
 
         // Then
-        final List<SEventTriggerInstance> sEventTriggerInstances = repository.searchTimerEventTriggerInstances(processInstanceId, "toto");
+        final List<STimerEventTriggerInstance> sTimerEventTriggerInstances = repository.searchTimerEventTriggerInstances(processInstanceId, "toto");
 
         // When
-        assertEquals(1, sEventTriggerInstances.size());
-        assertEquals(98L, sEventTriggerInstances.get(0).getId());
+        assertEquals(1, sTimerEventTriggerInstances.size());
+        assertEquals(98L, sTimerEventTriggerInstances.get(0).getId());
     }
 
     private STimerEventTriggerInstanceImpl buildSTimerEventTriggerInstance(final long id, final long eventInstanceId, final String eventInstanceName,
@@ -123,13 +120,6 @@ public class EventTriggerInstanceQueriesTest {
         sTimerEventTriggerInstanceImpl.setId(id);
         sTimerEventTriggerInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return sTimerEventTriggerInstanceImpl;
-    }
-
-    private SThrowErrorEventTriggerInstanceImpl buildSThrowErrorEventTriggerInstanceImpl(final long id, final long eventInstanceId) {
-        final SThrowErrorEventTriggerInstanceImpl sThrowErrorEventTriggerInstanceImpl = new SThrowErrorEventTriggerInstanceImpl(eventInstanceId, "errorCode");
-        sThrowErrorEventTriggerInstanceImpl.setId(id);
-        sThrowErrorEventTriggerInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        return sThrowErrorEventTriggerInstanceImpl;
     }
 
     private SIntermediateCatchEventInstanceImpl buildSIntermediateCatchEventInstanceImpl(final long id, final String name, final long processInstanceId) {
