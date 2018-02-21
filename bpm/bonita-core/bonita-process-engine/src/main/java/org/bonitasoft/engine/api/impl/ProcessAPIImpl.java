@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
+import static org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance.EXECUTION_DATE;
 import static org.bonitasoft.engine.search.AbstractSearchEntity.search;
 
 import java.io.File;
@@ -282,7 +283,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
@@ -4572,7 +4572,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SchedulerService schedulerService = tenantAccessor.getSchedulerService();
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(STimerEventTriggerInstanceBuilder.EXECUTION_DATE, executionDate.getTime());
+        descriptor.addField(EXECUTION_DATE, executionDate.getTime());
 
         try {
             final STimerEventTriggerInstance sTimerEventTriggerInstance = eventInstanceService.getEventTriggerInstance(STimerEventTriggerInstance.class,

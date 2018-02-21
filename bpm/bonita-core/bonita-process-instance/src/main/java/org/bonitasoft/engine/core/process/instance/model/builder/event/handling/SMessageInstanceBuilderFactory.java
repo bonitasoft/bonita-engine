@@ -14,14 +14,11 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.event.handling;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public interface SMessageInstanceBuilderFactory {
-
-    SMessageInstanceBuilder createNewInstance(final SThrowMessageEventTriggerInstance throwMessage, long processDefinitionId, String flowNodeName);
 
     SMessageInstanceBuilder createNewInstance(final String messageName, final String targetProcess, final String targetFlowNode, final long processDefinitionId,
                                               final String flowNodeName);

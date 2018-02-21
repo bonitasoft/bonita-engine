@@ -21,7 +21,7 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceSearchDescriptor;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -37,11 +37,11 @@ public class SearchEventTriggerInstanceDescriptor extends SearchEntityDescriptor
 
     public SearchEventTriggerInstanceDescriptor() {
         eventTriggerInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(6);
-        eventTriggerInstanceDescriptorKeys.put(EventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_ID, new FieldDescriptor(SEventTriggerInstance.class,
+        eventTriggerInstanceDescriptorKeys.put(EventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_ID, new FieldDescriptor(STimerEventTriggerInstance.class,
                 "eventInstanceId"));
         eventTriggerInstanceDescriptorKeys.put(TimerEventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_NAME, new FieldDescriptor(SEventInstance.class,
                 "name"));
-        eventTriggerInstanceDescriptorKeys.put(TimerEventTriggerInstanceSearchDescriptor.EXECUTION_DATE, new FieldDescriptor(SEventTriggerInstance.class,
+        eventTriggerInstanceDescriptorKeys.put(TimerEventTriggerInstanceSearchDescriptor.EXECUTION_DATE, new FieldDescriptor(STimerEventTriggerInstance.class,
                 "executionDate"));
 
         eventTriggerInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);

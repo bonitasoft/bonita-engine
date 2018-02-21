@@ -212,41 +212,18 @@
 
     <subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SThrowEventInstanceImpl" />
 
-    <class name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" abstract="true" table="event_trigger_instance">
+    <class name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" table="event_trigger_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
         </composite-id>
-        <discriminator column="kind" type="string" />
-
         <property name="eventInstanceId" type="long" column="eventInstanceId" />
+        <property name="eventInstanceName" type="string" column="eventInstanceName" />
+        <property name="executionDate" type="long" column="executionDate" />
+        <property name="jobTriggerName" type="string" column="jobTriggerName" />
 
         <filter name="tenantFilter" />
     </class>
-
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" discriminator-value="timer"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl">
-        <property name="executionDate" type="long" column="executionDate" />
-        <property name="jobTriggerName" type="string" column="jobTriggerName" />
-        <property name="eventInstanceName" type="string" column="eventInstanceName" />
-    </subclass>
-
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" discriminator-value="throwMessage"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl">
-        <property name="messageName" column="messageName" />
-        <property name="targetProcess" column="targetProcess" />
-        <property name="targetFlowNode" column="targetFlowNode" />
-    </subclass>
-
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" discriminator-value="throwSignal"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl">
-        <property name="signalName" column="signalName" />
-    </subclass>
-
-    <subclass name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" discriminator-value="throwError"
-              extends="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl">
-        <property name="errorCode" column="errorCode" />
-    </subclass>
 
     <class name="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" table="message_instance">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">

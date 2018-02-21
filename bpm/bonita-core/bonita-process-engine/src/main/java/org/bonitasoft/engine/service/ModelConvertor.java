@@ -87,7 +87,6 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedSubProcessActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.BPMEventType;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -215,7 +214,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -1204,51 +1202,13 @@ public class ModelConvertor {
         return eventInstance;
     }
 
-    public static List<EventTriggerInstance> toEventTriggerInstances(final List<SEventTriggerInstance> sEventTriggerInstances) {
-        final List<EventTriggerInstance> eventTriggerInstances = new ArrayList<>();
-        for (final SEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
-            final EventTriggerInstance eventTriggerInstance = toEventTriggerInstance(sEventTriggerInstance);
-            if (eventTriggerInstance != null) {
-                eventTriggerInstances.add(eventTriggerInstance);
-            }
-        }
-        return eventTriggerInstances;
-    }
-
     public static List<TimerEventTriggerInstance> toTimerEventTriggerInstances(final List<STimerEventTriggerInstance> sEventTriggerInstances) {
         final List<TimerEventTriggerInstance> eventTriggerInstances = new ArrayList<>();
         for (final STimerEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
             final TimerEventTriggerInstance eventTriggerInstance = toTimerEventTriggerInstance(sEventTriggerInstance);
-            if (eventTriggerInstance != null) {
-                eventTriggerInstances.add(eventTriggerInstance);
-            }
+            eventTriggerInstances.add(eventTriggerInstance);
         }
         return eventTriggerInstances;
-    }
-
-    public static EventTriggerInstance toEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance) {
-        EventTriggerInstance eventTriggerInstance = null;
-        switch (sEventTriggerInstance.getEventTriggerType()) {
-            case ERROR:
-                // Not support for now
-                break;
-            case TIMER:
-                eventTriggerInstance = toTimerEventTriggerInstance((STimerEventTriggerInstance) sEventTriggerInstance);
-                break;
-            case SIGNAL:
-                // Not support for now
-                break;
-            case MESSAGE:
-                // Not support for now
-                break;
-            case TERMINATE:
-                // Not support for now
-                break;
-            default:
-                throw new UnknownElementType(sEventTriggerInstance.getClass().getName());
-
-        }
-        return eventTriggerInstance;
     }
 
     public static TimerEventTriggerInstance toTimerEventTriggerInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance) {

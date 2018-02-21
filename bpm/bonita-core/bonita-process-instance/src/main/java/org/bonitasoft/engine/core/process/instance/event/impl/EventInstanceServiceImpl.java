@@ -42,7 +42,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
@@ -106,7 +105,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public void createEventTriggerInstance(final SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceCreationException {
+    public void createEventTriggerInstance(final STimerEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceCreationException {
         try {
             getRecorder().recordInsert(new InsertRecord(eventTriggerInstance), EVENT_TRIGGER_INSTANCE);
         } catch (final SRecorderException e) {
@@ -134,7 +133,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public void deleteEventTriggerInstance(final SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException {
+    public void deleteEventTriggerInstance(final STimerEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceDeletionException {
         try {
             getRecorder().recordDelete(new DeleteRecord(eventTriggerInstance), EVENT_TRIGGER_INSTANCE);
         } catch (final SRecorderException e) {
@@ -144,10 +143,10 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
 
     @Override
     public void deleteEventTriggerInstances(final long eventInstanceId) throws SEventTriggerInstanceReadException, SEventTriggerInstanceDeletionException {
-        final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
-        List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(eventInstanceId, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, STimerEventTriggerInstance.class, "id", OrderByType.ASC);
+        List<STimerEventTriggerInstance> triggerInstances = getEventTriggerInstances(eventInstanceId, queryOptions);
         while (!triggerInstances.isEmpty()) {
-            for (final SEventTriggerInstance eventTriggerInstance : triggerInstances) {
+            for (final STimerEventTriggerInstance eventTriggerInstance : triggerInstances) {
                 deleteEventTriggerInstance(eventTriggerInstance);
             }
             triggerInstances = getEventTriggerInstances(eventInstanceId, queryOptions);
@@ -239,7 +238,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public <T extends SEventTriggerInstance> T getEventTriggerInstance(final Class<T> entityClass, final long eventTriggerInstanceId)
+    public <T extends STimerEventTriggerInstance> T getEventTriggerInstance(final Class<T> entityClass, final long eventTriggerInstanceId)
             throws SEventTriggerInstanceReadException {
         try {
             return getPersistenceService().selectById(
@@ -250,9 +249,9 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final QueryOptions queryOptions)
+    public List<STimerEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final QueryOptions queryOptions)
             throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
+        final SelectListDescriptor<STimerEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, queryOptions);
         try {
             return getPersistenceService().selectList(selectDescriptor);
         } catch (final SBonitaReadException e) {
@@ -346,13 +345,13 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> entityClass, final QueryOptions countOptions)
+    public long getNumberOfEventTriggerInstances(final Class<? extends STimerEventTriggerInstance> entityClass, final QueryOptions countOptions)
             throws SBonitaReadException {
         return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @Override
-    public <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(final Class<T> entityClass, final QueryOptions searchOptions)
+    public <T extends STimerEventTriggerInstance> List<T> searchEventTriggerInstances(final Class<T> entityClass, final QueryOptions searchOptions)
             throws SBonitaReadException {
         return getPersistenceService().searchEntity(entityClass, searchOptions, null);
     }
@@ -395,10 +394,10 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public void updateEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance, final EntityUpdateDescriptor descriptor)
+    public void updateEventTriggerInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance, final EntityUpdateDescriptor descriptor)
             throws SEventTriggerInstanceModificationException {
         try {
-            getRecorder().recordUpdate(UpdateRecord.buildSetFields(sEventTriggerInstance, descriptor), EVENT_TRIGGER_INSTANCE);
+            getRecorder().recordUpdate(UpdateRecord.buildSetFields(sTimerEventTriggerInstance, descriptor), EVENT_TRIGGER_INSTANCE);
         } catch (final SRecorderException e) {
             throw new SEventTriggerInstanceModificationException(e);
         }

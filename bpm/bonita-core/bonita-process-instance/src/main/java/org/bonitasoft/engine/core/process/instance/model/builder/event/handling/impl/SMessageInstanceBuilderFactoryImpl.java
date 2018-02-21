@@ -17,19 +17,11 @@ import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SMessageInstanceBuilderFactoryImpl implements SMessageInstanceBuilderFactory {
-
-    @Override
-    public SMessageInstanceBuilder createNewInstance(final SThrowMessageEventTriggerInstance throwMessage, final long processDefinitionId,
-            final String flowNodeName) {
-        final SMessageInstanceImpl entity = new SMessageInstanceImpl(throwMessage, processDefinitionId, flowNodeName);
-        return new SMessageInstanceBuilderImpl(entity);
-    }
 
     @Override
     public SMessageInstanceBuilder createNewInstance(String messageName, String targetProcess, String targetFlowNode, long processDefinitionId, String flowNodeName) {
