@@ -206,6 +206,11 @@
             <logger category="org.hibernate">
                 <level name="WARN" />
             </logger>
+            <!-- Remove wrong warnings about ehcache: -->
+            <logger category="org.hibernate.cache.ehcache.AbstractEhcacheRegionFactory">
+                <level name="ERROR" />
+            </logger>
+
             <logger category="net.sf.ehcache">
                 <level name="WARN" />
             </logger>
