@@ -46,8 +46,6 @@ public interface FlowNodeInstanceService {
 
     String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION";
 
-    String ACTIVITYINSTANCE_EXPECTED_END_DATE = "ACTIVITYINSTANCE_EXPECTED_END_DATE";
-
     String LOOPINSTANCE_LOOPMAX_MODIFIED = "LOOPINSTANCE_LOOPMAX_MODIFIED";
 
     String MULTIINSTANCE_LOOPCARDINALITY_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
@@ -116,14 +114,6 @@ public interface FlowNodeInstanceService {
      * @since 6.0
      */
     void updateDisplayName(SFlowNodeInstance flowNodeInstance, String displayName) throws SFlowNodeModificationException;
-
-    /**
-     * @param flowNodeInstance
-     * @param expectedEndDate
-     * @throws SFlowNodeModificationException
-     * @since 7.4
-     */
-    void updateExpectedEndDate(SFlowNodeInstance flowNodeInstance, Long expectedEndDate) throws SFlowNodeModificationException;
 
     /**
      * @param flowElementInstance
