@@ -509,22 +509,25 @@ public class StateBehaviors {
             throws SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-        if (flowNodeDefinition instanceof SHumanTaskDefinition) {
-            SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) flowNodeDefinition;
-            final SExpression expectedDurationExpression = humanTaskDefinition.getExpectedDuration();
-            final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                    processDefinition.getId());
-            try {
-                final Long duration = (Long) expressionResolverService.evaluate(expectedDurationExpression, sExpressionContext);
-                if (duration == null) {
-                    activityInstanceService.updateExpectedEndDate(flowNodeInstance, null);
-                } else {
-                    activityInstanceService.updateExpectedEndDate(flowNodeInstance, System.currentTimeMillis() + duration);
-                }
-
-            } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("error while updating expected end date", e);
+        if (!(flowNodeDefinition instanceof SHumanTaskDefinition)) {
+            return;
+        }
+        SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) flowNodeDefinition;
+        final SExpression expectedDurationExpression = humanTaskDefinition.getExpectedDuration();
+        if (expectedDurationExpression == null) {
+            return;
+        }
+        final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                processDefinition.getId());
+        try {
+            final Long duration = (Long) expressionResolverService.evaluate(expectedDurationExpression, sExpressionContext);
+            if (duration == null) {
+                activityInstanceService.setExpectedEndDate(flowNodeInstance, null);
+            } else {
+                activityInstanceService.setExpectedEndDate(flowNodeInstance, System.currentTimeMillis() + duration);
             }
+        } catch (final SBonitaException e) {
+            throw new SActivityStateExecutionException("error while updating expected end date", e);
         }
     }
 

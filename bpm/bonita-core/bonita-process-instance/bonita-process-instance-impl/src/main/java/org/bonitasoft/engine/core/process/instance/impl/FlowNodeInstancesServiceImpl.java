@@ -152,11 +152,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
-    @Override
-    public void updateExpectedEndDate(final SFlowNodeInstance flowNodeInstance, final Long expectedEndDate) throws SFlowNodeModificationException {
-        updateOneField(flowNodeInstance, activityInstanceKeyProvider.getExpectedEndDateKey(), expectedEndDate, ACTIVITYINSTANCE_EXPECTED_END_DATE);
-    }
-
     private String getTruncated(final String value, final int maxLengh, final SFlowNodeInstance flowNodeInstance, final String key) {
         if (value.length() > maxLengh) {
             final String truncatedValue = value.substring(0, maxLengh);
