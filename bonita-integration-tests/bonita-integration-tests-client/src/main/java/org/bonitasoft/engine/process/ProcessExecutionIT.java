@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
+import static org.bonitasoft.engine.test.BuildTestUtil.generateJarAndBuildBarResource;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -23,8 +25,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
@@ -403,6 +408,30 @@ public class ProcessExecutionIT extends TestWithUser {
     @Test(expected = UpdateException.class)
     public void updateDueDateOfUnknownTask() throws Exception {
         getProcessAPI().updateDueDateOfTask(123456789L, new Date());
+    }
+
+
+    @Test
+    public void should_be_able_to_set_due_date_with_connector() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithDueDate", "1.0");
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME)
+                .addConnector("setDueDate", "dueDateConnector", "1.0", ConnectorEvent.ON_ENTER);
+
+        BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(builder.done())
+                .addConnectorImplementation(generateConnectorImplementation("dueDateConnector", "1.0", SetDueDateConnector.class))
+                .addClasspathResource(generateJarAndBuildBarResource(SetDueDateConnector.class, "dueDate.jar")).done();
+
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance1,"step1");
+
+
+        assertThat(step1.getExpectedEndDate()).isEqualTo(SetDueDateConnector.dueDate);
+
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
