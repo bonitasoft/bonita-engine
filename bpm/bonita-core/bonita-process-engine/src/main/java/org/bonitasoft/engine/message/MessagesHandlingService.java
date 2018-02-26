@@ -32,7 +32,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
@@ -217,7 +217,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
 
     private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), true);
+        descriptor.addField(SMessageInstanceBuilder.HANDLED, true);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
@@ -241,7 +241,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
             return;
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), false);
+        descriptor.addField(SMessageInstanceBuilder.HANDLED, false);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
