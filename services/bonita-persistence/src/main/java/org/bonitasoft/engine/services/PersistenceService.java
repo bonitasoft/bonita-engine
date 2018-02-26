@@ -44,7 +44,7 @@ public interface PersistenceService extends ReadPersistenceService {
      * @param entities
      * @throws SPersistenceException
      */
-    void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException;
+    void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException;
 
     /**
      * Delete a record from the table by given persistentObject.

@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.services.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -33,8 +32,9 @@ import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
-import org.bonitasoft.engine.services.SQueriableLogException;
 import org.bonitasoft.engine.services.SQueriableLogNotFoundException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -42,48 +42,40 @@ import org.bonitasoft.engine.services.SQueriableLogNotFoundException;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerService {
+public class QueriableLoggerImpl implements QueriableLoggerService {
 
     private final PersistenceService persistenceService;
-
     private final QueriableLoggerStrategy loggerStrategy;
-
+    private TransactionService transactionService;
     protected final TechnicalLoggerService logger;
-
     private final QueriableLogUpdater logUpdater;
+    private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<>();
 
-    public AbstractQueriableLoggerImpl(final PersistenceService persistenceService,
-            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService,
-            final TechnicalLoggerService logger) {
+
+    public QueriableLoggerImpl(PersistenceService persistenceService,
+                               TransactionService transactionService,
+                               QueriableLoggerStrategy loggerStrategy,
+                               QueriableLogSessionProvider sessionProvider,
+                               PlatformService platformService,
+                               TechnicalLoggerService logger) {
+        this.transactionService = transactionService;
         this.logger = logger;
-        NullCheckingUtil.checkArgsNotNull(persistenceService, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
         this.loggerStrategy = loggerStrategy;
         logUpdater = new QueriableLogUpdater(sessionProvider, platformService, logger);
     }
 
     @Override
-    public int getNumberOfLogs() throws SQueriableLogException {
+    public long getNumberOfLogs() throws SBonitaReadException {
         final Map<String, Object> emptyMap = Collections.emptyMap();
-        try {
-            final Long read = persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfLogs", emptyMap, SQueriableLog.class, Long.class));
-            return read.intValue();
-        } catch (final SBonitaReadException e) {
-            throw handleError("can't get the number of log", e);
-        }
+        return persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfLogs", emptyMap, SQueriableLog.class, Long.class));
     }
 
     @Override
-    public List<SQueriableLog> getLogs(final int startIndex, final int maxResults, final String field, final OrderByType order) throws SQueriableLogException {
-        List<SQueriableLog> logs;
-        final QueryOptions queryOptions;
-        queryOptions = new QueryOptions(startIndex, maxResults, SQueriableLog.class, field, order);
-        try {
-            logs = persistenceService.selectList(new SelectListDescriptor<SQueriableLog>("getLogs", null, SQueriableLog.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw handleError("can't get logs", e);
-        }
-        return logs;
+    public List<SQueriableLog> getLogs(final int startIndex, final int maxResults, final String field, final OrderByType order) throws SBonitaReadException {
+        return persistenceService.selectList(
+                new SelectListDescriptor<SQueriableLog>("getLogs", null, SQueriableLog.class,
+                        new QueryOptions(startIndex, maxResults, SQueriableLog.class, field, order)));
     }
 
     @Override
@@ -98,54 +90,52 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
 
     @Override
     public void log(final String callerClassName, final String callerMethodName, final SQueriableLog... queriableLogs) {
-        NullCheckingUtil.checkArgsNotNull((Object[]) queriableLogs);
-        final List<SQueriableLog> loggableLogs = new ArrayList<SQueriableLog>();
+        if (queriableLogs.length == 0) {
+            return;
+        }
+        BatchLogSynchronization synchronization = getBatchLogSynchronization();
         for (SQueriableLog log : queriableLogs) {
             if (isLoggable(log.getActionType(), log.getSeverity())) {
                 log = logUpdater.buildFinalLog(callerClassName, callerMethodName, log);
-                loggableLogs.add(log);
+                synchronization.addLog(log);
             }
-        }
-
-        if (loggableLogs.size() > 0) { // there is logs in a loggable level
-            log(loggableLogs);
         }
     }
 
-    protected abstract void log(final List<SQueriableLog> loggableLogs);
+    private synchronized BatchLogSynchronization getBatchLogSynchronization() {
+        BatchLogSynchronization synchronization = synchronizations.get();
+        if (synchronization == null) {
+            synchronization = new BatchLogSynchronization(persistenceService, this);
+            synchronizations.set(synchronization);
+            registerSynchronization(synchronization);
+        }
+        return synchronization;
+    }
+
+    private void registerSynchronization(BatchLogSynchronization synchro) {
+        try {
+            transactionService.registerBonitaSynchronization(synchro);
+        } catch (STransactionNotFoundException e) {
+            throw new SBonitaRuntimeException(e);
+        }
+    }
+
+    void clearSynchronization() {
+        synchronizations.remove();
+    }
 
     @Override
     public boolean isLoggable(final String actionType, final SQueriableLogSeverity severity) {
-        NullCheckingUtil.checkArgsNotNull(actionType, severity);
         return loggerStrategy.isLoggable(actionType, severity);
     }
 
-    protected PersistenceService getPersitenceService() {
-        return persistenceService;
-    }
-
-    protected QueriableLoggerStrategy getQueriableLogConfiguration() {
-        return loggerStrategy;
-    }
-
     @Override
-    public SQueriableLog getLog(final long logId) throws SQueriableLogNotFoundException, SQueriableLogException {
-        try {
-            final SQueriableLog selectOne = persistenceService.selectById(new SelectByIdDescriptor<SQueriableLog>(SQueriableLog.class,
-                    logId));
-            if (selectOne == null) {
-                throw new SQueriableLogNotFoundException(logId);
-            }
-            return selectOne;
-        } catch (final SBonitaReadException sbre) {
-            throw new SQueriableLogException(sbre);
+    public SQueriableLog getLog(final long logId) throws SQueriableLogNotFoundException, SBonitaReadException {
+        final SQueriableLog selectOne = persistenceService.selectById(new SelectByIdDescriptor<>(SQueriableLog.class, logId));
+        if (selectOne == null) {
+            throw new SQueriableLogNotFoundException(logId);
         }
+        return selectOne;
     }
 
-    private SQueriableLogException handleError(final String message, final Exception e) {
-        if (e != null) {
-            e.printStackTrace();
-        }
-        return new SQueriableLogException(message, e);
-    }
 }

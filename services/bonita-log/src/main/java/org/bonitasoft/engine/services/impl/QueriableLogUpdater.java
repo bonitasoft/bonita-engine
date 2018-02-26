@@ -30,9 +30,6 @@ import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 public class QueriableLogUpdater {
 
 
-    /**
-     *
-     */
     private static final int MAX_MESSAGE_LENGTH = 255;
     private final QueriableLogSessionProvider sessionProvider;
     private final PlatformService platformService;
@@ -64,11 +61,10 @@ public class QueriableLogUpdater {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
             }
         }
-        final SQueriableLog finalLog = builder.callerClassName(callerClassName).callerMethodName(callerMethodName)
+        return builder.callerClassName(callerClassName).callerMethodName(callerMethodName)
                 .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode())
                 .productVersion(platformService.getSPlatformProperties().getPlatformVersion())
                 .done();
-        return finalLog;
 
     }
 

@@ -277,7 +277,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
-    public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
+    public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
         if (!entities.isEmpty()) {
             final Session session = getSession(true);
             for (final PersistentObject entity : entities) {
