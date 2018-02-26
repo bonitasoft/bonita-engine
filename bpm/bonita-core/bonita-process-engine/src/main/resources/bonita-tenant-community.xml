@@ -314,7 +314,7 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="defaultCommandProvider" ref="defaultCommandProvider" />
     </bean>
 
@@ -1071,7 +1071,7 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="identityService" ref="identityService" />
     </bean>
 
@@ -1172,7 +1172,7 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="themeRetriever" ref="themeRetriever" />
     </bean>
 
@@ -1198,7 +1198,7 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
 
@@ -1207,7 +1207,7 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
     </bean>
@@ -1281,7 +1281,7 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
@@ -1292,7 +1292,7 @@
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
         <constructor-arg name="cacheService" ref="cacheService" />
     </bean>
@@ -1331,7 +1331,7 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="profileService" ref="profileService" />
         <property name="pageServiceListeners">
             <list>
@@ -1380,7 +1380,7 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="encrypter">
             <bean class="org.bonitasoft.engine.identity.impl.MD5CredentialsEncrypter" />
         </constructor-arg>
@@ -1392,7 +1392,7 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
     <!-- depends on transientDataExpressionExecutorStrategy because if this bean is loaded before it cause a circular dependency -->
@@ -1423,7 +1423,7 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="broadcastService" ref="broadcastService" />
         <constructor-arg name="readSessionAccessor" ref="sessionAccessor" />
@@ -1484,7 +1484,7 @@
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
     <bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
@@ -1715,14 +1715,14 @@
     <bean id="applicationService" class="org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
     <bean id="contractDataService" class="org.bonitasoft.engine.core.contract.data.ContractDataServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
@@ -1741,18 +1741,19 @@
         <constructor-arg name="legacyUrlAdapter">
             <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.LEGACY_URL_ADAPTER" />
         </constructor-arg>
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="authorizationRuleMapping" ref="${bonita.tenant.authorization.rule.mapping}" />
     </bean>
 
     <bean id="defaultAuthorizationRuleMapping" class="org.bonitasoft.engine.core.form.impl.AuthorizationRuleMappingImpl" />
 
-    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
+    <bean id="queriableLoggerService" class="org.bonitasoft.engine.services.impl.QueriableLoggerImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
         <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="platformService" ref="platformService" />
+        <constructor-arg name="transactionService" ref="transactionService"/>
     </bean>
 
     <bean id="sessionProvider" class="org.bonitasoft.engine.session.impl.SessionProviderImpl" />

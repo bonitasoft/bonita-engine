@@ -143,7 +143,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     @Override
     public QueriableLoggerService getQueriableLoggerService() {
-        return beanAccessor.getService("syncQueriableLoggerService", QueriableLoggerService.class);
+        return beanAccessor.getService("queriableLoggerService", QueriableLoggerService.class);
     }
 
     @Override

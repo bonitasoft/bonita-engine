@@ -34,6 +34,7 @@ import org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,10 +42,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SyncQueriableLoggerServiceImplTest {
+public class QueriableLoggerImplTest {
 
     private static final String FIRST_ACTION = "first_action";
 
@@ -52,6 +53,8 @@ public class SyncQueriableLoggerServiceImplTest {
 
     @Mock
     private PersistenceService persistenceService;
+    @Mock
+    private TransactionService transactionService;
     @Mock
     private QueriableLoggerStrategy loggerStrategy;
     @Mock
@@ -70,8 +73,10 @@ public class SyncQueriableLoggerServiceImplTest {
     private ArgumentCaptor<SelectByIdDescriptor<?>> selectByIdCaptor;
     @Captor
     private ArgumentCaptor<SelectListDescriptor<?>> selectListCaptor;
+    @Captor
+    private ArgumentCaptor<BatchLogSynchronization> synchroCaptor;
     @InjectMocks
-    private SyncQueriableLoggerServiceImpl logService;
+    private QueriableLoggerImpl logService;
 
     @Before
     public void setUp() {
@@ -124,12 +129,14 @@ public class SyncQueriableLoggerServiceImplTest {
         logService.log("CallerClass", "callerMethod", log1);
 
         // then
-        verify(persistenceService, times(1)).insert(log1);
-        verify(log1, times(1)).setClusterNode("node1");
-        verify(log1, times(1)).setCallerClassName("CallerClass");
-        verify(log1, times(1)).setCallerMethodName("callerMethod");
-        verify(log1, times(1)).setProductVersion("6.3");
-        verify(log1, times(1)).setUserId("walter.bates");
+        verify(transactionService).registerBonitaSynchronization(synchroCaptor.capture());
+        BatchLogSynchronization value = synchroCaptor.getValue();
+        assertThat(value.getLogs()).containsExactly(log1);
+        verify(log1).setClusterNode("node1");
+        verify(log1).setCallerClassName("CallerClass");
+        verify(log1).setCallerMethodName("callerMethod");
+        verify(log1).setProductVersion("6.3");
+        verify(log1).setUserId("walter.bates");
 
     }
 
@@ -155,8 +162,9 @@ public class SyncQueriableLoggerServiceImplTest {
         logService.log("CallerClass", "callerMethod", log1, log2);
 
         // then
-        verify(persistenceService, times(1)).insert(log1);
-        verify(persistenceService, times(1)).insert(log2);
+        verify(transactionService).registerBonitaSynchronization(synchroCaptor.capture());
+        BatchLogSynchronization value = synchroCaptor.getValue();
+        assertThat(value.getLogs()).containsExactly(log1, log2);
     }
 
     @Test
@@ -165,7 +173,7 @@ public class SyncQueriableLoggerServiceImplTest {
         doReturn(15L).when(persistenceService).selectOne(selectOneCaptor.capture());
 
         // when
-        int numberOfLogs = logService.getNumberOfLogs();
+        long numberOfLogs = logService.getNumberOfLogs();
 
         // then
         assertThat(numberOfLogs).isEqualTo(15);
@@ -218,7 +226,7 @@ public class SyncQueriableLoggerServiceImplTest {
     @Test
     public void getLog_should_return_log_from_persistence_service() throws Exception {
         // given
-        doReturn(log1).when(persistenceService).selectById(any(SelectByIdDescriptor.class));
+        doReturn(log1).when(persistenceService).selectById(any());
 
         // when
         SQueriableLog log = logService.getLog(100L);
