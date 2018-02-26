@@ -56,16 +56,15 @@ public interface QueriableLoggerService {
      * @throws SQueriableLogException
      * @since 6.0
      */
-    SQueriableLog getLog(long logId) throws SQueriableLogNotFoundException, SQueriableLogException;
+    SQueriableLog getLog(long logId) throws SQueriableLogNotFoundException, SBonitaReadException;
 
     /**
      * Get total number of queriable logs
      * 
      * @return the number of queriable logs
-     * @throws SQueriableLogException
      * @since 6.0
      */
-    int getNumberOfLogs() throws SQueriableLogException;
+    long getNumberOfLogs() throws SBonitaReadException;
 
     /**
      * Get the queriable logs having the given value for the given int index
@@ -80,7 +79,7 @@ public interface QueriableLoggerService {
      * @throws SQueriableLogException
      * @since 6.0
      */
-    List<SQueriableLog> getLogs(int startIndex, int maxResults, final String field, final OrderByType order) throws SQueriableLogException;
+    List<SQueriableLog> getLogs(int startIndex, int maxResults, final String field, final OrderByType order) throws SBonitaReadException;
 
     /**
      * Gets the queriable logs number matching to the given QueryOptions.

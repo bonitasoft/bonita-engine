@@ -136,7 +136,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     }
 
     @Override
-    public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
+    public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
         for (final PersistentObject entity : entities) {
             setTenant(entity);
         }

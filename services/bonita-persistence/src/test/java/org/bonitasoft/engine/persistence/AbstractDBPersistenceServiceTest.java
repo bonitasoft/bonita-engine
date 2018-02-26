@@ -68,7 +68,7 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
+        public void insertInBatch(final List<? extends PersistentObject> entities) throws SPersistenceException {
 
         }
 
