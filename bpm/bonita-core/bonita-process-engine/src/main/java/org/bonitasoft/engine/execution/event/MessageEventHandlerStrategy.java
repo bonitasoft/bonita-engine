@@ -37,7 +37,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -46,7 +45,6 @@ import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SCorrelationContainerBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
@@ -66,7 +64,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.message.MessagesHandlingService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.work.SWorkRegisterException;
 
 /**
  * @author Baptiste Mesta
@@ -162,20 +159,20 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SExpressionContext expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                 processDefinitionId);
 
-        handleThrowMessage(sEventTriggerDefinition, eventInstance.getId(), eventInstance.getName(), processDefinitionId, expressionContext);
+        handleThrowMessage(sEventTriggerDefinition, eventInstance.getName(), processDefinitionId, expressionContext);
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
-            final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException,
-            SDataInstanceException, SExpressionException, SWorkRegisterException, STransactionNotFoundException {
+                                 final SThrowMessageEventTriggerDefinition messageTrigger) throws SMessageInstanceCreationException,
+            SDataInstanceException, SExpressionException, STransactionNotFoundException {
         final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 processDefinition.getId());
-        handleThrowMessage(messageTrigger, sendTaskInstance.getId(), sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
+        handleThrowMessage(messageTrigger, sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
     }
 
-    private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final long eventInstanceId, final String eventInstanceName,
-            final Long processDefinitionId, final SExpressionContext expressionContext) throws SEventTriggerInstanceCreationException,
-            SMessageInstanceCreationException, SDataInstanceException, SExpressionException, SWorkRegisterException, STransactionNotFoundException {
+    private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final String eventInstanceName,
+                                    final Long processDefinitionId, final SExpressionContext expressionContext) throws
+            SMessageInstanceCreationException, SDataInstanceException, SExpressionException, STransactionNotFoundException {
         final SThrowMessageEventTriggerDefinition messageTrigger = (SThrowMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
         final SExpression targetProcess = messageTrigger.getTargetProcess();
@@ -186,9 +183,9 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (targetFlowNode != null) {
             stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode, expressionContext);
         }
-        final SMessageInstanceBuilder builder = BuilderFactory.get(SMessageInstanceBuilderFactory.class)
-                .createNewInstance(messageName, stringTargetProcess, stringTargetFlowNode, processDefinitionId, eventInstanceName);
+        final SMessageInstanceBuilder builder = SMessageInstanceBuilder.create(messageName, stringTargetProcess, stringTargetFlowNode, processDefinitionId, eventInstanceName);
         final List<SCorrelationDefinition> correlations = messageTrigger.getCorrelations();
+
         fillCorrelation(builder, correlations, expressionContext);
         final SMessageInstance messageInstance = builder.done();
         // evaluate and add correlations
@@ -252,7 +249,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
                 processDefinition.getId());
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SFlowNodeDefinition targetFlowNode = processContainer.getFlowNode(waitingEvent.getFlowNodeName());
-        SCatchMessageEventTriggerDefinition messageEventTrigger = null;
+        SCatchMessageEventTriggerDefinition messageEventTrigger;
         if (targetFlowNode instanceof SReceiveTaskDefinition) {
             messageEventTrigger = ((SReceiveTaskDefinition) targetFlowNode).getTrigger();
         } else {
@@ -270,7 +267,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     @Override
     public void handleThrowEvent(final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        handleThrowMessage(sEventTriggerDefinition, -1L, "", -1L, null);
+        handleThrowMessage(sEventTriggerDefinition, "", -1L, null);
     }
 
     @Override
