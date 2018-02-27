@@ -388,14 +388,12 @@ public class BPMLocalIT extends CommonAPILocalIT {
         semaphore1.acquire();
         semaphore2.acquire();
 
-        System.out.println("Start the process");
         final ProcessInstance pi1 = getProcessAPI().startProcess(p1.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(p2.getId());
         final ProcessInstance pi3 = getProcessAPI().startProcess(p3.getId());
         waitForUserTaskAndExecuteIt(pi1, "step1", john);
         waitForUserTaskAndExecuteIt(pi2, "step1", john);
         waitForUserTaskAndExecuteIt(pi3, "step1", john);
-        System.out.println("executed step1");
         logoutOnTenant();
         final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
@@ -409,23 +407,17 @@ public class BPMLocalIT extends CommonAPILocalIT {
                 } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("release semaphores");
                 BlockingConnector.semaphore.release();
                 semaphore1.release();
                 semaphore2.release();
-                System.out.println("released semaphores");
             }
         });
-        System.out.println("stop node");
         thread.start();
         platformAPI.stopNode();
-        System.out.println("node stopped");
         // release them (work will fail, node is stopped)
         thread.join(1000);
         Thread.sleep(50);
-        System.out.println("start node");
         platformAPI.startNode();
-        System.out.println("node started");
         logoutOnPlatform(loginPlatform);
         loginOnDefaultTenantWithDefaultTechnicalUser();
 

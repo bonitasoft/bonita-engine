@@ -123,7 +123,6 @@ public class RecorderTest extends CommonBPMServicesTest {
 
     @Test
     public void testNotLogOnInsertRecordWhenBTXRolledBack() throws Exception {
-        System.out.println(getTransactionService());
         getTransactionService().begin();
         final SelectOneDescriptor<SUserImpl> selectDescriptor = new SelectOneDescriptor<>("getUserByUserName",
                 (Map<String, Object>) Collections.singletonMap("userName", (Object) "firstName"), SUserImpl.class);

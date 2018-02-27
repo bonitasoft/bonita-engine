@@ -1192,9 +1192,7 @@ public class GatewayExecutionIT extends TestWithUser {
         logoutOnTenant();
         final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        System.out.println("stopping node");
         platformAPI.stopNode();
-        System.out.println("starting node");
         platformAPI.startNode();
         logoutOnPlatform(loginPlatform);
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
