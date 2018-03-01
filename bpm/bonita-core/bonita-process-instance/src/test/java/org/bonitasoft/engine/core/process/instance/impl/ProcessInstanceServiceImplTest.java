@@ -40,7 +40,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinitio
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SIntermediateThrowEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SStartEventDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SCatchSignalEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STimerEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
@@ -55,7 +54,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
@@ -793,30 +791,6 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
 
         verify(eventInstanceService, never()).deleteEventTriggerInstances(anyLong());
-    }
-
-    @Test
-    public void should_delete_event_trigger_instances_when_there_is_some_in_definitiion() throws Exception {
-        SFlowNodeInstanceImpl flownodeInstance = new SStartEventInstanceImpl();
-        flownodeInstance.setFlowNodeDefinitionId(1234L);
-        SStartEventDefinitionImpl start = new SStartEventDefinitionImpl(1234L, "start");
-        start.addSignalEventTrigger(new SCatchSignalEventTriggerDefinitionImpl("aSignalStart"));
-        SProcessDefinition processDefinition = aProcess().with(start).done();
-
-        processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
-
-        verify(eventInstanceService).deleteEventTriggerInstances(anyLong());
-    }
-
-    @Test
-    public void should_delete_event_trigger_instances_when_there_is_no_definition() throws Exception {
-        SFlowNodeInstanceImpl flownodeInstance = new SStartEventInstanceImpl();
-        flownodeInstance.setFlowNodeDefinitionId(1234L);
-        SProcessDefinition processDefinition = aProcess().done();
-
-        processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
-
-        verify(eventInstanceService).deleteEventTriggerInstances(anyLong());
     }
 
     private SProcessDefinitionBuilder aProcess() {
