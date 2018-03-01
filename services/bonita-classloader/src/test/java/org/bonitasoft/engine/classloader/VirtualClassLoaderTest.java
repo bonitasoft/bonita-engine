@@ -35,24 +35,23 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.thoughtworks.xstream.XStream;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import com.thoughtworks.xstream.XStream;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VirtualClassLoaderTest {
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private ClassLoader testClassLoader;
     @Mock
     private ClassLoaderListener myClassLoaderListener;
-
     private VirtualClassLoader localClassLoader;
     private BonitaClassLoader newClassLoader;
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private File tempDir;
 
     @Before
@@ -168,7 +167,6 @@ public class VirtualClassLoaderTest {
         //then
         verify(myClassLoaderListener).onUpdate(localClassLoader);
     }
-
 
     @Test
     public void should_replaceClassLoader_call_destroy_on_old_classloader() throws Exception {

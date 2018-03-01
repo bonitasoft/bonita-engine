@@ -14,13 +14,9 @@
 package org.bonitasoft.engine.business.application.impl.cleaner;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl;
-import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCleaner;
-import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
 import org.bonitasoft.engine.business.application.impl.filter.ChildrenMenusFilterBuilder;
 import org.bonitasoft.engine.business.application.impl.filter.SelectRange;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -28,7 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationMenuDestructorTest {

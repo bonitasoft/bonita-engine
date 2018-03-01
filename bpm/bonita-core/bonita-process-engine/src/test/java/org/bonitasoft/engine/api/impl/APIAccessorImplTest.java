@@ -24,7 +24,7 @@ import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIAccessorImplTest {

@@ -18,8 +18,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl;
-import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
-import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCleaner;
 import org.bonitasoft.engine.business.application.impl.filter.ApplicationRelatedMenusFilterBuilder;
 import org.bonitasoft.engine.business.application.impl.filter.SelectRange;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -28,7 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationDestructorTest {
