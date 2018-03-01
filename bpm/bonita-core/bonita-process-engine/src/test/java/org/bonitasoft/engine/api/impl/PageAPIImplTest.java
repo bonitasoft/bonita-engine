@@ -14,10 +14,7 @@
 
 package org.bonitasoft.engine.api.impl;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.page.PageMappingService;
@@ -28,7 +25,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta

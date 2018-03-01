@@ -33,14 +33,14 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.xml.MembershipNode;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileNode;
-import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
-import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.profile.xml.MembershipNode;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileMappingNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.session.SessionService;
 import org.junit.Before;
@@ -50,7 +50,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProfilesImporterTest {

@@ -50,7 +50,7 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * author Emmanuel Duchastenier

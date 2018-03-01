@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -36,7 +33,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet

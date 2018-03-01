@@ -18,14 +18,13 @@ import static org.mockito.BDDMockito.given;
 
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.impl.MenuIndex;
-import org.bonitasoft.engine.business.application.impl.converter.MenuIndexConverter;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
 import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MenuIndexConverterTest {

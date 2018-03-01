@@ -14,14 +14,10 @@
 package org.bonitasoft.engine.operation;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,7 +46,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentListLeftOperandHandlerTest {
@@ -113,7 +109,7 @@ public class DocumentListLeftOperandHandlerTest {
 
     @Test
     public void should_update_setDocumentList() throws Exception {
-        doNothing().when(documentHelper).setDocumentList(anyListOf(DocumentValue.class), anyString(), anyLong(), anyLong());
+        doNothing().when(documentHelper).setDocumentList(anyList(), anyString(), anyLong(), anyLong());
         List<DocumentValue> newValue = Arrays.asList(documentValue("doc1"), documentValue("doc2"));
         doReturn(newValue).when(documentHelper).toCheckedList(newValue);
         handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), newValue, CONTAINER_ID, CONTAINER_TYPE);
