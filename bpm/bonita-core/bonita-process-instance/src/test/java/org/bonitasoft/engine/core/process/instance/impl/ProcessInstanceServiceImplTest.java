@@ -36,6 +36,15 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryEventDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.event.impl.SIntermediateThrowEventDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.event.impl.SStartEventDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SCatchSignalEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STimerEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -46,10 +55,12 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl;
@@ -73,7 +84,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -629,8 +640,11 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_INTERMEDIATE_CATCH_EVENT()
             throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SIntermediateCatchEventInstanceImpl();
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        final SFlowNodeInstanceImpl flowNodeInstance = new SIntermediateCatchEventInstanceImpl();
+        flowNodeInstance.setFlowNodeDefinitionId(42);
+        SIntermediateThrowEventDefinitionImpl definition = new SIntermediateThrowEventDefinitionImpl(42, "inter");
+        definition.addMessageEventTriggerDefinition(new SThrowMessageEventTriggerDefinitionImpl());
+        final SProcessDefinition processDefinition = aProcess().with(definition).done();
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
@@ -657,8 +671,9 @@ public class ProcessInstanceServiceImplTest {
     @Test
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_START_EVENT() throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SStartEventInstanceImpl();
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        final SFlowNodeInstanceImpl flowNodeInstance = new SStartEventInstanceImpl();
+        flowNodeInstance.setFlowNodeDefinitionId(42);
+        final SProcessDefinition processDefinition = aProcess().with(new SStartEventDefinitionImpl(42, "start")).done();
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
@@ -671,8 +686,11 @@ public class ProcessInstanceServiceImplTest {
     public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_BOUNDARY_EVENT()
             throws Exception {
         // Given
-        final SFlowNodeInstance flowNodeInstance = new SBoundaryEventInstanceImpl();
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        final SFlowNodeInstanceImpl flowNodeInstance = new SBoundaryEventInstanceImpl();
+        flowNodeInstance.setFlowNodeDefinitionId(42);
+        SBoundaryEventDefinitionImpl boundary = new SBoundaryEventDefinitionImpl(42, "boundary");
+        boundary.addTimerEventTrigger(new STimerEventTriggerDefinitionImpl(null, null));
+        final SProcessDefinition processDefinition = aProcess().with(boundary).done();
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
@@ -766,4 +784,55 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.getNumberOfProcessInstances(45L);
     }
 
+    @Test
+    public void should_not_try_to_delete_event_trigger_instances_when_there_is_none_in_definitiion() throws Exception {
+        SFlowNodeInstanceImpl flownodeInstance = new SStartEventInstanceImpl();
+        flownodeInstance.setFlowNodeDefinitionId(1234L);
+        SProcessDefinition processDefinition = aProcess().with(new SStartEventDefinitionImpl(1234L, "start")).done();
+
+        processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
+
+        verify(eventInstanceService, never()).deleteEventTriggerInstances(anyLong());
+    }
+
+    @Test
+    public void should_delete_event_trigger_instances_when_there_is_some_in_definitiion() throws Exception {
+        SFlowNodeInstanceImpl flownodeInstance = new SStartEventInstanceImpl();
+        flownodeInstance.setFlowNodeDefinitionId(1234L);
+        SStartEventDefinitionImpl start = new SStartEventDefinitionImpl(1234L, "start");
+        start.addSignalEventTrigger(new SCatchSignalEventTriggerDefinitionImpl("aSignalStart"));
+        SProcessDefinition processDefinition = aProcess().with(start).done();
+
+        processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
+
+        verify(eventInstanceService).deleteEventTriggerInstances(anyLong());
+    }
+
+    @Test
+    public void should_delete_event_trigger_instances_when_there_is_no_definition() throws Exception {
+        SFlowNodeInstanceImpl flownodeInstance = new SStartEventInstanceImpl();
+        flownodeInstance.setFlowNodeDefinitionId(1234L);
+        SProcessDefinition processDefinition = aProcess().done();
+
+        processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
+
+        verify(eventInstanceService).deleteEventTriggerInstances(anyLong());
+    }
+
+    private SProcessDefinitionBuilder aProcess() {
+        return new SProcessDefinitionBuilder();
+    }
+
+    private class SProcessDefinitionBuilder {
+        private SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("aProcess", "1.0");
+
+        SProcessDefinitionBuilder with(SEventDefinition eventDefinition) {
+            ((SFlowElementContainerDefinitionImpl) processDefinition.getProcessContainer()).addEvent(eventDefinition);
+            return this;
+        }
+
+        SProcessDefinition done() {
+            return processDefinition;
+        }
+    }
 }

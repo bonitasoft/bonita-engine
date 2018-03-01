@@ -332,14 +332,14 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void should_updateExpectedEndDate_update_due_date_on_right_flownode_with_right_update_event_message() throws Exception {
+    public void should_update_due_date_on_right_flownode_with_right_update_event_message() throws Exception {
         //when
-        activityInstanceServiceImpl.updateExpectedEndDate(sFlowNodeInstance, 123L);
+        activityInstanceServiceImpl.setExpectedEndDate(sFlowNodeInstance, 123L);
 
         ArgumentCaptor<UpdateRecord> updateRecordArgumentCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
 
         //then
-        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), eq(FlowNodeInstanceService.ACTIVITYINSTANCE_EXPECTED_END_DATE));
+        verify(recorder).recordUpdate(updateRecordArgumentCaptor.capture(), eq(FlowNodeInstanceService.EXPECTED_END_DATE_MODIFIED));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).as("should update entity").isEqualTo(sFlowNodeInstance);
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).as("should only update expectedEndDate field with new value")
                 .containsExactly(entry("expectedEndDate", 123L));
@@ -355,7 +355,7 @@ public class ActivityInstanceServiceImplTest {
         expectedException.expect(SFlowNodeModificationException.class);
 
         //when
-        activityInstanceServiceImpl.updateExpectedEndDate(sFlowNodeInstance, 123L);
+        activityInstanceServiceImpl.setExpectedEndDate(sFlowNodeInstance, 123L);
     }
 
 
