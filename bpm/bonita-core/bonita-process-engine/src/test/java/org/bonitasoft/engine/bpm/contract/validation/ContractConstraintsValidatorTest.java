@@ -20,11 +20,11 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDef
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
 
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractConstraintsValidatorTest {
@@ -63,7 +63,7 @@ public class ContractConstraintsValidatorTest {
     public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException,
             SInvalidExpressionException {
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
-        doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class), anyMapOf(Integer.class, Object.class),
+        doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMap(), anyMap(),
                 any(ContainerState.class));
         returnTrueForExpressionWithContent("isValid != null");
         returnTrueForExpressionWithContent("isValid || !isValid && comment != null");
@@ -72,8 +72,8 @@ public class ContractConstraintsValidatorTest {
 
     private void returnTrueForExpressionWithContent(String content) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
-        doReturn(true).when(expressionService).evaluate(expressionHavingContent(content), anyMapOf(String.class, Object.class),
-                anyMapOf(Integer.class, Object.class), any(ContainerState.class));
+        doReturn(true).when(expressionService).evaluate(expressionHavingContent(content), anyMap(),
+                anyMap(), any(ContainerState.class));
     }
 
     private SExpression expressionHavingContent(String content) {
@@ -148,8 +148,8 @@ public class ContractConstraintsValidatorTest {
     public void exception_during_evaluation_report_it() throws Exception {
         //given
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
-        doThrow(SExpressionEvaluationException.class).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class),
-                anyMapOf(Integer.class, Object.class), any(ContainerState.class));
+        doThrow(SExpressionEvaluationException.class).when(expressionService).evaluate(any(SExpression.class), anyMap(),
+                anyMap(), any(ContainerState.class));
 
         //when
         try {

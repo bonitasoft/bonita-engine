@@ -18,7 +18,6 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.a
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -37,7 +36,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractValidatorTest {
@@ -53,7 +52,7 @@ public class ContractValidatorTest {
     private ContractValidator contractValidator;
 
     private Map<String, Serializable> anyVariables() {
-        return anyMapOf(String.class, Serializable.class);
+        return anyMap();
     }
 
     @Test

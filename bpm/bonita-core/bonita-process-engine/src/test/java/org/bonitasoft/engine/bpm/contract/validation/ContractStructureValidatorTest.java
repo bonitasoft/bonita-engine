@@ -22,7 +22,6 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInput
 import static org.bonitasoft.engine.core.process.definition.model.SType.*;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -45,7 +44,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractStructureValidatorTest {
@@ -63,7 +62,7 @@ public class ContractStructureValidatorTest {
     @Before
     public void setUp() {
         when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
-        doReturn(true).when(typeValidator).validate(any(SInputDefinition.class), anyObject(), any(ErrorReporter.class));
+        doReturn(true).when(typeValidator).validate(any(SInputDefinition.class), any(), any(ErrorReporter.class));
     }
 
     @Test

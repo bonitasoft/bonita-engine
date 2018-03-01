@@ -23,17 +23,17 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
-import org.bonitasoft.engine.profile.xml.ProfileNode;
-import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
 import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
+import org.bonitasoft.engine.profile.xml.ProfileNode;
+import org.bonitasoft.engine.profile.xml.ProfilesNode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta

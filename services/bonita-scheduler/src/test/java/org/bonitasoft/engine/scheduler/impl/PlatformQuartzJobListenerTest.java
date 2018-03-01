@@ -16,11 +16,9 @@ package org.bonitasoft.engine.scheduler.impl;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.quartz.DateBuilder.IntervalUnit;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -107,7 +105,7 @@ public class PlatformQuartzJobListenerTest {
         platformQuartzJobListener.jobToBeExecuted(context);
 
         // then
-        verify(bonitaJobListeners.get(0)).jobToBeExecuted(anyMapOf(String.class, Serializable.class));
+        verify(bonitaJobListeners.get(0)).jobToBeExecuted(anyMap());
     }
 
     /**
@@ -134,7 +132,7 @@ public class PlatformQuartzJobListenerTest {
         platformQuartzJobListener.jobExecutionVetoed(context);
 
         // then
-        verify(bonitaJobListeners.get(0)).jobExecutionVetoed(anyMapOf(String.class, Serializable.class));
+        verify(bonitaJobListeners.get(0)).jobExecutionVetoed(anyMap());
     }
 
     /**
