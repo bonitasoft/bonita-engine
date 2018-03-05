@@ -14,26 +14,24 @@
 
 package org.bonitasoft.permissions
 
-import static org.assertj.core.api.Assertions.assertThat
-import static org.mockito.Mockito.*
-
 import org.bonitasoft.engine.api.APIAccessor
-import org.bonitasoft.engine.api.IdentityAPI
 import org.bonitasoft.engine.api.Logger
 import org.bonitasoft.engine.api.ProcessAPI
 import org.bonitasoft.engine.api.permission.APICallContext
 import org.bonitasoft.engine.api.permission.PermissionRule
 import org.bonitasoft.engine.bpm.document.Document
 import org.bonitasoft.engine.bpm.process.ProcessInstance
-import org.bonitasoft.engine.exception.BonitaException
-import org.bonitasoft.engine.exception.SearchException
 import org.bonitasoft.engine.identity.User
 import org.bonitasoft.engine.session.APISession
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.junit.MockitoJUnitRunner
+
+import static org.assertj.core.api.Assertions.assertThat
+import static org.mockito.Mockito.doReturn
+import static org.mockito.Mockito.mock
 
 @RunWith(MockitoJUnitRunner.class)
 public class DownloadDocumentPermissionRuleTest {

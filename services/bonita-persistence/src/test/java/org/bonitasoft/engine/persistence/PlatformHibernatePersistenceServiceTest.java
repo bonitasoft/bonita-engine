@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -34,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet

@@ -16,7 +16,7 @@ import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Laurent Leseigneur

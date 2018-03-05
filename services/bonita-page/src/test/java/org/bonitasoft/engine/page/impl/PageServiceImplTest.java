@@ -20,10 +20,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMapOf;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
@@ -78,7 +78,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -757,7 +757,7 @@ public class PageServiceImplTest {
         final byte[] content = IOUtil.zip(pair("aFile.txt", "hello".getBytes()), pair(PAGE_PROPERTIES,
                 "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=page"
                         .getBytes()));
-        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMapOf(String.class, byte[].class));
+        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMap());
 
         //then
         exception.expect(SInvalidPageZipInconsistentException.class);
@@ -948,7 +948,7 @@ public class PageServiceImplTest {
         //given
         final SPage sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
         final byte[] badContent = "not_a_zip".getBytes();
-        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMapOf(String.class, byte[].class));
+        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMap());
 
         //then
         exception.expect(SInvalidPageZipInconsistentException.class);
