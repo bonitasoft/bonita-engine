@@ -14,21 +14,12 @@
 package org.bonitasoft.engine.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.expression.ExpressionConstants.ENGINE_EXECUTION_CONTEXT;
-import static org.bonitasoft.engine.expression.ExpressionConstants.LOGGED_USER_ID;
-import static org.bonitasoft.engine.expression.ExpressionConstants.PROCESS_INSTANCE_ID;
-import static org.bonitasoft.engine.expression.ExpressionConstants.ROOT_PROCESS_INSTANCE_ID;
-import static org.bonitasoft.engine.expression.ExpressionConstants.TASK_ASSIGNEE_ID;
+import static org.bonitasoft.engine.expression.ExpressionConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -60,7 +51,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Elias Ricken de Medeiros

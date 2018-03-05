@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.core.operation.model.SOperatorType.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyList;
@@ -54,7 +53,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OperationServiceImplTest {
@@ -63,7 +62,6 @@ public class OperationServiceImplTest {
     private static final String TYPE_2 = "type2";
     private static final String TYPE_3 = "type3";
     private static final String TYPE_4 = "type4";
-
 
     @Mock
     private ExpressionResolverService expressionResolverService;
@@ -165,9 +163,9 @@ public class OperationServiceImplTest {
         operationServiceImpl.updateLeftOperands(updates, 123, "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler1).update(argThat(leftOperand->leftOperand.getName().equals("data1")), anyMap(), eq("value1"), eq(123L),
+        verify(leftOperandHandler1).update(argThat(leftOperand -> leftOperand.getName().equals("data1")), anyMap(), eq("value1"), eq(123L),
                 eq("containerType"));
-        verify(leftOperandHandler2).delete(argThat(leftOperand->leftOperand.getName().equals("data2")), eq(123L), eq("containerType"));
+        verify(leftOperandHandler2).delete(argThat(leftOperand -> leftOperand.getName().equals("data2")), eq(123L), eq("containerType"));
     }
 
     @Test
@@ -184,8 +182,8 @@ public class OperationServiceImplTest {
         given(persistRightOperandResolver.shouldPersistByPosition(0, operations)).willReturn(true);
         given(persistRightOperandResolver.shouldPersistByPosition(1, operations)).willReturn(false);
         given(persistRightOperandResolver.shouldPersistByPosition(2, operations)).willReturn(true);
-        given(persistRightOperandResolver.shouldPersistByValue(anyObject(), eq(true), eq(true))).willReturn(true);
-        given(persistRightOperandResolver.shouldPersistByValue(anyObject(), eq(false), eq(true))).willReturn(false);
+        given(persistRightOperandResolver.shouldPersistByValue(any(), eq(true), eq(true))).willReturn(true);
+        given(persistRightOperandResolver.shouldPersistByValue(any(), eq(false), eq(true))).willReturn(false);
         given(expressionResolverService.evaluate(sExpression, expressionContext)).willReturn(1983L);
 
         doReturn("value1").when(assignmentOperationExecutorStrategy).computeNewValueForLeftOperand(op1, 1983L, expressionContext, true);
@@ -210,8 +208,8 @@ public class OperationServiceImplTest {
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1), 123, "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(Arrays.asList(op1.getLeftOperand())), anyLong(), anyString(), any(SExpressionContext.class)
-        );
+        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(Arrays.asList(op1.getLeftOperand())), anyLong(), anyString(),
+                any(SExpressionContext.class));
         assertThat(expressionContext.getInputValues().get("data1")).isEqualTo("originalValue");
     }
 
@@ -221,7 +219,7 @@ public class OperationServiceImplTest {
         final SOperation operation1 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
         final SOperation operation2 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
         final List<SOperation> operations = Arrays.asList(operation1, operation2);
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object>singletonMap("data1",
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object> singletonMap("data1",
                 "givenValue"));
 
         // when
@@ -240,7 +238,7 @@ public class OperationServiceImplTest {
         final List<SOperation> operations = new ArrayList<>();
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object>singletonMap("data1",
+        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", 987L, Collections.<String, Object> singletonMap("data1",
                 "givenValue"));
         final OperationServiceImpl spy = spy(operationServiceImpl);
 
@@ -334,7 +332,7 @@ public class OperationServiceImplTest {
     @Test
     public void should_not_update_left_operand_context_when_new_update() throws Exception {
         //given
-        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus>singletonMap(
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
                 buildLeftOperand("type1", "data1"), new LeftOperandUpdateStatus(ASSIGNMENT));
 
         //when
@@ -349,7 +347,7 @@ public class OperationServiceImplTest {
     @Test
     public void should_not_update_left_operand_context_when_previous_was_a_deletion() throws Exception {
         //given
-        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus>singletonMap(
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
                 buildLeftOperand("type1", "data1"), new LeftOperandUpdateStatus(SOperatorType.DELETION));
 
         //when
@@ -379,7 +377,7 @@ public class OperationServiceImplTest {
     public void should_update_left_operand_context_when_new_operation_is_deletion() throws Exception {
         //given
         final LeftOperandUpdateStatus previousUpdateState = new LeftOperandUpdateStatus(SOperatorType.JAVA_METHOD);
-        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus>singletonMap(
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
                 buildLeftOperand("type1", "data1"), previousUpdateState);
 
         //when new java method must be persisted again
