@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * author Emmanuel Duchastenier

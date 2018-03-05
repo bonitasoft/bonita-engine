@@ -15,10 +15,10 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.eq;
 
@@ -63,12 +63,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlatformAPIImplTest {
 
     public static final long TENANT_ID = 56423L;
+    private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
+    private final List<AbstractBonitaTenantJobListener> tenantJobListeners = Collections.singletonList(mock(AbstractBonitaTenantJobListener.class));
+    private final List<AbstractBonitaPlatformJobListener> platformJobListeners = Collections.singletonList(mock(AbstractBonitaPlatformJobListener.class));
     @Mock
     private PlatformServiceAccessor platformServiceAccessor;
     @Mock
@@ -89,9 +92,6 @@ public class PlatformAPIImplTest {
     private PlatformService platformService;
     @Mock
     private STenant sTenant;
-    private final List<STenant> tenants = Collections.singletonList(mock(STenant.class));
-    private final List<AbstractBonitaTenantJobListener> tenantJobListeners = Collections.singletonList(mock(AbstractBonitaTenantJobListener.class));
-    private final List<AbstractBonitaPlatformJobListener> platformJobListeners = Collections.singletonList(mock(AbstractBonitaPlatformJobListener.class));
     private TransactionService transactionService = new MockedTransactionService();
     @Spy
     @InjectMocks
@@ -250,8 +250,8 @@ public class PlatformAPIImplTest {
 
         // Then
         verify(schedulerService).initializeScheduler();
-        verify(schedulerService).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
-        verify(schedulerService).addJobListener(anyListOf(AbstractBonitaTenantJobListener.class), anyString());
+        verify(schedulerService).addJobListener(anyList());
+        verify(schedulerService).addJobListener(anyList(), anyString());
         verify(schedulerService).start();
     }
 
@@ -266,8 +266,8 @@ public class PlatformAPIImplTest {
 
         // Then
         verify(schedulerService, never()).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaTenantJobListener.class), anyString());
+        verify(schedulerService, never()).addJobListener(anyList());
+        verify(schedulerService, never()).addJobListener(anyList(), anyString());
         verify(schedulerService, never()).start();
     }
 
@@ -281,8 +281,8 @@ public class PlatformAPIImplTest {
 
         // Then
         verify(schedulerService, never()).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaTenantJobListener.class), anyString());
+        verify(schedulerService, never()).addJobListener(anyList());
+        verify(schedulerService, never()).addJobListener(anyList(), anyString());
         verify(schedulerService, never()).start();
     }
 
@@ -299,8 +299,8 @@ public class PlatformAPIImplTest {
 
         // Then
         verify(schedulerService).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaTenantJobListener.class), anyString());
+        verify(schedulerService, never()).addJobListener(anyList());
+        verify(schedulerService, never()).addJobListener(anyList(), anyString());
         verify(schedulerService).start();
     }
 
