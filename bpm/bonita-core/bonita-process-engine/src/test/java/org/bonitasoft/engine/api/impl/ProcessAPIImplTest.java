@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import com.google.common.collect.Lists;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -47,7 +46,11 @@ import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
-import org.bonitasoft.engine.bpm.flownode.*;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
@@ -170,6 +173,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import com.google.common.collect.Lists;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
 
@@ -186,9 +191,12 @@ public class ProcessAPIImplTest {
     private static final long ARCHIVED_FLOW_NODE_INSTANCE_ID = 1674;
     private static final long FLOW_NODE_DEFINITION_ID = 1664;
     private static final String ACTOR_NAME = "employee";
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Mock
-    private
-    ProcessManagementAPIImplDelegate managementAPIImplDelegate;
+    private ProcessManagementAPIImplDelegate managementAPIImplDelegate;
     @Mock
     private TenantServiceAccessor tenantAccessor;
     @Mock
@@ -250,11 +258,8 @@ public class ProcessAPIImplTest {
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
     private SUserTaskInstanceImpl sUserTaskInstance;
     private TestUserTransactionService userTransactionService;
-
 
     @Before
     public void setup() throws Exception {
@@ -365,7 +370,7 @@ public class ProcessAPIImplTest {
     @Test
     public void updateProcessDataInstance_should_call_updateProcessDataInstances() throws Exception {
         // Given
-        doNothing().when(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), anyMapOf(String.class, Serializable.class));
+        doNothing().when(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), anyMap());
 
         // When
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
@@ -377,7 +382,7 @@ public class ProcessAPIImplTest {
     @Test(expected = UpdateException.class)
     public void updateProcessDataInstance_should_throw_exception_when_updateProcessDataInstances_failed() throws Exception {
         // Given
-        doThrow(new UpdateException()).when(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), anyMapOf(String.class, Serializable.class));
+        doThrow(new UpdateException()).when(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), anyMap());
         // When
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
     }
@@ -961,21 +966,21 @@ public class ProcessAPIImplTest {
     public void deleteArchivedProcessInstance_by_id_should_delete_archived_process_instance_when_exist() throws Exception {
         // Given
         final long processInstanceId = 42l;
-        doReturn(Arrays.asList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(anyListOf(Long.class));
+        doReturn(Arrays.asList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(anyList());
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(processInstanceId);
 
         // Then
-        verify(processInstanceService).getArchivedProcessInstancesInAllStates(anyListOf(Long.class));
-        verify(processInstanceService).deleteArchivedParentProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
+        verify(processInstanceService).getArchivedProcessInstancesInAllStates(anyList());
+        verify(processInstanceService).deleteArchivedParentProcessInstancesAndElements(anyList());
     }
 
     @Test(expected = DeletionException.class)
     public void deleteArchivedProcessInstance_by_id_should_throw_exception_when_getArchivedProcessInstance_throws_exception() throws Exception {
         // Given
         final long archivedProcessInstanceId = 42l;
-        doThrow(new SProcessInstanceReadException(new Exception())).when(processInstanceService).getArchivedProcessInstancesInAllStates(anyListOf(Long.class));
+        doThrow(new SProcessInstanceReadException(new Exception())).when(processInstanceService).getArchivedProcessInstancesInAllStates(anyList());
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
@@ -987,9 +992,9 @@ public class ProcessAPIImplTest {
         // Given
         final long archivedProcessInstanceId = 42l;
         doReturn(Collections.singletonList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(
-                anyListOf(Long.class));
+                anyList());
         doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(
-                anyListOf(SAProcessInstance.class));
+                anyList());
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
@@ -1000,9 +1005,9 @@ public class ProcessAPIImplTest {
         // Given
         final long archivedProcessInstanceId = 42l;
         doReturn(Collections.singletonList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(
-                anyListOf(Long.class));
+                anyList());
         doThrow(new SProcessInstanceHierarchicalDeletionException("Parent still active", archivedProcessInstanceId)).when(processInstanceService)
-                .deleteArchivedParentProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
+                .deleteArchivedParentProcessInstancesAndElements(anyList());
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
@@ -1461,9 +1466,6 @@ public class ProcessAPIImplTest {
         verify(messageHandlingService).triggerMatchingOfMessages();
     }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void executeMessageCouple_should_throw_ExecutionException_with_details_in_case_of_error() throws Exception {
         // given:
@@ -1481,17 +1483,21 @@ public class ProcessAPIImplTest {
     }
 
     @Test(expected = ProcessInstanceNotFoundException.class)
-    public void getArchivedProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID() throws ProcessInstanceNotFoundException,ExpressionEvaluationException {
+    public void getArchivedProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID()
+            throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
         processAPI.getArchivedProcessInstanceExecutionContext(935);
     }
 
     @Test(expected = ProcessInstanceNotFoundException.class)
-    public void getProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID() throws ProcessInstanceNotFoundException,ExpressionEvaluationException {
+    public void getProcessInstanceExecutionContext_should_throw_the_correct_exception_when_given_a_missing_process_ID()
+            throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
         processAPI.getProcessInstanceExecutionContext(935);
     }
 
     private static class TestUserTransactionService implements UserTransactionService {
+
         private boolean failOnce = false;
+
         @Override
         public <T> T executeInTransaction(Callable<T> callable) throws Exception {
             if (failOnce) {
@@ -1510,6 +1516,7 @@ public class ProcessAPIImplTest {
         public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
 
         }
+
         public void failFirstTx() {
             failOnce = true;
         }
