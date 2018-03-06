@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -58,36 +57,27 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataServiceImplTest {
 
-    private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
-    private static final String NEW_NAME = "new name";
     public static final String PARAMETER_STRING = "parameterString";
     public static final String PARAMETER_INTEGER = "parameterInteger";
     public static final String PARAMETER_LONG = "parameterLong";
-
+    private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
+    private static final String NEW_NAME = "new name";
+    private final Entity pojo = new EntityPojo(1L);
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    private final Entity pojo = new EntityPojo(1L);
-    private BusinessDataServiceImpl businessDataService;
-
-    @Mock
-    private BusinessDataRepository businessDataRepository;
-
-    @Mock
-    private BusinessDataReloader businessDataReloader;
-
-    @Mock
-    private Entity businessData;
-
     @Mock
     JsonBusinessDataSerializer jsonEntitySerializer;
-
-    @Mock
-    private CountQueryProvider countQueryProvider;
-
     @Mock
     BusinessDataModelRepository businessDataModelRepository;
-
+    private BusinessDataServiceImpl businessDataService;
+    @Mock
+    private BusinessDataRepository businessDataRepository;
+    @Mock
+    private BusinessDataReloader businessDataReloader;
+    @Mock
+    private Entity businessData;
+    @Mock
+    private CountQueryProvider countQueryProvider;
     private TypeConverterUtil typeConverterUtil;
 
     @Before
@@ -548,7 +538,7 @@ public class BusinessDataServiceImplTest {
         doReturn(countQuery).when(countQueryProvider).getCountQueryDefinition(any(BusinessObject.class), any(Query.class));
         final long count = 5L;
         doReturn(count).when(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class),
-                anyMapOf(String.class, Serializable.class));
+                anyMap());
 
         //when
         final int startIndex = 3;
@@ -558,7 +548,7 @@ public class BusinessDataServiceImplTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        verify(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class), anyMapOf(String.class, Serializable.class));
+        verify(businessDataRepository).findByNamedQuery(eq("EntityPojo.countForFind"), eq(Long.class), anyMap());
         final BusinessDataQueryMetadata businessDataQueryMetadata = queryResult.getBusinessDataQueryMetadata();
         assertThat(businessDataQueryMetadata)
                 .as("should retrieve metadata")
