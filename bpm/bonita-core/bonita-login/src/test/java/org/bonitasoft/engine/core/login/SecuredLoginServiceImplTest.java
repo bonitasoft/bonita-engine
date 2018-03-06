@@ -143,12 +143,12 @@ public class SecuredLoginServiceImplTest {
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        when(genericAuthenticationService.checkUserCredentials(anyMapOf(String.class, Serializable.class))).thenThrow(new AuthenticationException());
+        when(genericAuthenticationService.checkUserCredentials(anyMap())).thenThrow(new AuthenticationException());
 
         try {
             securedLoginServiceImpl.login(credentials);
         } catch (final SLoginException e) {
-            verify(genericAuthenticationService, times(1)).checkUserCredentials(anyMapOf(String.class, Serializable.class));
+            verify(genericAuthenticationService, times(1)).checkUserCredentials(anyMap());
             verify(sessionAccessor, times(1)).deleteSessionId();
             verify(sessionService, times(0)).createSession(tenantId, userId, login, true);
             assertThat(e).hasRootCauseExactlyInstanceOf(AuthenticationException.class);
@@ -173,7 +173,7 @@ public class SecuredLoginServiceImplTest {
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
-        verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMapOf(String.class, Serializable.class));
+        verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMap());
         verify(sessionAccessor, times(1)).deleteSessionId();
         verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
         assertThat(sSessionResult).isSameAs(sSession);

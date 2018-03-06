@@ -16,10 +16,10 @@ package org.bonitasoft.engine.core.operation.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.core.operation.impl.OperationMockBuilder.buildMockOperation;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PersistRightOperandResolverTest {
@@ -70,7 +70,7 @@ public class PersistRightOperandResolverTest {
 
         //then
         assertThat(persist).isTrue();
-        verify(operationsAnalyzer, never()).findBusinessDataDependencyIndex(anyString(), anyInt(), anyListOf(SOperation.class));
+        verify(operationsAnalyzer, never()).findBusinessDataDependencyIndex(anyString(), anyInt(), anyList());
 
     }
 

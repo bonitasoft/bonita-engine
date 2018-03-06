@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.archive.impl;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyListOf;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -26,7 +24,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.junit.Test;
@@ -133,7 +130,7 @@ public class BatchArchiveCallableTest {
 
         callable.call();
 
-        verify(persistenceService).insertInBatch(anyListOf(PersistentObject.class));
+        verify(persistenceService).insertInBatch(anyList());
     }
 
 }

@@ -15,11 +15,11 @@ package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyMap;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -150,9 +150,9 @@ public class ProcessInstanceServiceImplTest {
 
     @Before
     public void setUp() throws SBonitaException {
-        doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(anyListOf(SProcessInstance.class));
+        doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(anyList());
 
-        doCallRealMethod().when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
+        doCallRealMethod().when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(anyList());
         doCallRealMethod().when(processInstanceService).deleteArchivedParentProcessInstanceAndElements(any(SAProcessInstance.class));
 
         when(processInstance.getId()).thenReturn(processInstanceId);
@@ -340,7 +340,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         final long number = 2L;
         doReturn(number).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("SupervisedBy"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         final long result = processInstanceService.getNumberOfOpenProcessInstancesSupervisedBy(userId, queryOptions);
@@ -356,7 +356,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("SupervisedBy"),
                 eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         processInstanceService.getNumberOfOpenProcessInstancesSupervisedBy(userId, queryOptions);
@@ -369,7 +369,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
         doReturn(list).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("SupervisedBy"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         final List<SProcessInstance> result = processInstanceService.searchOpenProcessInstancesSupervisedBy(userId, queryOptions);
@@ -384,7 +384,7 @@ public class ProcessInstanceServiceImplTest {
         final QueryOptions queryOptions = new QueryOptions(0, 10);
         final long userId = 198L;
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("SupervisedBy"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         processInstanceService.searchOpenProcessInstancesSupervisedBy(userId, queryOptions);
@@ -397,7 +397,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         final long number = 2L;
         doReturn(number).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUser"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         final long result = processInstanceService.getNumberOfOpenProcessInstancesInvolvingUser(userId, queryOptions);
@@ -413,7 +413,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUser"),
                 eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         processInstanceService.getNumberOfOpenProcessInstancesInvolvingUser(userId, queryOptions);
@@ -426,7 +426,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
         doReturn(list).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUser"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         final List<SProcessInstance> result = processInstanceService.searchOpenProcessInstancesInvolvingUser(userId, queryOptions);
@@ -441,7 +441,7 @@ public class ProcessInstanceServiceImplTest {
         final QueryOptions queryOptions = new QueryOptions(0, 10);
         final long userId = 198L;
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUser"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         processInstanceService.searchOpenProcessInstancesInvolvingUser(userId, queryOptions);
@@ -455,7 +455,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         final long number = 2L;
         doReturn(number).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         final long result = processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
@@ -471,7 +471,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"),
                 eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
@@ -484,7 +484,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
         doReturn(list).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"), eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         final List<SProcessInstance> result = processInstanceService.searchOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
@@ -500,7 +500,7 @@ public class ProcessInstanceServiceImplTest {
         final long userId = 198L;
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"),
                 eq(queryOptions),
-                anyMapOf(String.class, Object.class));
+                anyMap());
 
         // When
         processInstanceService.searchOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
@@ -798,6 +798,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     private class SProcessDefinitionBuilder {
+
         private SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("aProcess", "1.0");
 
         SProcessDefinitionBuilder with(SEventDefinition eventDefinition) {
