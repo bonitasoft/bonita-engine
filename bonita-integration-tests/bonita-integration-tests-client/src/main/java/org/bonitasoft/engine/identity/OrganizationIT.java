@@ -1210,38 +1210,38 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         // Role
         for (final Entry<RoleCreator.RoleField, Serializable> entry : roleCreator.getFields().entrySet()) {
-            assertTrue(organizationContent.contains((String) entry.getValue()));
+            assertThat(organizationContent).contains((String) entry.getValue());
         }
 
         // Group
         for (final Entry<GroupField, Serializable> entry : groupCreator.getFields().entrySet()) {
-            assertTrue(organizationContent.contains((String) entry.getValue()));
+            assertThat(organizationContent).contains((String) entry.getValue());
         }
 
         // User
-        assertTrue(organizationContent.contains("Céline*^$"));
-        assertTrue(organizationContent.contains("ééééééééééééééééééé"));
+        assertThat(organizationContent).contains("Céline*^$");
+        assertThat(organizationContent).contains("ééééééééééééééééééé");
 
         // UserMembership
-        assertTrue(organizationContent.contains(getIdentityAPI().getUserMembership(membership.getId()).getGroupName()));
+        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership.getId()).getGroupName());
 
         // Verify all tags
-        assertTrue(organizationContent.contains("<organization:Organization"));
-        assertTrue(organizationContent.contains("<users>"));
-        assertTrue(organizationContent.contains("<user"));
-        assertTrue(organizationContent.contains("</user>"));
-        assertTrue(organizationContent.contains("</users>"));
-        assertTrue(organizationContent.contains("<roles>"));
-        assertTrue(organizationContent.contains("<role"));
-        assertTrue(organizationContent.contains("</role>"));
-        assertTrue(organizationContent.contains("</roles>"));
-        assertTrue(organizationContent.contains("<groups>"));
-        assertTrue(organizationContent.contains("<group"));
-        assertTrue(organizationContent.contains("</group>"));
-        assertTrue(organizationContent.contains(" </groups>"));
-        assertTrue(organizationContent.contains("<memberships"));
-        assertTrue(organizationContent.contains("</memberships>"));
-        assertTrue(organizationContent.contains("</organization:Organization>"));
+        assertThat(organizationContent).contains("<organization:Organization");
+        assertThat(organizationContent).contains("<users>");
+        assertThat(organizationContent).contains("<user");
+        assertThat(organizationContent).contains("</user>");
+        assertThat(organizationContent).contains("</users>");
+        assertThat(organizationContent).contains("<roles>");
+        assertThat(organizationContent).contains("<role");
+        assertThat(organizationContent).contains("</role>");
+        assertThat(organizationContent).contains("</roles>");
+        assertThat(organizationContent).contains("<groups>");
+        assertThat(organizationContent).contains("<group");
+        assertThat(organizationContent).contains("</group>");
+        assertThat(organizationContent).contains(" </groups>");
+        assertThat(organizationContent).contains("<memberships");
+        assertThat(organizationContent).contains("</memberships>");
+        assertThat(organizationContent).contains("</organization:Organization>");
 
         // clean-up
         deleteUsers(user, user2);
@@ -1257,30 +1257,30 @@ public class OrganizationIT extends TestWithTechnicalUser {
         final String organizationContent = getIdentityAPI().exportOrganization();
 
         // Role
-        assertTrue(organizationContent.contains("ééé"));
+        assertThat(organizationContent).contains("ééé");
 
         // Group
-        assertTrue(organizationContent.contains("ééééééééé"));
+        assertThat(organizationContent).contains("ééééééééé");
 
         // User
-        assertTrue(organizationContent.contains("éé"));
+        assertThat(organizationContent).contains("éé");
 
         // Verify all tags
-        assertTrue(organizationContent.contains("<organization:Organization"));
-        assertTrue(organizationContent.contains("<users>"));
-        assertTrue(organizationContent.contains("<user"));
-        assertTrue(organizationContent.contains("</user>"));
-        assertTrue(organizationContent.contains("</users>"));
-        assertTrue(organizationContent.contains("<roles>"));
-        assertTrue(organizationContent.contains("<role"));
-        assertTrue(organizationContent.contains("</role>"));
-        assertTrue(organizationContent.contains("</roles>"));
-        assertTrue(organizationContent.contains("<groups>"));
-        assertTrue(organizationContent.contains("<group"));
-        assertTrue(organizationContent.contains("</group>"));
-        assertTrue(organizationContent.contains(" </groups>"));
-        assertTrue(organizationContent.contains("<memberships/>"));
-        assertTrue(organizationContent.contains("</organization:Organization>"));
+        assertThat(organizationContent).contains("<organization:Organization");
+        assertThat(organizationContent).contains("<users>");
+        assertThat(organizationContent).contains("<user");
+        assertThat(organizationContent).contains("</user>");
+        assertThat(organizationContent).contains("</users>");
+        assertThat(organizationContent).contains("<roles>");
+        assertThat(organizationContent).contains("<role");
+        assertThat(organizationContent).contains("</role>");
+        assertThat(organizationContent).contains("</roles>");
+        assertThat(organizationContent).contains("<groups>");
+        assertThat(organizationContent).contains("<group");
+        assertThat(organizationContent).contains("</group>");
+        assertThat(organizationContent).contains(" </groups>");
+        assertThat(organizationContent).contains("<memberships/>");
+        assertThat(organizationContent).contains("</organization:Organization>");
 
         // clean-up
         getIdentityAPI().deleteOrganization();
@@ -1318,12 +1318,12 @@ public class OrganizationIT extends TestWithTechnicalUser {
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
 
-        assertTrue(organizationContent.contains(DEVELOPER));
-        assertTrue(organizationContent.contains("Bonita developer"));
-        assertTrue(organizationContent.contains(ENGINE));
-        assertTrue(organizationContent.contains("engine team"));
-        assertTrue(organizationContent.contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName()));
-        assertTrue(organizationContent.contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName()));
+        assertThat(organizationContent).contains(DEVELOPER);
+        assertThat(organizationContent).contains("Bonita developer");
+        assertThat(organizationContent).contains(ENGINE);
+        assertThat(organizationContent).contains("engine team");
+        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
+        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser1.getId());
@@ -1359,7 +1359,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
-        assertTrue(organizationContent.contains("false"));
+        assertThat(organizationContent).contains("false");
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser.getId());
@@ -1374,7 +1374,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
 
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
-        assertTrue(organizationContent.contains("true"));
+        assertThat(organizationContent).contains("true");
 
         // clean-up
         getIdentityAPI().deleteUser(persistedUser.getId());
