@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.exception.PlatformException;
 
 /**
@@ -254,4 +255,6 @@ public interface ConfigurationService {
      * Delete all configuration and license files
      */
     void deleteAllConfiguration();
+
+    List<LightBonitaConfiguration> getMandatoryStructureConfiguration();
 }

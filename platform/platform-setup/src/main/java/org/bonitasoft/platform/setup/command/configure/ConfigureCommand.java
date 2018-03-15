@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup.command.configure;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.command.CommandUtils;
@@ -31,7 +32,7 @@ public class ConfigureCommand extends PlatformSetupCommand {
     }
 
     @Override
-    public void execute(Options options, String... args) throws PlatformException {
+    public void execute(Options options, CommandLine commandLine) throws PlatformException {
         BundleConfigurator bundleConfigurator = createBundleResolver().getConfigurator();
         if (bundleConfigurator != null) {
             bundleConfigurator.configureApplicationServer();

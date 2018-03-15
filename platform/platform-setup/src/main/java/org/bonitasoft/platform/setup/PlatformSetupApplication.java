@@ -45,7 +45,8 @@ import org.springframework.context.annotation.ComponentScan;
  * @author Emmanuel Duchastenier
  */
 @SpringBootApplication
-@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration", "org.bonitasoft.platform.version" })
+@ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration",
+        "org.bonitasoft.platform.version" })
 public class PlatformSetupApplication {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(PlatformSetupApplication.class);
@@ -59,9 +60,8 @@ public class PlatformSetupApplication {
     @Autowired
     PlatformSetup platformSetup;
 
-    public static void main(String[] args) throws Exception {
-        PlatformSetupApplication platformSetupApplication = new PlatformSetupApplication();
-        platformSetupApplication.run(args);
+    public static void main(String[] args) {
+        new PlatformSetupApplication().run(args);
     }
 
     public static PlatformSetup getPlatformSetup(String[] args) throws PlatformException {
@@ -102,7 +102,7 @@ public class PlatformSetupApplication {
 
     private void execute(CommandLine line) {
         try {
-            getCommand(line).execute(options, line.getArgs());
+            getCommand(line).execute(options, line);
         } catch (CommandException e) {
             //this is an known exception we do not show any stack trace
             LOGGER.error(e.getMessage());
@@ -145,11 +145,13 @@ public class PlatformSetupApplication {
 
     private Options createOptions() {
         Options options = new Options();
-        Option systemPropertyOption = new Option("D", "specify system property to override configuration from database.properties");
+        Option systemPropertyOption = new Option("D",
+                "specify system property to override configuration from database.properties");
         systemPropertyOption.setArgName("property=value");
         systemPropertyOption.setValueSeparator('=');
         systemPropertyOption.setArgs(2);
         options.addOption(systemPropertyOption);
+        options.addOption("f", "force", false, "Force push even if critical folders will be deleted");
         return options;
     }
 
