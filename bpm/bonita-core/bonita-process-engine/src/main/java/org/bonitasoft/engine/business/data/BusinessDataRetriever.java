@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.business.data;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
@@ -65,9 +64,8 @@ public class BusinessDataRetriever {
      */
     public List<Entity> getMultiBusinessData(SMultiRefBusinessDataInstance dataRef, Class<? extends Entity> bizClass) {
         if (dataRef.getDataIds() == null || dataRef.getDataIds().isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
-
         final List<? extends Entity> entities = businessDataRepository.findByIds(bizClass, dataRef.getDataIds());
 
         final List<Entity> e = new ArrayList<>();

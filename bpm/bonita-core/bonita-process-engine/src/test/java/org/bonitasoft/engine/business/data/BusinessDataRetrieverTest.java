@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -105,6 +106,21 @@ public class BusinessDataRetrieverTest {
 
         //then
         assertThat(retrievedEntities).isEmpty();
+        verifyZeroInteractions(repository);
+        verifyZeroInteractions(proxyfier);
+    }
+
+    @Test
+    public void getMultiBusinessData_should_return_empty_Array_list_when_multi_ref_data_does_not_reference_any_data() throws Exception {
+
+        List<Entity> retrievedEntities = retriever.getMultiBusinessData(buildMultiRefBusinessData(new ArrayList<>()), Employee.class);
+
+        assertThat(retrievedEntities).isEmpty();
+
+        //when
+        retrievedEntities.add(new Employee());
+        // no exceptions
+
         verifyZeroInteractions(repository);
         verifyZeroInteractions(proxyfier);
     }

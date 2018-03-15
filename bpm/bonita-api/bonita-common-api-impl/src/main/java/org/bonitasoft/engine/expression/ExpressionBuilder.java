@@ -330,7 +330,7 @@ public class ExpressionBuilder {
 
     public ExpressionBuilder setInterpreter(final String interpreter) {
         if (interpreter == null) {
-            expression.setInterpreter("NONE");// interpreter,ExpressionInterpreter.GROOVY.toString()
+            expression.setInterpreter("NONE");
         } else {
             expression.setInterpreter(interpreter);
         }
