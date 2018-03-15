@@ -38,10 +38,11 @@ public class ConfigurationFolderUtil {
         Files.write(platform_init_engine.resolve("initialConfig.properties"), "key=value".getBytes());
     }
 
-    public void buildCurrentFolder(Path rootFolder) throws IOException {
+    public Path buildCurrentFolder(Path rootFolder) throws IOException {
         Path platform_init_engine = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current").resolve("platform_init_engine");
         Files.createDirectories(platform_init_engine);
         Files.write(platform_init_engine.resolve("currentConfig.properties"), "key=value".getBytes());
+        return platform_init_engine;
     }
 
     public void buildSqlFolder(Path rootFolder, String dbVendor) throws IOException {

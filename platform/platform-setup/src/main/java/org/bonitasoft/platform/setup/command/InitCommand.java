@@ -19,6 +19,7 @@ import static org.bonitasoft.platform.setup.command.configure.DatabaseConfigurat
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.command.configure.PropertyReader;
@@ -34,13 +35,14 @@ public class InitCommand extends PlatformSetupCommand {
 
     public InitCommand() {
         super("init", "Initialise the database so that Bonita is ready to run with this database",
-                CommandUtils.getFileContentFromClassPath("init_header.txt"), CommandUtils.getFileContentFromClassPath("init_footer.txt"));
+                CommandUtils.getFileContentFromClassPath("init_header.txt"),
+                CommandUtils.getFileContentFromClassPath("init_footer.txt"));
     }
 
     @Override
-    public void execute(Options options, String... args) throws PlatformException, CommandException {
+    public void execute(Options options, CommandLine commandLine) throws PlatformException, CommandException {
         askConfirmationIfH2();
-        getPlatformSetup(args).init();
+        getPlatformSetup(commandLine.getArgs()).init();
     }
 
     void askConfirmationIfH2() throws PlatformException, CommandException {
@@ -60,7 +62,8 @@ public class InitCommand extends PlatformSetupCommand {
             }
         } catch (IOException e) {
             throw new PlatformException("Error reading configuration file database.properties." +
-                    " Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted", e);
+                    " Please make sure the file is present at the root of the Platform Setup Tool folder, and that is has not been moved of deleted",
+                    e);
         }
     }
 

@@ -25,7 +25,7 @@ echo "========================================"
 export E2E_DIR="target/e2e-postgres-bos"
 export ZIP=Bonita-platform-setup-${VERSION}.zip
 
-unzip -q -d ${E2E_DIR} target/${ZIP}
+unzip -o -q -d ${E2E_DIR} target/${ZIP}
 
 echo "Setting 'org.bonitasoft.platform.setup' log level to DEBUG"
 # Activate in debug development phase:
@@ -267,6 +267,13 @@ cp ${E2E_DIR}/platform_conf/initial/platform_engine/bonita-platform-custom.xml $
 tree ${E2E_DIR}/platform_conf/current
 
 ${E2E_DIR}/setup.sh push
+echo "==========================================="
+echo "setup.sh push should have failed just above"
+echo "Now let's FORCE push it"
+echo "==========================================="
+
+${E2E_DIR}/setup.sh push --force
+testReturnCode $? "setup.sh push --force should be successful"
 
 echo "========================================"
 echo "should contain only bonita-platform-custom.xml:"
