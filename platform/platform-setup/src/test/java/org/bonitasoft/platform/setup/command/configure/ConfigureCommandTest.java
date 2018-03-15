@@ -18,12 +18,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.bonitasoft.platform.setup.PlatformSetup;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -51,7 +51,7 @@ public class ConfigureCommandTest {
 
     @Test
     public void execute() throws Exception {
-        configureCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        configureCommand.execute(any(Options.class), any(CommandLine.class));
 
         verify(bundleConfigurator).configureApplicationServer();
     }

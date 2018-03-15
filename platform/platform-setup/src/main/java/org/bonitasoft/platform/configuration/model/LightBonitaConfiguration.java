@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2018 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,24 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.platform.configuration.model;
 
-package org.bonitasoft.platform.setup.command;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-import org.bonitasoft.platform.exception.PlatformException;
+import lombok.Data;
 
 /**
- * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
-public class PullCommand extends PlatformSetupCommand {
+@Data
+public class LightBonitaConfiguration {
 
-    public PullCommand() {
-        super("pull", "Pull configuration from the database", null, CommandUtils.getFileContentFromClassPath("pull.txt"));
-    }
+    private final Long tenantId;
+    private final String type;
 
-    @Override
-    public void execute(Options options, CommandLine commandLine) throws PlatformException {
-        getPlatformSetup(commandLine.getArgs()).pull();
-    }
 }

@@ -115,7 +115,8 @@ public class PlatformSetupIT {
         //given
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
-        FileUtils.write(setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("platform_init_engine")
+        FileUtils.write(setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+                .resolve("platform_init_engine")
                 .resolve("whatever.properties").toFile(), "custom content", Charset.defaultCharset());
         configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
         systemOutRule.clearLog();
@@ -128,8 +129,9 @@ public class PlatformSetupIT {
                 .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'whatever.properties'");
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).get("resource_content")).isEqualTo("custom content".getBytes());
-        assertThat(systemOutRule.getLog()).contains("Database will be initialized with configuration files from folder: "
-                + setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").toString());
+        assertThat(systemOutRule.getLog())
+                .contains("Database will be initialized with configuration files from folder: "
+                        + setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").toString());
     }
 
     @Test
@@ -138,13 +140,15 @@ public class PlatformSetupIT {
         platformSetup.init();
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
+                .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '"
+                        + ConfigurationType.TENANT_TEMPLATE_PORTAL + "' ORDER BY resource_name");
         assertThat(rows).hasSize(14);
         int rowId = 0;
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("authenticationManager-config.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("autologin-v6.json");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping-custom.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping-internal.properties");
+        assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
+                .isEqualTo("compound-permissions-mapping-internal.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("compound-permissions-mapping.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("console-config.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("custom-permissions-mapping.properties");
@@ -152,7 +156,8 @@ public class PlatformSetupIT {
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("dynamic-permissions-checks.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("forms-config.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("resources-permissions-mapping-custom.properties");
-        assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("resources-permissions-mapping-internal.properties");
+        assertThat(rows.get(rowId++).get("RESOURCE_NAME"))
+                .isEqualTo("resources-permissions-mapping-internal.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("resources-permissions-mapping.properties");
         assertThat(rows.get(rowId++).get("RESOURCE_NAME")).isEqualTo("security-config.properties");
     }
@@ -163,7 +168,8 @@ public class PlatformSetupIT {
         platformSetup.init();
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL + "' ORDER BY resource_name");
+                .queryForList("SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.PLATFORM_PORTAL
+                        + "' ORDER BY resource_name");
         assertThat(rows).hasSize(3);
         assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("cache-config.xml");
         assertThat(rows.get(1).get("RESOURCE_NAME")).isEqualTo("platform-tenant-config.properties");
@@ -177,7 +183,8 @@ public class PlatformSetupIT {
         //then
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList(
-                        "SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
+                        "SELECT * FROM CONFIGURATION WHERE content_type= '"
+                                + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("SamplePermissionRule.groovy.sample");
     }
@@ -191,13 +198,15 @@ public class PlatformSetupIT {
 
         System.setProperty(BONITA_SETUP_FOLDER, confFolder.toString());
 
-        FileUtils.write(confFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("tenant_template_security_scripts")
+        FileUtils.write(confFolder.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+                .resolve("tenant_template_security_scripts")
                 .resolve("SomeCustomScript.groovy").toFile(), "custom content", Charset.defaultCharset());
         platformSetup.init();
         //then
         List<Map<String, Object>> rows = jdbcTemplate
                 .queryForList(
-                        "SELECT * FROM CONFIGURATION WHERE content_type= '" + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
+                        "SELECT * FROM CONFIGURATION WHERE content_type= '"
+                                + ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS + "' ORDER BY resource_name");
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).get("RESOURCE_NAME")).isEqualTo("SomeCustomScript.groovy");
     }
@@ -213,13 +222,15 @@ public class PlatformSetupIT {
         platformSetup.pull();
 
         //then
-        File folderContainingResultOfGet = destinationFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current").toFile();
+        File folderContainingResultOfGet = destinationFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME)
+                .resolve("current").toFile();
         assertThat(folderContainingResultOfGet).as("should retrieve config files")
                 .exists()
                 .isDirectory();
 
         List<FullBonitaConfiguration> configurations = new ArrayList<>();
-        AllConfigurationResourceVisitor allConfigurationResourceVisitor = new AllConfigurationResourceVisitor(configurations);
+        AllConfigurationResourceVisitor allConfigurationResourceVisitor = new AllConfigurationResourceVisitor(
+                configurations);
         Files.walkFileTree(destinationFolder.toPath(), allConfigurationResourceVisitor);
 
         assertThat(configurations).extracting("resourceName").containsOnly(
@@ -298,14 +309,39 @@ public class PlatformSetupIT {
 
         // when
         systemOutRule.clearLog();
-        platformSetup.push();
+        platformSetup.forcePush();
 
         final String log = systemOutRule.getLogWithNormalizedLineSeparator();
         final String[] split = log.split("\n");
 
         // then
         assertThat(split[split.length - 1]).as("should push new configuration and log message").contains("INFO")
-                .endsWith("Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
+                .endsWith(
+                        "Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
+    }
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void push_should_fail_if_required_folder_would_be_deleted() throws Exception {
+        // given
+        platformSetup.init();
+        File setupFolder = temporaryFolder.newFolder("conf");
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
+        platformSetup.pull();
+        final Path platform_init_engine = setupFolder.toPath().resolve("platform_conf").resolve("current")
+                .resolve("platform_init_engine");
+        FileUtils.deleteDirectory(platform_init_engine.toFile());
+
+        // then
+        exception.expect(PlatformException.class);
+        exception.expectMessage("You are trying to remove a protected folder from configuration");
+        exception.expectMessage(platform_init_engine.toString());
+        exception.expectMessage("To restore the deleted folders");
+
+        // when
+        platformSetup.push();
     }
 
     @Test
@@ -358,12 +394,14 @@ public class PlatformSetupIT {
         final Path licensesPath = temporaryFolder.newFolder("lic").toPath();
 
         FileUtils.writeByteArrayToFile(
-                initPath.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve(PLATFORM_ENGINE.name().toLowerCase()).resolve("initial.properties")
+                initPath.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+                        .resolve(PLATFORM_ENGINE.name().toLowerCase()).resolve("initial.properties")
                         .toFile(),
                 "key1=value1".getBytes());
 
         FileUtils.writeByteArrayToFile(
-                pushPath.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current").resolve(TENANT_TEMPLATE_PORTAL.name().toLowerCase())
+                pushPath.resolve(PLATFORM_CONF_FOLDER_NAME).resolve("current")
+                        .resolve(TENANT_TEMPLATE_PORTAL.name().toLowerCase())
                         .resolve("current.properties").toFile(),
                 "key2=value2".getBytes());
 
@@ -373,7 +411,7 @@ public class PlatformSetupIT {
 
         //when
         System.setProperty(BONITA_SETUP_FOLDER, pushPath.toString());
-        platformSetup.push();
+        platformSetup.forcePush();
 
         //then
         platformSetup.pull(checkPath, licensesPath);
@@ -401,7 +439,8 @@ public class PlatformSetupIT {
         } catch (PlatformException ignored) {
             assertThat(ignored.getMessage()).isEqualTo("Unable to push configuration from " +
                     current +
-                    ", as directory does not exists. To modify your configuration, run 'setup pull', update your configuration files from " +
+                    ", as directory does not exists. To modify your configuration, run 'setup pull', update your configuration files from "
+                    +
                     current +
                     " folder, and then push your new configuration.");
             //ok
@@ -422,7 +461,8 @@ public class PlatformSetupIT {
         //then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage(
-                "Platform version [bad version] is not supported by current platform setup version [" + versionService.getPlatformSetupVersion() + "]");
+                "Platform version [bad version] is not supported by current platform setup version ["
+                        + versionService.getPlatformSetupVersion() + "]");
 
         //when
         final Path confFolder = temporaryFolder.newFolder().toPath();
@@ -440,7 +480,8 @@ public class PlatformSetupIT {
         //then
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage(
-                "Platform version [bad version] is not supported by current platform setup version [" + versionService.getPlatformSetupVersion() + "]");
+                "Platform version [bad version] is not supported by current platform setup version ["
+                        + versionService.getPlatformSetupVersion() + "]");
 
         //when
         platformSetup.pull();
@@ -463,8 +504,9 @@ public class PlatformSetupIT {
         Files.createDirectories(licenseFolder);
 
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita Platform subscription edition"
-                + " to start normally.\nPlace your license file");
+        expectedException
+                .expectMessage("No license (.lic file) found.\nThis would prevent Bonita Platform subscription edition"
+                        + " to start normally.\nPlace your license file");
 
         platformSetup.initProperties();
         platformSetup.preventFromPushingZeroLicense();
@@ -481,8 +523,9 @@ public class PlatformSetupIT {
         Files.createFile(licenseFolder.resolve("bonita-file.renamed"));
 
         expectedException.expect(PlatformException.class);
-        expectedException.expectMessage("No license (.lic file) found.\nThis would prevent Bonita Platform subscription edition"
-                + " to start normally.\nPlace your license file");
+        expectedException
+                .expectMessage("No license (.lic file) found.\nThis would prevent Bonita Platform subscription edition"
+                        + " to start normally.\nPlace your license file");
 
         platformSetup.initProperties();
         platformSetup.preventFromPushingZeroLicense();
@@ -493,7 +536,8 @@ public class PlatformSetupIT {
         //given
         File setupFolder = temporaryFolder.newFolder("conf");
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.getAbsolutePath());
-        final File permissionFile = setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial").resolve("tenant_template_portal")
+        final File permissionFile = setupFolder.toPath().resolve(PLATFORM_CONF_FOLDER_NAME).resolve("initial")
+                .resolve("tenant_template_portal")
                 .resolve("resources-permissions-mapping.properties").toFile();
         FileUtils.write(permissionFile, "default 7.5.4 content", Charset.defaultCharset());
         configurationFolderUtil.buildSqlFolder(setupFolder.toPath(), dbVendor);
@@ -508,7 +552,8 @@ public class PlatformSetupIT {
 
         //then
         List<Map<String, Object>> rows = jdbcTemplate
-                .queryForList("SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
+                .queryForList(
+                        "SELECT * FROM CONFIGURATION WHERE resource_name = 'resources-permissions-mapping.properties'");
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).get("resource_content")).isEqualTo(new_7_6_0_content.getBytes());
     }

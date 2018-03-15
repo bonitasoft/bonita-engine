@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup.command;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.bonitasoft.platform.exception.PlatformException;
 
@@ -27,8 +28,8 @@ public class PushCommand extends PlatformSetupCommand {
     }
 
     @Override
-    public void execute(Options options, String... args) throws PlatformException {
-        getPlatformSetup(args).push();
+    public void execute(Options options, CommandLine commandLine) throws PlatformException {
+        getPlatformSetup(commandLine.getArgs()).push(commandLine.hasOption("force"));
     }
 
 }
