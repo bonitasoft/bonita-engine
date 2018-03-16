@@ -98,7 +98,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         if (timerEventTriggerDefinition.getTimerType() != STimerType.CYCLE && eventInstance != null) {
             final STimerEventTriggerInstance sEventTriggerInstance
                     = new STimerEventTriggerInstanceImpl(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName());
-            eventInstanceService.createEventTriggerInstance(sEventTriggerInstance);
+            eventInstanceService.createTimerEventTriggerInstance(sEventTriggerInstance);
         }
     }
 

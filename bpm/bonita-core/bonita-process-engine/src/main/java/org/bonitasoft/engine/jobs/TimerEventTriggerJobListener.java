@@ -97,8 +97,7 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
         final List<OrderByOption> orders = Arrays.asList(new OrderByOption(STimerEventTriggerInstance.class, "id", OrderByType.ASC));
 
         final QueryOptions queryOptions = new QueryOptions(0, 1, orders, filters, null);
-        final List<STimerEventTriggerInstance> timerEventTriggerInstances = eventInstanceService.searchEventTriggerInstances(STimerEventTriggerInstance.class,
-                queryOptions);
+        final List<STimerEventTriggerInstance> timerEventTriggerInstances = eventInstanceService.searchTimerEventTriggerInstances(queryOptions);
         if (!timerEventTriggerInstances.isEmpty()) {
             eventInstanceService.deleteEventTriggerInstance(timerEventTriggerInstances.get(0));
         }
