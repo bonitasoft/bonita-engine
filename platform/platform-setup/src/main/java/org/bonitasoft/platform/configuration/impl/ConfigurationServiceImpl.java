@@ -27,6 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
 import org.bonitasoft.platform.configuration.model.FullBonitaConfiguration;
+import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 import org.bonitasoft.platform.configuration.util.AllConfigurationResourceVisitor;
 import org.bonitasoft.platform.configuration.util.AutoUpdateConfigurationVisitor;
@@ -38,6 +39,7 @@ import org.bonitasoft.platform.configuration.util.DeleteTenantConfigurationInTra
 import org.bonitasoft.platform.configuration.util.GetAllConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.GetConfigurationsInTransaction;
+import org.bonitasoft.platform.configuration.util.GetMandatoryStructureConfiguration;
 import org.bonitasoft.platform.configuration.util.LicensesResourceVisitor;
 import org.bonitasoft.platform.configuration.util.StoreConfigurationInTransaction;
 import org.bonitasoft.platform.configuration.util.UpdateConfigurationInTransactionForAllTenants;
@@ -310,5 +312,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public void deleteAllConfiguration() {
         transactionTemplate.execute(new DeleteAllConfigurationInTransaction(jdbcTemplate));
+    }
+
+    @Override
+    public List<LightBonitaConfiguration> getMandatoryStructureConfiguration() {
+        return transactionTemplate.execute(new GetMandatoryStructureConfiguration(jdbcTemplate));
     }
 }

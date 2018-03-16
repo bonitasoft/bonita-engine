@@ -19,6 +19,7 @@ import static java.lang.System.lineSeparator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +37,8 @@ public class HelpCommand extends PlatformSetupCommand {
     }
 
     @Override
-    public void execute(Options options, String... args) throws PlatformException, CommandException {
+    public void execute(Options options, CommandLine commandLine) throws PlatformException, CommandException {
+        String[] args = commandLine.getArgs();
         if (args.length == 0) {
             printUsage(options);
             throw new CommandException("Need to specify a command, see usage above.");
@@ -99,7 +101,8 @@ public class HelpCommand extends PlatformSetupCommand {
         usage.append(lineSeparator());
         usage.append("Available commands:").append(lineSeparator()).append(lineSeparator());
         for (PlatformSetupCommand command : commands) {
-            usage.append(" ").append(command.getName()).append("  --  ").append(command.getSummary()).append(lineSeparator());
+            usage.append(" ").append(command.getName()).append("  --  ").append(command.getSummary())
+                    .append(lineSeparator());
         }
         System.out.println(usage.toString());
     }
