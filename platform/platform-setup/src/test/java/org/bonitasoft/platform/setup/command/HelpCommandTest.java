@@ -16,9 +16,11 @@ package org.bonitasoft.platform.setup.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
+import static org.bonitasoft.platform.setup.command.CommandTestUtils.buildCommandLine;
 
 import java.util.Arrays;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.junit.Before;
@@ -41,26 +43,27 @@ public class HelpCommandTest {
     @Before
     public void before() throws Exception {
         helpCommand = new HelpCommand();
-        helpCommand.setCommands(Arrays.asList(new PlatformSetupCommand("command1", "summary1", "description of command 1", null) {
+        helpCommand.setCommands(
+                Arrays.asList(new PlatformSetupCommand("command1", "summary1", "description of command 1", null) {
 
-            @Override
-            public void execute(Options options, String... args) throws PlatformException {
+                    @Override
+                    public void execute(Options options, CommandLine commandLine) throws PlatformException {
 
-            }
-        }, new PlatformSetupCommand("command2", "summary2", "description of command 2", null) {
+                    }
+                }, new PlatformSetupCommand("command2", "summary2", "description of command 2", null) {
 
-            @Override
-            public void execute(Options options, String... args) throws PlatformException {
+                    @Override
+                    public void execute(Options options, CommandLine commandLine) throws PlatformException {
 
-            }
-        }, helpCommand));
+                    }
+                }, helpCommand));
     }
 
     @Test
     public void should_print_only_usage_when_no_command_is_given() throws Exception {
         //when
         try {
-            helpCommand.execute(new Options());
+            helpCommand.execute(new Options(), buildCommandLine());
             fail("no option should throw exception");
         } catch (CommandException e) {
             assertThat(e.getMessage()).isEqualTo("Need to specify a command, see usage above.");
@@ -68,37 +71,40 @@ public class HelpCommandTest {
         //then
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup ( command1 | command2 )");
         assertThat(systemOutRule.getLog()).as("do not contains other help").doesNotContain("command1  --  summary1");
-        assertThat(systemOutRule.getLog()).as("contains how to run help").contains("use `setup help` or `setup help <command>` for more details");
+        assertThat(systemOutRule.getLog()).as("contains how to run help")
+                .contains("use `setup help` or `setup help <command>` for more details");
     }
 
     @Test
     public void should_print_common_help_when_asking_help_on_unknown_command() throws Exception {
         try {
-            helpCommand.execute(new Options(), "help", "thisIsAnUnknownCommand");
+            helpCommand.execute(new Options(), buildCommandLine("help", "thisIsAnUnknownCommand"));
             fail("should throw exception");
         } catch (CommandException e) {
             assertThat(e.getMessage()).isEqualTo("ERROR: no command named: thisIsAnUnknownCommand");
         }
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup ( command1 | command2 )");
-        assertThat(systemOutRule.getLog()).as("contains how to run help").contains("use `setup help` or `setup help <command>` for more details");
+        assertThat(systemOutRule.getLog()).as("contains how to run help")
+                .contains("use `setup help` or `setup help <command>` for more details");
     }
 
     @Test
     public void should_print_only_usage_when_called_with_unknown_command() throws Exception {
         try {
-            helpCommand.execute(new Options(), "thisIsAnUnknownCommand");
+            helpCommand.execute(new Options(), buildCommandLine("thisIsAnUnknownCommand"));
             fail("should throw exception");
         } catch (CommandException e) {
             assertThat(e.getMessage()).isEqualTo("ERROR: no command named: thisIsAnUnknownCommand");
         }
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup ( command1 | command2 )");
         assertThat(systemOutRule.getLog()).as("do not contains other help").doesNotContain("command1  --  summary1");
-        assertThat(systemOutRule.getLog()).as("contains how to run help").contains("use `setup help` or `setup help <command>` for more details");
+        assertThat(systemOutRule.getLog()).as("contains how to run help")
+                .contains("use `setup help` or `setup help <command>` for more details");
     }
 
     @Test
     public void should_print_command_help_when_asking_help_on_a_command() throws Exception {
-        helpCommand.execute(new Options(), "help", "command2");
+        helpCommand.execute(new Options(), buildCommandLine("help", "command2"));
 
         assertThat(systemOutRule.getLog()).contains("description of command 2");
         assertThat(systemOutRule.getLog()).contains("usage: setup command2");
@@ -106,7 +112,8 @@ public class HelpCommandTest {
 
     @Test
     public void should_print_usage_with_options() throws Exception {
-        helpCommand.execute(new Options().addOption("a", "anOption", false, "the option"), "help", "command2");
+        helpCommand.execute(new Options().addOption("a", "anOption", false, "the option"),
+                buildCommandLine("help", "command2"));
 
         assertThat(systemOutRule.getLog()).as("contains the usage").contains("usage: setup command2 [-a]");
         assertThat(systemOutRule.getLog()).as("contains the option").contains("-a,--anOption   the option");

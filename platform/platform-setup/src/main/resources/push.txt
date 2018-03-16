@@ -1,4 +1,5 @@
 At execution, it:
+* ensures no configuration folder has been deleted locally before pushing. Otherwise it stops and fails.
 * writes all configuration files found in platform_conf/current in database.
 * writes license files found in platform_conf/licenses folder in database (Subscription editions only).
 * overwrites any previous configuration in the database.

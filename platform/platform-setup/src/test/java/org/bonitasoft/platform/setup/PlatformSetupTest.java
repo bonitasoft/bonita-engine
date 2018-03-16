@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.mockito.Mockito.doReturn;
 
@@ -25,6 +26,7 @@ import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
 
 import org.bonitasoft.platform.configuration.ConfigurationService;
+import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.util.ConfigurationFolderUtil;
 import org.bonitasoft.platform.version.VersionService;
@@ -100,5 +102,38 @@ public class PlatformSetupTest {
         expectedException.expect(PlatformException.class);
         expectedException.expectMessage("No license (.lic file) found");
         platformSetup.init();
+    }
+
+    @Test
+    public void getFolderFromConfiguration_should_work_for_platform_level_folder() throws Exception {
+        // given:
+        final Path setupFolder = temporaryFolder.newFolder().toPath();
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
+        platformSetup.initProperties();
+
+        LightBonitaConfiguration configuration = new LightBonitaConfiguration(0L, "some_folder");
+
+        // when:
+        final Path folder = platformSetup.getFolderFromConfiguration(configuration);
+
+        // then:
+        assertThat(folder.toString()).isEqualTo(setupFolder.toString() + "/platform_conf/current/some_folder");
+    }
+
+    @Test
+    public void getFolderFromConfiguration_should_work_for_tenant_level_folder() throws Exception {
+        // given:
+        final Path setupFolder = temporaryFolder.newFolder().toPath();
+        System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
+        platformSetup.initProperties();
+
+        LightBonitaConfiguration configuration = new LightBonitaConfiguration(2L, "TENANT-LEVEL-FOLDER");
+
+        // when:
+        final Path folder = platformSetup.getFolderFromConfiguration(configuration);
+
+        // then:
+        assertThat(folder.toString()).isEqualTo(setupFolder.toString() +
+                "/platform_conf/current/tenants/2/tenant-level-folder");
     }
 }

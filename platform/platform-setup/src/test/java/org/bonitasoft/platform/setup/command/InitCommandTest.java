@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup.command;
 
+import static org.bonitasoft.platform.setup.command.CommandTestUtils.buildCommandLine;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -26,7 +27,6 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -54,14 +54,14 @@ public class InitCommandTest {
 
     @Test
     public void should_execute_init() throws Exception {
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
 
         verify(platformSetup).init();
     }
 
     @Test
     public void should_call_h2_confirmation() throws Exception {
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
 
         verify(initCommand).askConfirmationIfH2();
     }
@@ -73,7 +73,7 @@ public class InitCommandTest {
         System.setProperty("bdm.db.vendor", "h2");
 
         // when:
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
 
         // then:
         verify(initCommand, times(0)).warn(anyString());
@@ -86,7 +86,7 @@ public class InitCommandTest {
         System.setProperty("bdm.db.vendor", "postgres");
 
         // when:
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
 
         // then:
         verify(initCommand, times(0)).warn(anyString());
@@ -104,7 +104,7 @@ public class InitCommandTest {
         expectedException.expectMessage("Exiting");
 
         // when:
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class InitCommandTest {
         doReturn("y").when(initCommand).readAnswer();
 
         // when:
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
 
         // then:
         verify(platformSetup).init();
@@ -129,9 +129,10 @@ public class InitCommandTest {
         System.setProperty("h2.noconfirm", "");
 
         // when:
-        initCommand.execute(any(Options.class), Matchers.<String> anyVararg());
+        initCommand.execute(new Options(), buildCommandLine());
 
         // then:
         verify(platformSetup).init();
     }
+
 }
