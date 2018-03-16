@@ -782,17 +782,6 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.getNumberOfProcessInstances(45L);
     }
 
-    @Test
-    public void should_not_try_to_delete_event_trigger_instances_when_there_is_none_in_definitiion() throws Exception {
-        SFlowNodeInstanceImpl flownodeInstance = new SStartEventInstanceImpl();
-        flownodeInstance.setFlowNodeDefinitionId(1234L);
-        SProcessDefinition processDefinition = aProcess().with(new SStartEventDefinitionImpl(1234L, "start")).done();
-
-        processInstanceService.deleteFlowNodeInstance(flownodeInstance, processDefinition);
-
-        verify(eventInstanceService, never()).deleteEventTriggerInstances(anyLong());
-    }
-
     private SProcessDefinitionBuilder aProcess() {
         return new SProcessDefinitionBuilder();
     }

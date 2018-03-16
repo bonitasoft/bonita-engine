@@ -74,18 +74,12 @@ public class TimerEventTriggerJobListenerTest {
         context.put(AbstractBonitaJobListener.JOB_TYPE, TriggerTimerEventJob.class.getName());
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.jobs.TimerEventTriggerJobListener#jobWasExecuted(java.util.Map, org.bonitasoft.engine.scheduler.exception.SSchedulerException)}
-     * .
-     */
     @Test
     public final void jobWasExecuted_should_delete_timer_event_trigger_if_exists() throws Exception {
         // Given
         final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
         final List<STimerEventTriggerInstance> timerEventTriggerInstances = Collections.singletonList(sTimerEventTriggerInstance);
-        doReturn(timerEventTriggerInstances).when(eventInstanceService).searchEventTriggerInstances(eq(STimerEventTriggerInstance.class),
-                any(QueryOptions.class));
+        doReturn(timerEventTriggerInstances).when(eventInstanceService).searchTimerEventTriggerInstances(any(QueryOptions.class));
 
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
@@ -103,14 +97,13 @@ public class TimerEventTriggerJobListenerTest {
         timerEventTriggerJobListener.jobWasExecuted(context, null);
 
         // then
-        verify(eventInstanceService, never()).searchEventTriggerInstances(same(STimerEventTriggerInstance.class), any(QueryOptions.class));
+        verify(eventInstanceService, never()).searchTimerEventTriggerInstances(any(QueryOptions.class));
     }
 
     @Test
     public final void jobWasExecuted_should_do_nothing_if_timer_event_trigger_doesnt_exist() throws Exception {
         // Given
-        doReturn(Collections.<STimerEventTriggerInstance> emptyList()).when(eventInstanceService).searchEventTriggerInstances(
-                eq(STimerEventTriggerInstance.class), any(QueryOptions.class));
+        doReturn(Collections.<STimerEventTriggerInstance> emptyList()).when(eventInstanceService).searchTimerEventTriggerInstances(any(QueryOptions.class));
 
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
