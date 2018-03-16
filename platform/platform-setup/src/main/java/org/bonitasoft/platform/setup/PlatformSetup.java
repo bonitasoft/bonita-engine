@@ -32,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.platform.configuration.ConfigurationService;
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
+import org.bonitasoft.platform.configuration.model.LightBonitaConfiguration;
 import org.bonitasoft.platform.configuration.type.ConfigurationType;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.version.VersionService;
@@ -50,6 +51,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PlatformSetup {
+
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     public static final String BONITA_SETUP_FOLDER = "org.bonitasoft.platform.setup.folder";
 
@@ -79,7 +82,8 @@ public class PlatformSetup {
     private Path licensesFolder;
 
     @Autowired
-    PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService, VersionService versionService, DataSource dataSource) {
+    PlatformSetup(ScriptExecutor scriptExecutor, ConfigurationService configurationService,
+            VersionService versionService, DataSource dataSource) {
         this.scriptExecutor = scriptExecutor;
         this.configurationService = configurationService;
         this.versionService = versionService;
@@ -94,7 +98,8 @@ public class PlatformSetup {
         if (isPlatformAlreadyCreated()) {
             LOGGER.info("Platform is already created.");
             if (Files.isDirectory(initialConfigurationFolder)) {
-                LOGGER.info("Upgrading default configuration with files from folder: " + initialConfigurationFolder.toString());
+                LOGGER.info("Upgrading default configuration with files from folder: "
+                        + initialConfigurationFolder.toString());
                 updateDefaultConfigurationFromFolder(initialConfigurationFolder);
             } else {
                 LOGGER.info("Upgrading default configuration with files from classpath");
@@ -106,7 +111,8 @@ public class PlatformSetup {
         initializePlatform();
         LOGGER.info("Platform created.");
         if (Files.isDirectory(initialConfigurationFolder)) {
-            LOGGER.info("Database will be initialized with configuration files from folder: " + initialConfigurationFolder.toString());
+            LOGGER.info("Database will be initialized with configuration files from folder: "
+                    + initialConfigurationFolder.toString());
             pushFromFolder(initialConfigurationFolder);
         } else {
             LOGGER.warn("Database will be initialized with configuration files from classpath");
@@ -141,6 +147,19 @@ public class PlatformSetup {
      * push all configuration files and licenses
      */
     public void push() throws PlatformException {
+        push(false);
+    }
+
+    public void forcePush() throws PlatformException {
+        push(true);
+    }
+
+    /**
+     * push all configuration files and licenses
+     * 
+     * @param forcePush shall we skip the check for removed folders?
+     */
+    public void push(boolean forcePush) throws PlatformException {
         initPlatformSetup();
         if (!isPlatformAlreadyCreated()) {
             throw new PlatformException("Platform is not created. Run 'setup init' first.");
@@ -148,11 +167,53 @@ public class PlatformSetup {
         preventFromPushingZeroLicense();
         checkPlatformVersion();
         checkPushFolderExists(currentConfigurationFolder);
-        LOGGER.info("Configuration currently in database will be replaced by configuration from folder: " + currentConfigurationFolder.toString());
+        LOGGER.info("Configuration currently in database will be replaced by configuration from folder: "
+                + currentConfigurationFolder.toString());
+        ensureNoCriticalFoldersAreDeleted(forcePush);
         clean();
         pushFromFolder(currentConfigurationFolder);
         pushLicenses();
-        LOGGER.info("Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
+        LOGGER.info(
+                "Configuration files successfully pushed to database. You can now restart Bonita to reflect your changes.");
+    }
+
+    private void ensureNoCriticalFoldersAreDeleted(boolean forcePush) throws PlatformException {
+        final List<LightBonitaConfiguration> configurations = configurationService
+                .getMandatoryStructureConfiguration();
+        for (LightBonitaConfiguration configuration : configurations) {
+            // check no mandatory folder from database is no more in the FileSystem and about to be deleted:
+            final Path folder = getFolderFromConfiguration(configuration);
+            if (!Files.isDirectory(folder)) {
+                if (forcePush) {
+                    LOGGER.warn("Force-pushing the deletion of folder " + folder.toString());
+                } else {
+                    throw new PlatformException("You are trying to remove a protected folder from configuration: " +
+                            getSpecificErrorMessage(configuration, folder));
+                }
+            }
+        }
+    }
+
+    protected Path getFolderFromConfiguration(LightBonitaConfiguration configuration) {
+        if (configuration.getTenantId() == 0L) {
+            return currentConfigurationFolder.resolve(configuration.getType().toLowerCase());
+        } else {
+            return currentConfigurationFolder.resolve("tenants").resolve(configuration.getTenantId().toString())
+                    .resolve(configuration.getType().toLowerCase());
+        }
+    }
+
+    private String getSpecificErrorMessage(LightBonitaConfiguration configuration, Path folder) {
+        final String message;
+        if (configuration.getTenantId() == 0L) {
+            message = "You are not allowed to remove folder '" + folder.toString() + "'";
+        } else {
+            message = "You are not allowed to remove configuration folder for tenant " + configuration.getTenantId() +
+                    ". To remove a tenant, please search for 'Platform API' on https://documentation.bonitasoft.com";
+        }
+        return message
+                + LINE_SEPARATOR
+                + "To restore the deleted folders, run 'setup pull'. You will lose the locally modified configuration.";
     }
 
     /**
@@ -169,7 +230,8 @@ public class PlatformSetup {
             LOGGER.info("Pulling licenses into folder: " + licensesFolder);
         }
         pull(currentConfigurationFolder, licensesFolder);
-        LOGGER.info("Configuration (and license) files successfully pulled. You can now edit them. Use \"setup push\" when done.");
+        LOGGER.info(
+                "Configuration (and license) files successfully pulled. You can now edit them. Use \"setup push\" when done.");
     }
 
     public void pull(Path configurationFolder, Path licensesFolder) throws PlatformException {
@@ -179,7 +241,8 @@ public class PlatformSetup {
                 FileUtils.cleanDirectory(licensesFolder.toFile());
             }
             List<File> licenses = new ArrayList<>();
-            List<File> files = configurationService.writeAllConfigurationToFolder(configurationFolder.toFile(), licensesFolder.toFile());
+            List<File> files = configurationService.writeAllConfigurationToFolder(configurationFolder.toFile(),
+                    licensesFolder.toFile());
             LOGGER.info("Retrieved following files in " + configurationFolder);
             for (File file : files) {
                 if (file.toPath().getParent().equals(licensesFolder)) {
@@ -211,7 +274,8 @@ public class PlatformSetup {
     private void checkPlatformVersion() throws PlatformException {
         if (!versionService.isValidPlatformVersion()) {
             throw new PlatformException("Platform version [" + versionService.getPlatformVersion() +
-                    "] is not supported by current platform setup version [" + versionService.getPlatformSetupVersion() + "]");
+                    "] is not supported by current platform setup version [" + versionService.getPlatformSetupVersion()
+                    + "]");
         }
     }
 
@@ -267,9 +331,12 @@ public class PlatformSetup {
     private void updateDefaultConfigurationFromClasspath() throws PlatformException {
         List<BonitaConfiguration> portalTenant = new ArrayList<>(3);
         try {
-            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
-            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
-            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
+            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "compound-permissions-mapping.properties");
+            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "dynamic-permissions-checks.properties");
+            addIfExists(portalTenant, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "resources-permissions-mapping.properties");
         } catch (IOException e) {
             throw new PlatformException(e);
         }
@@ -279,47 +346,69 @@ public class PlatformSetup {
     private void initConfigurationWithClasspath() throws PlatformException {
         try {
             List<BonitaConfiguration> platformInitConfigurations = new ArrayList<>(2);
-            addIfExists(platformInitConfigurations, ConfigurationType.PLATFORM_INIT_ENGINE, "bonita-platform-init-custom.xml");
+            addIfExists(platformInitConfigurations, ConfigurationType.PLATFORM_INIT_ENGINE,
+                    "bonita-platform-init-custom.xml");
             configurationService.storePlatformInitEngineConf(platformInitConfigurations);
 
             List<BonitaConfiguration> platformConfigurations = new ArrayList<>(8);
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-community-custom.properties");
+            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
+                    "bonita-platform-community-custom.properties");
             addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-custom.xml");
             //SP
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-private-community.properties");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-sp-custom.properties");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-sp-cluster-custom.properties");
+            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
+                    "bonita-platform-private-community.properties");
+            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
+                    "bonita-platform-sp-custom.properties");
+            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
+                    "bonita-platform-sp-cluster-custom.properties");
             addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-sp-custom.xml");
-            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-platform-hibernate-cache.xml");
+            addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE,
+                    "bonita-platform-hibernate-cache.xml");
             addIfExists(platformConfigurations, ConfigurationType.PLATFORM_ENGINE, "bonita-tenant-hibernate-cache.xml");
             configurationService.storePlatformEngineConf(platformConfigurations);
 
             List<BonitaConfiguration> tenantTemplateConfigurations = new ArrayList<>(5);
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenant-community-custom.properties");
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenants-custom.xml");
+            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenant-community-custom.properties");
+            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenants-custom.xml");
             //SP
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.properties");
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-cluster-custom.properties");
-            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE, "bonita-tenant-sp-custom.xml");
+            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenant-sp-custom.properties");
+            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenant-sp-cluster-custom.properties");
+            addIfExists(tenantTemplateConfigurations, ConfigurationType.TENANT_TEMPLATE_ENGINE,
+                    "bonita-tenant-sp-custom.xml");
             configurationService.storeTenantTemplateEngineConf(tenantTemplateConfigurations);
 
             List<BonitaConfiguration> securityScripts = new ArrayList<>();
-            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS, "SamplePermissionRule.groovy.sample");
+            addIfExists(securityScripts, ConfigurationType.TENANT_TEMPLATE_SECURITY_SCRIPTS,
+                    "SamplePermissionRule.groovy.sample");
             configurationService.storeTenantTemplateSecurityScripts(securityScripts);
 
             List<BonitaConfiguration> portalTenantTemplate = new ArrayList<>(14);
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "authenticationManager-config.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping-custom.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "compound-permissions-mapping-internal.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "authenticationManager-config.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "compound-permissions-mapping.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "compound-permissions-mapping-custom.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "compound-permissions-mapping-internal.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "console-config.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "custom-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "dynamic-permissions-checks-custom.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "custom-permissions-mapping.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "dynamic-permissions-checks.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "dynamic-permissions-checks-custom.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "forms-config.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping-custom.properties");
-            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "resources-permissions-mapping-internal.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "resources-permissions-mapping.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "resources-permissions-mapping-custom.properties");
+            addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL,
+                    "resources-permissions-mapping-internal.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "security-config.properties");
             addIfExists(portalTenantTemplate, ConfigurationType.TENANT_TEMPLATE_PORTAL, "autologin-v6.json");
 
@@ -337,9 +426,11 @@ public class PlatformSetup {
         }
     }
 
-    private void addIfExists(List<BonitaConfiguration> tenantTemplateConfigurations, ConfigurationType configurationType, String resourceName)
+    private void addIfExists(List<BonitaConfiguration> tenantTemplateConfigurations,
+            ConfigurationType configurationType, String resourceName)
             throws IOException {
-        BonitaConfiguration bonitaConfiguration = getBonitaConfigurationFromClassPath(configurationType.name().toLowerCase(), resourceName);
+        BonitaConfiguration bonitaConfiguration = getBonitaConfigurationFromClassPath(
+                configurationType.name().toLowerCase(), resourceName);
         if (bonitaConfiguration != null) {
             tenantTemplateConfigurations.add(bonitaConfiguration);
         }
@@ -349,14 +440,16 @@ public class PlatformSetup {
         try {
             try (Connection connection = dataSource.getConnection()) {
                 DatabaseMetaData metaData = connection.getMetaData();
-                LOGGER.info("Connected to '" + dbVendor + "' database with url: '" + metaData.getURL() + "' with user: '" + metaData.getUserName() + "'");
+                LOGGER.info("Connected to '" + dbVendor + "' database with url: '" + metaData.getURL()
+                        + "' with user: '" + metaData.getUserName() + "'");
             }
         } catch (SQLException e) {
             throw new PlatformException(e);
         }
     }
 
-    private BonitaConfiguration getBonitaConfigurationFromClassPath(String folder, String resourceName) throws IOException {
+    private BonitaConfiguration getBonitaConfigurationFromClassPath(String folder, String resourceName)
+            throws IOException {
         try (InputStream resourceAsStream = this.getClass().getResourceAsStream("/" + folder + "/" + resourceName)) {
             if (resourceAsStream == null) {
                 return null;
@@ -386,9 +479,10 @@ public class PlatformSetup {
         if (Files.isDirectory(licensesFolder)) {
             final String[] licenseFiles = licensesFolder.toFile().list(new RegexFileFilter(".*\\.lic"));
             if (licenseFiles.length == 0) {
-                throw new PlatformException("No license (.lic file) found.\n"
-                        + "This would prevent Bonita Platform subscription edition to start normally.\n" +
-                        "Place your license file in '" + licensesFolder.toAbsolutePath().toString() + "' and then try again.");
+                throw new PlatformException("No license (.lic file) found." + LINE_SEPARATOR
+                        + "This would prevent Bonita Platform subscription edition to start normally." + LINE_SEPARATOR
+                        + "Place your license file in '" + licensesFolder.toAbsolutePath().toString()
+                        + "' and then try again.");
             }
         }
     }

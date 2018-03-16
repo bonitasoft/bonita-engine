@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup.command;
 
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.bonitasoft.platform.exception.PlatformException;
 import org.bonitasoft.platform.setup.PlatformSetup;
@@ -37,7 +38,7 @@ public abstract class PlatformSetupCommand {
         this.descriptionFooter = descriptionFooter;
     }
 
-    public abstract void execute(Options options, String... args) throws PlatformException, CommandException;
+    public abstract void execute(Options options, CommandLine commandLine) throws PlatformException, CommandException;
 
     public String getName() {
         return name;

@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.h2.tools.Server;
 import org.junit.Before;
@@ -42,10 +43,16 @@ import org.junit.rules.TestRule;
  */
 public class PlatformSetupDistributionIT {
 
+    //
+    // WARNING !!!! This IT test class must be launched after a MAVEN build has been run:
+    // See PlatformSetupTestUtils.extractDistributionTo() to better understand why.
+    //
+
     private File distFolder;
 
     @Rule
-    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user", "db.password", "db.vendor", "db.server.name",
+    public TestRule clean = new ClearSystemProperties("db.admin.user", "sysprop.bonita.db.vendor", "db.user",
+            "db.password", "db.vendor", "db.server.name",
             "db.admin.password", "sysprop.bonita.bdm.db.vendor", "db.server.port", "db.database.name");
 
     @Rule
@@ -60,7 +67,7 @@ public class PlatformSetupDistributionIT {
     }
 
     @Test
-    public void setupSh_should_work_with_init_on_h2() throws Exception {
+    public void setupSh_should_work_with_init_on_h2_and_prevent_pushing_deletion() throws Exception {
         //given
         CommandLine oCmdLine = PlatformSetupTestUtils.createCommandLine();
         oCmdLine.addArgument("init");
@@ -77,6 +84,26 @@ public class PlatformSetupDistributionIT {
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) AS nb FROM CONFIGURATION");
         resultSet.next();
         assertThat(resultSet.getInt("nb")).isGreaterThan(0);
+
+        oCmdLine = PlatformSetupTestUtils.createCommandLine();
+        oCmdLine.addArgument("pull");
+        iExitValue = executor.execute(oCmdLine);
+        assertThat(iExitValue).isEqualTo(0);
+
+        final Path platform_engine = distFolder.toPath().resolve("platform_conf").resolve("current")
+                .resolve("platform_engine");
+        FileUtils.deleteDirectory(platform_engine.toFile());
+
+        oCmdLine = PlatformSetupTestUtils.createCommandLine();
+        oCmdLine.addArgument("push");
+        executor.setExitValue(1);
+        iExitValue = executor.execute(oCmdLine);
+        assertThat(iExitValue).isEqualTo(1);
+
+        oCmdLine.addArgument("--force");
+        executor.setExitValue(0);
+        iExitValue = executor.execute(oCmdLine);
+        assertThat(iExitValue).isEqualTo(0);
     }
 
     @Test
