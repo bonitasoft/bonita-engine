@@ -65,7 +65,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * STimerEventTriggerInstance is used to keep track of currently running timers
      * using {@link org.bonitasoft.engine.api.ProcessAPI#searchTimerEventTriggerInstances(long, SearchOptions)}
      */
-    void createEventTriggerInstance(STimerEventTriggerInstance sEventTriggerInstance) throws SEventTriggerInstanceCreationException;
+    void createTimerEventTriggerInstance(STimerEventTriggerInstance sEventTriggerInstance) throws SEventTriggerInstanceCreationException;
 
     void createMessageInstance(SMessageInstance messageInstance) throws SMessageInstanceCreationException;
 
@@ -94,8 +94,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @since 6.4.0
      */
     <T extends STimerEventTriggerInstance> T getEventTriggerInstance(Class<T> entityClass, long eventTriggerInstanceId) throws SEventTriggerInstanceReadException;
-
-    List<STimerEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, QueryOptions queryOptions) throws SEventTriggerInstanceReadException;
 
     void deleteMessageInstance(SMessageInstance messageInstance) throws SMessageModificationException;
 
@@ -134,20 +132,10 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
-    <T extends STimerEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
+    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(QueryOptions searchOptions) throws SBonitaReadException;
 
     SWaitingSignalEvent getWaitingSignalEvent(long id)
             throws SEventTriggerInstanceReadException, SEventTriggerInstanceNotFoundException;
-
-    long getNumberOfEventTriggerInstances(Class<? extends STimerEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaReadException;
-
-    /**
-     * @param eventInstanceId
-     * @throws SEventTriggerInstanceReadException
-     * @throws SEventTriggerInstanceDeletionException
-     * @since 6.1
-     */
-    void deleteEventTriggerInstances(long eventInstanceId) throws SEventTriggerInstanceReadException, SEventTriggerInstanceDeletionException;
 
     /**
      * @param eventTriggerInstance
