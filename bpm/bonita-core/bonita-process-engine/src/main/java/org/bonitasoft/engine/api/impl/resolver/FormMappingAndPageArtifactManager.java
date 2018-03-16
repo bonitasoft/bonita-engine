@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -63,8 +64,10 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Laurent Leseigneur
  */
 public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifactManager {
+    public static final String ERROR_MESSAGE_FORM_NOT_SET = "Error while resolving form mapping for processDefinitionId=%s and task=%s. The target bonita form is not defined";
+    public static final String ERROR_MESSAGE_FORM_NOT_FOUND = "Error while resolving form mapping %s. The target bonita form with ID %s does not exist.";
+    public static final String ERROR_MESSAGE_FORM_UNDEFINED = "Error while resolving form mapping processDefinitionId=%s and task=%s. The target bonita form is explicitly not yet defined but IS necessary for the process to be resolved";
 
-    public static final String ERROR_MESSAGE = "error while resolving form mapping %s";
     private static final String REGEX = "^resources/customPages/(custompage_.*)\\.(zip)$";
     private final SessionService sessionService;
     private final SessionAccessor sessionAccessor;
@@ -216,24 +219,27 @@ public class FormMappingAndPageArtifactManager implements BusinessArchiveArtifac
 
     protected void checkFormMappingResolution(SFormMapping formMapping, List<Problem> problems)
             throws SBonitaReadException, SObjectNotFoundException {
+        String errorMessage;
         if (isMappingRelatedToCustomPage(formMapping)) {
             SPageMapping pageMapping = formMapping.getPageMapping();
             if (pageMapping == null) {
-                addProblem(formMapping, problems);
+                errorMessage = String.format(ERROR_MESSAGE_FORM_NOT_SET, formMapping.getProcessDefinitionId(), formMapping.getTask());
+                addProblem(formMapping, problems, errorMessage);
                 return;
             }
             final Long pageId = pageMapping.getPageId();
             if (pageId == null || pageService.getPage(pageId) == null) {
-                addProblem(formMapping, problems);
+                errorMessage = String.format(ERROR_MESSAGE_FORM_NOT_FOUND, pageMapping.getKey(), pageId);
+                addProblem(formMapping, problems, errorMessage);
             }
         } else if (isUndefined(formMapping)) {
-            addProblem(formMapping, problems);
+            errorMessage =  String.format(ERROR_MESSAGE_FORM_UNDEFINED, formMapping.getProcessDefinitionId(), formMapping.getTask());
+            addProblem(formMapping, problems, errorMessage);
         }
     }
 
-    private void addProblem(SFormMapping formMapping, List<Problem> problems) {
-        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", String.format(ERROR_MESSAGE,
-                formMapping.toString())));
+    private void addProblem(SFormMapping formMapping, List<Problem> problems, String errorMessage) {
+        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", errorMessage));
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {

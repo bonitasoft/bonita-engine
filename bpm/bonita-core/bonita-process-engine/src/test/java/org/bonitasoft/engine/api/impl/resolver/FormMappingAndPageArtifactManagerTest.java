@@ -141,7 +141,7 @@ public class FormMappingAndPageArtifactManagerTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE, sFormMapping))
+        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND, sPageMapping.getKey(), 1L))
                 .hasLevel(Problem.Level.ERROR);
 
     }
@@ -161,7 +161,7 @@ public class FormMappingAndPageArtifactManagerTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE, sFormMapping))
+        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND, sPageMapping.getKey(), sPageMapping.getPageId()))
                 .hasLevel(Problem.Level.ERROR);
 
     }
@@ -191,13 +191,14 @@ public class FormMappingAndPageArtifactManagerTest {
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
+        doReturn(null).when(sPageMapping).getPageId();
 
         //when
         final List<Problem> problems = formMappingAndPageArtifactManager.checkResolution(sDefinition);
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE, sFormMapping))
+        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(FormMappingAndPageArtifactManager.ERROR_MESSAGE_FORM_NOT_FOUND, sPageMapping.getKey(), null))
                 .hasLevel(Problem.Level.ERROR);
 
     }
