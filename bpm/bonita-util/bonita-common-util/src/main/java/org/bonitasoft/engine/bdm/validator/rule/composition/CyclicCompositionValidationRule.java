@@ -13,9 +13,14 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule.composition;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -44,9 +49,14 @@ public class CyclicCompositionValidationRule extends ValidationRule<BusinessObje
     private ValidationStatus validateThatThereIsNoCycleDependencies(BusinessObject bo, List<BusinessObject> parentBOs) {
         ValidationStatus validationStatus = new ValidationStatus();
         parentBOs.add(bo);
+        Map<String, Serializable> context = new HashMap<>();
+        context.put(StatusContext.BDM_ARTIFACT_NAME_KEY, bo.getQualifiedName());
         for (BusinessObject businessObject : bo.getReferencedBusinessObjectsByComposition()) {
             if (parentBOs.contains(businessObject)) {
-                validationStatus.addError("Business object " + businessObject.getQualifiedName() + " has a circular composition reference to itself or is referenced several times in the object " + bo.getQualifiedName());
+                context.put(StatusContext.BUSINESS_OBJECT_NAME_KEY, businessObject.getQualifiedName());
+                validationStatus.addError(StatusCode.CIRCULAR_COMPOSITION_REFERENCE, String.format(
+                        "Business object %s has a circular composition reference to itself or is referenced several times in the object %s",
+                        businessObject.getQualifiedName(), bo.getQualifiedName()), context);
             } else {
                 validationStatus.addValidationStatus(validateThatThereIsNoCycleDependencies(businessObject, parentBOs));
             }

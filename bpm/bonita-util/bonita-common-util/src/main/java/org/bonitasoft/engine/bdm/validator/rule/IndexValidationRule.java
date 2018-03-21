@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.Index;
 import org.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -35,19 +38,20 @@ public class IndexValidationRule extends ValidationRule<Index, ValidationStatus>
         final ValidationStatus status = new ValidationStatus();
         final String name = index.getName();
         if (name == null || name.isEmpty()) {
-            status.addError("An index must have name");
+            status.addError(StatusCode.INDEX_WITHOUT_NAME, "An index must have name");
             return status;
         }
-        final boolean isValid = sqlNameValidator.isValid(name);
-        if (!isValid) {
-            status.addError(name + " is not a valid SQL identifier");
+        if (!sqlNameValidator.isValid(name)) {
+            status.addError(StatusCode.INVALID_SQL_IDENTIFIER_NAME,
+                    String.format("%s is not a valid SQL identifier", name),
+                    Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
-
         List<String> fieldNames = index.getFieldNames();
         if (fieldNames == null || fieldNames.isEmpty()) {
-            status.addError(name + " index must have at least one field declared");
+            status.addError(StatusCode.INDEX_WITHOUT_FIELD,
+                    String.format("%s index must have at least one field declared", name),
+                    Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
-
         return status;
     }
 

@@ -13,12 +13,18 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.SourceVersion;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.Query;
@@ -48,28 +54,35 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject,
         final ValidationStatus status = new ValidationStatus();
         final String qualifiedName = bo.getQualifiedName();
         if (qualifiedName == null) {
-            status.addError("A Business Object must have a qualified name");
+            status.addError(StatusCode.BUSINESS_OBJECT_WITHOUT_NAME, "A Business Object must have a qualified name");
             return status;
         }
 
         for (String reservedPrefix : RESERVED_PACKAGE_PREFIX) {
             if (qualifiedName.startsWith(reservedPrefix)) {
-                status.addError("Package " + reservedPrefix + " is reserved. Please choose another package name");
+                status.addError(StatusCode.RESERVED_PACKAGE_NAME,
+                        String.format("Package %s is reserved. Please choose another package name", reservedPrefix),
+                        Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, reservedPrefix));
             }
         }
 
         final String simpleName = bo.getSimpleName();
         if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
-            status.addError(qualifiedName + " is not a valid Java qualified name");
+            status.addError(StatusCode.INVALID_JAVA_IDENTIFIER_NAME,
+                    String.format("%s is not a valid Java qualified name", qualifiedName),
+                    Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, qualifiedName));
             return status;
         }
 
         if (simpleName.contains("_")) {
-            status.addError("_ is a forbidden character in business object's name");
+            status.addError(StatusCode.INVALID_CHARACTER_IN_BUSINESS_OBJECT_NAME,
+                    "_ is a forbidden character in business object's name");
         }
 
         if (bo.getFields().isEmpty()) {
-            status.addError(qualifiedName + " must have at least one field declared");
+            status.addError(StatusCode.BUSINESS_OBJECT_WITHOUT_FIELD,
+                    String.format("%s must have at least one field declared", qualifiedName),
+                    Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, qualifiedName));
         }
 
         validateConstraints(bo, status);
@@ -79,9 +92,14 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject,
 
     private void validateQueries(final BusinessObject bo, final ValidationStatus status) {
         final Set<String> queryNames = BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo);
+        Map<String, Serializable> context = new HashMap<>();
+        context.put(StatusContext.BUSINESS_OBJECT_NAME_KEY, bo.getQualifiedName());
         for (final Query q : bo.getQueries()) {
             if (queryNames.contains(q.getName())) {
-                status.addError("The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName());
+                context.put(StatusContext.BDM_ARTIFACT_NAME_KEY, q.getName());
+                status.addError(StatusCode.DUPLICATE_QUERY_NAME,
+                        "The query named \"" + q.getName() + "\" already exists for " + bo.getQualifiedName(),
+                        context);
             } else {
                 queryNames.add(q.getName());
             }
@@ -90,19 +108,26 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject,
 
     private void validateConstraints(final BusinessObject bo, final ValidationStatus status) {
         final Set<String> constraintNames = new HashSet<>();
+        Map<String, Serializable> context = new HashMap<>();
+        context.put(StatusContext.BUSINESS_OBJECT_NAME_KEY, bo.getQualifiedName());
         for (final UniqueConstraint uc : bo.getUniqueConstraints()) {
             String name = uc.getName();
             if (constraintNames.contains(name)) {
-                status.addError("The constraint named \"" + name + "\" already exists for " + bo.getQualifiedName());
+                context.put(StatusContext.BDM_ARTIFACT_NAME_KEY, name);
+                status.addError(StatusCode.DUPLICATE_CONSTRAINT_NAME,
+                        "The constraint named \"" + name + "\" already exists for " + bo.getQualifiedName(),
+                        context);
             } else {
                 constraintNames.add(name);
             }
             List<String> fieldNames = uc.getFieldNames();
             if (fieldNames != null) {
                 for (final String fName : fieldNames) {
-                    final Field field = getField(bo, fName);
-                    if (field == null) {
-                        status.addError("The field named " + fName + " does not exist in " + bo.getQualifiedName());
+                    if (getField(bo, fName) == null) {
+                        context.put(StatusContext.BDM_ARTIFACT_NAME_KEY, fName);
+                        status.addError(StatusCode.UNKNOWN_FIELD_IN_CONSTRAINT,
+                                String.format("The field named %s does not exist in %s", fName, bo.getQualifiedName()),
+                                context);
                     }
                 }
             }

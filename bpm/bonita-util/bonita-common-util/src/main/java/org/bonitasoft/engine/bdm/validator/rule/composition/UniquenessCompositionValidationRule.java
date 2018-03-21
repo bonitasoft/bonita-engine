@@ -14,8 +14,11 @@
 package org.bonitasoft.engine.bdm.validator.rule.composition;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -38,8 +41,11 @@ public class UniquenessCompositionValidationRule extends ValidationRule<Business
         List<BusinessObject> alreadyComposedBOs = new ArrayList<>();
         for (BusinessObject compositeBO : bom.getReferencedBusinessObjectsByComposition()) {
             if (alreadyComposedBOs.contains(compositeBO)) {
-                validationStatus.addError("Business object " + compositeBO.getQualifiedName()
-                        + " is referenced by composition in two business objects, or is referenced several times in a single business object");
+                validationStatus.addError(StatusCode.SEVERAL_COMPOSITION_REFERENCE_FOR_A_BUSINESS_OBJECT,
+                        String.format(
+                                "Business object %s is referenced by composition in two business objects, or is referenced several times in a single business object",
+                                compositeBO.getQualifiedName()),
+                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, compositeBO.getQualifiedName()));
             } else {
                 alreadyComposedBOs.add(compositeBO);
             }

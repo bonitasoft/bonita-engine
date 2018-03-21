@@ -31,32 +31,32 @@ public class ValidationStatusTest {
     }
 
     @Test
-    public void shouldIsOk_returns_true() {
+    public void isOk_should_return_true() {
         assertThat(validationStatus.isOk()).isTrue();
     }
 
     @Test
-    public void shouldIsOk_returns_false_if_contains_erros() {
-        validationStatus.addError("an error");
+    public void isOk_should_return_false_if_status_contains_errors() {
+        validationStatus.addError(null, "an error");
         assertThat(validationStatus.isOk()).isFalse();
     }
 
     @Test
-    public void shouldIsOk_returns_false_if_add_a_status_with_erros() {
+    public void isOk_should_return_false_if_add_a_status_with_errors() {
         ValidationStatus status = new ValidationStatus();
-        status.addError("an error");
+        status.addError(null, "an error");
         validationStatus.addValidationStatus(status);
         assertThat(validationStatus.isOk()).isFalse();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldAddError_throw_an_IllegalArgumentException_for_null_input() {
-        validationStatus.addError(null);
+        validationStatus.addError(null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldAddError_throw_an_IllegalArgumentException_for_empty_input() {
-        validationStatus.addError(null);
+        validationStatus.addError(null, null);
     }
 
 }

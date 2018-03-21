@@ -13,11 +13,16 @@
  **/
 package org.bonitasoft.engine.bdm.validator;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.NamedElement;
 
 /**
@@ -28,8 +33,13 @@ public class UniqueNameValidator {
     public ValidationStatus validate(Collection<? extends NamedElement> namedElements,  String namedElementTypePluralForm) {
         ValidationStatus status = new ValidationStatus();
         Set<String> duplicateNames = findDuplicateNames(namedElements);
+        Map<String, Serializable> context = new HashMap<>();
+        context.put(StatusContext.BDM_ARTIFACT_KEY, namedElementTypePluralForm);
         for (String name : duplicateNames) {
-            status.addError("There are at least two " + namedElementTypePluralForm + " with the same name : " + name);
+            context.put(StatusContext.BDM_ARTIFACT_NAME_KEY, name);
+            status.addError(StatusCode.DUPLICATE_CONSTRAINT_OR_INDEX_NAME,
+                    String.format("There are at least two %s with the same name : %s", namedElementTypePluralForm, name),
+                    context);
         }
         return status;
     }

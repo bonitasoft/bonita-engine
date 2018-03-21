@@ -13,53 +13,84 @@
  **/
 package org.bonitasoft.engine.bdm.validator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.bonitasoft.engine.api.result.Status;
+import org.bonitasoft.engine.api.result.StatusCode;
 
 /**
  * @author Romain Bioteau
  */
 public class ValidationStatus {
 
-    private final List<String> errorList;
-
-    private final List<String> warningList;
+    private final List<Status> statusList;
 
     public ValidationStatus() {
-        errorList = new ArrayList<>();
-        warningList = new ArrayList<>();
+        statusList = new ArrayList<>();
     }
 
-    public void addError(final String error) {
+    public void addError(StatusCode code, final String error) {
         if (error == null || error.isEmpty()) {
             throw new IllegalArgumentException("error message cannot be null or empty");
         }
-        errorList.add(error);
+        statusList.add(Status.errorStatus(code, error));
     }
 
-    public void addWarning(final String warning) {
+    public void addError(StatusCode code, final String error, Map<String, Serializable> context) {
+        if (error == null || error.isEmpty()) {
+            throw new IllegalArgumentException("error message cannot be null or empty");
+        }
+        statusList.add(Status.errorStatus(code, error, context));
+    }
+
+
+    public void addWarning(StatusCode code, final String warning) {
         if (warning == null || warning.isEmpty()) {
             throw new IllegalArgumentException("warning message cannot be null or empty");
         }
-        warningList.add(warning);
+        statusList.add(Status.warningStatus(code, warning));
+    }
+
+    public void addWarning(StatusCode code, final String warning, Map<String, Serializable> context) {
+        if (warning == null || warning.isEmpty()) {
+            throw new IllegalArgumentException("warning message cannot be null or empty");
+        }
+        statusList.add(Status.warningStatus(code, warning, context));
     }
 
     public boolean isOk() {
-        return errorList.isEmpty();
+        return statusList.stream().map(Status::getLevel).noneMatch(Status.Level.ERROR::equals);
     }
 
     public void addValidationStatus(final ValidationStatus status) {
-        warningList.addAll(status.getWarnings());
-        errorList.addAll(status.getErrors());
+        statusList.addAll(status.getStatuses());
     }
 
+    /**
+     * @Deprecated since release 7.7.0, replaced by {@link #getStatuses()}
+     */
+    @Deprecated
     public List<String> getErrors() {
-        return errorList;
+        return statusList.stream().filter(status -> Objects.equals(Status.Level.ERROR, status.getLevel()))
+                .map(Status::getMessage).collect(Collectors.toList());
     }
 
+    /**
+     * @Deprecated since release 7.7.0, replaced by {@link #getStatuses()}
+     */
+    @Deprecated
     public List<String> getWarnings() {
-        return warningList;
+        return statusList.stream().filter(status -> Objects.equals(Status.Level.WARNING, status.getLevel()))
+                .map(Status::getMessage).collect(Collectors.toList());
+    }
+
+    public List<Status> getStatuses() {
+        return statusList;
     }
 
     @Override
@@ -69,12 +100,11 @@ public class ValidationStatus {
         if (!(o instanceof ValidationStatus))
             return false;
         ValidationStatus that = (ValidationStatus) o;
-        return Objects.equals(errorList, that.errorList) &&
-                Objects.equals(warningList, that.warningList);
+        return Objects.equals(statusList, that.statusList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(errorList, warningList);
+        return Objects.hash(statusList);
     }
 }
