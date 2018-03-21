@@ -17,8 +17,11 @@ package org.bonitasoft.engine.bdm.validator.rule.composition;
 import static org.bonitasoft.engine.bdm.model.field.RelationField.Type.AGGREGATION;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.field.Field;
@@ -55,8 +58,12 @@ public class AggregationAndCompositionValidationRule extends ValidationRule<Busi
         composedBusinessObjects.addAll(bom.getReferencedBusinessObjectsByComposition());
         for (BusinessObject composedBo : composedBusinessObjects) {
             if (aggregatedBusinessObjects.contains(composedBo)) {
-                validationStatus.addWarning("The object " + composedBo.getQualifiedName()
-                        + " is referenced both in composition and in aggregation. This may lead to runtime errors and may lead to unpredictable behaviour of the AccessControl configuration.");
+                validationStatus.addWarning(StatusCode.BUSINESS_OBJECT_USED_IN_COMPOSITION_AND_AGGREGATION,
+                        String.format(
+                                "The object %s is referenced both in composition and in aggregation. This may lead to runtime errors and"
+                                + " may lead to unpredictable behaviour of the AccessControl configuration.",
+                        composedBo.getQualifiedName()),
+                        Collections.singletonMap(StatusContext.BUSINESS_OBJECT_NAME_KEY, composedBo.getQualifiedName()));
             }
         }
         return validationStatus;

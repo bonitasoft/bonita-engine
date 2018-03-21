@@ -19,12 +19,15 @@ import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
 import static org.bonitasoft.engine.bdm.builder.IndexBuilder.anIndex;
 import static org.bonitasoft.engine.bdm.builder.UniqueConstraintBuilder.aUniqueConstraint;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 
+import org.bonitasoft.engine.api.result.StatusCode;
 import org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -74,7 +77,7 @@ public class UniqueNameValidationRuleTest {
 
     private ValidationStatus anErrorStatus() {
         final ValidationStatus validationStatus = new ValidationStatus();
-        validationStatus.addError("an error");
+        validationStatus.addError(StatusCode.DUPLICATE_CONSTRAINT_OR_INDEX_NAME, "an error");
         return validationStatus;
     }
 

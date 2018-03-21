@@ -13,8 +13,13 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+
+import static java.util.Collections.singletonMap;
+
 import java.util.List;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -35,17 +40,19 @@ public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstra
         final ValidationStatus status = new ValidationStatus();
         final String name = uc.getName();
         if (name == null || name.isEmpty()) {
-            status.addError("A unique constraint must have name");
+            status.addError(StatusCode.UNIQUE_CONSTRAINT_WITHOUT_NAME, "A unique constraint must have name");
             return status;
         }
-        final boolean isValid = sqlNameValidator.isValid(name);
-        if (!isValid) {
-            status.addError(name + " is not a valid SQL identifier");
+        if (!sqlNameValidator.isValid(name)) {
+            status.addError(StatusCode.INVALID_SQL_IDENTIFIER_NAME, String.format("%s is not a valid SQL identifier", name),
+                    singletonMap(StatusContext.INVALID_NAME_KEY, name));
         }
 
         List<String> fieldNames = uc.getFieldNames();
         if (fieldNames == null || fieldNames.isEmpty()) {
-            status.addError(name + " unique constraint must have at least one field declared");
+            status.addError(StatusCode.UNIQUE_CONSTRAINT_WITHTOUT_FIELD,
+                    String.format("%s unique constraint must have at least one field declared", name),
+                    singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
         return status;
     }

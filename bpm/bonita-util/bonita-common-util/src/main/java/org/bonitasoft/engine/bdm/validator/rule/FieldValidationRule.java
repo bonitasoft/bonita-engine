@@ -13,8 +13,12 @@
  **/
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import java.util.Collections;
+
 import javax.lang.model.SourceVersion;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -38,7 +42,9 @@ public class FieldValidationRule extends ValidationRule<Field, ValidationStatus>
         final ValidationStatus status = new ValidationStatus();
         final String name = field.getName();
         if (name == null || !SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name) || isForbiddenIdentifier(name)) {
-            status.addError(name + " is not a valid field identifier");
+            status.addError(StatusCode.INVALID_FIELD_IDENTIFIER,
+                    String.format("%s is not a valid field identifier", name),
+                    Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
             return status;
         }
         return status;
