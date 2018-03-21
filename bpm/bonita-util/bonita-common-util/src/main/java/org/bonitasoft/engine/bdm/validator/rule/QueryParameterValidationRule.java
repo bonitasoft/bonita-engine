@@ -19,10 +19,13 @@ package org.bonitasoft.engine.bdm.validator.rule;
  * @author Emmanuel Duchastenier
  */
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.lang.model.SourceVersion;
 
+import org.bonitasoft.engine.api.result.StatusCode;
+import org.bonitasoft.engine.api.result.StatusContext;
 import org.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.bonitasoft.engine.bdm.model.QueryParameter;
 import org.bonitasoft.engine.bdm.validator.ValidationStatus;
@@ -40,18 +43,24 @@ public class QueryParameterValidationRule extends ValidationRule<QueryParameter,
         final ValidationStatus status = new ValidationStatus();
         final String name = parameter.getName();
         if (name == null || name.isEmpty()) {
-            status.addError("A parameter must have name");
+            status.addError(StatusCode.QUERY_PARAMETER_WITHOUT_NAME, "A parameter must have name");
             return status;
         }
         if (!SourceVersion.isIdentifier(name)) {
-            status.addError(name + " is not a valid Java identifier.");
+            status.addError(StatusCode.INVALID_JAVA_IDENTIFIER_NAME,
+                    String.format("%s is not a valid Java identifier.", name),
+                    Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
         if (FORBIDDEN_PARAMETER_NAMES.contains(name)) {
-            status.addError(name + " is a reserved parameter name. Use a name different from:" + FORBIDDEN_PARAMETER_NAMES);
+            status.addError(StatusCode.FORBIDDEN_QUERRY_PARAMETER_NAME,
+                    String.format("%s is a reserved parameter name. Use a name different from: %s", name,
+                            FORBIDDEN_PARAMETER_NAMES),
+                    Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
-
         if (parameter.getClassName() == null || parameter.getClassName().isEmpty()) {
-            status.addError(name + " query parameter must have a classname");
+            status.addError(StatusCode.QUERY_PARAMETER_WITHOUT_CLASS_NAME,
+                    String.format("%s query parameter must have a classname", name),
+                    Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
         return status;
     }

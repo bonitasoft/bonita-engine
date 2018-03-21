@@ -26,6 +26,9 @@ public class StatusContext extends HashMap<String, Serializable> {
     public static final String ACCESS_RULE_NAME_KEY = "accessRuleName";
     public static final String ATTRIBUTE_NAME_KEY = "attributeName";
     public static final String PROFILE_NAME_KEY = "profileName";
+    public static final String BDM_ARTIFACT_KEY = "bdmArtifact";
+    public static final String BDM_ARTIFACT_NAME_KEY = "bdmArtifactName";
+    public static final String INVALID_NAME_KEY = "invalidName";
 
     public StatusContext() {
         super();

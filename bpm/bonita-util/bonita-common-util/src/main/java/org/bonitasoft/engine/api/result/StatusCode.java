@@ -15,6 +15,10 @@ package org.bonitasoft.engine.api.result;
 
 public enum StatusCode {
 
+    /*****************************
+     * ACCESS CONTROL STATUS CODE
+     *****************************/
+
     /**
      * Everything is fine
      */
@@ -93,5 +97,64 @@ public enum StatusCode {
     /**
      * The naming of rules and objects in the access control file is inconsistent
      */
-    BDM_ACCESS_CONTROL_INCONSISTENT_NAME_IN_FILE
+    BDM_ACCESS_CONTROL_INCONSISTENT_NAME_IN_FILE,
+
+    /**********************************
+     * Business Data Model Status Code
+     **********************************/
+
+    DUPLICATE_CONSTRAINT_OR_INDEX_NAME,
+
+    UNIQUE_CONSTRAINT_WITHOUT_NAME,
+
+    INVALID_SQL_IDENTIFIER_NAME,
+
+    UNIQUE_CONSTRAINT_WITHTOUT_FIELD,
+
+    FIELD_WITHOUT_NAME,
+
+    QUERY_WITHOUT_NAME,
+
+    INVALID_JAVA_IDENTIFIER_NAME,
+
+    QUERY_NAME_LENGTH_TO_HIGH,
+
+    QUERY_WITHOUT_CONTENT,
+
+    QUERY_WITHOUT_RETURN_TYPE,
+
+    QUERY_PARAMETER_WITHOUT_NAME,
+
+    FORBIDDEN_QUERRY_PARAMETER_NAME,
+
+    QUERY_PARAMETER_WITHOUT_CLASS_NAME,
+
+    INDEX_WITHOUT_NAME,
+
+    INDEX_WITHOUT_FIELD,
+
+    INVALID_FIELD_IDENTIFIER,
+
+    BUSINESS_OBJECT_WITHOUT_NAME,
+
+    RESERVED_PACKAGE_NAME,
+
+    INVALID_CHARACTER_IN_BUSINESS_OBJECT_NAME,
+
+    BUSINESS_OBJECT_WITHOUT_FIELD,
+
+    DUPLICATE_QUERY_NAME,
+
+    DUPLICATE_CONSTRAINT_NAME,
+
+    UNKNOWN_FIELD_IN_CONSTRAINT,
+
+    EMPTY_BDM,
+
+    SEVERAL_COMPOSITION_REFERENCE_FOR_A_BUSINESS_OBJECT,
+
+    CIRCULAR_COMPOSITION_REFERENCE,
+
+    BUSINESS_OBJECT_USED_IN_COMPOSITION_AND_AGGREGATION
+
 }
