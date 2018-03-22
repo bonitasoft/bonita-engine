@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.bdm.validator.rule;
 
+import static org.bonitasoft.engine.api.result.StatusCode.MULTIPLE_AGGREGATION_RELATION_TO_ITSELF;
 import static org.bonitasoft.engine.bdm.model.field.RelationField.Type.AGGREGATION;
 
 import java.util.List;
@@ -44,8 +45,8 @@ public class MultipleAggregationToItselfValidationRule extends ValidationRule<Bu
                     String fieldReferenceQualifiedName = relationField.getReference().getQualifiedName();
                     String boQualifiedName = bo.getQualifiedName();
                     if (relationField.getType() == AGGREGATION && fieldReferenceQualifiedName.equals(boQualifiedName) && relationField.isCollection()) {
-                        validationStatus.addError("The object " + boQualifiedName
-                                + " is referencing itself in a multiple aggregation relation.");
+                        validationStatus.addError(MULTIPLE_AGGREGATION_RELATION_TO_ITSELF, "The object "
+                                + boQualifiedName + " is referencing itself in a multiple aggregation relation.");
                     }
                 }
             }

@@ -18,6 +18,7 @@ package org.bonitasoft.engine.bdm.validator.rule;
  * 
  * @author Emmanuel Duchastenier
  */
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ public class QueryParameterValidationRule extends ValidationRule<QueryParameter,
                     Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
         if (FORBIDDEN_PARAMETER_NAMES.contains(name)) {
-            status.addError(StatusCode.FORBIDDEN_QUERRY_PARAMETER_NAME,
+            status.addError(StatusCode.FORBIDDEN_QUERY_PARAMETER_NAME,
                     String.format("%s is a reserved parameter name. Use a name different from: %s", name,
                             FORBIDDEN_PARAMETER_NAMES),
                     Collections.singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
