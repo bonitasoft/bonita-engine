@@ -14,23 +14,28 @@
 
 package org.bonitasoft.engine.persistence;
 
-import java.io.Serializable;
-
 import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
-import org.hibernate.internal.util.SerializationHelper;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.jdbc.CharacterStream;
+import org.hibernate.engine.jdbc.internal.CharacterStreamImpl;
 import org.hibernate.type.descriptor.WrapperOptions;
 import org.hibernate.type.descriptor.java.AbstractTypeDescriptor;
-import org.hibernate.type.descriptor.java.ImmutableMutabilityPlan;
-import org.hibernate.type.descriptor.java.PrimitiveByteArrayTypeDescriptor;
+import org.hibernate.type.descriptor.java.DataHelper;
+import org.hibernate.type.descriptor.java.StringTypeDescriptor;
+
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.sql.Clob;
+import java.sql.SQLException;
 
 public class XMLTypeDescriptor
         extends AbstractTypeDescriptor<Serializable> {
 
-    private static PrimitiveByteArrayTypeDescriptor byteArrayTypeDescriptor = PrimitiveByteArrayTypeDescriptor.INSTANCE;
-
     public XMLTypeDescriptor() {
-        super(Serializable.class, ImmutableMutabilityPlan.INSTANCE);
+        super(Serializable.class);
     }
+
 
     @Override
     public boolean areEqual(Serializable one, Serializable another) {
@@ -56,27 +61,57 @@ public class XMLTypeDescriptor
     @SuppressWarnings({ "unchecked" })
     @Override
     public <X> X unwrap(Serializable value, Class<X> type, WrapperOptions options) {
+
         if (value == null) {
             return null;
         }
-        return byteArrayTypeDescriptor.unwrap(javaSerialize(toString((value))), type, options);
-    }
-
-    private byte[] javaSerialize(String value) {
-        return SerializationHelper.serialize(value);
-    }
-
-    private String javaDeserialize(byte[] value) {
-        return ((String) SerializationHelper.deserialize(value));
+        if (String.class.isAssignableFrom(type)) {
+            return (X) toString(value);
+        }
+        if (Reader.class.isAssignableFrom(type)) {
+            return (X) new StringReader(toString(value));
+        }
+        if (CharacterStream.class.isAssignableFrom(type)) {
+            return (X) new CharacterStreamImpl(toString(value));
+        }
+        if (Clob.class.isAssignableFrom(type)) {
+            return (X) options.getLobCreator().createClob(toString(value));
+        }
+        if (DataHelper.isNClob(type)) {
+            return (X) options.getLobCreator().createNClob(toString(value));
+        }
+        throw unknownUnwrap(type);
     }
 
     @Override
     public <X> Serializable wrap(X value, WrapperOptions options) {
-        byte[] bytes = byteArrayTypeDescriptor.wrap(value, options);
-        if (bytes == null) {
+        if (value == null) {
             return null;
         }
-        return fromString(javaDeserialize(bytes));
+        if (String.class.isAssignableFrom(value.getClass())) {
+            return fromString((String) value);
+        }
+        if (Reader.class.isInstance(value)) {
+            return fromReader((Reader) value);
+        }
+        if (Clob.class.isAssignableFrom(value.getClass())) {
+            return fromReader(extractReader((Clob) value));
+        }
+        throw unknownWrap(value.getClass());
+    }
+
+    private Reader extractReader(Clob value) {
+        Reader reader;
+        try {
+            reader = value.getCharacterStream();
+        } catch (SQLException e) {
+            throw new HibernateException("Unable to get the Clob value", e);
+        }
+        return reader;
+    }
+
+    private Serializable fromReader(Reader characterStream) {
+        return (Serializable) XStreamFactory.getXStream().fromXML(characterStream);
     }
 
 }

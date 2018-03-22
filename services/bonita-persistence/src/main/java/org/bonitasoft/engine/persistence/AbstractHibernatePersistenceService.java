@@ -113,25 +113,30 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final String dialect = configuration.getProperty("hibernate.dialect");
         OrderByBuilder orderByBuilder = new DefaultOrderByBuilder();
 
-        configuration.registerTypeOverride(new XMLType());
         if (dialect != null) {
             if (dialect.toLowerCase().contains("postgresql")) {
                 configuration.setInterceptor(new PostgresInterceptor());
                 configuration.registerTypeOverride(new PostgresMaterializedBlobType());
                 configuration.registerTypeOverride(new PostgresMaterializedClobType());
+                configuration.registerTypeOverride(new PostgresXMLType());
                 queryBuilderFactory.setVendor(POSTGRES);
             } else if (dialect.toLowerCase().contains("sqlserver")) {
                 SQLServerInterceptor sqlServerInterceptor = new SQLServerInterceptor();
                 configuration.setInterceptor(sqlServerInterceptor);
+                configuration.registerTypeOverride(new XMLType());
                 orderByBuilder = new SQLServerOrderByBuilder();
                 queryBuilderFactory.setVendor(SQLSERVER);
             } else if (dialect.toLowerCase().contains("oracle")) {
+                configuration.registerTypeOverride(new XMLType());
                 queryBuilderFactory.setVendor(ORACLE);
             } else if (dialect.toLowerCase().contains("mysql")) {
+                configuration.registerTypeOverride(new XMLType());
                 queryBuilderFactory.setVendor(MYSQL);
-
+            }else{
+                configuration.registerTypeOverride(new XMLType());
             }
         }
+
         this.orderByBuilder = orderByBuilder;
         final String className = configuration.getProperty("hibernate.interceptor");
         if (className != null && !className.isEmpty()) {

@@ -13,7 +13,7 @@ CREATE TABLE contract_data (
   kind VARCHAR(20) NOT NULL,
   scopeId INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
-  val BYTEA
+  val TEXT
 );
 
 ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId);
@@ -28,7 +28,7 @@ CREATE TABLE arch_contract_data (
   kind VARCHAR(20) NOT NULL,
   scopeId INT8 NOT NULL,
   name VARCHAR(50) NOT NULL,
-  val BYTEA,
+  val TEXT,
   archiveDate INT8 NOT NULL,
   sourceObjectId INT8 NOT NULL
 );
