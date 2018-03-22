@@ -16,7 +16,7 @@ CREATE TABLE contract_data (
   kind NVARCHAR(20) NOT NULL,
   scopeId NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
-  val VARBINARY(MAX)
+  val NVARCHAR(MAX)
 )
 GO
 ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId)
@@ -32,7 +32,7 @@ CREATE TABLE arch_contract_data (
   kind NVARCHAR(20) NOT NULL,
   scopeId NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
-  val VARBINARY(MAX),
+  val NVARCHAR(MAX),
   archiveDate NUMERIC(19, 0) NOT NULL,
   sourceObjectId NUMERIC(19, 0) NOT NULL
 )
