@@ -50,7 +50,7 @@ public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstra
 
         List<String> fieldNames = uc.getFieldNames();
         if (fieldNames == null || fieldNames.isEmpty()) {
-            status.addError(StatusCode.UNIQUE_CONSTRAINT_WITHTOUT_FIELD,
+            status.addError(StatusCode.UNIQUE_CONSTRAINT_WITHOUT_FIELD,
                     String.format("%s unique constraint must have at least one field declared", name),
                     singletonMap(StatusContext.BDM_ARTIFACT_NAME_KEY, name));
         }
