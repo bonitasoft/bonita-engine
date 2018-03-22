@@ -17,24 +17,23 @@ package org.bonitasoft.engine.persistence;
 import java.io.Serializable;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
-import org.hibernate.type.MaterializedClobType;
-import org.hibernate.type.descriptor.sql.ClobTypeDescriptor;
-import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
+import org.hibernate.type.descriptor.sql.VarcharTypeDescriptor;
 
-public class XMLType
+public class PostgresXMLType
         extends AbstractSingleColumnStandardBasicType<Serializable> {
- 
-    public XMLType() {
-        super(ClobTypeDescriptor.DEFAULT, new XMLTypeDescriptor());
+
+    public PostgresXMLType() {
+        // forcing VARCHAR to String as there is no real CLOB in PSQL
+        super(VarcharTypeDescriptor.INSTANCE, new XMLTypeDescriptor());
     }
- 
+
     public String getName() {
         return "xml_blob";
     }
- 
+
     @Override
     protected boolean registerUnderJavaType() {
         return true;
     }
- 
+
 }
