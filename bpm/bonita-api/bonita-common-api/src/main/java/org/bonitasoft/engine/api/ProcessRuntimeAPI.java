@@ -1779,7 +1779,8 @@ public interface ProcessRuntimeAPI {
     SearchResult<Comment> searchComments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Add a comment on a process instance.
+     * Add a comment on a process instance. Be aware that when called in a groovy script, there is no concept of authenticated users and you are identified as "System".
+     * Therefore, when called in a groovy script, "System" will be marked as having made the comment.
      *
      * @param processInstanceId
      *        The identifier of the process instance.
@@ -1793,6 +1794,24 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException;
+
+    /**
+     * Add a comment on a process instance, on behalf of an user. Mainly intended to be used in groovy scripts when the behavior of the addProcessComment might be unsatisfactory.
+     *
+     * @param processInstanceId
+     *        The identifier of the process instance.
+     * @param comment
+     *        The content of the comment.
+     * @param userId
+     *        The user that will be said to have made the comment
+     * @return The newly created comment.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws CreationException
+     *         If the parameter processInstanceId does not refer to any active process instance (existing and non-archived).
+     * @since 7.7
+     */
+    Comment addProcessCommentOnBehalfOfUser(final long processInstanceId, final String comment, long userId) throws CreationException;
 
     /**
      * Get the first 20 comments of the specified process instance.

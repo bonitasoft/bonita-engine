@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.search;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -147,7 +150,7 @@ public class SearchCommentIT extends TestWithUser {
         final String commentContent3 = "commentContent3";
         final String commentContent4 = "content4";
         final String commentContent5 = "content'5";
-        getProcessAPI().addProcessComment(pi1.getId(), commentContent1);
+        getProcessAPI().addProcessCommentOnBehalfOfUser(pi1.getId(), commentContent1, pi1.getStartedBy());
         getProcessAPI().addProcessComment(pi1.getId(), commentContent2);
         getProcessAPI().addProcessComment(pi1.getId(), commentContent3);
         getProcessAPI().addProcessComment(pi0.getId(), commentContent4);
@@ -168,6 +171,7 @@ public class SearchCommentIT extends TestWithUser {
         final List<Comment> commentList1 = searchResult1.getResult();
         assertEquals(3, commentList1.size());
         assertEquals(commentContent1, commentList1.get(0).getContent());
+        assertThat(commentList1.get(0).getUserId()).isEqualTo(pi1.getStartedBy());
         assertEquals(commentContent2, commentList1.get(1).getContent());
         assertEquals(commentContent3, commentList1.get(2).getContent());
 
