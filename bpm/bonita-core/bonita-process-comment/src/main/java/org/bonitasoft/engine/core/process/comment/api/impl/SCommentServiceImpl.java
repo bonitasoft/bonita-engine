@@ -119,11 +119,10 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public SComment addComment(final long processInstanceId, final String comment) throws SCommentAddException {
+    public SComment addComment(long processInstanceId, String comment, long userId) throws SCommentAddException {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final long userId = getUserId();
             final SComment sComment = BuilderFactory.get(SHumanCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, userId).done();
             recorder.recordInsert(new InsertRecord(sComment), COMMENT);
             return sComment;
@@ -274,4 +273,5 @@ public class SCommentServiceImpl implements SCommentService {
             }
         }
     }
+
 }

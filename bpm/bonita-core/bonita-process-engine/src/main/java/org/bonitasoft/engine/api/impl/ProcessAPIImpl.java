@@ -72,7 +72,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategories
 import org.bonitasoft.engine.api.impl.transaction.category.GetNumberOfCategoriesOfProcess;
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromProcessDefinition;
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
-import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
 import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
@@ -125,7 +124,13 @@ import org.bonitasoft.engine.bpm.category.CategoryUpdater;
 import org.bonitasoft.engine.bpm.category.CategoryUpdater.CategoryField;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
-import org.bonitasoft.engine.bpm.connector.*;
+import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
+import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
@@ -360,7 +365,12 @@ import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.search.*;
+import org.bonitasoft.engine.search.AbstractHumanTaskInstanceSearchEntity;
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.Sort;
 import org.bonitasoft.engine.search.activity.SearchActivityInstances;
 import org.bonitasoft.engine.search.activity.SearchArchivedActivityInstances;
 import org.bonitasoft.engine.search.comment.SearchArchivedComments;
@@ -4250,6 +4260,11 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Comment addProcessComment(final long processInstanceId, final String comment) throws CreationException {
+        return addProcessCommentOnBehalfOfUser(processInstanceId, comment, getUserId());
+    }
+
+    @Override
+    public Comment addProcessCommentOnBehalfOfUser(final long processInstanceId, final String comment, long userId) throws CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
@@ -4257,10 +4272,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(buildCantAddCommentOnProcessInstance(), e); // FIXME: should be another exception
         }
         final SCommentService commentService = tenantAccessor.getCommentService();
-        final AddComment addComment = new AddComment(commentService, processInstanceId, comment);
         try {
-            addComment.execute();
-            return ModelConvertor.toComment(addComment.getResult());
+            SComment sComment = commentService.addComment(processInstanceId, comment, userId);
+            return ModelConvertor.toComment(sComment);
         } catch (final SBonitaException e) {
             throw new CreationException(buildCantAddCommentOnProcessInstance(), e.getCause());
         }
@@ -5096,8 +5110,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     searchOptions,
                     sConnectorInstances -> ModelConvertor.toConnectorInstances(sConnectorInstances),
                     connectorInstanceService::getNumberOfConnectorInstances,
-                    connectorInstanceService::searchConnectorInstances
-            );
+                    connectorInstanceService::searchConnectorInstances);
         } catch (SearchException e) {
             throw new RetrieveException(e);
         }
@@ -5150,7 +5163,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<HumanTaskInstance> getHumanTaskInstances(final long processInstanceId, final String taskName, final int startIndex, final int maxResults,
-                                                          final String field, final Order order) throws SearchException {
+            final String field, final Order order) throws SearchException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName);
         builder.sort(field, order);
@@ -5623,7 +5636,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 (queryOptions) -> activityInstanceService.searchAssignedAndPendingHumanTasks(rootProcessDefinitionId, queryOptions)).search();
     }
 
-
     @Override
     public SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final SearchOptions searchOptions)
             throws SearchException {
@@ -5694,7 +5706,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void verifyIfTheActivityWasInTheCorrectStateAndThrowException(long flownodeInstanceId, Exception e) throws UserTaskNotFoundException, FlowNodeExecutionException {
+    private void verifyIfTheActivityWasInTheCorrectStateAndThrowException(long flownodeInstanceId, Exception e)
+            throws UserTaskNotFoundException, FlowNodeExecutionException {
         SFlowNodeInstance flowNodeInstance;
         try {
             flowNodeInstance = inTx(() -> getTenantAccessor().getActivityInstanceService().getFlowNodeInstance(flownodeInstanceId));

@@ -61,9 +61,11 @@ public interface SCommentService {
      *        identifier of processInstance
      * @param comment
      *        the comment you want to add
+     * @param userId
+     *        The user that will be said to have made the comment
      * @throws SCommentAddException
      */
-    SComment addComment(long processInstanceId, String comment) throws SCommentAddException;
+    SComment addComment(long processInstanceId, String comment, long userId) throws SCommentAddException;
 
     /**
      * Add a system comment on process instance
@@ -246,5 +248,4 @@ public interface SCommentService {
      * @since 6.4.0
      */
     void archive(long archiveDate, SComment sComment) throws SObjectModificationException;
-
 }
