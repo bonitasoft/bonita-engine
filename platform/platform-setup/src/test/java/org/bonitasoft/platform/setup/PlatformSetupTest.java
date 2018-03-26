@@ -14,6 +14,7 @@
 
 package org.bonitasoft.platform.setup;
 
+import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.BONITA_SETUP_FOLDER;
 import static org.mockito.Mockito.doReturn;
@@ -117,7 +118,8 @@ public class PlatformSetupTest {
         final Path folder = platformSetup.getFolderFromConfiguration(configuration);
 
         // then:
-        assertThat(folder.toString()).isEqualTo(setupFolder.toString() + "/platform_conf/current/some_folder");
+        assertThat(folder.toString())
+                .isEqualTo(separatorsToSystem(setupFolder.toString() + "/platform_conf/current/some_folder"));
     }
 
     @Test
@@ -133,7 +135,7 @@ public class PlatformSetupTest {
         final Path folder = platformSetup.getFolderFromConfiguration(configuration);
 
         // then:
-        assertThat(folder.toString()).isEqualTo(setupFolder.toString() +
-                "/platform_conf/current/tenants/2/tenant-level-folder");
+        assertThat(folder.toString()).isEqualTo(separatorsToSystem(setupFolder.toString() +
+                "/platform_conf/current/tenants/2/tenant-level-folder"));
     }
 }
