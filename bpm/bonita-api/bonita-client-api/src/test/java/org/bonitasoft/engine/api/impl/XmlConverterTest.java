@@ -38,6 +38,22 @@ public class XmlConverterTest {
     }
 
     @Test
+    public void should_fromXML_serialize_entity_when_xml_contains_unknown_elements() {
+        // given:
+
+        String xml = new StringBuilder("<root>")
+                .append("<org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl>")
+                .append("<name>test with unknown xml node</name>")
+                .append("<unknown_property_in_xml>test</unknown_property_in_xml>")
+                .append("</org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl></root>").toString();
+        // when:
+        ActorDefinitionImpl actor = xmlConverter.fromXML(xml);
+
+        // then:
+        assertThat(actor.getName()).isEqualTo("test with unknown xml node");
+    }
+
+    @Test
     public void should_fromXML_always_throws_a_bonita_exception_when_the_xml_is_malformed() {
         // given:
         XmlConverter xmlConverter = new XmlConverter();
