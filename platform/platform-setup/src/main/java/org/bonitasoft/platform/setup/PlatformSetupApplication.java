@@ -113,7 +113,7 @@ public class PlatformSetupApplication {
             } else {
                 LOGGER.error(e.getMessage());
                 LOGGER.error(
-                        "You might get more detailed information about the error by setting 'org.bonitasoft.platform.setup.PlatformSetupApplication' log level to 'DEBUG' in file 'logback.xml' and run again");
+                        "You might get more detailed information about the error by adding '-Dbonita.platform.setup.debug=true' to the command line, and run again");
             }
             // Exit code allows the calling script to catch an invalid execution:
             System.exit(1);
