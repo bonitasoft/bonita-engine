@@ -23,6 +23,7 @@ import static org.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.ass
 
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.junit.Test;

@@ -90,9 +90,8 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.util</groupId>
-            <artifactId>bonita-common-util</artifactId>
+            <artifactId>bonita-common-util-test</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
