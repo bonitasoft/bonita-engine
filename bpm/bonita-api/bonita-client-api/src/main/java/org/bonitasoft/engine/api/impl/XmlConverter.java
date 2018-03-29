@@ -30,6 +30,7 @@ public class XmlConverter {
     private static final XStream XSTREAM;
     static {
         XSTREAM = new XStream();
+        XSTREAM.ignoreUnknownElements();
         XStream.setupDefaultSecurity(XSTREAM);
         XSTREAM.addPermission(AnyTypePermission.ANY);
         XSTREAM.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
