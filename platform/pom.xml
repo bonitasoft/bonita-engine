@@ -17,6 +17,7 @@
     <modules>
         <module>platform-resources</module>
         <module>platform-setup</module>
+        <module>platform-setup-test</module>
     </modules>
 
     <dependencyManagement>

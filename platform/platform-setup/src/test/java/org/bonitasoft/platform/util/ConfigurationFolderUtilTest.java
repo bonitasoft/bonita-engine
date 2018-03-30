@@ -2,7 +2,7 @@ package org.bonitasoft.platform.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.platform.setup.PlatformSetup.PLATFORM_CONF_FOLDER_NAME;
-import static org.bonitasoft.platform.setup.ScriptExecutor.ALL_SQL_FILES;
+import static org.bonitasoft.platform.util.ConfigurationFolderUtil.ALL_SQL_FILES;
 
 import java.io.File;
 import java.nio.file.Path;
