@@ -14,8 +14,6 @@
 package org.bonitasoft.platform.util;
 
 import static java.util.Arrays.asList;
-import static org.bonitasoft.platform.setup.PlatformSetup.PLATFORM_CONF_FOLDER_NAME;
-import static org.bonitasoft.platform.setup.ScriptExecutor.ALL_SQL_FILES;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,6 +23,18 @@ import java.nio.file.Path;
  * @author Laurent Leseigneur
  */
 public class ConfigurationFolderUtil {
+
+    public static final String PLATFORM_CONF_FOLDER_NAME = "platform_conf";
+    public static final String[] ALL_SQL_FILES = new String[] { "cleanTables.sql",
+            "createQuartzTables.sql",
+            "createTables.sql",
+            "deleteTenantObjects.sql",
+            "dropQuartzTables.sql",
+            "dropTables.sql",
+            "initTables.sql",
+            "initTenantTables.sql",
+            "postCreateStructure.sql",
+            "preDropStructure.sql" };
 
     public Path buildPlatformConfFolder(Path rootFolder) throws IOException {
         Path initialFolder = rootFolder.resolve(PLATFORM_CONF_FOLDER_NAME);
