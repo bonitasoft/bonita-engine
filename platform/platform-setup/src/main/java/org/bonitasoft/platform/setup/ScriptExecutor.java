@@ -54,17 +54,6 @@ public class ScriptExecutor {
 
     public static final boolean FAIL_ON_ERROR = false;
 
-    public static final String[] ALL_SQL_FILES = new String[] { "cleanTables.sql",
-            "createQuartzTables.sql",
-            "createTables.sql",
-            "deleteTenantObjects.sql",
-            "dropQuartzTables.sql",
-            "dropTables.sql",
-            "initTables.sql",
-            "initTenantTables.sql",
-            "postCreateStructure.sql",
-            "preDropStructure.sql" };
-
     private final Logger logger = LoggerFactory.getLogger(ScriptExecutor.class);
 
     private final String sqlFolder;
