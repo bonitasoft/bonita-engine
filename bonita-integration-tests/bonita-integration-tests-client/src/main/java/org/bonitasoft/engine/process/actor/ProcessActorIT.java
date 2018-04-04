@@ -165,7 +165,7 @@ public class ProcessActorIT extends TestWithUser {
         builder.append("\t\t</users>");
         builder.append("\t</actorMapping>");
         builder.append("</actormapping:actorMappings>");
-        barBuilder.setActorMapping(builder.toString().getBytes());
+        barBuilder.setActorMapping(builder.toString().getBytes("UTF-8"));
         final BusinessArchive businessArchive = barBuilder.done();
         final ProcessDefinition processDefinition = deployProcess(businessArchive);
 

@@ -1481,7 +1481,6 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public void importOrganization(final String organizationContent, final ImportPolicy policy) throws OrganizationImportException {
-
         importOrganizationWithWarnings(organizationContent, policy);
     }
 

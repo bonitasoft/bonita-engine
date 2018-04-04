@@ -97,17 +97,10 @@ public class TestWithApplication extends CommonAPIIT {
             zos.write("return \"\";".getBytes());
 
             zos.putNextEntry(new ZipEntry("page.properties"));
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("name=");
-            stringBuilder.append(pageName);
-            stringBuilder.append("\n");
-            stringBuilder.append("displayName=");
-            stringBuilder.append("no display name");
-            stringBuilder.append("\n");
-            stringBuilder.append("description=");
-            stringBuilder.append("empty desc");
-            stringBuilder.append("\n");
-            zos.write(stringBuilder.toString().getBytes());
+            String s = "name=" + pageName + "\n"
+                    + "displayName=no display name\n"
+                    + "description=empty desc\n";
+            zos.write(s.getBytes("UTF-8"));
 
             zos.closeEntry();
             return baos.toByteArray();

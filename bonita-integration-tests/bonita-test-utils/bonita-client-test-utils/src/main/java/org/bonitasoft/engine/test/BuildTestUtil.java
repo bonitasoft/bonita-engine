@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class BuildTestUtil {
     public static final String ROLE_NAME = "Developper";
 
     public static byte[] buildConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
-            final String implementationVersion, final String implementationClassname, String... dependencies) {
+            final String implementationVersion, final String implementationClassname, String... dependencies) throws UnsupportedEncodingException {
         final StringBuilder stb = new StringBuilder();
         stb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         stb.append("<implementation:connectorImplementation xmlns:implementation=\"http://www.bonitasoft.org/ns/connector/implementation/6.0\">\n");
@@ -86,10 +87,10 @@ public class BuildTestUtil {
             stb.append("\t</jarDependencies>\n");
         }
         stb.append("</implementation:connectorImplementation>");
-        return stb.toString().getBytes();
+        return stb.toString().getBytes("UTF-8");
     }
 
-    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion, Class<? extends Connector> connectorClass) {
+    public static BarResource generateConnectorImplementation(String definitionId, String definitionVersion, Class<? extends Connector> connectorClass) throws UnsupportedEncodingException {
         return new BarResource(
                 connectorClass.getSimpleName() + ".impl",
                 BuildTestUtil.buildConnectorImplementationFile(definitionId,

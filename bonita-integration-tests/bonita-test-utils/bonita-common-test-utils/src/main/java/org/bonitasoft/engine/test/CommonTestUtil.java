@@ -54,7 +54,7 @@ public class CommonTestUtil {
 
             }
 
-            zos.write(stringBuilder.toString().getBytes());
+            zos.write(stringBuilder.toString().getBytes("UTF-8"));
 
             zos.closeEntry();
             return baos.toByteArray();

@@ -19,10 +19,10 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -230,14 +230,8 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     private void importOrganization(final String fileName) throws IOException, OrganizationImportException {
-        final InputStream xmlStream = OrganizationIT.class.getResourceAsStream(fileName);
-        final InputStreamReader reader = new InputStreamReader(xmlStream);
-        try {
-            final byte[] organisationContent = IOUtils.toByteArray(reader);
-            getIdentityAPI().importOrganization(new String(organisationContent, UTF_8));
-        } finally {
-            xmlStream.close();
-            reader.close();
+        try (InputStream xmlStream = OrganizationIT.class.getResourceAsStream(fileName)) {
+            getIdentityAPI().importOrganization(IOUtils.toString(xmlStream, Charset.forName(UTF_8)));
         }
     }
 
