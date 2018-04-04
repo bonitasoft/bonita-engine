@@ -140,7 +140,8 @@
                            <goal>shade</goal>
                        </goals>
                        <configuration>
-                           <finalName>${project.artifactId}-${project.version}-studio</finalName>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>studio</shadedClassifierName>
                            <filters>
                                <filter>
                                    <artifact>org.eclipse.jdt.core.compiler:ecj</artifact>
