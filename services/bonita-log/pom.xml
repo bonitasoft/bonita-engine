@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.platform</groupId>
-            <artifactId>bonita-platform-api</artifactId>
+            <artifactId>bonita-platform</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

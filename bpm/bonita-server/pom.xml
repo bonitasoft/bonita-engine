@@ -320,7 +320,7 @@
         <!-- Platform -->
         <dependency>
             <groupId>org.bonitasoft.engine.platform</groupId>
-            <artifactId>bonita-platform-impl</artifactId>
+            <artifactId>bonita-platform</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -605,8 +605,7 @@
                                     <!-- Persistence -->
                                     <include>org.bonitasoft.engine.persistence:bonita-persistence</include>
                                     <!-- Platform -->
-                                    <include>org.bonitasoft.engine.platform:bonita-platform-api</include>
-                                    <include>org.bonitasoft.engine.platform:bonita-platform-impl</include>
+                                    <include>org.bonitasoft.engine.platform:bonita-platform</include>
                                     <!-- Platform Authentication -->
                                     <include>org.bonitasoft.engine.platform.authentication:bonita-platform-authentication</include>
                                     <!-- Platform Command -->
