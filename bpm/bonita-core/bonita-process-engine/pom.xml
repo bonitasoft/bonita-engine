@@ -200,7 +200,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.platform</groupId>
-            <artifactId>bonita-platform-api</artifactId>
+            <artifactId>bonita-platform</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -333,12 +333,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>16.0.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.platform</groupId>
-            <artifactId>bonita-platform-impl</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
