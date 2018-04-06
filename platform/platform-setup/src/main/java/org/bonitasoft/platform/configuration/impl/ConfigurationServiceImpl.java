@@ -193,10 +193,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public void updateTenantPortalConfForAllTenantsAndTemplate(List<BonitaConfiguration> bonitaConfigurations) {
         // update default configuration at TENANT_TEMPLATE_PORTAL level:
         transactionTemplate.execute(
-                new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations, ConfigurationType.TENANT_TEMPLATE_PORTAL));
+                new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations,
+                        ConfigurationType.TENANT_TEMPLATE_PORTAL));
         // Also update default configuration at TENANT_PORTAL level for all existing tenants:
         transactionTemplate
-                .execute(new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations, ConfigurationType.TENANT_PORTAL));
+                .execute(new UpdateConfigurationInTransactionForAllTenants(jdbcTemplate, dbVendor, bonitaConfigurations,
+                        ConfigurationType.TENANT_PORTAL));
     }
 
     @Override
@@ -228,8 +230,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             File confFile = new File(folderResolver.getFolder(fullBonitaConfiguration), fullBonitaConfiguration.getResourceName());
             writtenFiles.add(confFile);
             LOGGER.debug(String.format("writing file %s to folder %s", confFile.getName(), confFile.getParentFile().getAbsolutePath()));
-            try {
-                IOUtils.write(fullBonitaConfiguration.getResourceContent(), new FileOutputStream(confFile));
+            try (FileOutputStream output = new FileOutputStream(confFile);) {
+                IOUtils.write(fullBonitaConfiguration.getResourceContent(), output);
             } catch (IOException e) {
                 throw new PlatformException(e);
             }
