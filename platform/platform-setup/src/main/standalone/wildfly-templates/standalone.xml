@@ -330,7 +330,7 @@
                         <password>@@PASSWORD@@</password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
                         <check-valid-connection-sql>@@TESTQUERY@@</check-valid-connection-sql>
                         <background-validation-millis>90000</background-validation-millis>
                     </validation>
