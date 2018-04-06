@@ -293,7 +293,8 @@
                         <password></password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
+                        <background-validation-millis>90000</background-validation-millis>
                         <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                     </validation>
                     <statement>
@@ -312,7 +313,8 @@
                         <password></password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
+                        <background-validation-millis>90000</background-validation-millis>
                         <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                     </validation>
                     <timeout>
@@ -339,7 +341,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -355,7 +358,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -382,7 +386,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1 FROM dual</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -398,7 +403,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1 FROM dual</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -425,7 +431,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -441,7 +448,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -468,7 +476,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -484,7 +493,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -517,7 +527,8 @@
                         <password></password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
+                        <background-validation-millis>90000</background-validation-millis>
                         <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                     </validation>
                     <statement>
@@ -536,7 +547,8 @@
                         <password></password>
                     </security>
                     <validation>
-                        <background-validation-millis>30000</background-validation-millis>
+                        <background-validation>true</background-validation>
+                        <background-validation-millis>90000</background-validation-millis>
                         <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                     </validation>
                     <timeout>
@@ -563,7 +575,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -579,7 +592,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -606,7 +620,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1 FROM dual</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -622,7 +637,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1 FROM dual</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -649,7 +665,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -665,7 +682,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <timeout>
@@ -692,7 +710,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <statement>
@@ -708,7 +727,8 @@
                             <password>bpm</password>
                         </security>
                         <validation>
-                            <background-validation-millis>30000</background-validation-millis>
+                            <background-validation>true</background-validation>
+                            <background-validation-millis>90000</background-validation-millis>
                             <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
                         </validation>
                         <timeout>
