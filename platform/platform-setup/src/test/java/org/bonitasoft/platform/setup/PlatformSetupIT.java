@@ -503,6 +503,13 @@ public class PlatformSetupIT {
     }
 
     @Test
+    public void should_not_fail_when_pulling_twice_in_the_same_jvm() throws Exception {
+        platformSetup.init();
+        platformSetup.pull();
+        platformSetup.pull();
+    }
+
+    @Test
     public void pushLicences_should_fail_if_licence_folder_exists_but_is_empty() throws Exception {
         final Path setupFolder = temporaryFolder.newFolder().toPath();
         System.setProperty(BONITA_SETUP_FOLDER, setupFolder.toString());
