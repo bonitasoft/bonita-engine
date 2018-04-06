@@ -15,7 +15,9 @@ package org.bonitasoft.engine.connectors;
 
 import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -511,8 +513,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(activityInstance.getId(), FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
-        final ConnectorInstance instance = connectorInstances.getResult().get(0);
-        assertEquals(ConnectorState.FAILED, instance.getState());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -535,8 +535,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(step1Id, FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
-        final ConnectorInstance instance = connectorInstances.getResult().get(0);
-        assertEquals(ConnectorState.FAILED, instance.getState());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -560,8 +558,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(startProcess.getId(), PROCESS).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
-        final ConnectorInstance instance = connectorInstances.getResult().get(0);
-        assertEquals(ConnectorState.FAILED, instance.getState());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -749,8 +745,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(activityInstance.getId(), FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
-        final ConnectorInstance instance = connectorInstances.getResult().get(0);
-        assertEquals(ConnectorState.FAILED, instance.getState());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -759,6 +753,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, containerType);
+        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.STATE, ConnectorState.FAILED.name());
         searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
         return searchOptionsBuilder;
     }

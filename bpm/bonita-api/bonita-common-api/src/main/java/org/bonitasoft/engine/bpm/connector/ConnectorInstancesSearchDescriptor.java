@@ -20,6 +20,7 @@ public final class ConnectorInstancesSearchDescriptor {
 
     public static final String NAME = "name";
 
+    // use ConnectorState.<VALUE>.name() for the value when using STATE as filter:
     public static final String STATE = "state";
 
     public static final String ACTIVATION_EVENT = "activationEvent";
