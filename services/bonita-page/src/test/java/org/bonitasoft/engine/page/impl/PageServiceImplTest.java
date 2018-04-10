@@ -25,9 +25,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1026,14 +1028,15 @@ public class PageServiceImplTest {
         SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
     }
 
-    protected Pair<String, byte[]> getPagePropertiesContentPair(final String... otherProperties) {
+    protected Pair<String, byte[]> getPagePropertiesContentPair(final String... otherProperties)
+            throws UnsupportedEncodingException {
         final StringBuilder stringBuilder = new StringBuilder()
                 .append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
         for (final String property : otherProperties) {
             stringBuilder.append(property).append("\n");
         }
 
-        return pair(PAGE_PROPERTIES, stringBuilder.toString().getBytes());
+        return pair(PAGE_PROPERTIES, stringBuilder.toString().getBytes("UTF-8"));
     }
 
     protected Pair<String, byte[]> getIndexGroovyContentPair() {

@@ -64,8 +64,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     private final SCustomUserInfoValueAPI userInfoValueAPI;
 
-    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy,
-                              final SCustomUserInfoValueAPI userInfoValueAPI)
+    public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent,
+            final ImportPolicy policy, final SCustomUserInfoValueAPI userInfoValueAPI)
             throws OrganizationImportException {
         this.serviceAccessor = serviceAccessor;
         this.userInfoValueAPI = userInfoValueAPI;
@@ -166,8 +166,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             } else {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(getClass(), TechnicalLogSeverity.WARNING, "The membership " + newMembership
-                            + " coud not be imported because the user, group or role can't be found\n userId=" + userId + " groupId=" + groupId + " roleId="
-                            + roleId);
+                            + " could not be imported because the user, group or role can't be found\n userId=" +
+                            userId + " groupId=" + groupId + " roleId=" + roleId);
                 }
             }
         }
