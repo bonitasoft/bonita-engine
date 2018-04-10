@@ -189,7 +189,7 @@ public class HTTPServerAPI implements ServerAPI {
             final StringBuilder credentials = new StringBuilder();
             credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
             final Base64 encoder = new Base64();
-            final String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes());
+            final String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes("UTF-8"));
             httpost.setHeader("Authorization", "Basic " + encodedCredentials);
         }
 
