@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bdm;
 
-import static ch.lambdaj.Lambda.extract;
-import static ch.lambdaj.Lambda.on;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -38,8 +36,6 @@ public class BDMQueryUtilTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private CountQueryGenerator countQueryGenerator = new CountQueryGenerator();
-
     private FindQueryGenerator findQueryGenerator = new FindQueryGenerator();
 
     @Test
@@ -57,7 +53,7 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        assertThat(getQueryNames(queries)).doesNotContain("getAllArrivalByPeople");
+        assertThat(queries).extracting(Query::getName).doesNotContain("getAllArrivalByPeople");
     }
 
     @Test
@@ -73,8 +69,9 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        final List<String> extract = extract(queries, on(Query.class).getName());
-        assertThat(extract).containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr", "findByUnconstrainedAttr", "countForFindByUnconstrainedAttr");
+        assertThat(queries).extracting(Query::getName)
+                .containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr",
+                        "findByUnconstrainedAttr", "countForFindByUnconstrainedAttr");
     }
 
     @Test
@@ -89,8 +86,8 @@ public class BDMQueryUtilTest {
         final List<Query> queries = BDMQueryUtil.createProvidedQueriesForBusinessObject(bo);
 
         // then:
-        final List<String> extract = extract(queries, on(Query.class).getName());
-        assertThat(extract).containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr","countForFindByUnikAttr");
+        assertThat(queries).extracting(Query::getName)
+                .containsOnly("find", "countForFind", "findByPersistenceId", "findByUnikAttr","countForFindByUnikAttr");
     }
 
     protected SimpleField aStringField(final String name) {
@@ -106,10 +103,6 @@ public class BDMQueryUtilTest {
         field.setType(Type.COMPOSITION);
         field.setReference(null);
         return field;
-    }
-
-    private List<String> getQueryNames(final List<Query> queries) {
-        return extract(queries, on(Query.class).getName());
     }
 
     @Test
