@@ -17,6 +17,7 @@ package org.bonitasoft.engine.identity;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -56,9 +57,10 @@ public class OrganizationParser {
         return (Organization) unmarshaller.unmarshal(new StringReader(organizationContent));
     }
 
-    protected Marshaller getMarshaller() throws JAXBException {
+    private Marshaller getMarshaller() throws JAXBException {
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         return marshaller;
     }
 
