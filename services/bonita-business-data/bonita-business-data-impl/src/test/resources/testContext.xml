@@ -1,10 +1,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation=" http://www.springframework.org/schema/beans
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
 	   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-	   http://www.springframework.org/schema/context 
-	   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+
+
 	   http://www.springframework.org/schema/util 
 	   http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
@@ -27,7 +27,6 @@
           class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <constructor-arg name="configuration">
             <bean class="com.zaxxer.hikari.HikariConfig">
-                <property name="driverClassName" value="${db.datasource.classname}" />
                 <property name="jdbcUrl" value="${db.url}" />
                 <property name="username" value="${db.user}" />
                 <property name="password" value="${db.password}" />
