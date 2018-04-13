@@ -28,12 +28,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import bitronix.tm.TransactionManagerServices;
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -52,11 +54,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.company.pojo.Employee;
-import com.company.pojo.Person;
-
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -108,7 +105,7 @@ public class JPABusinessDataRepositoryImplITest {
         }
 
         transactionService = mock(UserTransactionService.class);
-        final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(

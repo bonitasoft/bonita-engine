@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.data.impl;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -24,12 +25,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
+import bitronix.tm.TransactionManagerServices;
+import com.company.pojo.Employee;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -46,10 +48,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.company.pojo.Employee;
-
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -97,7 +95,7 @@ public class ConcurrencyTest {
         }
 
         final UserTransactionService transactionService = mock(UserTransactionService.class);
-        final SchemaManager schemaManager = new SchemaManager(modelConfiguration, mock(TechnicalLoggerService.class));
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(modelConfiguration, mock(TechnicalLoggerService.class));
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, mock(TenantResourcesService.class), TENANT_ID));
         businessDataRepository = spy(

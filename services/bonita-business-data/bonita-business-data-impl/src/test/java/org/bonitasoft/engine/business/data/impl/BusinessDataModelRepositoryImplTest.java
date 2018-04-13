@@ -53,7 +53,7 @@ public class BusinessDataModelRepositoryImplTest {
     @Before
     public void setUp() {
         businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService,
-                mock(SchemaManager.class), tenantResourcesService, TENANT_ID));
+                mock(SchemaManagerUpdate.class), tenantResourcesService, TENANT_ID));
     }
 
     @Test

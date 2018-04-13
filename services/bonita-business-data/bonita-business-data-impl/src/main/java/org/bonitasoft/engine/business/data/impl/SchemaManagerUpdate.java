@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.bonitasoft.engine.business.data.SchemaManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
@@ -32,18 +33,18 @@ import org.hibernate.tool.hbm2ddl.Target;
 /**
  * @author Matthieu Chaffotte
  */
-public class SchemaManager {
+public class SchemaManagerUpdate implements SchemaManager {
 
     private final TechnicalLoggerService loggerService;
 
     private final Map<String, Object> configuration;
 
-    public SchemaManager(final Map<String, Object> configuration, final TechnicalLoggerService loggerService) throws HibernateException {
+    public SchemaManagerUpdate(final Map<String, Object> configuration, final TechnicalLoggerService loggerService) throws HibernateException {
         this.loggerService = loggerService;
         this.configuration = new HashMap<>(configuration);
         final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
-        if (remove != null && loggerService.isLoggable(SchemaManager.class, TechnicalLogSeverity.INFO)) {
-            this.loggerService.log(SchemaManager.class, TechnicalLogSeverity.INFO, "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
+        if (remove != null && loggerService.isLoggable(SchemaManagerUpdate.class, TechnicalLogSeverity.INFO)) {
+            this.loggerService.log(SchemaManagerUpdate.class, TechnicalLogSeverity.INFO, "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
         }
     }
 
@@ -58,6 +59,7 @@ public class SchemaManager {
         return cfg;
     }
 
+
     public Class<?> getMappedClass(final String className) throws MappingException {
         if (className == null) {
             return null;
@@ -69,6 +71,7 @@ public class SchemaManager {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<Exception> drop(final Set<String> managedClasses) {
         final SchemaExport export = new SchemaExport(buildConfiguration(managedClasses));
@@ -76,6 +79,7 @@ public class SchemaManager {
         return export.getExceptions();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<Exception> update(final Set<String> managedClasses) {
         final SchemaUpdate schemaUpdate = new SchemaUpdate(buildConfiguration(managedClasses));

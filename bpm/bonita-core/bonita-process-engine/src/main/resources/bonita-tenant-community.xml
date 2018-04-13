@@ -1641,7 +1641,7 @@
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
-    <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManager">
+    <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManagerUpdate">
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="configuration">
             <map>
