@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.bonitasoft.engine.test</groupId>
+        <artifactId>bonita-integration-tests-as</artifactId>
+        <version>7.7.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>bonita-integration-http-api</artifactId>
+
+    <name>HTTP API Integration Tests on Embedded Jetty</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-server-api-http</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.4.9.v20180320</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>9.4.9.v20180320</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-server</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
