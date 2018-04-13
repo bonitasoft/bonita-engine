@@ -18,10 +18,11 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.bonitasoft.engine.BOMBuilder;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,9 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import org.bonitasoft.engine.BOMBuilder;
-import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -47,11 +45,11 @@ public class SchemaManagerTest {
 
     private final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
 
-    private SchemaManager schemaManager;
+    private SchemaManagerUpdate schemaManager;
 
     @Before
     public void setUp() throws Exception {
-        schemaManager = new SchemaManager(modelConfiguration, loggerService);
+        schemaManager = new SchemaManagerUpdate(modelConfiguration, loggerService);
     }
 
     @Test
