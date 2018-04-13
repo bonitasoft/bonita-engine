@@ -48,7 +48,7 @@
                 <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
-                <module>bonita-integration-tomcat</module>
+                <module>bonita-integration-http-api</module>
                 <module>bonita-integration-wildfly10</module>
             </modules>
         </profile>
@@ -58,7 +58,7 @@
                 <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
-                <module>bonita-integration-tomcat</module>
+                <module>bonita-integration-http-api</module>
                 <module>bonita-integration-wildfly10</module>
             </modules>
         </profile>
@@ -74,9 +74,7 @@
         <profile>
             <id>tomcat</id>
             <modules>
-                <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-war</module>
-                <module>bonita-integration-tomcat</module>
+                <module>bonita-integration-http-api</module>
             </modules>
         </profile>
     </profiles>

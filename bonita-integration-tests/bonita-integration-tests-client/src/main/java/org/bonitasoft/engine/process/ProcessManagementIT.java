@@ -83,7 +83,6 @@ import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
 import org.bonitasoft.engine.test.TestStates;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -274,20 +273,6 @@ public class ProcessManagementIT extends TestWithUser {
         waitForProcessToFinish(processInstance1);
         waitForProcessToFinish(processInstance2);
         disableAndDeleteProcess(processDefinition1, processDefinition2);
-    }
-
-    @Ignore("Pb : ReachedStateDate has 0 for value for activities in state executing")
-    @Test
-    public void getArchivedActivityInstancesOrderByStartDate() throws Exception {
-        getArchivedActivityInstancesOrderByPagingCriterion(ActivityInstanceCriterion.REACHED_STATE_DATE_ASC, 0, 1, 2,
-                ActivityInstanceCriterion.REACHED_STATE_DATE_DESC, 2, 1, 0);
-    }
-
-    @Ignore("Pb : lastUpdateDate has 0 for value for activities in state executing")
-    @Test
-    public void getArchivedActivityInstancesOrderByLastUpdateDate() throws Exception {
-        getArchivedActivityInstancesOrderByPagingCriterion(ActivityInstanceCriterion.LAST_UPDATE_ASC, 0, 1, 2, ActivityInstanceCriterion.LAST_UPDATE_DESC, 2,
-                1, 0);
     }
 
     @Test

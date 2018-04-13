@@ -37,7 +37,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -211,33 +210,6 @@ public class ActorPermissionCommandIT extends TestWithUser {
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras2));
 
         disableAndDeleteProcessById(processDefinitionIds);
-    }
-
-    @Ignore("test was bad (does not test archived things)")
-    @Test
-    public void isAllowedToSeeOverviewFormForArchivedProcessInstancesInvolvingUser() throws Exception {
-        // create process
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
-                "14.3");
-        designProcessDefinition.addActor(ACTOR_NAME);
-        designProcessDefinition.addAutomaticTask("step1");
-        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        designProcessDefinition.addTransition("step1", "step2");
-        // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        final long step2Id = waitForUserTask(processInstance, "step2");
-        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
-        // before execute
-        assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
-        assignAndExecuteStep(step2Id, user);
-        waitForProcessToFinish(processInstance);
-        // after execute
-        assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
-
-        skipTask(step2Id);
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
