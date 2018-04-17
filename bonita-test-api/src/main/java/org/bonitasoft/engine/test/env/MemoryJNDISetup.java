@@ -15,6 +15,7 @@ package org.bonitasoft.engine.test.env;
 
 import java.util.Map;
 import javax.naming.Context;
+import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingException;
 
 import org.slf4j.Logger;
@@ -31,7 +32,9 @@ public class MemoryJNDISetup {
 
     public MemoryJNDISetup(final JndiTemplate jndiTemplate, final Map<String, Object> jndiMapping) {
         super();
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.platform.setup.jndi.SimpleMemoryContextFactory");
+        if (System.getProperty(Context.INITIAL_CONTEXT_FACTORY) == null) {
+            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.platform.setup.jndi.SimpleMemoryContextFactory");
+        }
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.platform.setup.jndi");
         this.jndiTemplate = jndiTemplate;
         this.jndiMapping = jndiMapping;
@@ -40,7 +43,12 @@ public class MemoryJNDISetup {
     public void init() throws NamingException {
         for (final Map.Entry<String, Object> addToJndi : jndiMapping.entrySet()) {
             logger.info("Binding " + addToJndi.getKey() + " @ " + addToJndi.getValue());
-            jndiTemplate.bind(addToJndi.getKey(), addToJndi.getValue());
+            try {
+
+                jndiTemplate.bind(addToJndi.getKey(), addToJndi.getValue());
+            } catch (NameAlreadyBoundException ignored) {
+                logger.info(addToJndi.getKey() + " @ " + addToJndi.getValue() + " was already bound");
+            }
         }
     }
 

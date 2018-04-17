@@ -46,20 +46,18 @@
             <id>package-all</id>
             <modules>
                 <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
                 <module>bonita-integration-http-api</module>
-                <module>bonita-integration-wildfly10</module>
+                <module>bonita-integration-ejb-api</module>
             </modules>
         </profile>
         <profile>
             <id>as-tests</id>
             <modules>
                 <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
                 <module>bonita-integration-http-api</module>
-                <module>bonita-integration-wildfly10</module>
+                <module>bonita-integration-ejb-api</module>
             </modules>
         </profile>
         <profile>
@@ -67,8 +65,7 @@
             <modules>
                 <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-war</module>
-                <module>bonita-deploy-ear3</module>
-                <module>bonita-integration-wildfly10</module>
+                <module>bonita-integration-ejb-api</module>
             </modules>
         </profile>
         <profile>
