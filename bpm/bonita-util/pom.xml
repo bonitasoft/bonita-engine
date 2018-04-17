@@ -16,7 +16,6 @@
 
     <modules>
         <module>bonita-client-util</module>
-        <module>bonita-common-util</module>
         <module>bonita-common-util-test</module>
     </modules>
 </project>
