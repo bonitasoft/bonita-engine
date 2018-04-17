@@ -17,8 +17,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bonitasoft.engine.api</groupId>
-            <artifactId>bonita-common-api-impl</artifactId>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -68,12 +68,6 @@
             <groupId>javax.transaction</groupId>
             <artifactId>jta</artifactId>
             <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.util</groupId>
-            <artifactId>bonita-common-util</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

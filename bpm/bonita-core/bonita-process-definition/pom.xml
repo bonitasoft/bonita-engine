@@ -18,8 +18,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.api</groupId>
-            <artifactId>bonita-common-api-impl</artifactId>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -55,11 +55,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
             <artifactId>bonita-persistence</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.api</groupId>
-            <artifactId>bonita-common-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
