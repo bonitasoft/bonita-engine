@@ -151,9 +151,16 @@
                                </filter>
                                <filter>
                                    <artifact>org.bonitasoft.engine:bonita-common</artifact>
-                                   <excludes>
-                                       <exclude>org/bonitasoft/engine/api/**</exclude>
-                                   </excludes>
+                                   <includes>
+                                       <include>org/bonitasoft/engine/business/**</include>
+                                       <include>org/bonitasoft/engine/bdm/**</include>
+                                   </includes>
+                               </filter>
+                               <filter>
+                                   <artifact>org.bonitasoft.engine:bonita-commons</artifact>
+                                   <includes>
+                                       <include>org/bonitasoft/engine/commons/exceptions/SBonitaRuntimeException*</include>
+                                   </includes>
                                </filter>
                            </filters>
                        </configuration>
