@@ -32,6 +32,7 @@ public class EJBContainerFactory {
     public static void startTomee() {
         Properties props = new Properties();
         props.setProperty(EJBContainer.PROVIDER, "tomee-embedded");
+        props.setProperty("tomee.ejbcontainer.http.port", "0");//random port
         EJBContainer ejbContainer = EJBContainer.createEJBContainer(props);
         Context ctx = ejbContainer.getContext();
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, TomeeContextFactory.class.getName());
