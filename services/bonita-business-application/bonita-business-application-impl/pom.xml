@@ -63,9 +63,9 @@
                         </goals>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sources>
-                                <source>org/bonitasoft/engine/business/application/model/xml</source>
-                            </sources>
+                            <includes>
+                                <include>org/bonitasoft/engine/business/application/model/xml/**/*.java</include>
+                            </includes>
                             <outputDirectory>${project.build.directory}/schemas</outputDirectory>
                         </configuration>
                     </execution>
