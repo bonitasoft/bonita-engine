@@ -150,19 +150,34 @@
                                    </excludes>
                                </filter>
                                <filter>
+                                   <!-- exclude all unused packages,
+                                   This is not maintainable, we should not shade like that (shading bonita-common is wrong) -->
                                    <artifact>org.bonitasoft.engine:bonita-common</artifact>
-                                   <includes>
-                                       <include>org/bonitasoft/engine/business/**</include>
-                                       <include>org/bonitasoft/engine/bdm/**</include>
-                                       <include>org/bonitasoft/engine/io/**</include>
-                                   </includes>
-                               </filter>
-                               <filter>
-                                   <artifact>org.bonitasoft.engine:bonita-commons</artifact>
-                                   <includes>
-                                       <include>org/bonitasoft/engine/commons/exceptions/SBonitaRuntimeException*</include>
-                                       <include>org/bonitasoft/engine/commons/io/**</include>
-                                   </includes>
+                                   <excludes>
+                                       <exclude>org/bonitasoft/engine/api/**</exclude>
+                                       <exclude>org/bonitasoft/engine/bar/**</exclude>
+                                       <exclude>org/bonitasoft/engine/bpm/**</exclude>
+                                       <exclude>org/bonitasoft/engine/command/**</exclude>
+                                       <exclude>org/bonitasoft/engine/connector/**</exclude>
+                                       <exclude>org/bonitasoft/engine/entitymember/**</exclude>
+                                       <exclude>org/bonitasoft/engine/exception/**</exclude>
+                                       <exclude>org/bonitasoft/engine/expression/**</exclude>
+                                       <exclude>org/bonitasoft/engine/filter/**</exclude>
+                                       <exclude>org/bonitasoft/engine/form/**</exclude>
+                                       <exclude>org/bonitasoft/engine/home/**</exclude>
+                                       <exclude>org/bonitasoft/engine/identity/**</exclude>
+                                       <exclude>org/bonitasoft/engine/job/**</exclude>
+                                       <exclude>org/bonitasoft/engine/operation/**</exclude>
+                                       <exclude>org/bonitasoft/engine/page/**</exclude>
+                                       <exclude>org/bonitasoft/engine/platform/**</exclude>
+                                       <exclude>org/bonitasoft/engine/profile/**</exclude>
+                                       <exclude>org/bonitasoft/engine/search/**</exclude>
+                                       <exclude>org/bonitasoft/engine/session/**</exclude>
+                                       <exclude>org/bonitasoft/engine/tenant/**</exclude>
+                                       <exclude>org/bonitasoft/engine/theme/**</exclude>
+                                       <exclude>org/bonitasoft/engine/util/**</exclude>
+                                       <exclude>org/bonitasoft/engine/xml/**</exclude>
+                                   </excludes>
                                </filter>
                            </filters>
                        </configuration>
