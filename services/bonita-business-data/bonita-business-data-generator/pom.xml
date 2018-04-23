@@ -42,8 +42,8 @@
             <artifactId>hibernate-jpa-2.1-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-common</artifactId>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -150,7 +150,7 @@
                                    </excludes>
                                </filter>
                                <filter>
-                                   <artifact>org.bonitasoft.engine:bonita-common</artifact>
+                                   <artifact>org.bonitasoft.engine.util:bonita-common-util</artifact>
                                    <excludes>
                                        <exclude>org/bonitasoft/engine/api/**</exclude>
                                    </excludes>

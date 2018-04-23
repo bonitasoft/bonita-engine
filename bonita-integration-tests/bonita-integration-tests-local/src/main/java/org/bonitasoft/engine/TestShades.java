@@ -37,7 +37,7 @@ public class TestShades {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestShades.class);
 
-    protected static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";
+    private static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";
     protected static final String ORG_BONITASOFT_PLATFORM = "org.bonitasoft.platform";
 
     @Test
