@@ -18,8 +18,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-common</artifactId>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

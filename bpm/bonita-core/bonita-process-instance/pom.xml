@@ -14,8 +14,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-common</artifactId>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -140,6 +140,17 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/schemas</directory>
+                <excludes>
+                    <exclude>**/*.class</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -150,10 +161,11 @@
                         <goals>
                             <goal>schemagen</goal>
                         </goals>
+                        <phase>generate-sources</phase>
                         <configuration>
-                            <sources>
-                                <source>src/main/java/org/bonitasoft/engine/core/connector/parser</source>
-                            </sources>
+                            <includes>
+                                <include>org/bonitasoft/engine/core/connector/parser/*.java</include>
+                            </includes>
                             <outputDirectory>${project.build.directory}/connectors-schemas</outputDirectory>
                         </configuration>
                     </execution>
@@ -167,11 +179,11 @@
                         <goals>
                             <goal>run</goal>
                         </goals>
-                        <phase>process-resources</phase>
+                        <phase>process-sources</phase>
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/connectors-schemas/schema1.xsd"
-                                      toFile="${project.build.outputDirectory}/connectors-impl.xsd" />
+                                      toFile="${project.build.directory}/schemas/connectors-impl.xsd" />
                             </target>
                         </configuration>
                     </execution>

@@ -20,6 +20,14 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
@@ -58,6 +66,10 @@
             <artifactId>bonita-server-api-http</artifactId>
             <version>${project.version}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>*</artifactId>
@@ -108,6 +120,12 @@
             <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-impl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.data</groupId>
@@ -118,6 +136,12 @@
             <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-generator</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.util</groupId>
+                    <artifactId>bonita-common-util</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 
@@ -216,6 +240,12 @@
             <groupId>org.bonitasoft.engine.core</groupId>
             <artifactId>bonita-form-mapping</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Home Server -->
@@ -225,6 +255,12 @@
             <groupId>org.bonitasoft.engine.incident</groupId>
             <artifactId>bonita-incident</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Identity -->
@@ -246,6 +282,12 @@
             <groupId>org.bonitasoft.engine.core.login</groupId>
             <artifactId>bonita-login</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Logs -->
@@ -322,6 +364,16 @@
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
             <artifactId>bonita-process-definition</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Process Instance -->
@@ -329,6 +381,12 @@
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Recorder -->
@@ -410,6 +468,12 @@
             <groupId>org.bonitasoft.engine.core.filter</groupId>
             <artifactId>bonita-user-filter</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Work -->
@@ -445,6 +509,20 @@
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-common</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-util</artifactId>
+                    <groupId>org.bonitasoft.engine.util</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

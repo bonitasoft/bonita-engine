@@ -348,6 +348,17 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/schemas</directory>
+                <excludes>
+                    <exclude>**/*.class</exclude>
+                </excludes>
+            </resource>
+        </resources>
 
         <plugins>
             <plugin>
@@ -359,10 +370,11 @@
                         <goals>
                             <goal>schemagen</goal>
                         </goals>
+                        <phase>generate-sources</phase>
                         <configuration>
-                            <sources>
-                                <source>src/main/java/org/bonitasoft/engine/identity/xml</source>
-                            </sources>
+                            <includes>
+                                <include>org/bonitasoft/engine/identity/xml/**/*.java</include>
+                            </includes>
                             <outputDirectory>${project.build.directory}/organization-schemas</outputDirectory>
                         </configuration>
                     </execution>
@@ -377,11 +389,11 @@
                         <goals>
                             <goal>run</goal>
                         </goals>
-                        <phase>process-resources</phase>
+                        <phase>process-sources</phase>
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/organization-schemas/schema1.xsd"
-                                      toFile="${project.build.outputDirectory}/organization.xsd" />
+                                      toFile="${project.build.directory}/schemas/organization.xsd" />
                             </target>
                         </configuration>
                     </execution>
