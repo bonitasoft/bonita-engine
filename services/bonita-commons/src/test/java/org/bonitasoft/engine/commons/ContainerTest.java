@@ -16,12 +16,12 @@ package org.bonitasoft.engine.commons;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ContainerTest {
+class ContainerTest {
 
     @Test
-    public void constructor_should_create_container_based_on_given_information() throws Exception {
+    void constructor_should_create_container_based_on_given_information() {
         //when
         Container container = new Container(10, "cType");
 

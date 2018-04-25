@@ -20,17 +20,17 @@ import static org.mockito.Mockito.when;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.bonitasoft.engine.commons.MockitoExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ServicesResolverTest {
+@ExtendWith(MockitoExtension.class)
+class ServicesResolverTest {
 
     @Mock
     private ServicesLookup servicesLookup;
@@ -48,7 +48,7 @@ public class ServicesResolverTest {
             this.myService = myService;
         }
 
-        public Object getMyService() {
+        Object getMyService() {
             return myService;
         }
 
@@ -68,7 +68,7 @@ public class ServicesResolverTest {
     }
 
     @Test
-    public void should_injectService_inject_setter_having_the_annotation() throws Exception {
+    void should_injectService_inject_setter_having_the_annotation() throws Exception {
         final BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
 
         final Object myService = new Object();

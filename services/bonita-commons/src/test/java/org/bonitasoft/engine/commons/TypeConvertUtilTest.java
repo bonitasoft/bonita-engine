@@ -14,30 +14,26 @@
 package org.bonitasoft.engine.commons;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TypeConvertUtilTest {
+class TypeConvertUtilTest {
 
     private TypeConverterUtil typeConverterUtil;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss.SSS" };
         typeConverterUtil = new TypeConverterUtil(datePatterns);
     }
 
     @Test
-    public void should_convert_primitives() {
+    void should_convert_primitives() {
 
         assertThat((Long) typeConverterUtil.convertToType(Long.class, "15")).isEqualTo(15L);
 
@@ -62,11 +58,9 @@ public class TypeConvertUtilTest {
     }
 
     @Test
-    public void dateConvert_should_fail() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("unable to parse 'not a date' to type java.util.Date");
-
-        typeConverterUtil.convertToType(Date.class, "not a date");
+    void dateConvert_should_fail() {
+        assertThrows(IllegalArgumentException.class, () -> typeConverterUtil.convertToType(Date.class, "not a date"),
+                "unable to parse 'not a date' to type java.util.Date");
     }
 
     private void checkDateConvert(String dateToConvert, long expectedDateAsLong) {
