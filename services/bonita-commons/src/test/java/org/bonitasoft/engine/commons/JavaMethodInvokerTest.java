@@ -18,12 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class JavaMethodInvokerTest {
+class JavaMethodInvokerTest {
 
     @Test
-    public void invokeJavaMethodShouldNotModifyObjectReference() throws Exception {
+    void invokeJavaMethodShouldNotModifyObjectReference() throws Exception {
         // given:
         final JavaMethodInvoker invoker = new JavaMethodInvoker();
         final User user = new User("Jo la frite");
@@ -58,14 +58,14 @@ public class JavaMethodInvokerTest {
             this.thing = thing;
         }
 
-        public int getThing() {
+        int getThing() {
             return thing;
         }
 
     }
 
     @Test
-    public void invokeJavaMethod_should_update_a_list() throws Exception {
+    void invokeJavaMethod_should_update_a_list() throws Exception {
         final JavaMethodInvoker invoker = new JavaMethodInvoker();
         final List<User> users = new ArrayList<User>();
         final List<User> createdUsers = new ArrayList<User>();
@@ -77,12 +77,13 @@ public class JavaMethodInvokerTest {
     }
 
     @Test
-    public void invokeJavaMethod_should_use_autoboxing() throws Exception {
+    void invokeJavaMethod_should_use_autoboxing() throws Exception {
         final MyClass myData = new MyClass();
 
         final JavaMethodInvoker invoker = new JavaMethodInvoker();
 
-        final MyClass object = (MyClass) invoker.invokeJavaMethod(Integer.class.getName(), Integer.valueOf(83), myData, "setThing", "int");
+        final MyClass object = (MyClass) invoker.invokeJavaMethod(Integer.class.getName(), 83, myData, "setThing",
+                "int");
 
         assertThat(object.getThing()).isEqualTo(83);
     }

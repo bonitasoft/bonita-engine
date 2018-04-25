@@ -15,18 +15,18 @@ package org.bonitasoft.engine.commons;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class StringUtilsTest {
+class StringUtilsTest {
 
     @Test
-    public void uniformizePathPatternShouldChangeAllBackslashesToForwardSlashes() {
+    void uniformizePathPatternShouldChangeAllBackslashesToForwardSlashes() {
         final String uniformized = StringUtils.uniformizePathPattern("C:\\toto\\my path\\my\\/file.bak.txt");
         assertThat(uniformized).isEqualTo("C:/toto/my path/my/file.bak.txt");
     }
 
     @Test
-    public void uniformizePathPatternShouldLeaveNoDoubleSeparator() {
+    void uniformizePathPatternShouldLeaveNoDoubleSeparator() {
         final String uniformized = StringUtils.uniformizePathPattern("C:///toto//my path/////full_slashes/my file.bak.txt");
         assertThat(uniformized).isEqualTo("C:/toto/my path/full_slashes/my file.bak.txt");
     }

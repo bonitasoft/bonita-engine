@@ -62,7 +62,7 @@ public class IOUtilTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldToByteArray_ThrowIlllegalArgumentException_ForNullDocument() throws Exception {
+    public void shouldToByteArray_ThrowIllegalArgumentException_ForNullDocument() throws Exception {
         final Document document = null;
         IOUtil.toByteArray(document);
     }
@@ -73,15 +73,9 @@ public class IOUtilTest {
         documentBuilderFactory.setValidating(false);
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
-        InputStream is = null;
-        Document document = null;
-        try {
-            is = IOUtilTest.class.getResourceAsStream("persistence.xml");
+        Document document;
+        try (InputStream is = IOUtilTest.class.getResourceAsStream("persistence.xml")) {
             document = documentBuilder.parse(is);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
         }
         final byte[] byteArray = IOUtil.toByteArray(document);
         assertThat(byteArray).isNotNull();
@@ -97,8 +91,8 @@ public class IOUtilTest {
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(updatedJar);
         final JarInputStream jis = new JarInputStream(bais);
-        JarEntry entry = null;
-        final Map<String, byte[]> entryNames = new HashMap<String, byte[]>();
+        JarEntry entry;
+        final Map<String, byte[]> entryNames = new HashMap<>();
         final byte[] buffer = new byte[4096];
         while ((entry = jis.getNextJarEntry()) != null) {
             if (!entry.isDirectory()) {
