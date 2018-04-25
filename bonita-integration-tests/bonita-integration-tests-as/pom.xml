@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,12 +11,6 @@
 
     <artifactId>bonita-integration-tests-as</artifactId>
     <packaging>pom</packaging>
-
-    <name>Bonita AS Tests</name>
-
-    <properties>
-        <distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -41,39 +36,9 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>package-all</id>
-            <modules>
-                <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-war</module>
-                <module>bonita-integration-http-api</module>
-                <module>bonita-integration-ejb-api</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>as-tests</id>
-            <modules>
-                <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-war</module>
-                <module>bonita-integration-http-api</module>
-                <module>bonita-integration-ejb-api</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>wildfly</id>
-            <modules>
-                <module>bonita-deploy-resources</module>
-                <module>bonita-deploy-war</module>
-                <module>bonita-integration-ejb-api</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>tomcat</id>
-            <modules>
-                <module>bonita-integration-http-api</module>
-            </modules>
-        </profile>
-    </profiles>
+    <modules>
+        <module>bonita-integration-http-api</module>
+        <module>bonita-integration-ejb-api</module>
+    </modules>
 
 </project>
