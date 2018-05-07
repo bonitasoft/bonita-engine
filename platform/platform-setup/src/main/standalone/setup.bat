@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 :: Let's position into folder containing this script:
 set CURRENTDIR="%cd%"
@@ -24,10 +24,18 @@ IF NOT "%BONITA_DATABASE%" == "h2" IF NOT "%BONITA_DATABASE%" == "postgres" IF N
     exit /b 1
 )
 
+:: extract specific parameters
+set otherArgs=
+set JVM_OPTS=
+FOR %%a IN (%*) DO (
+    if "%%a" == "--debug" (
+        set JVM_OPTS="-Dbonita.platform.setup.log=DEBUG"
+    ) else (
+        set otherArgs=!otherArgs! %%~a
+    )
+)
 
-:: get rid of first parameter (action parameter) and pass the rest of the command line to the java program through $@:
-SHIFT
-"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*"  -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %0 %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%JAVA_CMD%" -cp "%BASEDIR%;%CFG_FOLDER%;%INITIAL_CFG_FOLDER%;%LIB_FOLDER%\*" %JVM_OPTS% -Dspring.profiles.active=default -Dsysprop.bonita.db.vendor=%BONITA_DATABASE% org.bonitasoft.platform.setup.PlatformSetupApplication %otherArgs%
 
 if errorlevel 1 (
     exit /b 1

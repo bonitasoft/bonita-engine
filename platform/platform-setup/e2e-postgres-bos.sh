@@ -291,7 +291,7 @@ echo "should fail if drivers not found:"
 echo "========================================"
 sed -i s/^postgres.nonXaDriver=org.UnknownClass*$/postgres.nonXaDriver=org.postgresql.Driver/g ${E2E_DIR}/internal.properties
 rm ${E2E_DIR}/lib/postgres*.jar
-${E2E_DIR}/setup.sh push
+${E2E_DIR}/setup.sh push --debug
 
 echo "========================================"
 echo "end."
