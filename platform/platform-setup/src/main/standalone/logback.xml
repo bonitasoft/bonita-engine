@@ -13,15 +13,8 @@
     <logger name="org.bonitasoft.platform.setup" level="INFO" />
 
 
-    <if condition='property("bonita.platform.setup.debug").contains("true")'>
-        <then>
-            <!-- SET level below to DEBUG for more information about errors: -->
-            <logger name="org.bonitasoft.platform.setup.PlatformSetupApplication" level="DEBUG" />
-        </then>
-        <else>
-            <logger name="org.bonitasoft.platform.setup.PlatformSetupApplication" level="WARN" />
-        </else>
-    </if>
+    <!-- SET level below to DEBUG for more information about errors: -->
+    <logger name="org.bonitasoft.platform.setup.PlatformSetupApplication" level="${bonita.platform.setup.log:-WARN}" />
 
     <!--TRACE level displays all relevant jdbc transaction information-->
     <!--<logger name="org.springframework" level="TRACE" />-->
