@@ -19,14 +19,6 @@
     </modules>
 
     <profiles>
-        <profile>
-            <id>package-all</id>
-            <modules>
-                <module>bonita-integration-tests-client</module>
-                <module>bonita-integration-tests-local</module>
-                <module>bonita-integration-tests-as</module>
-            </modules>
-        </profile>
 
         <profile>
             <id>tests</id>
@@ -42,24 +34,6 @@
                 <module>bonita-integration-tests-client</module>
                 <module>bonita-integration-tests-local</module>
                 <module>bonita-integration-tests-as</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>all</id>
-            <modules>
-                <module>bonita-integration-tests-client</module>
-                <module>bonita-integration-tests-local</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>package</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>bonita-query-tests</module>
             </modules>
         </profile>
 
