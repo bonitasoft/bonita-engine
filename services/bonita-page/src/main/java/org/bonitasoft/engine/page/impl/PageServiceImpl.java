@@ -154,16 +154,19 @@ public class PageServiceImpl implements PageService {
     @Override
     public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException,
             SInvalidPageZipException, SInvalidPageTokenException {
-        Map<String, byte[]> zipContent;
         try {
-            zipContent = IOUtil.unzip(content);
-            checkZipContainsRequiredEntries(zipContent);
+            checkZipContainsRequiredEntries(unzip(content));
             checkPageNameIsValid(page.getName(), page.isProvided());
             checkPageDisplayNameIsValid(page.getDisplayName());
             return insertPage(page, content);
         } catch (final IOException e) {
             throw new SInvalidPageZipInconsistentException("Error while reading zip file", e);
         }
+    }
+
+    // @VisibleForTesting
+    Map<String, byte[]> unzip(byte[] content) throws IOException {
+        return IOUtil.unzip(content);
     }
 
     @Override
@@ -214,7 +217,7 @@ public class PageServiceImpl implements PageService {
             throw new SInvalidPageZipInconsistentException("Content can't be null");
         }
         try {
-            final Map<String, byte[]> zipContent = IOUtil.unzip(content);
+            final Map<String, byte[]> zipContent = unzip(content);
             pageProperties = helper.loadPageProperties(zipContent);
             if (isAnAPIExtension(pageProperties)) {
                 checkApiControllerExists(zipContent, pageProperties);
@@ -437,7 +440,7 @@ public class PageServiceImpl implements PageService {
         }
         final byte[] content = page.getContent();
         try {
-            final Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
+            final Map<String, byte[]> contentAsMap = unzip(content);
             final byte[] bytes = contentAsMap.get("page.properties");
             final Properties pageProperties = new Properties();
             if (bytes != null) {

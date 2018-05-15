@@ -13,8 +13,7 @@
  */
 package org.bonitasoft.engine.page.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -157,12 +156,10 @@ public class PageServiceImplTest {
 
         final List<PageServiceListener> listeners = Arrays.asList(apiExtensionPageServiceListener);
         pageServiceImpl.setPageServiceListeners(listeners);
-
     }
 
     @Test
     public void getNumberOfPages() throws SBonitaException {
-
         // given
         final long expected = 50;
         when(readPersistenceService.getNumberOfEntities(SPage.class, queryOptions, null)).thenReturn(expected);
@@ -758,15 +755,15 @@ public class PageServiceImplTest {
         final byte[] content = IOUtil.zip(pair("aFile.txt", "hello".getBytes()), pair(PAGE_PROPERTIES,
                 "name=custompage_mypage\ndisplayName=My Page\ndescription=mypage description\n\ncontentType=page"
                         .getBytes()));
-        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMap());
+        doThrow(SInvalidPageZipMissingIndexException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMap());
+
+        //when
+        Throwable throwable = catchThrowable(() -> pageServiceImpl.readPageZip(content, false));
 
         //then
-        exception.expect(SInvalidPageZipInconsistentException.class);
-        exception.expectMessage("Error while reading zip file");
-
-        // when
-        pageServiceImpl.readPageZip(content, false);
-
+        assertThat(throwable)
+                .isExactlyInstanceOf(SInvalidPageZipMissingIndexException.class)
+        ;
     }
 
     @Test
@@ -949,14 +946,17 @@ public class PageServiceImplTest {
         //given
         final SPage sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
         final byte[] badContent = "not_a_zip".getBytes();
-        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMap());
-
-        //then
-        exception.expect(SInvalidPageZipInconsistentException.class);
-        exception.expectMessage("Error while reading zip file");
+        doThrow(IOException.class).when(pageServiceImpl).unzip(badContent);
 
         //when
-        pageServiceImpl.addPage(sPage, badContent);
+        Throwable throwable = catchThrowable(() -> pageServiceImpl.addPage(sPage, badContent));
+
+        //then
+        assertThat(throwable)
+                .isExactlyInstanceOf(SInvalidPageZipInconsistentException.class)
+                .hasMessage("Error while reading zip file")
+                .hasCauseExactlyInstanceOf(IOException.class)
+        ;
     }
 
     @Test

@@ -15,8 +15,8 @@
 package org.bonitasoft.permissions
 
 import static org.assertj.core.api.Assertions.assertThat
-import static org.mockito.Matchers.any
-import static org.mockito.Matchers.eq
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.*
 
 import org.bonitasoft.engine.api.APIAccessor
@@ -247,7 +247,7 @@ public class TaskPermissionRuleTest {
         doReturn(true).when(apiCallContext).isGET()
         doReturn(null).when(apiCallContext).getResourceName()
         havingFilters([parentTaskId: "4"])
-        doThrow(NotFoundException).when(processAPI).getFlowNodeInstance(4)
+        doThrow(FlowNodeInstanceNotFoundException.class).when(processAPI).getFlowNodeInstance(4)
         doReturn(archivedTask).when(processAPI).getArchivedFlowNodeInstance(4)
         doReturn(currentUserId).when(archivedTask).getExecutedBy()
 

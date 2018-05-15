@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.expression.ExpressionConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -252,9 +252,9 @@ public class EngineConstantExpressionExecutorStrategyTest {
     public void should_evaluate_LOGGED_USER_ID_return_minus1_when_exception() throws Exception {
         //given
         expression.setContent(LOGGED_USER_ID.getEngineConstantName());
-        doThrow(SBonitaReadException.class).when(activityInstanceService).getFlowNodeInstance(anyLong());
+        doThrow(SFlowNodeReadException.class).when(activityInstanceService).getFlowNodeInstance(anyLong());
         //when
-        Serializable loggerUserId = strategy.evaluate(expression, dependencies, Collections.<Integer, Object>emptyMap(),
+        Serializable loggerUserId = strategy.evaluate(expression, dependencies, Collections.emptyMap(),
                 ContainerState.ACTIVE);
         //then
         assertThat(loggerUserId).as("logged user id").isEqualTo(-1L);
