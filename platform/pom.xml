@@ -17,7 +17,6 @@
     <modules>
         <module>platform-resources</module>
         <module>platform-setup</module>
-        <module>platform-setup-test</module>
     </modules>
 
     <dependencyManagement>
@@ -59,6 +58,18 @@
     </dependencyManagement>
 
     <profiles>
+        <profile>
+            <id>package</id>
+            <modules>
+                <module>platform-setup-test</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tests</id>
+            <modules>
+                <module>platform-setup-test</module>
+            </modules>
+        </profile>
         <profile>
             <id>deploy</id>
             <build>
