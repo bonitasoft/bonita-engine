@@ -14,14 +14,14 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
@@ -128,15 +128,16 @@ public class BusinessDataModelRepositoryImplTest {
 
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
+    @Test(expected = SBusinessDataRepositoryDeploymentException.class)
     public void should_getBusinessObjectModel_throw_exception() throws Exception {
         //given
         final InputStream resourceAsStream = this.getClass().getResourceAsStream("client-bdm.zip");
         final byte[] clientBDMZip = IOUtil.getAllContentFrom(resourceAsStream);
 
         doReturn(clientBDMZip).when(businessDataModelRepository).getClientBDMZip();
-        doThrow(IOException.class).when(businessDataModelRepository)
+        doThrow(SBusinessDataRepositoryDeploymentException.class).when(businessDataModelRepository)
                 .getBusinessObjectModel(any(clientBDMZip.getClass()));
+        doReturn(true).when(businessDataModelRepository).isBDMDeployed();
 
         //when then exception
         businessDataModelRepository.getBusinessObjectModel();

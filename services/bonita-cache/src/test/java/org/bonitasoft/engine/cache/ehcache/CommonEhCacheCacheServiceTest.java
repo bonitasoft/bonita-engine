@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,7 +26,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,9 +45,6 @@ public class CommonEhCacheCacheServiceTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
-
-    @Mock
-    private Cache cache;
 
     private EhCacheCacheService cacheService;
 
@@ -78,18 +74,5 @@ public class CommonEhCacheCacheServiceTest {
 
         assertTrue(keys.isEmpty());
     }
-
-    // cache is final can't change methods... use powermock...
-    // @Test
-    // public void should_getKeys_return_cache_getKeys() throws Exception {
-    // List<String> values = Arrays.asList("a", "b");
-    // when(cacheManager.getCache("knownCache")).thenReturn(cache);
-    // cacheService.start();
-    // when(cache.getKeys()).thenReturn(values);
-    //
-    // List<Object> keys = cacheService.getKeys("knownCache");
-    //
-    // assertEquals(values, keys);
-    // }
 
 }
