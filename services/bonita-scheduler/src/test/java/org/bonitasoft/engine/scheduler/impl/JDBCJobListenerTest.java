@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -34,7 +34,7 @@ import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
+import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
@@ -211,7 +211,7 @@ public class JDBCJobListenerTest {
     @Test
     public void jobWasExecuted_should_do_nothing_if_delete_job_failed_and_cant_log_and_Job_is_no_more_triggered_in_the_future() throws Exception {
         // Given
-        doThrow(SJobDescriptorNotFoundException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        doThrow(SJobDescriptorReadException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);
@@ -225,7 +225,7 @@ public class JDBCJobListenerTest {
     @Test
     public void jobWasExecuted_should_log_if_delete_job_failed_and_log_and_Job_is_no_more_triggered_in_the_future() throws Exception {
         // Given
-        doThrow(SJobDescriptorNotFoundException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        doThrow(SJobDescriptorReadException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);
