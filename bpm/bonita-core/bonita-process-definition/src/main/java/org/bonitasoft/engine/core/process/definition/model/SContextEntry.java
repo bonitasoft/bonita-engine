@@ -14,14 +14,17 @@
 
 package org.bonitasoft.engine.core.process.definition.model;
 
+import java.io.Serializable;
+
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Baptiste Mesta
  */
-public interface SContextEntry {
+public interface SContextEntry extends Serializable {
 
     String getKey();
 
     SExpression getExpression();
+
 }
