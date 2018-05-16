@@ -14,6 +14,7 @@
 package org.bonitasoft.platform.version.impl;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class VersionServiceImpl implements VersionService {
 
-    public static final String SQL_PLATFORM_VERSION = "SELECT p.version FROM platform p ORDER BY p.id";
+    private static final String SQL_PLATFORM_VERSION = "SELECT p.version FROM platform p ORDER BY p.id";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(VersionServiceImpl.class);
 
@@ -65,7 +66,8 @@ public class VersionServiceImpl implements VersionService {
     public String getPlatformSetupVersion() {
         String version = null;
         try {
-            version = IOUtils.toString(this.getClass().getResource("/PLATFORM_ENGINE_VERSION"));
+            version = IOUtils.toString(this.getClass().getResource("/PLATFORM_ENGINE_VERSION"),
+                    Charset.forName("UTF-8"));
         } catch (IOException e) {
             LOGGER.error("unable to read version.");
         }
