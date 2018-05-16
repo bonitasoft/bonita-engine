@@ -29,7 +29,6 @@ import java.util.Properties;
 
 import org.apache.commons.io.comparator.ExtensionFileComparator;
 import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 
 /**
@@ -37,13 +36,13 @@ import org.custommonkey.xmlunit.XMLUnit;
  */
 public class FolderComparator {
 
-    public static final int ARE_EQUALS = 0;
-    public static final String XML = "xml";
-    public static final String PROPERTIES = "properties";
+    private static final int ARE_EQUALS = 0;
+    private static final String XML = "xml";
+    private static final String PROPERTIES = "properties";
 
-    public void compare(File configFolder, File destFolder) throws Exception {
+    public void compare(File configFolder, File destinationFolder) throws Exception {
         final Map<String, File> expectedFiles = flattenFolderFiles(configFolder);
-        final Map<String, File> files = flattenFolderFiles(destFolder);
+        final Map<String, File> files = flattenFolderFiles(destinationFolder);
         assertThat(files).as("should have same size").hasSize(expectedFiles.size());
         assertThat(expectedFiles.keySet()).as("should have same file names").isEqualTo(files.keySet());
         for (String name : expectedFiles.keySet()) {
@@ -52,7 +51,7 @@ public class FolderComparator {
 
     }
 
-    public Map<String, File> flattenFolderFiles(File folder) throws IOException {
+    private Map<String, File> flattenFolderFiles(File folder) throws IOException {
         Map<String, File> fileMap = new HashMap<>();
         final FlattenFolderVisitor flattenFolderVisitor = new FlattenFolderVisitor(fileMap);
         Files.walkFileTree(folder.toPath(), flattenFolderVisitor);
@@ -74,7 +73,8 @@ public class FolderComparator {
                         .isEqualTo(getProperties(givenFile));
                 break;
             case XML:
-                final List<Diff> allDifferences = new DetailedDiff(XMLUnit.compareXML(new FileReader(givenFile), new FileReader(expectedFile)))
+                final List allDifferences = new DetailedDiff(
+                        XMLUnit.compareXML(new FileReader(givenFile), new FileReader(expectedFile)))
                         .getAllDifferences();
                 assertThat(allDifferences).as("should xml file be equals").isEmpty();
                 break;
@@ -87,7 +87,7 @@ public class FolderComparator {
 
     private Properties getProperties(File propertyFile) throws IOException {
         final Properties properties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream(propertyFile);){
+        try (FileInputStream fileInputStream = new FileInputStream(propertyFile)) {
             properties.load(fileInputStream);
             return properties;
         }
