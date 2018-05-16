@@ -35,7 +35,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -44,7 +44,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * author Laurent Leseigneur
  */
 @RunWith(SpringRunner.class)
-@SpringApplicationConfiguration(classes = {
+@SpringBootTest(classes = {
         PlatformSetupApplication.class
 })
 public class ScriptExecutorIT {

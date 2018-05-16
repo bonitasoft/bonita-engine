@@ -19,7 +19,7 @@ import org.bonitasoft.platform.setup.jndi.MemoryJNDISetup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * author Emmanuel Duchastenier
  */
 @RunWith(SpringRunner.class)
-@SpringApplicationConfiguration(classes = {
+@SpringBootTest(classes = {
         PlatformSetupApplication.class
 })
 public class ScriptExecutorTest {

@@ -43,7 +43,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.InputStreamResource;
@@ -60,7 +60,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 @RunWith(SpringRunner.class)
 
 //keep order
-@SpringApplicationConfiguration(classes = {
+@SpringBootTest(classes = {
         PlatformSetupApplication.class })
 @ComponentScan(basePackages = { "org.bonitasoft.platform.setup", "org.bonitasoft.platform.configuration" })
 @PropertySource("classpath:/application.properties")
