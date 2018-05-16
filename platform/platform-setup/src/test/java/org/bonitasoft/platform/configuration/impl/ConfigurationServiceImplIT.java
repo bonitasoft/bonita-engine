@@ -17,15 +17,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.jdbc.datasource.init.ScriptUtils.*;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,9 +67,9 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 @Component
 public class ConfigurationServiceImplIT {
 
-    public static final long TENANT_ID_1 = 1L;
-    public static final long TENANT_ID_5 = 5L;
-    public static final long TENANT_ID_12 = 12L;
+    private static final long TENANT_ID_1 = 1L;
+    private static final long TENANT_ID_5 = 5L;
+    private static final long TENANT_ID_12 = 12L;
 
     @Autowired
     MemoryJNDISetup memoryJNDISetup;
@@ -81,7 +78,7 @@ public class ConfigurationServiceImplIT {
     JdbcTemplate jdbcTemplate;
 
     @Value("${db.vendor}")
-    String dbVendor;
+    private String dbVendor;
 
     @Autowired
     ConfigurationServiceImpl configurationService;
@@ -271,16 +268,22 @@ public class ConfigurationServiceImplIT {
 
     private void createTables() throws Exception {
         final InputStream createTableResource = this.getClass().getResourceAsStream("/sql/" + dbVendor + "/createTables.sql");
-        ScriptUtils.executeSqlScript(getConnection(),
-                new EncodedResource(new InputStreamResource(createTableResource)), false, false, DEFAULT_COMMENT_PREFIX, getDefaultStatementSeparator(),
-                DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+        try (Connection connection = getConnection()) {
+            ScriptUtils.executeSqlScript(connection,
+                    new EncodedResource(new InputStreamResource(createTableResource)), false, false,
+                    DEFAULT_COMMENT_PREFIX, getDefaultStatementSeparator(),
+                    DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+        }
     }
 
     private void dropTables() throws Exception {
         final InputStream dropTablesResource = this.getClass().getResourceAsStream("/sql/" + dbVendor + "/dropTables.sql");
-        ScriptUtils.executeSqlScript(getConnection(),
-                new EncodedResource(new InputStreamResource(dropTablesResource)), true, true, DEFAULT_COMMENT_PREFIX, getDefaultStatementSeparator(),
-                DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+        try (Connection connection = getConnection()) {
+            ScriptUtils.executeSqlScript(connection,
+                    new EncodedResource(new InputStreamResource(dropTablesResource)), true, true,
+                    DEFAULT_COMMENT_PREFIX, getDefaultStatementSeparator(),
+                    DEFAULT_BLOCK_COMMENT_START_DELIMITER, DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+        }
     }
 
     private String getDefaultStatementSeparator() {
@@ -292,7 +295,7 @@ public class ConfigurationServiceImplIT {
         }
     }
 
-    public File createLicenseFolder() throws IOException {
+    private File createLicenseFolder() throws IOException {
         File licenses = temporaryFolder.newFolder("licenses");
         Files.write(licenses.toPath().resolve("license1.lic"), "license 1 content".getBytes(UTF_8));
         Files.write(licenses.toPath().resolve("license2.lic"), "license 2 content".getBytes(UTF_8));
@@ -303,7 +306,7 @@ public class ConfigurationServiceImplIT {
         return licenses;
     }
 
-    public File createNewLicenseFolder() throws IOException {
+    private File createNewLicenseFolder() throws IOException {
         File newLicenses = temporaryFolder.newFolder("newLicenses");
         Files.write(newLicenses.toPath().resolve("license2.lic"), "new license 2 content".getBytes(UTF_8));
         Files.write(newLicenses.toPath().resolve("license3.lic"), "license 3 content".getBytes(UTF_8));
