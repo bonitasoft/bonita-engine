@@ -224,7 +224,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     activityInstanceService.buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(flowNodeInstance.getId(),
                             Integer.MAX_VALUE))) {
                 activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
-                if (child.isStable()) {//if not sable the flow node will be executed automatically
+                if (child.isStable()) {//if not stable the flow node will be executed automatically
                     registerExecuteFlowNodeWork(child);
                 }
             }

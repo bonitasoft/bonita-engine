@@ -38,13 +38,15 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
 
     private final ContainerRegistry containerRegistry;
 
-    public ExecutingBoundaryEventStateImpl(final ActivityInstanceService activityInstanceService, final ContainerRegistry containerRegistry) {
+    public ExecutingBoundaryEventStateImpl(final ActivityInstanceService activityInstanceService,
+            final ContainerRegistry containerRegistry) {
         this.activityInstanceService = activityInstanceService;
         this.containerRegistry = containerRegistry;
     }
 
     @Override
-    public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
+    public boolean shouldExecuteState(final SProcessDefinition processDefinition,
+            final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
@@ -59,7 +61,8 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     }
 
     @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
+    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance)
+            throws SActivityStateExecutionException {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) instance;
         if (boundaryEventInstance.isInterrupting()) {
             abortRelatedActivity(boundaryEventInstance);
@@ -68,18 +71,22 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
         return StateCode.DONE;
     }
 
-    private void abortRelatedActivity(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
-        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+    private void abortRelatedActivity(final SBoundaryEventInstance boundaryEventInstance)
+            throws SActivityStateExecutionException {
+        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory
+                .get(SUserTaskInstanceBuilderFactory.class);
         if (SStateCategory.NORMAL.equals(boundaryEventInstance.getStateCategory())) {
             try {
-                final SActivityInstance relatedActivityInst = activityInstanceService.getActivityInstance(boundaryEventInstance.getActivityInstanceId());
+                final SActivityInstance relatedActivityInst = activityInstanceService
+                        .getActivityInstance(boundaryEventInstance.getActivityInstanceId());
                 activityInstanceService.setStateCategory(relatedActivityInst, SStateCategory.ABORTING);
                 activityInstanceService.setAbortedByBoundaryEvent(relatedActivityInst, boundaryEventInstance.getId());
-                if (relatedActivityInst.isStable() || relatedActivityInst.isStateExecuting()) {
+                if (relatedActivityInst.isStable() && !relatedActivityInst.isStateExecuting()) {
                     containerRegistry
                             .executeFlowNode(relatedActivityInst.getProcessDefinitionId(),
-                                    boundaryEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()), relatedActivityInst.getId()
-                            );
+                                    boundaryEventInstance
+                                            .getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()),
+                                    relatedActivityInst.getId());
                 }
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
@@ -88,7 +95,8 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     }
 
     @Override
-    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
+    public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance,
+            final SFlowNodeInstance childInstance) {
         return true;
     }
 
