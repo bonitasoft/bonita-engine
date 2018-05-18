@@ -46,8 +46,6 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  */
 public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
-    private static final long serialVersionUID = 9031279948838300081L;
-
     protected final long processDefinitionId;
 
     protected final long connectorInstanceId;
@@ -58,8 +56,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     private final long processInstanceId;
 
     public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId,
-            final String connectorDefinitionName,
-            final SExpressionContext inputParametersContext, long processInstanceId) {
+            final String connectorDefinitionName, final SExpressionContext inputParametersContext,
+            long processInstanceId) {
         this(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParametersContext, null,
                 processInstanceId);
     }
@@ -77,8 +75,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition,
-            Exception Exception)
-            throws SBonitaException;
+            Exception Exception) throws SBonitaException;
 
     protected abstract SThrowEventInstance createThrowErrorEventInstance(Map<String, Object> context,
             final SEndEventDefinition eventDefinition)

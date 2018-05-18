@@ -26,8 +26,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public abstract class BonitaWork {
 
-    private static final long serialVersionUID = 1L;
-
     private String uuid = UUID.randomUUID().toString();
 
     protected long tenantId;

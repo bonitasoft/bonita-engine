@@ -23,8 +23,6 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public abstract class TenantAwareBonitaWork extends BonitaWork {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String TENANT_ACCESSOR = "tenantAccessor";
 
     public TenantAwareBonitaWork() {
