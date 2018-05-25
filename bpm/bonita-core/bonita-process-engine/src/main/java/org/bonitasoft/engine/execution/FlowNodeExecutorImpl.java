@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import java.util.List;
+
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -31,6 +33,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
@@ -46,6 +49,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -68,6 +72,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private final FlowNodeStateManager flowNodeStateManager;
 
     private final ActivityInstanceService activityInstanceService;
+
+    private final EventInstanceService eventInstanceService;
 
     private final OperationService operationService;
 
@@ -100,7 +106,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final ProcessInstanceService processInstanceService,
             final ConnectorInstanceService connectorInstanceService,
             final ClassLoaderService classLoaderService, final WorkService workService, BPMWorkFactory workFactory,
-            final ContractDataService contractDataService) {
+            final ContractDataService contractDataService, final EventInstanceService eventInstanceService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -117,6 +123,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
         this.contractDataService = contractDataService;
+        this.eventInstanceService = eventInstanceService;
     }
 
     @Override
@@ -255,6 +262,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     interruptSubActivities(sFlowNodeInstance);
                 } else {
                     registerNotifyFinishWork(sFlowNodeInstance);
+                }
+                List<SBoundaryEventInstance> activityBoundaryEventInstances = eventInstanceService.getActivityBoundaryEventInstances(flowNodeInstanceId, 0,
+                        1000);
+                if (!activityBoundaryEventInstances.isEmpty()) {
+                    for (SBoundaryEventInstance activityBoundaryEventInstance : activityBoundaryEventInstances) {
+                        registerNotifyFinishWork(activityBoundaryEventInstance);
+                    }
                 }
             }
         } catch (final SBonitaException e) {

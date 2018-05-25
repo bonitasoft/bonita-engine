@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -66,6 +67,8 @@ public class FlowNodeExecutorImplTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
     @Mock
+    private EventInstanceService eventInstanceService;
+    @Mock
     private ArchiveService archiveService;
     @Captor
     private ArgumentCaptor<WorkDescriptor> workDescriptorArgumentCaptor;
@@ -76,7 +79,7 @@ public class FlowNodeExecutorImplTest {
     public void before() throws Exception {
         flowNodeExecutor = new FlowNodeExecutorImpl(flowNodeStateManager, activityInstanceService, null, archiveService,
                 null, containerRegistry, processDefinitionService, null, null, null, null, workService, workFactory,
-                null);
+                null,eventInstanceService);
         skippedFlowNodeState = new SkippedFlowNodeStateImpl();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
     }
