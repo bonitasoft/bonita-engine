@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.flownode.EventCriterion.NAME_DESC;
+import static org.bonitasoft.engine.bpm.flownode.TimerType.DURATION;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -42,6 +45,8 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.Test;
 
 public class HumanTasksIT extends TestWithUser {
+
+    final static int INTIALIZING_STATE_ID = 32;
 
     @Test
     public void cannotGetHumanTaskInstances() throws Exception {
@@ -362,7 +367,7 @@ public class HumanTasksIT extends TestWithUser {
         HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
 
         final long activityInstanceId = step1.getId();
-        getProcessAPI().setActivityStateById(activityInstanceId, 32);
+        getProcessAPI().setActivityStateById(activityInstanceId, INTIALIZING_STATE_ID);
         step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(ActivityStates.INITIALIZING_STATE, step1.getState());
 
@@ -374,6 +379,40 @@ public class HumanTasksIT extends TestWithUser {
         getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.SKIPPED_STATE);
         // will skip task and finish process
         waitForProcessToFinish(processInstance.getId());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void setStateShouldTerminateATaskWithBoundaryEvent() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("step1", ACTOR_NAME).addBoundaryEvent("theBoundaryEvent").addTimerEventTriggerDefinition(DURATION,
+                new ExpressionBuilder().createConstantLongExpression(9000L));
+        processBuilder.addEndEvent("boundaryEnd");
+        processBuilder.addEndEvent("TheEnd");
+        processBuilder.addTransition("step1", "TheEnd");
+        processBuilder.addTransition("theBoundaryEvent", "boundaryEnd");
+        final DesignProcessDefinition designProcessDefinition = processBuilder.getProcess();
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
+        List<EventInstance> eventInstances = getProcessAPI().getEventInstances(processInstance.getId(), 0, 1000, NAME_DESC);
+        assertThat(eventInstances.size()).isEqualTo(1);
+
+        final long activityInstanceId = step1.getId();
+        getProcessAPI().setActivityStateById(activityInstanceId, INTIALIZING_STATE_ID);
+        step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
+        assertEquals(ActivityStates.INITIALIZING_STATE, step1.getState());
+
+        getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.SKIPPED_STATE);
+        // skip task and finish process
+        waitForProcessToFinish(processInstance.getId());
+
+        //verify that the BD has been cleaned
+        eventInstances = getProcessAPI().getEventInstances(processInstance.getId(), 0, 1000, NAME_DESC);
+        assertThat(eventInstances).isEmpty();
 
         disableAndDeleteProcess(processDefinition);
     }

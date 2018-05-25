@@ -50,6 +50,7 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
         <constructor-arg name="workFactory" ref="workFactory" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
     </bean>
 
     <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
