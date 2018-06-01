@@ -1354,6 +1354,9 @@
                 <value>bonita-groovy-page-example.zip</value>
                 <value>api-extension-example.zip</value>
                 <value>api-extension-viewer.zip</value>
+                <!-- New web-pages -->
+                <value>page-process-list.zip</value>
+
             </list>
         </property>
     </bean>
