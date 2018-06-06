@@ -15,9 +15,7 @@ package org.bonitasoft.engine.connectors;
 
 import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.test.BuildTestUtil.generateConnectorImplementation;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -390,7 +388,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     @Test
-    public void getNumberofConnectorImplementationsWhenProcessDoesNotExists() {
+    public void getNumberOfConnectorImplementationsWhenProcessDoesNotExists() {
         assertEquals(0, getProcessAPI().getNumberOfConnectorImplementations(123L));
     }
 
