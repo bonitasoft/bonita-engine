@@ -13,19 +13,16 @@
  **/
 package org.bonitasoft.engine.api;
 
-import java.io.ByteArrayInputStream;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -34,9 +31,11 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -45,7 +44,6 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
-import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 /**
  * @author Baptiste Mesta
@@ -57,10 +55,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = -3375874140999200702L;
 
-    private static final Logger LOGGER = Logger.getLogger(HTTPServerAPI.class.getName());
-
-    private static final String UTF_8 = "UTF-8";
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final ContentType XML_UTF_8  = ContentType.create("application/xml", UTF_8);
 
     private static final String CLASS_NAME_PARAMETERS = "classNameParameters";
 
@@ -100,7 +95,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static DefaultHttpClient httpclient;
 
-    private static final ResponseHandler<String> RESPONSE_HANDLER = new BonitaResponseHandler();
+    private static final ResponseHandler<String> RESPONSE_HANDLER = new BasicResponseHandler();
 
     private final XmlConverter xmlConverter;
 
@@ -126,9 +121,6 @@ public class HTTPServerAPI implements ServerAPI {
             response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
             return checkInvokeMethodReturn(response);
         } catch (final UndeclaredThrowableException e) {
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, e.getMessage(), e);
-            }
             throw new ServerWrappedException(e);
         } catch (final Throwable e) {
             final StackTraceElement[] stackTrace = new Exception().getStackTrace();
@@ -157,10 +149,7 @@ public class HTTPServerAPI implements ServerAPI {
         try {
             return httpclient.execute(httpost, RESPONSE_HANDLER);
         } catch (final ClientProtocolException e) {
-            if (LOGGER.isLoggable(Level.SEVERE)) {
-                LOGGER.log(Level.SEVERE, e.getMessage() + System.getProperty("line.separator") + "httpost = <" + httpost + ">");
-            }
-            throw e;
+            throw new IOException("Error while executing POST request" + System.getProperty("line.separator") + "httpost = <" + httpost + ">", e);
         }
     }
 
@@ -169,8 +158,8 @@ public class HTTPServerAPI implements ServerAPI {
         final HttpEntity httpEntity = buildEntity(options, classNameParameters, parametersValues);
         final StringBuilder sBuilder = new StringBuilder(serverUrl);
         sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH).append(methodName);
-        final HttpPost httpost = new HttpPost(sBuilder.toString());
-        httpost.setEntity(httpEntity);
+        final HttpPost httpPost = new HttpPost(sBuilder.toString());
+        httpPost.setEntity(httpEntity);
 
         // Basic authentication
         if (basicAuthenticationActive) {
@@ -178,24 +167,23 @@ public class HTTPServerAPI implements ServerAPI {
             credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
             final Base64 encoder = new Base64();
             final String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes("UTF-8"));
-            httpost.setHeader("Authorization", "Basic " + encodedCredentials);
+            httpPost.setHeader("Authorization", "Basic " + encodedCredentials);
         }
 
-        return httpost;
+        return httpPost;
     }
 
     // package-private for testing purpose
     final HttpEntity buildEntity(final Map<String, Serializable> options, final List<String> classNameParameters,
             final Object[] parametersValues) throws IOException {
         final HttpEntity httpEntity;
-        /*
-         * if we have a business archive we use multipart to have the business archive attached as a binary content (it can be big)
-         */
+         // if we have a business archive we use multipart to have the business archive attached as a binary content (it can be big)
         if (classNameParameters.contains(BusinessArchive.class.getName()) || classNameParameters.contains(byte[].class.getName())) {
             final List<Object> bytearrayParameters = new ArrayList<>();
-            final MultipartEntity entity = new MultipartEntity(null, null, UTF8);
-            entity.addPart(OPTIONS, new StringBody(xmlConverter.toXML(options), UTF8));
-            entity.addPart(CLASS_NAME_PARAMETERS, new StringBody(xmlConverter.toXML(classNameParameters), UTF8));
+
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create().setBoundary(null).setCharset(UTF_8);
+            entityBuilder.addPart(OPTIONS, new StringBody(xmlConverter.toXML(options), XML_UTF_8));
+            entityBuilder.addPart(CLASS_NAME_PARAMETERS, new StringBody(xmlConverter.toXML(classNameParameters), XML_UTF_8));
             for (int i = 0; i < parametersValues.length; i++) {
                 final Object parameterValue = parametersValues[i];
                 if (parameterValue instanceof BusinessArchive || parameterValue instanceof byte[]) {
@@ -203,34 +191,28 @@ public class HTTPServerAPI implements ServerAPI {
                     bytearrayParameters.add(parameterValue);
                 }
             }
-            entity.addPart(PARAMETERS_VALUES, new StringBody(xmlConverter.toXML(parametersValues), UTF8));
+            entityBuilder.addPart(PARAMETERS_VALUES, new StringBody(xmlConverter.toXML(parametersValues), XML_UTF_8));
             int i = 0;
             for (final Object object : bytearrayParameters) {
-                entity.addPart(BINARY_PARAMETER + i, new ByteArrayBody(serialize(object), BINARY_PARAMETER + i));
+                entityBuilder.addPart(BINARY_PARAMETER + i, new ByteArrayBody(serialize(object), BINARY_PARAMETER + i));
                 i++;
             }
-            httpEntity = entity;
+            httpEntity = entityBuilder.build();
         } else {
             final List<NameValuePair> nvps = new ArrayList<>();
             nvps.add(new BasicNameValuePair(OPTIONS, xmlConverter.toXML(options)));
             nvps.add(new BasicNameValuePair(CLASS_NAME_PARAMETERS, xmlConverter.toXML(classNameParameters)));
             nvps.add(new BasicNameValuePair(PARAMETERS_VALUES, xmlConverter.toXML(parametersValues)));
-            httpEntity = new UrlEncodedFormEntity(nvps, UTF_8);
+            httpEntity = new UrlEncodedFormEntity(nvps, UTF_8.name());
         }
         return httpEntity;
     }
 
-    public byte[] serialize(final Object obj) throws IOException {
+    private static byte[] serialize(final Object obj) throws IOException {
         final ByteArrayOutputStream b = new ByteArrayOutputStream();
         final ObjectOutputStream o = new ObjectOutputStream(b);
         o.writeObject(obj);
         return b.toByteArray();
-    }
-
-    public Object deserialize(final byte[] bytes) throws IOException, ClassNotFoundException {
-        final ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-        final ObjectInputStream o = new ObjectInputStream(b);
-        return o.readObject();
     }
 
 }
