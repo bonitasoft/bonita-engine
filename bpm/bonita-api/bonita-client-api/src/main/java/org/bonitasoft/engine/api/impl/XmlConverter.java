@@ -36,10 +36,12 @@ public class XmlConverter {
         XSTREAM.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
     }
 
-    public String toXML(final Object object) throws IOException {
+    public String toXML(final Object object) {
         final StringWriter stringWriter = new StringWriter();
         try (final ObjectOutputStream out = XSTREAM.createObjectOutputStream(stringWriter)){
             out.writeObject(object);
+        } catch (IOException e) {
+            throw new BonitaRuntimeException("Unable to serialize object " + object, e);
         }
         return stringWriter.toString();
     }

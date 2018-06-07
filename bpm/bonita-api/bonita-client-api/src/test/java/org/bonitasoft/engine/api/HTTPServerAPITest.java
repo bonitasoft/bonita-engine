@@ -16,11 +16,11 @@ package org.bonitasoft.engine.api;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URLDecoder;
@@ -29,25 +29,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 /**
  * @author Celine Souchet
  */
-@RunWith(MockitoJUnitRunner.class)
 public class HTTPServerAPITest {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private HTTPServerAPI httpServerAPI;
 
@@ -59,67 +58,59 @@ public class HTTPServerAPITest {
         httpServerAPI = new HTTPServerAPI(map);
     }
 
-    @Test(expected = ServerWrappedException.class)
-    public void invokeMethodCatchUndeclaredThrowableException() throws Throwable {
-        final PrintStream printStream = System.err;
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(myOut));
-        final Logger logger = Logger.getLogger(HTTPServerAPI.class.getName());
-        logger.setLevel(Level.FINE);
-        final ConsoleHandler ch = new ConsoleHandler();
-        ch.setLevel(Level.FINE);
-        logger.addHandler(ch);
+    @Test
+    public void should_invoke_method_catch_and_wrap_UndeclaredThrowableException() throws Throwable {
+        //given:
+        final Map<String, Serializable> options = new HashMap<>();
+        final String apiInterfaceName = "apiInterfaceName";
+        final String methodName = "methodName";
+        final List<String> classNameParameters = new ArrayList<>();
+        final Object[] parametersValues = null;
 
-        try {
-            final Map<String, Serializable> options = new HashMap<>();
-            final String apiInterfaceName = "apiInterfaceName";
-            final String methodName = "methodName";
-            final List<String> classNameParameters = new ArrayList<>();
-            final Object[] parametersValues = null;
+        final HTTPServerAPI httpServerAPI = mock(HTTPServerAPI.class);
+        final String response = "response";
+        doReturn(response).when(httpServerAPI).executeHttpPost(eq(options), eq(apiInterfaceName), eq(methodName),
+                eq(classNameParameters),
+                eq(parametersValues));
+        doThrow(new UndeclaredThrowableException(new BonitaException("Bonita exception"), "Exception plop"))
+                .when(httpServerAPI).checkInvokeMethodReturn(eq(response));
 
-            final HTTPServerAPI httpServerAPI = mock(HTTPServerAPI.class);
-            final String response = "response";
-            doReturn(response).when(httpServerAPI).executeHttpPost(eq(options), eq(apiInterfaceName), eq(methodName),
-                    eq(classNameParameters),
-                    eq(parametersValues));
-            doThrow(new UndeclaredThrowableException(new BonitaException("Bonita exception"), "Exception plop"))
-                    .when(httpServerAPI).checkInvokeMethodReturn(eq(response));
+        // Let's call it for real:
+        doCallRealMethod().when(httpServerAPI).invokeMethod(options, apiInterfaceName, methodName, classNameParameters,
+                parametersValues);
 
-            // Let's call it for real:
-            doCallRealMethod().when(httpServerAPI).invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-            httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } finally {
-            System.setErr(printStream);
-            final String logs = myOut.toString();
-            assertTrue("should have written in logs an exception", logs.contains("java.lang.reflect.UndeclaredThrowableException"));
-            assertTrue("should have written in logs an exception", logs.contains("BonitaException"));
-            assertTrue("should have written in logs an exception", logs.contains("Exception plop"));
-        }
+        //when:
+        Throwable thrown = catchThrowable(
+                () -> httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters,
+                        parametersValues));
+
+        //then:
+        assertThat(thrown).as("Thrown exception").isInstanceOf(ServerWrappedException.class)
+                .hasMessageContaining("java.lang.reflect.UndeclaredThrowableException: Exception plop")
+                .hasRootCauseInstanceOf(BonitaException.class);
     }
 
     @Test
-    public void serializeSimpleParameters() throws Exception {
+    public void should_build_entity_serialize_simple_parameters() throws Exception {
         HttpEntity entity = httpServerAPI.buildEntity(emptyMap(),
                 asList("param1", "param2"),
                 new Object[] {"Välue1", singletonMap("key", "välue") });
         String content = IOUtil.read(entity.getContent());
         String decodedContent = URLDecoder.decode(content, "UTF-8");
-        assertTrue(decodedContent.contains("välue"));
-        assertTrue(decodedContent.contains("Välue1"));
+        assertThat(decodedContent).as("Decoded content").contains("välue", "Välue1");
     }
 
     @Test
-    public void serializeByteArrayParameters() throws Exception {
-        MultipartEntity entity = (MultipartEntity) httpServerAPI.buildEntity(emptyMap(),
-                asList(String.class.getName(), "java.util.Map", byte[].class.getName()),
-                new Object[] {"Välue1", singletonMap("key", "välue"), new byte[] {} }
+    public void should_build_entity_serialize_byte_array_parameters() throws Exception {
+        HttpEntity entity = httpServerAPI.buildEntity(emptyMap(),
+                asList(String.class.getName(), Map.class.getName(), byte[].class.getName()),
+                new Object[] {"Välue36", singletonMap("key", "välue"), new byte[] {} }
         );
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         entity.writeTo(outputStream);
         byte[] content = outputStream.toByteArray();
         String contentAsString = new String(content, Charset.forName("UTF-8"));
-        assertTrue(contentAsString.contains("välue"));
-        assertTrue(contentAsString.contains("Välue1"));
+        assertThat(contentAsString).as("Content").contains("välue", "Välue36");
     }
 
 }
