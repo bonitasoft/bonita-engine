@@ -13,12 +13,10 @@
  **/
 package org.bonitasoft.engine.api.internal.servlet;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,11 +30,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.api.internal.servlet.impl.XmlConverter;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * @author Julien Mege
@@ -58,21 +53,16 @@ public class HttpAPIServletCall extends ServletCall {
 
     private static final String OPTIONS = "options";
 
-    private static final XStream XSTREAM = new XStream();
-
-    static {
-        XStream.setupDefaultSecurity(XSTREAM);
-        XSTREAM.addPermission(AnyTypePermission.ANY);
-    }
+    private XmlConverter xmlConverter;
 
     public HttpAPIServletCall(final HttpServletRequest request, final HttpServletResponse response) throws FileUploadException, IOException {
         super(request, response);
+        xmlConverter = new XmlConverter();
     }
 
     @Override
     public void doGet() {
         error("GET method forbidden", HttpServletResponse.SC_FORBIDDEN);
-
     }
 
     @Override
@@ -89,17 +79,17 @@ public class HttpAPIServletCall extends ServletCall {
             final String parametersValues = this.getParameter(PARAMETERS_VALUES);
             final String parametersClasses = this.getParameter(CLASS_NAME_PARAMETERS);
 
-            Map<String, Serializable> myOptions = new HashMap<String, Serializable>();
-            if (options != null && !options.isEmpty()) {
-                myOptions = fromXML(options, XSTREAM);
+            Map<String, Serializable> myOptions = new HashMap<>();
+            if (isNotBlank(options)) {
+                myOptions = xmlConverter.fromXML(options);
             }
-            List<String> myClassNameParameters = new ArrayList<String>();
+            List<String> myClassNameParameters = new ArrayList<>();
             if (parametersClasses != null && !parametersClasses.isEmpty() && !parametersClasses.equals(ARRAY)) {
-                myClassNameParameters = fromXML(parametersClasses, XSTREAM);
+                myClassNameParameters = xmlConverter.fromXML(parametersClasses);
             }
             Object[] myParametersValues = new Object[0];
             if (parametersValues != null && !parametersValues.isEmpty() && !parametersValues.equals(NULL)) {
-                myParametersValues = fromXML(parametersValues, XSTREAM);
+                myParametersValues = xmlConverter.fromXML(parametersValues);
                 if (myParametersValues != null && !(myParametersValues.length == 0)) {
                     final Iterator<byte[]> binaryParameters = getBinaryParameters().iterator();
                     for (int i = 0; i < myParametersValues.length; i++) {
@@ -111,11 +101,9 @@ public class HttpAPIServletCall extends ServletCall {
                 }
             }
 
-            final ServerAPI serverAPI = ServerAPIFactory.getServerAPI();
-
             final Object invokeMethod;
             try {
-                invokeMethod = serverAPI.invokeMethod(myOptions, apiInterfaceName, methodName, myClassNameParameters, myParametersValues);
+                invokeMethod = getServerAPI().invokeMethod(myOptions, apiInterfaceName, methodName, myClassNameParameters, myParametersValues);
             } catch (ServerWrappedException e) {
                 // merge stack trace of the server exception
                 throw StackTraceTransformer.mergeStackTraces(e);
@@ -123,36 +111,19 @@ public class HttpAPIServletCall extends ServletCall {
 
             String invokeMethodSerialized = null;
             if (invokeMethod != null) {
-                invokeMethodSerialized = toXML(invokeMethod, XSTREAM);
+                invokeMethodSerialized = xmlConverter.toXML(invokeMethod);
             }
 
             // add charset avoid encoding problems
-            this.output(invokeMethodSerialized);
+            output(invokeMethodSerialized);
         } catch (final Exception e) {
             error(toResponse(e), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T fromXML(final String object, final XStream xstream) {
-        final StringReader xmlReader = new StringReader(object);
-        ObjectInputStream in = null;
-
-        try {
-            in = xstream.createObjectInputStream(xmlReader);
-            try {
-                return (T) in.readObject();
-            } catch (final IOException e) {
-                throw new BonitaRuntimeException("unable to deserialize object " + object, e);
-            } catch (final ClassNotFoundException e) {
-                throw new BonitaRuntimeException("unable to deserialize object " + object, e);
-            } finally {
-                in.close();
-                xmlReader.close();
-            }
-        } catch (final IOException e) {
-            throw new BonitaRuntimeException("unable to deserialize object " + object, e);
-        }
+    // Visible for testing
+    ServerAPI getServerAPI() {
+        return ServerAPIFactory.getServerAPI();
     }
 
     @Override
@@ -166,35 +137,11 @@ public class HttpAPIServletCall extends ServletCall {
     }
 
     private String toResponse(final Exception exception) {
-        Throwable result = null;
+        Throwable result = exception;
         if (exception instanceof ServerWrappedException) {
             result = exception.getCause();
-        } else {
-            result = exception;
         }
-        // ignore fields suppressedExceptions and stackTrance causing exceptions in some cases
-        XSTREAM.omitField(Throwable.class, "suppressedExceptions");
-        // xstream.omitField(Throwable.class, "stackTrace");
-        return toXML(result, XSTREAM);
-    }
-
-    private String toXML(final Object object, final XStream xstream) {
-        final StringWriter stringWriter = new StringWriter();
-        ObjectOutputStream out;
-        try {
-            out = xstream.createObjectOutputStream(stringWriter);
-            try {
-                out.writeObject(object);
-            } catch (final IOException e) {
-                throw new BonitaRuntimeException("unable to serialize object " + object.toString(), e);
-            } finally {
-                stringWriter.close();
-                out.close();
-            }
-        } catch (final IOException e1) {
-            throw new BonitaRuntimeException("unable to serialize object " + object.toString(), e1);
-        }
-        return stringWriter.toString();
+        return xmlConverter.toXML(result);
     }
 
 }
