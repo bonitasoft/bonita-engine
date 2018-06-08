@@ -84,8 +84,8 @@ public abstract class ServletCall {
         super();
         this.request = request;
         this.response = response;
-        parameters = new HashMap<String, String>();
-        binaryParameters = new ArrayList<byte[]>();
+        parameters = new HashMap<>();
+        binaryParameters = new ArrayList<>();
         if (ServletFileUpload.isMultipartContent(request)) {
             final ServletFileUpload upload = new ServletFileUpload();
             // Parse the request
@@ -358,7 +358,6 @@ public abstract class ServletCall {
 
     /**
      * Prepare the output
-     * 
      * @param response
      */
     private PrintWriter getOutputWriter() {
