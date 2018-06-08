@@ -402,13 +402,17 @@ public class ConnectorServiceImpl implements ConnectorService {
     private void updateJarDependencies(SProcessDefinition sDefinition, ConnectorArchive connectorArchive,
             SConnectorImplementationDescriptor connectorImplementationDescriptorToReplace)
             throws SBonitaReadException, SDependencyException {
-        List<String> jarFileNames = connectorImplementationDescriptorToReplace == null ? Collections.<String> emptyList()
+        List<String> jarFileNames = connectorImplementationDescriptorToReplace == null ? Collections.emptyList()
                 : connectorImplementationDescriptorToReplace.getJarDependencies();
         Set<String> dependenciesToUpdate = new HashSet<>();
-        // delete the .jar files for the specified connector
         if (jarFileNames != null) {
             for (String jarFileName : jarFileNames) {
-                final SDependency dependencyOfArtifact = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, jarFileName);
+                SDependency dependencyOfArtifact = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS, jarFileName);
+                if (dependencyOfArtifact == null) {
+                    // For compatibility with older versions that may still have the wrong name in database:
+                    dependencyOfArtifact = dependencyService.getDependencyOfArtifact(sDefinition.getId(), ScopeType.PROCESS,
+                            sDefinition.getId() + "_" + jarFileName);
+                }
                 if (dependencyOfArtifact != null) {
                     if (connectorArchive.getDependencies().keySet().contains(jarFileName)) {
                         dependenciesToUpdate.add(jarFileName);
