@@ -1041,6 +1041,16 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 	</query>
 
+	<query name="getNumberOfSCallActivityInstancewithSActivityInstance">
+		SELECT COUNT(a)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl AS a
+	</query>
+
+	<query name="searchSCallActivityInstancewithSActivityInstance">
+		SELECT a
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl AS a
+	</query>
+
 	<!-- Process Instance  -->
 	<query name="getNumberOfSProcessInstance">
 		SELECT COUNT(DISTINCT p)

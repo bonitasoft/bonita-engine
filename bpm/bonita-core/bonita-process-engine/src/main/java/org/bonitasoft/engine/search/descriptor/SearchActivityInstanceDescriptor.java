@@ -38,7 +38,7 @@ public class SearchActivityInstanceDescriptor extends SearchEntityDescriptor {
 
     public SearchActivityInstanceDescriptor() {
         final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        activityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(11);
+        activityInstanceDescriptorKeys = new HashMap<>();
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.NAME,
                 new FieldDescriptor(SActivityInstance.class, keyProvider.getNameKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.STATE_NAME,
@@ -64,8 +64,8 @@ public class SearchActivityInstanceDescriptor extends SearchEntityDescriptor {
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.ROLE_ID,
                 new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
 
-        activityInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> tasksInstanceFields = new HashSet<String>(2);
+        activityInstanceDescriptorAllFields = new HashMap<>();
+        final Set<String> tasksInstanceFields = new HashSet<>();
         tasksInstanceFields.add(keyProvider.getNameKey());
         tasksInstanceFields.add(keyProvider.getDisplayNameKey());
         activityInstanceDescriptorAllFields.put(SActivityInstance.class, tasksInstanceFields);
