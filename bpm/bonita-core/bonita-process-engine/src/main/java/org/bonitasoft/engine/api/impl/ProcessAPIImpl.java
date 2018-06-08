@@ -153,6 +153,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
@@ -3281,6 +3282,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 @Override
                 public Void call() throws Exception {
                     final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+
                     deleteJobsOnProcessInstance(sProcessInstance);
                     processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
                     return null;
@@ -3365,8 +3367,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<SIntermediateCatchEventDefinition> intermediateCatchEvents = sSubProcessDefinition.getSubProcessContainer().getIntermediateCatchEvents();
             deleteJobsOnEventSubProcess(processDefinition, sProcessInstance, sSubProcessDefinition, intermediateCatchEvents);
 
-            final List<SBoundaryEventDefinition> sEndEventDefinitions = sSubProcessDefinition.getSubProcessContainer().getBoundaryEvents();
-            deleteJobsOnEventSubProcess(processDefinition, sProcessInstance, sSubProcessDefinition, sEndEventDefinitions);
+            final List<SBoundaryEventDefinition> sBoundaryEventDefinitions = sSubProcessDefinition.getSubProcessContainer().getBoundaryEvents();
+            deleteJobsOnEventSubProcess(processDefinition, sProcessInstance, sSubProcessDefinition, sBoundaryEventDefinitions);
         }
     }
 
@@ -3412,16 +3414,47 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteJobsOnProcessInstance(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance)
             throws SBonitaReadException {
+
+        deleteJobsOnCallActivitiesOfProcessInstance(sProcessInstance.getId());
+
         final List<SStartEventDefinition> startEventsOfSubProcess = processDefinition.getProcessContainer().getStartEvents();
         deleteJobsOnProcessInstance(processDefinition, sProcessInstance, startEventsOfSubProcess);
 
         final List<SIntermediateCatchEventDefinition> intermediateCatchEvents = processDefinition.getProcessContainer().getIntermediateCatchEvents();
         deleteJobsOnProcessInstance(processDefinition, sProcessInstance, intermediateCatchEvents);
 
-        final List<SBoundaryEventDefinition> sEndEventDefinitions = processDefinition.getProcessContainer().getBoundaryEvents();
-        deleteJobsOnProcessInstance(processDefinition, sProcessInstance, sEndEventDefinitions);
+        final List<SBoundaryEventDefinition> sBoundaryEventDefinitions = processDefinition.getProcessContainer().getBoundaryEvents();
+        deleteJobsOnProcessInstance(processDefinition, sProcessInstance, sBoundaryEventDefinitions);
 
         deleteJobsOnEventSubProcess(processDefinition, sProcessInstance);
+    }
+
+    private void deleteJobsOnCallActivitiesOfProcessInstance(final long processInstanceId) throws SBonitaReadException {
+        List<ActivityInstance> flowNodeInstances;
+        int index = 0;
+        final ProcessInstanceService processInstanceService = getTenantAccessor().getProcessInstanceService();
+        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
+        do {
+            try {
+                flowNodeInstances = searchActivities(new SearchOptionsBuilder(index, index + BATCH_SIZE)
+                        .filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY)
+                        .done()).getResult();
+            } catch (SearchException e) {
+                throw new SBonitaReadException("Unable to delete jobs on call activities of process instance id " + processInstanceId, e);
+            }
+            for (ActivityInstance callActivityInstance : flowNodeInstances) {
+                try {
+                    deleteJobsOnProcessInstance(processInstanceService.getChildOfActivity(callActivityInstance.getId()));
+                } catch (SBonitaException e) {
+                    logger.log(getClass(), TechnicalLogSeverity.INFO,
+                            "Can't find the process instance called by the activity. This process may be already finished.", e);
+
+                }
+            }
+            index = index + BATCH_SIZE;
+        } while (flowNodeInstances.size() == BATCH_SIZE);
+
     }
 
     private void deleteJobsOnProcessInstance(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance,
