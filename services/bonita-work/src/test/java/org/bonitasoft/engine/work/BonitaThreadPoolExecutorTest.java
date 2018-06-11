@@ -21,7 +21,6 @@ import static org.awaitility.Awaitility.await;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,42 +46,21 @@ public class BonitaThreadPoolExecutorTest {
     private MyWorkExecutionCallback workExecutionCallback = new MyWorkExecutionCallback();
     private BonitaThreadPoolExecutor bonitaThreadPoolExecutor;
     private FixedEngineClock engineClock = new FixedEngineClock(Instant.now());
-    private WorkFactory workFactory = workDescriptor -> new BonitaWork() {
-
-        @Override
-        public String getDescription() {
-            return workDescriptor.toString();
-        }
-
-        @Override
-        public void work(Map<String, Object> context) throws Exception {
-            switch (workDescriptor.getType()) {
-                case "EXCEPTION":
-                    throw new Exception("classic exception");
-                case "NORMAL":
-            }
-        }
-
-        @Override
-        public void handleFailure(Exception e, Map<String, Object> context) throws Exception {
-
-        }
-    };
-
-    public BonitaThreadPoolExecutorTest() {
-    }
+    private WorkFactory workFactory = new LocalWorkFactory(2);
 
     @Before
     public void before() throws Exception {
-        ThreadFactory threadFactory = new WorkerThreadFactory("test-worker", 1, 3);
-        bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(3, 3, 1000, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(1000), threadFactory,
-                (r, executor) -> {
-                }, workFactory, technicalLoggerService, engineClock, workExecutionCallback);
+        bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(3, 3 //
+                , 1_000, TimeUnit.SECONDS //
+                , new ArrayBlockingQueue<>(1_000) //
+                , new WorkerThreadFactory("test-worker", 1, 3) //
+                , (r, executor) -> {
+                } //
+                , workFactory, technicalLoggerService, engineClock, workExecutionCallback);
     }
 
     @Test
-    public void should_call_on_success_callback_when_work_executed_properly() throws Exception {
+    public void should_call_on_success_callback_when_work_executed_properly() {
         WorkDescriptor workDescriptor = WorkDescriptor.create("NORMAL");
 
         bonitaThreadPoolExecutor.submit(workDescriptor);
@@ -92,7 +70,7 @@ public class BonitaThreadPoolExecutorTest {
     }
 
     @Test
-    public void should_call_on_failure_callback_when_work_executed_properly() throws Exception {
+    public void should_call_on_failure_callback_when_work_executed_properly() {
         WorkDescriptor workDescriptor = WorkDescriptor.create("EXCEPTION");
 
         bonitaThreadPoolExecutor.submit(workDescriptor);
@@ -116,6 +94,49 @@ public class BonitaThreadPoolExecutorTest {
         //add time, work should be executed
         engineClock.addTime(5, SECONDS);
         await().until(() -> workExecutionCallback.isOnSuccessCalled());
+    }
+
+    @Test
+    public void should_update_works_counters_when_adding_a_workDescriptor_with_immediate_execution() throws Exception {
+        //given:
+        WorkDescriptor workDescriptor = WorkDescriptor.create("NORMAL");
+
+        //when:
+        bonitaThreadPoolExecutor.submit(workDescriptor);
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
+
+        //then:
+        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(1);
+        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(0);
+        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(0);
+    }
+
+    @Test
+    public void should_update_works_counters_when_enqueuing_workDescriptor_with_long_processing_time()
+            throws Exception {
+        // We are using
+        // an executor that can process only 1 element at a given time
+        // works that take a lot of time to process to ensure to enqueue subsequent submitted works
+
+        //given:
+        bonitaThreadPoolExecutor = new BonitaThreadPoolExecutor(1, 1 //
+                , 1_000, TimeUnit.SECONDS //
+                , new ArrayBlockingQueue<>(1_000) //
+                , new WorkerThreadFactory("test-worker", 1, 3) //
+                , (r, executor) -> {
+                } //
+                , workFactory //
+                , technicalLoggerService, engineClock, workExecutionCallback);
+
+        //when:
+        bonitaThreadPoolExecutor.submit(WorkDescriptor.create("SLEEP"));
+        bonitaThreadPoolExecutor.submit(WorkDescriptor.create("NORMAL"));
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
+
+        //then:
+        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(0);
+        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(1);
+        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(1);
     }
 
     private static class MyWorkExecutionCallback implements WorkExecutionCallback {
@@ -142,4 +163,44 @@ public class BonitaThreadPoolExecutorTest {
             return onFailureCalled.get();
         }
     }
+
+    private static class LocalWorkFactory implements WorkFactory {
+
+        private final long workSleepPeriodInSeconds;
+
+        private LocalWorkFactory(long workSleepPeriodInSeconds) {
+            this.workSleepPeriodInSeconds = workSleepPeriodInSeconds;
+        }
+
+        @Override
+        public BonitaWork create(WorkDescriptor workDescriptor) {
+            return new BonitaWork() {
+
+                @Override
+                public String getDescription() {
+                    return workDescriptor.toString();
+                }
+
+                @Override
+                public void work(Map<String, Object> context) throws Exception {
+                    switch (workDescriptor.getType()) {
+                        case "EXCEPTION":
+                            throw new Exception("classic exception");
+                        case "SLEEP":
+                            TimeUnit.SECONDS.sleep(workSleepPeriodInSeconds);
+                            break;
+                        case "NORMAL":
+                        default:
+                    }
+                }
+
+                @Override
+                public void handleFailure(Exception e, Map<String, Object> context) {
+                    // do nothing
+                }
+            };
+        }
+
+    }
+
 }
