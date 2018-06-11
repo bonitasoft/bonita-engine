@@ -25,12 +25,14 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -45,7 +47,7 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class ConnectorExecutorImpl implements ConnectorExecutor {
+public class ConnectorExecutorImpl implements ConnectorExecutor, ObservableExecutor {
 
     private ExecutorService executorService;
 
@@ -64,6 +66,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     private final TechnicalLoggerService loggerService;
 
     private final TimeTracker timeTracker;
+
+    private final AtomicLong pendingWorks = new AtomicLong();
+    private final AtomicLong runningWorks = new AtomicLong();
+    private final AtomicLong executedWorks = new AtomicLong();
 
     /**
      * The handling of threads relies on the JVM
@@ -117,7 +123,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
         }
         final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader);
-        final Future<Map<String, Object>> submit = executorService.submit(callable);
+        final Future<Map<String, Object>> submit = executorService.submit(wrapForStats(callable));
         try {
             return getValue(submit);
         } catch (final InterruptedException | ExecutionException e) {
@@ -130,6 +136,21 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         } finally {
             track(TimeTrackerRecords.EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT, startTime, sConnector, inputParameters);
         }
+    }
+
+    private Callable<Map<String, Object>> wrapForStats(final Callable<Map<String, Object>> task) {
+        pendingWorks.incrementAndGet();
+        return () -> {
+            pendingWorks.decrementAndGet();
+            runningWorks.incrementAndGet();
+            try {
+                Map<String, Object> call = task.call();
+                executedWorks.incrementAndGet();
+                return call;
+            } finally {
+                runningWorks.decrementAndGet();
+            }
+        };
     }
 
     private void track(final TimeTrackerRecords recordName, final long startTime, final SConnector sConnector, final Map<String, Object> inputParameters) {
@@ -154,7 +175,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             sConnector.disconnect();
         } catch (final Exception t) {
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occured while disconnecting the connector: " + sConnector, t);
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occurred while disconnecting the connector: " + sConnector, t);
             }
         }
     }
@@ -168,6 +189,21 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         } catch (final Exception t) {
             throw new SConnectorException(t);
         }
+    }
+
+    @Override
+    public long getPendings() {
+        return pendingWorks.get();
+    }
+
+    @Override
+    public long getRunnings() {
+        return runningWorks.get();
+    }
+
+    @Override
+    public long getExecuted() {
+        return executedWorks.get();
     }
 
     /**

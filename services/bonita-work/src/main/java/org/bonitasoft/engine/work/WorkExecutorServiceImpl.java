@@ -21,11 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.ObservableExecutor;
 
 /**
  * @author Baptiste Mesta
  */
-public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecutionCallback {
+public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecutionCallback, ObservableExecutor {
 
     private BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
     private BonitaExecutorService executor;
@@ -130,5 +131,29 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
 
     @Override
     public void notifyNodeStopped(String nodeName) {
+    }
+
+    @Override
+    public long getPendings() {
+        if (executor == null) {
+            return 0;
+        }
+        return executor.getPendings();
+    }
+
+    @Override
+    public long getRunnings() {
+        if (executor == null) {
+            return 0;
+        }
+        return executor.getRunnings();
+    }
+
+    @Override
+    public long getExecuted() {
+        if (executor == null) {
+            return 0;
+        }
+        return executor.getExecuted();
     }
 }

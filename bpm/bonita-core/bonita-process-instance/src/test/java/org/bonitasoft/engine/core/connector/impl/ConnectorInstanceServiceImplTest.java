@@ -50,12 +50,10 @@ public class ConnectorInstanceServiceImplTest {
 
     private static final String EXCEPTION_MESSAGE = "exceptionMessage";
 
-    private final String message = "An exception occured during execution.";
-
-    private final String causedByMessage = "This is the caused by message.";
+    private final String message = "An exception occurred during execution.";
 
     @Mock
-    private ReadPersistenceService readPersitenceService;
+    private ReadPersistenceService readPersistenceService;
 
     @Mock
     private Recorder recorder;
@@ -110,6 +108,7 @@ public class ConnectorInstanceServiceImplTest {
 
     @Test
     public void setConnectorInstanceFailureExceptionWithCausedBy() throws Exception {
+        String causedByMessage = "This is the caused by message.";
         final Exception causedByException = new Exception(causedByMessage);
         final Exception exception = new Exception(message, causedByException);
 
@@ -174,7 +173,7 @@ public class ConnectorInstanceServiceImplTest {
     @Test
     public void getConnectorInstanceWithFailureInfo_should_return_the_result_of_select_list() throws Exception {
         //given
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("containerId", 1L);
         parameters.put("containerType", "flowNode");
         parameters.put("state", "failed");
@@ -182,7 +181,8 @@ public class ConnectorInstanceServiceImplTest {
         List<SConnectorInstanceWithFailureInfo> connectors = Arrays.asList(mock(SConnectorInstanceWithFailureInfo.class),
                 mock(SConnectorInstanceWithFailureInfo.class));
         given(
-                readPersitenceService.selectList(new SelectListDescriptor<SConnectorInstanceWithFailureInfo>("getConnectorInstancesWithFailureInfoInState",
+                readPersistenceService.selectList(new SelectListDescriptor<SConnectorInstanceWithFailureInfo>(
+                        "getConnectorInstancesWithFailureInfoInState",
                         parameters,
                         SConnectorInstanceWithFailureInfo.class, new QueryOptions(0, 100, SConnectorInstanceWithFailureInfo.class, "id", OrderByType.ASC))))
                 .willReturn(connectors);

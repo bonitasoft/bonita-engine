@@ -92,15 +92,13 @@ public interface OrganizationAPI {
 
 
     /**
-     * Imports the organization. Returns the error/info messages about what occured during the process.
+     * Imports the organization. Returns the error/info messages about what occurred during the process.
      * Functionally the same thing that {@link OrganizationAPI#importOrganization(String, ImportPolicy)} but allows
-     * to inform the end-user of particular non-critical events that occured during the import.
-     *
+     * to inform the end-user of particular non-critical events that occurred during the import.
      * <p>
      * Ex: If a group in the organization contains an illegal character in their name, the method will import all the other
      * groups in the organization, and return a List with one String : "The group name (...) contains the illegal character (...). The group has not been imported"
      * </p>
-     *
      * <p>
      * An organization is composed by users, roles, groups and user memberships.
      * </p>
