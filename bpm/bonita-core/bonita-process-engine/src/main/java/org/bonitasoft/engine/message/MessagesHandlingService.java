@@ -18,16 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
@@ -43,6 +41,7 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.monitoring.ObservableExecutor;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
@@ -55,7 +54,7 @@ import org.bonitasoft.engine.work.WorkService;
 /**
  * @author Baptiste Mesta
  */
-public class MessagesHandlingService implements TenantLifecycleService {
+public class MessagesHandlingService implements TenantLifecycleService, ObservableExecutor {
 
     private static final int MAX_COUPLES = 1000;
     private static final String LOCK_TYPE = "EVENTS";
@@ -68,6 +67,8 @@ public class MessagesHandlingService implements TenantLifecycleService {
     private UserTransactionService userTransactionService;
     private SessionAccessor sessionAccessor;
     private BPMWorkFactory workFactory;
+
+    private AtomicLong executedMessages = new AtomicLong();
 
     public MessagesHandlingService(EventInstanceService eventInstanceService, WorkService workService, TechnicalLoggerService loggerService,
             LockService lockService, Long tenantId, UserTransactionService userTransactionService,
@@ -83,25 +84,16 @@ public class MessagesHandlingService implements TenantLifecycleService {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         log(TechnicalLogSeverity.INFO, "Starting thread that handle messages.");
-        threadPoolExecutor = new ThreadPoolExecutor(1, 1, 3600000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(5), new ThreadFactory() {
-
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, "Bonita-Message-Matching");
-            }
-        }, new RejectedExecutionHandler() {
-
-            @Override
-            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                log(TechnicalLogSeverity.DEBUG, "Message matching queue capacity reached.");
-            }
-        });
+        threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1L, TimeUnit.HOURS,
+                new ArrayBlockingQueue<>(5),
+                r -> new Thread(r, "Bonita-Message-Matching"),
+                (r, executor) -> log(TechnicalLogSeverity.DEBUG, "Message matching queue capacity reached."));
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() {
         if (threadPoolExecutor == null) {
             log(TechnicalLogSeverity.INFO, "Thread that handle messages is already stopped.");
             return;
@@ -121,12 +113,12 @@ public class MessagesHandlingService implements TenantLifecycleService {
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         stop();
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         start();
     }
 
@@ -139,24 +131,23 @@ public class MessagesHandlingService implements TenantLifecycleService {
     }
 
     private void matchEventCoupleAndTriggerExecution() throws Exception {
-        userTransactionService.executeInTransaction(new Callable<Object>() {
-
-            @Override
-            public Object call() throws Exception {
-                final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples(0, MAX_COUPLES);
-                final List<SMessageEventCouple> uniqueCouples = getMessageUniqueCouples(potentialMessageCouples);
-                executeUniqueMessageCouplesWork(uniqueCouples);
-                if (uniqueCouples.size() > 0) {
-                    log(TechnicalLogSeverity.INFO, "Triggered execution of " + uniqueCouples.size() + " event couples");
-                } else {
-                    log(TechnicalLogSeverity.DEBUG, "Executed thread to match event couples, but there is nothing to match");
-                }
-                if (potentialMessageCouples.size() == MAX_COUPLES) {
-                    log(TechnicalLogSeverity.DEBUG, "There is more than " + MAX_COUPLES + " event to match. will retrigger the execution now.");
-                    triggerMatchingOfMessages();
-                }
-                return null;
+        userTransactionService.executeInTransaction(() -> {
+            final List<SMessageEventCouple> potentialMessageCouples = eventInstanceService.getMessageEventCouples(0,
+                    MAX_COUPLES);
+            final List<SMessageEventCouple> uniqueCouples = getMessageUniqueCouples(potentialMessageCouples);
+            executeUniqueMessageCouplesWork(uniqueCouples);
+            if (!uniqueCouples.isEmpty()) {
+                log(TechnicalLogSeverity.INFO, "Triggered execution of " + uniqueCouples.size() + " event couples");
+            } else {
+                log(TechnicalLogSeverity.DEBUG,
+                        "Executed thread to match event couples, but there is nothing to match");
             }
+            if (potentialMessageCouples.size() == MAX_COUPLES) {
+                log(TechnicalLogSeverity.DEBUG,
+                        "There is more than " + MAX_COUPLES + " event to match. will retrigger the execution now.");
+                triggerMatchingOfMessages();
+            }
+            return null;
         });
     }
 
@@ -182,6 +173,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
         if (!SBPMEventType.START_EVENT.equals(waitingMsg.getEventType())) {
             markWaitingMessageAsInProgress(waitingMsg);
         }
+        executedMessages.incrementAndGet();
         workService.registerWork(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMsg));
     }
 
@@ -194,7 +186,7 @@ public class MessagesHandlingService implements TenantLifecycleService {
      * @param potentialMessageCouples all the possible couples that match the potential correlation.
      * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
      */
-    List<SMessageEventCouple> getMessageUniqueCouples(List<SMessageEventCouple> potentialMessageCouples) throws SEventTriggerInstanceReadException {
+    List<SMessageEventCouple> getMessageUniqueCouples(List<SMessageEventCouple> potentialMessageCouples) {
         final List<Long> takenMessages = new ArrayList<>();
         final List<Long> takenWaitings = new ArrayList<>();
         final List<SMessageEventCouple> uniqueMessageCouples = new ArrayList<>();
@@ -255,6 +247,21 @@ public class MessagesHandlingService implements TenantLifecycleService {
         descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
                 SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
+    }
+
+    @Override
+    public long getPendings() {
+        return 0;
+    }
+
+    @Override
+    public long getRunnings() {
+        return 0;
+    }
+
+    @Override
+    public long getExecuted() {
+        return executedMessages.get();
     }
 
     private class MatchEventCallable implements Callable<Void> {

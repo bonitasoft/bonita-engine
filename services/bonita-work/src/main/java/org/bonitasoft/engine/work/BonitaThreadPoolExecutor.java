@@ -20,6 +20,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bonitasoft.engine.commons.time.EngineClock;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -36,6 +37,9 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
     private final TechnicalLoggerService logger;
     private final EngineClock engineClock;
     private final WorkExecutionCallback workExecutionCallback;
+
+    private final AtomicLong runningWorks = new AtomicLong();
+    private final AtomicLong executedWorks = new AtomicLong();
 
     public BonitaThreadPoolExecutor(final int corePoolSize,
             final int maximumPoolSize,
@@ -87,12 +91,31 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             BonitaWork bonitaWork = workFactory.create(work);
             HashMap<String, Object> context = new HashMap<>();
             try {
+                runningWorks.incrementAndGet();
                 bonitaWork.work(context);
                 workExecutionCallback.onSuccess(work);
             } catch (Exception e) {
                 workExecutionCallback.onFailure(work, bonitaWork, context, e);
             }
+            finally {
+                executedWorks.incrementAndGet();
+                runningWorks.decrementAndGet();
+            }
         });
     }
 
+    @Override
+    public long getPendings() {
+        return workQueue.size();
+    }
+
+    @Override
+    public long getRunnings() {
+        return runningWorks.get();
+    }
+
+    @Override
+    public long getExecuted() {
+        return executedWorks.get();
+    }
 }
