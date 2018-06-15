@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bonita-engine</artifactId>
         <groupId>org.bonitasoft.engine</groupId>
-        <version>7.7.1-SNAPSHOT</version>
+        <version>7.7.1.W24</version>
     </parent>
 
     <artifactId>services</artifactId>
