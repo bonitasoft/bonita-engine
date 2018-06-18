@@ -18,8 +18,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.notNull;
 
 import java.io.Serializable;
@@ -427,6 +427,33 @@ public class ConnectorServiceImplTest {
         for (BarResource jar : jars) {
             doReturn(new SDependencyImpl(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
                     .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, jar.getName());
+        }
+    }
+
+    @Test
+    public void setConnectorImplementation_should_detect_old_convention_fileName_in_db() throws Exception {
+        //given
+        byte[] zip = createConnectorArchiveZip("myConnector2.impl", "connectorId", "connectorVersion");
+        havingConnectorWithWrongJarName(processDefinition, "myConnector1.impl", "connectorId", "connectorVersion",
+                new BarResource("myJar.jar", new byte[] { 1 }));
+
+        //when
+        connectorService.setConnectorImplementation(processDefinition, "connectorId", "connectorVersion", zip);
+
+        //then
+        verify(dependencyService).getDependencyOfArtifact(123153L, ScopeType.PROCESS, "123153_myJar.jar");
+    }
+
+    private void havingConnectorWithWrongJarName(SProcessDefinitionImpl processDefinition, String implName, String connectorId, String connectorVersion, BarResource... jars)
+            throws Exception {
+        doReturn(Collections.singletonList(
+                new SBARResource(implName, BARResourceType.CONNECTOR, processDefinition.getId(), createConnectorImplFile(connectorId, connectorVersion, jars))))
+                        .when(processResourcesService)
+                        .get(eq(processDefinition.getId()), eq(BARResourceType.CONNECTOR), anyInt(), anyInt());
+        for (BarResource jar : jars) {
+            doReturn(null).when(dependencyService).getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, jar.getName());
+            doReturn(new SDependencyImpl(jar.getName(), jar.getName(), jar.getContent())).when(dependencyService)
+                    .getDependencyOfArtifact(processDefinition.getId(), ScopeType.PROCESS, processDefinition.getId()+ "_" + jar.getName());
         }
     }
 
