@@ -15,12 +15,21 @@ package org.bonitasoft.engine.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -34,17 +43,17 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
     private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
 
+    protected static void setSessionInfo(final APISession session) throws Exception {
+        final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+        sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+    }
+
     protected PlatformServiceAccessor getPlatformAccessor() {
         try {
             return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-    }
-
-    protected static void setSessionInfo(final APISession session) throws Exception {
-        final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
     }
 
     private boolean containsTimerJob(final String jobName) throws Exception {
@@ -219,6 +228,95 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void deleteProcessInstanceAlsoDeleteChildrenProcessesEvents() throws Exception {
+        // deploy a simple process with BoundaryEvent P1
+        List<ProcessDefinition> processDefinitions = new ArrayList<>();
+        final String simpleStepName = "simpleStep";
+        final ProcessDefinition simpleProcess = deployAndEnableSimpleProcessWithBoundaryEvent("simpleProcess", simpleStepName);
+        processDefinitions.add(simpleProcess); // To clean in the end
+
+        // deploy a process P2 containing a call activity calling P1
+        final String intermediateStepName = "intermediateStep1";
+        final String intermediateCallActivityName = "intermediateCall";
+        final ProcessDefinition intermediateProcess = deployAndEnableProcessWithCallActivity("intermediateProcess", simpleProcess.getName(),
+                intermediateStepName, intermediateCallActivityName);
+        processDefinitions.add(intermediateProcess); // To clean in the end
+
+        // deploy a process P3 containing a call activity calling P2
+        final String rootStepName = "rootStep1";
+        final String rootCallActivityName = "rootCall";
+        final ProcessDefinition rootProcess = deployAndEnableProcessWithCallActivity("rootProcess", intermediateProcess.getName(), rootStepName,
+                rootCallActivityName);
+        processDefinitions.add(rootProcess); // To clean in the end
+
+        // start P3, the call activities will start instances of P2 a and P1
+        final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
+        waitForUserTask(rootProcessInstance, simpleStepName);
+        List<String> allJobs = getPlatformAccessor().getSchedulerService().getAllJobs();
+
+        boolean timer_ev_isCreated = false;
+        for (String job : allJobs) {
+            if (job.contains("Timer_Ev")) {
+                timer_ev_isCreated = true;
+            }
+        }
+        //make sure timer events are created
+        assertThat(timer_ev_isCreated).isTrue();
+
+        // delete the root process instance
+        getProcessAPI().deleteProcessInstance(rootProcessInstance.getId());
+
+        // check that the instances of p1 and p2 were deleted
+        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
+        assertThat(processInstances.size()).isEqualTo(0);
+
+        // check that archived flow nodes were deleted.
+        List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(rootProcessInstance.getId(), 0, 100,
+                ActivityInstanceCriterion.DEFAULT);
+        assertThat(taskInstances.size()).isEqualTo(0);
+
+        //check the quartz events got deleted correctly
+        allJobs = getPlatformAccessor().getSchedulerService().getAllJobs();
+
+        for (String job : allJobs) {
+            // There might be a few of those left in the DB, it should be the only ones
+            assertThat(job).isEqualToIgnoringCase("CleanInvalidSessions");
+        }
+        //cleanup
+        disableAndDeleteProcess(processDefinitions);
+    }
+
+    private ProcessDefinition deployAndEnableSimpleProcessWithBoundaryEvent(final String processName, final String userTaskName) throws BonitaException {
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        processDefBuilder.addActor(ACTOR_NAME);
+        processDefBuilder.addStartEvent("tStart");
+        processDefBuilder.addUserTask(userTaskName, ACTOR_NAME).addBoundaryEvent("TheBoundaryEvent").addTimerEventTriggerDefinition(TimerType.DURATION,
+                new ExpressionBuilder().createConstantLongExpression(6000L));
+        processDefBuilder.addEndEvent("tEnd");
+        processDefBuilder.addEndEvent("tBoundaryEnd");
+        processDefBuilder.addTransition("TheBoundaryEvent", "tBoundaryEnd");
+        processDefBuilder.addTransition("tStart", userTaskName);
+        processDefBuilder.addTransition(userTaskName, "tEnd");
+        return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, user);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String userTaskName,
+            final String callActivityName) throws BonitaException {
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
+
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
+        processDefBuilder.addActor(ACTOR_NAME);
+        processDefBuilder.addStartEvent("start");
+        processDefBuilder.addCallActivity(callActivityName, targetProcessNameExpr, null);
+        processDefBuilder.addUserTask(userTaskName, ACTOR_NAME);
+        processDefBuilder.addEndEvent("end");
+        processDefBuilder.addTransition("start", callActivityName);
+        processDefBuilder.addTransition(callActivityName, userTaskName);
+        processDefBuilder.addTransition(userTaskName, "end");
+        return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, user);
     }
 
 }
