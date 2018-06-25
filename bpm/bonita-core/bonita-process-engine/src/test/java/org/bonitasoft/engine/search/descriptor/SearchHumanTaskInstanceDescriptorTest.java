@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2018 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -13,36 +13,36 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.junit.Test;
 
-public class SearchArchivedHumanTaskInstanceDescriptorTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class SearchHumanTaskInstanceDescriptorTest {
 
     @Test
     public void getEntityKey_should_map_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
-        final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
+        final SearchHumanTaskInstanceDescriptor descriptor = new SearchHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup2");
     }
 
     @Test
     public void getEntityKey_should_map_root_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
-        final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
+        final SearchHumanTaskInstanceDescriptor descriptor = new SearchHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup2");
     }
 
     @Test
     public void getEntityKey_should_map_parent_process_instance_to_the_logical_group_4_which_is_the_parent_process_instance() {
-        final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
+        final SearchHumanTaskInstanceDescriptor descriptor = new SearchHumanTaskInstanceDescriptor();
 
-        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
+        final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(HumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
 
         assertThat(fieldDescriptor.getValue()).isEqualTo("logicalGroup4");
     }
