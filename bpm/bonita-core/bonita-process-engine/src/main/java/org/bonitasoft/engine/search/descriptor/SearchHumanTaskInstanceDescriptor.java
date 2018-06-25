@@ -57,6 +57,10 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
                 keyProvider.getProcessDefinitionKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SHumanTaskInstance.class,
                 keyProvider.getRootProcessInstanceKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
+        humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getParentProcessInstanceKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SHumanTaskInstance.class,
                 keyProvider.getParentActivityInstanceKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_CONTAINER_ID, new FieldDescriptor(SHumanTaskInstance.class,
