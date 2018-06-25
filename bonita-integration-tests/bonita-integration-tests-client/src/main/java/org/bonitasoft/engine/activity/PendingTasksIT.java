@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -96,6 +97,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         getProcessAPI().addGroupToActor(actors.get(1).getId(), group.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait for tasks in READY state:
         waitForUserTask(processInstance, "step1");
@@ -103,25 +105,33 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final long step3Id = waitForUserTask(processInstance, "step3");
         waitForUserTask(processInstance, "step4");
 
+        waitForUserTask(processInstance2, "step1");
+        waitForUserTask(processInstance2, "step2");
+        waitForUserTask(processInstance2, "step3");
+        waitForUserTask(processInstance2, "step4");
+
         // 2 tasks should already be pending for me:
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, Order.DESC);
         SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
-        assertEquals(2, humanTasksSearch.getCount());
+        assertEquals(4, humanTasksSearch.getCount());
+
+        List<HumanTaskInstance> searchResult = humanTasksSearch.getResult();
+        assertThat(searchResult).extracting(HumanTaskInstance::getRootContainerId).isSortedAccordingTo(Comparator.reverseOrder());
 
         // Force assigning 'task3' (DESC name sort) to me (event though I am not an actor for it):
         getProcessAPI().assignUserTask(step3Id, user.getId());
 
         // 3 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
-        assertEquals(3, humanTasksSearch.getCount());
+        assertEquals(5, humanTasksSearch.getCount());
 
         // Force assigning 'task2' (DESC name sort) to someone else than me (event though he is not an actor for it):
         getProcessAPI().assignUserTask(step2Id, user2.getId());
 
         // 2 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
-        assertEquals(2, humanTasksSearch.getCount());
+        assertEquals(4, humanTasksSearch.getCount());
 
         disableAndDeleteProcess(processDefinition);
         deleteUsers(user, user2);

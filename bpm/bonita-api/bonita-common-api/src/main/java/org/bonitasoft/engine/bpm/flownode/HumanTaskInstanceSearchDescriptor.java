@@ -50,6 +50,10 @@ public final class HumanTaskInstanceSearchDescriptor {
 
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
+    public static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
+
+    public static final String PARENT_PROCESS_INSTANCE_ID = "parentProcessInstanceId";
+
     public static final String PARENT_ACTIVITY_INSTANCE_ID = "parentActivityInstanceId";
 
     public static final String ASSIGNEE_ID = "assigneeId";
