@@ -464,12 +464,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private Long saveBusinessData(final Entity entity) throws SObjectCreationException {
         try {
-            final Entity mergedBusinessData = businessDataRepository.merge(ServerProxyfier.unProxy(entity));
+            final Entity mergedBusinessData = businessDataRepository.merge(ServerProxyfier.unProxifyIfNeeded(entity));
             if (mergedBusinessData == null) {
                 return null;
             }
             return mergedBusinessData.getPersistenceId();
-        } catch (IllegalArgumentException | IllegalAccessException e) {
+        } catch (IllegalArgumentException e) {
             throw new SObjectCreationException("Unable to save the business data", e);
         }
     }

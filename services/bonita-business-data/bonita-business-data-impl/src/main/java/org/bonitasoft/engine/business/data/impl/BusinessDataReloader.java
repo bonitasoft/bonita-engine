@@ -44,7 +44,7 @@ public class BusinessDataReloader {
     }
 
     public Class getEntityRealClass(Entity entity) {
-        return HibernateProxyHelper.getClassWithoutInitializingProxy(ServerProxyfier.unProxyfyIfNeeded(entity));
+        return HibernateProxyHelper.getClassWithoutInitializingProxy(ServerProxyfier.unProxifyIfNeeded(entity));
     }
 
     /**

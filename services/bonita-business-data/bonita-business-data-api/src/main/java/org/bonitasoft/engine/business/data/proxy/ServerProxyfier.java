@@ -18,9 +18,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
@@ -32,6 +35,8 @@ import javassist.util.proxy.ProxyFactory;
  * @author Laurent Leseigneur
  */
 public class ServerProxyfier {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerProxyfier.class);
 
     private final ServerLazyLoader lazyLoader;
 
@@ -136,9 +141,7 @@ public class ServerProxyfier {
         private boolean isAListOfEntities(final Object invocationResult) {
             if (invocationResult instanceof List) {
                 final List<?> list = (List<?>) invocationResult;
-                if (!list.isEmpty() && list.get(0) instanceof Entity) {
-                    return true;
-                }
+                return !list.isEmpty() && list.get(0) instanceof Entity;
             }
             return false;
         }
@@ -165,39 +168,34 @@ public class ServerProxyfier {
 
     }
 
-    public static Entity unProxyfyIfNeeded(final Entity entity) {
+    public static Entity unProxifyIfNeeded(final Entity entity) {
+        Entity detachedEntity = entity;
         if (entity != null && isLazyMethodProxyfied(entity)) {
-            final LazyMethodHandler handler = (LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity);
-            return handler.getEntity();
+            detachedEntity = ((LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity)).getEntity();
         }
-        return entity;
-    }
-
-    public static Entity unProxy(final Entity entity) throws IllegalArgumentException, IllegalAccessException {
-        final Entity realEntity = unProxyfyIfNeeded(entity);
-        if (entity != null) {
-            final Field[] declaredFields = realEntity.getClass().getDeclaredFields();
+        if (detachedEntity != null) {
+            final Field[] declaredFields = detachedEntity.getClass().getDeclaredFields();
             for (final Field field : declaredFields) {
-                if (Entity.class.isAssignableFrom(field.getType())) {
-                    field.setAccessible(true);
-                    field.set(entity, unProxyfyIfNeeded((Entity) field.get(entity)));
-                } else if (List.class.isAssignableFrom(field.getType())) {
-                    field.setAccessible(true);
-                    final List list = (List) field.get(entity);
-                    if (list != null && !list.isEmpty() && Entity.class.isAssignableFrom(list.get(0).getClass())) {
-                        final List<Entity> entities = list;
-                        final List<Entity> realEntities = new ArrayList<>();
-                        for (final Entity e : entities) {
-                            realEntities.add(unProxyfyIfNeeded(e));
+                try {
+                    if (Entity.class.isAssignableFrom(field.getType())) {
+                        field.setAccessible(true);
+                        field.set(detachedEntity, unProxifyIfNeeded((Entity) field.get(detachedEntity)));
+                    } else if (List.class.isAssignableFrom(field.getType())) {
+                        field.setAccessible(true);
+                        final List list = (List) field.get(detachedEntity);
+                        if (list != null && !list.isEmpty() && Entity.class.isAssignableFrom(list.get(0).getClass())) {
+                            final List<Entity> realEntities = ((List<Entity>) list).stream()
+                                    .map(ServerProxyfier::unProxifyIfNeeded).collect(Collectors.toList());
+                            list.clear();
+                            list.addAll(realEntities);
+                            field.set(detachedEntity, list);
                         }
-                        list.clear();
-                        list.addAll(realEntities);
-                        field.set(entity, list);
                     }
+                } catch (IllegalAccessException e) {
+                    LOGGER.error(String.format("Illegal access to field '%s' of Entity '%s'", field, detachedEntity));
                 }
             }
         }
-        return realEntity;
+        return detachedEntity;
     }
-
 }
