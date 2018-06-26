@@ -338,6 +338,45 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
+    @Test
+    public void updatingABOThroughAGroovyScriptShouldUpdateTheBO() throws Exception {
+        String businessDataName = "myEmployee";
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("BS-18402", "7.7.2");
+        processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIFIED_NAME, new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
+                "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIFIED_NAME));
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIFIED_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("CreateNewAddress", "import " +
+                                ADDRESS_QUALIFIED_NAME + "; Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; return a;",
+                        ADDRESS_QUALIFIED_NAME));
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName), OperatorType.ASSIGNMENT, null, null,
+                        new ExpressionBuilder().createGroovyScriptExpression("setEmployee", "import " +
+                                        EMPLOYEE_QUALIFIED_NAME + "; myEmployee.setAddress(myAddress); return myEmployee;",
+                                EMPLOYEE_QUALIFIED_NAME, new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME),
+                                new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("Start");
+        processDefinitionBuilder.addEndEvent("End");
+        processDefinitionBuilder.addTransition("Start", "step1");
+        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("step2", "End");
+        processDefinitionBuilder.addContextEntry("myEmployee_context_key",
+                new ExpressionBuilder().createGroovyScriptExpression("retrieveEmployeeAddressBasicInfo",
+                        "\"Employee [ address street = \" + " + businessDataName + ".address.street + \" ]\";",
+                        String.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)));
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, testUser);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(instance.getId(), "step2");
+
+        final Serializable employeeFromContext = getProcessAPI().getProcessInstanceExecutionContext(instance.getId()).get("myEmployee_context_key");
+        assertThat(employeeFromContext).isEqualTo("Employee [ address street = 32, rue Gustave Eiffel ]");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
     @Test(expected = ProcessEnablementException.class)
     public void deployProcessWithWrongBusinessDataTypeShouldNotBeDeployable() throws Exception {
         final User user = createUser("login1", "password");
