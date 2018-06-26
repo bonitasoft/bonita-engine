@@ -150,7 +150,7 @@ abstract class BundleConfigurator {
         }
     }
 
-    static String replaceValues(String content, Map<String, String> replacementMap) throws PlatformException {
+    static String replaceValues(String content, Map<String, String> replacementMap) {
         for (Map.Entry<String, String> entry : replacementMap.entrySet()) {
             content = content.replaceAll(entry.getKey(), entry.getValue());
         }
@@ -260,7 +260,7 @@ abstract class BundleConfigurator {
     /**
      * Constructs path relative to rootPath.
      *
-     * @param partialPath    path relative to rootPath
+     * @param partialPath path relative to rootPath
      * @param failIfNotExist should we fail if file does not exist?
      * @return the real path, constructed from rootPath, appending the partialPath
      */
@@ -277,7 +277,7 @@ abstract class BundleConfigurator {
     }
 
     // Visible for testing
-    static String escapeXmlCharacters(String url) throws PlatformException {
+    static String escapeXmlCharacters(String url) {
         return StringEscapeUtils.escapeXml11(url);
     }
 
@@ -289,16 +289,24 @@ abstract class BundleConfigurator {
         return getPath(APPSERVER_FOLDERNAME + "/" + path, failIfNotExist);
     }
 
-    protected static String getDatabaseConnectionUrlForXmlFile(DatabaseConfiguration configuration) throws PlatformException {
-        return escapeXmlCharacters(getDatabaseConnectionUrl(configuration));
+    protected static String getDatabaseConnectionUrlForXmlFile(DatabaseConfiguration configuration) {
+        return escapeXmlCharacters(Matcher.quoteReplacement(getDatabaseConnectionUrl(configuration)));
     }
 
-    protected static String getDatabaseConnectionUrl(DatabaseConfiguration configuration) {
+    protected static String getDatabaseConnectionUrlForPropertiesFile(DatabaseConfiguration configuration) {
+        String url = getDatabaseConnectionUrl(configuration);
+        if (H2.equals(configuration.getDbVendor())) {
+            url = StringEscapeUtils.escapeJava(url);
+        }
+        return Matcher.quoteReplacement(url);
+    }
+
+    static String getDatabaseConnectionUrl(DatabaseConfiguration configuration) {
         String url = configuration.getUrl();
         if (H2.equals(configuration.getDbVendor())) {
             url = convertWindowsBackslashes(url);
         }
-        return Matcher.quoteReplacement(url);
+        return url;
     }
 
 }
