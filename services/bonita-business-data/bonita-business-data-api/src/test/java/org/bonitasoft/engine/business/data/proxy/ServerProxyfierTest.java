@@ -116,7 +116,7 @@ public class ServerProxyfierTest {
 
     @Test
     public void unProxy_should_not_remove_a_proxy_on_a_null_entity() throws Exception {
-        final Entity entity = ServerProxyfier.unProxy(null);
+        final Entity entity = ServerProxyfier.unProxifyIfNeeded(null);
 
         assertThat(entity).isNull();
     }
@@ -125,7 +125,7 @@ public class ServerProxyfierTest {
     public void unProxy_should_not_remove_a_proxy_on_an_entity() throws Exception {
         final PersonEntity proxy = new PersonEntity();
 
-        final Entity entity = ServerProxyfier.unProxy(proxy);
+        final Entity entity = ServerProxyfier.unProxifyIfNeeded(proxy);
 
         assertThat(ServerProxyfier.isLazyMethodProxyfied(entity)).isFalse();
     }
@@ -134,7 +134,7 @@ public class ServerProxyfierTest {
     public void unProxy_should_remove_a_proxy_on_an_entity() throws Exception {
         final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
-        final Entity entity = ServerProxyfier.unProxy(proxy);
+        final Entity entity = ServerProxyfier.unProxifyIfNeeded(proxy);
 
         assertThat(ServerProxyfier.isLazyMethodProxyfied(entity)).isFalse();
     }
@@ -145,7 +145,7 @@ public class ServerProxyfierTest {
         final Employee employee = new Employee(10L, 45L, "John", "Doe");
         employee.setAddress(proxy);
 
-        final Employee entity = (Employee) ServerProxyfier.unProxy(employee);
+        final Employee entity = (Employee) ServerProxyfier.unProxifyIfNeeded(employee);
 
         assertThat(ServerProxyfier.isLazyMethodProxyfied(entity.getAddress())).isFalse();
     }
@@ -158,7 +158,7 @@ public class ServerProxyfierTest {
         final Employee employee = new Employee(10L, 45L, "John", "Doe");
         employee.setAddresses(addresses);
 
-        final Employee entity = (Employee) ServerProxyfier.unProxy(employee);
+        final Employee entity = (Employee) ServerProxyfier.unProxifyIfNeeded(employee);
 
         for (final Address address : entity.getAddresses()) {
             assertThat(ServerProxyfier.isLazyMethodProxyfied(address)).isFalse();

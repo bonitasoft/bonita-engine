@@ -100,7 +100,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         }
     }
 
-    private String updateBitronixFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
+    private String updateBitronixFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) {
         Map<String, String> replacements = new HashMap<>(7);
         replacements.put("@@" + bitronixDatasourceAlias + "_driver_class_name@@", configuration.getXaDriverClassName());
         replacements.put("@@" + bitronixDatasourceAlias + "_database_connection_user@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
@@ -113,7 +113,8 @@ class TomcatBundleConfigurator extends BundleConfigurator {
             replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_port_number@@", configuration.getServerPort()));
             replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_postgres_database_name@@", Matcher.quoteReplacement(configuration.getDatabaseName())));
         } else {
-            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_database_connection_url@@", getDatabaseConnectionUrl(configuration)));
+            replacements.putAll(uncommentLineAndReplace("@@" + bitronixDatasourceAlias + "_database_connection_url@@",
+                    getDatabaseConnectionUrlForPropertiesFile(configuration)));
         }
 
         return replaceValues(content, replacements);
@@ -123,7 +124,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         return Collections.singletonMap("#[ ]*(.*)=" + originalValue, "$1=" + replacement);
     }
 
-    private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) throws PlatformException {
+    private String updateBonitaXmlFile(String content, DatabaseConfiguration configuration, final String bitronixDatasourceAlias) {
         Map<String, String> replacements = new HashMap<>(5);
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_user@@", Matcher.quoteReplacement(configuration.getDatabaseUser()));
         replacements.put("@@" + bitronixDatasourceAlias + ".database_connection_password@@", Matcher.quoteReplacement(configuration.getDatabasePassword()));
@@ -133,7 +134,7 @@ class TomcatBundleConfigurator extends BundleConfigurator {
         return replaceValues(content, replacements);
     }
 
-    private String updateSetEnvFile(String setEnvFileContent, String dbVendor, final String systemPropertyName) throws PlatformException {
+    private String updateSetEnvFile(String setEnvFileContent, String dbVendor, final String systemPropertyName) {
         final Map<String, String> replacementMap = Collections.singletonMap("-D" + systemPropertyName + "=.*\"",
                 "-D" + systemPropertyName + "=" + dbVendor + "\"");
 
