@@ -38,8 +38,8 @@ public class MergeEntityAction implements EntityAction {
             throw new SEntityActionExecutionException("Unable to insert/update a null business data");
         }
         try {
-            return repository.merge(ServerProxyfier.unProxy(entity));
-        } catch (final IllegalArgumentException | IllegalAccessException iae) {
+            return repository.merge(ServerProxyfier.unProxifyIfNeeded(entity));
+        } catch (final IllegalArgumentException iae) {
             throw new SEntityActionExecutionException(iae);
         }
     }
