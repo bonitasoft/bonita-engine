@@ -192,7 +192,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
     private SimpleBizData unProxyfyIdNeeded(final Entity fetchedBizData) {
         final SimpleBizData unProxyfyIfNeeded;
-        unProxyfyIfNeeded = (SimpleBizData) ServerProxyfier.unProxyfyIfNeeded(fetchedBizData);
+        unProxyfyIfNeeded = (SimpleBizData) ServerProxyfier.unProxifyIfNeeded(fetchedBizData);
         return unProxyfyIfNeeded;
     }
 
