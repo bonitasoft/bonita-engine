@@ -23,8 +23,10 @@ import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedSendTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -33,6 +35,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SendTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.event.AbstractEventIT;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -44,6 +47,7 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.Test;
 
 /**
@@ -162,6 +166,7 @@ public class SendTaskIT extends AbstractEventIT {
         // start a instance of a receive message process
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
+
         // wait the event node instance
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
@@ -170,6 +175,20 @@ public class SendTaskIT extends AbstractEventIT {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
+
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, sendMessageProcessInstance.getId())
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, sendMessageProcessInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SEND_TASK).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
         waitForProcessToFinish(sendMessageProcessInstance);
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(sendMessageProcessInstance.getId(), 0,
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);

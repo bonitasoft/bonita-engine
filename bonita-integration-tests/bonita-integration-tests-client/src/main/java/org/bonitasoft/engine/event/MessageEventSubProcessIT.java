@@ -24,7 +24,9 @@ import org.bonitasoft.engine.bar.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
@@ -32,10 +34,12 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.Test;
 
@@ -71,12 +75,28 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         addMessageEventTrigger.addMessageContentExpression(new ExpressionBuilder().createConstantStringExpression("msgData"),
                 new ExpressionBuilder().createGroovyScriptExpression("msgVariable", "\"message variable OK\"", String.class.getName()));
         final ProcessDefinition sendProcess = deployAndEnableProcess(sendProcessBuilder.done());
-
-        getProcessAPI().startProcess(receiveProcess.getId());
+        ProcessInstance receiveProcessInstance = getProcessAPI().startProcess(receiveProcess.getId());
         waitForUserTask("waitHere");
 
-        getProcessAPI().startProcess(sendProcess.getId());
+        ProcessInstance processInstance = getProcessAPI().startProcess(sendProcess.getId());
         final long stepInSubProcessId = waitForUserTask("stepInSubProcess");
+
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
+        final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, receiveProcessInstance.getId())
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS).done());
 
         // data should be transmit from the message
         assertEquals("message variable OK", getProcessAPI().getActivityDataInstance("aData", stepInSubProcessId).getValue());

@@ -33,7 +33,7 @@ public class SearchActivityInstances extends AbstractActivityInstanceSearchEntit
     private final ActivityInstanceService activityInstanceService;
 
     public SearchActivityInstances(final ActivityInstanceService activityInstanceService, final FlowNodeStateManager flowNodeStateManager,
-            final SearchActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) {
+            final SearchActivityInstanceDescriptor searchDescriptor, final SearchOptions searchOptions) throws SBonitaReadException {
         super(searchDescriptor, searchOptions, flowNodeStateManager);
         this.activityInstanceService = activityInstanceService;
     }

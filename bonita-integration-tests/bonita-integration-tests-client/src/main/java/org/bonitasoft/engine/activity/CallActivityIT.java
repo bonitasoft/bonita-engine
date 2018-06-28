@@ -31,6 +31,7 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
@@ -50,6 +51,7 @@ import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.IntermediateCatchEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -300,6 +302,20 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
             assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
             final ProcessInstance mainProcessInstance = getProcessAPI().startProcess(cascao.getId(), mainProcessDefinition.getId());
+
+            // No need to verify anything, if no exception, query exists
+            getProcessAPI().searchActivities(
+                    new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, mainProcessInstance.getId())
+                            .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).done());
+
+            getProcessAPI().searchActivities(
+                    new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, mainProcessInstance.getId())
+                            .filter(ProcessSupervisorSearchDescriptor.USER_ID,cascao.getId()).done());
+
+            getProcessAPI().searchActivities(
+                    new SearchOptionsBuilder(0, 10)
+                            .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID,cascao.getId()).done());
+
             waitForUserTaskAndExecuteIt("Step1", cascao);
             final ActivityInstance read = waitForUserTaskAndGetIt("Read");
             final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
