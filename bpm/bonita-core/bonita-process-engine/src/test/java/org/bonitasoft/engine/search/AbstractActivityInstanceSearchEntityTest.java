@@ -33,12 +33,17 @@ import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * author Emmanuel Duchastenier
  */
 public class AbstractActivityInstanceSearchEntityTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void getEntityClassShouldHandleAutoTaskType() throws Exception {
@@ -122,6 +127,17 @@ public class AbstractActivityInstanceSearchEntityTest {
     }
 
     @Test
+    public void getEntityClassShouldThrowExceptionOnUnknownType() throws Exception {
+        //given
+        final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
+        searchOptions.addFilter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.START_EVENT);
+        expectedException.expect(SBonitaReadException.class);
+        //when
+        final AbstractActivityInstanceSearchEntity searcher = new MyAbstractActivityInstanceSearchEntity(searchOptions);
+        //then exception
+    }
+
+    @Test
     public void getEntityClassShouldHandleSuProcessTaskType() throws Exception {
         final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
         searchOptions.addFilter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.SUB_PROCESS);
@@ -131,7 +147,7 @@ public class AbstractActivityInstanceSearchEntityTest {
     }
 
     private static class MyAbstractActivityInstanceSearchEntity extends AbstractActivityInstanceSearchEntity {
-        public MyAbstractActivityInstanceSearchEntity(SearchOptionsImpl searchOptions) {
+        public MyAbstractActivityInstanceSearchEntity(SearchOptionsImpl searchOptions) throws SBonitaReadException {
             super(null, searchOptions, null);
         }
 

@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.search;
 
+import java.util.List;
+
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
@@ -34,8 +36,6 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.impl.SearchFilter;
 import org.bonitasoft.engine.service.ModelConvertor;
 
-import java.util.List;
-
 /**
  * @author Yanyan Liu
  * @author Celine Souchet
@@ -47,7 +47,7 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
     private final Class<? extends PersistentObject> entityClass;
 
     public AbstractActivityInstanceSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options,
-            final FlowNodeStateManager flowNodeStateManager) {
+            final FlowNodeStateManager flowNodeStateManager) throws SBonitaReadException {
         super(searchDescriptor, options);
         this.flowNodeStateManager = flowNodeStateManager;
         entityClass = getEntityClass(options);
@@ -59,7 +59,7 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
         return ModelConvertor.toActivityInstances(serverObjects, flowNodeStateManager);
     }
 
-    protected Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) {
+    protected Class<? extends PersistentObject> getEntityClass(final SearchOptions searchOptions) throws SBonitaReadException {
         Class<? extends PersistentObject> entityClass = SActivityInstance.class;
         final SearchFilter searchFilter = getSearchFilter(searchOptions, ActivityInstanceSearchDescriptor.ACTIVITY_TYPE);
         if (searchFilter != null) {
@@ -97,8 +97,7 @@ public abstract class AbstractActivityInstanceSearchEntity extends AbstractSearc
                         entityClass = SLoopActivityInstance.class;
                         break;
                     default:
-                        entityClass = SActivityInstance.class;
-                        break;
+                        throw new SBonitaReadException("You're searching for a " + activityType.name() + " which is not an activity type, using the ActivityInstanceSearch feature. Ensure you are using the correct search method for your needs.");
                 }
                 searchOptions.getFilters().remove(searchFilter);
             }
