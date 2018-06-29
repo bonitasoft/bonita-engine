@@ -56,6 +56,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -159,9 +160,20 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final long step1Id = waitForUserTask(processInstance, "step1");
+
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,john.getId()).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MULTI_INSTANCE_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID,john.getId()).done());
+
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
-                        .filter(ActivityInstanceSearchDescriptor.STATE_NAME, "executing").done());
+                        .filter(ActivityInstanceSearchDescriptor.STATE_NAME, "executing").filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MULTI_INSTANCE_ACTIVITY).done());
+        assertThat(searchActivities.getResult().get(0).getType()).isEqualByComparingTo( FlowNodeType.MULTI_INSTANCE_ACTIVITY);
         final MultiInstanceActivityInstance activityInstance = (MultiInstanceActivityInstance) searchActivities.getResult().get(0);
         assertEquals(1, activityInstance.getNumberOfActiveInstances());
 
