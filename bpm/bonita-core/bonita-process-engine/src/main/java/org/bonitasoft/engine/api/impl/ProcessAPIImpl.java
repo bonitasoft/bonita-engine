@@ -4549,9 +4549,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final SearchActivityInstances searchActivityInstancesTransaction = new SearchActivityInstances(activityInstanceService, flowNodeStateManager,
-                searchEntitiesDescriptor.getSearchActivityInstanceDescriptor(), searchOptions);
+        final SearchActivityInstances searchActivityInstancesTransaction;
         try {
+            searchActivityInstancesTransaction = new SearchActivityInstances(activityInstanceService, flowNodeStateManager,
+                    searchEntitiesDescriptor.getSearchActivityInstanceDescriptor(), searchOptions);
             searchActivityInstancesTransaction.execute();
         } catch (final SBonitaException e) {
             throw new SearchException(e);

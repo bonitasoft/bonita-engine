@@ -24,24 +24,26 @@ import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.junit.After;
 import org.junit.Test;
@@ -179,6 +181,19 @@ public class LoopIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.LOOP_ACTIVITY).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.LOOP_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
         for (int i = 0; i < 3; i++) {
             final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
             assignAndExecuteStep(step1Id, user);
@@ -247,7 +262,7 @@ public class LoopIT extends TestWithUser {
     }
 
     private ProcessDefinition deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(final String loopName, final String parallelTaskName)
-            throws InvalidExpressionException, BonitaException, InvalidProcessDefinitionException {
+            throws  BonitaException {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My proc", "1.0");
         builder.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");

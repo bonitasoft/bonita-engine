@@ -19,13 +19,17 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.VariableStorage;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
 import org.junit.Test;
 
@@ -54,6 +58,19 @@ public class ManualTasksIT extends TestWithUser {
         assertEquals(1, toDoTasks.size());
         final HumanTaskInstance humanTaskInstance = toDoTasks.get(0);
         assertEquals(user.getId(), humanTaskInstance.getAssigneeId());
+
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.MANUAL_TASK).filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
 
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         waitForProcessToFinish(processInstance.getId());

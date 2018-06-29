@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -53,12 +52,9 @@ import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.ConnectorDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
-import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connector.ConnectorException;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -665,6 +661,21 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
+
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, pi1.getId())
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.AUTOMATIC_TASK).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, pi1.getId())
+                        .filter(ProcessSupervisorSearchDescriptor.USER_ID,user.getId()).done());
+
+        getProcessAPI().searchActivities(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.AUTOMATIC_TASK).filter(ProcessSupervisorSearchDescriptor.USER_ID,pi1.getId()).done());
+
+
         waitForUserTask(pi1, "userTask1");
         waitForUserTaskAndAssignIt(pi1, "userTask2", user);
         waitForUserTask(pi1, "manualTask");
