@@ -155,6 +155,7 @@ public class PlatformSetupDistributionIT {
             properties.setProperty("db.server.name", "localhost");
             properties.setProperty("db.server.port", String.valueOf(pgServer.getPort()));
             properties.setProperty("db.database.name", "bonita");
+            properties.setProperty("db.password", "bpm"); // Because Postgres does not allow to have empty password
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             properties.store(out, "");
             Files.write(databaseProperties, out.toByteArray());
