@@ -66,6 +66,9 @@
         </profile>
         <profile>
             <id>tests</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <modules>
                 <module>platform-setup-test</module>
             </modules>
