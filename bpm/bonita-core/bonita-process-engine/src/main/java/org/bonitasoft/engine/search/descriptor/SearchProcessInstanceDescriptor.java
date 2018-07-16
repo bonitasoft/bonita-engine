@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
+import static org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor.*;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -48,30 +49,32 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         final SProcessInstanceBuilderFactory instanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(14);
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getNameKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
+        searchEntityKeys = new HashMap<>();
+        searchEntityKeys.put(NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getNameKey()));
+        searchEntityKeys.put(PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SProcessInstance.class, instanceBuilder.getProcessDefinitionIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.LAST_UPDATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getLastUpdateKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.START_DATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartDateKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.END_DATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getEndDateKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STATE_ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStateIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStateIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.STARTED_BY, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartedByKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.CALLER_ID,
-                new FieldDescriptor(SProcessInstance.class, instanceBuilder.getCallerIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.USER_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.GROUP_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.ROLE_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.ASSIGNEE_ID,
+        searchEntityKeys.put(LAST_UPDATE,
+                new FieldDescriptor(SProcessInstance.class, instanceBuilder.getLastUpdateKey()));
+        searchEntityKeys.put(START_DATE,
+                new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartDateKey()));
+        searchEntityKeys.put(END_DATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getEndDateKey()));
+        searchEntityKeys.put(STATE_ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStateIdKey()));
+        searchEntityKeys.put(STATE_NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStateIdKey()));
+        searchEntityKeys.put(ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getIdKey()));
+        searchEntityKeys.put(STARTED_BY,
+                new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartedByKey()));
+        searchEntityKeys.put(CALLER_ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getCallerIdKey()));
+        searchEntityKeys.put(USER_ID, new FieldDescriptor(SProcessSupervisor.class,
+                BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
+        searchEntityKeys.put(GROUP_ID, new FieldDescriptor(SProcessSupervisor.class,
+                BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
+        searchEntityKeys.put(ROLE_ID, new FieldDescriptor(SProcessSupervisor.class,
+                BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
+        searchEntityKeys.put(ASSIGNEE_ID,
                 new FieldDescriptor(SUserTaskInstance.class, sUserTaskInstanceBuilder.getAssigneeIdKey()));
 
-        processInstanceAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        processFields = new HashSet<String>(6);
+        processInstanceAllFields = new HashMap<>();
+        processFields = new HashSet<>();
         processFields.add(instanceBuilder.getNameKey());
         processInstanceAllFields.put(SProcessInstance.class, processFields);
     }
@@ -88,7 +91,7 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
 
     @Override
     protected Serializable convertFilterValue(final String filterField, final Serializable filterValue) {
-        if (ProcessInstanceSearchDescriptor.STATE_NAME.equals(filterField)) {
+        if (STATE_NAME.equals(filterField)) {
             if (filterValue instanceof String) {
                 return ProcessInstanceState.valueOf((String) filterValue).getId();
             } else if (filterValue instanceof ProcessInstanceState) {
