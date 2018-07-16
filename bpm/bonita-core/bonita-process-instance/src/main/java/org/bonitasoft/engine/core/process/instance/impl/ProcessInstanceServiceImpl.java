@@ -649,12 +649,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public long getNumberOfProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceRead.getNumberOfEntities(SProcessInstance.class, queryOptions, Collections.<String, Object> emptyMap());
+        return persistenceRead.getNumberOfEntities(SProcessInstance.class, queryOptions, Collections.emptyMap());
     }
 
     @Override
     public List<SProcessInstance> searchProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceRead.searchEntity(SProcessInstance.class, queryOptions, Collections.<String, Object> emptyMap());
+        return persistenceRead.searchEntity(SProcessInstance.class, queryOptions, Collections.emptyMap());
     }
 
     @Override

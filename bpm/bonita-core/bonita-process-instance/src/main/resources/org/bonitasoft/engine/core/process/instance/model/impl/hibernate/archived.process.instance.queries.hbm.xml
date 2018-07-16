@@ -429,7 +429,66 @@
 		AND ap.stateId IN (6,7,3,4)
   	</query>
 
-  	<query name="getChildrenSourceProcessInstanceIdsFromRootProcessInstance">
+	<query name="getNumberOfSAProcessInstancewithSUserTaskInstanceWithoutSubProcess">
+		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+	</query>
+
+	<query name="searchSAProcessInstancewithSUserTaskInstanceWithoutSubProcess">
+		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+	</query>
+
+
+	<query name="getNumberOfSAProcessInstancewithSProcessSupervisorWithoutSubProcess">
+		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="searchSAProcessInstancewithSProcessSupervisorWithoutSubProcess">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="getNumberOfSAProcessInstancewithSProcessSupervisorSUserTaskInstanceWithoutSubProcess">
+		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a,
+		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="searchSAProcessInstancewithSProcessSupervisorSUserTaskInstanceWithoutSubProcess">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+		     org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a,
+		     org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE ap.callerId = -1
+		AND ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = processsupervisor.processDefId
+	</query>
+
+	<query name="getChildrenSourceProcessInstanceIdsFromRootProcessInstance">
 		SELECT DISTINCT ap.sourceObjectId
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
 		WHERE ap.rootProcessInstanceId = :rootProcessInstanceId
@@ -493,6 +552,54 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE ap.stateId IN (6,7,3,4)
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+				   	 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				WHERE um.userId = :userId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+    </query>
+
+  	<query name="getNumberOfSAProcessInstancewithSUserTaskInstanceSupervisedBy">
+		SELECT COUNT(DISTINCT ap)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+		     org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
+		AND ap.processDefinitionId = supervisor.processDefId
+		AND (supervisor.userId = :userId
+			OR (supervisor.id IN (
+				SELECT supervisor.id
+				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+				   	 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				WHERE um.userId = :userId
+				AND (
+					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+					OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+					OR (supervisor.groupId = um.groupId AND supervisor.roleId = um.roleId)
+					)
+				)
+			)
+		)
+  	</query>
+
+  	<query name="searchSAProcessInstancewithSUserTaskInstanceSupervisedBy">
+		SELECT DISTINCT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+             org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE ap.stateId IN (6,7,3,4)
+		AND a.rootContainerId = ap.sourceObjectId
 		AND ap.processDefinitionId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
