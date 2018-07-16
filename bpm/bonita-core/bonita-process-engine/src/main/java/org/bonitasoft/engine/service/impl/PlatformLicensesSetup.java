@@ -52,12 +52,26 @@ public class PlatformLicensesSetup {
     }
 
     private void extractLicensesIfNeeded() throws IOException, NamingException, PlatformException {
+        LOGGER.debug("Start extracting licenses if needed...");
         Path licensesFolder = getLicensesFolder().toPath();
+        LOGGER.debug("License folder: {}", licensesFolder);
         if (Files.exists(licensesFolder) && !isEmpty(licensesFolder)) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("The folder exists and is not empty");
+                File[] files = licensesFolder.toFile().listFiles();
+                LOGGER.debug("It contains {} files/folders", files.length);
+                for (File file : files) {
+                    LOGGER.debug(file.getName());
+                }
+                LOGGER.debug("So nothing to extract and stop processing");
+            }
             return;
         }
+        LOGGER.debug("Retrieving licenses....");
         final List<BonitaConfiguration> licenses = getConfigurationService().getLicenses();
+        LOGGER.debug("Found {} licenses", licenses.size());
         if (licenses.isEmpty()) {
+            LOGGER.debug("No licenses, so stop processing");
             return;
         }
         writeLicenses(licensesFolder, licenses);
@@ -66,21 +80,28 @@ public class PlatformLicensesSetup {
 
     private void setBonitaClientHomeIfNotSet(Path licensesFolder) {
         String property = System.getProperty(BONITA_CLIENT_HOME);
-        if (property != null && !property.equals(licensesFolder.toString())) {
-            LOGGER.warn("Licenses are taken from folder " + property + " instead of database. This happens when you are in a Studio environment.");
+        String licenseFolderPath = licensesFolder.toString();
+        if (property != null && !property.equals(licenseFolderPath)) {
+            LOGGER.warn("Licenses are taken from folder {} instead of database. "
+                    + "This happens when you are in a Studio environment.", property);
         } else {
-            System.setProperty(BONITA_CLIENT_HOME, licensesFolder.toString());
+            System.setProperty(BONITA_CLIENT_HOME, licenseFolderPath);
+            LOGGER.debug("BONITA_CLIENT_HOME set to {}", licenseFolderPath);
         }
     }
 
     private void writeLicenses(Path licensesFolder, List<BonitaConfiguration> licenses) throws IOException {
+        LOGGER.debug("Writing licenses to disk");
         if (!Files.exists(licensesFolder)) {
+            LOGGER.debug("The license folder does not exist, so creating it: {}", licensesFolder);
             Files.createDirectory(licensesFolder);
         }
         for (BonitaConfiguration license : licenses) {
             File licenseFile = licensesFolder.resolve(license.getResourceName()).toFile();
+            LOGGER.debug("Writing file {}", licenseFile.getName());
             IOUtil.write(licenseFile, license.getResourceContent());
         }
+        LOGGER.debug("Licenses have been written to disk.");
     }
 
     private File getLicensesFolder() throws IOException {
