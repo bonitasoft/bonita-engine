@@ -1265,29 +1265,55 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(),
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe';")
+                        .append(" Employee rambo = new Employee(); rambo.firstName = 'John'; rambo.lastName = 'Rambo'; [jane, john, rambo]")
+                        .toString(),
                 List.class.getName());
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MBIMI", "1.2-beta");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression).setMultiple(true);
         builder.addData("names", List.class.getName(), null);
+        builder.addBusinessData("firstNames", EMPLOYEE_QUALIFIED_NAME, null).setMultiple(true);
+        builder.addContextEntry("firstNames_ref",
+                new ExpressionBuilder().createBusinessDataExpression("firstNames", List.class.getName()));
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", ACTOR_NAME);
         userTaskBuilder.addBusinessData("employee", EMPLOYEE_QUALIFIED_NAME);
         userTaskBuilder.addShortTextData("name", null);
-        userTaskBuilder.addMultiInstance(false, "myEmployees").addDataInputItemRef("employee").addDataOutputItemRef("name").addLoopDataOutputRef("names");
-        userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("name", new ExpressionBuilder().createConstantStringExpression("Doe")));
-        builder.addUserTask("step2", ACTOR_NAME);
+        userTaskBuilder.addMultiInstance(false, "myEmployees").addDataInputItemRef("employee")
+                .addDataOutputItemRef("name").addLoopDataOutputRef("names");
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("name",
+                new ExpressionBuilder().createConstantStringExpression("Doe")));
+        UserTaskDefinitionBuilder step2Builder = builder.addUserTask("step2", ACTOR_NAME);
+        step2Builder.addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("firstNames",
+                new ExpressionBuilder()
+                .createQueryBusinessDataExpression("findFirstNames", "Employee." + FIND_EMPLOYEE_WITH_FIRSTNAMES,
+                        List.class.getName(),
+                        new ExpressionBuilder().createGroovyScriptExpression("firstNames", "['john'] as String[]",
+                                        String[].class.getName()),
+                new ExpressionBuilder().createExpression("startIndex", "0", Integer.class.getName(),
+                        ExpressionType.TYPE_CONSTANT),
+                new ExpressionBuilder().createExpression("maxResults", "10", Integer.class.getName(),
+                                ExpressionType.TYPE_CONSTANT))));
+        builder.addUserTask("step3", ACTOR_NAME);
         builder.addTransition("step1", "step2");
+        builder.addTransition("step2", "step3");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, testUser);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", testUser);
         waitForUserTaskAndExecuteIt(instance, "step1", testUser);
-        waitForUserTask(instance, "step2");
+        waitForUserTaskAndExecuteIt(instance, "step1", testUser);
+        waitForUserTaskAndExecuteIt(instance, "step2", testUser);
+        waitForUserTask(instance, "step3");
 
-        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
-        assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
+        final DataInstance namesDataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
+        assertThat(namesDataInstance.getValue().toString()).isEqualTo("[Doe, Doe, Doe]");
+
+        final Serializable firstNamesDataInstance = getProcessAPI().getProcessInstanceExecutionContext(instance.getId())
+                .get("firstNames_ref");
+        assertThat((List)firstNamesDataInstance).extracting("lastName").contains("Doe", "Rambo");
+
         final Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
                 instance.getId(),
                 Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
@@ -1297,7 +1323,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
         assertThat(myEmployees.getName()).isEqualTo("myEmployees");
         assertThat(myEmployees.getType()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
-        assertThat(myEmployees.getStorageIds()).hasSize(2);
+        assertThat(myEmployees.getStorageIds()).hasSize(3);
 
         disableAndDeleteProcess(processDefinition);
     }
