@@ -317,6 +317,10 @@ public class CallActivityIT extends TestWithTechnicalUser {
                             .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).filter(ProcessSupervisorSearchDescriptor.USER_ID,cascao.getId()).done());
 
             waitForUserTaskAndExecuteIt("Step1", cascao);
+
+            getProcessAPI().searchActivities(new SearchOptionsBuilder(0, 10)
+                            .filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, FlowNodeType.CALL_ACTIVITY).done());
+
             final ActivityInstance read = waitForUserTaskAndGetIt("Read");
             final DataInstance copyMsg = getProcessAPI().getProcessDataInstance("copymsg", read.getParentProcessInstanceId());
             assertThat(copyMsg.getValue()).isEqualTo("data");

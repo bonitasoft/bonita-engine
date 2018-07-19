@@ -1174,6 +1174,16 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 	</query>
 
+	<query name="getNumberOfSCallActivityInstance">
+		SELECT COUNT(DISTINCT a)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl AS a
+	</query>
+
+	<query name="searchSCallActivityInstance">
+		SELECT DISTINCT a
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl AS a
+	</query>
+
 	<query name="getNumberOfSFlowNodeInstance">
 		SELECT COUNT(f)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
