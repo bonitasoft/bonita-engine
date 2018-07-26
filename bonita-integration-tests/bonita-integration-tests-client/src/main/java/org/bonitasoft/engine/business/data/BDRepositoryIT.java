@@ -1289,7 +1289,7 @@ public class BDRepositoryIT extends CommonAPIIT {
                 new ExpressionBuilder()
                 .createQueryBusinessDataExpression("findFirstNames", "Employee." + FIND_EMPLOYEE_WITH_FIRSTNAMES,
                         List.class.getName(),
-                        new ExpressionBuilder().createGroovyScriptExpression("firstNames", "['john'] as String[]",
+                        new ExpressionBuilder().createGroovyScriptExpression("firstNames", "['John'] as String[]",
                                         String[].class.getName()),
                 new ExpressionBuilder().createExpression("startIndex", "0", Integer.class.getName(),
                         ExpressionType.TYPE_CONSTANT),
