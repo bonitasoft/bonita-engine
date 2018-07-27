@@ -179,7 +179,6 @@ public class APITestUtil extends PlatformTestUtil {
     protected static final String COUNT_EMPLOYEE = "countEmployee";
     protected static final String COUNT_ADDRESS = "countAddress";
     private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
-    protected static final String FIND_EMPLOYEE_WITH_FIRSTNAMES = "findEmployeeWithFirstNames";
 
     private final APIClient apiClient = new APIClient();
 
@@ -1534,11 +1533,6 @@ public class APITestUtil extends PlatformTestUtil {
         countForFindByHireDate.addQueryParameter("date2", Date.class.getName());
 
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
-
-        final Query findEmployeesWithFirstNames = employee.addQuery(FIND_EMPLOYEE_WITH_FIRSTNAMES,
-                "SELECT e FROM Employee e WHERE e.firstName IN (:firstNames) ORDER BY e.firstName",
-                List.class.getName());
-        findEmployeesWithFirstNames.addQueryParameter("firstNames", String[].class.getName());
 
         employee.addIndex("IDX_LSTNM", "lastName");
         employee.addIndex("IDX_LSTNM", "address");
