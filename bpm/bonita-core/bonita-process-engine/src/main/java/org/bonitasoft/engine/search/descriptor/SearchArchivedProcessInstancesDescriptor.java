@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
+import static org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
@@ -45,39 +46,41 @@ public class SearchArchivedProcessInstancesDescriptor extends SearchEntityDescri
         final SAProcessInstanceBuilderFactory instanceBuilder = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(14);
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.NAME, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getNameKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID,
+        searchEntityKeys = new HashMap<>();
+        searchEntityKeys.put(NAME, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getNameKey()));
+        searchEntityKeys.put(PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getProcessDefinitionIdKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.ID, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getIdKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STARTED_BY,
+        searchEntityKeys.put(ID, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getIdKey()));
+        searchEntityKeys.put(STARTED_BY,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartedByKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STARTED_BY_SUBSTITUTE,
+        searchEntityKeys.put(STARTED_BY_SUBSTITUTE,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartedBySubstituteKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.START_DATE,
+        searchEntityKeys.put(START_DATE,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStartDateKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.END_DATE, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getEndDateKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STATE_ID, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStateIdKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID,
+        searchEntityKeys.put(END_DATE, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getEndDateKey()));
+        searchEntityKeys.put(STATE_ID, new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStateIdKey()));
+        searchEntityKeys.put(SOURCE_OBJECT_ID,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getSourceObjectIdKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.LAST_UPDATE,
+        searchEntityKeys.put(LAST_UPDATE,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getLastUpdateKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE,
+        searchEntityKeys.put(ARCHIVE_DATE,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getArchiveDateKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.CALLER_ID,
+        searchEntityKeys.put(CALLER_ID,
                 new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getCallerIdKey()));
         searchEntityKeys
-                .put(ArchivedProcessInstancesSearchDescriptor.USER_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.GROUP_ID,
-                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
+                .put(USER_ID, new FieldDescriptor(SProcessSupervisor.class,
+                        BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
+        searchEntityKeys.put(GROUP_ID,
+                new FieldDescriptor(SProcessSupervisor.class,
+                        BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
         searchEntityKeys
-                .put(ArchivedProcessInstancesSearchDescriptor.ROLE_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
-        searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.ASSIGNEE_ID,
+                .put(ROLE_ID, new FieldDescriptor(SProcessSupervisor.class,
+                        BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
+        searchEntityKeys.put(ASSIGNEE_ID,
                 new FieldDescriptor(SUserTaskInstance.class, sUserTaskInstanceBuilder.getAssigneeIdKey()));
 
-        archivedProcessInstanceAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        processInstanceFields = new HashSet<String>(1);
-        // processInstanceFields.add(instanceBuilder.getStartedByKey());
+        archivedProcessInstanceAllFields = new HashMap<>();
+        processInstanceFields = new HashSet<>();
         processInstanceFields.add(instanceBuilder.getNameKey());
         archivedProcessInstanceAllFields.put(SAProcessInstance.class, processInstanceFields);
     }

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.supervisor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 import java.io.Serializable;
@@ -455,6 +456,21 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         assertEquals(1, result2.getCount());
         assertEquals(john.getId(), result2.getResult().get(0).getStartedBy());
         assertEquals(matti.getId(), result2.getResult().get(0).getStartedBySubstitute());
+
+        // No need to verify anything, if no exception, query exists
+        getProcessAPI().searchProcessInstances(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
+                        .done());
+        getProcessAPI().searchProcessInstances(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .done());
+        getProcessAPI().searchProcessInstances(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
+                        .done());
     }
 
     @Test
@@ -470,10 +486,36 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         waitForProcessToFinish(processInstance);
 
         // test supervisor
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        final SearchResult<ArchivedProcessInstance> sapi = getProcessAPI().searchArchivedProcessInstancesSupervisedBy(matti.getId(), builder.done());
-        assertEquals(1, sapi.getCount());
-        final List<ArchivedProcessInstance> archivedProcessInstanceList = sapi.getResult();
-        assertEquals(processInstance.getId(), archivedProcessInstanceList.get(0).getSourceObjectId());
+        final SearchResult<ArchivedProcessInstance> sapi = getProcessAPI()
+                .searchArchivedProcessInstancesSupervisedBy(matti.getId(), new SearchOptionsBuilder(0, 10).done());
+        assertThat(sapi.getCount()).as("Archived Process Instance count").isEqualTo(1);
+        final List<ArchivedProcessInstance> archivedProcessInstances = sapi.getResult();
+        assertThat(archivedProcessInstances).extracting(ArchivedProcessInstance::getSourceObjectId)
+                .as("source object ids of archived process instances")
+                .containsOnly(processInstance.getId());
+
+        // test supervisor with assignee
+        getProcessAPI().searchArchivedProcessInstancesSupervisedBy(matti.getId(),
+                new SearchOptionsBuilder(0, 10).filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
+                        .done());
+
+        // No need to verify anything, if no exception, query exists
+        final long processDefinitionId = processInstance.getProcessDefinitionId();
+        getProcessAPI().searchArchivedProcessInstances(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId)
+                        .filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
+                        .done());
+        getProcessAPI().searchArchivedProcessInstances(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .done());
+        getProcessAPI().searchArchivedProcessInstances(
+                new SearchOptionsBuilder(0, 10)
+                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId)
+                        .filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
+                        .done());
     }
+
 }
