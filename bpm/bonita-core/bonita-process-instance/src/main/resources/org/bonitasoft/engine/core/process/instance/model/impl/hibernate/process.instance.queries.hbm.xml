@@ -1453,7 +1453,7 @@
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
-	<query name="searchNumberOfSProcessInstancewithSProcessSupervisor">
+	<query name="searchSProcessInstancewithSProcessSupervisor">
 		SELECT DISTINCT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
 		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor

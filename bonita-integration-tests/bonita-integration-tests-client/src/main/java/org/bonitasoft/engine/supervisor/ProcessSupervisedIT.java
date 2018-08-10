@@ -464,11 +464,11 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
                         .done());
         getProcessAPI().searchProcessInstances(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .filter(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID, john.getId())
                         .done());
         getProcessAPI().searchProcessInstances(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .filter(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID, john.getId())
                         .filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
                         .done());
     }
@@ -508,11 +508,11 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
                         .done());
         getProcessAPI().searchArchivedProcessInstances(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .filter(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID, john.getId())
                         .done());
         getProcessAPI().searchArchivedProcessInstances(
                 new SearchOptionsBuilder(0, 10)
-                        .filter(ProcessInstanceSearchDescriptor.USER_ID, john.getId())
+                        .filter(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID, john.getId())
                         .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId)
                         .filter(ProcessInstanceSearchDescriptor.ASSIGNEE_ID, john.getId())
                         .done());
