@@ -209,7 +209,7 @@ public class SearchProcessInstanceDescriptorTest {
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
 
         // Then
-        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.USER_ID);
+        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_USER_ID);
         assertNotNull(fieldDescriptor);
         assertEquals(SProcessSupervisor.class, fieldDescriptor.getPersistentClass());
         assertEquals("userId", fieldDescriptor.getValue());
@@ -224,7 +224,7 @@ public class SearchProcessInstanceDescriptorTest {
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
 
         // Then
-        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.GROUP_ID);
+        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_GROUP_ID);
         assertNotNull(fieldDescriptor);
         assertEquals(SProcessSupervisor.class, fieldDescriptor.getPersistentClass());
         assertEquals("groupId", fieldDescriptor.getValue());
@@ -239,7 +239,7 @@ public class SearchProcessInstanceDescriptorTest {
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
 
         // Then
-        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.ROLE_ID);
+        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.PROCESS_SUPERVISOR_ROLE_ID);
         assertNotNull(fieldDescriptor);
         assertEquals(SProcessSupervisor.class, fieldDescriptor.getPersistentClass());
         assertEquals("roleId", fieldDescriptor.getValue());
