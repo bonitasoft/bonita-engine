@@ -356,13 +356,9 @@ public abstract class ServletCall {
      */
     private PrintWriter outputWriter = null;
 
-    /**
-     * Prepare the output
-     * @param response
-     */
     private PrintWriter getOutputWriter() {
         if (outputWriter == null) {
-            response.setContentType("application/json;charset=UTF-8");
+            response.setContentType(getResponseContentType());
             try {
                 outputWriter = response.getWriter();
             } catch (final IOException e) {
@@ -370,6 +366,10 @@ public abstract class ServletCall {
             }
         }
         return outputWriter;
+    }
+
+    protected String getResponseContentType() {
+        return "application/json;charset=UTF-8";
     }
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
