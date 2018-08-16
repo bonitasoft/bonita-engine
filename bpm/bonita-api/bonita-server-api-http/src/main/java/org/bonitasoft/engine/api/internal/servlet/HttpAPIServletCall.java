@@ -61,6 +61,11 @@ public class HttpAPIServletCall extends ServletCall {
     }
 
     @Override
+    protected String getResponseContentType() {
+        return "application/xml;charset=UTF-8";
+    }
+
+    @Override
     public void doGet() {
         error("GET method forbidden", HttpServletResponse.SC_FORBIDDEN);
     }
