@@ -41,7 +41,7 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
 
     protected final Map<String, FieldDescriptor> searchEntityKeys;
 
-    protected final Map<Class<? extends PersistentObject>, Set<String>> processInstanceAllFields;
+    private final Map<Class<? extends PersistentObject>, Set<String>> processInstanceAllFields;
 
     protected final Set<String> processFields;
 
@@ -64,11 +64,11 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(STARTED_BY,
                 new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartedByKey()));
         searchEntityKeys.put(CALLER_ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getCallerIdKey()));
-        searchEntityKeys.put(USER_ID, new FieldDescriptor(SProcessSupervisor.class,
+        searchEntityKeys.put(PROCESS_SUPERVISOR_USER_ID, new FieldDescriptor(SProcessSupervisor.class,
                 BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
-        searchEntityKeys.put(GROUP_ID, new FieldDescriptor(SProcessSupervisor.class,
+        searchEntityKeys.put(PROCESS_SUPERVISOR_GROUP_ID, new FieldDescriptor(SProcessSupervisor.class,
                 BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
-        searchEntityKeys.put(ROLE_ID, new FieldDescriptor(SProcessSupervisor.class,
+        searchEntityKeys.put(PROCESS_SUPERVISOR_ROLE_ID, new FieldDescriptor(SProcessSupervisor.class,
                 BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
         searchEntityKeys.put(ASSIGNEE_ID,
                 new FieldDescriptor(SUserTaskInstance.class, sUserTaskInstanceBuilder.getAssigneeIdKey()));
