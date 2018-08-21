@@ -155,6 +155,12 @@
                                        <exclude>org/bonitasoft/engine/api/**</exclude>
                                    </excludes>
                                </filter>
+                               <filter>
+                                   <artifact>org.bonitasoft.engine.util:bonita-common-util</artifact>
+                                   <excludes>
+                                       <exclude>org/bonitasoft/engine/bdm/model/*</exclude>
+                                   </excludes>
+                               </filter>
                            </filters>
                        </configuration>
                    </execution>

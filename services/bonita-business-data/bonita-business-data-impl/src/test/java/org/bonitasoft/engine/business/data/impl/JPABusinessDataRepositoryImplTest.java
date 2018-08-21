@@ -14,13 +14,15 @@
 package org.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
@@ -35,9 +37,9 @@ import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -237,6 +239,52 @@ public class JPABusinessDataRepositoryImplTest {
         //when
         repository.remove(new Address(12));
         //then exception
+    }
+
+    @Test
+    public void should_transform_query_parameter_values_from_string_array_to_collection() throws Exception {
+        Object collection = repository
+                .checkParameterValue(new String[] { "v1", "v2" });
+ 
+        assertThat((Collection) collection).contains("v1", "v2");
+    }
+
+    @Test
+    public void should_transform_query_parameter_values_from_int_array_to_collection() throws Exception {
+        Object collection = repository
+                .checkParameterValue(new Integer[] { 1, 2 });
+
+        assertThat((Collection) collection).contains(1, 2);
+    }
+
+    @Test
+    public void should_transform_query_parameter_values_from_float_array_to_collection() throws Exception {
+        Object collection = repository
+                .checkParameterValue(new Float[] { 1.2f, 2.0f });
+
+        assertThat((Collection) collection).contains(1.2f, 2.0f);
+    }
+
+    @Test
+    public void should_transform_query_parameter_values_from_double_array_to_collection() throws Exception {
+        Object collection = repository
+                .checkParameterValue(new Double[] { 1.2d, 2.0d });
+
+        assertThat((Collection) collection).contains(1.2d, 2.0d);
+    }
+
+    @Test
+    public void should_transform_query_parameter_values_from_long_array_to_collection() throws Exception {
+        Object collection = repository
+                .checkParameterValue(new Long[] { 12l, 23456l });
+
+        assertThat((Collection) collection).contains(12l, 23456l);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_check_supported_query_parameter_types() throws Exception {
+        repository
+                .checkParameterValue(new Byte[] { 0x1, 0x2 });
     }
 
     class Address implements Entity {
