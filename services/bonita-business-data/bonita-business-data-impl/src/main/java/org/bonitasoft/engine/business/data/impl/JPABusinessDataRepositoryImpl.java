@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
 import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.model.QueryParameterTypes;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
@@ -42,10 +44,10 @@ import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.hibernate.Hibernate;
@@ -239,7 +241,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         }
         if (parameters != null) {
             for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
-                query.setParameter(parameter.getKey(), parameter.getValue());
+                query.setParameter(parameter.getKey(), checkParameterValue(parameter.getValue()));
             }
         }
         try {
@@ -249,6 +251,18 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         } catch (final NoResultException e) {
             return null;
         }
+    }
+
+    Object checkParameterValue(final Serializable parameterValue) {
+        if (parameterValue != null && !QueryParameterTypes.contains(parameterValue.getClass())) {
+            throw new IllegalArgumentException(String.format(
+                    "'%s' is not a supported type for a query parameter.",
+                    parameterValue.getClass().getName()));
+        }
+        if (parameterValue instanceof Object[]) {
+            return Arrays.asList((Object[]) parameterValue);
+        }
+        return parameterValue;
     }
 
     @Override
@@ -311,7 +325,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
         if (maxResults > 0) {
             if (parameters != null) {
                 for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
-                    query.setParameter(parameter.getKey(), parameter.getValue());
+                    query.setParameter(parameter.getKey(), checkParameterValue(parameter.getValue()));
                 }
             }
             query.setFirstResult(startIndex);
