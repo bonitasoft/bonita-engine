@@ -22,4 +22,7 @@ public class HandlerUnregistrationException extends SBonitaException {
 
     private static final long serialVersionUID = -6460850460472780165L;
 
+    public HandlerUnregistrationException(String message) {
+        super(message);
+    }
 }

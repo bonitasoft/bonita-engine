@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.events.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Christophe Havard
@@ -27,24 +27,29 @@ public class SFireEventException extends SBonitaException {
 
     private static final long serialVersionUID = 752699780388742999L;
 
-    private List<Exception> handlerExceptions;
+    private List<Exception> handlerExceptions = new ArrayList<>();
 
-    public SFireEventException(final String message) {
+    public SFireEventException(String message) {
         super(message);
     }
 
+    public SFireEventException(final String message, Exception firstCause) {
+        super(message, firstCause);
+    }
+
     public void addHandlerException(final Exception e) {
-        if (handlerExceptions == null) {
-            handlerExceptions = new ArrayList<Exception>();
-        }
         handlerExceptions.add(e);
     }
 
     public List<Exception> getHandlerExceptions() {
-        if (handlerExceptions != null) {
-            return handlerExceptions;
-        }
-        return Collections.emptyList();
+        return handlerExceptions;
     }
 
+
+    @Override
+    public String getMessage() {
+        return super.getMessage() +  handlerExceptions.stream()
+                .map(e -> e.getClass().getName() + ": " + e.getMessage())
+                .collect(Collectors.joining("\n", " [", "]"));
+    }
 }

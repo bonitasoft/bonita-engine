@@ -102,7 +102,7 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
             }
         }
         if (!removed) {
-            throw new HandlerUnregistrationException();
+            throw new HandlerUnregistrationException("Handler did not exists");
         }
     }
 }
