@@ -19,9 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -31,13 +29,12 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
-import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
@@ -70,6 +67,8 @@ public class FlowNodeExecutorImplTest {
     private EventInstanceService eventInstanceService;
     @Mock
     private ArchiveService archiveService;
+    @Mock
+    private StateBehaviors stateBehaviors;
     @Captor
     private ArgumentCaptor<WorkDescriptor> workDescriptorArgumentCaptor;
     private FlowNodeExecutorImpl flowNodeExecutor;
@@ -82,10 +81,11 @@ public class FlowNodeExecutorImplTest {
                 null,eventInstanceService);
         skippedFlowNodeState = new SkippedFlowNodeStateImpl();
         doReturn(skippedFlowNodeState).when(flowNodeStateManager).getState(SkippedFlowNodeStateImpl.ID);
+        doReturn(stateBehaviors).when(flowNodeStateManager).getStateBehaviors();
     }
 
     @Test
-    public void should_interrupt_children_when_setting_activity_to_a_terminal_state() throws Exception {
+    public void should_abort_children_when_setting_activity_to_a_terminal_state() throws Exception {
         SUserTaskInstanceImpl flowNodeInstance = aTask(1L, true);
         flowNodeInstance.setTokenCount(2);
         SUserTaskInstanceImpl task1 = aTask(2L, true);
@@ -100,7 +100,16 @@ public class FlowNodeExecutorImplTest {
         assertThat(workDescriptorArgumentCaptor.getAllValues().stream()
                 .map(work -> tuple(work.getType(), work.getLong("flowNodeInstanceId")))
                 .collect(Collectors.toList())).containsOnly(tuple("EXECUTE_FLOWNODE", 2L),
-                        tuple("EXECUTE_FLOWNODE", 3L));
+                tuple("EXECUTE_FLOWNODE", 3L));
+    }
+
+    @Test
+    public void should_interrupt_boundary_when_setting_activity_to_a_terminal_state() throws Exception {
+        SUserTaskInstanceImpl sUserTaskInstance = aTask(1L, true);
+
+        flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
+
+        verify(stateBehaviors).interruptAttachedBoundaryEvent(any(),eq(sUserTaskInstance),eq(ABORTING));
     }
 
     @Test
@@ -121,21 +130,6 @@ public class FlowNodeExecutorImplTest {
         flowNodeExecutor.setStateByStateId(1L, SkippedFlowNodeStateImpl.ID);
 
         verify(activityInstanceService).setState(aTask, skippedFlowNodeState);
-    }
-
-    private List<BonitaWork> getRootWorks(List<BonitaWork> bonitaWorkList) {
-        ArrayList<BonitaWork> bonitaWorks = new ArrayList<>();
-        for (BonitaWork bonitaWork : bonitaWorkList) {
-            bonitaWorks.add(unwrap(bonitaWork));
-        }
-        return bonitaWorks;
-    }
-
-    private BonitaWork unwrap(BonitaWork work) {
-        while (work instanceof WrappingBonitaWork) {
-            work = ((WrappingBonitaWork) work).getWrappedWork();
-        }
-        return work;
     }
 
     private SUserTaskInstanceImpl aTask(long id, boolean stable) throws SFlowNodeReadException, SFlowNodeNotFoundException {

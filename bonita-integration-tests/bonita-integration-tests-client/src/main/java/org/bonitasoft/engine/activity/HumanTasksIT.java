@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.awaitility.Awaitility;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -45,6 +47,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.junit.Test;
 
@@ -430,6 +433,29 @@ public class HumanTasksIT extends TestWithUser {
         //verify that the BD has been cleaned
         eventInstances = getProcessAPI().getEventInstances(processInstance.getId(), 0, 1000, NAME_DESC);
         assertThat(eventInstances).isEmpty();
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+
+    @Test
+    public void setStateByName_should_remove_time_of_linked_boundary_events() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("step1", ACTOR_NAME).addBoundaryEvent("theBoundaryEvent").addTimerEventTriggerDefinition(DURATION,
+                new ExpressionBuilder().createConstantLongExpression(9000L));
+        processBuilder.addUserTask("step2", ACTOR_NAME);
+        processBuilder.addTransition("step1", "step2");
+        processBuilder.addTransition("theBoundaryEvent", "step2");
+        final DesignProcessDefinition designProcessDefinition = processBuilder.getProcess();
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        getProcessAPI().setActivityStateByName(waitForUserTaskAndGetIt(processInstance, "step1").getId(), ActivityStates.SKIPPED_STATE);
+        waitForUserTask(processInstance, "step2");
+
+        Awaitility.await().until(()->getProcessAPI().searchTimerEventTriggerInstances(processInstance.getId(), new SearchOptionsBuilder(0, 100).done()).getResult().isEmpty());
 
         disableAndDeleteProcess(processDefinition);
     }
