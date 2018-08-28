@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -930,6 +931,18 @@ public interface ProcessManagementAPI {
      * @see BusinessArchive#getResources(String)
      */
     Map<String, byte[]> getProcessResources(long processDefinitionId, String filenamesPattern) throws RetrieveException;
+
+    /**
+     * Get a resource from the process.
+     * Can only retrieve resources stored in the 'resources' folder of the business archive
+     *
+     * @param processDefinitionId if of the process definition
+     * @param fileName            name of the file to retrieve inside the resources folder of the business archive
+     * @return the content of the file
+     * @throws RetrieveException
+     * @throws FileNotFoundException
+     */
+    byte[] getExternalProcessResource(long processDefinitionId, String fileName) throws RetrieveException, FileNotFoundException;
 
     /**
      * Returns the identifier of the most recently deployed process definition with the given name. This method does not take into consideration the process
