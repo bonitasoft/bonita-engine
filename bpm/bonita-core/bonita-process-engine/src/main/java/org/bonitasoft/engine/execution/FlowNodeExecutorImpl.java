@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.List;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -49,7 +47,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -223,15 +220,19 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             for (SActivityInstance child : activityInstanceService.searchActivityInstances(SActivityInstance.class,
                     activityInstanceService.buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(flowNodeInstance.getId(),
                             Integer.MAX_VALUE))) {
-                activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
-                if (child.isStable()) {//if not stable the flow node will be executed automatically
-                    registerExecuteFlowNodeWork(child);
-                }
+                abort(child);
             }
         } catch (SFlowNodeModificationException | SBonitaReadException e) {
             throw new SWorkRegisterException("unable interrupt sub activities", e);
         }
 
+    }
+
+    private void abort(SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException, SWorkRegisterException {
+        activityInstanceService.setStateCategory(flowNodeInstance, SStateCategory.ABORTING);
+        if (flowNodeInstance.isStable()) {//if not stable the flow node will be executed automatically
+            registerExecuteFlowNodeWork(flowNodeInstance);
+        }
     }
 
     private void setExecutedBySubstitute(final Long executerSubstituteId, final SFlowNodeInstance sFlowNodeInstance) throws SFlowNodeModificationException {
@@ -263,12 +264,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 } else {
                     registerNotifyFinishWork(sFlowNodeInstance);
                 }
-                List<SBoundaryEventInstance> activityBoundaryEventInstances = eventInstanceService.getActivityBoundaryEventInstances(flowNodeInstanceId, 0,
-                        1000);
-                if (!activityBoundaryEventInstances.isEmpty()) {
-                    for (SBoundaryEventInstance activityBoundaryEventInstance : activityBoundaryEventInstances) {
-                        registerNotifyFinishWork(activityBoundaryEventInstance);
-                    }
+                if (sFlowNodeInstance instanceof SActivityInstance) {
+                    flowNodeStateManager.getStateBehaviors().interruptAttachedBoundaryEvent(processDefinitionService.getProcessDefinition(sFlowNodeInstance.getProcessDefinitionId()),
+                            ((SActivityInstance) sFlowNodeInstance), SStateCategory.ABORTING);
                 }
             }
         } catch (final SBonitaException e) {
