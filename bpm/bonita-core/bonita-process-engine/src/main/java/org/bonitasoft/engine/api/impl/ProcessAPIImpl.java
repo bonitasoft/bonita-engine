@@ -19,6 +19,7 @@ import static org.bonitasoft.engine.core.process.instance.model.event.trigger.ST
 import static org.bonitasoft.engine.search.AbstractSearchEntity.search;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -359,7 +360,9 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.resources.BARResourceType;
 import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
@@ -2249,6 +2252,20 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (SBonitaException | InvalidBusinessArchiveFormatException e) {
             throw new RetrieveException(e);
         }
+    }
+
+    @Override
+    public byte[] getExternalProcessResource(final long processDefinitionId, final String fileName) throws RetrieveException,FileNotFoundException {
+        SBARResource resource;
+        try {
+            resource = getTenantAccessor().getProcessResourcesService().get(processDefinitionId, BARResourceType.EXTERNAL, fileName);
+        } catch (SBonitaException  e) {
+            throw new RetrieveException(e);
+        }
+        if (resource == null) {
+            throw new FileNotFoundException("No resource named " + fileName + " in process " + processDefinitionId);
+        }
+        return resource.getContent();
     }
 
     @Override
