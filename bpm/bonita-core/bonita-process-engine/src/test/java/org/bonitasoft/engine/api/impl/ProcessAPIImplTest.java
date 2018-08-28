@@ -20,6 +20,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -143,6 +144,9 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.resources.BARResourceType;
+import org.bonitasoft.engine.resources.ProcessResourcesService;
+import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -247,6 +251,8 @@ public class ProcessAPIImplTest {
     private BusinessArchiveService businessArchiveService;
     @Mock
     private UserFilterService userFilterService;
+    @Mock
+    private ProcessResourcesService processResourcesService;
     private SProcessDefinitionImpl processDefinition;
     private SUserTaskDefinitionImpl userTaskDefinition;
     @Captor
@@ -286,6 +292,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getWorkService()).thenReturn(workService);
         when(tenantAccessor.getBPMWorkFactory()).thenReturn(workFactory);
         when(tenantAccessor.getUserFilterService()).thenReturn(userFilterService);
+        when(tenantAccessor.getProcessResourcesService()).thenReturn(processResourcesService);
         userTransactionService = new TestUserTransactionService();
         when(tenantAccessor.getUserTransactionService()).thenReturn(userTransactionService);
 
@@ -1520,5 +1527,34 @@ public class ProcessAPIImplTest {
         public void failFirstTx() {
             failOnce = true;
         }
+    }
+
+    @Test
+    public void should_get_external_resources_from_process() throws Exception {
+        doReturn(new SBARResource("myResource", BARResourceType.EXTERNAL, PROCESS_DEFINITION_ID, new byte[]{1, 2, 3}))
+                .when(processResourcesService)
+                .get(PROCESS_DEFINITION_ID, BARResourceType.EXTERNAL, "myResource");
+
+        byte[] myResource = processAPI.getExternalProcessResource(PROCESS_DEFINITION_ID, "myResource");
+
+        assertThat(myResource).isEqualTo(new byte[]{1, 2, 3});
+    }
+
+    @Test
+    public void should_throw_FileNotFoundException_when_getting_unexisting_external_resource() throws Exception {
+        expectedException.expect(FileNotFoundException.class);
+
+        processAPI.getExternalProcessResource(PROCESS_DEFINITION_ID, "myResource2");
+    }
+
+    @Test
+    public void should_throw_RetrieveException_when_cant_read_database() throws Exception {
+        doThrow(new SBonitaReadException(""))
+                .when(processResourcesService)
+                .get(anyLong(),any(),anyString());
+
+        expectedException.expect(RetrieveException.class);
+
+        processAPI.getExternalProcessResource(PROCESS_DEFINITION_ID, "myResource2");
     }
 }
