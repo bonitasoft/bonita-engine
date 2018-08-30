@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.event;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeNotNull;
@@ -35,6 +37,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
@@ -691,6 +694,44 @@ public class MessageEventIT extends AbstractEventIT {
         assertEquals("Doe", dataInstance.getValue());
 
         disableAndDeleteProcess(receiveMessageProcess);
+    }
+
+    @Test
+    public void should_be_able_to_send_a_good_message_even_after_sending_a_bad_one() throws Exception {
+        DesignProcessDefinition process = new ProcessDefinitionBuilder()
+                .createNewInstance(CATCH_MESSAGE_PROCESS_NAME, PROCESS_VERSION)
+                .addActor(ACTOR_NAME)
+                .addShortTextData("processData", null)
+                .addIntermediateCatchEvent("waitingMessage")
+                .addMessageEventTrigger("aMessage")
+                .addOperation(new OperationBuilder().createSetDataOperation("processData", new ExpressionBuilder().createDataExpression("messageData", String.class.getName())))
+                .addUserTask("step1", ACTOR_NAME)
+                .addTransition("waitingMessage", "step1").getProcess();
+
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithActor(process, ACTOR_NAME, user);
+        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+
+
+        // send a message that match the waiting message but with missing data
+        sendMessage("aMessage", CATCH_MESSAGE_PROCESS_NAME, "waitingMessage", emptyMap());
+        Thread.sleep(200);
+        // the message should not be handled (no way to check that using the API)
+        Assertions.assertThat(getProcessAPI().getOpenActivityInstances(receiveMessageProcessInstance.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT)).isEmpty();
+
+        // send the same message but  with the missing data
+        sendMessage("aMessage", CATCH_MESSAGE_PROCESS_NAME, "waitingMessage", singletonMap(string("messageData"), string("Doe")));
+        // the waiting message is now correctly triggered
+        waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
+
+        // we verify that it was really the second message that matched
+        DataInstance dataInstance = getProcessAPI().getProcessDataInstance("processData", receiveMessageProcessInstance.getId());
+        Assertions.assertThat(dataInstance.getValue()).isEqualTo("Doe");
+
+        disableAndDeleteProcess(receiveMessageProcess);
+    }
+
+    private Expression string(String messageData) throws InvalidExpressionException {
+        return new ExpressionBuilder().createConstantStringExpression(messageData);
     }
 
     @Test(expected = SendEventException.class)
