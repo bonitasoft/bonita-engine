@@ -54,7 +54,7 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
         loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, format("Completed work %s", work));
     }
 
-    public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Exception thrown) {
+    public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context, Throwable thrown) {
         if (thrown instanceof LockTimeoutException) {
             //retry the work
             execute(work);

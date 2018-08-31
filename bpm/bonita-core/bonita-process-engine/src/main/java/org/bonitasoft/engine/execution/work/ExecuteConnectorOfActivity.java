@@ -52,8 +52,6 @@ import org.bonitasoft.engine.work.WorkService;
  */
 public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
-    private static final long serialVersionUID = 6220793197069669088L;
-
     private final long flowNodeInstanceId;
 
     private final long flowNodeDefinitionId;
@@ -127,7 +125,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     @Override
     protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition,
-            final Exception exception)
+            final Throwable exception)
             throws SBonitaException {
         setConnectorAndContainerToFailed(context, exception);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);

@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
@@ -154,11 +155,12 @@ public class BPMWorkFactoryTest {
             }
 
             @Override
-            public void work(Map<String, Object> context) throws Exception {
+            public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
+                return CompletableFuture.completedFuture(null);
             }
 
             @Override
-            public void handleFailure(Exception e, Map<String, Object> context) throws Exception {
+            public void handleFailure(Throwable e, Map<String, Object> context) throws Exception {
             }
         };
         workFactory.addExtension("MyWork", workDescriptor -> bonitaWork);

@@ -21,6 +21,9 @@ import static org.awaitility.Awaitility.await;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -112,6 +115,58 @@ public class BonitaThreadPoolExecutorTest {
     }
 
     @Test
+    public void should_update_works_counters_only_when_async_work_completes() throws Exception {
+        //given:
+        WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC");
+
+        //when:
+        bonitaThreadPoolExecutor.submit(workDescriptor);
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
+
+        //then:
+        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(0);
+        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(1);
+        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(0);
+
+        //when
+        TimeUnit.MILLISECONDS.sleep(500); // wait for the completable future to finish
+        assertThat(bonitaThreadPoolExecutor.getExecuted()).as("Executed works number").isEqualTo(1);
+        assertThat(bonitaThreadPoolExecutor.getRunnings()).as("Running works number").isEqualTo(0);
+        assertThat(bonitaThreadPoolExecutor.getPendings()).as("Pending works number").isEqualTo(0);
+    }
+
+
+    @Test
+    public void should_call_on_success_callback_only_when_async_work_executed_properly() throws InterruptedException {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC");
+
+        bonitaThreadPoolExecutor.submit(workDescriptor);
+
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
+        assertThat(workExecutionCallback.isOnSuccessCalled()).isFalse();
+        assertThat(workExecutionCallback.isOnFailureCalled()).isFalse();
+
+        await().until(() -> workExecutionCallback.isOnSuccessCalled());
+        assertThat(workExecutionCallback.isOnFailureCalled()).isFalse();
+    }
+
+    @Test
+    public void should_call_on_failure_callback_ony_when_async_work_executed_properly() throws InterruptedException {
+        WorkDescriptor workDescriptor = WorkDescriptor.create("ASYNC_EXCEPTION");
+
+        bonitaThreadPoolExecutor.submit(workDescriptor);
+
+        TimeUnit.MILLISECONDS.sleep(50); // give some time to the executor to process the work
+        assertThat(workExecutionCallback.isOnSuccessCalled()).isFalse();
+        assertThat(workExecutionCallback.isOnFailureCalled()).isFalse();
+
+
+        await().until(() -> workExecutionCallback.isOnFailureCalled());
+        assertThat(workExecutionCallback.isOnSuccessCalled()).isFalse();
+        assertThat(workExecutionCallback.getThrown()).hasMessage("my exception").isInstanceOf(SWorkException.class);
+    }
+
+    @Test
     public void should_update_works_counters_when_enqueuing_workDescriptor_with_long_processing_time()
             throws Exception {
         // We are using
@@ -143,6 +198,7 @@ public class BonitaThreadPoolExecutorTest {
 
         private final AtomicBoolean onSuccessCalled = new AtomicBoolean(false);
         private final AtomicBoolean onFailureCalled = new AtomicBoolean(false);
+        private Throwable thrown;
 
         @Override
         public void onSuccess(WorkDescriptor workDescriptor) {
@@ -151,7 +207,8 @@ public class BonitaThreadPoolExecutorTest {
 
         @Override
         public void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
-                Exception thrown) {
+                              Throwable thrown) {
+            this.thrown = thrown;
             onFailureCalled.set(true);
         }
 
@@ -161,6 +218,10 @@ public class BonitaThreadPoolExecutorTest {
 
         public boolean isOnFailureCalled() {
             return onFailureCalled.get();
+        }
+
+        public Throwable getThrown() {
+            return thrown;
         }
     }
 
@@ -182,20 +243,37 @@ public class BonitaThreadPoolExecutorTest {
                 }
 
                 @Override
-                public void work(Map<String, Object> context) throws Exception {
+                public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
                     switch (workDescriptor.getType()) {
                         case "EXCEPTION":
                             throw new Exception("classic exception");
                         case "SLEEP":
                             TimeUnit.SECONDS.sleep(workSleepPeriodInSeconds);
                             break;
+                        case "ASYNC":
+                            return CompletableFuture.supplyAsync(() -> {
+                                try {
+                                    TimeUnit.MILLISECONDS.sleep(200);
+                                } catch (InterruptedException ignored) {
+                                }
+                                return null;
+                            }, Executors.newSingleThreadExecutor());
+                        case "ASYNC_EXCEPTION":
+                            return CompletableFuture.supplyAsync(() -> {
+                                try {
+                                    TimeUnit.MILLISECONDS.sleep(200);
+                                } catch (InterruptedException ignored) {
+                                }
+                                throw new CompletionException(new SWorkException("my exception"));
+                            }, Executors.newSingleThreadExecutor());
                         case "NORMAL":
                         default:
                     }
+                    return CompletableFuture.completedFuture(null);
                 }
 
                 @Override
-                public void handleFailure(Exception e, Map<String, Object> context) {
+                public void handleFailure(Throwable e, Map<String, Object> context) {
                     // do nothing
                 }
             };

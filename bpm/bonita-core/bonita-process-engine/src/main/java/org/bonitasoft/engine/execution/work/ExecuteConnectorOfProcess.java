@@ -56,7 +56,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
-    private static final long serialVersionUID = 4993288070721748951L;
 
     private final long processInstanceId;
 
@@ -131,7 +130,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Exception exception)
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable exception)
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
