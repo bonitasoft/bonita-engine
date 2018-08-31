@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -34,7 +35,7 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
         super(work);
     }
 
-    protected void logIncident(final Exception cause, final Exception exceptionWhenHandlingFailure) {
+    protected void logIncident(final Throwable cause, final Exception exceptionWhenHandlingFailure) {
         final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
         final IncidentService incidentService = getTenantAccessor().getIncidentService();
         incidentService.report(getTenantId(), incident);
@@ -49,20 +50,20 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
         context.put(TENANT_ACCESSOR, tenantAccessor);
         try {
             sessionAccessor.setTenantId(getTenantId());
-            getWrappedWork().work(context);
+            return getWrappedWork().work(context);
         } finally {
             sessionAccessor.deleteTenantId();
         }
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SessionAccessor sessionAccessor = tenantAccessor.getSessionAccessor();
         sessionAccessor.setTenantId(getTenantId());
@@ -97,7 +98,7 @@ public class InSessionBonitaWork extends WrappingBonitaWork {
         }
     }
 
-    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Exception e, final Map<String, Object> context) {
+    private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Throwable e, final Map<String, Object> context) {
         try {
             getWrappedWork().handleFailure(e, context);
             logException(loggerService, e);

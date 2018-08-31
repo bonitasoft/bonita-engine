@@ -15,6 +15,8 @@ package org.bonitasoft.engine.work;
 
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
@@ -90,17 +92,30 @@ public class BonitaThreadPoolExecutor extends ThreadPoolExecutor implements Boni
             }
             BonitaWork bonitaWork = workFactory.create(work);
             HashMap<String, Object> context = new HashMap<>();
+            CompletableFuture<Void> asyncResult;
+            runningWorks.incrementAndGet();
             try {
-                runningWorks.incrementAndGet();
-                bonitaWork.work(context);
-                workExecutionCallback.onSuccess(work);
+                asyncResult = bonitaWork.work(context);
             } catch (Exception e) {
-                workExecutionCallback.onFailure(work, bonitaWork, context, e);
-            }
-            finally {
                 executedWorks.incrementAndGet();
                 runningWorks.decrementAndGet();
+                workExecutionCallback.onFailure(work, bonitaWork, context, e);
+                return;
             }
+
+            asyncResult.handle((result, error) -> {
+                executedWorks.incrementAndGet();
+                runningWorks.decrementAndGet();
+                if (error != null) {
+                    if (error instanceof CompletionException) {
+                        error = error.getCause();
+                    }
+                    workExecutionCallback.onFailure(work, bonitaWork, context, error);
+                } else {
+                    workExecutionCallback.onSuccess(work);
+                }
+                return null;
+            });
         });
     }
 

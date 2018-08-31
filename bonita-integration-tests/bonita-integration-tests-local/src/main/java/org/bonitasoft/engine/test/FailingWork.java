@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.test;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.work.BonitaWork;
 
@@ -32,13 +33,13 @@ final class FailingWork extends BonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         throw new Exception("an unexpected exception");
 
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         throw new Exception("unable to handle failure");
     }
 }

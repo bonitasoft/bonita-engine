@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
@@ -75,7 +76,7 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
@@ -86,10 +87,11 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
             eventInstanceService.deleteMessageInstance(messageInstance);
             dataInstanceService.deleteLocalDataInstances(messageInstanceId, DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
         }
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
         resetMessageInstance(messageInstanceId, tenantAccessor.getEventInstanceService());

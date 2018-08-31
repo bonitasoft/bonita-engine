@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
@@ -31,19 +32,17 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
 
-    private static final long serialVersionUID = -731662535816176640L;
-
     public TxInHandleFailureWrappingWork(final BonitaWork work) {
         super(work);
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
-        getWrappedWork().work(context);
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
+        return getWrappedWork().work(context);
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         // Enrich the exception before log it.
         if (e instanceof SBonitaException) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);

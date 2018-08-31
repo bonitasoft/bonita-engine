@@ -69,7 +69,7 @@ public class ExecuteConnectorWorkTest {
     private Map<String, Object> workContext = new HashMap<>();
     private ExecuteConnectorWork executeConnectorWork = new ExecuteConnectorWork(PROCESS_DEFINITION_ID, CONNECTOR_INSTANCE_ID, CONNECTOR_NAME, expressionContext, PROCESS_INSTANCE_ID) {
         @Override
-        protected void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Exception Exception) throws SBonitaException {
+        protected void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Throwable Exception) throws SBonitaException {
         }
 
         @Override

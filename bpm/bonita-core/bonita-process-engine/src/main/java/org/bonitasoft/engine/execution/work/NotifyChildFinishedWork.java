@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -31,8 +32,6 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  * @author Celine Souchet
  */
 public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
-
-    private static final long serialVersionUID = -8987586943379865375L;
 
     private final long processDefinitionId;
 
@@ -54,7 +53,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final ClassLoader processClassloader = getClassLoader(context);
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -64,6 +63,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -61,7 +62,7 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         if (isReadyHumanTask) {
             SHumanTaskInstance humanTaskInstance = tenantAccessor.getActivityInstanceService().getHumanTaskInstance(flowNodeInstanceId);
@@ -83,10 +84,11 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
             }
         }
         tenantAccessor.getFlowNodeExecutor().executeFlowNode(flowNodeInstanceId, null, null);
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
