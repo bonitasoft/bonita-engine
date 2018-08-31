@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -33,8 +34,6 @@ import org.bonitasoft.engine.work.LockTimeoutException;
  */
 public class LockProcessInstanceWork extends WrappingBonitaWork {
 
-    private static final long serialVersionUID = -4604852239659029393L;
-
     protected final long processInstanceId;
 
     private static final long TIMEOUT = 20;
@@ -47,7 +46,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(final Map<String, Object> context) throws Exception {
         final TechnicalLoggerService loggerService = getTenantAccessor(context).getTechnicalLoggerService();
         final LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
@@ -71,7 +70,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " obtained lock for instance " + processInstanceId
                         + ": " + getWorkStack());
             }
-            getWrappedWork().work(context);
+            return getWrappedWork().work(context);
         } finally {
             if (lock != null) {
                 lockService.unlock(lock, getTenantId());

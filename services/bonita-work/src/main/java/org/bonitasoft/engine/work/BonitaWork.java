@@ -15,6 +15,7 @@ package org.bonitasoft.engine.work;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -54,9 +55,9 @@ public abstract class BonitaWork {
      *            a map of context that can be filled by a work to be given to a wrapped work
      * @throws Exception
      */
-    public abstract void work(Map<String, Object> context) throws Exception;
+    public abstract CompletableFuture<Void> work(Map<String, Object> context) throws Exception;
 
-    public abstract void handleFailure(Exception e, Map<String, Object> context) throws Exception;
+    public abstract void handleFailure(Throwable e, Map<String, Object> context) throws Exception;
 
     public long getTenantId() {
         if (tenantId <= 0) {

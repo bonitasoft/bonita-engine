@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.execution.work.TenantAwareBonitaWork;
@@ -39,15 +40,16 @@ public class TriggerSignalWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void work(Map<String, Object> context) throws Exception {
+    public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         SWaitingSignalEvent listeningSignal = tenantAccessor.getEventInstanceService()
                 .getWaitingSignalEvent(signalId);
         tenantAccessor.getEventsHandler().triggerCatchEvent(listeningSignal, null);
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void handleFailure(Exception e, Map<String, Object> context) throws Exception {
+    public void handleFailure(Throwable e, Map<String, Object> context) throws Exception {
         throw new UnsupportedOperationException("No automatic failure handling for signals. See recovery procedure.");
     }
 

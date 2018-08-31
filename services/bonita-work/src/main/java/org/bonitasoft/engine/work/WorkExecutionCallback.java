@@ -27,6 +27,6 @@ public interface WorkExecutionCallback {
     void onSuccess(WorkDescriptor workDescriptor);
 
     void onFailure(WorkDescriptor work, BonitaWork bonitaWork, Map<String, Object> context,
-                   Exception thrown);
+                   Throwable thrown);
 
 }
