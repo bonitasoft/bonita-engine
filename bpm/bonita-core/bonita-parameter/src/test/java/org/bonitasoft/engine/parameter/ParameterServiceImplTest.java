@@ -14,13 +14,16 @@
 package org.bonitasoft.engine.parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -49,7 +52,7 @@ public class ParameterServiceImplTest {
     @Mock
     ReadPersistenceService persistenceService;
     @Mock
-    EventService eventService;
+    TechnicalLoggerService loggerService;
 
     @Captor
     private ArgumentCaptor<SelectListDescriptor<SParameter>> getSelectDescriptor;
@@ -171,5 +174,29 @@ public class ParameterServiceImplTest {
         final long processDefinitionId = 4656556L;
         spy.getAll(processDefinitionId);
         verify(spy).get(eq(processDefinitionId), eq(0), anyInt(), nullable(OrderBy.class));
+    }
+
+    @Test
+    public void should_merge_parameters_with_existing_parameters() throws Exception {
+        final ParameterServiceImpl spy = spy(parameterService);
+        final long processDefinitionId = 4656556L;
+        SParameter hostParameter = sParameter("host", "localhost", processDefinitionId);
+        doReturn(hostParameter).when(spy).get(processDefinitionId, "host");
+        when(loggerService.isLoggable(any(), any())).thenReturn(true);
+        
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("host", "192.168.0.1");
+        parameters.put("password", "kittycat");
+        
+        spy.merge(processDefinitionId, parameters);
+
+        verify(spy).update(hostParameter, "192.168.0.1");
+        verify(spy, never()).add(processDefinitionId, "password", "kittycat");
+        verify(loggerService, times(1)).log(eq(ParameterServiceImpl.class), any(TechnicalLogSeverity.class),
+                eq("Parameter <password> doesn't exist in process definition <4656556> and has not been merged."));
+    }
+
+    private SParameter sParameter(String name, String value, long processDefinitionId) {
+        return new SParameterImpl(name, value, processDefinitionId);
     }
 }
