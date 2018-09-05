@@ -928,7 +928,7 @@
     <bean id="parameterService" class="org.bonitasoft.engine.parameter.ParameterServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService"/>
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
