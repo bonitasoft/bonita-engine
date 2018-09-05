@@ -284,6 +284,10 @@ public class DocumentHelper {
                 continue;
 
             }
+            if (item == null) {
+                //ignore the item
+                continue;
+            }
             throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
 
         }
