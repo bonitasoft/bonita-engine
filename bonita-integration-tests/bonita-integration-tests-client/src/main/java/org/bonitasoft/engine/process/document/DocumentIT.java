@@ -1354,6 +1354,7 @@ public class DocumentIT extends TestWithUser {
         final String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file.txt\")," +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file.txt\")," +
+                "null," +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file.txt\")," +
                 "new org.bonitasoft.engine.bpm.contract.FileInputValue(\"file.txt\", \"hello4\".getBytes())" +
                 "]";
