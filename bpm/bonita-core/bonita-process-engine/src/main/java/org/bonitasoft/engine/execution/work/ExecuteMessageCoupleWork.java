@@ -18,16 +18,15 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -36,8 +35,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  */
 public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
-
-    private static final long serialVersionUID = 2171765554098439091L;
 
     private final long messageInstanceId;
 
@@ -60,14 +57,6 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         descriptor
                 .addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
-    }
-
-    private void resetMessageInstance(final long messageInstanceId, final EventInstanceService eventInstanceService) throws SMessageModificationException,
-            SMessageInstanceReadException {
-        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(SMessageInstanceBuilder.HANDLED, false);
-        eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
     @Override
@@ -93,8 +82,28 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
-        resetMessageInstance(messageInstanceId, tenantAccessor.getEventInstanceService());
+        tenantAccessor.getUserTransactionService().executeInTransaction(() -> {
+            resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
+            return null;
+        });
+        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        logger.log(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.WARNING,
+                String.format("Unable to execute message couple with sent message %s and waiting message %s, the waiting message was reset" +
+                        " to allow other message to trigger it. This failure might come from a design issue, cause is: %s", messageInstanceId, waitingMessageId, getRootCause(e)));
+        if (logger.isLoggable(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.DEBUG)) {
+            logger.log(ExecuteMessageCoupleWork.class, TechnicalLogSeverity.DEBUG,
+                    String.format("Cause of the issue while executing message couple: sent message %s and waiting message %s:", messageInstanceId, waitingMessageId), e);
+        }
+
+    }
+
+    private String getRootCause(Throwable e) {
+        String message = null;
+        while (e != null) {
+            message = e.getMessage();
+            e = e.getCause();
+        }
+        return message;
     }
 
 }
