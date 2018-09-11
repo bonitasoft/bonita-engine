@@ -14,6 +14,9 @@
 package org.bonitasoft.engine.expression.impl;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,6 +75,12 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
                 result = expressionContent;
             } else if (Date.class.getName().equals(returnType)) { // "2013-01-02T02:42:12.17+02:00"
                 result = parseDate(expressionContent);
+            } else if (LocalDate.class.getName().equals(returnType)) {
+                result = LocalDate.parse(expressionContent);
+            } else if (LocalDateTime.class.getName().equals(returnType)) {
+                result = LocalDateTime.parse(expressionContent);
+            } else if (OffsetDateTime.class.getName().equals(returnType)) {
+                result = OffsetDateTime.parse(expressionContent);
             } else {
                 throw new SExpressionEvaluationException("Unknown return type: " + returnType + " for expression " + expression.getName() + " : "
                         + expressionContent, expression.getName());

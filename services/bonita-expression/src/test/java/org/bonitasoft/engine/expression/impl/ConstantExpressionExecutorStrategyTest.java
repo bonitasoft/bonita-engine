@@ -13,8 +13,14 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 
@@ -66,6 +72,47 @@ public class ConstantExpressionExecutorStrategyTest {
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
         assertNotNull(result);
+    }
+
+    @Test
+    public void should_evaluate_local_date() throws Exception {
+        final SExpression sExpression = buildExpression("2013-07-18", SExpression.TYPE_CONSTANT,
+                LocalDate.class.getName(), null, null);
+
+        final LocalDate result = (LocalDate) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
+        assertThat(result.getYear()).isEqualTo(2013);
+        assertThat(result.getMonth()).isEqualTo(Month.JULY);
+        assertThat(result.getDayOfMonth()).isEqualTo(18);
+    }
+
+    @Test
+    public void should_evaluate_local_date_time() throws Exception {
+        final SExpression sExpression = buildExpression("2013-07-18T12:00:00", SExpression.TYPE_CONSTANT,
+                LocalDateTime.class.getName(), null, null);
+
+        final LocalDateTime result = (LocalDateTime) strategy.evaluate(sExpression, null, null, ContainerState.ACTIVE);
+        assertThat(result.getYear()).isEqualTo(2013);
+        assertThat(result.getMonth()).isEqualTo(Month.JULY);
+        assertThat(result.getDayOfMonth()).isEqualTo(18);
+        assertThat(result.getHour()).isEqualTo(12);
+        assertThat(result.getMinute()).isEqualTo(0);
+        assertThat(result.getSecond()).isEqualTo(0);
+    }
+
+    @Test
+    public void should_evaluate_offset_date_time() throws Exception {
+        final SExpression sExpression = buildExpression("2007-12-03T10:15:30+01:00", SExpression.TYPE_CONSTANT,
+                OffsetDateTime.class.getName(), null, null);
+
+        final OffsetDateTime result = (OffsetDateTime) strategy.evaluate(sExpression, null, null,
+                ContainerState.ACTIVE);
+        assertThat(result.getYear()).isEqualTo(2007);
+        assertThat(result.getMonth()).isEqualTo(Month.DECEMBER);
+        assertThat(result.getDayOfMonth()).isEqualTo(3);
+        assertThat(result.getHour()).isEqualTo(10);
+        assertThat(result.getMinute()).isEqualTo(15);
+        assertThat(result.getSecond()).isEqualTo(30);
+        assertThat(result.getOffset()).isEqualTo(ZoneOffset.ofHours(1));
     }
 
     private SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
