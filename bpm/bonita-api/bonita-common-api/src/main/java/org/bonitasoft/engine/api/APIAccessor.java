@@ -84,7 +84,9 @@ public interface APIAccessor extends Serializable {
      * Gives access to the <code>BusinessDataAPI</code>
      *
      * @return an <code>BusinessDataAPI</code>
+     * @deprecated as of 7.3, see {@link BusinessDataAPI} for replacements
      */
+    @Deprecated
     BusinessDataAPI getBusinessDataAPI();
 
 }
