@@ -45,7 +45,7 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link PageAPI},</li>
  * <li>{@link ApplicationAPI},</li>
  * <li>{@link PermissionAPI},</li>
- * <li>{@link BusinessDataAPI},</li>
+ * <li>{@link BusinessDataAPI} (deprecated as of 7.3),</li>
  * </ul>
  *
  * @author Nicolas Chabanoles
@@ -297,7 +297,9 @@ public class APIClient {
      * Get API to access Business Data related to processes.
      *
      * @since 7.2
+     * @deprecated as of 7.3, see {@link BusinessDataAPI} for replacements
      */
+    @Deprecated
     public BusinessDataAPI getBusinessDataAPI() {
         return getAPI(BusinessDataAPI.class);
     }

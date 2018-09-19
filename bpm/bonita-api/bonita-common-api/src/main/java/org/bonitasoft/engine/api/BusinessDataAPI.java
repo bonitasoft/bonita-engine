@@ -27,7 +27,7 @@ import org.bonitasoft.engine.business.data.BusinessDataReference;
  * @since 7.0.0
  * @see org.bonitasoft.engine.business.data.BusinessDataReference
  * @see org.bonitasoft.engine.bpm.process.ProcessInstance
- * @deprecated Replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
+ * @deprecated As of 7.3, replaced by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} ({@link ProcessAPI#getArchivedProcessInstanceExecutionContext(long)} for
  *             archived process instances). In
  *             the map return by {@link ProcessAPI#getProcessInstanceExecutionContext(long)} you can get {@link BusinessDataReference} by using
  *             "yourBusinessDataName_ref" key (business data name as declared in

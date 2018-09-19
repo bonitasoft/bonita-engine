@@ -105,6 +105,10 @@ public final class TenantAPIAccessor {
         return getAPI(TenantAdministrationAPI.class, session);
     }
 
+    /**
+     * @deprecated as of 7.3, see {@link BusinessDataAPI} for replacements
+     */
+    @Deprecated
     public static BusinessDataAPI getBusinessDataAPI(APISession session) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(BusinessDataAPI.class, session);
