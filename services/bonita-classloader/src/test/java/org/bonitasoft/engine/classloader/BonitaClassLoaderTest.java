@@ -14,10 +14,11 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.home.BonitaResource.resource;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.stream.Stream;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class BonitaClassLoaderTest {
     @Test
     public void releaseShouldRemoveAllScopeFolderAndItsContent() throws IOException {
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(
-                Collections.singletonMap("myJar.jar", "Salut le monde".getBytes()), "here", 154L,
+                Stream.of(resource("myJar.jar", "Salut le monde".getBytes())), "here", 154L,
                 temporaryFolder.newFolder().toURI(), BonitaClassLoader.class.getClassLoader());
         File temporaryFolder = bonitaClassLoader.getTemporaryFolder();
         assertThat(temporaryFolder).as("bonitaClassLoader tempDir:%s should exists after bonitaClassLoader creation",
@@ -55,10 +56,10 @@ public class BonitaClassLoaderTest {
         File tempFolder = temporaryFolder.newFolder();
         //when
         BonitaClassLoader classLoader1 = new BonitaClassLoader(
-                Collections.singletonMap("myJar1.jar", "content".getBytes()), "type", 12L, tempFolder.toURI(),
+                Stream.of(resource("myJar1.jar", "content".getBytes())), "type", 12L, tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader());
         BonitaClassLoader classLoader2 = new BonitaClassLoader(
-                Collections.singletonMap("myJar2.jar", "content".getBytes()), "type", 13L, tempFolder.toURI(),
+                Stream.of(resource("myJar2.jar", "content".getBytes())), "type", 13L, tempFolder.toURI(),
                 BonitaClassLoaderTest.class.getClassLoader());
         //then
         assertThat(classLoader1.getTemporaryFolder().getAbsolutePath())
