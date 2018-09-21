@@ -71,7 +71,7 @@ class UserPermissionRule implements PermissionRule {
                 def processAPI = apiAccessor.getProcessAPI()
                 return processAPI.isUserProcessSupervisor(processId, currentUserId)
             }
+            return false
         }
-        return true
     }
 }
