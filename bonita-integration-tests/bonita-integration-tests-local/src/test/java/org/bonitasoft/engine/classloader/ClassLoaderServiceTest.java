@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.home.BonitaResource.resource;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -521,13 +523,12 @@ public class ClassLoaderServiceTest extends CommonBPMServicesTest {
         Map<String, byte[]> jarResources = Collections.singletonMap("test.xml", "<node>content</mode>".getBytes());
         byte[] jarContent = IOUtil.generateJar(jarResources);
         dependencyService.createMappedDependency("myResource.jar", jarContent, "myResource.jar", ID1, TYPE1);
-        Map<String, byte[]> resources = Collections.singletonMap("myResource.jar", jarContent);
         getTransactionService().complete();
         getTransactionService().begin();
-        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, resources);
+        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, Stream.of(resource("myResource.jar", jarContent)));
         getTransactionService().complete();
         getTransactionService().begin();
-        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, resources);
+        classLoaderService.refreshLocalClassLoader(TYPE1.name(), ID1, Stream.of(resource("myResource.jar", jarContent)));
         getTransactionService().complete();
 
         //when

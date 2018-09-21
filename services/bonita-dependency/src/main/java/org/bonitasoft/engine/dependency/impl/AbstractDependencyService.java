@@ -14,11 +14,14 @@
 
 package org.bonitasoft.engine.dependency.impl;
 
+import static org.bonitasoft.engine.home.BonitaResource.resource;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Stream;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
@@ -26,6 +29,7 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -80,21 +84,18 @@ public abstract class AbstractDependencyService implements DependencyService {
 
     protected abstract AbstractRefreshClassLoaderTask getRefreshClassLoaderTask(final ScopeType type, final long id);
 
-    protected Map<String, byte[]> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
-        final Map<String, byte[]> resources = new HashMap<>();
-        int fromIndex = 0;
-        List<Long> dependencyIds;
-        do {
-            dependencyIds = getDependencyIds(id, type, fromIndex, BATCH_SIZE);
-            if (dependencyIds != null && dependencyIds.size() > 0) {
-                final List<SDependency> dependencies = getDependencies(dependencyIds);
-                for (final SDependency dependency : dependencies) {
-                    resources.put(dependency.getFileName(), dependency.getValue());
-                }
-            }
-            fromIndex = fromIndex + BATCH_SIZE;
-        } while (dependencyIds != null && dependencyIds.size() == BATCH_SIZE);
-        return resources;
+
+    Stream<BonitaResource> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
+        List<Long> dependencyIds = getDependencyIds(id, type, 0, Integer.MAX_VALUE);
+        return dependencyIds.stream()
+                .map(dependencyId -> {
+                    try {
+                        return getDependency(dependencyId);
+                    } catch (SDependencyNotFoundException e) {
+                        throw new SBonitaRuntimeException(e);
+                    }
+                })
+                .map(dependency -> resource(dependency.getFileName(), dependency.getValue()));
     }
 
     protected abstract Long getTenantId() throws STenantIdNotSetException;

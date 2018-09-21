@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.classloader;
 
+import static java.util.stream.Stream.empty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.home.BonitaResource.resource;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -27,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
@@ -60,7 +62,7 @@ public class VirtualClassLoaderTest {
         localClassLoader = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
         Thread.currentThread().setContextClassLoader(localClassLoader);
 
-        newClassLoader = new BonitaClassLoader(Collections.emptyMap(), "test", 125,
+        newClassLoader = new BonitaClassLoader(empty(), "test", 125,
                 File.createTempFile("test", ".tmp").toURI(), testClassLoader);
         tempDir = temporaryFolder.newFolder();
     }
@@ -73,9 +75,8 @@ public class VirtualClassLoaderTest {
     @Test
     public void loadClassStudentInformation_to_VirtualClassLoarder_should_be_get_as_resource() throws Exception {
         VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
-        final Map<String, byte[]> resources = new HashMap<>(1);
-        resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
+        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(Stream.of(resource("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))),
+                "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
         URL url = vcl.getResource("au/edu/sydney/faas/applicationstudent/StudentInformation.class");
@@ -96,9 +97,7 @@ public class VirtualClassLoaderTest {
     @Test
     public void loadStudentInformation_toVirtualClassLoader_should_be_usable_via_JavaMethodInvoker() throws Exception {
         final VirtualClassLoader vcl = new VirtualClassLoader("org.bonitasoft", 1L, Thread.currentThread().getContextClassLoader());
-        final Map<String, byte[]> resources = new HashMap<>(1);
-        resources.put("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")));
-        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
+        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(Stream.of(resource("UOSFaasApplication.jar", FileUtils.readFileToByteArray(new File("src/test/resources/UOSFaasApplication.jar")))), "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
 
         vcl.replaceClassLoader(bonitaClassLoader);
         final Object objectToInvokeJavaMethodOn = vcl.loadClass("au.edu.sydney.faas.applicationstudent.StudentRequest").getConstructors()[0].newInstance();
@@ -227,10 +226,7 @@ public class VirtualClassLoaderTest {
     }
 
     private BonitaClassLoader classloader(long id) {
-        final Map<String, byte[]> resources = new HashMap<>(1);
-        resources.put("test-1.jar",
-                new byte[] { 1, 2, 3 });
-        return new BonitaClassLoader(resources, "here", id, tempDir.toURI(),
+        return new BonitaClassLoader(Stream.of(resource("test-1.jar", new byte[] { 1, 2, 3 })), "here", id, tempDir.toURI(),
                 BonitaClassLoader.class.getClassLoader());
     }
 }
