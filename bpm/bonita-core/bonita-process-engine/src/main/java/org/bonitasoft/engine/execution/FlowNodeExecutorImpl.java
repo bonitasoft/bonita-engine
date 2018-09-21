@@ -286,11 +286,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SFlowNodeNotFoundException,
+    public void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance sFlowNodeInstanceChild) throws SFlowNodeNotFoundException,
             SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException, SFlowNodeModificationException,
             SFlowNodeExecutionException, SContractDataDeletionException, SWorkRegisterException {
-        final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-
         // TODO check deletion here
         archiveFlowNodeInstance(sFlowNodeInstanceChild, true, processDefinitionId);
 

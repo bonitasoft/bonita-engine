@@ -17,12 +17,16 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.bonitasoft.engine.work.SWorkPreconditionException;
 
 /**
  * Work that notify a container that a flow node is in completed state
@@ -58,12 +62,27 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
-            final ContainerRegistry containerRegistry = getTenantAccessor(context).getContainerRegistry();
-            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, parentId, parentType);
+            TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+            SFlowNodeInstance flowNodeInstance = retrieveAndVerifyFlowNodeInstance(tenantAccessor);
+            final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
+            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstance, parentId, parentType);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         return CompletableFuture.completedFuture(null);
+    }
+
+    private SFlowNodeInstance retrieveAndVerifyFlowNodeInstance(TenantServiceAccessor tenantAccessor) throws SWorkPreconditionException, SFlowNodeReadException {
+        SFlowNodeInstance flowNodeInstance;
+        try {
+            flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
+        } catch (SFlowNodeNotFoundException e) {
+            throw new SWorkPreconditionException("Flow node is already completed ( not found )");
+        }
+        if (!flowNodeInstance.isTerminal()) {
+            throw new SWorkPreconditionException("Flow node is not in a terminal state");
+        }
+        return flowNodeInstance;
     }
 
     @Override

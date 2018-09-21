@@ -20,6 +20,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
@@ -46,11 +47,11 @@ public class ContainerRegistry {
         executors.put(containerExecutor.getHandledType(), containerExecutor);
     }
 
-    public void nodeReachedState(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType)
+    public void nodeReachedState(final long processDefinitionId, final SFlowNodeInstance flowNodeInstance, final long parentId, final String parentType)
             throws SBonitaException {
         final ContainerExecutor containerExecutor = executors.get(parentType);
         if (containerExecutor != null) {
-            containerExecutor.childFinished(processDefinitionId, flowNodeInstanceId, parentId);
+            containerExecutor.childFinished(processDefinitionId, parentId, flowNodeInstance);
         } else {
             throw new SActivityExecutionException("There is no container executor for the container " + parentId + " having the type " + parentType);
         }

@@ -17,6 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 
 /**
  * @author Baptiste Mesta
@@ -29,13 +30,12 @@ public interface ContainerExecutor {
      * 
      * @param processDefinitionId
      *            The identifier of the process definition
-     * @param flowNodeInstanceId
-     *            The identifier of the flow node instance
      * @param parentId
      *            The identifier of the parent of the flow node
+     * @param flowNodeInstance
      * @throws SBonitaException
      */
-    void childFinished(long processDefinitionId, long flowNodeInstanceId, long parentId) throws SBonitaException;
+    void childFinished(long processDefinitionId, long parentId, SFlowNodeInstance flowNodeInstance) throws SBonitaException;
 
     /**
      * Execute a flow node in the context of this container executor
