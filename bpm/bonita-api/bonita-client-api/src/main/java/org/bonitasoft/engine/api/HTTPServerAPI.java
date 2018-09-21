@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -125,7 +127,7 @@ public class HTTPServerAPI implements ServerAPI {
         } catch (final Throwable e) {
             final StackTraceElement[] stackTrace = new Exception().getStackTrace();
             StackTraceTransformer.addStackTo(e, stackTrace);
-            throw new ServerWrappedException(e.getMessage() + "response= " + response, e);
+            throw new ServerWrappedException(e.getMessage() + " / response: " + response, e);
         }
     }
 
@@ -149,7 +151,13 @@ public class HTTPServerAPI implements ServerAPI {
         try {
             return httpclient.execute(httpost, RESPONSE_HANDLER);
         } catch (final ClientProtocolException e) {
-            throw new IOException("Error while executing POST request" + System.getProperty("line.separator") + "httpost = <" + httpost + ">", e);
+            String httpCodeMessage = "";
+            // required as the http code is not included in the exception message
+            if (e instanceof HttpResponseException) {
+                final int statusCode = ((HttpResponseException) e).getStatusCode();
+                httpCodeMessage = format(" (http code: %s)", statusCode);
+            }
+            throw new IOException("Error while executing POST request" + httpCodeMessage + " <" + httpost + ">", e);
         }
     }
 

@@ -13,7 +13,8 @@
  **/
 package org.bonitasoft.engine.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -112,7 +113,7 @@ public class HTTPServerAPIIT {
 
     @Test
     public void invokeMethodWithBasicAuthentication() throws Exception {
-        Map<String, String> configuration = new HashMap<String, String>();
+        Map<String, String> configuration = new HashMap<>();
         configuration.put("server.url", baseResourceUrl);
         configuration.put("application.name", APPLICATION_NAME);
         configuration.put("basicAuthentication.active", "true");
@@ -123,9 +124,9 @@ public class HTTPServerAPIIT {
         httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 
-    @Test(expected = ServerWrappedException.class)
-    public void invokeBasicAuthenticationWithWrongCredentialsShouldFail() throws Exception {
-        Map<String, String> configuration = new HashMap<String, String>();
+    @Test
+    public void invokeBasicAuthenticationWithWrongCredentialsShouldFail() {
+        Map<String, String> configuration = new HashMap<>();
         configuration.put("server.url", baseResourceUrl);
         configuration.put("application.name", APPLICATION_NAME);
         configuration.put("basicAuthentication.active", "true");
@@ -133,14 +134,18 @@ public class HTTPServerAPIIT {
         configuration.put("basicAuthentication.password", "__LENNON__");
 
         final HTTPServerAPI httpServerAPI = new HTTPServerAPI(configuration);
-        httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        Throwable thrown = catchThrowable(() -> httpServerAPI.invokeMethod(options, apiInterfaceName, methodName,
+                classNameParameters, parametersValues));
+
+        assertThat(thrown).isInstanceOf(ServerWrappedException.class)
+                .hasMessageStartingWith("Error while executing POST request (http code: 401)");
     }
 
     private static final class BonitaHandler extends AbstractHandler {
 
         @Override
         public void handle(final String s, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) {
-            assertEquals("john", request.getUserPrincipal().getName());
+            assertThat(request.getUserPrincipal().getName()).isEqualTo("john");
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);
             baseRequest.setHandled(true);
