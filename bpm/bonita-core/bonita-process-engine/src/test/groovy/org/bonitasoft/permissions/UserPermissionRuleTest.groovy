@@ -87,6 +87,6 @@ public class UserPermissionRuleTest {
 
         def isAuthorized = rule.isAllowed(apiSession, apiCallContext, apiAccessor, logger)
 
-        assertThat(isAuthorized).isTrue()
+        assertThat(isAuthorized).isFalse()
     }
 }
