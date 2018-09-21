@@ -24,6 +24,10 @@ public class BonitaResource {
     private final String name;
     private final byte[] content;
 
+    public static BonitaResource resource(String name, byte[] content) {
+        return new BonitaResource(name, content);
+    }
+
     public BonitaResource(String name, byte[] content) {
         this.name = name;
         this.content = content;
