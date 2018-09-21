@@ -20,14 +20,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -169,11 +173,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    @Override
-    public void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException {
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Refreshing global classloader");
-        }
+    public void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException {
+        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing global classloader");
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         try {
             refreshClassLoader(virtualClassloader, resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(),
@@ -185,11 +186,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws SClassLoaderException {
+    public void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources) throws SClassLoaderException {
         final ClassLoaderIdentifier key = getKey(type, id);
-        if (traceEnabled) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Refreshing local classloader with key: " + key);
-        }
+        logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Refreshing classloader with key: " + key);
         final VirtualClassLoader virtualClassloader = getLocalClassLoader(type, id);
         try {
             refreshClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id),
@@ -206,7 +205,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return BonitaHomeServer.getInstance().getLocalTemporaryFolder(type, id);
     }
 
-    private void refreshClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
+    private void refreshClassLoader(final VirtualClassLoader virtualClassloader, Stream<BonitaResource> resources, final String type, final long id,
                                     final URI temporaryFolder, final ClassLoader parent) {
         final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
         virtualClassloader.replaceClassLoader(classLoader);

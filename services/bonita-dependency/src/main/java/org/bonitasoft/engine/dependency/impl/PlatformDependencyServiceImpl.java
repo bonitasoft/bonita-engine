@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.home.BonitaResource;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -220,7 +222,7 @@ public class PlatformDependencyServiceImpl extends AbstractDependencyService {
 
     @Override
     public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
-        final Map<String, byte[]> resources = getDependenciesResources(type, id);
+        final Stream<BonitaResource> resources = getDependenciesResources(type, id);
         try {
             classLoaderService.refreshGlobalClassLoader(resources);
         } catch (final SClassLoaderException e) {

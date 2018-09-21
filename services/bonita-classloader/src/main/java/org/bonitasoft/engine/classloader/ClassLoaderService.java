@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import java.util.Map;
+import java.util.stream.Stream;
 
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
+import org.bonitasoft.engine.home.BonitaResource;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -66,9 +67,9 @@ public interface ClassLoaderService extends PlatformLifecycleService {
      */
     void removeLocalClassLoader(final String type, final long id) throws SClassLoaderException;
 
-    void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException;
+    void refreshGlobalClassLoader(Stream<BonitaResource> resources) throws SClassLoaderException;
 
-    void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws SClassLoaderException;
+    void refreshLocalClassLoader(String type, long id, Stream<BonitaResource> resources) throws SClassLoaderException;
 
     /**
      * add listener on a classloader

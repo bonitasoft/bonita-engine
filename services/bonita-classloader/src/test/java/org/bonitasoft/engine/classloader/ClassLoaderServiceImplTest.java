@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -120,7 +121,7 @@ public class ClassLoaderServiceImplTest {
         //given
         classLoaderService.addListener(CHILD_TYPE, CHILD_ID, myClassLoaderListener);
         //when
-        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Collections.<String, byte[]>emptyMap());
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Stream.empty());
         //then
         assertThat(myClassLoaderListener.isOnUpdateCalled()).isTrue();
         assertThat(myClassLoaderListener.isOnDestroyCalled()).isFalse();
@@ -230,8 +231,8 @@ public class ClassLoaderServiceImplTest {
         ClassLoaderListener listener = mock(ClassLoaderListener.class);
         classLoaderService.addListener(listener);
         //when
-        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Collections.<String, byte[]>emptyMap());
-        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, 17, Collections.<String, byte[]>emptyMap());
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, CHILD_ID, Stream.empty());
+        classLoaderService.refreshLocalClassLoader(CHILD_TYPE, 17, Stream.empty());
 
         //then
         verify(listener, times(2)).onUpdate(any(VirtualClassLoader.class));
