@@ -964,6 +964,7 @@ CREATE TABLE page (
   installationDate NUMERIC(19, 0) NOT NULL,
   installedBy NUMERIC(19, 0) NOT NULL,
   provided BIT,
+  hidden BIT NOT NULL,
   lastModificationDate NUMERIC(19, 0) NOT NULL,
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,
   contentName NVARCHAR(280) NOT NULL,

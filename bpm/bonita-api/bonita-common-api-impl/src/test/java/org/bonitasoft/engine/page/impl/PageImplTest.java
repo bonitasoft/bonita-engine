@@ -28,6 +28,8 @@ public class PageImplTest {
 
     private static final boolean PROVIDED = true;
 
+    private static final boolean HIDDEN = true;
+
     private static final String NAME = "name";
 
     private static final String DISPLAY_NAME = "display name";
@@ -42,12 +44,13 @@ public class PageImplTest {
 
         PageImplAssert
                 .assertThat(
-                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
+                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
                                 "content.zip", ContentType.PAGE, null))
                 .hasId(-1l)
                 .hasName(NAME)
                 .hasDisplayName(DISPLAY_NAME)
                 .isProvided()
+                .isHidden()
                 .hasDescription(DESCRIPTION).hasInstallationDate(date)
                 .hasLastModificationDate(modificationDate)
                 .hasContentType(ContentType.PAGE);
@@ -62,12 +65,13 @@ public class PageImplTest {
 
         PageImplAssert
                 .assertThat(
-                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
+                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
                                 "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID))
                 .hasId(-1l)
                 .hasName(NAME)
                 .hasDisplayName(DISPLAY_NAME)
                 .isProvided()
+                .isHidden()
                 .hasDescription(DESCRIPTION).hasInstallationDate(date)
                 .hasLastModificationDate(modificationDate)
                 .hasProcessDefinitionId(PROCESS_DEFINITION_ID)
@@ -82,7 +86,7 @@ public class PageImplTest {
         Date modificationDate = new Date(2);
 
         assertThat(
-                new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
+                new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, HIDDEN, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
                         "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID).toString()).contains(String.valueOf(PROCESS_DEFINITION_ID)).contains(
                 ContentType.FORM);
 

@@ -47,6 +47,13 @@ public interface Page extends BaseElement {
     boolean isProvided();
 
     /**
+     * Is this page hidden.
+     *
+     * @return true if this page is hidden, false otherwise.
+     */
+    boolean isHidden();
+
+    /**
      * Get the description of this <code>Page</code>.
      * 
      * @return the description of this <code>Page</code>.
