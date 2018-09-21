@@ -60,6 +60,10 @@ public class WorkExecutorServiceImpl implements WorkExecutorService, WorkExecuti
             execute(work);
             return;
         }
+        if (thrown instanceof SWorkPreconditionException) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, format("Work was not executed because of precondition where not met, %s : %s", work, thrown.getMessage()));
+            return;
+        }
         try {
             bonitaWork.handleFailure(thrown, context);
         } catch (Exception e) {
