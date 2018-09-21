@@ -32,6 +32,8 @@ public interface SPage extends PersistentObject {
 
     boolean isProvided();
 
+    boolean isHidden();
+
     /**
      * @return the date of the last modification of this report.
      */

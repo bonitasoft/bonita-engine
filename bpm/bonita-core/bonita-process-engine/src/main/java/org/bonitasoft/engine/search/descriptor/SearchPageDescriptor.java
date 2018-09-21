@@ -36,10 +36,11 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
 
     SearchPageDescriptor() {
         final SPageBuilderFactory keyProvider = BuilderFactory.get(SPageBuilderFactory.class);
-        pageKeys = new HashMap<>(8);
+        pageKeys = new HashMap<>();
         pageKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, keyProvider.getIdKey()));
         pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
         pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
+        pageKeys.put(PageSearchDescriptor.HIDDEN, new FieldDescriptor(SPage.class, keyProvider.getHiddenKey()));
         pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
         pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getLastModificationDateKey()));
         pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));

@@ -17,9 +17,12 @@ import java.util.Date;
 
 import org.bonitasoft.engine.page.Page;
 
+import lombok.ToString;
+
 /**
  * @author Laurent Leseigneur
  */
+@ToString
 public class PageImpl implements Page {
 
     private static final long serialVersionUID = 5785414687043871169L;
@@ -29,28 +32,22 @@ public class PageImpl implements Page {
     private final String name;
 
     private final boolean provided;
-
     private final String description;
-
     private final Date installationDate;
-
     private final long installedBy;
-
     private final Date lastModificationDate;
-
     private final String displayName;
-
     private final long lastUpdatedBy;
-
     private final String contentName;
-
     private final String contentType;
-
     private final Long processDefinitionId;
+    private boolean hidden;
 
-    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided, final String description,
+    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
+            boolean hidden, final String description,
             final long installationDate,
-            final long installedBy, final long lastModificationDate, final long lastUpdatedBy, final String zipName, String contentType,
+            final long installedBy, final long lastModificationDate, final long lastUpdatedBy, final String zipName,
+            String contentType,
             Long processDefinitionId) {
         this.pageId = pageId;
         this.name = name;
@@ -64,6 +61,7 @@ public class PageImpl implements Page {
         this.installationDate = new Date(installationDate);
         this.installedBy = installedBy;
         this.lastModificationDate = new Date(lastModificationDate);
+        this.hidden = hidden;
     }
 
     @Override
@@ -131,12 +129,8 @@ public class PageImpl implements Page {
     }
 
     @Override
-    public String toString() {
-        return new StringBuilder().append("PageImpl [pageId=").append(pageId).append(", name=").append(name).append(", provided=").append(provided)
-                .append(", description=").append(description).append(", installationDate=").append(installationDate).append(", installedBy=")
-                .append(installedBy).append(", lastModificationDate=").append(lastModificationDate).append(", displayName=").append(displayName)
-                .append(", lastUpdatedBy=").append(lastUpdatedBy).append(", contentName=").append(contentName).append(", contentType=")
-                .append(contentType).append(", processDefinitionId=").append(processDefinitionId).append("]").toString();
+    public boolean isHidden() {
+        return hidden;
     }
 
 }

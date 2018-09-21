@@ -849,6 +849,7 @@ CREATE TABLE page (
   installationDate INT8 NOT NULL,
   installedBy INT8 NOT NULL,
   provided BOOLEAN,
+  hidden BOOLEAN default false,
   lastModificationDate INT8 NOT NULL,
   lastUpdatedBy INT8 NOT NULL,
   contentName VARCHAR(280) NOT NULL,

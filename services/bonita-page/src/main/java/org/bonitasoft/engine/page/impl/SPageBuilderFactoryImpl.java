@@ -23,8 +23,8 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
 
     @Override
     public SPageBuilder createNewInstance(final String name, final String description, final String displayName, final long installationDate,
-            final long installedBy, final boolean provided, final String contentName) {
-        return new SPageBuilderImpl(new SPageImpl(name, description, displayName, installationDate, installedBy, provided, installationDate, installedBy,
+            final long installedBy, final boolean provided, boolean hidden, final String contentName) {
+        return new SPageBuilderImpl(new SPageImpl(name, description, displayName, installationDate, installedBy, provided, hidden, installationDate, installedBy,
                 contentName));
     }
 
@@ -72,6 +72,11 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
     @Override
     public String getProvidedKey() {
         return "provided";
+    }
+
+    @Override
+    public String getHiddenKey() {
+        return "hidden";
     }
 
     @Override

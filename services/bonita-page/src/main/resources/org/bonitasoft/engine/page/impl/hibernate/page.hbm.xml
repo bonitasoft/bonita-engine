@@ -17,6 +17,7 @@
 		<property name="installationDate" column="installationDate" />
 		<property name="installedBy" column="installedBy" />
 		<property name="provided" column="provided" />
+		<property name="hidden" column="hidden" />
 		<property name="lastModificationDate" column="lastModificationDate" />
 		<property name="lastUpdatedBy" column="lastUpdatedBy" />
 		<property name="contentName" column="contentName" />
@@ -36,6 +37,7 @@
 		<property name="installationDate" column="installationDate" />
 		<property name="installedBy" column="installedBy" />
 		<property name="provided" column="provided" />
+		<property name="hidden" column="hidden" />
 		<property name="lastModificationDate" column="lastModificationDate" />
 		<property name="lastUpdatedBy" column="lastUpdatedBy" />
 		<property name="contentName" column="contentName" />

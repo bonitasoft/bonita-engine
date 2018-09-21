@@ -848,6 +848,7 @@ CREATE TABLE page (
   installationDate BIGINT NOT NULL,
   installedBy BIGINT NOT NULL,
   provided BOOLEAN,
+  hidden BOOLEAN default false,
   lastModificationDate BIGINT NOT NULL,
   lastUpdatedBy BIGINT NOT NULL,
   contentName VARCHAR(280) NOT NULL,

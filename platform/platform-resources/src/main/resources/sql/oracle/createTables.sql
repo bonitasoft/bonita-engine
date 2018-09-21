@@ -838,6 +838,7 @@ CREATE TABLE page (
   installationDate NUMBER(19, 0) NOT NULL,
   installedBy NUMBER(19, 0) NOT NULL,
   provided NUMBER(1),
+  hidden NUMBER(1) Default 0 NOT NULL,
   lastModificationDate NUMBER(19, 0) NOT NULL,
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
   contentName VARCHAR2(280 CHAR) NOT NULL,
