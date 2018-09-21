@@ -25,7 +25,7 @@ public class PageUpdater implements Serializable {
     private static final long serialVersionUID = 4295108162470507415L;
 
     public enum PageUpdateField {
-        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID, HIDDEN
     }
 
     private final Map<PageUpdateField, Serializable> fields;
@@ -61,6 +61,11 @@ public class PageUpdater implements Serializable {
 
     public PageUpdater setProcessDefinitionId(final Long processDefinitionId) {
         fields.put(PageUpdateField.PROCESS_DEFINITION_ID, processDefinitionId);
+        return this;
+    }
+
+    public PageUpdater setHidden(Boolean hidden) {
+        fields.put(PageUpdateField.HIDDEN,hidden);
         return this;
     }
 

@@ -30,6 +30,8 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     private boolean provided;
 
+    private boolean hidden;
+
     private long lastModificationDate;
 
     private long lastUpdatedBy;
@@ -48,7 +50,7 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     @Override
     public SPageWithContentImpl _build() {
-        final SPageImpl sPageImpl = new SPageImpl(name, description, displayName, installationDate, installedBy, provided, lastModificationDate, lastUpdatedBy,
+        final SPageImpl sPageImpl = new SPageImpl(name, description, displayName, installationDate, installedBy, provided, hidden, lastModificationDate, lastUpdatedBy,
                 contentName);
         sPageImpl.setProcessDefinitionId(processDefinitionId);
 
@@ -112,6 +114,11 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     public PageBuilder withProcessDefinitionId(final Long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    public PageBuilder makeHidden(Boolean hidden) {
+        this.hidden = hidden;
         return this;
     }
 

@@ -13,12 +13,15 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import lombok.ToString;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SPage;
 
 /**
  * @author Baptiste Mesta
  */
+
+@ToString
 public class SPageImpl implements SPage {
 
     private static final long serialVersionUID = 6328720053646015171L;
@@ -39,6 +42,8 @@ public class SPageImpl implements SPage {
 
     private boolean provided;
 
+    private boolean hidden;
+
     private long lastModificationDate;
 
     private long lastUpdatedBy;
@@ -53,8 +58,10 @@ public class SPageImpl implements SPage {
 
     }
 
-    public SPageImpl(final String name, final String description, final String displayName, final long installationDate, final long installedBy,
-            final boolean provided, final long lastModificationDate, final long lastUpdatedBy, final String contentName) {
+    public SPageImpl(final String name, final String description, final String displayName, final long installationDate,
+            final long installedBy,
+            final boolean provided, final long lastModificationDate, final long lastUpdatedBy,
+            final String contentName) {
         this(name, installationDate, installedBy, provided, contentName);
         setDescription(description);
         setDisplayName(displayName);
@@ -63,24 +70,39 @@ public class SPageImpl implements SPage {
         setLastUpdatedBy(lastUpdatedBy);
     }
 
+    public SPageImpl(final String name, final String description, final String displayName, final long installationDate,
+            final long installedBy,
+            final boolean provided, boolean hidden, final long lastModificationDate, final long lastUpdatedBy,
+            final String contentName) {
+        this(name, installationDate, installedBy, provided, contentName);
+        setDescription(description);
+        setDisplayName(displayName);
+        setProvided(provided);
+        setLastModificationDate(lastModificationDate);
+        setLastUpdatedBy(lastUpdatedBy);
+        setHidden(hidden);
+    }
+
     /**
      * @param sPage
      */
     public SPageImpl(final SPage sPage) {
-        this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.isProvided(), sPage
-                .getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
+        this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(),
+                sPage.getInstalledBy(), sPage.isProvided(), sPage.isHidden(), sPage
+                        .getLastModificationDate(),
+                sPage.getLastUpdatedBy(), sPage.getContentName());
         setContentType(sPage.getContentType());
         setProcessDefinitionId(sPage.getProcessDefinitionId());
     }
 
-    public SPageImpl(final String name, final long installationDate, final long installedBy, final boolean provided, final String contentName) {
+    public SPageImpl(final String name, final long installationDate, final long installedBy, final boolean provided,
+            final String contentName) {
         setName(name);
         setInstallationDate(installationDate);
         setInstalledBy(installedBy);
         setProvided(provided);
         setContentName(contentName);
         setContentType(SContentType.PAGE);
-
     }
 
     @Override
@@ -162,6 +184,15 @@ public class SPageImpl implements SPage {
     }
 
     @Override
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    @Override
     public long getLastModificationDate() {
         return lastModificationDate;
     }
@@ -175,9 +206,17 @@ public class SPageImpl implements SPage {
         return contentName;
     }
 
+    public void setContentName(final String contentName) {
+        this.contentName = contentName;
+    }
+
     @Override
     public String getContentType() {
         return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     @Override
@@ -185,8 +224,8 @@ public class SPageImpl implements SPage {
         return processDefinitionId;
     }
 
-    public void setContentName(final String contentName) {
-        this.contentName = contentName;
+    public void setProcessDefinitionId(long processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 
     @Override
@@ -196,23 +235,5 @@ public class SPageImpl implements SPage {
 
     public void setLastUpdatedBy(final long lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder().append("SPageImpl [tenantId=").append(tenantId).append(", id=").append(id).append(", name=").append(name)
-                .append(", description=").append(description).append(", displayName=").append(displayName).append(", installationDate=")
-                .append(installationDate).append(", installedBy=").append(installedBy).append(", provided=").append(provided).append(", lastModificationDate=")
-                .append(lastModificationDate).append(", lastUpdatedBy=").append(lastUpdatedBy).append(", contentName=").append(contentName)
-                .append(", contentType=").append(contentType).append(", processDefinitionId=").append(processDefinitionId).append("]")
-                .toString();
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public void setProcessDefinitionId(long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
     }
 }

@@ -40,8 +40,11 @@ public class PageModelConverter {
         final String contentName = (String) fields.get(PageCreator.PageField.CONTENT_NAME);
         final String contentType = (String) fields.get(PageCreator.PageField.CONTENT_TYPE);
         final Long processDefinitionId = (Long) fields.get(PageCreator.PageField.PROCESS_DEFINITION_ID);
-
-        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId);
+        Boolean hidden = (Boolean) fields.get(PageCreator.PageField.HIDDEN);
+        if (hidden == null) {
+            hidden = false;
+        }
+        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId, hidden);
     }
 
     public SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
@@ -52,14 +55,17 @@ public class PageModelConverter {
         final String contentName = (String) fields.get(PageUpdater.PageUpdateField.CONTENT_NAME);
         final String contentType = (String) fields.get(PageUpdater.PageUpdateField.CONTENT_TYPE);
         final Long processDefinitionId = (Long) fields.get(PageUpdater.PageUpdateField.PROCESS_DEFINITION_ID);
-
-        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId);
+        Boolean hidden = (Boolean) fields.get(PageUpdater.PageUpdateField.HIDDEN);
+        if (hidden == null) {
+            hidden = false;
+        }
+        return buildSPage(creatorUserId, name, description, displayName, contentName, contentType, processDefinitionId, hidden);
     }
 
     private SPage buildSPage(long creatorUserId, String name, String description, String displayName, String contentName, String contentType,
-            Long processDefinitionId) {
+            Long processDefinitionId, boolean hidden) {
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, false, contentName);
+                System.currentTimeMillis(), creatorUserId, false, hidden, contentName);
         newSPageBuilder.setContentType(contentType);
         newSPageBuilder.setProcessDefinitionId(processDefinitionId);
         return newSPageBuilder.done();
@@ -67,7 +73,7 @@ public class PageModelConverter {
 
     public Page toPage(final SPage sPage) {
         Long processDefinitionId = sPage.getProcessDefinitionId() > 0 ? sPage.getProcessDefinitionId() : null;
-        return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
+        return new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.isHidden(), sPage.getDescription(),
                 sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName(),
                 sPage.getContentType(), processDefinitionId);
     }

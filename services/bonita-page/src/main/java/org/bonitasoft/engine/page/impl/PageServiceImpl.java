@@ -173,7 +173,7 @@ public class PageServiceImpl implements PageService {
     public SPage addPage(final byte[] content, final String contentName, final long userId) throws SObjectCreationException, SObjectAlreadyExistsException,
             SInvalidPageZipException,
             SInvalidPageTokenException {
-        return addPage(content, contentName, userId, false/* provided */);
+        return addPage(content, contentName, userId, false,false);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class PageServiceImpl implements PageService {
         final Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("pageName", name);
         inputParameters.put("processDefinitionId", processDefinitionId);
-        return persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID, inputParameters, SPage.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<>(QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID, inputParameters, SPage.class));
     }
 
     @Override
@@ -191,15 +191,15 @@ public class PageServiceImpl implements PageService {
         inputParameters.put("processDefinitionId", processDefinitionId);
         final OrderByOption orderByOption = new OrderByOption(SPage.class, SPageFields.PAGE_NAME, OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, Collections.singletonList(orderByOption));
-        return persistenceService.selectList(new SelectListDescriptor<SPage>(QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID, inputParameters, SPage.class,
+        return persistenceService.selectList(new SelectListDescriptor<>(QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID, inputParameters, SPage.class,
                 queryOptions));
     }
 
-    private SPage addPage(final byte[] content, final String contentName, final long userId, final boolean provided) throws SInvalidPageZipException,
+    private SPage addPage(final byte[] content, final String contentName, final long userId, final boolean provided, boolean hidden) throws SInvalidPageZipException,
             SInvalidPageTokenException, SObjectAlreadyExistsException, SObjectCreationException {
         final Properties pageProperties = readPageZip(content, provided);
         final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
-                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided,
+                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided, hidden,
                 pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         return insertPage(page, content);
     }
@@ -316,9 +316,9 @@ public class PageServiceImpl implements PageService {
     }
 
     private SPage buildPage(final String name, final String displayName, final String description, final String contentName, final long creatorUserId,
-            final boolean provided, final String contentType) {
+            final boolean provided, boolean hidden, final String contentType) {
         return BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, provided, contentName).setContentType(contentType).done();
+                System.currentTimeMillis(), creatorUserId, provided, hidden, contentName).setContentType(contentType).done();
     }
 
     SPageLogBuilder getPageLog(final ActionType actionType, final String message) {
@@ -617,7 +617,7 @@ public class PageServiceImpl implements PageService {
     private void createPage(final String zipName, final byte[] providedPageContent, final Properties pageProperties) throws SObjectAlreadyExistsException,
             SObjectCreationException {
         final SPage page = buildPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
-                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), zipName, -1, true,
+                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), zipName, -1, true, false,
                 pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         insertPage(page, providedPageContent);
     }
