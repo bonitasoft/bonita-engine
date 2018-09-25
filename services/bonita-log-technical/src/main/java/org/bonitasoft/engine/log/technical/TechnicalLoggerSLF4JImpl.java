@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,8 +15,6 @@ package org.bonitasoft.engine.log.technical;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,18 +25,6 @@ import org.slf4j.LoggerFactory;
  * @author Celine Souchet
  */
 public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
-
-    private final Map<Class<?>, Boolean> classIsTraceLoggable = new HashMap<Class<?>, Boolean>();
-
-    private final Map<Class<?>, Boolean> classIsDebugLoggable = new HashMap<Class<?>, Boolean>();
-
-    private final Map<Class<?>, Boolean> classIsInfoLoggable = new HashMap<Class<?>, Boolean>();
-
-    private final Map<Class<?>, Boolean> classIsWarnLoggable = new HashMap<Class<?>, Boolean>();
-
-    private final Map<Class<?>, Boolean> classIsErrorLoggable = new HashMap<Class<?>, Boolean>();
-
-    private final Map<Class<?>, Logger> classLoggers = new HashMap<Class<?>, Logger>();
 
     private String hostname = null;
 
@@ -122,69 +108,28 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
     public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
         switch (severity) {
             case TRACE:
-                return isEnabledForLevel(callerClass, classIsTraceLoggable, severity);
+                return getLogger(callerClass).isTraceEnabled();
             case DEBUG:
-                return isEnabledForLevel(callerClass, classIsDebugLoggable, severity);
+                return getLogger(callerClass).isDebugEnabled();
             case INFO:
-                return isEnabledForLevel(callerClass, classIsInfoLoggable, severity);
+                return getLogger(callerClass).isInfoEnabled();
             case WARNING:
-                return isEnabledForLevel(callerClass, classIsWarnLoggable, severity);
+                return getLogger(callerClass).isWarnEnabled();
             case ERROR:
-                return isEnabledForLevel(callerClass, classIsErrorLoggable, severity);
+                return getLogger(callerClass).isErrorEnabled();
             default:
-                getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
-                return isEnabledForLevel(callerClass, classIsErrorLoggable, TechnicalLogSeverity.ERROR);
+                getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead: {}",
+                        severity);
+                return getLogger(callerClass).isErrorEnabled();
         }
     }
 
-    private boolean isEnabledForLevel(final Class<?> callerClass, final Map<Class<?>, Boolean> loggableMap, final TechnicalLogSeverity severity) {
-        Boolean isLevelEnabled = loggableMap.get(callerClass);
-        if (isLevelEnabled == null) {
-            switch (severity) {
-                case DEBUG:
-                    isLevelEnabled = getLogger(callerClass).isDebugEnabled();
-                    break;
-                case ERROR:
-                    isLevelEnabled = getLogger(callerClass).isErrorEnabled();
-                    break;
-                case INFO:
-                    isLevelEnabled = getLogger(callerClass).isInfoEnabled();
-                    break;
-                case TRACE:
-                    isLevelEnabled = getLogger(callerClass).isTraceEnabled();
-                    break;
-                case WARNING:
-                    isLevelEnabled = getLogger(callerClass).isWarnEnabled();
-                    break;
-                default:
-                    isLevelEnabled = false;
-                    break;
-            }
-            loggableMap.put(callerClass, isLevelEnabled);
-        }
-        return isLevelEnabled;
-    }
-
-    /**
-     * Get the logger from the logger "cache", or retrieves it if not found (and then put it in "cache")
-     * 
-     * @param clazz
-     *            the class of the logger to retrieve
-     * @return the logger for the given class
-     * @since 6.0
-     */
     private Logger getLogger(final Class<?> clazz) {
-        Logger logger = classLoggers.get(clazz);
-        if (logger == null) {
-            logger = LoggerFactory.getLogger(clazz);
-            classLoggers.put(clazz, logger);
-        }
-        return logger;
+        return LoggerFactory.getLogger(clazz);
     }
 
     private String getContextMessage() {
         return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage();
-        // return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage();
     }
 
     private String getThreadIdMessage() {
@@ -199,10 +144,5 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
     private String getTenantIdMessage() {
         return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
     }
-
-    // private String getUserNameMessage() {
-    // return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
-    // }
-    //
 
 }
