@@ -52,6 +52,11 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
     }
 
     @Override
+    public TechnicalLogger asLogger(Class<?> clazz) {
+        return new TechnicalLogger(clazz, this);
+    }
+
+    @Override
     public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
         if (!isLoggable(callerClass, severity)) { // prevent computation of the loggedMessage if not needed
             return;
