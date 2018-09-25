@@ -662,8 +662,8 @@ public class PageAPIIT extends CommonAPIIT {
                 new SearchOptionsBuilder(0, expectedMatchingResults + 10).filter(PageSearchDescriptor.HIDDEN,true).done());
         // then
         final List<Page> results = searchPages.getResult();
-        assertThat(results.size()).as("should have "
-                + +expectedMatchingResults + " results").isEqualTo(expectedMatchingResults);
+        assertThat(results.size()).as("should have " + expectedMatchingResults + " results")
+                .isEqualTo(expectedMatchingResults);
 
     }
 

@@ -30,7 +30,7 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     private boolean provided;
 
-    private boolean hidden;
+    private boolean hidden = false;
 
     private long lastModificationDate;
 
