@@ -61,6 +61,7 @@ public class PageImpl implements Page {
         this.name = name;
         this.displayName = displayName;
         this.provided = provided;
+        this.hidden = hidden;
         this.description = description;
         this.lastUpdatedBy = lastUpdatedBy;
         this.contentName = zipName;
@@ -69,7 +70,6 @@ public class PageImpl implements Page {
         this.installationDate = new Date(installationDate);
         this.installedBy = installedBy;
         this.lastModificationDate = new Date(lastModificationDate);
-        this.hidden = hidden;
     }
 
     @Override

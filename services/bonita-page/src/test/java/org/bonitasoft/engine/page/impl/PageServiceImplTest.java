@@ -22,8 +22,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.assertj.core.data.MapEntry;
 import org.bonitasoft.engine.commons.Pair;
@@ -42,7 +43,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageServiceListener;
@@ -110,9 +110,6 @@ public class PageServiceImplTest {
     public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private Recorder recorder;
 
     @Mock
@@ -149,7 +146,7 @@ public class PageServiceImplTest {
 
     @Before
     public void before() {
-        pageServiceImpl = spy(new PageServiceImpl(readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService,
+        pageServiceImpl = spy(new PageServiceImpl(readPersistenceService, recorder, technicalLoggerService, queriableLoggerService,
                 profileService));
         doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
         doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class), anyString());
@@ -318,12 +315,12 @@ public class PageServiceImplTest {
     public void start_should_import_provided_page() throws SBonitaException {
         // given
         // resource in the classpath bonita-groovy-example-page.zip
-        pageServiceImpl.setProvidedPages(Arrays.asList(
+        pageServiceImpl.setProvidedPages(getProvidedPageList(Arrays.asList(
                 "bonita-groovy-page-example.zip",
                 "bonita-home-page.zip",
                 "bonita-html-page-example.zip",
                 BONITA_DEFAULT_LAYOUT_ZIP_NAME,
-                BONITA_DEFAULT_THEME_ZIP_NAME));
+                BONITA_DEFAULT_THEME_ZIP_NAME)));
 
         doAnswer(invocation -> {
             final SPage sPage = (SPage) invocation.getArguments()[0];
@@ -349,6 +346,27 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
     }
 
+    @Test
+    public void importing_provided_pages_should_respect_declared_visibility() throws SBonitaException {
+        // given
+        final ImportPageDescriptor importPageDescriptor1 = new ImportPageDescriptor(BONITA_DEFAULT_LAYOUT_ZIP_NAME,
+                false);
+        final ImportPageDescriptor importPageDescriptor2 = new ImportPageDescriptor(BONITA_DEFAULT_THEME_ZIP_NAME,
+                true);
+        pageServiceImpl.setProvidedPages(Arrays.asList(
+                importPageDescriptor1,
+                importPageDescriptor2));
+        doNothing().when(pageServiceImpl).createPage(any(), any(), any());
+
+        // when
+        pageServiceImpl.start();
+
+        // then
+        verify(pageServiceImpl, times(1)).createPage(eq(importPageDescriptor1), any(byte[].class),
+                any(Properties.class));
+        verify(pageServiceImpl, times(1)).createPage(eq(importPageDescriptor2), any(byte[].class),
+                any(Properties.class));
+    }
     @Test
     public void start_should_update_provided_page_if_different() throws SBonitaException {
         // given
@@ -397,12 +415,12 @@ public class PageServiceImplTest {
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
 
         // when
-        pageServiceImpl.setProvidedPages(Arrays.asList(
+        pageServiceImpl.setProvidedPages(getProvidedPageList(Arrays.asList(
                 "bonita-groovy-page-example.zip",
                 "bonita-home-page.zip",
                 "bonita-html-page-example.zip",
                 BONITA_DEFAULT_LAYOUT_ZIP_NAME,
-                BONITA_DEFAULT_THEME_ZIP_NAME));
+                BONITA_DEFAULT_THEME_ZIP_NAME)));
         pageServiceImpl.start();
 
         // then
@@ -412,6 +430,10 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(1)).updatePageContent(eq(14L), any(byte[].class), eq("bonita-home-page.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(15L), any(byte[].class), eq(BONITA_DEFAULT_LAYOUT_ZIP_NAME));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(16L), any(byte[].class), eq(BONITA_DEFAULT_THEME_ZIP_NAME));
+    }
+
+    private List<ImportPageDescriptor> getProvidedPageList(List<String> zipNameList) {
+        return zipNameList.stream().map(s -> new ImportPageDescriptor(s, false)).collect(Collectors.toList());
     }
 
     @Test
