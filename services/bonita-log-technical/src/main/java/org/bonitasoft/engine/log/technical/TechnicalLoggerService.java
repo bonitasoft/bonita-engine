@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,11 +18,17 @@ package org.bonitasoft.engine.log.technical;
  */
 public interface TechnicalLoggerService {
 
-    void log(Class<?> callerClass, TechnicalLogSeverity severity, Throwable t);
-
     void log(Class<?> callerClass, TechnicalLogSeverity severity, String message);
+
+    /**
+     * @since 7.8.0
+     */
+    void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Object... arguments);
 
     void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Throwable t);
 
+    void log(Class<?> callerClass, TechnicalLogSeverity severity, Throwable t);
+
     boolean isLoggable(Class<?> callerClass, TechnicalLogSeverity severity);
+
 }

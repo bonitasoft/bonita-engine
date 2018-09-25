@@ -13,11 +13,8 @@
  **/
 package org.bonitasoft.engine.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +23,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
 import org.junit.Before;
@@ -110,25 +106,8 @@ public class CacheServiceTest {
         final CacheConfiguration cacheWithOneElementInMemoryOnly = createOneElementInMemoryOnlyCacheConfiguration();
         configurationsList.add(cacheWithOneElementInMemoryOnly);
 
-        return new EhCacheCacheService(new TechnicalLoggerService() {
-
-            @Override
-            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
-            }
-
-            @Override
-            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
-            }
-
-            @Override
-            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
-            }
-
-            @Override
-            public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
-                return false;
-            }
-        }, configurationsList, new CacheConfiguration(), "target", 1);
+        return new EhCacheCacheService(mock(TechnicalLoggerService.class), configurationsList, new CacheConfiguration(),
+                "target", 1);
     }
 
 	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {
