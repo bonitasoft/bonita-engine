@@ -18,9 +18,22 @@ package org.bonitasoft.engine.log.technical;
  */
 public interface TechnicalLoggerService {
 
+    /**
+     * Provides a <code>TechnicalLogger</code> backed to this <code>TechnicalLoggerService</code>.
+     * @since 7.8.0
+     */
+    TechnicalLogger asLogger(Class<?> clazz);
+
     void log(Class<?> callerClass, TechnicalLogSeverity severity, String message);
 
     /**
+     * Generates parametrized logs like <a href="https://www.slf4j.org/faq.html#logging_performance">slf4j</a> does.
+     * <br/>
+     * Usage example: <br/>
+     * <code>
+     * log(getClass(), INFO, "Ready to update process {} with {}", processId, complexObjectWithSlowToStringMethod);
+     * </code>
+     * 
      * @since 7.8.0
      */
     void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Object... arguments);
