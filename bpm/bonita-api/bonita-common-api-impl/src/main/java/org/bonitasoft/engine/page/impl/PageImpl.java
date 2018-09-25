@@ -44,6 +44,14 @@ public class PageImpl implements Page {
     private boolean hidden;
 
     public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
+            final String description, final long installationDate, final long installedBy,
+            final long lastModificationDate, final long lastUpdatedBy, final String zipName, String contentType,
+            Long processDefinitionId) {
+        this(pageId, name, displayName, provided, false, description, installationDate, installedBy,
+                lastModificationDate, lastUpdatedBy, zipName, contentType, processDefinitionId);
+    }
+
+    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided,
             boolean hidden, final String description,
             final long installationDate,
             final long installedBy, final long lastModificationDate, final long lastUpdatedBy, final String zipName,
