@@ -53,6 +53,9 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
 
     @Override
     public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
+        if (!isLoggable(callerClass, severity)) { // prevent computation of the loggedMessage if not needed
+            return;
+        }
         final Logger logger = getLogger(callerClass);
         final String loggedMessage = getContextMessage() + message;
         switch (severity) {
@@ -72,55 +75,90 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
                 logger.error(loggedMessage);
                 break;
             default:
-                logger.error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
+                logger.error("Trying to log using an unknown severity, using ERROR instead: {}", severity);
+                logger.error(loggedMessage);
+                break;
+        }
+    }
+
+    public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Object... arguments) {
+        if (!isLoggable(callerClass, severity)) { // prevent computation of the loggedMessage if not needed
+            return;
+        }
+        final Logger logger = getLogger(callerClass);
+        final String loggedMessage = getContextMessage() + message;
+
+        switch (severity) {
+            case TRACE:
+                logger.trace(loggedMessage, arguments);
+                break;
+            case DEBUG:
+                logger.debug(loggedMessage, arguments);
+                break;
+            case INFO:
+                logger.info(loggedMessage, arguments);
+                break;
+            case WARNING:
+                logger.warn(loggedMessage, arguments);
+                break;
+            case ERROR:
+                logger.error(loggedMessage, arguments);
+                break;
+            default:
+                logger.error("Trying to log using an unknown severity, using ERROR instead: {}", severity);
+                logger.error(loggedMessage, arguments);
+                break;
+        }
+    }
+
+    @Override
+    public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message,
+            final Throwable t) {
+        if (!isLoggable(callerClass, severity)) { // prevent computation of the loggedMessage if not needed
+            return;
+        }
+        final Logger logger = getLogger(callerClass);
+        final String loggedMessage = getContextMessage() + message;
+        switch (severity) {
+            case TRACE:
+                logger.trace(loggedMessage, t);
+                break;
+            case DEBUG:
+                logger.debug(loggedMessage, t);
+                break;
+            case INFO:
+                logger.info(loggedMessage, t);
+                break;
+            case WARNING:
+                logger.warn(loggedMessage, t);
+                break;
+            case ERROR:
+                logger.error(loggedMessage, t);
+                break;
+            default:
+                logger.error("Trying to log using an unknown severity, using ERROR instead: {}", severity);
                 logger.error(loggedMessage);
                 break;
         }
     }
 
     @Override
-    public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
-        final String loggedMessage = getContextMessage() + message;
-        switch (severity) {
-            case TRACE:
-                getLogger(callerClass).trace(loggedMessage, t);
-                break;
-            case DEBUG:
-                getLogger(callerClass).debug(loggedMessage, t);
-                break;
-            case INFO:
-                getLogger(callerClass).info(loggedMessage, t);
-                break;
-            case WARNING:
-                getLogger(callerClass).warn(loggedMessage, t);
-                break;
-            case ERROR:
-                getLogger(callerClass).error(loggedMessage, t);
-                break;
-            default:
-                getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead:" + severity.name());
-                getLogger(callerClass).error(loggedMessage);
-                break;
-        }
-    }
-
-    @Override
     public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
+        final Logger logger = getLogger(callerClass);
         switch (severity) {
             case TRACE:
-                return getLogger(callerClass).isTraceEnabled();
+                return logger.isTraceEnabled();
             case DEBUG:
-                return getLogger(callerClass).isDebugEnabled();
+                return logger.isDebugEnabled();
             case INFO:
-                return getLogger(callerClass).isInfoEnabled();
+                return logger.isInfoEnabled();
             case WARNING:
-                return getLogger(callerClass).isWarnEnabled();
+                return logger.isWarnEnabled();
             case ERROR:
-                return getLogger(callerClass).isErrorEnabled();
+                return logger.isErrorEnabled();
             default:
-                getLogger(callerClass).error("Trying to log using an unknow severity, using ERROR instead: {}",
-                        severity);
-                return getLogger(callerClass).isErrorEnabled();
+                logger.error("Trying to log using an unknown severity, using ERROR instead: {}", severity);
+                return logger.isErrorEnabled();
         }
     }
 
@@ -128,6 +166,8 @@ public class TechnicalLoggerSLF4JImpl implements TechnicalLoggerService {
         return LoggerFactory.getLogger(clazz);
     }
 
+    // TODO we should use slf4j MDC instead, see https://www.slf4j.org/manual.html#mdc
+    // not supported by JUL, to be checked for JBoss-logging
     private String getContextMessage() {
         return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage();
     }
