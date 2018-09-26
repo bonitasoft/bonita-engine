@@ -22,7 +22,7 @@
 				<index>4</index>
 				<description>Manage processes</description>
 				<type>link</type>
-				<page>processlistinguser</page>
+				<page>custompage_processlistBonita</page>
 			</parentProfileEntry>
 		</profileEntries>
 	</profile>
