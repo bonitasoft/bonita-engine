@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.business.data.SchemaManager;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
 
@@ -27,24 +27,25 @@ import org.hibernate.HibernateException;
  * @author Pablo Alonso de Linaje García
  */
 public class SchemaManagerReadOnly implements SchemaManager {
-    private final TechnicalLoggerService loggerService;
+
+    private final TechnicalLogger log;
 
     public SchemaManagerReadOnly(final TechnicalLoggerService loggerService) throws HibernateException {
-        this.loggerService = loggerService;
-        this.loggerService.log(SchemaManagerReadOnly.class, TechnicalLogSeverity.WARNING, "No update of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
+        log = loggerService.asLogger(getClass());
+        log.warn("Ready-Only Schema manager. No change will be performed on the BDM DB Schema." +
+                " Please ensure that this update is done before using the new BDM");
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Exception> drop(Set<String> managedClasses) {
-        this.loggerService.log(SchemaManagerReadOnly.class, TechnicalLogSeverity.WARNING, "No drop of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
-        return new ArrayList<Exception>();
+        log.warn("No drop of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
+        return new ArrayList<>();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Exception> update(Set<String> managedClasses) {
-        this.loggerService.log(SchemaManagerReadOnly.class, TechnicalLogSeverity.WARNING, "No update of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
-        return new ArrayList<Exception>();
+        log.warn("No update of BDM DB Schema will be performed. Please ensure that this update is done before using the new BDM");
+        return new ArrayList<>();
     }
+
 }

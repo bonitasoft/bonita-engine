@@ -46,7 +46,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderListener;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SRetryableException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -68,18 +68,19 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     private final ThreadLocal<EntityManager> managers = new ThreadLocal<>();
 
     private final BusinessDataModelRepository businessDataModelRepository;
-    private final TechnicalLoggerService loggerService;
+    private final TechnicalLogger log;
     private final ClassLoaderService classLoaderService;
     private final long tenantId;
 
     private final UserTransactionService transactionService;
 
-    public JPABusinessDataRepositoryImpl(final UserTransactionService transactionService, final BusinessDataModelRepository businessDataModelRepository,
-            TechnicalLoggerService loggerService,
-            final Map<String, Object> configuration, ClassLoaderService classLoaderService, long tenantId) {
+    public JPABusinessDataRepositoryImpl(final UserTransactionService transactionService,
+            final BusinessDataModelRepository businessDataModelRepository,
+            TechnicalLoggerService loggerService, final Map<String, Object> configuration,
+            ClassLoaderService classLoaderService, long tenantId) {
         this.transactionService = transactionService;
         this.businessDataModelRepository = businessDataModelRepository;
-        this.loggerService = loggerService;
+        this.log = loggerService.asLogger(getClass());
         this.classLoaderService = classLoaderService;
         this.tenantId = tenantId;
         this.configuration = new HashMap<>(configuration);
@@ -89,8 +90,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     @Override
     public void start() {
         if (businessDataModelRepository.isBDMDeployed()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Create entity factory on tenant " + tenantId);
+            log.debug("Creating entity factory on tenant {}", tenantId);
             entityManagerFactory = createEntityManagerFactory();
+            log.debug("Entity factory created");
         }
         classLoaderService.addListener(ScopeType.TENANT.name(), tenantId, this);
     }
@@ -102,16 +104,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     @Override
     public void stop() {
         if (getEntityManagerFactory() != null) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Close entity factory because service is stopping on tenant " + tenantId);
+            log.debug("Closing entity factory because service is stopping on tenant {}", tenantId);
             getEntityManagerFactory().close();
             entityManagerFactory = null;
+            log.debug("Entity factory closed");
         }
         classLoaderService.removeListener(ScopeType.TENANT.name(), tenantId, this);
     }
 
     private synchronized void recreateEntityManagerFactory(ClassLoader newClassLoader) {
         if (businessDataModelRepository.isBDMDeployed()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Recreate entity factory for classloader " + newClassLoader + " on tenant " + tenantId);
+            log.debug("Recreating entity factory for classloader {} on tenant {}", newClassLoader, tenantId);
             final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newClassLoader);
@@ -120,6 +123,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
             } finally {
                 Thread.currentThread().setContextClassLoader(currentClassLoader);
             }
+            log.debug("Entity factory recreated");
         }
     }
 
@@ -388,9 +392,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository, Cl
     }
 
     private void clearProxyFactoryCache() {
-        loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Clearing BDM proxy cache");
+        log.debug("Clearing BDM proxy cache");
         try {
             new ProxyCacheManager().clearCache();
+            log.debug("BDM proxy cache cleared");
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new SRetryableException(e);
         }

@@ -23,9 +23,8 @@ import java.util.Set;
  */
 public interface SchemaManager {
 
-    @SuppressWarnings("unchecked")
     List<Exception> drop(Set<String> managedClasses);
 
-    @SuppressWarnings("unchecked")
     List<Exception> update(Set<String> managedClasses);
+
 }
