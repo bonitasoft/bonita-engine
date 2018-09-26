@@ -34,6 +34,7 @@ import bitronix.tm.TransactionManagerServices;
 import com.company.pojo.Employee;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.resources.TenantResourcesService;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -75,7 +76,6 @@ public class ConcurrencyTest {
     private UserTransaction ut;
 
     private ClassLoaderService classLoaderService = mock(ClassLoaderService.class);
-    private TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
 
     @BeforeClass
     public static void initializeBitronix() {
@@ -94,10 +94,12 @@ public class ConcurrencyTest {
             jdbcTemplate = new JdbcTemplate(datasource);
         }
 
-        final UserTransactionService transactionService = mock(UserTransactionService.class);
-        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(modelConfiguration, mock(TechnicalLoggerService.class));
+        final TechnicalLoggerService loggerService = mock(TechnicalLoggerService.class);
+        doReturn(mock(TechnicalLogger.class)).when(loggerService).asLogger(any());
+        final SchemaManagerUpdate schemaManager = new SchemaManagerUpdate(modelConfiguration, loggerService);
         final BusinessDataModelRepositoryImpl businessDataModelRepositoryImpl = spy(new BusinessDataModelRepositoryImpl(mock(DependencyService.class),
                 schemaManager, mock(TenantResourcesService.class), TENANT_ID));
+        final UserTransactionService transactionService = mock(UserTransactionService.class);
         businessDataRepository = spy(
                 new JPABusinessDataRepositoryImpl(transactionService, businessDataModelRepositoryImpl, loggerService, configuration, classLoaderService, 1L));
         doReturn(true).when(businessDataModelRepositoryImpl).isBDMDeployed();

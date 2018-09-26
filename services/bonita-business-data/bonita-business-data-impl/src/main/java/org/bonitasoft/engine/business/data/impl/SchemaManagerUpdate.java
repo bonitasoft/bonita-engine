@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,7 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.bonitasoft.engine.business.data.SchemaManager;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLogger;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
@@ -35,16 +35,16 @@ import org.hibernate.tool.hbm2ddl.Target;
  */
 public class SchemaManagerUpdate implements SchemaManager {
 
-    private final TechnicalLoggerService loggerService;
+    private final TechnicalLogger log;
 
     private final Map<String, Object> configuration;
 
     public SchemaManagerUpdate(final Map<String, Object> configuration, final TechnicalLoggerService loggerService) throws HibernateException {
-        this.loggerService = loggerService;
+        this.log = loggerService.asLogger(getClass());
         this.configuration = new HashMap<>(configuration);
         final Object remove = this.configuration.remove("hibernate.hbm2ddl.auto");
-        if (remove != null && loggerService.isLoggable(SchemaManagerUpdate.class, TechnicalLogSeverity.INFO)) {
-            this.loggerService.log(SchemaManagerUpdate.class, TechnicalLogSeverity.INFO, "'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
+        if (remove != null && log.isInfoEnabled()) {
+            log.info("'hibernate.hbm2ddl.auto' is not a valid property so it has been ignored");
         }
     }
 
@@ -74,16 +74,20 @@ public class SchemaManagerUpdate implements SchemaManager {
     @Override
     @SuppressWarnings("unchecked")
     public List<Exception> drop(final Set<String> managedClasses) {
+        log.info("Dropping classes: {}", managedClasses);
         final SchemaExport export = new SchemaExport(buildConfiguration(managedClasses));
         export.drop(Target.EXPORT);
+        log.info("Drop operation done");
         return export.getExceptions();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Exception> update(final Set<String> managedClasses) {
+        log.info("Updating classes: {}", managedClasses);
         final SchemaUpdate schemaUpdate = new SchemaUpdate(buildConfiguration(managedClasses));
         schemaUpdate.execute(Target.EXPORT);
+        log.info("Update operation done");
         return schemaUpdate.getExceptions();
     }
 
