@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.dependency.impl;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
@@ -44,16 +43,12 @@ public class RefreshClassloaderSynchronization implements BonitaTransactionSynch
 
     @Override
     public void afterCompletion(TransactionState txState) {
-        try {
-            Map<String, TaskResult<Void>> execute = broadcastService.executeOnOthers(callable, tenantId).get();
-            for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
-                if (resultEntry.getValue().isError()) {
-                    throw new IllegalStateException(resultEntry.getValue().getThrowable());
-                }
-
+        Map<String, TaskResult<Void>> execute = broadcastService.executeOnOthers(callable, tenantId);
+        for (Map.Entry<String, TaskResult<Void>> resultEntry : execute.entrySet()) {
+            if (resultEntry.getValue().isError()) {
+                throw new IllegalStateException(resultEntry.getValue().getThrowable());
             }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new IllegalStateException("Unable to execute refresh classloader on other nodes", e);
+
         }
     }
 }
