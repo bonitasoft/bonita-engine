@@ -278,6 +278,7 @@
     </bean>
 
     <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal">
+        <constructor-arg name="servicesResolver" ref="servicesResolver" />
     </bean>
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
