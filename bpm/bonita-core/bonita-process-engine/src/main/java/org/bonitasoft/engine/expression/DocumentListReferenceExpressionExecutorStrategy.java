@@ -50,7 +50,8 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     private final DocumentHelper documentHelper;
 
     public DocumentListReferenceExpressionExecutorStrategy(final DocumentService documentService,
-            final ActivityInstanceService activityInstanceService, final ProcessDefinitionService processDefinitionService,
+            final ActivityInstanceService activityInstanceService,
+            final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.activityInstanceService = activityInstanceService;
@@ -77,9 +78,14 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         try {
             final Long time = (Long) context.get("time");
             final long processInstanceId = getProcessInstance(containerId, containerType, time != null);
-            final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
+            final List<Object> results = new ArrayList<>(expressions.size());
             for (final SExpression expression : expressions) {
-                results.add(getDocumentList(processInstanceId, expression.getContent(), time));
+                final String docListName = expression.getContent();
+                if (context.containsKey(docListName)) {
+                    results.add(context.get(docListName));
+                } else {
+                    results.add(getDocumentList(processInstanceId, docListName, time));
+                }
             }
             return results;
         } catch (final SExpressionDependencyMissingException e) {
@@ -89,6 +95,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         }
     }
 
+    // Visible for Testing
     List<Document> getDocumentList(final long processInstanceId, final String name, final Long time) throws SBonitaReadException {
         final List<SMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name, time);
         try {
