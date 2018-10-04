@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,8 +25,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.assertj.core.api.SoftAssertions;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -147,6 +149,58 @@ public class OperationIT extends TestWithUser {
                         (Object) 1234567891234567891L, (Object) "test1"),
                 Arrays.asList((Object) "test3", (Object) true, (Object) 1234567891234567892L,
                         (Object) "test3"));
+    }
+
+    @Test
+    public void should_set_documents_with_operations() throws Exception {
+        final String actorName = "Document supplier";
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("should_set_documents_with_operations", "1.0");
+        processDefinitionBuilder.addActor(actorName).addDescription("Process documents");
+        processDefinitionBuilder.addDocumentListDefinition("docList1");
+        processDefinitionBuilder.addDocumentListDefinition("docList2").addDescription("Will receive the content of docList1");
+
+        processDefinitionBuilder.addUserTask("step0", actorName);
+        processDefinitionBuilder
+                .addAutomaticTask("step1")
+                .addOperation(new OperationBuilder().createSetDocumentList("docList1",
+                        new ExpressionBuilder().createGroovyScriptExpression("setDocumentList1()",
+                                "[new org.bonitasoft.engine.bpm.contract.FileInputValue('doc1.txt', 'content of doc1'.getBytes('UTF-8'))"
+                                        + ",new org.bonitasoft.engine.bpm.contract.FileInputValue('doc2.txt', 'content of doc2'.getBytes('UTF-8'))]",
+                                List.class.getName())))
+                .addOperation(new OperationBuilder().createSetDocumentList("docList2",
+                        new ExpressionBuilder().createGroovyScriptExpression("setDocList1ValueToDocList2()",
+                                "return docList1",
+                                List.class.getName(),
+                                // mimic what we have in BS-18741, force usage of document list reference as this is done
+                                // in the Studio (automatic dependencies resolution)
+                                new ExpressionBuilder().createDocumentListExpression("docList1"))));
+
+        processDefinitionBuilder.addUserTask("step2", actorName);
+        processDefinitionBuilder.addTransition("step0", "step1");
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, user);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "step0", user);
+        waitForUserTask(processInstance, "step2");
+
+
+        SoftAssertions softly = new SoftAssertions();
+
+        final List<org.bonitasoft.engine.bpm.document.Document> docList1AfterExecution = getProcessAPI().getDocumentList(processInstance.getId(), "docList1", 0, 100);
+        softly.assertThat(docList1AfterExecution).as("docList1 after execution")
+                .hasSize(2)
+                .extracting(org.bonitasoft.engine.bpm.document.Document::getContentFileName)
+                .containsOnly("doc1.txt", "doc2.txt");
+        final List<org.bonitasoft.engine.bpm.document.Document> docList2AfterExecution = getProcessAPI().getDocumentList(processInstance.getId(), "docList2", 0, 100);
+        softly.assertThat(docList2AfterExecution).as("docList2 after execution")
+                .hasSize(2)
+                .extracting(org.bonitasoft.engine.bpm.document.Document::getContentFileName)
+                .containsOnly("doc1.txt", "doc2.txt");
+
+        disableAndDeleteProcess(processDefinition);
+        softly.assertAll();
     }
 
     protected void createAndExecuteProcessWithOperations(final String procName, final List<String> dataName, final List<String> className,
