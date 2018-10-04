@@ -15,59 +15,38 @@ package org.bonitasoft.engine.service;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 /**
- * Small service that broadcast a call made on services to all nodes or only in local
+ * Service allowing to broadcast a call made on services to the other nodes of a Cluster
  * 
  * @author Baptiste Mesta
  */
 public interface BroadcastService {
 
     /**
-     * Broadcast the execution of a callable on all nodes and wait for the result.
-     * The callable will be executed on the platform level and broadcasted on all nodes including the calling node.
-     * The method will return only when all nodes finished executing the callable.
-     * 
-     * @param callable
-     *        callable that will be executed on all nodes
-     * @return
-     *         a map containing the name of the node and the result of the callable
-     */
-    <T> Map<String, TaskResult<T>> executeOnAllNodes(Callable<T> callable);
-
-    /**
-     * Broadcast the execution of a callable on other nodes and wait for the result.
-     * The callable will be executed on the platform level and broadcasted on other nodes, it is not executed on the calling node.
-     * The method will return only when all nodes finished executing the callable.
+     * Broadcast the execution of a callable on other nodes and returns immediately
+     * a future holding the execution result on each node (once available).
+     * <br/>
+     * The callable will be executed using a platform level session on other nodes.
      *
      * @param callable
      *        callable that will be executed on all nodes except the current one
      * @param <T>
      *        type of the returned value
      * @return
-     *         a map containing the name of the node and the result of the callable
+     *         a future of a map containing the name of the node and the result of the callable
      */
-    <T> Map<String, TaskResult<T>> executeOnOthers(Callable<T> callable);
+    <T> Future<Map<String, TaskResult<T>>> executeOnOthers(Callable<T> callable);
 
     /**
-     * Broadcast the execution of a callable on all nodes and wait for the result.
-     * The callable will be executed on the tenant level and broadcasted on all nodes including the calling node.
-     * The method will return only when all nodes finished executing the callable.
+     * Broadcast the execution of a callable on other nodes and returns immediately
+     * a future holding the execution result on each node (once available).
+     * <br/>
+     * The callable will be executed using a tenant level session on other nodes.
      *
-     * @param callable
-     *        callable that will be executed on all nodes
-     * @param tenantId
-     *        the if of the tenant
-     * @return
-     *         a map containing the name of the node and the result of the callable
-     */
-    <T> Map<String, TaskResult<T>> executeOnAllNodes(Callable<T> callable, Long tenantId);
-
-    /**
-     * Broadcast the execution of a callable on other nodes and wait for the result.
-     * The callable will be executed on the tenant level and broadcasted on other nodes, it is not executed on the calling node.
-     * The method will return only when all nodes finished executing the callable.
-     * 
      * @param callable
      *        callable that will be executed on all nodes except the current one
      * @param <T>
@@ -75,18 +54,10 @@ public interface BroadcastService {
      * @param tenantId
      *        the if of the tenant
      * @return
-     *         a map containing the name of the node and the result of the callable
+     *         a future of a map containing the name of the node and the result of the callable
      */
-    <T> Map<String, TaskResult<T>> executeOnOthers(Callable<T> callable, Long tenantId);
+    <T> Future<Map<String, TaskResult<T>>> executeOnOthers(Callable<T> callable, Long tenantId);
 
-    /**
-     * Broadcast the execution of a callable on all nodes but do not wait for the result.
-     * The callable will be executed on the platform level and broadcasted on all nodes including the calling node.
-     * The method will return after submitting the callable, it will be executed asynchronously ion each node.
-     *
-     * @param callable
-     *        the callable that will be executed on all nodes
-     */
-    void submit(Callable<?> callable);
+    <T> Map<String, TaskResult<T>> executeOnOthersAndWait(Callable<T> callable, Long tenantId) throws TimeoutException, InterruptedException, ExecutionException;
 
 }
