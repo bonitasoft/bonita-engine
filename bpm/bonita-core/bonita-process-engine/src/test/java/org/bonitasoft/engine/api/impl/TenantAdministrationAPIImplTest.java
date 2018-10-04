@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static java.util.Collections.singletonMap;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.tenant.TenantResourceType.BDM;
 import static org.mockito.Matchers.any;
@@ -24,6 +26,8 @@ import static org.mockito.Mockito.*;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
@@ -121,11 +125,13 @@ public class TenantAdministrationAPIImplTest {
         when(tenantServiceAccessor.getSessionService()).thenReturn(sessionService);
 
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
+        doNothing().when(tenantManagementAPI).execute(any());
     }
 
     @Test
     public void pause_should_pause_tenant_service_with_lifecycle() throws Exception {
         // Given
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
         whenTenantIsInState(STenant.ACTIVATED);
 
         // When a tenant moved to pause mode:
@@ -141,6 +147,7 @@ public class TenantAdministrationAPIImplTest {
 
     @Test
     public void resume_should_resume_tenant_service_with_lifecycle() throws Exception {
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
         // When a tenant moved to available mode
         tenantManagementAPI.resume();
 
@@ -151,11 +158,15 @@ public class TenantAdministrationAPIImplTest {
                 isA(PauseServiceStrategy.class));
     }
 
+    private static Map<String, TaskResult<String>> okFuture() {
+        return singletonMap("workService", TaskResult.ok("ok"));
+    }
+
     @Test(expected = UpdateException.class)
     public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_fail() throws Exception {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(new SWorkException("plop"));
-        doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).executeOnAllNodes(any(SetServiceState.class), eq(tenantId));
+        doReturn(singletonMap("workService", taskResult)).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
 
         // When a tenant moved to available mode
         tenantManagementAPI.resume();
@@ -165,7 +176,7 @@ public class TenantAdministrationAPIImplTest {
     public void resume_should_throw_UpdateException_when_resuming_tenant_service_with_lifecycle_is_time_out() throws Exception {
         // Given
         TaskResult<Void> taskResult = new TaskResult<>(5l, TimeUnit.HOURS);
-        doReturn(Collections.singletonMap("workService", taskResult)).when(broadcastService).executeOnAllNodes(any(SetServiceState.class), eq(tenantId));
+        doReturn(singletonMap("workService", taskResult)).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
 
         // When a tenant moved to available mode
         tenantManagementAPI.resume();
@@ -174,6 +185,7 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void resume_should_restart_tenant_handlers() throws Exception {
         // Given
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
         final TenantRestartHandler tenantRestartHandler1 = mock(TenantRestartHandler.class);
         final TenantRestartHandler tenantRestartHandler2 = mock(TenantRestartHandler.class);
         when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
@@ -200,6 +212,8 @@ public class TenantAdministrationAPIImplTest {
 
     @Test
     public void resume_should_resolve_dependecies_for_deployed_processes() throws Exception {
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
+
         tenantManagementAPI.resume();
 
         verify(businessArchiveArtifactsManager).resolveDependenciesForAllProcesses(tenantServiceAccessor);
@@ -208,6 +222,7 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void pause_should_update_tenant_in_pause() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
 
         tenantManagementAPI.pause();
 
@@ -220,6 +235,8 @@ public class TenantAdministrationAPIImplTest {
 
     @Test
     public void resume_should_resume_jobs() throws Exception {
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
+
         tenantManagementAPI.resume();
 
         verify(schedulerService).resumeJobs(tenantId);
@@ -228,6 +245,7 @@ public class TenantAdministrationAPIImplTest {
     @Test
     public void pause_should_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
 
         tenantManagementAPI.pause();
 
@@ -236,6 +254,8 @@ public class TenantAdministrationAPIImplTest {
 
     @Test
     public void resume_should_delete_sessions() throws Exception {
+        doReturn(okFuture()).when(broadcastService).executeOnOthersAndWait(any(SetServiceState.class), eq(tenantId));
+
         tenantManagementAPI.resume();
 
         verify(sessionService, times(0)).deleteSessionsOfTenantExceptTechnicalUser(tenantId);

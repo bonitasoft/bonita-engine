@@ -192,8 +192,18 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
             final ServiceStrategy serviceStrategy) throws UpdateException {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
         final SetServiceState setServiceState = new SetServiceState(tenantId, serviceStrategy);
-        final Map<String, TaskResult<Void>> result = broadcastService.executeOnAllNodes(setServiceState, tenantId);
+        final Map<String, TaskResult<Void>> result;
+        try {
+            execute(setServiceState);
+            result = broadcastService.executeOnOthersAndWait(setServiceState, tenantId);
+        } catch (Exception e) {
+            throw new UpdateException(e);
+        }
         handleResult(result);
+    }
+
+    void execute(SetServiceState setServiceState) throws Exception {
+        setServiceState.call();
     }
 
     private void pauseScheduler(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws SSchedulerException {
