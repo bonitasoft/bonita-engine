@@ -51,6 +51,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
+import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -95,10 +96,12 @@ public interface ProcessManagementAPI {
      *         If a process with same name and version is already deployed.
      * @throws ProcessDeployException
      *         If an exception occurs when deploying the archive.
+     * @throws V6FormDeployException
+     *         If the deployed process contains v6 forms, not supported anymore.
      * @see BusinessArchive
      * @since 6.0
      */
-    ProcessDefinition deploy(BusinessArchive businessArchive) throws AlreadyExistsException, ProcessDeployException;
+    ProcessDefinition deploy(BusinessArchive businessArchive) throws AlreadyExistsException, ProcessDeployException, V6FormDeployException;
 
     /**
      * Deploys a simple {@link DesignProcessDefinition} (without any dependencies).
