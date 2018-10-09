@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Bonitasoft S.A.
+ * Copyright (C) 2016-2018 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,11 +14,15 @@
 
 package org.bonitasoft.engine.service.impl;
 
+import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
 import javax.naming.NamingException;
 
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -38,36 +42,41 @@ public class PlatformLicensesSetup {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlatformLicensesSetup.class);
     public static final String BONITA_CLIENT_HOME = "bonita.client.home";
 
+    private boolean initialized;
+
+    PlatformLicensesSetup() {
+        // enforce retrieving instance using the Factory class
+    }
+
     public void setupLicenses() {
-        try {
-            extractLicensesIfNeeded();
-        } catch (NamingException | PlatformException | IOException e) {
-            throw new IllegalStateException("unable to get license files from database", e);
-        }
-    }
-
-    private boolean isEmpty(Path licensesFolder) {
-        File[] files = licensesFolder.toFile().listFiles();
-        return files == null || files.length == 0;
-    }
-
-    private void extractLicensesIfNeeded() throws IOException, NamingException, PlatformException {
-        LOGGER.debug("Start extracting licenses if needed...");
-        Path licensesFolder = getLicensesFolder().toPath();
-        LOGGER.debug("License folder: {}", licensesFolder);
-        if (Files.exists(licensesFolder) && !isEmpty(licensesFolder)) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("The folder exists and is not empty");
-                File[] files = licensesFolder.toFile().listFiles();
-                LOGGER.debug("It contains {} files/folders", files.length);
-                for (File file : files) {
-                    LOGGER.debug(file.getName());
-                }
-                LOGGER.debug("So nothing to extract and stop processing");
-            }
+        if (initialized) {
+            LOGGER.debug("Platform licenses already setup, so skip processing");
             return;
         }
-        LOGGER.debug("Retrieving licenses....");
+        try {
+            extractLicenses();
+            initialized = true;
+        } catch (NamingException | PlatformException | IOException e) {
+            throw new IllegalStateException("Unable to get license files from database", e);
+        }
+    }
+
+    public void forceSetupLicenses() {
+        LOGGER.debug("Force licenses extraction");
+        this.initialized = false;
+        setupLicenses();
+    }
+
+    private void extractLicenses() throws IOException, NamingException, PlatformException {
+        LOGGER.debug("Start extracting licenses...");
+        Path licensesFolder = getLicensesFolder().toPath();
+        LOGGER.debug("License folder: {}", licensesFolder);
+        if (LOGGER.isDebugEnabled()) {
+            File[] files = ofNullable(licensesFolder.toFile().listFiles()).orElse(new File[0]);
+            LOGGER.debug("It contains {} files/folders", files.length);
+            stream(files).forEach(file -> LOGGER.debug(file.getName()));
+        }
+        LOGGER.debug("Retrieving licenses from configuration....");
         final List<BonitaConfiguration> licenses = getConfigurationService().getLicenses();
         LOGGER.debug("Found {} licenses", licenses.size());
         if (licenses.isEmpty()) {
@@ -108,6 +117,7 @@ public class PlatformLicensesSetup {
         return BonitaHomeServer.getInstance().getLicensesFolder();
     }
 
+    // visible for testing
     ConfigurationService getConfigurationService() throws NamingException {
         return PlatformSetupAccessor.getConfigurationService();
     }
