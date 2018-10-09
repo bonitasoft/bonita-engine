@@ -196,6 +196,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -204,6 +205,7 @@ import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SV6FormsDeployException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -668,12 +670,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
+    public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException  {
         validateBusinessArchive(businessArchive);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final BusinessArchiveService businessArchiveService = tenantAccessor.getBusinessArchiveService();
         try {
             return ModelConvertor.toProcessDefinition(businessArchiveService.deploy(businessArchive));
+        } catch (SV6FormsDeployException e) {
+            throw new V6FormDeployException(e);
         } catch (SObjectCreationException e) {
             throw new ProcessDeployException(e);
         } catch (SAlreadyExistsException e) {
