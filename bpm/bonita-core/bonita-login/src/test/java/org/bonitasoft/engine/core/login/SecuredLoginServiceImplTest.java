@@ -15,9 +15,13 @@ package org.bonitasoft.engine.core.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +29,6 @@ import java.util.Map;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -59,10 +62,9 @@ public class SecuredLoginServiceImplTest {
     private TechnicalLoggerService logger;
 
     @Before
-    public void setUp() throws IOException, BonitaHomeNotSetException, SLoginException {
-        securedLoginServiceImpl = spy(new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
-                sessionAccessor, identityService, logger));
-        doReturn(new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS)).when(securedLoginServiceImpl).getTechnicalUser(1L);
+    public void setUp() {
+        securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
+                sessionAccessor, identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS));
     }
 
     @Test
@@ -119,7 +121,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithInvalidPlatformCredentials() throws Exception {
+    public void testSecuredLoginServiceWithInvalidPlatformCredentials() {
         final Map<String, Serializable> credentials = new HashMap<>();
         final String password = "poutpout";
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
@@ -192,7 +194,6 @@ public class SecuredLoginServiceImplTest {
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, never()).checkUserCredentials(credentials);
-        verify(securedLoginServiceImpl).getTechnicalUser(TENANT_ID);
         verify(sessionAccessor).deleteSessionId();
         verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true);
         assertThat(sSessionResult).isSameAs(sSession);
@@ -326,19 +327,14 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void should_login_with_technical_user__return_technical_session() throws Exception {
-        SecuredLoginServiceImpl spy = spy(securedLoginServiceImpl);
-        final Long tenantId = new Long(1);
-        final String username = "john";
-        final String password = "bpm";
-        doReturn(new TechnicalUser(username, password)).when(spy).getTechnicalUser(1);
         final Map<String, Serializable> credentials = new HashMap<>();
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, 1L);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, TECH_USER_NAME);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, TECH_USER_PASS);
 
-        spy.login(credentials);
+        securedLoginServiceImpl.login(credentials);
 
-        verify(sessionService).createSession(1, -1, "john", true);
+        verify(sessionService).createSession(1, -1, TECH_USER_NAME, true);
     }
 
 }
