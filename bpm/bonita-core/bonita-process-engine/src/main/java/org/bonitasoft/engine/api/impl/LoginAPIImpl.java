@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +30,8 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.TenantStatusException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -116,9 +115,9 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                 .get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         final STenant sTenant = getTenant(tenantId, platformServiceAccessor);
-        checkThatWeCanLogin(userName, sTenant, getBonitaHomeServerInstance());
 
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(sTenant.getId());
+        checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
@@ -159,26 +158,18 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
     }
 
-    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, BonitaHomeServer bonitaHomeServer) throws LoginException {
+    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, TechnicalUser technicalUser) throws LoginException {
         if (!sTenant.isActivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }
-        try {
-            if (sTenant.isPaused()) {
-                final String technicalUserName = bonitaHomeServer.getTenantProperties(sTenant.getId()).getProperty("userName");
+        if (sTenant.isPaused()) {
+            final String technicalUserName = technicalUser.getUserName();
 
-                if (!technicalUserName.equals(userName)) {
-                    throw new TenantStatusException("Tenant with ID " + sTenant.getId()
-                            + " is in pause, unable to login with other user than the technical user.");
-                }
+            if (!technicalUserName.equals(userName)) {
+                throw new TenantStatusException("Tenant with ID " + sTenant.getId()
+                        + " is in pause, unable to login with other user than the technical user.");
             }
-        } catch (IOException e) {
-            throw new LoginException(e);
         }
-    }
-
-    protected BonitaHomeServer getBonitaHomeServerInstance() {
-        return BonitaHomeServer.getInstance();
     }
 
     private class LoginAndRetrieveUser implements Callable<SSession> {

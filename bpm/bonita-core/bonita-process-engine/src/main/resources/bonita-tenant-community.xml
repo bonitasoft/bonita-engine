@@ -1401,6 +1401,11 @@
         </property>
     </bean>
 
+    <bean id="technicalUser" class="org.bonitasoft.engine.core.login.TechnicalUser">
+        <constructor-arg name="userName" value="${userName}" />
+        <constructor-arg name="password" value="${userPassword}" />
+    </bean>
+
 
     <bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
@@ -1408,6 +1413,7 @@
         <constructor-arg ref="sessionAccessor" />
         <constructor-arg ref="identityService" />
         <constructor-arg ref="tenantTechnicalLoggerService" />
+        <constructor-arg ref="technicalUser" />
     </bean>
 
     <bean id="genericAuthenticationServiceAccessor"
