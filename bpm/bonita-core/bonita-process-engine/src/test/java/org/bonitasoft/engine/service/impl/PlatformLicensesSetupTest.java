@@ -14,13 +14,15 @@
 
 package org.bonitasoft.engine.service.impl;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.service.impl.PlatformLicensesSetup.BONITA_CLIENT_HOME;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -53,10 +55,10 @@ public class PlatformLicensesSetupTest {
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    ConfigurationServiceImpl configurationService;
+    private ConfigurationServiceImpl configurationService;
 
     @Spy
-    PlatformLicensesSetup platformLicensesSetup;
+    private PlatformLicensesSetup platformLicensesSetup;
 
     private LicenseAnswer licenseAnswer;
     private File licensesFolder;
@@ -71,15 +73,15 @@ public class PlatformLicensesSetupTest {
 
     private final class LicenseAnswer implements Answer<List<BonitaConfiguration>> {
 
-        int i = 0;
+        private int count = 0;
 
         @Override
         public List<BonitaConfiguration> answer(final InvocationOnMock invocation) {
-            i++;
+            count++;
             List<BonitaConfiguration> bonitaConfigurations = new ArrayList<>();
-            final String resourceName = "license" + i + ".lic";
+            final String resourceName = "license" + count + ".lic";
             bonitaConfigurations
-                    .add(new BonitaConfiguration(resourceName, ("license " + i + " content").getBytes()));
+                    .add(new BonitaConfiguration(resourceName, ("license " + count + " content").getBytes()));
             return bonitaConfigurations;
         }
 
@@ -88,7 +90,9 @@ public class PlatformLicensesSetupTest {
     @Test
     public void should_setup_licenses_folder_when_bonitaHomeClient_is_not_set() throws Exception {
         //given
-        doReturn(Collections.singletonList(new BonitaConfiguration("license1.lic", "licence content".getBytes()))).when(configurationService).getLicenses();
+        doReturn(singletonList(
+                new BonitaConfiguration("license1.lic", "licence content".getBytes(StandardCharsets.UTF_8))))
+                        .when(configurationService).getLicenses();
 
         //when
         platformLicensesSetup.setupLicenses();
@@ -102,9 +106,9 @@ public class PlatformLicensesSetupTest {
     }
 
     @Test
-    public void should_setup_licenses_folder_do_not_set_bonita_client_home_even_if_there_is_no_licenses() throws Exception {
+    public void should_not_set_the_bonita_client_home_if_there_is_no_licenses() throws Exception {
         //given
-        doReturn(Collections.EMPTY_LIST).when(configurationService).getLicenses();
+        doReturn(emptyList()).when(configurationService).getLicenses();
 
         //when
         platformLicensesSetup.setupLicenses();
@@ -114,7 +118,7 @@ public class PlatformLicensesSetupTest {
     }
 
     @Test
-    public void should_not_overwrite_bonita_client_home_system_property() throws Exception {
+    public void should_not_overrride_bonita_client_home_if_it_is_already_set() throws Exception {
         //given
         System.setProperty(BONITA_CLIENT_HOME, "existing_licenses_folder");
         when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
@@ -123,7 +127,8 @@ public class PlatformLicensesSetupTest {
         platformLicensesSetup.setupLicenses();
 
         //then
-        assertThat(System.getProperty(BONITA_CLIENT_HOME)).as("should not modify system property").isEqualTo("existing_licenses_folder");
+        assertThat(System.getProperty(BONITA_CLIENT_HOME)).as("should not override system property")
+                .isEqualTo("existing_licenses_folder");
     }
 
     @Test
@@ -136,11 +141,10 @@ public class PlatformLicensesSetupTest {
 
         //when
         platformLicensesSetup.setupLicenses();
-
     }
 
     @Test
-    public void should_extract_licenses_do_not_extract_it_if_already_done() throws Exception {
+    public void should_not_extract_licenses_if_already_done() throws Exception {
         //given
         when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
 
@@ -160,33 +164,19 @@ public class PlatformLicensesSetupTest {
     }
 
     @Test
-    public void should_extract_extract_a_second_time_if_folder_is_deleted() throws Exception {
+    public void should_extract_license_a_second_time_when_calling_force_setup_licenses() throws Exception {
         //given
         when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
         platformLicensesSetup.setupLicenses();
-        assertThat(licensesFolder.listFiles()).extracting("name").as("should contains only extracted licenses").containsOnly("license1.lic");
-        FileUtils.deleteDirectory(licensesFolder);
+        assertThat(licensesFolder.listFiles()).extracting("name").as("initial extracted licenses")
+                .containsOnly("license1.lic");
+
         //when
-        platformLicensesSetup.setupLicenses();
+        platformLicensesSetup.forceSetupLicenses();
 
         //then: licenses were not replace by new one: it was already done
-        assertThat(licensesFolder.listFiles()).extracting("name").as("should remove previous licenses").containsOnly("license2.lic");
-    }
-
-    @Test
-    public void should_extract_extract_a_second_time_if_folder_is_empty() throws Exception {
-        //given
-        when(configurationService.getLicenses()).thenAnswer(licenseAnswer);
-        platformLicensesSetup.setupLicenses();
-        assertThat(licensesFolder.listFiles()).extracting("name").as("should contains only extracted licenses").containsOnly("license1.lic");
-        for (File file : licensesFolder.listFiles()) {
-            file.delete();
-        }
-        //when
-        platformLicensesSetup.setupLicenses();
-
-        //then: licenses were not replace by new one: it was already done
-        assertThat(licensesFolder.listFiles()).extracting("name").as("should remove previous licenses").containsOnly("license2.lic");
+        assertThat(licensesFolder.listFiles()).extracting("name").as("licenses after reset and new retrieval")
+                .containsOnly("license1.lic", "license2.lic");
     }
 
 }
