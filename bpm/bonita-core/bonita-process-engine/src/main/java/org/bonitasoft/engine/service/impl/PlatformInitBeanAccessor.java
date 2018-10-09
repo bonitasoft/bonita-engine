@@ -36,8 +36,9 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
         return super.createContext();
     }
 
+    // visible for testing
     PlatformLicensesSetup getPlatformLicensesSetup() {
-        return new PlatformLicensesSetup();
+        return PlatformLicensesSetupFactory.getInstance();
     }
 
     @Override

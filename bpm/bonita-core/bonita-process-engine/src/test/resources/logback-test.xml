@@ -1,0 +1,19 @@
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>|%d{HH:mm:ss.SSS}|%thread|%-5level|%logger{16}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="org.bonitasoft" level="WARN"/>
+
+    <logger name="org.bonitasoft.engine.service.impl.PlatformLicensesSetup" level="WARN"/>
+
+</configuration>
