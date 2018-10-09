@@ -14,10 +14,15 @@
 
 package org.bonitasoft.engine.bar;
 
+import static org.bonitasoft.engine.form.FormMappingTarget.LEGACY;
+
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.resolver.BusinessArchiveArtifactsManager;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
@@ -25,6 +30,7 @@ import org.bonitasoft.engine.commons.exceptions.SAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SV6FormsDeployException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -61,10 +67,10 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
     public SProcessDefinition deploy(BusinessArchive businessArchive) throws SObjectCreationException, SAlreadyExistsException {
 
         final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
-
         SProcessDefinition sProcessDefinition;
         try {
             checkIfExists(designProcessDefinition);
+            checkNoV6Forms(businessArchive);
             sProcessDefinition = processDefinitionService.store(designProcessDefinition);
 
             final boolean isResolved = businessArchiveArtifactsManager.resolveDependencies(businessArchive, sProcessDefinition);
@@ -72,13 +78,23 @@ public class BusinessArchiveServiceImpl implements BusinessArchiveService {
                 processDefinitionService.resolveProcess(sProcessDefinition.getId());
             }
             dependencyService.refreshClassLoaderAfterUpdate(ScopeType.PROCESS, sProcessDefinition.getId());
-        } catch (SAlreadyExistsException e) {
+        } catch (SV6FormsDeployException | SAlreadyExistsException e) {
             throw e;
         } catch (final SBonitaException e) {
             throw new SObjectCreationException(e);
         }
         info(sProcessDefinition);
         return sProcessDefinition;
+    }
+
+    private void checkNoV6Forms(BusinessArchive businessArchive) throws SV6FormsDeployException {
+
+        List<FormMappingDefinition> formMappings = businessArchive.getFormMappingModel().getFormMappings();
+        for (FormMappingDefinition formMapping : formMappings) {
+            if (formMapping.getTarget() == LEGACY) {
+                throw new SV6FormsDeployException("The process contains v6 forms");
+            }
+        }
     }
 
     void checkIfExists(DesignProcessDefinition designProcessDefinition) throws SBonitaReadException, SAlreadyExistsException {

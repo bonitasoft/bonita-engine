@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.V6FormDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -47,6 +48,9 @@ import org.junit.rules.ExpectedException;
 public class FormMappingIT extends TestWithUser {
 
     private final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void deployProcessesWithFormMappings() throws Exception {
@@ -73,7 +77,6 @@ public class FormMappingIT extends TestWithUser {
                                 .addProcessOverviewForm(null, FormMappingTarget.LEGACY).build());
 
         ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());
-        ProcessDefinition p2 = getProcessAPI().deploy(bar2.done());
 
         ProcessAPI processConfigurationAPI = getProcessAPI();
 
@@ -93,20 +96,6 @@ public class FormMappingIT extends TestWithUser {
         FormMapping step2Form1 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
                 .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p1.getId())
                 .filter(FormMappingSearchDescriptor.TASK, "step2").done()).getResult().get(0);
-        FormMapping processStartForm2 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p2.getId())
-                .done()).getResult().get(0);
-        FormMapping processOverviewForm2 = processConfigurationAPI.searchFormMappings(
-                new SearchOptionsBuilder(0, 10)
-                        .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_OVERVIEW)
-                        .filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p2.getId())
-                        .done()).getResult().get(0);
-        FormMapping step1Form2 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p2.getId())
-                .filter(FormMappingSearchDescriptor.TASK, "step1").done()).getResult().get(0);
-        FormMapping step2Form2 = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p2.getId())
-                .filter(FormMappingSearchDescriptor.TASK, "step2").done()).getResult().get(0);
 
         assertThat(processStartForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(processStartForm1.getPageId()).isNull();
@@ -122,35 +111,19 @@ public class FormMappingIT extends TestWithUser {
         assertThat(step2Form1.getURL()).isNull();
         assertThat(step2Form1.getTarget()).isEqualTo(FormMappingTarget.NONE);
 
-        assertThat(processStartForm2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        assertThat(processStartForm2.getURL()).isEqualTo("processStartForm");
-        assertThat(processOverviewForm2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        assertThat(processOverviewForm2.getURL()).isNull();
-        assertThat(processOverviewForm2.getTarget()).isEqualTo(FormMappingTarget.LEGACY);
-        assertThat(step1Form2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        assertThat(step1Form2.getURL()).isEqualTo("task2Form");
-        assertThat(step2Form2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        assertThat(step2Form2.getURL()).isNull();
-        assertThat(step2Form2.getTarget()).isEqualTo(FormMappingTarget.NONE);
-
         //search
         SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
                 FormMappingSearchDescriptor.ID, Order.DESC).done());
-        assertThat(formMappingSearchResult.getCount()).isEqualTo(8);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p2.getId(), p2.getId(), p2.getId(),
-                p1.getId(), p1.getId(), p1.getId(), p1.getId());
-        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
-                .filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p2.getId()).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(4);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p2.getId(), p2.getId(), p2.getId());
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(
+                p1.getId(), p1.getId(), p1.getId(), p1.getId());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(4);
         formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
                 .filter(FormMappingSearchDescriptor.TASK, "step1").done());
-        assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
         formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
                 .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).done());
-        assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
 
         //resolve urls:
         PageURL p1Instanciation = getPageAPI().resolvePageOrURL("process/P1/1.0", context, true);
@@ -161,15 +134,32 @@ public class FormMappingIT extends TestWithUser {
         assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
 
         getProcessAPI().deleteProcessDefinition(p1.getId());
-        getProcessAPI().deleteProcessDefinition(p2.getId());
         assertThat(
                 processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
                         .getResult()).isEmpty();
 
     }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    @Test
+    public void deployProcessesWithV6FormMappingsFails() throws Exception {
+        // given:
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("P2", "1.0");
+        processBuilder.addUserTask("step1", "actor").addUserTask("step2", "actor");
+        BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
+                .createNewBusinessArchive()
+                .setProcessDefinition(processBuilder.done())
+                .setFormMappings(
+                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                                .addTaskForm("task2Form", FormMappingTarget.URL, "step1")
+                                .addProcessOverviewForm(null, FormMappingTarget.LEGACY).build());
+
+        // then:
+        expectedException.expect(V6FormDeployException.class);
+        expectedException.expectMessage("The process contains v6 forms");
+
+        // when:
+        getProcessAPI().deploy(bar.done());
+    }
 
     @Test
     public void resolvePageOrURLThrowsNotFoundExceptionForUndefinedFormMapping() throws Exception {
