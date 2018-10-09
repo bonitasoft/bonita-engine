@@ -13,17 +13,14 @@
  **/
 package org.bonitasoft.engine.core.login;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -50,19 +47,22 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final IdentityService identityService;
 
     private final TechnicalLoggerService logger;
+    private TechnicalUser technicalUser;
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService, final SessionService sessionService,
-            final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService) {
+            final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
+                                   TechnicalUser technicalUser) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.identityService = identityService;
         this.logger = tenantTechnicalLoggerService;
+        this.technicalUser = technicalUser;
     }
 
     @Override
     public SSession login(final Map<String, Serializable> credentials) throws SLoginException, SUserNotFoundException {
-        debugLog("Loging in");
+        debugLog("Logging in");
         if (credentials == null) {
             throw new SLoginException("invalid credentials, map is null");
         }
@@ -72,8 +72,6 @@ public class SecuredLoginServiceImpl implements LoginService {
         boolean isTechnicalUser = false;
         String userName = null;
         try {
-            final TechnicalUser technicalUser = getTechnicalUser(tenantId);
-
             if (credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) && credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
                 userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
             }
@@ -175,17 +173,6 @@ public class SecuredLoginServiceImpl implements LoginService {
             return sessionService.isValid(sessionId);
         } catch (final SSessionNotFoundException e) {
             return false;
-        }
-    }
-
-    protected TechnicalUser getTechnicalUser(final long tenantId) throws SLoginException {
-        try {
-            final Properties properties = BonitaHomeServer.getInstance().getTenantProperties(tenantId);
-            final String userName = (String) properties.get("userName");
-            final String password = (String) properties.get("userPassword");
-            return new TechnicalUser(userName, password);
-        } catch (IOException e) {
-            throw new SLoginException(e);
         }
     }
 

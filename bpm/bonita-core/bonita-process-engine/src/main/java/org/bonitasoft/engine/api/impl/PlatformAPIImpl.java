@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -45,6 +44,7 @@ import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -573,7 +573,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
-        String userName;
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
         Long tenantId = -1L;
@@ -586,26 +585,14 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             transactionService.complete();
             transactionService.begin();
-            try {
-                createTenantFolderInBonitaHome(tenantId);
-            } catch (STenantCreationException e) {
-                transactionService.complete();
-                throw e;
-            }
-
-            try {
-                // Get user name
-                userName = getUserName(tenantId);
-            } catch (Exception e) {
-                transactionService.complete();
-                throw new STenantCreationException(e);
-            }
+            createTenantFolderInBonitaHome(tenantId);
 
             // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             final SessionService sessionService = tenantServiceAccessor.getSessionService();
+            TechnicalUser technicalUser = tenantServiceAccessor.getTechnicalUser();
             sessionAccessor = createSessionAccessor();
-            final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
+            final SSession session = sessionService.createSession(tenantId, -1L, technicalUser.getUserName(), true);
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
@@ -632,7 +619,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
+    private void createTenantFolderInBonitaHome(final long tenantId) {
         getBonitaHomeServerInstance().createTenant(tenantId);
     }
 
@@ -643,11 +630,6 @@ public class PlatformAPIImpl implements PlatformAPI {
                 sessionAccessor.setSessionInfo(platformSessionId, -1);
             }
         }
-    }
-
-    private String getUserName(final long tenantId) throws IOException, BonitaHomeNotSetException {
-        final Properties properties = getBonitaHomeServerInstance().getTenantProperties(tenantId);
-        return properties.getProperty("userName");
     }
 
     void deleteTenant(final long tenantId) throws STenantDeletionException {

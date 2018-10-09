@@ -40,6 +40,7 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -258,4 +259,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     MessagesHandlingService getMessagesHandlingService();
 
     BPMWorkFactory getBPMWorkFactory();
+
+    TechnicalUser getTechnicalUser();
 }
