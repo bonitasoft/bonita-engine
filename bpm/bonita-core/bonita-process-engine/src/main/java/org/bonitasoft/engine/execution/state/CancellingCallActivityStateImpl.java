@@ -19,12 +19,11 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -32,13 +31,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class CancellingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
-    public CancellingCallActivityStateImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final SCommentService commentService, final DocumentService documentService, final TechnicalLoggerService logger,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
-            ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
-        super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService,
-                documentService, logger, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+    public CancellingCallActivityStateImpl(ProcessInstanceService processInstanceService, final ArchiveService archiveService, final SCommentService commentService,
+                                           final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+                                           final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService,
+                                           ProcessInstanceInterruptor processInstanceInterruptor) {
+        super(processInstanceService, archiveService, commentService, documentService, logger, processDefinitionService,
+                connectorInstanceService, classLoaderService, refBusinessDataService, processInstanceInterruptor);
     }
 
     @Override

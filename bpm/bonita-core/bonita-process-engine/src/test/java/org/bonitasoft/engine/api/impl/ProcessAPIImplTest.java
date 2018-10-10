@@ -361,7 +361,7 @@ public class ProcessAPIImplTest {
         final ProcessInstanceInterruptor interruptor = mock(ProcessInstanceInterruptor.class);
 
         when(tenantAccessor.getLockService()).thenReturn(lockService);
-        doReturn(interruptor).when(processAPI).buildProcessInstanceInterruptor(tenantAccessor);
+        doReturn(interruptor).when(tenantAccessor).getProcessInstanceInterruptor();
         doThrow(new SProcessInstanceNotFoundException(PROCESS_INSTANCE_ID)).when(interruptor).interruptProcessInstance(PROCESS_INSTANCE_ID,
                 SStateCategory.CANCELLING);
 

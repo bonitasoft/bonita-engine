@@ -108,14 +108,16 @@ public class EventsHandler {
     private final OperationService operationService;
 
     private ProcessExecutor processExecutor;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
-            final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
-            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService,
-            final TechnicalLoggerService logger,
-            OperationService operationService,
-            MessagesHandlingService messagesHandlingService, WorkService workService, BPMWorkFactory workFactory) {
+                         final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator,
+                         final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
+                         final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService,
+                         final TechnicalLoggerService logger,
+                         OperationService operationService,
+                         MessagesHandlingService messagesHandlingService, WorkService workService, BPMWorkFactory workFactory,
+                         ProcessInstanceInterruptor processInstanceInterruptor) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -123,17 +125,17 @@ public class EventsHandler {
         this.processInstanceService = processInstanceService;
         this.logger = logger;
         this.operationService = operationService;
+        this.processInstanceInterruptor = processInstanceInterruptor;
         handlers = new HashMap<>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
                 bpmInstancesCreator, processDefinitionService, messagesHandlingService));
         handlers.put(SEventTriggerType.SIGNAL,
                 new SignalEventHandlerStrategy(eventInstanceService, workService, workFactory));
-        handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
-                containerRegistry, logger));
+        handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceInterruptor));
         handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
                 containerRegistry,
-                processDefinitionService, this, logger));
+                processDefinitionService, this, logger, processInstanceInterruptor));
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -368,16 +370,8 @@ public class EventsHandler {
                 parentProcessInstanceId, SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0,
                 SStateCategory.NORMAL, -1);
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
-        if (triggerType.equals(SEventTriggerType.ERROR)) {
-            // if error interrupt directly.
-            final ProcessInstanceInterruptor interruptor = new ProcessInstanceInterruptor(
-                    processInstanceService, eventInstanceService, containerRegistry, logger);
-            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, subProcflowNodeInstance.getId());
-        } else if (isInterrupting) {
-            // other interrupting catch
-            final ProcessInstanceInterruptor interruptor = new ProcessInstanceInterruptor(processInstanceService,
-                    eventInstanceService, containerRegistry, logger);
-            interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, subProcflowNodeInstance.getId());
+        if (triggerType.equals(SEventTriggerType.ERROR) || isInterrupting) {
+            processInstanceInterruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
                 subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.

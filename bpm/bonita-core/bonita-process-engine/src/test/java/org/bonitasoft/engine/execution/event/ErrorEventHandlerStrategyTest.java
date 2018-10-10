@@ -33,6 +33,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventIns
 import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,12 +65,15 @@ public class ErrorEventHandlerStrategyTest {
     @Mock
     private TechnicalLoggerService logger;
 
+    @Mock
+    private ProcessInstanceInterruptor processInstanceInterruptor;
+
     private ErrorEventHandlerStrategy spyStrategy;
 
     @Before
     public void setUp() {
         spyStrategy = spy(new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
-                containerRegistry, processDefinitionService, eventsHandler, logger));
+                containerRegistry, processDefinitionService, eventsHandler, logger, processInstanceInterruptor));
     }
 
     @Test

@@ -4695,7 +4695,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void cancelProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final LockService lockService = tenantAccessor.getLockService();
-        final ProcessInstanceInterruptor processInstanceInterruptor = buildProcessInstanceInterruptor(tenantAccessor);
+        final ProcessInstanceInterruptor processInstanceInterruptor = tenantAccessor.getProcessInstanceInterruptor();
         // lock process execution
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
@@ -4717,9 +4717,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected ProcessInstanceInterruptor buildProcessInstanceInterruptor(final TenantServiceAccessor tenantAccessor) {
-        return new ProcessInstanceInterruptor(tenantAccessor.getProcessInstanceService(), tenantAccessor.getActivityInstanceService(),
-                tenantAccessor.getContainerRegistry(),
-                tenantAccessor.getTechnicalLoggerService());
+        return tenantAccessor.getProcessInstanceInterruptor();
     }
 
     @Override
