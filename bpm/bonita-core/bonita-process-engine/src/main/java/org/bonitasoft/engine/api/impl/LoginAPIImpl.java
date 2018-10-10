@@ -30,6 +30,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -119,14 +120,18 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(sTenant.getId());
         checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
-        final IdentityService identityService = serviceAccessor.getIdentityService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
 
         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
         credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
-        final SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService,
-                credentialsWithResolvedTenantId));
-        return ModelConvertor.toAPISession(sSession, sTenant.getName());
+        try {
+            final SSession sSession = transactionService.executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
+            return ModelConvertor.toAPISession(sSession, sTenant.getName());
+        } catch (Exception e) {
+            //avoid brut force... (should be done differently, but it is the behavior since 6.0.0)
+            Thread.sleep(3000);
+            throw e;
+        }
     }
 
     protected STenant getTenant(final Long tenantId, final PlatformServiceAccessor platformServiceAccessor) throws SBonitaException {
@@ -170,50 +175,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                         + " is in pause, unable to login with other user than the technical user.");
             }
         }
-    }
-
-    private class LoginAndRetrieveUser implements Callable<SSession> {
-
-        private final LoginService loginService;
-
-        private final IdentityService identityService;
-
-        private final Map<String, Serializable> credentials;
-
-        public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService, final Map<String, Serializable> credentials) {
-            this.loginService = loginService;
-            this.identityService = identityService;
-            this.credentials = credentials;
-        }
-
-        @Override
-        public SSession call() throws Exception {
-            SessionAccessor sessionAccessor = null;
-            SSession session;
-            try {
-                session = loginService.login(credentials);
-                if (!session.isTechnicalUser()) {
-                    final Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), 0L);
-                    sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-                    sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                    final SUser sUser = identityService.getUserByUserName(session.getUserName());
-                    if (!sUser.isEnabled()) {
-                        throw new LoginException("Unable to login : the user is disable.");
-                    }
-                    final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
-                    final long lastConnection = System.currentTimeMillis();
-                    identityService.updateUser(sUser, userUpdateBuilder.updateLastConnection(lastConnection).done());
-                }
-            } catch (SUserNotFoundException e) {
-                throw new UnknownUserException("Unable to find user in database.");
-            } finally {
-                if (sessionAccessor != null) {
-                    sessionAccessor.deleteSessionId();
-                }
-            }
-            return session;
-        }
-
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {

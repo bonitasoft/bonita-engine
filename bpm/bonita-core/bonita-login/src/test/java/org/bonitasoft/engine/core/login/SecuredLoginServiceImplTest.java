@@ -15,7 +15,13 @@ package org.bonitasoft.engine.core.login;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -23,8 +29,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
@@ -32,9 +40,11 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.session.model.impl.SSessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,9 +72,21 @@ public class SecuredLoginServiceImplTest {
     private TechnicalLoggerService logger;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
                 sessionAccessor, identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS));
+        //return a session with given arguments
+        when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean()))
+                .thenAnswer(invok -> {
+                    SSessionImpl session = new SSessionImpl(UUID.randomUUID().getLeastSignificantBits(),
+                            invok.getArgument(0),
+                            invok.getArgument(2),
+                            "myApp",
+                            invok.getArgument(1));
+                    session.setTechnicalUser(invok.getArgument(3));
+                    return session;
+                });
+
     }
 
     @Test
@@ -138,8 +160,8 @@ public class SecuredLoginServiceImplTest {
     @Test
     public void testSecuredLoginServiceWithInvalidPlatformCredentialsWithGenericAuthenticationService() throws Exception {
         final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = new Long(1);
-        final Long userId = new Long(-1);
+        final Long tenantId = 1L;
+        final Long userId = -1L;
         final String login = "julien";
         final String password = "julien";
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
@@ -162,31 +184,21 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testSecuredLoginServiceWithPlatformCredentialsWithGenericAuthenticationService() throws Exception {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = new Long(1);
-        final Long userId = new Long(-1);
-        final String login = TECH_USER_NAME;
-        final String password = TECH_USER_PASS;
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, -1L, TECH_USER_NAME, true)).thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMap());
         verify(sessionAccessor, times(1)).deleteSessionId();
-        verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
+        verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true);
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
     @Test
     public void testSecuredLoginServiceWithPlatformCredentials() throws Exception {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, TENANT_ID);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, TECH_USER_NAME);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, TECH_USER_PASS);
+        final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
 
         final SSession sSession = mock(SSession.class);
         when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true)).thenReturn(sSession);
@@ -201,140 +213,148 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void testSecuredLoginServiceWithStandardUserCredentials() throws Exception {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        final Long tenantId = 1L;
-        final Long userId = 112345L;
-        final String login = "julien";
-        final String password = "julien";
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        final Map<String, Serializable> credentials = credentials("julien", "julien", TENANT_ID);
 
         final SSession sSession = mock(SSession.class);
         final SUser sUser = mock(SUser.class);
+        doReturn(true).when(sUser).isEnabled();
 
-        when(sUser.getId()).thenReturn(userId);
-        when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
-        when(sessionService.createSession(tenantId, userId, login, false)).thenReturn(sSession);
-        when(identityService.getUserByUserName(login)).thenReturn(sUser);
+        when(sUser.getId()).thenReturn(112345L);
+        when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn("julien");
+        when(sessionService.createSession(TENANT_ID, 112345L, "julien", false)).thenReturn(sSession);
+        when(identityService.getUserByUserName("julien")).thenReturn(sUser);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(1)).checkUserCredentials(credentials);
         verify(sessionAccessor, times(1)).deleteSessionId();
-        verify(sessionService, times(1)).createSession(tenantId, userId, login, false);
+        verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false);
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
     @Test
-    public void testRetrievePasswordFromCredentials() throws Exception {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        final String password = "julien";
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-
-        assertThat(securedLoginServiceImpl.retrievePasswordFromCredentials(credentials)).isEqualTo(password);
-    }
-
-    @Test
-    public void testRetrievePasswordFromEmptyCredentials() {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        try {
-            securedLoginServiceImpl.retrievePasswordFromCredentials(credentials);
-            fail();
-        } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, password is absent");
-        }
-    }
-
-    @Test
-    public void testRetrievePasswordFromNullPassword() {
+    public void should_fail_if_no_password_is_provided() {
         final Map<String, Serializable> credentials = new HashMap<>();
         final String password = null;
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         try {
-            securedLoginServiceImpl.retrievePasswordFromCredentials(credentials);
+            securedLoginServiceImpl.login(credentials);
             fail();
         } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, password is absent");
+            assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
     }
 
-    @Test
-    public void testRetrievePasswordFromNullCredentials() {
-        try {
-            securedLoginServiceImpl.retrievePasswordFromCredentials(null);
-            fail();
-        } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, password is absent");
-        }
-    }
 
     @Test
-    public void testRetrieveUsernameFromCredentials() throws Exception {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        final String username = "julien";
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, username);
-
-        assertThat(securedLoginServiceImpl.retrievePasswordFromCredentials(credentials)).isEqualTo(username);
-    }
-
-    @Test
-    public void testRetrieveUserNameFromEmptyCredentials() {
+    public void should_fail_if_credentials_are_empty() {
         final Map<String, Serializable> credentials = new HashMap<>();
         try {
-            securedLoginServiceImpl.retrieveUsernameFromCredentials(credentials);
+            securedLoginServiceImpl.login(credentials);
             fail();
         } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, username is blank");
+            assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
     }
 
     @Test
-    public void testRetrieveUserNameFromBlankPassword() {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        final String username = "   ";
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, username);
+    public void should_fail_if_username_is_blank() throws Exception {
+        havingUser("   ", "password", 1L);
         try {
-            securedLoginServiceImpl.retrieveUsernameFromCredentials(credentials);
+            securedLoginServiceImpl.login(credentials("   ", "password", 1L));
             fail();
         } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, username is blank");
+            assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
     }
 
     @Test
-    public void testRetrieveUserNameFromNullPassword() {
-        final Map<String, Serializable> credentials = new HashMap<>();
-        final String username = null;
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, username);
+    public void should_fail_if_password_does_not_match() throws Exception {
+        havingUser("a", "password1", 1L);
         try {
-            securedLoginServiceImpl.retrieveUsernameFromCredentials(credentials);
+            securedLoginServiceImpl.login(credentials("a", "password2", 1L));
             fail();
         } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, username is blank");
+            assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
     }
 
+
     @Test
-    public void testRetrieveUserNameFromNullCredentials() {
+    public void should_fail_when_given_null_credentials() {
         try {
-            securedLoginServiceImpl.retrieveUsernameFromCredentials(null);
+            securedLoginServiceImpl.login(null);
             fail();
         } catch (final Exception e) {
-            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, username is blank");
+            assertThat(e.getMessage()).isEqualToIgnoringCase("invalid credentials, map is null");
+        }
+    }
+
+
+    @Test
+    public void should_login_with_technical_user() throws Exception {
+        SSession session = securedLoginServiceImpl.login(credentials(TECH_USER_NAME, TECH_USER_PASS, 1L));
+
+        assertThat(session).hasFieldOrPropertyWithValue("tenantId", 1L)
+                .hasFieldOrPropertyWithValue("userName", TECH_USER_NAME)
+                .hasFieldOrPropertyWithValue("userId", -1L)
+                .hasFieldOrPropertyWithValue("technicalUser", true);
+    }
+
+    @Test
+    public void should_login_with_existing_user() throws Exception {
+        SUserImpl user = havingUser("john", "bpm", 42L);
+
+        SSession session = securedLoginServiceImpl.login(credentials("john", "bpm", 42));
+
+        assertThat(session).hasFieldOrPropertyWithValue("tenantId", 42L)
+                .hasFieldOrPropertyWithValue("userName", "john")
+                .hasFieldOrPropertyWithValue("userId", user.getId())
+                .hasFieldOrPropertyWithValue("technicalUser", false);
+    }
+
+    @Test
+    public void should_fail_if_user_is_disabled() throws Exception {
+        SUserImpl user = havingUser("john", "bpm", 42L);
+        user.setEnabled(false);
+        try {
+            securedLoginServiceImpl.login(credentials("john", "bpm", 42L));
+            fail();
+        } catch (SLoginException e) {
+            assertThat(e.getMessage()).isEqualToIgnoringCase("Unable to login : the user is disable.");
         }
     }
 
     @Test
-    public void should_login_with_technical_user__return_technical_session() throws Exception {
+    public void should_update_last_connection_date_when_successfully_connected() throws Exception {
+        SUserImpl user = havingUser("john", "bpm", 42L);
+
+        securedLoginServiceImpl.login(credentials("john", "bpm", 42));
+
+        verify(identityService).updateUser(eq(user), argThat(e -> e.getFields().keySet().equals(Collections.singleton("lastConnection"))));
+    }
+
+    private Map<String, Serializable> credentials(String username, String password, long tenantId) {
         final Map<String, Serializable> credentials = new HashMap<>();
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, 1L);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, TECH_USER_NAME);
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, TECH_USER_PASS);
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        return credentials;
+    }
 
-        securedLoginServiceImpl.login(credentials);
 
-        verify(sessionService).createSession(1, -1, TECH_USER_NAME, true);
+    private SUserImpl havingUser(String username, String password, long tenantId) throws Exception {
+        SUserImpl user = new SUserImpl();
+        user.setId(UUID.randomUUID().getLeastSignificantBits());
+        user.setUserName(username);
+        user.setPassword(password);
+        user.setEnabled(true);
+        doReturn(user).when(identityService).getUserByUserName(username);
+
+
+        doReturn(username).when(genericAuthenticationService).checkUserCredentials(eq(credentials(username, password, tenantId)));
+
+        return user;
     }
 
 }
