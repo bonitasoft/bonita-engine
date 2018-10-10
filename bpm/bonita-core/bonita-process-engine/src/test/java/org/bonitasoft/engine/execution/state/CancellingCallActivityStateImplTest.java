@@ -35,6 +35,7 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
@@ -76,6 +77,8 @@ public class CancellingCallActivityStateImplTest {
     private ArchiveService archiveService;
     @Mock
     private ActivityInstanceService flowNodeInstanceService;
+    @Mock
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
     @Before
     public void before() throws Exception {

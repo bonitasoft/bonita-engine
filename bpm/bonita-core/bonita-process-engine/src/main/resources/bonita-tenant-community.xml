@@ -124,6 +124,14 @@
         <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="processInstanceInterruptor" ref="processInstanceInterruptor" />
+    </bean>
+
+    <bean id="processInstanceInterruptor" class="org.bonitasoft.engine.execution.ProcessInstanceInterruptor">
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -140,6 +148,7 @@
         <constructor-arg name="messagesHandlingService" ref="messagesHandlingService" />
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="workFactory" ref="workFactory" />
+        <constructor-arg name="processInstanceInterruptor" ref="processInstanceInterruptor" />
     </bean>
 
 
