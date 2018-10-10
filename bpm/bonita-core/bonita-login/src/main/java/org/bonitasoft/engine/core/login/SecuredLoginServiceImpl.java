@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.login;
 
+import static org.bonitasoft.engine.authentication.AuthenticationConstants.BASIC_USERNAME;
+import static org.bonitasoft.engine.identity.model.builder.impl.SUserUpdateBuilderImpl.updateBuilder;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -23,6 +26,7 @@ import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.identity.SUserUpdateException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -63,104 +67,100 @@ public class SecuredLoginServiceImpl implements LoginService {
     @Override
     public SSession login(final Map<String, Serializable> credentials) throws SLoginException, SUserNotFoundException {
         debugLog("Logging in");
-        if (credentials == null) {
-            throw new SLoginException("invalid credentials, map is null");
-        }
-        final Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
+        checkNull(credentials);
+        Long tenantId = extractTenant(credentials);
+        String userNameFromCredentials = extractUserName(credentials);
         sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
-        long userId = 0;
-        boolean isTechnicalUser = false;
-        String userName = null;
         try {
-            if (credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) && credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
-                userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
-            }
-
-            if (technicalUser.getUserName().equals(userName)
-                    && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)))) {
+            if (isTechnicalUser(credentials, userNameFromCredentials)) {
                 debugLog("Authenticated as technical user");
-                isTechnicalUser = true;
-                userId = -1;
+                return createSession(tenantId, userNameFromCredentials, -1L, true);
             } else {
-                userName = authenticationService.checkUserCredentials(credentials);
-                if (StringUtils.isNotBlank(userName)) {
-                    debugLog("Authenticated as regular user");
-                    final SUser user = identityService.getUserByUserName(userName);
-                    userId = user.getId();
-                } else {
-                    debugLog("Authentication failed");
-                    // now we are sure authentication Failed
-                    authenticationFailed();
-                }
+                String userName = verifyCredentials(credentials);
+                checkIsBlank(userName);
+                debugLog("Authenticated as regular user");
+                SUser user = getUser(userName);
+                checkIsEnabled(user);
+                SSession session = createSession(tenantId, userName, user.getId(), false);
+                updateLastConnectionDate(user);
+                return session;
             }
-        } catch (final AuthenticationException ae) {
-            debugLog("Unable to authenticate user with username " + userName);
-            throw new SLoginException(ae);
-        } catch (final SUserNotFoundException e) {
-            debugLog("Unable to find user with username " + userName + " in database.");
-            throw e;
         } finally {
             // clean session accessor
             sessionAccessor.deleteSessionId();
         }
+    }
+
+    private void updateLastConnectionDate(SUser user) throws SLoginException {
         try {
-            debugLog("Session creation");
-            return sessionService.createSession(tenantId, userId, userName, isTechnicalUser);
-        } catch (final SSessionException e) {
+            identityService.updateUser(user, updateBuilder().updateLastConnection(System.currentTimeMillis()).done());
+        } catch (SUserUpdateException e) {
             throw new SLoginException(e);
         }
     }
 
-    /**
-     * Processes the failed authentication behaviour.
-     * 
-     * @throws SLoginException
-     *         the appropriate exception
-     */
-    protected void authenticationFailed() throws SLoginException {
+    private long extractTenant(Map<String, Serializable> credentials) {
+        return NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
+    }
+
+    private void checkNull(Map<String, Serializable> credentials) throws SLoginException {
+        if (credentials == null) {
+            throw new SLoginException("invalid credentials, map is null");
+        }
+    }
+
+    private SSession createSession(Long tenantId, String userName, long id, boolean b) throws SLoginException {
         try {
-            Thread.sleep(3000);
-        } catch (final InterruptedException e) {
+            return sessionService.createSession(tenantId, id, userName, b);
+        } catch (SSessionException e) {
+            throw new SLoginException(e);
+        }
+    }
+
+    private void checkIsEnabled(SUser user) throws SLoginException {
+        if (!user.isEnabled()) {
+            throw new SLoginException("Unable to login : the user is disable.");
+        }
+    }
+
+    private void checkIsBlank(String userName) throws SLoginException {
+        if (StringUtils.isBlank(userName)) {
+            debugLog("Authentication failed");
+            // now we are sure authentication Failed
             throw new SLoginException("User name or password is not valid!");
         }
-        throw new SLoginException("User name or password is not valid!");
     }
 
-    /**
-     * retrieve password from credentials assuming it is stored under the {@link AuthenticationConstants#BASIC_PASSWORD} key
-     * 
-     * @param credentials
-     *        the credentials to check
-     * @return the password
-     * @throws SLoginException
-     *         if password is absent or if credentials is null
-     */
-    protected String retrievePasswordFromCredentials(final Map<String, Serializable> credentials) throws SLoginException {
-        if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_PASSWORD)
-                || credentials.get(AuthenticationConstants.BASIC_PASSWORD) == null) {
-            throw new SLoginException("invalid credentials, password is absent");
+    private SUser getUser(String userName) throws SUserNotFoundException {
+        try {
+            return identityService.getUserByUserName(userName);
+        } catch (SUserNotFoundException e) {
+            debugLog("Unable to find user with username " + userName + " in database.");
+            throw e;
         }
-        return String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
     }
 
-    /**
-     * retrieve username from credentials assuming it is stored under the {@link AuthenticationConstants#BASIC_USERNAME} key
-     * 
-     * @param credentials
-     *        the credentials to check
-     * @return the username
-     * @throws SLoginException
-     *         if username is absent, blank or if credentials is null
-     */
-    protected String retrieveUsernameFromCredentials(final Map<String, Serializable> credentials) throws SLoginException {
-        String userName;
-        if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_USERNAME)
-                || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null
-                || StringUtils.isBlank(userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)))) {
-            throw new SLoginException("invalid credentials, username is blank");
+    private String verifyCredentials(Map<String, Serializable> credentials) throws SLoginException {
+        try {
+            return authenticationService.checkUserCredentials(credentials);
+        } catch (AuthenticationException e) {
+            debugLog("Unable to authenticate user with username " + credentials.get(BASIC_USERNAME));
+            throw new SLoginException(e);
         }
-        return userName;
     }
+
+    private boolean isTechnicalUser(Map<String, Serializable> credentials, String userName) {
+        return technicalUser.getUserName().equals(userName)
+                && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)));
+    }
+
+    private String extractUserName(Map<String, Serializable> credentials) {
+        if (credentials.containsKey(BASIC_USERNAME) && credentials.get(BASIC_USERNAME) != null) {
+            return String.valueOf(credentials.get(BASIC_USERNAME));
+        }
+        return null;
+    }
+
 
     @Override
     public void logout(final long sessionId) throws SSessionNotFoundException {
@@ -176,7 +176,7 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    protected void debugLog(String message) {
+    private void debugLog(String message) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
