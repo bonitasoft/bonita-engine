@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import static org.bonitasoft.engine.persistence.QueryOptions.ALL_RESULTS;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -129,7 +131,7 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfile getProfile(final long profileId) throws SProfileNotFoundException {
         logBeforeMethod("getProfile");
         try {
-            final SelectByIdDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getElementById(SProfile.class, "Profile", profileId);
+            final SelectByIdDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getElementById(SProfile.class, profileId);
             final SProfile profile = persistenceService.selectById(descriptor);
             if (profile == null) {
                 throw new SProfileNotFoundException("No profile exists with id: " + profileId);
@@ -143,20 +145,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public SProfile getProfileByName(final String profileName) throws SProfileNotFoundException {
-        logBeforeMethod("getProfileByName");
-        try {
-            final SelectOneDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getElementByNameDescriptor(SProfile.class, "Profile", profileName);
-            final SProfile profile = persistenceService.selectOne(descriptor);
-            if (profile == null) {
-                throw new SProfileNotFoundException("No profile exists with name: " + profileName);
-            }
-            logAfterMethod("getProfileByName");
-            return profile;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod("getProfileByName", e);
-            throw new SProfileNotFoundException(e);
+    public SProfile getProfileByName(final String profileName) throws SProfileNotFoundException, SBonitaReadException {
+        final SelectOneDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getElementByNameDescriptor(SProfile.class, "Profile", profileName);
+        final SProfile profile = persistenceService.selectOne(descriptor);
+        if (profile == null) {
+            throw new SProfileNotFoundException("No profile exists with name: " + profileName);
         }
+        return profile;
     }
 
     @Override
@@ -233,13 +228,10 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void deleteAllProfileEntriesOfProfile(final SProfile profile) throws SProfileEntryDeletionException {
         try {
-            List<SProfileEntry> entries;
-            do {
-                entries = getEntriesOfProfile(profile.getId(), 0, BATCH_NUMBER, "id", OrderByType.ASC);
-                for (final SProfileEntry entry : entries) {
+            List<SProfileEntry> entries = getEntriesOfProfile(profile);
+            for (final SProfileEntry entry : entries) {
                     deleteProfileEntry(entry);
                 }
-            } while (!entries.isEmpty());
         } catch (final SBonitaReadException e) {
             throw new SProfileEntryDeletionException(e);
         }
@@ -258,7 +250,7 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfileEntry getProfileEntry(final long profileEntryId) throws SProfileEntryNotFoundException {
         logBeforeMethod("getProfileEntry");
         try {
-            final SelectByIdDescriptor<SProfileEntry> descriptor = SelectDescriptorBuilder.getElementById(SProfileEntry.class, "ProfileEntry", profileEntryId);
+            final SelectByIdDescriptor<SProfileEntry> descriptor = SelectDescriptorBuilder.getElementById(SProfileEntry.class, profileEntryId);
             final SProfileEntry profileEntry = persistenceService.selectById(descriptor);
             if (profileEntry == null) {
                 throw new SProfileEntryNotFoundException("No entry exists with id: " + profileEntryId);
@@ -272,33 +264,15 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<SProfileEntry> getEntriesOfProfile(final long profileId, final int fromIndex, final int numberOfProfileEntries, final String field,
-            final OrderByType order) throws SBonitaReadException {
-        logBeforeMethod("getEntriesOfProfile");
-        try {
-            final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, field, order,
-                    fromIndex, numberOfProfileEntries));
-            logAfterMethod("getEntriesOfProfile");
-            return listspEntries;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod("getEntriesOfProfile", bre);
-            throw bre;
-        }
+    public List<SProfileEntry> getEntriesOfProfile(String profileName) throws SBonitaReadException, SProfileNotFoundException {
+        SProfile profile = getProfileByName(profileName);
+        return getEntriesOfProfile(profile);
     }
 
-    @Override
-    public List<SProfileEntry> getEntriesOfProfileByParentId(final long profileId, final long parentId, final int fromIndex, final int numberOfProfileEntries,
-            final String field, final OrderByType order) throws SBonitaReadException {
-        logBeforeMethod("getEntriesOfProfileByParentId");
-        try {
-            final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, parentId, field,
-                    order, fromIndex, numberOfProfileEntries));
-            logAfterMethod("getEntriesOfProfileByParentId");
-            return listspEntries;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod("getEntriesOfProfileByParentId", bre);
-            throw bre;
-        }
+    private List<SProfileEntry> getEntriesOfProfile(SProfile profile) throws SBonitaReadException {
+        SelectListDescriptor<SProfileEntry> selectDescriptor = new SelectListDescriptor<>("getEntriesOfProfile",
+                Collections.singletonMap("profileId", profile.getId()), SProfileEntry.class, ALL_RESULTS);
+        return persistenceService.selectList(selectDescriptor);
     }
 
     @Override

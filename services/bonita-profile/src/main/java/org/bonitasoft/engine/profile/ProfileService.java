@@ -163,21 +163,12 @@ public interface ProfileService {
     SProfileEntry getProfileEntry(long profileEntryId) throws SProfileEntryNotFoundException;
 
     /**
-     * Get all profile entries having the given value for the given int index by profileId
-     *
-     * @param profileId
-     * @param fromIndex
-     *        first result to be considered(>=0)
-     * @param numberOfProfileEntry
-     *        the max number of profileEntry to be returned (>=0)
-     * @param field
-     * @param order
-     * @return all profile entries having the given value for the given int index by profileId
+     * @param profileName
+     * @return all profile entries of the profile
      * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry, String field, OrderByType order)
-            throws SBonitaReadException;
+    List<SProfileEntry> getEntriesOfProfile(String profileName) throws SBonitaReadException, SProfileNotFoundException;
 
     /**
      * Add new profile entry
@@ -416,7 +407,7 @@ public interface ProfileService {
      *         occurs when the identifier does not refer to an existing sProfile
      * @since 6.0
      */
-    SProfile getProfileByName(String profileName) throws SProfileNotFoundException;
+    SProfile getProfileByName(String profileName) throws SProfileNotFoundException, SBonitaReadException;
 
     /**
      * Get a list of profileMembers by the given profileId
@@ -427,20 +418,6 @@ public interface ProfileService {
      */
     List<SProfileMember> getProfileMembers(long profileId, QueryOptions queryOptions) throws SProfileMemberNotFoundException;
 
-    /**
-     * Get a list of profileEntries by the given profileId and parentId
-     *
-     * @param profileId
-     * @param parentId
-     * @param fromIndex
-     * @param numberOfProfileEntries
-     * @param field
-     * @param order
-     * @return a list of profileEntries
-     * @throws SBonitaReadException
-     */
-    List<SProfileEntry> getEntriesOfProfileByParentId(long profileId, long parentId, int fromIndex, int numberOfProfileEntries, String field, OrderByType order)
-            throws SBonitaReadException;
 
     /**
      * Delete all profile members for the connected tenant
