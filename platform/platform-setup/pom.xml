@@ -21,6 +21,11 @@
         </license>
     </licenses>
 
+    <properties>
+      <assembly_generation_skip>false</assembly_generation_skip>
+      <test_jar_generation_skip>false</test_jar_generation_skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-io</groupId>
@@ -154,57 +159,64 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>platform-setup-bos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <skipAssembly>${assembly_generation_skip}</skipAssembly>
+                            <finalName>Bonita-platform-setup-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <archiverConfig>
+                                <directoryMode>0750</directoryMode>
+                                <defaultDirectoryMode>0750</defaultDirectoryMode>
+                                <fileMode>0640</fileMode>
+                            </archiverConfig>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${test_jar_generation_skip}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
         <profile>
-            <id>package</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>platform-setup-bos</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <configuration>
-                                    <finalName>Bonita-platform-setup-${project.version}</finalName>
-                                    <appendAssemblyId>false</appendAssemblyId>
-                                    <descriptors>
-                                        <descriptor>assembly.xml</descriptor>
-                                    </descriptors>
-                                    <archiverConfig>
-                                        <directoryMode>0750</directoryMode>
-                                        <defaultDirectoryMode>0750</defaultDirectoryMode>
-                                        <fileMode>0640</fileMode>
-                                    </archiverConfig>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>test-jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <id>deploy</id>
+            <properties>
+              <assembly_generation_skip>true</assembly_generation_skip>
+              <test_jar_generation_skip>true</test_jar_generation_skip>
+            </properties>
         </profile>
         <profile>
-            <id>deploy</id>
+            <id>javadoc</id>
+            <properties>
+                <maven.javadoc.skip>false</maven.javadoc.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
