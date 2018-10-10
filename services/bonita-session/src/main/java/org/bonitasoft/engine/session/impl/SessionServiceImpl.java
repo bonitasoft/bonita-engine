@@ -15,9 +15,6 @@ package org.bonitasoft.engine.session.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionException;
@@ -25,7 +22,6 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.session.model.builder.SSessionBuilderFactory;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
@@ -59,10 +55,18 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public SSession createSession(final long tenantId, final long userId, final String userName, final boolean isTechnicalUser) throws SSessionException {
         final long id = SessionIdGenerator.getNextId();
-        final long duration = getSessionDuration();
-
-        final SSession session = BuilderFactory.get(SSessionBuilderFactory.class)
-                .createNewInstance(id, tenantId, duration, userName, applicationName, userId).technicalUser(isTechnicalUser).done();
+        Date now = new Date();
+        SSession session = SSession.builder()
+                .id(id)
+                .tenantId(tenantId)
+                .duration(sessionDuration)
+                .userName(userName)
+                .applicationName(applicationName)
+                .userId(userId)
+                .technicalUser(isTechnicalUser)
+                .creationDate(now)
+                .lastRenewDate(now)
+                .build();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "CreateSession with tenantId = <" + tenantId + ">, username = <" + userName + ">, id = <"
@@ -74,43 +78,16 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void deleteSession(final long sessionId) throws SSessionNotFoundException {
         sessionProvider.removeSession(sessionId);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "DeleteSession with sessionId = <" + sessionId + ">");
-        }
     }
 
     @Override
     public boolean isValid(final long sessionId) throws SSessionNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "isValid"));
-        }
-        SSession session = null;
-        try {
-            session = sessionProvider.getSession(sessionId);
-        } catch (final SSessionNotFoundException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id = <" + sessionId + "> is invalid, because it does not exist.");
-            }
-            throw e;
-        }
-        final Date now = new Date();
-        final boolean isValid = session.getExpirationDate().getTime() > now.getTime();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "isValid"));
-        }
-        return isValid;
+        return sessionProvider.getSession(sessionId).getExpirationDate().getTime() > new Date().getTime();
     }
 
     @Override
     public SSession getSession(final long sessionId) throws SSessionNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getSession"));
-        }
-        final SSession session = sessionProvider.getSession(sessionId);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
-        }
-        return BuilderFactory.get(SSessionBuilderFactory.class).copy(session);
+        return sessionProvider.getSession(sessionId).toBuilder().build();
     }
 
     @Override
@@ -118,23 +95,15 @@ public class SessionServiceImpl implements SessionService {
         try {
             long sessionId = sessionAccessor.getSessionId();
             return sessionProvider.getSession(sessionId).getUserId();
-        } catch (SessionIdNotSetException e) {
-            return -1;
-        } catch (SSessionNotFoundException e) {
+        } catch (SessionIdNotSetException | SSessionNotFoundException e) {
             return -1;
         }
     }
 
     @Override
     public void setSessionDuration(final long duration) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "setSessionDuration"));
-        }
         if (duration <= 0) {
             throw new IllegalArgumentException("The duration must be greater then 0");
-        }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "setSessionDuration"));
         }
         sessionDuration = duration;
     }
@@ -151,22 +120,9 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void renewSession(final long sessionId) throws SSessionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "renewSession"));
-        }
         final SSession session = getSession(sessionId);
-        try {
-            ClassReflector.invokeSetter(session, "setLastRenewDate", Date.class, new Date());
-            sessionProvider.updateSession(session);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "renewSession"));
-            }
-        } catch (final Exception e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "renewSession", e));
-            }
-            throw new SSessionException(e);
-        }
+        SSession updatedSession = session.toBuilder().lastRenewDate(new Date()).build();
+        sessionProvider.updateSession(updatedSession);
     }
 
     @Override

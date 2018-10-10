@@ -26,7 +26,7 @@ import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class StarterThreadTest {
         starterThread = spy(new StarterThread(platformAccessor, tenantServiceAccessor, Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)));
         doReturn(tenantServiceAccessor).when(platformAccessor).getTenantServiceAccessor(1L);
         doReturn(sessionService).when(tenantServiceAccessor).getSessionService();
-        doReturn(new SSessionImpl(5432L, 231L, "SYSTEM", "", 42352L)).when(sessionService).createSession(anyLong(), anyString());
+        doReturn(SSession.builder().id(54L).tenantId(1).userName("SYSTEM").userId(12).build()).when(sessionService).createSession(anyLong(), anyString());
         doReturn(tenant).when(starterThread).getTenant(1L);
         doReturn(1L).when(tenantServiceAccessor).getTenantId();
         doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();

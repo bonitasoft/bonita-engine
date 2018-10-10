@@ -158,7 +158,7 @@ import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -317,7 +317,7 @@ public class ProcessAPIImplTest {
         SAProcessInstanceImpl value1 = new SAProcessInstanceImpl(sProcessInstance);
         value1.setId(ARCHIVED_PROCESS_INSTANCE_ID);
         when(processInstanceService.getArchivedProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(value1);
-        doReturn(new SSessionImpl(12354L, TENANT_ID, "john", "", 5432L)).when(processAPI).getSession();
+        doReturn(SSession.builder().id(54L).tenantId(1).userName("john").userId(12).build()).when(processAPI).getSession();
         doReturn("john").when(processAPI).getUserNameFromSession();
 
         when(tenantAccessor.getMessagesHandlingService()).thenReturn(messageHandlingService);
