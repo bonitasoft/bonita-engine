@@ -69,22 +69,20 @@ public class SecuredLoginServiceImpl implements LoginService {
         debugLog("Logging in");
         checkNull(credentials);
         Long tenantId = extractTenant(credentials);
-        String userNameFromCredentials = extractUserName(credentials);
         sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
         try {
-            if (isTechnicalUser(credentials, userNameFromCredentials)) {
+            if (isTechnicalUser(credentials)) {
                 debugLog("Authenticated as technical user");
-                return createSession(tenantId, userNameFromCredentials, -1L, true);
-            } else {
-                String userName = verifyCredentials(credentials);
-                checkIsBlank(userName);
-                debugLog("Authenticated as regular user");
-                SUser user = getUser(userName);
-                checkIsEnabled(user);
-                SSession session = createSession(tenantId, userName, user.getId(), false);
-                updateLastConnectionDate(user);
-                return session;
+                return createSession(tenantId, extractUserName(credentials), -1L, true);
             }
+            String userName = verifyCredentials(credentials);
+            checkIsNotBlank(userName);
+            debugLog("Authenticated as regular user");
+            SUser user = getUser(userName);
+            checkIsEnabled(user);
+            SSession session = createSession(tenantId, userName, user.getId(), false);
+            updateLastConnectionDate(user);
+            return session;
         } finally {
             // clean session accessor
             sessionAccessor.deleteSessionId();
@@ -123,7 +121,7 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    private void checkIsBlank(String userName) throws SLoginException {
+    private void checkIsNotBlank(String userName) throws SLoginException {
         if (StringUtils.isBlank(userName)) {
             debugLog("Authentication failed");
             // now we are sure authentication Failed
@@ -149,8 +147,8 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    private boolean isTechnicalUser(Map<String, Serializable> credentials, String userName) {
-        return technicalUser.getUserName().equals(userName)
+    private boolean isTechnicalUser(Map<String, Serializable> credentials) {
+        return technicalUser.getUserName().equals(extractUserName(credentials))
                 && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)));
     }
 
