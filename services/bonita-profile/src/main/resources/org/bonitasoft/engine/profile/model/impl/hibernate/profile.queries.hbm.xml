@@ -48,13 +48,6 @@
 		FROM org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
 		WHERE profileentry.profileId = :profileId
 	</query>
-	
-	<query name="getEntriesOfProfileByParentId">
-		SELECT profileentry
-		FROM org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl AS profileentry
-		WHERE profileentry.profileId = :profileId
-		AND profileentry.parentId = :parentId
-	</query>
 
 	<query name="getDirectProfileMembersOfUser">
 		SELECT pm

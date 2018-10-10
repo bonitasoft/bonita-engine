@@ -13,10 +13,12 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.Order;
@@ -30,15 +32,24 @@ import org.junit.Test;
  */
 public class ProfileEntryIT extends AbstractProfileIT {
 
+    public static final int NB_PROFILE_ENTRY_IN_ADMIN = 24;
+
     @Test
     public void searchProfileEntry() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, adminProfileId);
         builder.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
-        assertEquals(24, searchedProfileEntries.getCount());
+        assertEquals(NB_PROFILE_ENTRY_IN_ADMIN, searchedProfileEntries.getCount());
         final List<ProfileEntry> result = searchedProfileEntries.getResult();
         assertEquals(10, result.size());
+    }
+
+    @Test
+    public void should_getProfileEntries_of_a_profile() throws ProfileNotFoundException {
+        List<ProfileEntry> profileEntries = getProfileAPI().getProfileEntries("Administrator");
+
+        assertThat(profileEntries).hasSize(NB_PROFILE_ENTRY_IN_ADMIN);
     }
 
     @Test(expected = SearchException.class)

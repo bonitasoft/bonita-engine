@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -32,12 +33,15 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
 import org.bonitasoft.engine.profile.builder.impl.SProfileEntryUpdateBuilderImpl;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
+import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
+import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -97,6 +101,12 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntryImpl entry = new SProfileEntryImpl();
         entry.setId(id);
         return entry;
+    }
+    private SProfile profile(String name) {
+        final SProfileImpl profile = new SProfileImpl();
+        profile.setId(UUID.randomUUID().getLeastSignificantBits());
+        profile.setName(name);
+        return profile;
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -174,71 +184,34 @@ public class ProfileServiceImplForProfileEntryTest {
         profileServiceImpl.deleteProfileEntry(sProfileEntry);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getEntriesOfProfileByParentId(long, long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
-     * .
-     *
-     * @throws SBonitaReadException
-     */
     @Test
-    public final void getEntriesOfProfileByParentId() throws SBonitaReadException {
+    public final void getEntriesOfProfile() throws Exception {
         final List<SProfileEntry> sProfileEntries = new ArrayList<>();
         final SProfileEntry sProfileEntry = createProfileEntry(1);
         sProfileEntries.add(sProfileEntry);
 
+        doReturn(profile("myProfile")).when(persistenceService).selectOne(any());
         doReturn(sProfileEntries).when(persistenceService).selectList(any());
 
-        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, OrderByType.ASC));
+        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile("myProfile"));
     }
 
     @Test
-    public final void getNoEntriesOfProfileByParentId() throws SBonitaReadException {
-        final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
+    public final void getNoEntriesOfProfile() throws Exception {
+        final List<SProfileEntry> sProfileEntries = new ArrayList<>();
 
+        doReturn(profile("myProfile")).when(persistenceService).selectOne(any());
         doReturn(sProfileEntries).when(persistenceService).selectList(any());
 
-        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, OrderByType.ASC));
+        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile("myProfile"));
     }
 
     @Test(expected = SBonitaReadException.class)
-    public final void getEntriesOfProfileByParentIdThrowException() throws SBonitaReadException {
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
-
-        profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, null);
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getEntriesOfProfile(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
-     *
-     * @throws SBonitaReadException
-     */
-    @Test
-    public final void getEntriesOfProfile() throws SBonitaReadException {
-        final List<SProfileEntry> sProfileEntries = new ArrayList<>();
-        final SProfileEntry sProfileEntry = createProfileEntry(1);
-        sProfileEntries.add(sProfileEntry);
-
-        doReturn(sProfileEntries).when(persistenceService).selectList(any());
-
-        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, OrderByType.ASC));
-    }
-
-    @Test
-    public final void getNoEntriesOfProfile() throws SBonitaReadException {
-        final List<SProfileEntry> sProfileEntries = new ArrayList<>();
-
-        doReturn(sProfileEntries).when(persistenceService).selectList(any());
-
-        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, OrderByType.ASC));
-    }
-
-    @Test(expected = SBonitaReadException.class)
-    public final void getEntriesOfProfileThrowException() throws SBonitaReadException {
+    public final void getEntriesOfProfileThrowException() throws Exception {
         doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(any());
 
-        profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, null);
+        doReturn(profile("myProfile")).when(persistenceService).selectOne(any());
+        profileServiceImpl.getEntriesOfProfile("myProfile");
     }
 
     /**

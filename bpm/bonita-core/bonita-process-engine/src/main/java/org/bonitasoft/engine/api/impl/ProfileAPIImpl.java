@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,14 +40,17 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
+import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfileMember;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -140,27 +144,6 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
     }
 
-    protected String getQuerySuffix(final MemberType memberType) {
-        String suffix = null;
-        switch (memberType) {
-            case USER:
-                suffix = "ForUser";
-                break;
-            case GROUP:
-                suffix = "ForGroup";
-                break;
-            case ROLE:
-                suffix = "ForRole";
-                break;
-            case MEMBERSHIP:
-                suffix = "ForRoleAndGroup";
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        return suffix;
-    }
-
     @Override
     public Map<Long, Long> getNumberOfProfileMembers(final List<Long> profileIds) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -245,6 +228,19 @@ public class ProfileAPIImpl implements ProfileAPI {
             return searchProfileEntries.getResult();
         } catch (final SBonitaException e) {
             throw new SearchException(e);
+        }
+    }
+
+    @Override
+    public List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        ProfileService profileService = tenantAccessor.getProfileService();
+        try {
+            return ModelConvertor.toProfileEntries(profileService.getEntriesOfProfile(profileName));
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (SProfileNotFoundException e) {
+            throw new ProfileNotFoundException(e);
         }
     }
 

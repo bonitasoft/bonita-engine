@@ -107,7 +107,7 @@ public class NodeToApplicationConverter {
             try {
                 final SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
                 builder.setProfileId(profile.getId());
-            } catch (final SProfileNotFoundException e) {
+            } catch (final SProfileNotFoundException | SBonitaReadException e) {
                 importError = new ImportError(applicationNode.getProfile(), ImportError.Type.PROFILE);
             }
         }
