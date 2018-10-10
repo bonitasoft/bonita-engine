@@ -39,7 +39,7 @@ public class QueryOptions implements Serializable {
 
     public static final int UNLIMITED_NUMBER_OF_RESULTS = Integer.MAX_VALUE;
 
-    private static final QueryOptions ALL_RESULTS_QUERY_OPTIONS = new QueryOptions(0, UNLIMITED_NUMBER_OF_RESULTS);
+    public static final QueryOptions ALL_RESULTS = new QueryOptions(0, UNLIMITED_NUMBER_OF_RESULTS);
 
     public QueryOptions(final QueryOptions queryOptions) {
         super();
@@ -152,7 +152,7 @@ public class QueryOptions implements Serializable {
      * Just for get number of elements on a table
      */
     public static QueryOptions countQueryOptions() {
-        return ALL_RESULTS_QUERY_OPTIONS;
+        return ALL_RESULTS;
     }
 
     public static QueryOptions getNextPage(final QueryOptions queryOptions) {
