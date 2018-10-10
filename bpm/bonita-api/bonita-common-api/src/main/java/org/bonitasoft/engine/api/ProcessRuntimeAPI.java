@@ -1538,7 +1538,8 @@ public interface ProcessRuntimeAPI {
      * @param targetProcess
      *        An expression representing the target process name.
      * @param targetFlowNode
-     *        An expression representing the target flow node name.
+     *        An expression representing the target flow node name. Optional parameter that can be used to explicitly set the target flow node if the
+     *        message is caught by different flow nodes in the same process. If not necessary, pass null value.
      * @param messageContent
      *        A key-&gt;value map containing the message data, with the data name as key.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
@@ -1558,7 +1559,8 @@ public interface ProcessRuntimeAPI {
      * @param targetProcess
      *        An expression representing the target process name.
      * @param targetFlowNode
-     *        An expression representing the target flow node name.
+     *        An expression representing the target flow node name. Optional parameter that can be used to explicitly set the target flow node if the
+     *        message is caught by different flow nodes in the same process. If not necessary, pass null value.
      * @param messageContent
      *        A key-&gt;value map containing the message data, with the data name as key.
      * @param correlations
