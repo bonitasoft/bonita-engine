@@ -20,13 +20,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -44,7 +39,6 @@ import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.session.model.impl.SSessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,16 +71,14 @@ public class SecuredLoginServiceImplTest {
                 sessionAccessor, identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS));
         //return a session with given arguments
         when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean()))
-                .thenAnswer(invok -> {
-                    SSessionImpl session = new SSessionImpl(UUID.randomUUID().getLeastSignificantBits(),
-                            invok.getArgument(0),
-                            invok.getArgument(2),
-                            "myApp",
-                            invok.getArgument(1));
-                    session.setTechnicalUser(invok.getArgument(3));
-                    return session;
-                });
-
+                .thenAnswer(invok -> SSession.builder()
+                        .id(UUID.randomUUID().getLeastSignificantBits())
+                        .applicationName("myApp")
+                        .tenantId(invok.getArgument(0))
+                        .userId(invok.getArgument(1))
+                        .userName(invok.getArgument(2))
+                        .technicalUser(invok.getArgument(3))
+                        .build());
     }
 
     @Test
