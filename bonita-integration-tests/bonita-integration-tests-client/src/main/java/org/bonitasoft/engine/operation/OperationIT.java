@@ -30,6 +30,7 @@ import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -156,6 +157,8 @@ public class OperationIT extends TestWithUser {
         final String actorName = "Document supplier";
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("should_set_documents_with_operations", "1.0");
         processDefinitionBuilder.addActor(actorName).addDescription("Process documents");
+        processDefinitionBuilder.addDocumentDefinition("doc1");
+        processDefinitionBuilder.addDocumentDefinition("doc2").addDescription("Will receive the content of doc1");
         processDefinitionBuilder.addDocumentListDefinition("docList1");
         processDefinitionBuilder.addDocumentListDefinition("docList2").addDescription("Will receive the content of docList1");
 
@@ -173,7 +176,20 @@ public class OperationIT extends TestWithUser {
                                 List.class.getName(),
                                 // mimic what we have in BS-18741, force usage of document list reference as this is done
                                 // in the Studio (automatic dependencies resolution)
-                                new ExpressionBuilder().createDocumentListExpression("docList1"))));
+                                new ExpressionBuilder().createDocumentListExpression("docList1"))))
+                .addOperation(new OperationBuilder().createSetDocument("doc1",
+                        new ExpressionBuilder().createGroovyScriptExpression("setDoc1()",
+                                "new org.bonitasoft.engine.bpm.contract.FileInputValue('doc1.txt', 'content of doc1'.getBytes('UTF-8'))",
+                                FileInputValue.class.getName())))
+                .addOperation(new OperationBuilder().createSetDocument("doc2",
+                        new ExpressionBuilder().createGroovyScriptExpression("setDoc1ValueToDoc2()",
+                                "doc1",
+                                DocumentValue.class.getName()
+                                // mimic what we have in BS-18741, force usage of document reference as this is done
+                                // in the Studio (automatic dependencies resolution)
+                                , new ExpressionBuilder().createDocumentReferenceExpression("doc1")
+                        )))
+        ;
 
         processDefinitionBuilder.addUserTask("step2", actorName);
         processDefinitionBuilder.addTransition("step0", "step1");
@@ -184,7 +200,6 @@ public class OperationIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "step0", user);
         waitForUserTask(processInstance, "step2");
-
 
         SoftAssertions softly = new SoftAssertions();
 
@@ -198,6 +213,14 @@ public class OperationIT extends TestWithUser {
                 .hasSize(2)
                 .extracting(org.bonitasoft.engine.bpm.document.Document::getContentFileName)
                 .containsOnly("doc1.txt", "doc2.txt");
+
+        final org.bonitasoft.engine.bpm.document.Document doc1AfterExecution = getProcessAPI().getLastDocument(processInstance.getId(), "doc1");
+        softly.assertThat(doc1AfterExecution.hasContent()).isTrue();
+        softly.assertThat(doc1AfterExecution.getContentFileName()).isEqualTo("doc1.txt");
+
+        final org.bonitasoft.engine.bpm.document.Document doc2AfterExecution = getProcessAPI().getLastDocument(processInstance.getId(), "doc2");
+        softly.assertThat(doc2AfterExecution.hasContent()).isTrue();
+        softly.assertThat(doc2AfterExecution.getContentFileName()).isEqualTo("doc1.txt");
 
         disableAndDeleteProcess(processDefinition);
         softly.assertAll();
