@@ -18,39 +18,44 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
-import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.session.model.SSession;
+import org.junit.Before;
 import org.junit.Test;
 
 public class SessionProviderImplTest {
 
     private final SessionProvider sessionProvider = new SessionProviderImpl();
 
+    @Before
+    public void cleanSession() {
+        //session provider have a static map of sessions
+        sessionProvider.removeSessions();
+    }
+
     @Test
     public void testAddSession() throws Exception {
-        sessionProvider.addSession(new SSessionImpl(12, 2, "john", "TEST", 12));
+        sessionProvider.addSession(SSession.builder().id(12L).tenantId(1).userName("john").userId(12).build());
         assertNotNull(sessionProvider.getSession(12));
     }
 
     @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSession() throws Exception {
-        sessionProvider.addSession(new SSessionImpl(13, 2, "john", "TEST", 12));
+        sessionProvider.addSession(SSession.builder().id(12L).tenantId(1).userName("john").userId(12).build());
         sessionProvider.removeSession(12);
         sessionProvider.getSession(12);
     }
 
     @Test(expected = SSessionNotFoundException.class)
     public void testGetUnexistingSession() throws Exception {
-        sessionProvider.getSession(10l);
+        sessionProvider.getSession(10L);
     }
 
     @Test
     public void testDeleteSessionsOfTenantKeepTechnical() throws Exception {
         sessionProvider.removeSessions();
-        sessionProvider.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
-        SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
-        technicalSession.setTechnicalUser(true);
-        sessionProvider.addSession(technicalSession);
-        sessionProvider.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
+        sessionProvider.addSession(SSession.builder().id(54L).tenantId(3).userName("john").userId(12).build());
+        sessionProvider.addSession(SSession.builder().id(55L).tenantId(3).userName("john").userId(12).technicalUser(true).build());
+        sessionProvider.addSession(SSession.builder().id(56L).tenantId(1).userName("john").userId(12).build());
         sessionProvider.deleteSessionsOfTenant(3, true /* keep technical sessions */);
         sessionProvider.getSession(55);
         sessionProvider.getSession(56);
@@ -65,11 +70,9 @@ public class SessionProviderImplTest {
     @Test
     public void testDeleteSessionsOfTenant() throws Exception {
         sessionProvider.removeSessions();
-        sessionProvider.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
-        SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
-        technicalSession.setTechnicalUser(true);
-        sessionProvider.addSession(technicalSession);
-        sessionProvider.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
+        sessionProvider.addSession(SSession.builder().id(54L).tenantId(3).userName("john").userId(12).build());
+        sessionProvider.addSession(SSession.builder().id(55L).tenantId(3).userName("tech").userId(13).technicalUser(true).build());
+        sessionProvider.addSession(SSession.builder().id(56L).tenantId(1).userName("john").userId(14).build());
         sessionProvider.deleteSessionsOfTenant(3, false /* keep technical sessions */);
         sessionProvider.getSession(56);
         try {
