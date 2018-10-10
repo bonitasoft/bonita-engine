@@ -30,6 +30,9 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
         super();
         this.descriptor = descriptor;
     }
+    public static SUserUpdateBuilder updateBuilder() {
+        return new SUserUpdateBuilderImpl(new EntityUpdateDescriptor());
+    }
 
     @Override
     public EntityUpdateDescriptor done() {
@@ -94,9 +97,5 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     public SUserUpdateBuilder updateEnabled(final boolean enabled) {
         descriptor.addField(SUserBuilderFactoryImpl.ENABLED, enabled);
         return this;
-    }
-
-    public static SUserUpdateBuilder getInstance() {
-        return new SUserUpdateBuilderImpl(null);
     }
 }
