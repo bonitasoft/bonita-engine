@@ -16,102 +16,54 @@ package org.bonitasoft.engine.session.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Builder;
+import lombok.Data;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  */
-public interface SSession extends Serializable {
+@Data
+@Builder(toBuilder = true)
+public class SSession implements Serializable {
+
+    private long tenantId;
+    private final long id;
+    /**
+     * creation date (GMT+0)
+     */
+    private Date creationDate;
+    private long duration;
 
     /**
-     * Gets the tenantId associated to this session
-     * 
-     * @return
+     * last renew date (GMT+0)
      */
-    long getTenantId();
+    private Date lastRenewDate;
+    private String userName;
+    private long userId;
+    //FIXME: remove it, it looks like it is never set
+    private String clusterNode;
+    private String applicationName;
+    /**
+     * true if the user is the technical user: false otherwise
+     */
+    private boolean technicalUser;
+
 
     /**
-     * Gets the session's id
-     * 
-     * @return
+     * @return the expiration date (GMT+0)
      */
-    long getId();
+    public Date getExpirationDate() {
+        return new Date(lastRenewDate.getTime() + duration);
+    }
+
 
     /**
-     * Gets the session's creation date (GMT+0)
-     * 
-     * @return
+     * @return true if the session is still valid
      */
-    Date getCreationDate();
-
-    /**
-     * Gets the session's last renew date (GMT+0)
-     * 
-     * @return
-     */
-    Date getLastRenewDate();
-
-    /**
-     * Gets the session's duration
-     * 
-     * @return
-     */
-    long getDuration();
-
-    /**
-     * Gets the session's expiration date (GMT+0)
-     * 
-     * @return
-     */
-    Date getExpirationDate();
-
-    /**
-     * Gets the user name associated to this session
-     * 
-     * @return
-     */
-    String getUserName();
-
-    /**
-     * @return the Id of the user
-     */
-    long getUserId();
-
-    /**
-     * Checks whether the user is the technical user.
-     * 
-     * @return true if the user is the technical user: false otherwise
-     */
-    boolean isTechnicalUser();
-
-    /**
-     * Get client's IP associated to this session
-     * 
-     * @return
-     */
-    String getClientIP();
-
-    /**
-     * Get the cluster node when the engine is running in a cluster
-     * 
-     * @return
-     */
-    String getClusterNode();
-
-    /**
-     * Get the application's name. For instance, BPM, Case, RULES
-     * 
-     * @return
-     */
-    String getApplicationName();
-
-    /**
-     * Get the client application's name. For instance, User XP
-     * 
-     * @return
-     */
-    String getClientApplicationName();
-
-    boolean isValid();
+    public boolean isValid() {
+        return getExpirationDate().getTime() > System.currentTimeMillis();
+    }
 
 }

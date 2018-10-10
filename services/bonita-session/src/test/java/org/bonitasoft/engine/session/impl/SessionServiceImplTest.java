@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
-import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.junit.Before;
@@ -37,15 +37,10 @@ import org.mockito.MockitoAnnotations;
  */
 public class SessionServiceImplTest {
 
-    public static final long SESSION_ID = 1258l;
-
-    public static final long TENANT_ID = 2l;
-
-    public static final String USER_NAME = "john";
-
-    public static final String APPLICATION_NAME = "bonita";
-
-    public static final long USER_ID = 58l;
+    private static final long SESSION_ID = 1258L;
+    private static final long TENANT_ID = 2L;
+    private static final String USER_NAME = "john";
+    private static final long USER_ID = 58L;
 
     @Mock
     private TechnicalLoggerService logger;
@@ -58,12 +53,12 @@ public class SessionServiceImplTest {
 
     @InjectMocks
     private SessionServiceImpl sessionServiceImpl;
-    private SSessionImpl sSession;
+    private SSession sSession;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        sSession = new SSessionImpl(SESSION_ID, TENANT_ID, USER_NAME, APPLICATION_NAME, USER_ID);
+        sSession = SSession.builder().id(SESSION_ID).tenantId(TENANT_ID).userName(USER_NAME).userId(USER_ID).build();
     }
 
     /**
