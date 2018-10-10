@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,8 +14,11 @@
 package org.bonitasoft.engine.expression;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.eq;
+import static org.bonitasoft.engine.expression.ContainerState.ACTIVE;
+import static org.bonitasoft.engine.service.ModelConvertor.toDocument;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.impl.DocumentImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
@@ -32,7 +36,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.service.ModelConvertor;
+import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,19 +60,17 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     private ActivityInstanceService activityInstanceService;
     @InjectMocks
     private DocumentReferenceExpressionExecutorStrategy strategy;
+
     @Mock
     private SMappedDocument document;
     @Mock
     private SMappedDocument parentDocument;
     @Mock
     private SMappedDocument archivedDocument;
-    @Mock
-    SExpression expression;
-    @Mock
-    private SFlowNodeInstance flowNodeInstance;
 
     @Before
     public void setUp() throws Exception {
+        final SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(PROCESS_INSTANCE_ID);
         doReturn(PARENT_PROCESS_INSTANCE_ID).when(flowNodeInstance).getParentProcessInstanceId();
         doReturn(document).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), nullable(String.class));
@@ -78,46 +80,46 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluate_should_throw_an_exception_when_container_id_is_null() throws Exception {
-        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> emptyMap(), null, ContainerState.ACTIVE);
+        strategy.evaluate(Collections.emptyList(), emptyMap(), null, ACTIVE);
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluate_should_throw_an_exception_when_container_type_is_null() throws Exception {
-        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID), null,
-                ContainerState.ACTIVE);
+        strategy.evaluate(Collections.emptyList(), singletonMap("containerId", PROCESS_INSTANCE_ID), null,
+                ACTIVE);
     }
 
     @Test
     public void evaluate_result_should_contains_process_document_when_container_is_a_process_instance() throws Exception {
-        final Map<String, Object> dependencies = new HashMap<>();
-        dependencies.put("containerId", PROCESS_INSTANCE_ID);
-        dependencies.put("containerType", "PROCESS_INSTANCE");
+        final Map<String, Object> context = new HashMap<>();
+        context.put("containerId", PROCESS_INSTANCE_ID);
+        context.put("containerType", "PROCESS_INSTANCE");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
+        final List<Object> result = strategy.evaluate(asList(mock(SExpression.class)), context, null, ACTIVE);
 
-        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document, documentService));
+        assertThat(result).hasSize(1).contains(toDocument(document, documentService));
     }
 
     @Test
     public void evaluate_result_should_contains_parent_process_document_when_container_is_not_a_process_instance() throws Exception {
-        final Map<String, Object> dependencies = new HashMap<>();
-        dependencies.put("containerId", PROCESS_INSTANCE_ID);
-        dependencies.put("containerType", "OTHER");
+        final Map<String, Object> context = new HashMap<>();
+        context.put("containerId", PROCESS_INSTANCE_ID);
+        context.put("containerType", "OTHER");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
+        final List<Object> result = strategy.evaluate(asList(mock(SExpression.class)), context, null, ACTIVE);
 
-        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(parentDocument, documentService));
+        assertThat(result).hasSize(1).contains(toDocument(parentDocument, documentService));
     }
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID),
                 nullable(String.class));
-        final Map<String, Object> dependencies = new HashMap<>();
-        dependencies.put("containerId", PROCESS_INSTANCE_ID);
-        dependencies.put("containerType", "PROCESS_INSTANCE");
+        final Map<String, Object> context = new HashMap<>();
+        context.put("containerId", PROCESS_INSTANCE_ID);
+        context.put("containerType", "PROCESS_INSTANCE");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
+        final List<Object> result = strategy.evaluate(asList(mock(SExpression.class)), context, null, ACTIVE);
 
         assertThat(result).hasSize(1).contains((Document) null);
     }
@@ -126,26 +128,47 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID),
                 nullable(String.class));
-        final Map<String, Object> dependencies = new HashMap<>();
-        dependencies.put("containerId", PROCESS_INSTANCE_ID);
-        dependencies.put("containerType", "OTHER");
+        final Map<String, Object> context = new HashMap<>();
+        context.put("containerId", PROCESS_INSTANCE_ID);
+        context.put("containerType", "OTHER");
 
-        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null, ContainerState.ACTIVE);
+        final List<Object> result = strategy.evaluate(asList(mock(SExpression.class)), context, null, ACTIVE);
 
         assertThat(result).hasSize(1).contains((Document) null);
     }
 
     @Test
     public void evaluate_result_should_contains_archived_document_when_a_time_is_defined() throws Exception {
-        final Map<String, Object> dependencies = new HashMap<>();
-        dependencies.put("containerId", PROCESS_INSTANCE_ID);
-        dependencies.put("containerType", "PROCESS_INSTANCE");
-        dependencies.put("time", A_LONG_TIME_AGO);
+        final Map<String, Object> context = new HashMap<>();
+        context.put("containerId", PROCESS_INSTANCE_ID);
+        context.put("containerType", "PROCESS_INSTANCE");
+        context.put("time", A_LONG_TIME_AGO);
 
-        final List<Object> result = strategy.evaluate(Collections.singletonList(expression), dependencies, null,
-                ContainerState.ACTIVE);
+        final List<Object> result = strategy.evaluate(singletonList(mock(SExpression.class)), context,
+                null, ACTIVE);
 
-        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument, documentService));
+        assertThat(result).hasSize(1).contains(toDocument(archivedDocument, documentService));
+    }
+
+    @Test
+    public void evaluate_should_directly_return_the_document_when_it_is_already_in_the_context() throws Exception {
+        //given:
+        final Map<String, Object> context = new HashMap<>();
+        final DocumentImpl docInContext = new DocumentImpl();
+        final String docName = "docPreviouslyPutInContext";
+        context.put(docName, docInContext);
+
+        context.put("containerId", PROCESS_INSTANCE_ID);
+        context.put("containerType", "PROCESS_INSTANCE");
+        context.put("time", A_LONG_TIME_AGO);
+
+        //when:
+        final Object result = strategy.evaluate(expressionForDocument(docName), context, null,
+                ACTIVE);
+
+        //then:
+        assertThat(result).isSameAs(docInContext);
+        verifyZeroInteractions(documentService);
     }
 
     @Test
@@ -161,6 +184,18 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         verify(activityInstanceService).getMostRecentArchivedActivityInstance(containerId);
         assertThat(retrievedPIId).isEqualTo(processInstanceId);
-
     }
+
+    // =================================================================================================================
+    // UTILS
+    // =================================================================================================================
+
+    private static SExpressionImpl expressionForDocument(final String content) {
+        final SExpressionImpl expression = new SExpressionImpl();
+        expression.setContent(content);
+        expression.setReturnType(DocumentImpl.class.getName());
+        expression.setExpressionType(ExpressionType.TYPE_DOCUMENT.name());
+        return expression;
+    }
+
 }
