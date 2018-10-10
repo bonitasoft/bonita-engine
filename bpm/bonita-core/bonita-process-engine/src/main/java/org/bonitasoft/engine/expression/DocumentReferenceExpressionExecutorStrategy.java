@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -71,9 +71,14 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
         try {
             final long processInstanceId = getProcessInstance(containerId, containerType, time);
-            final ArrayList<Object> results = new ArrayList<>(expressions.size());
+            final List<Object> results = new ArrayList<>(expressions.size());
             for (final SExpression expression : expressions) {
-                results.add(getDocument(processInstanceId, expression, time));
+                final String docName = expression.getContent();
+                if (context.containsKey(docName)) {
+                    results.add(context.get(docName));
+                } else {
+                    results.add(getDocument(processInstanceId, expression, time));
+                }
             }
             return results;
         } catch (final SExpressionDependencyMissingException e) {
@@ -97,6 +102,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
+    // visible for testing
     long getProcessInstance(final Long containerId, final String containerType, Long time) throws SFlowNodeNotFoundException, SFlowNodeReadException,
             SExpressionDependencyMissingException, SActivityInstanceNotFoundException {
         if (containerId == null || containerType == null) {

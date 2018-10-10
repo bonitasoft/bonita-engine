@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -32,8 +38,21 @@ public class ReturnTypeChecker {
     private static final String PROCESS_INSTANCE_SCOPE = "PROCESS_INSTANCE";
 
     /**
-     * Check if the declared return type is compatible with the real Expression evaluation return type. If the result of the Expression evaluation is null, then
-     * this method returns true.
+     * Describes types that can be be converted later to other types.<br>
+     *     <li>key: the type which can be converted to
+     *     <li>values: the input types that can be converted to the <code>key</code> type
+     */
+    private static final Map<String, List<String>> CONVERTIBLE_TYPES = new HashMap<>();
+    static {
+        CONVERTIBLE_TYPES.put("org.bonitasoft.engine.bpm.document.Document",
+                asList("org.bonitasoft.engine.bpm.contract.FileInputValue"));
+        CONVERTIBLE_TYPES.put("org.bonitasoft.engine.bpm.document.DocumentValue",
+                asList("org.bonitasoft.engine.bpm.contract.FileInputValue"));
+    }
+
+    /**
+     * Check if the declared return type is compatible with the real Expression evaluation return type. If the result of
+     * the Expression evaluation is null, then this method returns <code>true</code>.
      *
      * @param expression
      *        the evaluated expression
@@ -43,18 +62,31 @@ public class ReturnTypeChecker {
      *         if the condition is not fulfilled, does nothing otherwise
      */
     public void checkReturnType(final SExpression expression, final Object result, final Map<String, Object> context) throws SExpressionEvaluationException {
-        if (result != null && !result.getClass().getName().equals(expression.getReturnType())) {
+        if (result == null) {
+            return;
+        }
+        final String declaredReturnType = expression.getReturnType();
+        final String evaluatedClassName = result.getClass().getName();
+        if (!evaluatedClassName.equals(declaredReturnType)) {
+            if (isConvertible(declaredReturnType, evaluatedClassName)) {
+                return;
+            }
+
             try {
+                final String expressionName = expression.getName();
                 try {
-                    final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
-                    final Class<?> evaluatedReturnedType = result.getClass();
-                    if (!declaredReturnedType.isAssignableFrom(evaluatedReturnedType)) {
-                        throw new SExpressionEvaluationException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
-                                + evaluatedReturnedType + " for expression " + expression.getName(), expression.getName());
+                    final Class<?> declaredReturnedClass = getClazz(declaredReturnType);
+                    final Class<?> evaluatedClass = result.getClass();
+                    if (!declaredReturnedClass.isAssignableFrom(evaluatedClass)) {
+                        throw new SExpressionEvaluationException(format(
+                                "Declared return type %s is not compatible with evaluated type %s for expression %s",
+                                declaredReturnedClass, evaluatedClass, expressionName), expressionName);
                     }
                 } catch (final ClassNotFoundException e) {
-                    throw new SExpressionEvaluationException("Declared return type unknown : " + expression.getReturnType() + " for expression "
-                            + expression.getName(), e, expression.getName());
+                    throw new SExpressionEvaluationException(
+                            format("Unknown declared return type %s for expression %s", declaredReturnType,
+                                    expressionName),
+                            e, expressionName);
                 }
             } catch (final SExpressionEvaluationException e) {
                 if (isContextOnActivity(context)) {
@@ -68,14 +100,20 @@ public class ReturnTypeChecker {
         }
     }
 
-    // process instance
-    // activity name
+    private static Class<?> getClazz(String type) throws ClassNotFoundException {
+        return Thread.currentThread().getContextClassLoader().loadClass(type);
+    }
 
-    protected boolean isContextOnProcess(final Map<String, Object> context) {
+    private static Boolean isConvertible(String targetType, String sourceType) {
+        return ofNullable(CONVERTIBLE_TYPES.get(targetType)).map(targets -> targets.contains(sourceType)).orElse(false);
+    }
+
+    private static boolean isContextOnProcess(final Map<String, Object> context) {
         return context.containsKey(CONTAINER_TYPE) && PROCESS_INSTANCE_SCOPE.equals(context.get(CONTAINER_TYPE));
     }
 
-    protected boolean isContextOnActivity(final Map<String, Object> context) {
+    private static boolean isContextOnActivity(final Map<String, Object> context) {
         return context.containsKey(CONTAINER_TYPE) && ACTIVITY_INSTANCE_SCOPE.equals(context.get(CONTAINER_TYPE));
     }
+
 }
