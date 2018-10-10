@@ -14,97 +14,101 @@
 
 package org.bonitasoft.engine.service.impl;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.bonitasoft.platform.configuration.model.BonitaConfiguration;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.mock.env.MockEnvironment;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * @author Baptiste Mesta
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SpringBeanAccessorTest {
 
+    private List<String> springFilesFromClasspath = new ArrayList<>();
+    private List<BonitaConfiguration> configurationFromDatabase = new ArrayList<>();
     private SpringBeanAccessor springBeanAccessor;
-    @Mock
-    private BonitaSpringContext context;
 
     private Properties contextProperties = new Properties();
-    private ConfigurableEnvironment environment = new MockEnvironment();
 
-    @Before
-    public void before() throws Exception {
+    @Rule
+    public EnvironmentVariables envVar = new EnvironmentVariables();
+    @Rule
+    public RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
+
+    private void createSpringContext() {
         springBeanAccessor = createSpringBeanAccessor();
-        doReturn(context).when(springBeanAccessor).createContext();
-        doReturn(environment).when(context).getEnvironment();
-        doReturn(true).when(springBeanAccessor).isCluster();
     }
 
     private SpringBeanAccessor createSpringBeanAccessor() {
-        SpringBeanAccessor springBeanAccessor = spy(new SpringBeanAccessor(null) {
+        FileSystemXmlApplicationContext parent = new FileSystemXmlApplicationContext();
+        parent.refresh();
+        return new SpringBeanAccessor(parent) {
 
             @Override
-            protected Properties getProperties() throws IOException {
+            protected Properties getProperties() {
                 return contextProperties;
             }
 
             @Override
-            protected List<BonitaConfiguration> getConfigurationFromDatabase() throws IOException {
-                return Collections.emptyList();
+            protected List<BonitaConfiguration> getConfigurationFromDatabase() {
+                return configurationFromDatabase;
+            }
+
+            @Override
+            protected boolean isCluster() {
+                return false;
             }
 
             @Override
             protected List<String> getSpringFileFromClassPath(boolean cluster) {
-                return Collections.emptyList();
+                return springFilesFromClasspath;
             }
-        });
-        return springBeanAccessor;
+        };
     }
 
     @Test
-    public void should_getContext_create_context_using_classpathResources() throws Exception {
-        //given
-        doReturn(Arrays.asList("classpathResource1", "classpathResource2")).when(springBeanAccessor).getSpringFileFromClassPath(anyBoolean());
+    public void should_getContext_create_context_using_classpathResources() {
+        //given: these resources exists in the classpath (or else they are not added)
+        springFilesFromClasspath.add("classpathresource1");
+        springFilesFromClasspath.add("classpathresource2");
+        createSpringContext();
         //when
-        springBeanAccessor.getContext();
-        //then
-        InOrder inOrder = inOrder(context);
-        inOrder.verify(context).addClassPathResource("classpathResource1");
-        inOrder.verify(context).addClassPathResource("classpathResource2");
+        BonitaSpringContext context = (BonitaSpringContext) springBeanAccessor.getContext();
+        //then: the resources in spring context are ClassPathResources with path as follow
+        assertThat(asList(context.getConfigResources())).extracting("path").containsExactly("classpathresource1", "classpathresource2");
     }
 
     @Test
-    public void should_getContext_create_context_using_BonitaConfiguration() throws Exception {
+    public void should_create_context_using_BonitaConfiguration_as_byte_array_resources() {
         //given
-        BonitaConfiguration res1 = new BonitaConfiguration("res1", "c1".getBytes());
-        BonitaConfiguration res2 = new BonitaConfiguration("res2", "c2".getBytes());
-        doReturn(Arrays.asList(res1, res2)).when(springBeanAccessor).getConfigurationFromDatabase();
+        String xmlFile = "<beans xmlns=\"http://www.springframework.org/schema/beans\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                "xsi:schemaLocation=\"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd\"/>";
+        BonitaConfiguration res1 = new BonitaConfiguration("res1", xmlFile.getBytes());
+        BonitaConfiguration res2 = new BonitaConfiguration("res2", xmlFile.getBytes());
+        configurationFromDatabase.add(res1);
+        configurationFromDatabase.add(res2);
+        createSpringContext();
         //when
-        springBeanAccessor.getContext();
-        //then
-        InOrder inOrder = inOrder(context);
-        inOrder.verify(context).addByteArrayResource(res1);
-        inOrder.verify(context).addByteArrayResource(res2);
+        BonitaSpringContext context = (BonitaSpringContext) springBeanAccessor.getContext();
+        //then: the resources in spring context are ByteArrayResource with generated description as follow
+        assertThat(asList(context.getConfigResources())).extracting("description")
+                .containsExactly("Byte array resource [res1]", "Byte array resource [res2]");
     }
 
     @Test
-    public void should_populate_environment_with_properties() throws Exception {
+    public void should_populate_environment_with_properties() {
         contextProperties.setProperty("a.property", "itsValue");
+        createSpringContext();
 
         ApplicationContext context = springBeanAccessor.getContext();
 
@@ -112,8 +116,30 @@ public class SpringBeanAccessorTest {
     }
 
     @Test
-    public void should_getPropertyWithPlaceholder_with_placeholder_return_system_property() throws Exception {
+    public void should_create_context_with_properties_from_database_that_override_env() {
+        contextProperties.setProperty("myProperty", "databaseValue");
+        envVar.set("myProperty", "envValue");
+        createSpringContext();
+
+        ApplicationContext context = springBeanAccessor.getContext();
+
+        assertThat(context.getEnvironment().getProperty("myProperty")).isEqualTo("databaseValue");
+    }
+    @Test
+    public void should_create_context_with_properties_from_database_that_override_system_properties() {
+        contextProperties.setProperty("myProperty", "databaseValue");
+        System.setProperty("myProperty", "sysPropValue");
+        createSpringContext();
+
+        ApplicationContext context = springBeanAccessor.getContext();
+
+        assertThat(context.getEnvironment().getProperty("myProperty")).isEqualTo("databaseValue");
+    }
+
+    @Test
+    public void should_getPropertyWithPlaceholder_with_placeholder_return_system_property() {
         //given
+        createSpringContext();
         Properties properties = new Properties();
         properties.setProperty("myTestProperty", "${system.test.property:default value if not set in system properties}");
         System.setProperty("system.test.property", "the value set in syst properties");
@@ -125,8 +151,9 @@ public class SpringBeanAccessorTest {
     }
 
     @Test
-    public void should_getPropertyWithPlaceholder_with_placeholder_return_default_value_from_property() throws Exception {
+    public void should_getPropertyWithPlaceholder_with_placeholder_return_default_value_from_property() {
         //given
+        createSpringContext();
         Properties properties = new Properties();
         properties.setProperty("myTestProperty", "${system.test.property2:default value if not set in system properties}");
         //when
@@ -137,8 +164,9 @@ public class SpringBeanAccessorTest {
     }
 
     @Test
-    public void should_getPropertyWithPlaceholder_without_placeholder_return_default_value() throws Exception {
+    public void should_getPropertyWithPlaceholder_without_placeholder_return_default_value() {
         //given
+        createSpringContext();
         Properties properties = new Properties();
         //when
         String value = springBeanAccessor.getPropertyWithPlaceholder(properties, "myTestProperty", "default");
@@ -148,8 +176,9 @@ public class SpringBeanAccessorTest {
     }
 
     @Test
-    public void should_getPropertyWithPlaceholder_without_placeholder_return_value() throws Exception {
+    public void should_getPropertyWithPlaceholder_without_placeholder_return_value() {
         //given
+        createSpringContext();
         Properties properties = new Properties();
         properties.setProperty("myTestProperty", "toto}");
         //when

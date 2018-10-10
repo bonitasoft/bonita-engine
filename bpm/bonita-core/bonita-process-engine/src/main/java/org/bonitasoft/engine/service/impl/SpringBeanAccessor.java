@@ -75,15 +75,11 @@ public abstract class SpringBeanAccessor {
         }
 
         MutablePropertySources propertySources = context.getEnvironment().getPropertySources();
-        propertySources.addLast(new PropertiesPropertySource("contextProperties", getProperties()));
+        propertySources.addFirst(new PropertiesPropertySource("contextProperties", getProperties()));
     }
 
     protected BonitaSpringContext createContext() {
         return new BonitaSpringContext(parent);
-    }
-
-    BonitaHomeServer getBonitaHomeServer() {
-        return BONITA_HOME_SERVER;
     }
 
     public void destroy() {
