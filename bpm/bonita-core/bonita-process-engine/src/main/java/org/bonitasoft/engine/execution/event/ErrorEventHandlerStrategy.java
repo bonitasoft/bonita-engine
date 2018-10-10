@@ -92,10 +92,11 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     private final EventsHandler eventsHandler;
 
     private final TechnicalLoggerService logger;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
     public ErrorEventHandlerStrategy(final EventInstanceService eventInstanceService, final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
-            final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler, final TechnicalLoggerService logger) {
+                                     final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
+                                     final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler, final TechnicalLoggerService logger, ProcessInstanceInterruptor processInstanceInterruptor) {
         super(eventInstanceService);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -103,6 +104,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         this.processDefinitionService = processDefinitionService;
         this.eventsHandler = eventsHandler;
         this.logger = logger;
+        this.processInstanceInterruptor = processInstanceInterruptor;
     }
 
     @Override
@@ -112,8 +114,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Error event is thrown, error code = "
                     + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = " + eventInstance.getRootContainerId());
         }
-        final ProcessInstanceInterruptor processInstanceInterruptor = new ProcessInstanceInterruptor(
-                processInstanceService, getEventInstanceService(), containerRegistry, logger);
         updateInterruptorErrorEvent(eventInstance);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
     }

@@ -38,29 +38,17 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
 
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
 
-    private final ProcessInstanceService processInstanceService;
 
-    private final FlowNodeInstanceService activityInstanceService;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
-    private final ContainerRegistry containerRegistry;
-
-    private final TechnicalLoggerService logger;
-
-    public TerminateEventHandlerStrategy(final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService activityInstanceService, final ContainerRegistry containerRegistry,
-            final TechnicalLoggerService logger) {
+    public TerminateEventHandlerStrategy(ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
-        this.processInstanceService = processInstanceService;
-        this.activityInstanceService = activityInstanceService;
-        this.containerRegistry = containerRegistry;
-        this.logger = logger;
+        this.processInstanceInterruptor = processInstanceInterruptor;
     }
 
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final ProcessInstanceInterruptor processInstanceInterruptor = new ProcessInstanceInterruptor(
-                processInstanceService, activityInstanceService, containerRegistry, logger);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, eventInstance.getId());
         // Parent should always be process for event (but must change that id it's not the case anymore
     }

@@ -176,15 +176,17 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     protected AbortingReceiveTaskStateImpl abortingReceiveTask;
 
     protected CancellingReceiveTaskStateImpl cancellingReceiveTask;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
     public FlowNodeStateManagerImpl(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ExpressionResolverService expressionResolverService, final OperationService operationService,
-            final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService, StateBehaviors stateBehaviors,
-            WaitingEventsInterrupter waitingEventsInterrupter, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
+                                    final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
+                                    final ExpressionResolverService expressionResolverService, final OperationService operationService,
+                                    final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
+                                    final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService, StateBehaviors stateBehaviors,
+                                    WaitingEventsInterrupter waitingEventsInterrupter, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.stateBehaviors = stateBehaviors;
+        this.processInstanceInterruptor = processInstanceInterruptor;
         bpmInstancesCreator.setStateManager(this);
         initStates(connectorInstanceService, expressionResolverService, operationService, activityInstanceService, bpmInstancesCreator,
                 containerRegistry, processDefinitionService, processInstanceService, archiveService, logger, documentService, commentService,
@@ -343,8 +345,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         cancellingContainer = new CancellingFlowNodeContainerChildrenStateImpl(stateBehaviors);
         cancellingFlowNode = new CancellingFlowNodeStateImpl();
         cancelingBoundaryAndIntermediateCatchEvent = new CancellingBoundaryAndIntermediateCatchEventStateImpl(waitingEventsInterrupter);
-        cancellingCallActivity = new CancellingCallActivityStateImpl(activityInstanceService, processInstanceService, containerRegistry, archiveService,
-                commentService, documentService, logger, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+        cancellingCallActivity = new CancellingCallActivityStateImpl(processInstanceService, archiveService,
+                commentService, documentService, logger, processDefinitionService, connectorInstanceService,
+                classLoaderService, refBusinessDataService, processInstanceInterruptor);
         cancellingActivityWithBoundary = new CancellingActivityWithBoundaryStateImpl(stateBehaviors);
         cancellingReceiveTask = new CancellingReceiveTaskStateImpl(stateBehaviors, waitingEventsInterrupter);
         initializingMultiInstance = new InitializingMultiInstanceActivityStateImpl(expressionResolverService, activityInstanceService,
@@ -352,8 +355,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         executingMultiInstance = new ExecutingMultiInstanceActivityStateImpl(expressionResolverService, containerRegistry, activityInstanceService,
                 stateBehaviors);
         abortingContainer = new AbortingFlowNodeContainerStateImpl(stateBehaviors);
-        abortingCallActivity = new AbortingCallActivityStateImpl(activityInstanceService, processInstanceService, containerRegistry, archiveService,
-                commentService, documentService, logger, processDefinitionService, connectorInstanceService, classLoaderService, refBusinessDataService);
+        abortingCallActivity = new AbortingCallActivityStateImpl(processInstanceService, archiveService,
+                commentService, documentService, logger, processDefinitionService, connectorInstanceService,
+                classLoaderService, refBusinessDataService, processInstanceInterruptor);
         abortingFlowNode = new AbortingFlowNodeStateImpl();
         abortingBoundaryAndIntermediateCatchEvent = new AbortingBoundaryAndIntermediateCatchEventStateImpl(waitingEventsInterrupter);
         abortingActivityWithBoundary = new AbortingActivityWithBoundaryStateImpl(stateBehaviors);

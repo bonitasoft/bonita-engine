@@ -70,7 +70,7 @@ public class ExecuteFlowNodesTest {
     @Before
     public void before() {
         flownodeStateManager = new FlowNodeStateManagerImpl(null, null, null, null, null, null, bpmInstancesCreator, null, null,
-                null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null);
         when(tenantServiceAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         when(tenantServiceAccessor.getGatewayInstanceService()).thenReturn(gatewayInstanceService);

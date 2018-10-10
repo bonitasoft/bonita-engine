@@ -57,6 +57,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
@@ -257,6 +258,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TenantResourcesService getTenantResourcesService();
 
     MessagesHandlingService getMessagesHandlingService();
+
+    ProcessInstanceInterruptor getProcessInstanceInterruptor();
 
     BPMWorkFactory getBPMWorkFactory();
 

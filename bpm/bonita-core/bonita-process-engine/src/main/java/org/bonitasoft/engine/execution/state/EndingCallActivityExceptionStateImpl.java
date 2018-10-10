@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -33,7 +32,6 @@ import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -45,11 +43,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeState {
 
-    private final ActivityInstanceService activityInstanceService;
-
     private final ProcessInstanceService processInstanceService;
-
-    private final ContainerRegistry containerRegistry;
 
     private final ArchiveService archiveService;
 
@@ -65,15 +59,13 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
 
     private ClassLoaderService classLoaderService;
     private RefBusinessDataService refBusinessDataService;
+    private ProcessInstanceInterruptor processInstanceInterruptor;
 
-    public EndingCallActivityExceptionStateImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
-            final ContainerRegistry containerRegistry, final ArchiveService archiveService, final SCommentService commentService,
-            final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService) {
+    public EndingCallActivityExceptionStateImpl(ProcessInstanceService processInstanceService, ArchiveService archiveService, final SCommentService commentService,
+                                                final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+                                                final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService, RefBusinessDataService refBusinessDataService, ProcessInstanceInterruptor processInstanceInterruptor) {
         super();
-        this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
-        this.containerRegistry = containerRegistry;
         this.archiveService = archiveService;
         this.commentService = commentService;
         this.documentService = documentService;
@@ -82,6 +74,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
         this.refBusinessDataService = refBusinessDataService;
+        this.processInstanceInterruptor = processInstanceInterruptor;
     }
 
     @Override
@@ -91,8 +84,6 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
             final boolean hasActiveChild = callActivity.getTokenCount() > 0;
             if (hasActiveChild) {
                 final SProcessInstance targetProcessInstance = processInstanceService.getChildOfActivity(flowNodeInstance.getId());
-                final ProcessInstanceInterruptor processInstanceInterruptor = new ProcessInstanceInterruptor(
-                        processInstanceService, activityInstanceService, containerRegistry, logger);
                 processInstanceInterruptor.interruptProcessInstance(targetProcessInstance.getId(), getStateCategory());
             } else {
                 archiveChildProcessInstance(flowNodeInstance);

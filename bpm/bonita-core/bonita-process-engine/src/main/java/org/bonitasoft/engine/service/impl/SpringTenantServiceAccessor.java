@@ -58,6 +58,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.ProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.BPMWorkFactory;
@@ -508,6 +509,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     public MessagesHandlingService getMessagesHandlingService() {
         return beanAccessor.getService(MessagesHandlingService.class);
+    }
+
+    @Override
+    public ProcessInstanceInterruptor getProcessInstanceInterruptor() {
+        return beanAccessor.getService(ProcessInstanceInterruptor.class);
     }
 
     public BPMWorkFactory getBPMWorkFactory() {
