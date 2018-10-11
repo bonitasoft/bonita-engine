@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -42,13 +42,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class EngineInitializer {
 
-    /**
-     * Logger
-     */
     private static final Logger LOGGER = Logger.getLogger(EngineInitializer.class.getName());
 
     private static PlatformAPI platformAPI;
-
 
     public EngineInitializer() {
         super();
@@ -78,13 +74,11 @@ public class EngineInitializer {
             LOGGER.log(Level.INFO, "Starting node...");
             platformAPI.startNode();
             LOGGER.log(Level.INFO, "Node started successfully.");
-        } catch (Throwable e) {
-            LOGGER.log(Level.SEVERE, "Exception while initializing the engine: ", e);
+            final long after = System.currentTimeMillis();
+            LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
-        final long after = System.currentTimeMillis();
-        LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
     }
 
     SessionAccessor getSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
@@ -101,12 +95,17 @@ public class EngineInitializer {
         return result.getPlatformSessionService();
     }
 
-    protected PlatformAPI getPlatformAPI() {
+    // Visible for testing
+    PlatformAPI getPlatformAPI() {
         if (platformAPI == null) {
             //in local only
-            platformAPI = new PlatformAPIImpl();
+            platformAPI = newPlatformAPI();
         }
         return platformAPI;
+    }
+
+    protected PlatformAPI newPlatformAPI() {
+        return new PlatformAPIImpl();
     }
 
     private void deletePlatformSession(final PlatformSessionService platformSessionService, final SessionAccessor sessionAccessor, final long sessionId)
@@ -137,7 +136,7 @@ public class EngineInitializer {
             LOGGER.log(Level.INFO, "Stopping node...");
             platformAPI.stopNode();
         } catch (final Throwable e) {
-            LOGGER.log(Level.SEVERE, "Issue while stopping the platform:", e);
+            LOGGER.log(Level.SEVERE, "Issue while stopping the platform", e);
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
             // after that the engine is unloaded
