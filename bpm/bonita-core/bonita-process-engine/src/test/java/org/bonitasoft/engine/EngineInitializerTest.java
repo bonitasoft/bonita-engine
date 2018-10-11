@@ -13,10 +13,14 @@
  **/
 package org.bonitasoft.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -71,8 +75,9 @@ public class EngineInitializerTest {
         //given
         doReturn(false).when(platformAPI).isPlatformCreated();
         //when
-        engineInitializer.initializeEngine();
+        final Throwable throwable = catchThrowable(() -> engineInitializer.initializeEngine());
         //then
+        assertThat(throwable).isInstanceOf(PlatformNotFoundException.class);
         verify(platformAPI, never()).startNode();
     }
 
@@ -81,8 +86,9 @@ public class EngineInitializerTest {
         //given
         doReturn(false).when(platformAPI).isPlatformCreated();
         //when
-        engineInitializer.initializeEngine();
+        final Throwable throwable = catchThrowable(() -> engineInitializer.initializeEngine());
         //then
+        assertThat(throwable).isInstanceOf(PlatformNotFoundException.class);
         verify(platformAPI, never()).initializePlatform();
     }
 

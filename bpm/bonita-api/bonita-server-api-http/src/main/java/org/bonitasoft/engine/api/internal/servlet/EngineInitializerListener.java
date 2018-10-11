@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,25 +13,24 @@
  **/
 package org.bonitasoft.engine.api.internal.servlet;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.platform.setup.PlatformSetupAccessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EngineInitializerListener implements ServletContextListener {
 
-    private static final Logger LOGGER = Logger.getLogger(EngineInitializerListener.class.getName());
-    private static boolean initializationOk = false;
+    private static final Logger log = LoggerFactory.getLogger(EngineInitializerListener.class);
 
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
         try {
             PlatformSetupAccessor.getPlatformSetup().init(); // init tables and default configuration
             new EngineInitializer().initializeEngine();
-            initializationOk = true;
         } catch (final Throwable e) {
             throw new RuntimeException("Error while initializing the Engine", e);
         }
@@ -39,14 +38,10 @@ public class EngineInitializerListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(final ServletContextEvent arg0) {
-        if (initializationOk) {
-            try {
-                new EngineInitializer().unloadEngine();
-            } catch (final Throwable e) {
-                LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
-            }
-        } else {
-            LOGGER.info("Initialization went wrong, no need to try to unload the Engine");
+        try {
+            new EngineInitializer().unloadEngine();
+        } catch (final Throwable e) {
+            log.error("Error while unloading the Engine", e);
         }
     }
 
