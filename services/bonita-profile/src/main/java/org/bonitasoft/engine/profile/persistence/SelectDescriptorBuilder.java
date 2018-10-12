@@ -77,13 +77,6 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<>("getDirectProfileMembersOfRole", parameters, SProfileMember.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SProfileMember> getProfileMembers(final int fromIndex, final int numberOfElements, final String field,
-            final OrderByType order) {
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfileMember.class, field, order);
-        final Map<String, Object> parameters = new HashMap<>(1);
-        return new SelectListDescriptor<>("getProfileMembers", parameters, SProfileMember.class, queryOptions);
-    }
-
     public static SelectListDescriptor<SProfile> getProfilesOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field,
             final OrderByType order) {
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements, SProfile.class, field, order);
