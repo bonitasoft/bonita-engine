@@ -67,11 +67,6 @@
 		WHERE pm.roleId = :roleId
 	</query>
 
-	<query name="getProfileMembers">
-		SELECT pm
-		FROM org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl AS pm
-	</query>
-
 
 	<query name="getSProfileMembersWithoutDisplayName">
 		SELECT pm 
@@ -300,7 +295,7 @@
 		WHERE pm.profileId IN (:profileIds)
 	</query>
 
-    <query name="updateLastupdatePtofile">
+    <query name="updateLastUpdateProfile">
         UPDATE org.bonitasoft.engine.profile.model.impl.SProfileImpl AS p
         SET p.lastUpdateDate = :lastUpdateDate,
         p.lastUpdatedBy = :lastUpdatedBy

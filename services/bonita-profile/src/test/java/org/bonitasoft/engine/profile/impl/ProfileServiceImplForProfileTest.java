@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -65,12 +63,6 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ProfileServiceImplForProfileTest {
-
-    @Mock
-    private EventService eventService;
-
-    @Mock
-    private TechnicalLoggerService logger;
 
     @Mock
     private PersistenceService persistenceService;
