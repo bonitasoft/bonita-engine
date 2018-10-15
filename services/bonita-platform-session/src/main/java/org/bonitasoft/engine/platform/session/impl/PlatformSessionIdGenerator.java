@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.platform.session.impl;
 
+import static java.lang.Math.abs;
+
 import java.security.SecureRandom;
 
 /**
@@ -28,7 +30,7 @@ public class PlatformSessionIdGenerator {
         if (ng == null) {
             numberGenerator = ng = new SecureRandom();
         }
-        return ng.nextLong();
+        return abs(ng.nextLong());
     }
 
 }

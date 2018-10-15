@@ -54,7 +54,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     private TechnicalUser technicalUser;
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService, final SessionService sessionService,
-            final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
+                                   final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
                                    TechnicalUser technicalUser) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
@@ -69,24 +69,18 @@ public class SecuredLoginServiceImpl implements LoginService {
         debugLog("Logging in");
         checkNull(credentials);
         Long tenantId = extractTenant(credentials);
-        sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
-        try {
-            if (isTechnicalUser(credentials)) {
-                debugLog("Authenticated as technical user");
-                return createSession(tenantId, extractUserName(credentials), -1L, true);
-            }
-            String userName = verifyCredentials(credentials);
-            checkIsNotBlank(userName);
-            debugLog("Authenticated as regular user");
-            SUser user = getUser(userName);
-            checkIsEnabled(user);
-            SSession session = createSession(tenantId, userName, user.getId(), false);
-            updateLastConnectionDate(user);
-            return session;
-        } finally {
-            // clean session accessor
-            sessionAccessor.deleteSessionId();
+        if (isTechnicalUser(credentials)) {
+            debugLog("Authenticated as technical user");
+            return createSession(tenantId, extractUserName(credentials), -1L, true);
         }
+        String userName = verifyCredentials(credentials);
+        checkIsNotBlank(userName);
+        debugLog("Authenticated as regular user");
+        SUser user = getUser(userName);
+        checkIsEnabled(user);
+        SSession session = createSession(tenantId, userName, user.getId(), false);
+        updateLastConnectionDate(user);
+        return session;
     }
 
     private void updateLastConnectionDate(SUser user) throws SLoginException {
