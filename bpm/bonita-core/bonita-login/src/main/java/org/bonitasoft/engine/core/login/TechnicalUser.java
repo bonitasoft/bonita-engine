@@ -18,9 +18,9 @@ package org.bonitasoft.engine.core.login;
  */
 public class TechnicalUser {
 
-    private final String userName;
+    private String userName;
 
-    private final String password;
+    private String password;
 
     public TechnicalUser(final String userName, final String password) {
         super();
@@ -36,4 +36,11 @@ public class TechnicalUser {
         return password;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
