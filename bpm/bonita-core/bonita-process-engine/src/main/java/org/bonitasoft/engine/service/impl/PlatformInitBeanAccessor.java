@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015-2018 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,18 +31,7 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
     }
 
     @Override
-    protected BonitaSpringContext createContext() {
-        getPlatformLicensesSetup().setupLicenses();
-        return super.createContext();
-    }
-
-    // visible for testing
-    PlatformLicensesSetup getPlatformLicensesSetup() {
-        return PlatformLicensesSetupFactory.getInstance();
-    }
-
-    @Override
-    protected Properties getProperties() throws IOException {
+    protected Properties getProperties() {
         return new Properties();
     }
 
@@ -53,6 +42,10 @@ public class PlatformInitBeanAccessor extends SpringBeanAccessor {
 
     @Override
     protected List<String> getSpringFileFromClassPath(boolean cluster) {
-        return Collections.singletonList("bonita-platform-init-community.xml");
+        List<String> resources = new ArrayList<>();
+        resources.add("bonita-platform-init-community.xml");
+        resources.add("bonita-platform-init-sp.xml");
+        return resources;
     }
+
 }
