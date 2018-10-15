@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -25,19 +24,12 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInsta
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.Logout;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
-import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.TenantStatusException;
-import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.SUserNotFoundException;
-import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -121,9 +113,11 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         checkThatWeCanLogin(userName, sTenant, serviceAccessor.getTechnicalUser());
         final LoginService loginService = serviceAccessor.getLoginService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<>(credentials);
         credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
+        sessionAccessor.setTenantId(sTenant.getId());
         try {
             final SSession sSession = transactionService.executeInTransaction(() -> loginService.login(credentialsWithResolvedTenantId));
             return ModelConvertor.toAPISession(sSession, sTenant.getName());

@@ -165,7 +165,6 @@ public class SecuredLoginServiceImplTest {
             securedLoginServiceImpl.login(credentials);
         } catch (final SLoginException e) {
             verify(genericAuthenticationService, times(1)).checkUserCredentials(anyMap());
-            verify(sessionAccessor, times(1)).deleteSessionId();
             verify(sessionService, times(0)).createSession(tenantId, userId, login, true);
             assertThat(e).hasRootCauseExactlyInstanceOf(AuthenticationException.class);
             return;
@@ -183,7 +182,6 @@ public class SecuredLoginServiceImplTest {
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMap());
-        verify(sessionAccessor, times(1)).deleteSessionId();
         verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true);
         assertThat(sSessionResult).isSameAs(sSession);
     }
@@ -198,7 +196,6 @@ public class SecuredLoginServiceImplTest {
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, never()).checkUserCredentials(credentials);
-        verify(sessionAccessor).deleteSessionId();
         verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true);
         assertThat(sSessionResult).isSameAs(sSession);
     }
@@ -219,7 +216,6 @@ public class SecuredLoginServiceImplTest {
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(1)).checkUserCredentials(credentials);
-        verify(sessionAccessor, times(1)).deleteSessionId();
         verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false);
         assertThat(sSessionResult).isSameAs(sSession);
     }

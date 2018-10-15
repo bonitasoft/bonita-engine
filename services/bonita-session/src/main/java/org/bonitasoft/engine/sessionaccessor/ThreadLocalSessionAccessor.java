@@ -19,9 +19,9 @@ package org.bonitasoft.engine.sessionaccessor;
  */
 public class ThreadLocalSessionAccessor implements SessionAccessor {
 
-    private final ThreadLocal<Long> sessionData = new ThreadLocal<Long>();
+    private final ThreadLocal<Long> sessionData = new ThreadLocal<>();
 
-    private final ThreadLocal<Long> tenantData = new ThreadLocal<Long>();
+    private final ThreadLocal<Long> tenantData = new ThreadLocal<>();
 
     @Override
     public long getSessionId() throws SessionIdNotSetException {
@@ -34,6 +34,9 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     @Override
     public void setSessionInfo(final long sessionId, final long tenantId) {
+        if (sessionId <= 0) {
+            throw new IllegalArgumentException("Session id is invalid: " + sessionId);
+        }
         sessionData.set(sessionId);
         tenantData.set(tenantId);
     }
