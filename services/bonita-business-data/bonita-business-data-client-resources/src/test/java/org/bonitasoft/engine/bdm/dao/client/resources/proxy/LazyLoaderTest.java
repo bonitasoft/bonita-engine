@@ -15,7 +15,9 @@ package org.bonitasoft.engine.bdm.dao.client.resources.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -30,7 +32,7 @@ import org.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.proxy.model.Child;
 import org.bonitasoft.engine.bdm.proxy.model.Parent;
-import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +49,7 @@ public class LazyLoaderTest {
 
     @Before
     public void setUp() throws Exception {
-        lazyLoader = spy(new LazyLoader(new FakeSession()));
+        lazyLoader = spy(new LazyLoader(new APISessionImpl(1, new Date(), 3000, "john", 1, "default", 1)));
         doReturn(commandAPI).when(lazyLoader).getCommandAPI();
     }
 
@@ -106,47 +108,4 @@ public class LazyLoaderTest {
         return BDMQueryCommandParameters.createCommandParameters(new EntityGetter(method), persistenceId);
     }
 
-    @SuppressWarnings("serial")
-    private class FakeSession implements APISession {
-
-        @Override
-        public long getId() {
-            return 0;
-        }
-
-        @Override
-        public Date getCreationDate() {
-            return null;
-        }
-
-        @Override
-        public long getDuration() {
-            return 0;
-        }
-
-        @Override
-        public String getUserName() {
-            return null;
-        }
-
-        @Override
-        public long getUserId() {
-            return 0;
-        }
-
-        @Override
-        public boolean isTechnicalUser() {
-            return false;
-        }
-
-        @Override
-        public String getTenantName() {
-            return null;
-        }
-
-        @Override
-        public long getTenantId() {
-            return 0;
-        }
-    }
 }

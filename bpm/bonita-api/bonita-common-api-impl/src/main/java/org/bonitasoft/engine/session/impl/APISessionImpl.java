@@ -14,105 +14,29 @@
 package org.bonitasoft.engine.session.impl;
 
 import java.util.Date;
+import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bonitasoft.engine.session.APISession;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class APISessionImpl extends SessionImpl implements APISession {
 
-    private static final long serialVersionUID = 2585081338329254538L;
-
     private String tenantName;
-
     private long tenantId;
+    private List<String> profiles;
 
     public APISessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId, final String tenantName,
             final long tenantId) {
         super(id, creationDate, duration, userName, userId);
         this.tenantName = tenantName;
         this.tenantId = tenantId;
-    }
-
-    @Override
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    @Override
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    public String getTenant() {
-        return tenantName;
-    }
-
-    public void setTenant(final String tenant) {
-        tenantName = tenant;
-    }
-
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((tenantName == null) ? 0 : tenantName.hashCode());
-        result = prime * result + (int) (tenantId ^ (tenantId >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final APISessionImpl other = (APISessionImpl) obj;
-        if (tenantName == null) {
-            if (other.tenantName != null) {
-                return false;
-            }
-        } else if (!tenantName.equals(other.tenantName)) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("APISessionImpl [tenant=");
-        builder.append(tenantName);
-        builder.append(", tenantId=");
-        builder.append(tenantId);
-        builder.append(", getId()=");
-        builder.append(getId());
-        builder.append(", getCreationDate()=");
-        builder.append(getCreationDate());
-        builder.append(", getDuration()=");
-        builder.append(getDuration());
-        builder.append(", getUserName()=");
-        builder.append(getUserName());
-        builder.append(", getUserId()=");
-        builder.append(getUserId());
-        builder.append(", isTechnicalUser()=");
-        builder.append(isTechnicalUser());
-        builder.append("]");
-        return builder.toString();
     }
 
 }
