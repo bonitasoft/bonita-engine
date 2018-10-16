@@ -95,6 +95,8 @@ public interface ApplicationService {
 
     List<String> getAllPagesForProfile(long profileId) throws SBonitaReadException;
 
+    List<String> getAllPagesForProfile(String profile) throws SBonitaReadException;
+
     int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException;
 
     int getLastUsedIndex(Long parentMenuId) throws SBonitaReadException;

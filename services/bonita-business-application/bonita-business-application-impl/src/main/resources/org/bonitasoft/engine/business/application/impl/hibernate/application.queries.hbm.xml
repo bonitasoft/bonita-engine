@@ -99,13 +99,29 @@
         org.bonitasoft.engine.page.impl.SPageImpl as page
         WHERE application.profileId = :profileId
         AND (
-            application.layoutId = page.id
-            OR
-            application.themeId = page.id
-            OR (
-                applicationPage.applicationId = application.id
-                AND applicationPage.pageId = page.id
-            )
+        application.layoutId = page.id
+        OR
+        application.themeId = page.id
+        OR (
+        applicationPage.applicationId = application.id
+        AND applicationPage.pageId = page.id
+        )
+        )
+
+        ORDER BY page.name
+    </query>
+    <query name="getAllPagesForProfileName">
+        SELECT DISTINCT page.name
+        FROM org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl as applicationPage,
+        org.bonitasoft.engine.business.application.model.impl.SApplicationImpl as application,
+        org.bonitasoft.engine.page.impl.SPageImpl as page,
+        org.bonitasoft.engine.profile.model.impl.SProfileImpl as profile
+        WHERE
+        profile.name = :profileName
+        AND application.profileId = profile.id
+        AND ( application.layoutId = page.id
+        OR application.themeId = page.id
+        OR ( applicationPage.applicationId = application.id AND applicationPage.pageId = page.id )
         )
 
         ORDER BY page.name

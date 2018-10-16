@@ -159,4 +159,11 @@ public class ApplicationPageAPIDelegate {
             throw new RetrieveException(e);
         }
     }
+    public List<String> getAllPagesForProfile(String profile) {
+        try {
+            return applicationService.getAllPagesForProfile(profile);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
 }
