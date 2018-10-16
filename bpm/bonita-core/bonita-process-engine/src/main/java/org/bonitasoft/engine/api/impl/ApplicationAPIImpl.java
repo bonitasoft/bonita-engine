@@ -248,6 +248,10 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public List<String> getAllPagesForProfile(final long profileId) {
         return getApplicationPageAPIDelegate().getAllPagesForProfile(profileId);
     }
+    @Override
+    public List<String> getAllPagesForProfile(String profile) {
+        return getApplicationPageAPIDelegate().getAllPagesForProfile(profile);
+    }
 
     @Override
     public byte[] exportApplications(final long... applicationIds) throws ExportException {

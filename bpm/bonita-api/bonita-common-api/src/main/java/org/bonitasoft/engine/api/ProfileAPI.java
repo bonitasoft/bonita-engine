@@ -193,15 +193,17 @@ public interface ProfileAPI {
     SearchResult<ProfileEntry> searchProfileEntries(SearchOptions options) throws SearchException;
 
     /**
-     *
-     * This method retrieve the full portal navigation of a profile.
-     * <p/>
+     * Retrieves the full portal navigation of a profile.
+     * <br/>
      * This navigation is what a user having the given profile have in the navigation bar of the portal.
+     * <p/>
+     * <b>WARNING:</b> this method is <b>Experimental</b>, it might change in later versions
      *
      * @param profileName name of the profile
      * @return the list of profile entries linked to this profile
-     * @since  7.8
+     * @since 7.8
      */
+    @Experimental
     List<ProfileEntry> getProfileEntries(String profileName) throws ProfileNotFoundException;
 
 

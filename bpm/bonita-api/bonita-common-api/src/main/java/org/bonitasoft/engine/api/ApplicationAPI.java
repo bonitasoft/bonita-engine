@@ -280,6 +280,21 @@ public interface ApplicationAPI {
     List<String> getAllPagesForProfile(long profileId);
 
     /**
+     * Returns all pages names that can be accessed by the profile through applications.
+     * The portal use this method to calculate all permissions for a user.
+     * <br/>
+     * <b>WARNING:</b> this method is <b>Experimental</b>, it might change in later versions
+     *
+     * @param profile
+     *        the name of the profile
+     * @return
+     *         list of page name accessible by the profile through applications
+     * @since 7.8
+     */
+    @Experimental
+    List<String> getAllPagesForProfile(String profile);
+
+    /**
      * Exports the {@link org.bonitasoft.engine.business.application.Application}s which identifier is in {@code applicationIds}
      *
      * @param applicationIds the identifiers of {@code Application}s to be exported
