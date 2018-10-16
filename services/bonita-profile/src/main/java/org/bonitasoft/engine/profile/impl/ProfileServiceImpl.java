@@ -397,7 +397,12 @@ public class ProfileServiceImpl implements ProfileService {
         final SelectListDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getProfilesOfUser(userId, fromIndex, numberOfElements, field, order);
         return persistenceService.selectList(descriptor);
     }
-    
+
+    @Override
+    public List<SProfile> getProfilesOfUser(long userId) throws SBonitaReadException {
+        return searchProfilesOfUser(userId, 0, Integer.MAX_VALUE, null, null);
+    }
+
     @Override
     public List<SProfile> searchProfilesWithNavigationOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field, final OrderByType order)
             throws SBonitaReadException {

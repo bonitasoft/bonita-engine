@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,6 +72,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
@@ -106,8 +109,9 @@ public class BPMLocalIT extends CommonAPILocalIT {
     public void useAFakeSessionId() throws BonitaException {
         final LoginAPI loginAPI = getLoginAPI();
         final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
-        final FakeSession fakeSession = new FakeSession(session);
-        fakeSession.setId(fakeSession.getId() + 1);
+        final APISession fakeSession = new APISessionImpl(session.getId() + 1, session.getCreationDate(),
+                session.getDuration(), session.getUserName(), session.getUserId(), session.getTenantName(),
+                session.getTenantId());
 
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(fakeSession);
         identityAPI.getGroup(12);

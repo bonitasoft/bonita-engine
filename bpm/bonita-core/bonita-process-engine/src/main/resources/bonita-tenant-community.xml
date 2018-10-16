@@ -1365,10 +1365,10 @@
     <bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
         <constructor-arg ref="sessionService" />
-        <constructor-arg ref="sessionAccessor" />
         <constructor-arg ref="identityService" />
         <constructor-arg ref="tenantTechnicalLoggerService" />
         <constructor-arg ref="technicalUser" />
+        <constructor-arg ref="profileService" />
     </bean>
 
     <bean id="genericAuthenticationServiceAccessor"

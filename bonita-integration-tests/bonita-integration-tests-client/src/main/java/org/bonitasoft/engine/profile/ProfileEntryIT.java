@@ -32,15 +32,13 @@ import org.junit.Test;
  */
 public class ProfileEntryIT extends AbstractProfileIT {
 
-    public static final int NB_PROFILE_ENTRY_IN_ADMIN = 24;
-
     @Test
     public void searchProfileEntry() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, adminProfileId);
         builder.sort(ProfileEntrySearchDescriptor.NAME, Order.DESC);
         final SearchResult<ProfileEntry> searchedProfileEntries = getProfileAPI().searchProfileEntries(builder.done());
-        assertEquals(NB_PROFILE_ENTRY_IN_ADMIN, searchedProfileEntries.getCount());
+        assertEquals(ADMIN_PROFILE_ENTRY_COUNT, searchedProfileEntries.getCount());
         final List<ProfileEntry> result = searchedProfileEntries.getResult();
         assertEquals(10, result.size());
     }
@@ -49,7 +47,7 @@ public class ProfileEntryIT extends AbstractProfileIT {
     public void should_getProfileEntries_of_a_profile() throws ProfileNotFoundException {
         List<ProfileEntry> profileEntries = getProfileAPI().getProfileEntries("Administrator");
 
-        assertThat(profileEntries).hasSize(NB_PROFILE_ENTRY_IN_ADMIN);
+        assertThat(profileEntries).hasSize(ADMIN_PROFILE_ENTRY_COUNT);
     }
 
     @Test(expected = SearchException.class)

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.session.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Builder;
 import lombok.Data;
@@ -49,6 +50,7 @@ public class SSession implements Serializable {
      * true if the user is the technical user: false otherwise
      */
     private boolean technicalUser;
+    private List<String> profiles;
 
 
     /**

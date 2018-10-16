@@ -134,6 +134,9 @@ public interface ProfileService {
      * @since 6.0
      */
     List<SProfile> searchProfilesOfUser(long userId, int fromIndex, int numberOfElements, String field, OrderByType order) throws SBonitaReadException;
+
+    List<SProfile> getProfilesOfUser(long userId) throws SBonitaReadException;
+
     
     /**
      * Get all profiles with portal navigation for a user
