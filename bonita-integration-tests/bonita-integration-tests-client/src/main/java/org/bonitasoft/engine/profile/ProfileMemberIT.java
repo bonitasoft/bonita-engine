@@ -133,13 +133,13 @@ public class ProfileMemberIT extends AbstractProfileIT {
     public void getProfileForUser() throws BonitaException {
         // Get Profile For User
         final List<Profile> profiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
-        assertThat(profiles).hasSize(1).extracting("name").contains("Administrator");
+        assertThat(profiles).hasSize(2).extracting("name").contains("Administrator", "User");
     }
 
     @Test
     public void getProfileWithNavigationForUser() throws BonitaException {
         final List<Profile> profiles = getProfileAPI().getProfilesWithNavigationForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
-        assertThat(profiles).hasSize(1).extracting("name").contains("Administrator");
+        assertThat(profiles).hasSize(2).extracting("name").containsExactlyInAnyOrder("Administrator", "User");
     }
     
     @Test
@@ -150,8 +150,8 @@ public class ProfileMemberIT extends AbstractProfileIT {
         // Get Profile For User
         final List<Profile> getUserProfiles = getProfileAPI().getProfilesForUser(user1.getId(), 0, 10, ProfileCriterion.NAME_ASC);
 
-        assertEquals(1, getUserProfiles.size());
-        assertEquals("Administrator", getUserProfiles.get(0).getName());
+        assertEquals(2, getUserProfiles.size());
+        assertThat(getUserProfiles).extracting("name").containsExactlyInAnyOrder("Administrator", "User");
     }
 
     @Test
@@ -290,7 +290,7 @@ public class ProfileMemberIT extends AbstractProfileIT {
         assertNotNull(numberOfProfileMembers);
         assertEquals(2, numberOfProfileMembers.size());
         assertEquals(Long.valueOf(5L), numberOfProfileMembers.get(adminProfileId));
-        assertEquals(Long.valueOf(1L), numberOfProfileMembers.get(userProfileId));
+        assertEquals(Long.valueOf(2L), numberOfProfileMembers.get(userProfileId));
     }
 
     @Test(expected = SearchException.class)
@@ -303,7 +303,7 @@ public class ProfileMemberIT extends AbstractProfileIT {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ProfileMemberSearchDescriptor.USER_ID, user1.getId());
         final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
-        assertEquals(1, searchedProfileMember.getResult().size());
+        assertEquals(2, searchedProfileMember.getResult().size());
         assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
         assertEquals("User1LastName", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
         assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());

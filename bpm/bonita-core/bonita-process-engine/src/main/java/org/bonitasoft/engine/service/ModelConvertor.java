@@ -329,6 +329,7 @@ public class ModelConvertor {
         final boolean technicalUser = session.isTechnicalUser();
         final APISessionImpl apiSession = new APISessionImpl(id, creationDate, duration, userName, userId, tenant, tenantId);
         apiSession.setTechnicalUser(technicalUser);
+        apiSession.setProfiles(session.getProfiles());
         return apiSession;
     }
 

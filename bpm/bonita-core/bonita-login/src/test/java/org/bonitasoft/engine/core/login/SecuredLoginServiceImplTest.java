@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.login;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -20,14 +21,23 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
@@ -37,9 +47,11 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,18 +71,18 @@ public class SecuredLoginServiceImplTest {
     @Mock
     private SessionService sessionService;
     @Mock
-    private SessionAccessor sessionAccessor;
-    @Mock
     private IdentityService identityService;
     @Mock
     private TechnicalLoggerService logger;
+    @Mock
+    private ProfileService profileService;
 
     @Before
     public void setUp() throws Exception {
         securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService,
-                sessionAccessor, identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS));
+                identityService, logger, new TechnicalUser(TECH_USER_NAME, TECH_USER_PASS), profileService);
         //return a session with given arguments
-        when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean()))
+        when(sessionService.createSession(anyLong(), anyLong(), anyString(), anyBoolean(), anyList()))
                 .thenAnswer(invok -> SSession.builder()
                         .id(UUID.randomUUID().getLeastSignificantBits())
                         .applicationName("myApp")
@@ -78,6 +90,7 @@ public class SecuredLoginServiceImplTest {
                         .userId(invok.getArgument(1))
                         .userName(invok.getArgument(2))
                         .technicalUser(invok.getArgument(3))
+                        .profiles(invok.getArgument(4))
                         .build());
     }
 
@@ -177,12 +190,12 @@ public class SecuredLoginServiceImplTest {
     public void testSecuredLoginServiceWithPlatformCredentialsWithGenericAuthenticationService() throws Exception {
         final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(TENANT_ID, -1L, TECH_USER_NAME, true)).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, -1L, TECH_USER_NAME, true, emptyList())).thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(0)).checkUserCredentials(anyMap());
-        verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true);
+        verify(sessionService, times(1)).createSession(1L, -1L, TECH_USER_NAME, true, emptyList());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -191,12 +204,12 @@ public class SecuredLoginServiceImplTest {
         final Map<String, Serializable> credentials = credentials(TECH_USER_NAME, TECH_USER_PASS, TENANT_ID);
 
         final SSession sSession = mock(SSession.class);
-        when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true)).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList())).thenReturn(sSession);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, never()).checkUserCredentials(credentials);
-        verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true);
+        verify(sessionService).createSession(TENANT_ID, USER_ID, TECH_USER_NAME, true, emptyList());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -210,13 +223,13 @@ public class SecuredLoginServiceImplTest {
 
         when(sUser.getId()).thenReturn(112345L);
         when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn("julien");
-        when(sessionService.createSession(TENANT_ID, 112345L, "julien", false)).thenReturn(sSession);
+        when(sessionService.createSession(TENANT_ID, 112345L, "julien", false, emptyList())).thenReturn(sSession);
         when(identityService.getUserByUserName("julien")).thenReturn(sUser);
 
         final SSession sSessionResult = securedLoginServiceImpl.login(credentials);
 
         verify(genericAuthenticationService, times(1)).checkUserCredentials(credentials);
-        verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false);
+        verify(sessionService, times(1)).createSession(TENANT_ID, 112345L, "julien", false, emptyList());
         assertThat(sSessionResult).isSameAs(sSession);
     }
 
@@ -320,6 +333,28 @@ public class SecuredLoginServiceImplTest {
         securedLoginServiceImpl.login(credentials("john", "bpm", 42));
 
         verify(identityService).updateUser(eq(user), argThat(e -> e.getFields().keySet().equals(Collections.singleton("lastConnection"))));
+    }
+
+    @Test
+    public void should_have_profiles_in_session() throws Exception {
+        SUserImpl user = havingUser("myUser", "myPass", 43L);
+        doReturn(profiles("User", "Administrator")).when(profileService).getProfilesOfUser(user.getId());
+
+        SSession session = securedLoginServiceImpl.login(credentials("myUser", "myPass", 43L));
+
+        assertThat(session.getProfiles()).containsExactlyInAnyOrder("User", "Administrator");
+    }
+
+    private List<SProfile> profiles(String... profiles) {
+        return Arrays.stream(profiles)
+                .map(this::profile)
+                .collect(Collectors.toList());
+    }
+
+    private SProfile profile(String name) {
+        SProfileImpl sProfile = new SProfileImpl();
+        sProfile.setName(name);
+        return sProfile;
     }
 
     private Map<String, Serializable> credentials(String username, String password, long tenantId) {

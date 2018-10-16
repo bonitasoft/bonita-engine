@@ -542,6 +542,9 @@
 			</parentProfileEntry>
 		</profileEntries>
 		<profileMapping>
+			<users>
+				<user>userName1</user>
+			</users>
 			<groups>
 				<group>/group1</group>
 			</groups>

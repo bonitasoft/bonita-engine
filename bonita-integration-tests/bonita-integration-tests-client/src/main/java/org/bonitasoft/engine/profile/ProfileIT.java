@@ -16,12 +16,13 @@ package org.bonitasoft.engine.profile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.exception.AlreadyExistsException;
+import java.util.List;
+
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.platform.LoginException;
+import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -32,6 +33,31 @@ import org.junit.Test;
  * @author Celine Souchet
  */
 public class ProfileIT extends AbstractProfileIT {
+
+    @Test
+    public void should_have_profiles_in_session() throws Exception {
+        getApiClient().logout();
+        List<String> profilesOfUser1 = getProfilesFromSession(this.user1, "User1Pwd");
+        List<String> profilesOfUser2 = getProfilesFromSession(this.user2, "User2Pwd");
+        List<String> profilesOfUser3 = getProfilesFromSession(this.user3, "User3Pwd");
+        List<String> profilesOfUser4 = getProfilesFromSession(this.user4, "User4Pwd");
+        List<String> profilesOfUser5 = getProfilesFromSession(this.user5, "User5Pwd");
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        //Theses profiles are the one mapped in the AllProfiles.xml test file
+        assertThat(profilesOfUser1).containsExactlyInAnyOrder("Administrator", "User");
+        assertThat(profilesOfUser2).isEmpty();
+        assertThat(profilesOfUser3).isEmpty();
+        assertThat(profilesOfUser4).containsExactlyInAnyOrder("Team manager");
+        assertThat(profilesOfUser5).isEmpty();
+    }
+
+    private List<String> getProfilesFromSession(User user, String password) throws LoginException, LogoutException {
+        getApiClient().login(user.getUserName(), password);
+        List<String> profiles = getApiClient().getSession().getProfiles();
+        getApiClient().logout();
+        return profiles;
+    }
 
     @Test
     public void searchProfile() throws BonitaException {
@@ -97,9 +123,7 @@ public class ProfileIT extends AbstractProfileIT {
         shouldProfileMemberOperation_update_profile_metadata(creator);
     }
 
-    private void shouldProfileMemberOperation_update_profile_metadata(final ProfileMemberCreator creator) throws ProfileNotFoundException, BonitaException,
-            CreationException, AlreadyExistsException,
-            DeletionException, Exception {
+    private void shouldProfileMemberOperation_update_profile_metadata(final ProfileMemberCreator creator) throws Exception {
         // given
         final Profile profileBefore = getProfileAPI().getProfile(adminProfileId);
 
