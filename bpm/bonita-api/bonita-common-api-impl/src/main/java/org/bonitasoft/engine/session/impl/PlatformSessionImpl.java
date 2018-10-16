@@ -15,15 +15,17 @@ package org.bonitasoft.engine.session.impl;
 
 import java.util.Date;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bonitasoft.engine.session.PlatformSession;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PlatformSessionImpl extends SessionImpl implements PlatformSession {
-
-    private static final long serialVersionUID = -160039773966138194L;
 
     public PlatformSessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId) {
         super(id, creationDate, duration, userName, userId);

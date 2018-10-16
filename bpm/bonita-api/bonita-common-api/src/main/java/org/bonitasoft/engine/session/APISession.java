@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.session;
 
+import java.util.List;
+
 /**
  * Informations concerning the connected tenant to the APIs
  * 
@@ -31,5 +33,10 @@ public interface APISession extends Session {
      * @return The identifier of the connected tenant
      */
     long getTenantId();
+
+    /**
+     * @return The list of profiles of the user
+     */
+    List<String> getProfiles();
 
 }

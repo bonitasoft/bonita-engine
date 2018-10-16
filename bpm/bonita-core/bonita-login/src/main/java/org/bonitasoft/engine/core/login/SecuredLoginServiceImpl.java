@@ -17,7 +17,9 @@ import static org.bonitasoft.engine.authentication.AuthenticationConstants.BASIC
 import static org.bonitasoft.engine.identity.model.builder.impl.SUserUpdateBuilderImpl.updateBuilder;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -30,6 +32,9 @@ import org.bonitasoft.engine.identity.SUserUpdateException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -42,26 +47,22 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class SecuredLoginServiceImpl implements LoginService {
 
-    private GenericAuthenticationService authenticationService;
-
+    private final GenericAuthenticationService authenticationService;
     private final SessionService sessionService;
-
-    private final SessionAccessor sessionAccessor;
-
     private final IdentityService identityService;
-
     private final TechnicalLoggerService logger;
-    private TechnicalUser technicalUser;
+    private final TechnicalUser technicalUser;
+    private final ProfileService profileService;
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService authenticationService, final SessionService sessionService,
-                                   final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
-                                   TechnicalUser technicalUser) {
+                                   final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService,
+                                   TechnicalUser technicalUser, ProfileService profileService) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
-        this.sessionAccessor = sessionAccessor;
         this.identityService = identityService;
         this.logger = tenantTechnicalLoggerService;
         this.technicalUser = technicalUser;
+        this.profileService = profileService;
     }
 
     @Override
@@ -103,8 +104,10 @@ public class SecuredLoginServiceImpl implements LoginService {
 
     private SSession createSession(Long tenantId, String userName, long id, boolean b) throws SLoginException {
         try {
-            return sessionService.createSession(tenantId, id, userName, b);
-        } catch (SSessionException e) {
+            List<SProfile> profilesOfUser = profileService.getProfilesOfUser(id);
+            List<String> profiles = profilesOfUser.stream().map(SProfile::getName).collect(Collectors.toList());
+            return sessionService.createSession(tenantId, id, userName, b, profiles);
+        } catch (SSessionException | SBonitaReadException e) {
             throw new SLoginException(e);
         }
     }

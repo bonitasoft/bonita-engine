@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.session;
 
+import java.util.List;
+
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
@@ -47,6 +49,8 @@ public interface SessionService {
     SSession createSession(long tenantId, String userName) throws SSessionException;
 
     SSession createSession(long tenantId, long userId, String userName, boolean technicalUser) throws SSessionException;
+
+    SSession createSession(long tenantId, long userId, String userName, boolean technicalUser, List<String> profiles) throws SSessionException;
 
     /**
      * Delete a session having the given id

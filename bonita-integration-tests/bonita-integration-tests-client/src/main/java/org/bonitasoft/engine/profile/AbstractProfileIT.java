@@ -92,7 +92,6 @@ public abstract class AbstractProfileIT extends TestWithTechnicalUser {
         role3 = createRole("role3");
 
         // Restoring up default profiles before tests:
-        // Restoring up default profiles before tests:
         final InputStream xmlStream = AbstractProfileIT.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
         xmlStream.close();
