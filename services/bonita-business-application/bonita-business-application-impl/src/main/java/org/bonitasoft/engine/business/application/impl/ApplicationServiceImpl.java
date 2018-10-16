@@ -577,6 +577,12 @@ public class ApplicationServiceImpl implements ApplicationService {
                 "profileId", profileId), SApplicationPage.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
         return persistenceService.selectList(selectList);
     }
+    @Override
+    public List<String> getAllPagesForProfile(String profile) throws SBonitaReadException {
+        final SelectListDescriptor<String> selectList = new SelectListDescriptor<String>("getAllPagesForProfileName", Collections.<String, Object> singletonMap(
+                "profileName", profile), SApplicationPage.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+        return persistenceService.selectList(selectList);
+    }
 
     protected Integer executeGetLastUsedIndexQuery(final Long parentMenuId) throws SBonitaReadException {
         SelectOneDescriptor<Integer> selectDescriptor;
