@@ -600,8 +600,8 @@
                 <!-- Default failsafe configuration -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration combine.children="append">
-                    <argLine combine.self="append">-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap</argLine>
+                <configuration>
+                    <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -612,14 +612,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration combine.children="append">
-                    <!-- for JVM to know memory limits when running inside docker: -->
-                    <argLine combine.self="append">-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap</argLine>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -962,9 +954,8 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration combine.children="append">
-                            <!-- for JVM to know memory limits when running inside docker: -->
-                            <argLine combine.self="append">-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap</argLine>
+                        <configuration>
+                            <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>postgres</sysprop.bonita.db.vendor>
                                 <sysprop.bonita.bdm.db.vendor>postgres</sysprop.bonita.bdm.db.vendor>
@@ -1020,9 +1011,8 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration combine.children="append">
-                            <!-- for JVM to know memory limits when running inside docker: -->
-                            <argLine combine.self="append">-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap</argLine>
+                        <configuration>
+                            <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>mysql</sysprop.bonita.db.vendor>
                                 <sysprop.bonita.bdm.db.vendor>mysql</sysprop.bonita.bdm.db.vendor>
@@ -1083,9 +1073,8 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration combine.children="append">
-                            <!-- for JVM to know memory limits when running inside docker: -->
-                            <argLine combine.self="append">-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap</argLine>
+                        <configuration>
+                            <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
                             <systemPropertyVariables>
                                 <sysprop.bonita.db.vendor>oracle</sysprop.bonita.db.vendor>
                                 <sysprop.bonita.bdm.db.vendor>oracle</sysprop.bonita.bdm.db.vendor>
