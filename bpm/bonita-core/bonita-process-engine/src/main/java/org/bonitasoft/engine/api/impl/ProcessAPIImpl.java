@@ -5005,22 +5005,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<Problem> getProcessResolutionProblems(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
-        final List<BusinessArchiveArtifactManager> resolvers = tenantAccessor.getBusinessArchiveArtifactsManager().getArtifactManagers();
-        SProcessDefinition processDefinition;
         try {
-            processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            return tenantAccessor.getBusinessArchiveArtifactsManager().getProcessResolutionProblems(processDefinition);
         } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
             throw new ProcessDefinitionNotFoundException(e);
         }
-        final List<Problem> problems = new ArrayList<>();
-        for (final BusinessArchiveArtifactManager resolver : resolvers) {
-            final List<Problem> problem = resolver.checkResolution(processDefinition);
-            if (problem != null) {
-                problems.addAll(problem);
-            }
-        }
-        return problems;
     }
 
     @Override
