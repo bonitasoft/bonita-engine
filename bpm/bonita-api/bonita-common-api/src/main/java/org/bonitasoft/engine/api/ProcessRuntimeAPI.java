@@ -1781,8 +1781,9 @@ public interface ProcessRuntimeAPI {
     SearchResult<Comment> searchComments(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Add a comment on a process instance. Be aware that when called in a groovy script, there is no concept of authenticated users and you are identified as "System".
-     * Therefore, when called in a groovy script, "System" will be marked as having made the comment.
+     * Add a comment on a process instance. Be aware that operations inside tasks are executed by the System, not the task assignee.
+     * Therefore, when called from an operation inside a task, the user "System" will be marked as having made the comment. If you wish to add a comment made by the assigned user in those places,
+     * use addProcessCommentOnBehalfOfUser.
      *
      * @param processInstanceId
      *        The identifier of the process instance.

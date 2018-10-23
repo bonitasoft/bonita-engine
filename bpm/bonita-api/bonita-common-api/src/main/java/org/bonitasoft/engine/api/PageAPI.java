@@ -113,6 +113,7 @@ public interface PageAPI {
 
     /**
      * Creates a custom page.
+     * Note that if called from an operation in a task, the author of the page will always be the user System.
      *
      * @param pageCreator
      *        the creator object to instantiate the new page.
@@ -183,6 +184,7 @@ public interface PageAPI {
      * name, displayName and description. Be aware that this method does not update your web permission-mappings.
      * It means that rest api extensions created with this method will not be accessible from the portal.
      * To avoid the problem, either use the <a href="https://documentation.bonitasoft.com/?page=portal-api#toc0">create page rest api</a> or upload the extensions directly from Bonita Portal.
+     * Note that if called from an operation in a task, the author of the page will always be the user System.
      *
      * @param contentName
      *        name of the zip file containing the page
