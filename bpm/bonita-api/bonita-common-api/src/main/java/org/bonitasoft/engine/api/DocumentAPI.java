@@ -52,6 +52,9 @@ public interface DocumentAPI {
      * Attach a document by reference to the specified process instance.
      * <p>
      * The document itself does not contain content but is a reference to external content specified by its URL.
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * document whose author is the user System.
      * </p>
      *
      * @param processInstanceId
@@ -105,13 +108,16 @@ public interface DocumentAPI {
      * Attach a new document to a process instance.
      * <br>
      * Depending on the DocumentValue given the document will be internal (with content) or external (with url).
-     *  <ol>
-     *      <li>If the target document is a list of document then we append it to the list</li>
-     *      <li>If the target document is a list of document and the index is set on the document value then we insert the element in the list at the specified
-     *      index</li>
-     *      <li>If the target single document or is non existent in the definition we create it</li>
-     *      <li>If the target single document and is already existent an exception is thrown</li>
-     *  </ol>
+     * <ol>
+     * <li>If the target document is a list of document then we append it to the list</li>
+     * <li>If the target document is a list of document and the index is set on the document value then we insert the element in the list at the specified
+     * index</li>
+     * <li>If the target single document or is non existent in the definition we create it</li>
+     * <li>If the target single document and is already existent an exception is thrown</li>
+     * </ol>
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach add
+     * a document whose author is the user System.
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -139,6 +145,9 @@ public interface DocumentAPI {
      * Attach the given document to the specified process instance.
      * <p>
      * The content is stored to enable later retrieval.
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * document whose author is the user System.
      * </p>
      *
      * @param processInstanceId
@@ -166,7 +175,9 @@ public interface DocumentAPI {
     /**
      * Attach a new version of a document by reference to the specified process instance. The referenced document is
      * a new version of the named document.
-     *
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * document whose author is the user System.
      * @param processInstanceId
      *        The identifier of the process instance
      * @param documentName
@@ -191,6 +202,9 @@ public interface DocumentAPI {
      * Attach a new document version to the specified process instance. The document is a new version of the named document.
      * <p>
      * The content is stored to enable later retrieval.
+     * The author of the document will be the user currently calling the API method. Note that the operations of a task are not executed by the assigned user,
+     * but directly by the System. It means that calling this method directly from an operation inside a task (through a groovy script for example) will attach a
+     * document whose author is the user System.
      * </p>
      *
      * @param processInstanceId
@@ -460,7 +474,7 @@ public interface DocumentAPI {
     List<Document> getDocumentList(long processInstanceId, String name, int fromIndex, int numberOfResult) throws DocumentNotFoundException;
 
     /**
-     * Get a document list that have the specified name on the process
+     * Set the document list on a specified process
      *
      * @param processInstanceId
      *        The identifier of the process instance that contains the list
