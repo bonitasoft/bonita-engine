@@ -17,6 +17,7 @@ import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.ERROR;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.INFO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -160,5 +161,10 @@ public class BusinessArchiveArtifactsManager {
             businessArchiveArtifactManager.exportToBusinessArchive(processDefinitionId, businessArchiveBuilder);
         }
         return businessArchiveBuilder.done();
+    }
+
+    public List<Problem> getProcessResolutionProblems(SProcessDefinition processDefinition) {
+        return getArtifactManagers().stream().flatMap(resolver -> resolver.checkResolution(processDefinition).stream())
+                .collect(Collectors.toList());
     }
 }
