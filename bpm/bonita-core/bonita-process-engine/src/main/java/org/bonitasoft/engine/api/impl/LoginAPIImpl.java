@@ -22,12 +22,12 @@ import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.platform.Logout;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.platform.LoginException;
@@ -179,13 +179,11 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     @CustomTransactions
     public void logout(final APISession session) throws LogoutException, SessionNotFoundException {
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(session.getTenantId());
-        final TransactionExecutor transactionExecutor = serviceAccessor.getTransactionExecutor();
-        final Logout logout = new Logout(serviceAccessor.getLoginService(), session.getId());
         try {
-            transactionExecutor.execute(logout);
+            serviceAccessor.getLoginService().logout(session.getId());
         } catch (final SSessionNotFoundException sbe) {
             throw new SessionNotFoundException(sbe);
-        } catch (final SBonitaException sbe) {
+        } catch (final SLoginException sbe) {
             throw new LogoutException(sbe);
         }
     }
