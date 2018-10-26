@@ -33,12 +33,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
 
-    @Mock
-    private SMessageInstance messageInstance;
-
-    @Mock
-    private SWaitingMessageEvent waitingMessageEvent;
-
     private final static String MESSAGE_INSTANCE_NAME = "name";
 
     private final static String MESSAGE_INSTANCE_TARGET_PROCESS_NAME = "process";
@@ -50,17 +44,14 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
     @Override
     @Before
     public void before() throws SBonitaException {
-        txBonitawork = spy(new MessageInstanceContextWork(wrappedWork, messageInstance, waitingMessageEvent));
-        doReturn(MESSAGE_INSTANCE_NAME).when(messageInstance).getMessageName();
-        doReturn(MESSAGE_INSTANCE_TARGET_PROCESS_NAME).when(messageInstance).getTargetProcess();
-        doReturn(MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME).when(messageInstance).getTargetFlowNode();
-        doReturn(WAITING_MESSAGE_EVENT_TYPE).when(waitingMessageEvent).getEventType();
+        txBonitawork = spy(new MessageInstanceContextWork(wrappedWork, MESSAGE_INSTANCE_NAME,MESSAGE_INSTANCE_TARGET_PROCESS_NAME,
+                MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME,WAITING_MESSAGE_EVENT_TYPE.name()));
         super.before();
     }
 
     @Test
     public void handleFailure() throws Throwable {
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Map<String, Object> context = Collections.singletonMap("tenantAccessor", tenantAccessor);
         final SBonitaException e = new SBonitaException() {
 
             private static final long serialVersionUID = -6748168976371554636L;

@@ -16,8 +16,6 @@ package org.bonitasoft.engine.execution.work.failurewrapping;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -26,24 +24,25 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public class MessageInstanceContextWork extends TxInHandleFailureWrappingWork {
 
-    private static final long serialVersionUID = 8250011422595020879L;
+    private String messageName;
+    private String targetProcess;
+    private String targetFlowNode;
+    private String eventType;
 
-    private final SMessageInstance messageInstance;
-
-    private final SWaitingMessageEvent waitingMessageEvent;
-
-    public MessageInstanceContextWork(final BonitaWork work, final SMessageInstance messageInstance, final SWaitingMessageEvent waitingMessageEvent) {
+    public MessageInstanceContextWork(BonitaWork work, String messageName, String targetProcess, String targetFlowNode, String eventType) {
         super(work);
-        this.messageInstance = messageInstance;
-        this.waitingMessageEvent = waitingMessageEvent;
+        this.messageName = messageName;
+        this.targetProcess = targetProcess;
+        this.targetFlowNode = targetFlowNode;
+        this.eventType = eventType;
     }
 
     @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) {
-        sBonitaException.setMessageInstanceNameOnContext(messageInstance.getMessageName());
-        sBonitaException.setMessageInstanceTargetProcessOnContext(messageInstance.getTargetProcess());
-        sBonitaException.setMessageInstanceTargetFlowNodeOnContext(messageInstance.getTargetFlowNode());
-        sBonitaException.setWaitingMessageEventTypeOnContext(waitingMessageEvent.getEventType().name());
+        sBonitaException.setMessageInstanceNameOnContext(messageName);
+        sBonitaException.setMessageInstanceTargetProcessOnContext(targetProcess);
+        sBonitaException.setMessageInstanceTargetFlowNodeOnContext(targetFlowNode);
+        sBonitaException.setWaitingMessageEventTypeOnContext(eventType);
     }
 
 }

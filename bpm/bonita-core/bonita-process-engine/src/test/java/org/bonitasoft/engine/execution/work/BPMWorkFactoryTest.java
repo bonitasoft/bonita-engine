@@ -20,12 +20,17 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.TriggerSignalWork;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkDescriptor;
 import org.junit.Assert;
@@ -43,18 +48,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BPMWorkFactoryTest {
 
-    @Mock
-    private SMessageInstance messageInstance;
-
-    @Mock
-    private SWaitingMessageEvent waitingMessageEvent;
 
     @InjectMocks
     private BPMWorkFactory workFactory;
 
     @Test
     public void createExecuteMessageCoupleWorkHasNoLockProcessInstanceWorkIfNoTargetProcess() {
-        doReturn(-1L).when(waitingMessageEvent).getParentProcessInstanceId();
+        SWaitingMessageEventImpl waitingMessageEvent = createWaitingMessage();
+        SMessageInstanceImpl messageInstance = createMessageInstance();
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertFalse("A lock Process Instance Work is used although there is no Target process", containsLockProcessInstance);
@@ -62,7 +63,9 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createExecuteMessageCoupleWorkWithLockProcessInstanceWork() {
-        doReturn(1L).when(waitingMessageEvent).getParentProcessInstanceId();
+        SWaitingMessageEventImpl waitingMessageEvent = createWaitingMessage();
+        waitingMessageEvent.setParentProcessInstanceId(5L);
+        SMessageInstanceImpl messageInstance = createMessageInstance();
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertTrue("A lock Process Instance Work is missing although there is a Target process", containsLockProcessInstance);
@@ -70,9 +73,23 @@ public class BPMWorkFactoryTest {
 
     @Test
     public void createExecuteMessageCoupleWork() {
+        SWaitingMessageEventImpl waitingMessageEvent = createWaitingMessage();
+        SMessageInstanceImpl messageInstance = createMessageInstance();
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteMessageCoupleWorkDescriptor(messageInstance, waitingMessageEvent));
         Assert.assertTrue("A MessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
         Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing", containsFailureHandlingProcessDefinition(work));
+    }
+
+    private SMessageInstanceImpl createMessageInstance() {
+        SMessageInstanceImpl sMessageInstance = new SMessageInstanceImpl("message", "myProcess", "flowNode", 1L, "throwFlowNode");
+        sMessageInstance.setId(543L);
+        return sMessageInstance;
+    }
+
+    private SWaitingMessageEventImpl createWaitingMessage() {
+        SWaitingMessageEventImpl sWaitingMessageEvent = new SWaitingMessageEventImpl(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L, "myProcess", 2, "flowNode", "message");
+        sWaitingMessageEvent.setId(1234L);
+        return sWaitingMessageEvent;
     }
 
     @Test
@@ -111,42 +128,64 @@ public class BPMWorkFactoryTest {
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
     }
 
-    private boolean containsFailureHandlingFlowNodeInstance(final WrappingBonitaWork work) {
-        return containsWorkOfClass(work, FlowNodeDefinitionAndInstanceContextWork.class);
-    }
+    @Test
+    public void createTriggerSignalWork() {
+        SWaitingSignalEventImpl listeningSignal = new SWaitingSignalEventImpl(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L, "myProcess", 2L, "myFlowNode", "mySignal");
+        listeningSignal.setId(123L);
+        WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
 
-    private boolean containsFailureHandlingProcessInstance(final WrappingBonitaWork work) {
-        return containsWorkOfClass(work, ProcessInstanceContextWork.class);
-    }
-
-    private boolean containsFailureHandlingProcessDefinition(final WrappingBonitaWork work) {
-        return containsWorkOfClass(work, ProcessDefinitionContextWork.class);
-    }
-
-    private boolean containsFailureHandlingMessageInstance(final WrappingBonitaWork work) {
-        return containsWorkOfClass(work, MessageInstanceContextWork.class);
-    }
-
-    private boolean containsLockProcessInstanceWork(final WrappingBonitaWork work) {
-        return containsWorkOfClass(work, LockProcessInstanceWork.class);
-    }
-
-    private boolean containsWorkOfClass(WrappingBonitaWork work, final Class<?> clazz) {
-        boolean containsLockProcessInstance = clazz.isAssignableFrom(work.getClass());
-        while (work.getWrappedWork() != null && !containsLockProcessInstance) {
-            final BonitaWork wrappedWork = work.getWrappedWork();
-            if (wrappedWork instanceof WrappingBonitaWork) {
-                work = (WrappingBonitaWork) work.getWrappedWork();
-                containsLockProcessInstance = clazz.isAssignableFrom(work.getClass());
-            } else {
-                break;
-            }
-        }
-        return containsLockProcessInstance;
+        assertThat(getWorkOfClass(work, TriggerSignalWork.class).getDescription()).contains("waitingSignalEvent: 123");
+        assertThat(containsLockProcessInstanceWork(work)).isFalse();
     }
 
     @Test
-    public void should_create_work_using_extensions() throws Exception {
+    public void createTriggerSignalWork_in_a_process_instance() {
+        SWaitingSignalEventImpl listeningSignal = new SWaitingSignalEventImpl(SBPMEventType.INTERMEDIATE_CATCH_EVENT, 1L, "myProcess", 2L, "myFlowNode", "mySignal");
+        listeningSignal.setId(123L);
+        listeningSignal.setParentProcessInstanceId(456L);
+        WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createTriggerSignalWorkDescriptor(listeningSignal));
+
+        assertThat(getWorkOfClass(work, TriggerSignalWork.class).getDescription()).contains("waitingSignalEvent: 123");
+        assertThat(getWorkOfClass(work, LockProcessInstanceWork.class).processInstanceId).isEqualTo(456L);
+    }
+
+    private boolean containsFailureHandlingFlowNodeInstance(BonitaWork work) {
+        return containsWorkOfClass(work, FlowNodeDefinitionAndInstanceContextWork.class);
+    }
+
+    private boolean containsFailureHandlingProcessInstance(BonitaWork work) {
+        return containsWorkOfClass(work, ProcessInstanceContextWork.class);
+    }
+
+    private boolean containsFailureHandlingProcessDefinition(BonitaWork work) {
+        return containsWorkOfClass(work, ProcessDefinitionContextWork.class);
+    }
+
+    private boolean containsFailureHandlingMessageInstance(BonitaWork work) {
+        return containsWorkOfClass(work, MessageInstanceContextWork.class);
+    }
+
+    private boolean containsLockProcessInstanceWork(BonitaWork work) {
+        return containsWorkOfClass(work, LockProcessInstanceWork.class);
+    }
+
+    private boolean containsWorkOfClass(BonitaWork work, final Class<?> clazz) {
+        return getWorkOfClass(work, clazz) != null;
+    }
+
+    private <T> T getWorkOfClass(BonitaWork work, Class<T> clazz) {
+        if (clazz.isAssignableFrom(work.getClass())) {
+            return ((T) work);
+        }
+        if (!(work instanceof WrappingBonitaWork)) {
+            return null;
+        }
+        WrappingBonitaWork wrappingBonitaWork = ((WrappingBonitaWork) work);
+        return getWorkOfClass(wrappingBonitaWork.getWrappedWork(), clazz);
+    }
+
+    @Test
+    public void should_create_work_using_extensions() {
         BonitaWork bonitaWork = new BonitaWork() {
 
             @Override
@@ -155,12 +194,12 @@ public class BPMWorkFactoryTest {
             }
 
             @Override
-            public CompletableFuture<Void> work(Map<String, Object> context) throws Exception {
+            public CompletableFuture<Void> work(Map<String, Object> context) {
                 return CompletableFuture.completedFuture(null);
             }
 
             @Override
-            public void handleFailure(Throwable e, Map<String, Object> context) throws Exception {
+            public void handleFailure(Throwable e, Map<String, Object> context) {
             }
         };
         workFactory.addExtension("MyWork", workDescriptor -> bonitaWork);
