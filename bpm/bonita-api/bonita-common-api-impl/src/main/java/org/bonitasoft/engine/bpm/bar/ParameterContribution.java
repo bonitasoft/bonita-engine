@@ -29,7 +29,7 @@ public class ParameterContribution implements BusinessArchiveContribution {
 
     static final String PARAMETERS_FILE = "parameters.properties";
 
-    static final String NULL = "-==NULLL==-";
+    public static final String NULL = "-==NULLL==-";
 
     @Override
     public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {

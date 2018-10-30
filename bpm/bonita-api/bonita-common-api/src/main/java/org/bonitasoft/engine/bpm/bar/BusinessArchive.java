@@ -94,7 +94,7 @@ public class BusinessArchive implements Serializable {
      */
     public Map<String, String> getParameters() {
         if (parameters == null) {
-            parameters = new HashMap<String, String>();
+            parameters = new HashMap<>();
         }
         return parameters;
     }

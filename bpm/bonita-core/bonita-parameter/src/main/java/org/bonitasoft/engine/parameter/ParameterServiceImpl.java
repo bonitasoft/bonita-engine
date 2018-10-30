@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.bpm.bar.ParameterContribution;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -73,7 +74,7 @@ public class ParameterServiceImpl implements ParameterService {
 
     void update(SParameter sParameter, String parameterValue) throws SObjectModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(VALUE_KEY, parameterValue);
+        descriptor.addField(VALUE_KEY, interpretParameterValue(parameterValue));
         try {
             recorder.recordUpdate(UpdateRecord.buildSetFields(sParameter, descriptor), PARAMETER);
         } catch (SRecorderException e) {
@@ -100,6 +101,13 @@ public class ParameterServiceImpl implements ParameterService {
         }
     }
 
+    /**
+     * Handle null values. If input is {@link org.bonitasoft.engine.bpm.bar.ParameterContribution#NULL}, convert it to <code>null</code>
+     */
+    protected String interpretParameterValue(String s) {
+        return ParameterContribution.NULL.equals(s) ? null : s;
+    }
+
     @Override
     public void addAll(long processDefinitionId, Map<String, String> parameters)
             throws SObjectCreationException, SBonitaReadException, SObjectModificationException {
@@ -118,7 +126,7 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     void add(long processDefinitionId, String name, String value) throws SObjectCreationException {
-        final SParameterImpl sParameter = new SParameterImpl(name, value, processDefinitionId);
+        final SParameterImpl sParameter = new SParameterImpl(name, interpretParameterValue(value), processDefinitionId);
         try {
             recorder.recordInsert(new InsertRecord(sParameter), PARAMETER);
         } catch (SRecorderException e) {
@@ -160,7 +168,8 @@ public class ParameterServiceImpl implements ParameterService {
     @Override
     public List<SParameter> get(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order) throws SBonitaReadException {
         return persistenceService.selectList(
-                new SelectListDescriptor<SParameter>("getParameters", Collections.<String, Object> singletonMap(PROCESS_DEFINITION_ID_KEY, processDefinitionId),
+                new SelectListDescriptor<>("getParameters",
+                        Collections.singletonMap(PROCESS_DEFINITION_ID_KEY, processDefinitionId),
                         SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
     }
 
@@ -169,17 +178,19 @@ public class ParameterServiceImpl implements ParameterService {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put(PROCESS_DEFINITION_ID_KEY, processDefinitionId);
         parameters.put("name", parameterName);
-        return persistenceService.selectOne(new SelectOneDescriptor<SParameter>("getParameterByName", parameters, SParameter.class));
+        return persistenceService
+                .selectOne(new SelectOneDescriptor<>("getParameterByName", parameters, SParameter.class));
     }
 
     @Override
     public List<SParameter> getNullValues(long processDefinitionId, int fromIndex, int numberOfResult, OrderBy order)
             throws SParameterProcessNotFoundException, SBonitaReadException {
-        return persistenceService.selectList(new SelectListDescriptor<SParameter>("getParametersWithNullValues", Collections.<String, Object> singletonMap(
+        return persistenceService.selectList(new SelectListDescriptor<>("getParametersWithNullValues",
+                Collections.singletonMap(
                 PROCESS_DEFINITION_ID_KEY, processDefinitionId), SParameter.class, new QueryOptions(fromIndex, numberOfResult, getOrderByOptions(order))));
     }
 
-    List<OrderByOption> getOrderByOptions(OrderBy order) {
+    private List<OrderByOption> getOrderByOptions(OrderBy order) {
         OrderByType type = OrderByType.ASC;
         String fieldName = "name";
         if (order != null) {
@@ -202,8 +213,9 @@ public class ParameterServiceImpl implements ParameterService {
 
     @Override
     public boolean containsNullValues(long processDefinitionId) throws SBonitaReadException {
-        return !persistenceService.selectList(new SelectListDescriptor<SParameter>("getParametersWithNullValues", Collections.<String, Object> singletonMap(
-                PROCESS_DEFINITION_ID_KEY, processDefinitionId), SParameter.class, new QueryOptions(0, 1000))).isEmpty();
+        return !persistenceService.selectList(new SelectListDescriptor<SParameter>("getParametersWithNullValues",
+                Collections.singletonMap(PROCESS_DEFINITION_ID_KEY, processDefinitionId), SParameter.class,
+                new QueryOptions(0, 1))).isEmpty();
     }
 
 }
