@@ -14,7 +14,10 @@
 package org.bonitasoft.engine.parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -39,6 +42,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -58,33 +62,54 @@ public class ParameterServiceImplTest {
     private ArgumentCaptor<SelectListDescriptor<SParameter>> getSelectDescriptor;
 
     @InjectMocks
+    @Spy
     private ParameterServiceImpl parameterService;
-
-    public ParameterServiceImplTest() {
-    }
 
     @Test
     public void update_should_call_internal_update_with_retrieved_existing_value() throws Exception {
-        final ParameterServiceImpl spy = spy(parameterService);
         final String aParam = "aParam";
         final long processDefinitionId = 1544878L;
         final SParameterImpl sParameter = new SParameterImpl(aParam, "value", processDefinitionId);
-        doReturn(sParameter).when(spy).get(processDefinitionId, aParam);
+        doReturn(sParameter).when(parameterService).get(processDefinitionId, aParam);
 
         final String newValue = "newValue";
-        spy.update(processDefinitionId, aParam, newValue);
+        parameterService.update(processDefinitionId, aParam, newValue);
 
-        verify(spy).update(sParameter, newValue);
+        verify(parameterService).update(sParameter, newValue);
     }
 
     @Test
-    public void update_shoudl_call_recordUpdate_on_recorder() throws Exception {
+    public void update_should_convert_parameter_value() throws Exception {
+        final String newValue = "newValue";
+
+        parameterService.update(new SParameterImpl("parameter", "defaultValue", 9874654654L), newValue);
+
+        verify(parameterService).interpretParameterValue(newValue);
+    }
+
+    @Test
+    public void add_should_convert_parameter_value() throws Exception {
+        parameterService.add(9874654654L,"parameter", "defaultValue");
+
+        verify(parameterService).interpretParameterValue("defaultValue");
+    }
+
+    @Test
+    public void interpretParameterValue_should_convert_NULL_VALUES() {
+        assertThat(parameterService.interpretParameterValue("")).isEqualTo("");
+        assertThat(parameterService.interpretParameterValue(null)).isEqualTo(null);
+        assertThat(parameterService.interpretParameterValue("someValue")).isEqualTo("someValue");
+        assertThat(parameterService.interpretParameterValue("-==NULLL==-")).isEqualTo(null);
+    }
+
+    @Test
+    public void update_should_call_recordUpdate_on_recorder() throws Exception {
         parameterService.update(mock(SParameter.class), "value");
         verify(recorder).recordUpdate(any(UpdateRecord.class), nullable(String.class));
     }
 
     @Test(expected = SParameterNameNotFoundException.class)
-    public void updateUnexistingParameter() throws Exception {
+    public void updateNonExistingParameter() throws Exception {
         parameterService.update(123L, "aParam", "newValue");
     }
 
@@ -101,9 +126,9 @@ public class ParameterServiceImplTest {
     @Test
     public void deleteAll_should_call_recordDelete() throws Exception {
         final long processDefinitionId = 123L;
-        final ParameterServiceImpl spy = spy(parameterService);
-        doReturn(Collections.singletonList(new SParameterImpl())).when(spy).get(eq(processDefinitionId), anyInt(), anyInt(), nullable(OrderBy.class));
-        spy.deleteAll(processDefinitionId);
+        doReturn(Collections.singletonList(new SParameterImpl())).when(parameterService).get(eq(processDefinitionId),
+                anyInt(), anyInt(), nullable(OrderBy.class));
+        parameterService.deleteAll(processDefinitionId);
         verify(recorder).recordDelete(any(DeleteRecord.class), nullable(String.class));
     }
 
@@ -128,7 +153,7 @@ public class ParameterServiceImplTest {
     }
 
     @Test
-    public void getUnexistingParameter_should_return_null() throws Exception {
+    public void getNonExistingParameter_should_return_null() throws Exception {
         assertThat(parameterService.get(123L, "aParam")).isNull();
     }
 
@@ -161,37 +186,34 @@ public class ParameterServiceImplTest {
         final String paramName = "paramName";
         final long processDefinitionId = 5457878L;
         final String paramValue = "paramValue";
-        final ParameterServiceImpl spy = spy(parameterService);
         final SParameter sParameter = mock(SParameter.class);
-        doReturn(sParameter).when(spy).get(processDefinitionId, paramName);
-        spy.addOrUpdate(processDefinitionId, paramName, paramValue);
-        verify(spy).update(sParameter, paramValue);
+        doReturn(sParameter).when(parameterService).get(processDefinitionId, paramName);
+        parameterService.addOrUpdate(processDefinitionId, paramName, paramValue);
+        verify(parameterService).update(sParameter, paramValue);
     }
 
     @Test
     public void getAll_should_get_paginated_method() throws Exception {
-        final ParameterServiceImpl spy = spy(parameterService);
         final long processDefinitionId = 4656556L;
-        spy.getAll(processDefinitionId);
-        verify(spy).get(eq(processDefinitionId), eq(0), anyInt(), nullable(OrderBy.class));
+        parameterService.getAll(processDefinitionId);
+        verify(parameterService).get(eq(processDefinitionId), eq(0), anyInt(), nullable(OrderBy.class));
     }
 
     @Test
     public void should_merge_parameters_with_existing_parameters() throws Exception {
-        final ParameterServiceImpl spy = spy(parameterService);
         final long processDefinitionId = 4656556L;
         SParameter hostParameter = sParameter("host", "localhost", processDefinitionId);
-        doReturn(hostParameter).when(spy).get(processDefinitionId, "host");
+        doReturn(hostParameter).when(parameterService).get(processDefinitionId, "host");
         when(loggerService.isLoggable(any(), any())).thenReturn(true);
         
         Map<String, String> parameters = new HashMap<>();
         parameters.put("host", "192.168.0.1");
         parameters.put("password", "kittycat");
         
-        spy.merge(processDefinitionId, parameters);
+        parameterService.merge(processDefinitionId, parameters);
 
-        verify(spy).update(hostParameter, "192.168.0.1");
-        verify(spy, never()).add(processDefinitionId, "password", "kittycat");
+        verify(parameterService).update(hostParameter, "192.168.0.1");
+        verify(parameterService, never()).add(processDefinitionId, "password", "kittycat");
         verify(loggerService, times(1)).log(eq(ParameterServiceImpl.class), any(TechnicalLogSeverity.class),
                 eq("Parameter <password> doesn't exist in process definition <4656556> and has not been merged."));
     }
