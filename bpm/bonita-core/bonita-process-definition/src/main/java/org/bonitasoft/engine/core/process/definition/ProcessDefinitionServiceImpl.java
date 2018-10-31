@@ -141,13 +141,18 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public void disableProcessDeploymentInfo(final long processId) throws SProcessDefinitionNotFoundException, SProcessDisablementException {
+        disableProcess(processId, true);
+    }
+
+    @Override
+    public void disableProcess(long processId, boolean failIfAlreadyDisabled) throws SProcessDefinitionNotFoundException, SProcessDisablementException{
         SProcessDefinitionDeployInfo processDefinitionDeployInfo;
         try {
             processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
         } catch (final SBonitaReadException e) {
             throw new SProcessDisablementException(e);
         }
-        if (ActivationState.DISABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
+        if (failIfAlreadyDisabled && ActivationState.DISABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
             throw new SProcessDisablementException("Process " + processDefinitionDeployInfo.getName() + " with version "
                     + processDefinitionDeployInfo.getVersion() + " is already disabled");
         }
@@ -174,13 +179,18 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public void enableProcessDeploymentInfo(final long processId) throws SProcessDefinitionNotFoundException, SProcessEnablementException {
+        enableProcess(processId, true);
+    }
+
+    @Override
+    public void enableProcess(final long processId, boolean failIfAlreadyEnabled) throws SProcessDefinitionNotFoundException, SProcessEnablementException {
         SProcessDefinitionDeployInfo processDefinitionDeployInfo;
         try {
             processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
         } catch (final SBonitaReadException e) {
             throw new SProcessEnablementException(e);
         }
-        if (ActivationState.ENABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
+        if (failIfAlreadyEnabled && ActivationState.ENABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
             throw new SProcessEnablementException("Process " + processDefinitionDeployInfo.getName() + " with version "
                     + processDefinitionDeployInfo.getVersion() + " is already enabled");
         }
