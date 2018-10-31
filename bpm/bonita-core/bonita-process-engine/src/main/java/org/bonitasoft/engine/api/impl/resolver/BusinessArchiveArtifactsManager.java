@@ -133,7 +133,7 @@ public class BusinessArchiveArtifactsManager {
         }
     }
 
-    private void changeResolutionStatus(final long processDefinitionId, final ProcessDefinitionService processDefinitionService,
+    public void changeResolutionStatus(final long processDefinitionId, final ProcessDefinitionService processDefinitionService,
                                         final boolean resolved) throws SBonitaException {
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {

@@ -101,13 +101,13 @@ public interface ProcessDefinitionService {
     SProcessDefinition getProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SBonitaReadException;
 
     /**
-     * Get processDefinition by its id, if it's enabled.
+     * Get processDefinition by its id, if it is enabled. Throws SProcessDefinitionException otherwise.
      *
      * @param processDefinitionId
      *        The identifier of processDefinition
      * @return The processDefinition corresponding to the parameter processId
      * @throws SBonitaReadException
-     * @throws SProcessDefinitionException
+     * @throws SProcessDefinitionException if process is not enabled.
      * @since 6.4.0
      */
     SProcessDefinition getProcessDefinitionIfIsEnabled(long processDefinitionId) throws SBonitaReadException, SProcessDefinitionException;
@@ -155,30 +155,59 @@ public interface ProcessDefinitionService {
             throws SBonitaReadException;
 
     /**
-     * Enable the specific process definition, set the process as ENABLED when it's in RESOLVED state
+     * Enable the specific process definition, set the process as ENABLED when it is in RESOLVED state.
+     * If process is already enabled, this method fails with SProcessEnablementException
      * 
      * @param processId
      *        identifier of processDefinition
      * @throws SProcessDefinitionNotFoundException
      *         error thrown if no process definition found for the given processId
-     * @throws SProcessEnablementException
+     * @throws SProcessEnablementException if process is already enabled or if process is not resolved
+     * @see #resolveProcess(long) Resolving a process
+     * @see #enableProcess(long, boolean)
      */
     void enableProcessDeploymentInfo(long processId) throws SProcessDefinitionNotFoundException, SProcessEnablementException;
 
     /**
-     * set the process as RESOLVED when it's in ENABLED state
-     * 
+     * Enable the specific process definition, when it is in RESOLVED state.
+     *
+     * @param processId
+     *        identifier of processDefinition
+     * @param failIfAlreadyEnabled should we fail if process is already enabled?
+     * @throws SProcessDefinitionNotFoundException
+     *         error thrown if no process definition found for the given processId
+     * @throws SProcessEnablementException if process is already enabled and failIfAlreadyEnabled == true, or if process is not resolved
+     */
+    void enableProcess(long processId, boolean failIfAlreadyEnabled) throws SProcessDefinitionNotFoundException, SProcessEnablementException;
+
+    /**
+     * Disable the process passed as parameter.
+     * If process is already disabled, this method fails with SProcessDisablementException.
+     *
      * @param processId
      *        identifier of process definition
      * @throws SProcessDefinitionNotFoundException
      *         error thrown if no process definition found for the given processId
-     * @throws SProcessDisablementException
+     * @throws SProcessDisablementException if process is already disabled
+     * @see #disableProcess(long, boolean)
      */
     void disableProcessDeploymentInfo(long processId) throws SProcessDefinitionNotFoundException, SProcessDisablementException;
 
     /**
-     * set the process as RESOLVED when it's in UNRESOLVED state
-     * 
+     * Disable the process passed as parameter.
+     *
+     * @param processId
+     *        identifier of process definition
+     * @param failIfAlreadyDisabled should we fail if process is already disabled?
+     * @throws SProcessDefinitionNotFoundException
+     *         error thrown if no process definition found for the given processId
+     * @throws SProcessDisablementException if process is already disabled and failIfAlreadyDisabled == true
+     */
+    void disableProcess(long processId, boolean failIfAlreadyDisabled) throws SProcessDefinitionNotFoundException, SProcessDisablementException;
+
+    /**
+     * set the process as RESOLVED when it is in UNRESOLVED state
+     *
      * @param processId
      *        identifier of process definition
      * @throws SProcessDefinitionNotFoundException
