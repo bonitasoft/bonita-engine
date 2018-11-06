@@ -30,7 +30,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -51,25 +50,22 @@ public class ParameterBusinessArchiveArtifactManager implements BusinessArchiveA
     }
 
     @Override
-    public boolean deploy(final BusinessArchive businessArchive,
-                          final SProcessDefinition processDefinition) throws NotFoundException, CreationException {
-        final Set<SParameterDefinition> parameters = processDefinition.getParameters();
+    public boolean deploy(final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
+            throws CreationException {
+        final Set<SParameterDefinition> declaredParameters = processDefinition.getParameters();
         boolean resolved = true;
-        if (parameters.isEmpty()) {
+        if (declaredParameters.isEmpty()) {
             return true;
         }
         final Map<String, String> defaultParameterValues = businessArchive.getParameters();
         final Map<String, String> storedParameters = new HashMap<>();
-        for (final SParameterDefinition sParameterDefinition : parameters) {
+        for (final SParameterDefinition sParameterDefinition : declaredParameters) {
             final String name = sParameterDefinition.getName();
             final String value = defaultParameterValues.get(sParameterDefinition.getName());
             if (value == null) {
                 resolved = false;
             }
             storedParameters.put(name, value);
-        }
-        if (!resolved && parameters.size() != defaultParameterValues.size()) {
-            resolved = false;
         }
         try {
             parameterService.addAll(processDefinition.getId(), storedParameters);
@@ -92,7 +88,8 @@ public class ParameterBusinessArchiveArtifactManager implements BusinessArchiveA
             try {
                 parameters = parameterService.getNullValues(processDefinition.getId(), i, NUMBER_OF_RESULT, OrderBy.NAME_ASC);
             } catch (final SBonitaException e) {
-                return Collections.singletonList((Problem) new ProblemImpl(Level.ERROR, null, "parameter", "Unable to get parameter !!"));
+                return Collections
+                        .singletonList(new ProblemImpl(Level.ERROR, null, "parameter", "Unable to get parameter !!"));
             }
             i += NUMBER_OF_RESULT;
             for (final SParameter parameter : parameters) {
