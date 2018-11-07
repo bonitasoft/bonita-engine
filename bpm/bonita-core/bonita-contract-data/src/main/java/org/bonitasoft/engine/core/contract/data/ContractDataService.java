@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -30,6 +31,13 @@ public interface ContractDataService {
 
     void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException;
 
+    /**
+     * delete all archived user task data from the list of user task ids (sourceObjectIds)
+     * @param sourceUserTaskIds list of user tasks ids (non-archived)
+     * @throws SContractDataDeletionException
+     */
+    void deleteArchivedUserTaskData(List<Long> sourceUserTaskIds) throws SContractDataDeletionException;
+
     void archiveAndDeleteUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException;
 
     Serializable getArchivedUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
@@ -39,6 +47,13 @@ public interface ContractDataService {
     Serializable getProcessDataValue(long processInstanceId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
     void deleteProcessData(long processInstanceId) throws SContractDataDeletionException;
+
+    /**
+     * delete all archived user task data from the list of process instance ids (sourceObjectIds)
+     * @param sourceProcessInstanceIds list of process instance ids (non-archived)
+     * @throws SContractDataDeletionException
+     */
+    void deleteArchivedProcessData(List<Long> sourceProcessInstanceIds) throws SContractDataDeletionException;
 
     void archiveAndDeleteProcessData(long processInstanceId, long archiveDate) throws SObjectModificationException;
 

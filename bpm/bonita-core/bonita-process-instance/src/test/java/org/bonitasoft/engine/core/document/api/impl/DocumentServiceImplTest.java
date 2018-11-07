@@ -55,8 +55,6 @@ public class DocumentServiceImplTest {
     @Mock
     private SDocumentDownloadURLProvider urlProvider;
     @Mock
-    private EventService eventService;
-    @Mock
     private TechnicalLoggerService technicalLogger;
     @Mock
     private ArchiveService archiveService;
@@ -65,7 +63,7 @@ public class DocumentServiceImplTest {
 
     @Before
     public void setUp() {
-        documentService = spy(new DocumentServiceImpl(recorder, persistenceService, urlProvider, eventService, archiveService));
+        documentService = spy(new DocumentServiceImpl(recorder, persistenceService, urlProvider, archiveService));
     }
 
     @Test

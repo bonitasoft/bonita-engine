@@ -275,11 +275,12 @@ public interface DocumentService {
     void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SBonitaReadException, SObjectModificationException;
 
     /**
-     * @param instanceId
-     * @throws SObjectModificationException
-     * @since 6.0
+     * delete archived documents mapping and documents links to a set of processes
+     * @param processInstanceId ids of the source process instances
+     * @throws SBonitaReadException
+     * @throws SRecorderException
      */
-    void deleteArchivedDocuments(long instanceId) throws SObjectModificationException;
+    void deleteArchivedDocuments(List<Long> processInstanceId) throws SBonitaReadException, SRecorderException;
 
     /**
      * archive the specific document mapping in the archive date

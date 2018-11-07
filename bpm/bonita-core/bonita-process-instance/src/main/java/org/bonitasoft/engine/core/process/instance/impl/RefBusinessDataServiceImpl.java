@@ -226,5 +226,14 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
             throw new SObjectModificationException("Unable to delete SARefBusinessDataInstance's for processInstanceId: " + processInstanceId, e);
         }
     }
+    @Override
+    public void deleteArchivedRefBusinessDataInstance(List<Long> processInstanceIds) throws SObjectModificationException {
+        try {
+            archiveService.deleteFromQuery("deleteArchivedRefBizDataForProcessInstances",
+                    Collections.<String, Object> singletonMap("processInstanceIds", processInstanceIds));
+        } catch (SRecorderException e) {
+            throw new SObjectModificationException("Unable to delete SARefBusinessDataInstance's for processInstanceIds: " + processInstanceIds, e);
+        }
+    }
 
 }
