@@ -42,4 +42,15 @@
         AND ap.name = :name
     </query>
 
+    <query name="deleteArchivedProcessContractData">
+        DELETE
+        FROM org.bonitasoft.engine.core.contract.data.SAProcessContractData AS c
+        WHERE c.scopeId IN (:scopeIds)
+    </query>
+    <query name="deleteArchivedTaskContractData">
+        DELETE
+        FROM org.bonitasoft.engine.core.contract.data.SATaskContractData AS c
+        WHERE c.scopeId IN (:scopeIds)
+    </query>
+
 </hibernate-mapping>

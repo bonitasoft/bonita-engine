@@ -44,6 +44,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -60,18 +61,16 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 public class DocumentServiceImpl implements DocumentService {
 
     private final SDocumentDownloadURLProvider urlProvider;
-    private final EventService eventService;
     private final ArchiveService archiveService;
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
     private final ReadPersistenceService definitiveArchiveReadPersistenceService;
 
     public DocumentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final SDocumentDownloadURLProvider urlProvider, final EventService eventService, final ArchiveService archiveService) {
+            final SDocumentDownloadURLProvider urlProvider, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.urlProvider = urlProvider;
-        this.eventService = eventService;
         this.archiveService = archiveService;
         definitiveArchiveReadPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
 
@@ -284,7 +283,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return definitiveArchiveReadPersistenceService.getNumberOfEntities(SAMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -300,7 +299,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public long getNumberOfDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return persistenceService.getNumberOfEntities(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -320,12 +319,6 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private void removeArchivedDocument(final SAMappedDocument mappedDocument) throws SRecorderException, SBonitaReadException, SObjectNotFoundException {
-        // Delete document itself and the mapping
-        delete((SADocumentMapping) mappedDocument);
-        delete(getDocument(mappedDocument.getDocumentId()));
-    }
-
     @Override
     public void deleteDocument(final SLightDocument document) throws SObjectModificationException {
         try {
@@ -337,10 +330,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     private void delete(final SLightDocument document) throws SRecorderException {
         recorder.recordDelete(new DeleteRecord(document), "SDocument");
-    }
-
-    private void delete(final SADocumentMapping mappedDocument) throws SRecorderException {
-        recorder.recordDelete(new DeleteRecord(mappedDocument), "SADocumentMapping");
     }
 
     @Override
@@ -362,7 +351,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<SAMappedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService1 = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
         return persistenceService1.searchEntity(SAMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
@@ -378,7 +367,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<SMappedDocument> searchDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
-            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+            final Map<String, Object> parameters = Collections.singletonMap("userId", userId);
             return persistenceService.searchEntity(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
@@ -386,22 +375,21 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void deleteArchivedDocuments(final long instanceId) throws SObjectModificationException {
-        final FilterOption filterOption = new FilterOption(SAMappedDocument.class, "processInstanceId", instanceId);
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(filterOption);
-        final QueryOptions queryOptions = new QueryOptions(0, 100, null, filters, null);
-        try {
-            List<SAMappedDocument> documentMappings;
-            do {
-                documentMappings = definitiveArchiveReadPersistenceService.searchEntity(SAMappedDocument.class, queryOptions, null);
-                for (final SAMappedDocument documentMapping : documentMappings) {
-                    removeArchivedDocument(documentMapping);
-                }
-            } while (!documentMappings.isEmpty());
-        } catch (final SBonitaException e) {
-            throw new SObjectModificationException(e);
+    public void deleteArchivedDocuments(List<Long> processInstanceIds) throws SBonitaReadException, SRecorderException {
+        List<SAMappedDocument> archivedMappedDocuments = persistenceService.selectList(new SelectListDescriptor<>("getArchiveMappingsOfProcessInstances", Collections.singletonMap("processInstanceIds", processInstanceIds), SAMappedDocument.class, QueryOptions.countQueryOptions()));
+        if (archivedMappedDocuments.isEmpty()) {
+            //no documents to delete
+            return;
         }
+        List<Long> documentIds = new ArrayList<>();
+        List<Long> documentMappingIds = new ArrayList<>();
+        for (SAMappedDocument mappedDocument : archivedMappedDocuments) {
+            documentIds.add(mappedDocument.getDocumentId());
+            documentMappingIds.add(mappedDocument.getId());
+        }
+
+        archiveService.deleteFromQuery("deleteArchiveDocumentsByIds", Collections.singletonMap("ids", documentIds));
+        archiveService.deleteFromQuery("deleteArchiveMappingsByIds", Collections.singletonMap("ids", documentMappingIds));
     }
 
     private SDocumentMapping create(final long documentId, final long processInstanceId, final String name, final String description, final int index)
