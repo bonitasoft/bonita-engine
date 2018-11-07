@@ -412,24 +412,30 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    private void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
+    @Override
+    public void deleteLocalArchivedDataInstances(final long containerId, final String containerType) throws SDataInstanceException {
+
+        HashMap<String, Object> map = new HashMap<>();
+            map.put("containerId", containerId);
+        map.put("containerType", containerType);
         try {
-            recorder.recordDelete(new DeleteRecord(dataInstance), DATA_INSTANCE);
-        } catch (final SRecorderException e) {
-            throw new SDeleteDataInstanceException("Impossible to delete data instance", e);
+            archiveService.deleteFromQuery("deleteLocalSADataInstances", map);
+        } catch (SRecorderException e) {
+            throw new SDataInstanceException(e);
+        }
+    }
+            @Override
+    public void deleteLocalArchivedDataInstances(List<Long> containerIds,final String containerType) throws SDataInstanceException {
+                HashMap<String, Object> map = new HashMap<>();
+            map.put("containerIds", containerIds);
+        map.put("containerType", containerType);
+        try {
+            archiveService.deleteFromQuery("deleteLocalSADataInstancesOfContainers", map);
+        } catch (SRecorderException e) {
+            throw new SDataInstanceException(e);
         }
     }
 
-    @Override
-    public void deleteLocalArchivedDataInstances(final long containerId, final String containerType) throws SDataInstanceException {
-        List<SADataInstance> sDataInstances;
-        do {
-            sDataInstances = getLocalSADataInstances(containerId, containerType, 0, 100);
-            for (final SADataInstance sDataInstance : sDataInstances) {
-                deleteSADataInstance(sDataInstance);
-            }
-        } while (!sDataInstances.isEmpty());
-    }
 
     @Override
     public void deleteLocalDataInstances(final long containerId, final String dataInstanceContainerType, final boolean dataPresent)

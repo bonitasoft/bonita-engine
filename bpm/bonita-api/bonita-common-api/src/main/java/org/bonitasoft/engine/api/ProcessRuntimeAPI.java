@@ -329,26 +329,28 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Delete all archived process instance (different states) of the source identifier list.
+     * This work only with process instances that are root (not called by an other process). Using this method with ids of called processes (using call activity) will not delete them.
      *
      * @param sourceProcessInstanceIds
-     *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
-     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
+     *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}. These ids needs to be ids of root process instances
+     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived in several
      *         states: Cancelled, Aborted, Completed, Failed
      * @throws DeletionException
-     *         If a process instance can't be deleted because of a parent that is still active
+     *         If there is some e.g. connection issue to the database
      * @since 6.4.0
      */
     long deleteArchivedProcessInstancesInAllStates(List<Long> sourceProcessInstanceIds) throws DeletionException;
 
     /**
      * Delete all archived process instance (different states) corresponding to the source identifier.
+     * This work only with process instances that are root (not called by an other process). Using this method with id of called process (using call activity) will not delete it.
      *
      * @param sourceProcessInstanceId
-     *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
-     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
+     *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}. These id needs to be the id of a root process instances
+     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived in several
      *         states: Cancelled, Aborted, Completed, Failed
      * @throws DeletionException
-     *         If a process instance can't be deleted because of a parent that is still active
+     *         If there is some e.g. connection issue to the database
      * @since 6.4.0
      */
     long deleteArchivedProcessInstancesInAllStates(long sourceProcessInstanceId) throws DeletionException;

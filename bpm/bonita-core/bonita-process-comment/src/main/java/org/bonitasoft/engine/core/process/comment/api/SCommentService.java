@@ -224,13 +224,11 @@ public interface SCommentService {
     SAComment getArchivedComment(long archivedCommentId) throws SCommentNotFoundException, SBonitaReadException;
 
     /**
-     * Delete archived comments for a specified process instance
+     * Delete archived comments for specified process instances
      *
-     * @param processInstanceId
-     * @throws SBonitaException
-     * @since 6.1
+     * @param processInstanceIds
      */
-    void deleteArchivedComments(long processInstanceId) throws SBonitaException;
+    void deleteArchivedComments(List<Long> processInstanceIds) throws SBonitaException;
 
     /**
      * Delete comments for a specified process instance

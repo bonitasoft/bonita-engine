@@ -74,5 +74,5 @@ public interface ArchiveService {
      */
     boolean isArchivable(Class<? extends PersistentObject> sourceObjectClass);
 
-    void deleteFromQuery(String queryName, Map<String, Object> parameters) throws SRecorderException;
+    int deleteFromQuery(String queryName, Map<String, Object> parameters) throws SRecorderException;
 }

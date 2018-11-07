@@ -514,40 +514,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
-            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        List<ProcessInstance> processInstances;
-        final int maxResults = 1000;
-        do {
-            processInstances = searchProcessInstancesFromProcessDefinition(tenantAccessor, processDefinitionId, 0, maxResults);
-            if (processInstances.size() > 0) {
-                deleteProcessInstancesInsideLocks(tenantAccessor, true, processInstances, tenantAccessor.getTenantId());
-            }
-        } while (!processInstances.isEmpty());
-    }
-
-    private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<ProcessInstance> processInstances, final long tenantId) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        final List<Long> processInstanceIds = new ArrayList<>(processInstances.size());
-        for (final ProcessInstance processInstance : processInstances) {
-            processInstanceIds.add(processInstance.getId());
-        }
-        deleteProcessInstancesInsideLocksFromIds(tenantAccessor, ignoreProcessInstanceNotFound, processInstanceIds, tenantId);
-    }
-
-    private void deleteProcessInstancesInsideLocksFromIds(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<Long> processInstanceIds, final long tenantId) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        final LockService lockService = tenantAccessor.getLockService();
-        final String objectType = SFlowElementsContainerType.PROCESS.name();
-        final List<Long> lockedProcesses = new ArrayList<>();
-        List<BonitaLock> locks = null;
-        try {
-            locks = createLocks(lockService, objectType, lockedProcesses, processInstanceIds, tenantId);
-            deleteProcessInstancesInTransaction(tenantAccessor, ignoreProcessInstanceNotFound, processInstanceIds);
-        } finally {
-            releaseLocks(tenantAccessor, lockService, locks, tenantId);
-        }
-    }
 
     private void releaseLocks(final TenantServiceAccessor tenantAccessor, final LockService lockService, final List<BonitaLock> locks, final long tenantId) {
         if (locks == null) {
@@ -571,65 +537,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             lockedProcesses.add(processInstanceId);
         }
         return locks;
-    }
-
-    private void deleteProcessInstancesInTransaction(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        deleteProcessInstances(processInstanceService, tenantAccessor, ignoreProcessInstanceNotFound, activityInstanceService, processInstanceIds);
-    }
-
-    private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TenantServiceAccessor tenantAccessor,
-            final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService, final List<Long> processInstanceIds)
-            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        for (final Long processInstanceId : processInstanceIds) {
-            try {
-                deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
-            } catch (final SProcessInstanceNotFoundException e) {
-                if (ignoreProcessInstanceNotFound) {
-                    logInstanceNotFound(tenantAccessor, e);
-                } else {
-                    throw e;
-                }
-            }
-        }
-    }
-
-    private void deleteProcessInstance(final ProcessInstanceService processInstanceService, final Long processInstanceId,
-            final ActivityInstanceService activityInstanceService) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        final long callerId = sProcessInstance.getCallerId();
-        if (callerId > 0) {
-            try {
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(callerId);
-                final long rootProcessInstanceId = flowNodeInstance.getRootProcessInstanceId();
-                final SProcessInstanceHierarchicalDeletionException exception = new SProcessInstanceHierarchicalDeletionException(
-                        "Unable to delete the process instance, because the parent is still active.", rootProcessInstanceId);
-                exception.setProcessInstanceIdOnContext(processInstanceId);
-                exception.setRootProcessInstanceIdOnContext(rootProcessInstanceId);
-                exception.setFlowNodeDefinitionIdOnContext(flowNodeInstance.getFlowNodeDefinitionId());
-                exception.setFlowNodeInstanceIdOnContext(flowNodeInstance.getId());
-                exception.setFlowNodeNameOnContext(flowNodeInstance.getName());
-                exception.setProcessDefinitionIdOnContext(flowNodeInstance.getProcessDefinitionId());
-                throw exception;
-            } catch (final SFlowNodeNotFoundException e) {
-                // ok the activity that called this process do not exists anymore
-            }
-        }
-        deleteJobsOnProcessInstance(sProcessInstance);
-        processInstanceService.deleteArchivedProcessInstanceElements(processInstanceId, sProcessInstance.getProcessDefinitionId());
-        processInstanceService.deleteArchivedProcessInstancesOfProcessInstance(processInstanceId);
-        processInstanceService.deleteProcessInstance(sProcessInstance);
-    }
-
-    private List<ProcessInstance> searchProcessInstancesFromProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId,
-            final int startIndex, final int maxResults) throws SBonitaException {
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(startIndex, maxResults);
-        searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
-        // Order by caller id ASC because we need to have parent process deleted before their sub processes
-        searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.CALLER_ID, Order.ASC);
-        return searchProcessInstances(tenantAccessor, searchOptionsBuilder.done()).getResult();
     }
 
     @Override
@@ -3540,12 +3447,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
         try {
-            final List<SAProcessInstance> saProcessInstances = searchArchivedProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId,
-                    startIndex, maxResults);
-            if (!saProcessInstances.isEmpty()) {
-                return processInstanceService.deleteArchivedParentProcessInstancesAndElements(saProcessInstances);
+            List<Long> sourceProcessInstanceIds = processInstanceService.getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, startIndex, maxResults, null);
+            if (sourceProcessInstanceIds.isEmpty()) {
+                return 0;
             }
-            return 0;
+            return deleteArchivedProcessInstancesInAllStates(sourceProcessInstanceIds);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -3560,8 +3466,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
         try {
-            final List<SAProcessInstance> saProcessInstances = processInstanceService.getArchivedProcessInstancesInAllStates(sourceProcessInstanceIds);
-            return processInstanceService.deleteArchivedParentProcessInstancesAndElements(saProcessInstances);
+            return processInstanceService.deleteArchivedProcessInstances(sourceProcessInstanceIds);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SBonitaException e) {
@@ -3572,17 +3477,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long deleteArchivedProcessInstancesInAllStates(final long sourceProcessInstanceId) throws DeletionException {
         return deleteArchivedProcessInstancesInAllStates(Collections.singletonList(sourceProcessInstanceId));
-    }
-
-    private List<SAProcessInstance> searchArchivedProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
-            final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaReadException {
-        final SAProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
-        final FilterOption filterOption = new FilterOption(SAProcessInstance.class, keyProvider.getProcessDefinitionIdKey(), processDefinitionId);
-        final OrderByOption order = new OrderByOption(SAProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
-        // Order by caller id ASC because we need to have parent process deleted before their sub processes
-        final OrderByOption order2 = new OrderByOption(SAProcessInstance.class, keyProvider.getCallerIdKey(), OrderByType.ASC);
-        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Arrays.asList(order, order2), Collections.singletonList(filterOption), null);
-        return processInstanceService.searchArchivedProcessInstances(queryOptions);
     }
 
     private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType,
