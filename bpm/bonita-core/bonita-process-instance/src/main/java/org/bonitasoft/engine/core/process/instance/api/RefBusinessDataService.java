@@ -62,4 +62,5 @@ public interface RefBusinessDataService {
     void archiveRefBusinessDataInstance(SRefBusinessDataInstance businessDataInstance) throws SObjectModificationException; // TODO; specific exception
 
     void deleteArchivedRefBusinessDataInstance(long processInstanceId) throws SObjectModificationException;
+    void deleteArchivedRefBusinessDataInstance(List<Long> processInstanceIds) throws SObjectModificationException;
 }

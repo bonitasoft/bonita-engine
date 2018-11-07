@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.connector;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceCreationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
@@ -196,12 +197,6 @@ public interface ConnectorInstanceService {
             throws SBonitaReadException;
 
     /**
-     * @param sConnectorInstance
-     * @throws SConnectorInstanceDeletionException
-     */
-    void deleteArchivedConnectorInstance(SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException;
-
-    /**
      * @param containerId
      * @param containerType
      * @throws SConnectorInstanceReadException
@@ -211,12 +206,12 @@ public interface ConnectorInstanceService {
     void deleteConnectors(long containerId, String containerType) throws SConnectorInstanceReadException, SConnectorInstanceDeletionException;
 
     /**
-     * @param containerId
+     * Delete archived connector instances using a list of container ids and a container type
+     *
+     * @param containerIds ids on the container (source process instance id or source task id)
      * @param containerType
-     * @throws SBonitaReadException
-     * @throws SConnectorInstanceDeletionException
-     * @since 6.1
+     * @throws SBonitaException
      */
-    void deleteArchivedConnectorInstances(long containerId, String containerType) throws SBonitaReadException, SConnectorInstanceDeletionException;
+    void deleteArchivedConnectorInstances(List<Long> containerIds, String containerType) throws SBonitaException;
 
 }
