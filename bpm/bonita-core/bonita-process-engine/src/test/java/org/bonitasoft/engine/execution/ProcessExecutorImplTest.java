@@ -35,7 +35,6 @@ import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -171,9 +170,6 @@ public class ProcessExecutorImplTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
-
-    @Mock
-    private TransactionExecutor transactionExecutor;
 
     @Mock
     private WorkService workService;
