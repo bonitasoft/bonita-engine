@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
 
 import java.io.IOException;
@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -50,11 +48,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionCommitException;
-import org.bonitasoft.engine.transaction.STransactionCreationException;
-import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
 import org.junit.Before;
@@ -313,7 +306,7 @@ public class PlatformAPIImplTest {
     }
 
     @Test
-    public void should_getTenantPortalConfigurationFile_call_bonitaHomeServer() throws Exception {
+    public void should_getTenantPortalConfigurationFile_call_bonitaHomeServer() {
         //given
         final String configurationFile = "a file";
         doReturn("content".getBytes()).when(bonitaHomeServer).getTenantPortalConfiguration(TENANT_ID, configurationFile);
@@ -345,31 +338,31 @@ public class PlatformAPIImplTest {
         verify(platformAPI).deleteTenant(2L);
     }
 
-    private static class MockedTransactionService implements TransactionService, TransactionExecutor {
+    private static class MockedTransactionService implements TransactionService {
 
         @Override
-        public void begin() throws STransactionCreationException {
+        public void begin() {
         }
 
         @Override
-        public void complete() throws STransactionCommitException, STransactionRollbackException {
+        public void complete() {
         }
 
-        public TransactionState getState() throws STransactionException {
+        public TransactionState getState() {
             return null;
         }
 
         @Override
-        public boolean isTransactionActive() throws STransactionException {
+        public boolean isTransactionActive() {
             return false;
         }
 
         @Override
-        public void setRollbackOnly() throws STransactionException {
+        public void setRollbackOnly() {
         }
 
         @Override
-        public boolean isRollbackOnly() throws STransactionException {
+        public boolean isRollbackOnly() {
             return false;
         }
 
@@ -384,18 +377,14 @@ public class PlatformAPIImplTest {
         }
 
         @Override
-        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) {
 
         }
 
         @Override
-        public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
+        public void registerBeforeCommitCallable(Callable<Void> callable) {
 
         }
 
-        @Override
-        public void execute(TransactionContent transactionContent) throws SBonitaException {
-            transactionContent.execute();
-        }
     }
 }

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.service.impl;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -75,11 +74,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
         return TenantServiceSingleton.getInstance(tenantId);
-    }
-
-    @Override
-    public TransactionExecutor getTransactionExecutor() {
-        return beanAccessor.getService(TransactionExecutor.class);
     }
 
     @Override

@@ -34,16 +34,12 @@ import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.TechnicalUser;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -638,16 +634,20 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             platformAccessor = getPlatformAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
+            final TransactionService transactionService = platformAccessor.getTransactionService();
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
 
             // delete tenant objects in database
-            final TransactionContent transactionContentForTenantObjects = new DeleteTenantObjects(tenantId, platformService);
-            transactionExecutor.execute(transactionContentForTenantObjects);
+            transactionService.executeInTransaction(() -> {
+                platformService.deleteTenantObjects(tenantId);
+                return null;
+            });
 
             // delete tenant in database
-            final TransactionContent transactionContentForTenant = new DeleteTenant(tenantId, platformService);
-            transactionExecutor.execute(transactionContentForTenant);
+            transactionService.executeInTransaction(() -> {
+                platformService.deleteTenant(tenantId);
+                return null;
+            });
 
             // stop tenant services and clear the spring context
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);

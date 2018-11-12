@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
-import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException;
@@ -90,10 +89,8 @@ public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
     @AvailableWhenTenantIsPaused
     public boolean isPaused() {
         final long tenantId = getTenantId();
-        final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformAccessorNoException().getPlatformService());
         try {
-            getTenant.execute();
-            return getTenant.getResult().isPaused();
+            return getPlatformAccessorNoException().getPlatformService().getTenant(tenantId).isPaused();
         } catch (final SBonitaException e) {
             throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId, e);
         }

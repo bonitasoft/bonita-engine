@@ -28,7 +28,6 @@ import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -134,8 +133,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     ProcessExecutor getProcessExecutor();
 
     FlowNodeStateManager getFlowNodeStateManager();
-
-    TransactionExecutor getTransactionExecutor();
 
     ActorMappingService getActorMappingService();
 
