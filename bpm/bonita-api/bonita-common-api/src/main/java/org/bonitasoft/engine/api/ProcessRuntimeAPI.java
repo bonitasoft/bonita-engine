@@ -319,10 +319,9 @@ public interface ProcessRuntimeAPI {
      *        The index
      * @param maxResults
      *        The max number of elements to retrieve per page
-     * @return The number of elements that have been deleted in any state. For example, process instance can be archived is several states: Cancelled,
-     *         Aborted, Completed, Failed
+     * @return The number of rows deleted from the archived process instance table related to the cases that were deleted
      * @throws DeletionException
-     *         If a process instance can't be deleted because of a parent that is still active
+     *         If there is some e.g. connection issue to the database
      * @since 6.1
      */
     long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
