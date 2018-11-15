@@ -13,9 +13,14 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
@@ -55,7 +60,8 @@ public class BPMWorkFactory implements WorkFactory {
     private static final String CONNECTOR_DEFINITION_NAME = "connectorDefinitionName";
     private static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
     private static final String ACTIVATION_EVENT = "activationEvent";
-    private static final String FLOW_NODE_SELECTOR = "flowNodeSelector";
+    private static final String SUB_PROCESS_DEFINITION_ID = "subProcessDefinitionId";
+    private static final String FLOW_NODE_DEFINITIONS_FILTER = "flowNodeDefinitionsFilter";
     private static final String READY_HUMAN_TASK = "readyHumanTask";
     private static final String MESSAGE_INSTANCE_ID = "messageInstanceId";
     private static final String MESSAGE_INSTANCE_NAME = "messageInstanceName";
@@ -96,22 +102,22 @@ public class BPMWorkFactory implements WorkFactory {
     }
 
     private BonitaWork createExecuteConnectorOfProcess(WorkDescriptor workDescriptor) {
-        final long processDefinitionId = getLongParameter(workDescriptor);
-        final long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
-        final long rootProcessInstanceId = workDescriptor.getLong(ROOT_PROCESS_INSTANCE_ID);
-        final long connectorInstanceId = workDescriptor.getLong(CONNECTOR_INSTANCE_ID);
-        final String connectorDefinitionName = workDescriptor.getString(CONNECTOR_DEFINITION_NAME);
-        final ConnectorEvent activationEvent = (ConnectorEvent.valueOf(workDescriptor.getString(ACTIVATION_EVENT)));
+        long processDefinitionId = workDescriptor.getLong(PROCESS_DEFINITION_ID);
+        long processInstanceId = workDescriptor.getLong(PROCESS_INSTANCE_ID);
+        long rootProcessInstanceId = workDescriptor.getLong(ROOT_PROCESS_INSTANCE_ID);
+        long connectorInstanceId = workDescriptor.getLong(CONNECTOR_INSTANCE_ID);
+        String connectorDefinitionName = workDescriptor.getString(CONNECTOR_DEFINITION_NAME);
+        ConnectorEvent activationEvent = (ConnectorEvent.valueOf(workDescriptor.getString(ACTIVATION_EVENT)));
+        String flowNodeIds = workDescriptor.getString(FLOW_NODE_DEFINITIONS_FILTER);
+        List<Long> flowNodeDefinitionsFilter = flowNodeIds != null ? stream(flowNodeIds.split(",")).map(Long::valueOf).collect(toList()) : null;
+        Long subProcessDefinitionId = workDescriptor.getLong(SUB_PROCESS_DEFINITION_ID);
+
         BonitaWork wrappedWork = withConnectorContext(connectorInstanceId, connectorDefinitionName, activationEvent,
                 withProcessContext(processDefinitionId, processInstanceId,
                         rootProcessInstanceId,
                         new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
-                                rootProcessInstanceId, activationEvent, ((FlowNodeSelector) workDescriptor.getParameter(FLOW_NODE_SELECTOR)))));
+                                rootProcessInstanceId, activationEvent, flowNodeDefinitionsFilter, subProcessDefinitionId)));
         return withSession(wrappedWork);
-    }
-
-    private Long getLongParameter(WorkDescriptor workDescriptor) {
-        return workDescriptor.getLong(PROCESS_DEFINITION_ID);
     }
 
 
@@ -125,7 +131,10 @@ public class BPMWorkFactory implements WorkFactory {
                 .withParameter(CONNECTOR_INSTANCE_ID, connectorInstanceId)
                 .withParameter(CONNECTOR_DEFINITION_NAME, connectorDefinitionName)
                 .withParameter(ACTIVATION_EVENT, activationEvent.name())
-                .withParameter(FLOW_NODE_SELECTOR, flowNodeSelector);
+                .withParameter(FLOW_NODE_DEFINITIONS_FILTER, flowNodeSelector != null ?
+                        flowNodeSelector.getFilteredElements().stream().map(f -> f.getId().toString()).collect(Collectors.joining(",")) : null)
+                .withParameter(SUB_PROCESS_DEFINITION_ID, flowNodeSelector != null ?
+                        flowNodeSelector.getSubProcessDefinitionId() : null);
     }
 
     private InSessionBonitaWork withSession(BonitaWork wrappedWork) {

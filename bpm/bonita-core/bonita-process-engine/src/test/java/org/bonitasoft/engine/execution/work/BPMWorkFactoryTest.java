@@ -14,18 +14,21 @@
 package org.bonitasoft.engine.execution.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.core.process.definition.model.event.impl.SStartEventDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SFlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl;
+import org.bonitasoft.engine.execution.FlowNodeNameFilter;
+import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
@@ -37,7 +40,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -105,6 +107,27 @@ public class BPMWorkFactoryTest {
         final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
                 null));
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
+    }
+
+    @Test
+    public void createExecuteConnectorOfProcessWithFlowNodeSelector() {
+        SProcessDefinitionImpl definition = new SProcessDefinitionImpl("name", "version");
+        SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
+        definition.setProcessContainer(processContainer);
+        SStartEventDefinitionImpl start1 = new SStartEventDefinitionImpl(1L, "start1");
+        SStartEventDefinitionImpl start2 = new SStartEventDefinitionImpl(2L, "start2");
+        SStartEventDefinitionImpl start3 = new SStartEventDefinitionImpl(3L, "start3");
+        processContainer.addEvent(start1);
+        processContainer.addEvent(start2);
+        processContainer.addEvent(start3);
+        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition, new FlowNodeNameFilter(Arrays.asList("start1", "start2")));
+
+        final WrappingBonitaWork work = (WrappingBonitaWork) workFactory.create(workFactory.createExecuteConnectorOfProcessDescriptor(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+                flowNodeSelector));
+
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start1)).isTrue();
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start2)).isTrue();
+        assertThat(getWorkOfClass(work, ExecuteConnectorOfProcess.class).filterFlowNodeDefinitions.mustSelect(start3)).isFalse();
     }
 
     @Test

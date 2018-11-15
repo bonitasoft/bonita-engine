@@ -73,7 +73,4 @@ public class FlowNodeSelector implements Serializable {
         return subProcessDefinitionId;
     }
 
-    public Filter<SFlowNodeDefinition> getSelector() {
-        return selector;
-    }
 }
