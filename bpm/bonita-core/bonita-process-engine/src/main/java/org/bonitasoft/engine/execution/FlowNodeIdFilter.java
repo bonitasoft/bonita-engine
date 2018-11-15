@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 
 /**
@@ -22,14 +25,18 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
  */
 public class FlowNodeIdFilter implements Filter<SFlowNodeDefinition> {
 
-    private final long id;
+    private final List<Long> ids;
 
     public FlowNodeIdFilter(long id) {
-        this.id = id;
+        this.ids = Collections.singletonList(id);
+    }
+
+    public FlowNodeIdFilter(List<Long> ids) {
+        this.ids = ids;
     }
 
     @Override
     public boolean mustSelect(SFlowNodeDefinition flowNode) {
-        return flowNode.getId() == id;
+        return ids.contains(flowNode.getId());
     }
 }

@@ -13,9 +13,12 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
+
+import java.util.Arrays;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.junit.Test;
@@ -34,13 +37,11 @@ public class FlowNodeIdFilterTest {
     @Mock
     private SFlowNodeDefinition flownode;
 
-    final FlowNodeIdFilter filter = new FlowNodeIdFilter(3L);
-
     @Test
     public void select_should_return_false_if_flow_node_id_is_not_the_expected_one() {
         doReturn(5L).when(flownode).getId();
 
-        boolean result = filter.mustSelect(flownode);
+        boolean result = new FlowNodeIdFilter(3L).mustSelect(flownode);
 
         assertFalse(result);
     }
@@ -49,8 +50,25 @@ public class FlowNodeIdFilterTest {
     public void select_should_return_true_if_flow_node_id_is_the_expected_one() {
         doReturn(3L).when(flownode).getId();
 
-        boolean result = filter.mustSelect(flownode);
+        boolean result = new FlowNodeIdFilter(3L).mustSelect(flownode);
 
         assertTrue(result);
+    }
+
+    @Test
+    public void should_return_true_if_flow_node_is_in_the_expected_list() {
+        doReturn(3L).when(flownode).getId();
+
+        boolean result = new FlowNodeIdFilter(asList(4L, 3L)).mustSelect(flownode);
+
+        assertTrue(result);
+    }
+    @Test
+    public void should_return_false_if_flow_node_is_not_in_the_expected_list() {
+        doReturn(3L).when(flownode).getId();
+
+        boolean result = new FlowNodeIdFilter(asList(4L, 5L)).mustSelect(flownode);
+
+        assertFalse(result);
     }
 }
