@@ -60,14 +60,8 @@ public class CodeGenerator {
 
     private final JCodeModel model;
 
-    private final EqualsBuilder equalsBuilder;
-
-    private final HashCodeBuilder hashCodeBuilder;
-
     public CodeGenerator() {
         model = new JCodeModel();
-        equalsBuilder = new EqualsBuilder();
-        hashCodeBuilder = new HashCodeBuilder();
     }
 
     public void generate(final File destDir) throws IOException {
@@ -219,18 +213,6 @@ public class CodeGenerator {
         final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getGetterName(field)));
         body.add(decl.invoke(listMethodName).arg(adderParam));
         return method;
-    }
-
-    public JMethod addEqualsMethod(final JDefinedClass definedClass) {
-        final JMethod equalsMethod = equalsBuilder.generate(definedClass);
-        addAnnotation(equalsMethod, Override.class);
-        return equalsMethod;
-    }
-
-    public JMethod addHashCodeMethod(final JDefinedClass definedClass) {
-        final JMethod hashCodeMethod = hashCodeBuilder.generate(definedClass);
-        addAnnotation(hashCodeMethod, Override.class);
-        return hashCodeMethod;
     }
 
     public String getGetterName(final JVar field) {

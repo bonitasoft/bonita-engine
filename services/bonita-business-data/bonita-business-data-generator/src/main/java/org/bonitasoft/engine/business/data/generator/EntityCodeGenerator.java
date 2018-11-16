@@ -87,9 +87,6 @@ public class EntityCodeGenerator {
 
         codeGenerator.addDefaultConstructor(entityClass);
 
-        codeGenerator.addEqualsMethod(entityClass);
-        codeGenerator.addHashCodeMethod(entityClass);
-
         return entityClass;
     }
 
