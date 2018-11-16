@@ -41,6 +41,7 @@ import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -399,14 +400,24 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
-        final SFlowNodeType type = flowNodeInstance.getType();
-        if (type.equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT) || type.equals(SFlowNodeType.BOUNDARY_EVENT) || type.equals(SFlowNodeType.RECEIVE_TASK)
-                || type.equals(SFlowNodeType.START_EVENT)) {
+        if (isReceiveTask(flowNodeInstance) || isEventWithTrigger(flowNodeInstance, processDefinition)) {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
         if (flowNodeInstance instanceof SActivityInstance) {
             deleteActivityInstanceElements((SActivityInstance) flowNodeInstance, processDefinition);
         }
+    }
+
+    private boolean isEventWithTrigger(SFlowNodeInstance flowNodeInstance, SProcessDefinition processDefinition) {
+        if (processDefinition != null) {
+            SFlowNodeDefinition flowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
+            return flowNodeDefinition instanceof SEventDefinition && !((SEventDefinition) flowNodeDefinition).getEventTriggers().isEmpty();
+        }
+        return false;
+    }
+
+    private boolean isReceiveTask(SFlowNodeInstance flowNodeInstance) {
+        return flowNodeInstance.getType().equals(SFlowNodeType.RECEIVE_TASK);
     }
 
     private void deleteActivityInstanceElements(final SActivityInstance sActivityInstance, final SProcessDefinition processDefinition) throws SBonitaException {
