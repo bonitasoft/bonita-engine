@@ -51,11 +51,6 @@ public class SAMappedDocumentImpl extends SMappedDocumentImpl implements SAMappe
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAMappedDocument.class.getName();
-    }
-
-    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;

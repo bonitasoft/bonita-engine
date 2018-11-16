@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainer;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -70,11 +69,6 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
         long now = new Date().getTime();
         lastUpdateDate = now;
         reachedStateDate = now;
-    }
-
-    @Override
-    public String getDiscriminator() {
-        return SActivityInstance.class.getName();
     }
 
     @Override

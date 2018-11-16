@@ -35,11 +35,6 @@ public abstract class SActivityInstanceImpl extends SFlowNodeInstanceImpl implem
     }
 
     @Override
-    public String getDiscriminator() {
-        return SActivityInstance.class.getName();
-    }
-
-    @Override
     public long getAbortedByBoundary() {
         return abortedByBoundary;
     }

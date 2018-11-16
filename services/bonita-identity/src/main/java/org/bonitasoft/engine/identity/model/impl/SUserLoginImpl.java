@@ -55,11 +55,6 @@ public class SUserLoginImpl extends SPersistentObjectImpl implements SUserLogin 
         this.lastConnection = lastConnection;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SUserLogin.class.getName();
-    }
-
 
     @Override
     public boolean equals(Object o) {

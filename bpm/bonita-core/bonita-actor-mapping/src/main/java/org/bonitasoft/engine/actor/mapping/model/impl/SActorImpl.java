@@ -106,11 +106,6 @@ public class SActorImpl implements SActor {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SActorImpl.class.getName();
-    }
-
-    @Override
     public boolean isInitiator() {
         return initiator;
     }

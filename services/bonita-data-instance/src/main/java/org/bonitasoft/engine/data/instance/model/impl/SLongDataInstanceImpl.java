@@ -45,9 +45,4 @@ public class SLongDataInstanceImpl extends SDataInstanceImpl {
         this.value = (Long) value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SLongDataInstanceImpl.class.getSimpleName();
-    }
-
 }

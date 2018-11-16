@@ -41,11 +41,6 @@ public class SDocumentMappingImpl implements SDocumentMapping {
         this.name = name;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SDocumentMappingImpl.class.getName();
-    }
-
 
     public long getId() {
         return id;

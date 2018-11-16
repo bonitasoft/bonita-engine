@@ -72,11 +72,6 @@ public class SLightDocumentImpl implements SLightDocument {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SLightDocumentImpl.class.getName();
-    }
-
-    @Override
     public long getAuthor() {
         return author;
     }

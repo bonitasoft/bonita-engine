@@ -40,11 +40,6 @@ public class SProcessDefinitionDesignContentImpl implements SProcessDefinitionDe
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProcessDefinitionDesignContent.class.getName();
-    }
-
-    @Override
     public void setId(long id) {
         this.id = id;
     }

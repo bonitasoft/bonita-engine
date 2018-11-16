@@ -55,7 +55,6 @@ public class SAXMLObjectDataInstanceImplTest {
         assertEquals(sDataInstance.getId(), saxmlObjectDataInstanceImpl.getSourceObjectId());
         assertEquals(sDataInstance.getName(), saxmlObjectDataInstanceImpl.getName());
         assertEquals(sDataInstance.getValue(), saxmlObjectDataInstanceImpl.getValue());
-        assertEquals(SAXMLObjectDataInstanceImpl.class.getSimpleName(), saxmlObjectDataInstanceImpl.getDiscriminator());
     }
 
     /**
@@ -77,15 +76,6 @@ public class SAXMLObjectDataInstanceImplTest {
     public final void getValueShouldBeNull() {
         final SAXMLObjectDataInstanceImpl saxmlObjectDataInstanceImpl = new SAXMLObjectDataInstanceImpl();
         assertEquals(null, saxmlObjectDataInstanceImpl.getValue());
-    }
-
-    /**
-     * Test method for {@link SAXMLObjectDataInstanceImpl#getDiscriminator()}.
-     */
-    @Test
-    public final void getDiscriminator() {
-        final SAXMLObjectDataInstanceImpl saxmlObjectDataInstanceImpl = new SAXMLObjectDataInstanceImpl();
-        assertEquals(SAXMLObjectDataInstanceImpl.class.getSimpleName(), saxmlObjectDataInstanceImpl.getDiscriminator());
     }
 
     /**

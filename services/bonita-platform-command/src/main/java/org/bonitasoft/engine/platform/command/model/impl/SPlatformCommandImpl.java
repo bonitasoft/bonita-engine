@@ -52,11 +52,6 @@ public class SPlatformCommandImpl implements SPlatformCommand {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SPlatformCommandImpl.class.getName();
-    }
-
-    @Override
     public long getId() {
         return id;
     }

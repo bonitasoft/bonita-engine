@@ -45,9 +45,4 @@ public class SDoubleDataInstanceImpl extends SDataInstanceImpl {
         return value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SDoubleDataInstanceImpl.class.getSimpleName();
-    }
-
 }

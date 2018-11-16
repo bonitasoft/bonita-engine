@@ -47,11 +47,6 @@ public class STimerEventTriggerInstanceImpl extends SPersistenceObjectImpl imple
     }
 
     @Override
-    public String getDiscriminator() {
-        return STimerEventTriggerInstance.class.getName();
-    }
-
-    @Override
     public long getExecutionDate() {
         return executionDate;
     }

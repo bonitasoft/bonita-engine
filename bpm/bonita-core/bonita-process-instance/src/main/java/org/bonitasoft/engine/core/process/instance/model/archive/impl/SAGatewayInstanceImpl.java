@@ -65,11 +65,6 @@ public class SAGatewayInstanceImpl extends SAFlowNodeInstanceImpl implements SAG
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAGatewayInstance.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "gate";
     }

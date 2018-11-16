@@ -38,11 +38,6 @@ public class SAFloatDataInstanceImpl extends SADataInstanceImpl implements SAFlo
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAFloatDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Float getValue() {
         return value;
     }

@@ -70,11 +70,6 @@ public class SUserMembershipImpl extends SPersistentObjectImpl implements SUserM
     }
 
     @Override
-    public String getDiscriminator() {
-        return SUserMembership.class.getName();
-    }
-
-    @Override
     public long getGroupId() {
         return groupId;
     }

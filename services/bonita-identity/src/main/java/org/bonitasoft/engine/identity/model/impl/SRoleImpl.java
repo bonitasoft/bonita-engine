@@ -38,11 +38,6 @@ public class SRoleImpl extends SNamedElementImpl implements SRole {
         super();
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SRole.class.getName();
-    }
-
     public void setCreatedBy(final long createdBy) {
         this.createdBy = createdBy;
     }

@@ -161,11 +161,6 @@ public class SAMultiInstanceActivityInstanceImpl extends SAActivityInstanceImpl 
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAMultiInstanceActivityInstance.class.getName();
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();

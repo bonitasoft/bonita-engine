@@ -42,11 +42,6 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
     }
 
     @Override
-    public String getDiscriminator() {
-        return SApplicationMenu.class.getName();
-    }
-
-    @Override
     public String getDisplayName() {
         return displayName;
     }

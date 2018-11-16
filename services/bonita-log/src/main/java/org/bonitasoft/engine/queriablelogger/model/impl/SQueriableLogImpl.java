@@ -104,11 +104,6 @@ public class SQueriableLogImpl implements SQueriableLog {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SQueriableLog.class.getName();
-    }
-
-    @Override
     public long getTimeStamp() {
         return timeStamp;
     }

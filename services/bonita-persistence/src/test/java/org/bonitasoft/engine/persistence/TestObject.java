@@ -25,11 +25,6 @@ public class TestObject implements PersistentObject {
     }
 
     @Override
-    public String getDiscriminator() {
-        return null;
-    }
-
-    @Override
     public void setId(long id) {
 
     }

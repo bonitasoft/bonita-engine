@@ -55,16 +55,4 @@ public class SXMLObjectDataInstanceImplTest {
         //then
         assertThat(returnedValue).as("should be null").isNull();
     }
-
-    @Test
-    public void discriminator_should_not_be_null() {
-        //given
-        final SXMLObjectDataInstanceImpl sxmlObjectDataInstanceImpl = new SXMLObjectDataInstanceImpl();
-
-        //when
-        final String returnedValue = sxmlObjectDataInstanceImpl.getDiscriminator();
-
-        //then
-        assertThat(returnedValue).as("should not be null").isNotEmpty();
-    }
 }

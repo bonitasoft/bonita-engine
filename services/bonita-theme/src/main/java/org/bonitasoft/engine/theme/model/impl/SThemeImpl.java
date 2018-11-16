@@ -145,11 +145,6 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
     }
 
     @Override
-    public String getDiscriminator() {
-        return STheme.class.getName();
-    }
-
-    @Override
     public String toString() {
         return "SThemeImpl [id=" + getId() + ", content=" + Arrays.toString(content) + ", cssContent=" + Arrays.toString(cssContent) + ", isDefault="
                 + isDefault + ", lastUpdateDate=" + lastUpdateDate + ", type=" + type + "]";

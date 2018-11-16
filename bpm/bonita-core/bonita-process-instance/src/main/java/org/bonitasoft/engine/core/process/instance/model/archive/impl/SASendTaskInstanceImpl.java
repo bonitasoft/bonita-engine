@@ -39,11 +39,6 @@ public class SASendTaskInstanceImpl extends SAActivityInstanceImpl implements SA
     }
 
     @Override
-    public String getDiscriminator() {
-        return SASendTaskInstanceImpl.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "send";
     }

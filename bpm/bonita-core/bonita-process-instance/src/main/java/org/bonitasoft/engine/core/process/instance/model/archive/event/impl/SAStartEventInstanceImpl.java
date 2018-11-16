@@ -35,11 +35,6 @@ public class SAStartEventInstanceImpl extends SACatchEventInstanceImpl implement
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAStartEventInstance.class.getName();
-    }
-
-    @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.START_EVENT;
     }

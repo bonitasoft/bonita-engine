@@ -50,11 +50,6 @@ public class SPendingActivityMappingImpl extends SPersistenceObjectImpl implemen
         return userId;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SPendingActivityMappingImpl.class.getName();
-    }
-
     public void setActivityId(final long activityId) {
         this.activityId = activityId;
     }

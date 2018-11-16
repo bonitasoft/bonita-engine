@@ -48,9 +48,4 @@ public class SAIntermediateCatchEventInstanceImpl extends SACatchEventInstanceIm
         return SIntermediateCatchEventInstance.class;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SAIntermediateCatchEventInstance.class.getName();
-    }
-
 }

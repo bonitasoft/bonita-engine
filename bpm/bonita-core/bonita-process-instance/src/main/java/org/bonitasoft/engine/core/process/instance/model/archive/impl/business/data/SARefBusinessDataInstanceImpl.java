@@ -34,11 +34,6 @@ public abstract class SARefBusinessDataInstanceImpl extends SAPersistenceObjectI
     }
 
     @Override
-    public String getDiscriminator() {
-        return SARefBusinessDataInstanceImpl.class.getName();
-    }
-
-    @Override
     public String getName() {
         return name;
     }

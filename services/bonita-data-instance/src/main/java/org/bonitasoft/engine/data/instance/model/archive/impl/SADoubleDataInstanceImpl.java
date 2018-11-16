@@ -38,11 +38,6 @@ public class SADoubleDataInstanceImpl extends SADataInstanceImpl implements SADo
     }
 
     @Override
-    public String getDiscriminator() {
-        return SADoubleDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Double getValue() {
         return value;
     }

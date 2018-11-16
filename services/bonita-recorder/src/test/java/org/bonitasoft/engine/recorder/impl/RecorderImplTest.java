@@ -105,11 +105,6 @@ public class RecorderImplTest {
         }
 
         @Override
-        public String getDiscriminator() {
-            return null;
-        }
-
-        @Override
         public void setId(long id) {
         }
 

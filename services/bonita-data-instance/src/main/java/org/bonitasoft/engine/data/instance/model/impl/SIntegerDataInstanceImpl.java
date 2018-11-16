@@ -45,9 +45,4 @@ public class SIntegerDataInstanceImpl extends SDataInstanceImpl {
         this.value = (Integer) value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SIntegerDataInstanceImpl.class.getSimpleName();
-    }
-
 }

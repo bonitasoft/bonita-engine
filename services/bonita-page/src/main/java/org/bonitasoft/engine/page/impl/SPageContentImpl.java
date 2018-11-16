@@ -95,8 +95,4 @@ public class SPageContentImpl implements SPageContent {
         return true;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SPageContentImpl.class.getName();
-    }
 }

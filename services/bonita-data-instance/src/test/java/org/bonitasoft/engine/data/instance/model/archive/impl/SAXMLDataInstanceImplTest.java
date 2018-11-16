@@ -56,18 +56,6 @@ public class SAXMLDataInstanceImplTest {
     }
 
     @Test
-    public void discriminator_should_not_be_null() {
-        //given
-        final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl();
-
-        //when
-        final String returnedValue = sxmlObjectDataInstanceImpl.getDiscriminator();
-
-        //then
-        assertThat(returnedValue).as("should be not null").isNotEmpty();
-    }
-
-    @Test
     public void nameSpaceTest() {
         //given
         final String expected = "namspace";

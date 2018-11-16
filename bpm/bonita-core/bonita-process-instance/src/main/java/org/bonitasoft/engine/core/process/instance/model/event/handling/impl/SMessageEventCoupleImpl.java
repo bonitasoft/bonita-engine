@@ -66,11 +66,6 @@ public class SMessageEventCoupleImpl implements SMessageEventCouple {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SMessageEventCouple.class.getName();
-    }
-
-	@Override
     public SBPMEventType getWaitingMessageEventType() {
 	    return eventType;
     }

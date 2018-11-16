@@ -49,7 +49,6 @@ public class SPageImplTest {
                 .hasLastUpdatedBy(LAST_UPDATED_BY)
                 .hasInstalledBy(INSTALLED_BY)
                 .hasId(ID)
-                .hasDiscriminator(SPage.class.getName())
                 .hasTenantId(TENANT_ID);
 
     }

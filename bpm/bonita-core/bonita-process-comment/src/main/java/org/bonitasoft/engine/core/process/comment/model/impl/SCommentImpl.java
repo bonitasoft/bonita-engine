@@ -49,11 +49,6 @@ public abstract class SCommentImpl implements SComment {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SComment.class.getName();
-    }
-
-    @Override
     public long getId() {
         return id;
     }

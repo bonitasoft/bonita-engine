@@ -43,11 +43,6 @@ public class Book implements PersistentObject {
     }
 
     @Override
-    public String getDiscriminator() {
-        return null;
-    }
-
-    @Override
     public void setId(final long id) {
         this.id = id;
     }

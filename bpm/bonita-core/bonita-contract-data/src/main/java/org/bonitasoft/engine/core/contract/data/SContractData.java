@@ -67,9 +67,4 @@ public abstract class SContractData extends PersistentObjectId implements Persis
     }
 
 
-    @Override
-    public String getDiscriminator() {
-        return SContractData.class.getName();
-    }
-
 }

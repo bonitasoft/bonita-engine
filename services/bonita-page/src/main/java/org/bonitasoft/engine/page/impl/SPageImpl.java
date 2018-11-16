@@ -105,11 +105,6 @@ public class SPageImpl implements SPage {
         setContentType(SContentType.PAGE);
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SPage.class.getName();
-    }
-
     public long getTenantId() {
         return tenantId;
     }

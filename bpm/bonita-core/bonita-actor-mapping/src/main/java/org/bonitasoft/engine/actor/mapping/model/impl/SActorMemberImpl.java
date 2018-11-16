@@ -59,11 +59,6 @@ public class SActorMemberImpl implements SActorMember {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SActorMemberImpl.class.getName();
-    }
-
-    @Override
     public long getActorId() {
         return actorId;
     }
