@@ -34,11 +34,6 @@ public abstract class SRefBusinessDataInstanceImpl extends SPersistenceObjectImp
     }
 
     @Override
-    public String getDiscriminator() {
-        return SRefBusinessDataInstanceImpl.class.getName();
-    }
-
-    @Override
     public String getName() {
         return name;
     }

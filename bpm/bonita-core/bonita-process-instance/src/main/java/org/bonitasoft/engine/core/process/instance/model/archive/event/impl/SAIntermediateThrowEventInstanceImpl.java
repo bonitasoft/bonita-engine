@@ -48,9 +48,4 @@ public class SAIntermediateThrowEventInstanceImpl extends SAThrowEventInstanceIm
         return SIntermediateThrowEventInstance.class;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SAIntermediateThrowEventInstance.class.getName();
-    }
-
 }

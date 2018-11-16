@@ -54,11 +54,6 @@ public class SXMLDataInstanceImpl extends SDataInstanceImpl implements SXMLDataI
     }
 
     @Override
-    public String getDiscriminator() {
-        return SXMLDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public String getNamespace() {
         return namespace;
     }

@@ -37,11 +37,6 @@ public class SAIntegerDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAIntegerDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Integer getValue() {
         return value;
     }

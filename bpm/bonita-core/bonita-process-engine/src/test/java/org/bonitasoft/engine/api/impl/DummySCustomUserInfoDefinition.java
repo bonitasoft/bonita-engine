@@ -61,11 +61,6 @@ public class DummySCustomUserInfoDefinition implements SCustomUserInfoDefinition
     }
 
     @Override
-    public String getDiscriminator() {
-        throw new UnsupportedOperationException(MESSAGE);
-    }
-
-    @Override
     public void setTenantId(long id) {
         throw new UnsupportedOperationException(MESSAGE);
     }

@@ -48,11 +48,6 @@ public class SASubProcessActivityInstanceImpl extends SAActivityInstanceImpl imp
     }
 
     @Override
-    public String getDiscriminator() {
-        return SASubProcessActivityInstance.class.getName();
-    }
-
-    @Override
     public boolean isTriggeredByEvent() {
         return triggeredByEvent;
     }

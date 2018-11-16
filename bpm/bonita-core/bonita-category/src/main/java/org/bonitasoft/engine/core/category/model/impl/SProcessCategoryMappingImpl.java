@@ -49,11 +49,6 @@ public class SProcessCategoryMappingImpl implements SProcessCategoryMapping {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProcessCategoryMappingImpl.class.getName();
-    }
-
-    @Override
     public long getCategoryId() {
         return categoryId;
     }

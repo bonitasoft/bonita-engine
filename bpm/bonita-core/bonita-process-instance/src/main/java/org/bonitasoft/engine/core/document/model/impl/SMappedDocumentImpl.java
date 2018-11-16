@@ -153,11 +153,6 @@ public class SMappedDocumentImpl implements SMappedDocument {
         this.version = version;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SMappedDocumentImpl.class.getName();
-    }
-
     public int getIndex() {
         return index;
     }

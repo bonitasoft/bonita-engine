@@ -49,11 +49,6 @@ public class SShortTextDataInstanceImpl extends SDataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SShortTextDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public void validate() throws SDataInstanceNotWellFormedException {
         if (getValue() != null && getValue().length() > MAX_LENGTH) {
             throw new SDataInstanceNotWellFormedException("Data " + getName() + " must not be longer than " + MAX_LENGTH + " characters");

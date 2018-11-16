@@ -51,11 +51,6 @@ public class SJobDescriptorImpl extends SPersistentObjectImpl implements SJobDes
     }
 
     @Override
-    public String getDiscriminator() {
-        return SJobDescriptor.class.getName();
-    }
-
-    @Override
     public String getJobClassName() {
         return jobClassName;
     }

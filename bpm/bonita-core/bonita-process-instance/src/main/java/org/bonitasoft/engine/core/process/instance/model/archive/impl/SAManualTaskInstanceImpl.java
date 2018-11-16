@@ -41,11 +41,6 @@ public class SAManualTaskInstanceImpl extends SAHumanTaskInstanceImpl implements
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAManualTaskInstanceImpl.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "manual";
     }

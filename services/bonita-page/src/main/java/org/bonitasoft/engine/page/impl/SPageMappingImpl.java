@@ -116,11 +116,6 @@ public class SPageMappingImpl extends PersistentObjectId implements SPageMapping
     }
 
     @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
-    @Override
     public long getLastUpdateDate() {
         return lastUpdateDate;
     }

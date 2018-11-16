@@ -55,11 +55,6 @@ public class SACommentImpl implements SAComment {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SComment.class.getName();
-    }
-
-    @Override
     public long getId() {
         return id;
     }

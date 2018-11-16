@@ -46,9 +46,4 @@ public class SDateDataInstanceImpl extends SDataInstanceImpl {
         this.value = (Date) value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SDateDataInstanceImpl.class.getSimpleName();
-    }
-
 }

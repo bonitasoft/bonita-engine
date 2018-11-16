@@ -40,11 +40,6 @@ public class SJobLogImpl extends SPersistentObjectImpl implements SJobLog {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SJobLogImpl.class.getName();
-    }
-
-    @Override
     public long getJobDescriptorId() {
         return jobDescriptorId;
     }

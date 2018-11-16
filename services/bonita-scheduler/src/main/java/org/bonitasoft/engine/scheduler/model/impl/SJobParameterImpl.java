@@ -36,11 +36,6 @@ public class SJobParameterImpl extends SPersistentObjectImpl implements SJobPara
     }
 
     @Override
-    public String getDiscriminator() {
-        return SJobParameterImpl.class.getName();
-    }
-
-    @Override
     public long getJobDescriptorId() {
         return jobDescriptorId;
     }

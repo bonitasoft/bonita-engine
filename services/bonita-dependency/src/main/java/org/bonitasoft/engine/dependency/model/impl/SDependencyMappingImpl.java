@@ -88,11 +88,6 @@ public class SDependencyMappingImpl implements SDependencyMapping {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SDependencyMappingImpl.class.getName();
-    }
-
-    @Override
     public String toString() {
         return "SDependencyMappingImpl [id=" + id + ", artifactId=" + artifactId + ", artifactType=" + artifactType + ", dependencyId=" + dependencyId
                 + ", tenantId=" + tenantId + "]";

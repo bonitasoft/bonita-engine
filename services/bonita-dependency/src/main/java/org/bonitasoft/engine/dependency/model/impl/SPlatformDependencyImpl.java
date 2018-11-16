@@ -101,9 +101,4 @@ public class SPlatformDependencyImpl implements SPlatformDependency {
         return value_;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SPlatformDependencyImpl.class.getName();
-    }
-
 }

@@ -71,11 +71,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     }
 
     @Override
-    public String getDiscriminator() {
-        return SApplication.class.getName();
-    }
-
-    @Override
     public String getToken() {
         return token;
     }

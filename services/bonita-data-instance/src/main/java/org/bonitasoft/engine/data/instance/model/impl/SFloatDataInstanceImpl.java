@@ -45,9 +45,4 @@ public class SFloatDataInstanceImpl extends SDataInstanceImpl {
         return value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SFloatDataInstanceImpl.class.getSimpleName();
-    }
-
 }

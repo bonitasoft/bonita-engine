@@ -42,11 +42,6 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
     }
 
     @Override
-    public String getDiscriminator() {
-        return SApplicationPage.class.getName();
-    }
-
-    @Override
     public long getApplicationId() {
         return applicationId;
     }

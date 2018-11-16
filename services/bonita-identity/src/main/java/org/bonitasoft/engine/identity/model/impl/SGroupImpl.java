@@ -41,11 +41,6 @@ public class SGroupImpl extends SNamedElementImpl implements SGroup {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SGroup.class.getName();
-    }
-
-    @Override
     public String getParentPath() {
         return parentPath;
     }

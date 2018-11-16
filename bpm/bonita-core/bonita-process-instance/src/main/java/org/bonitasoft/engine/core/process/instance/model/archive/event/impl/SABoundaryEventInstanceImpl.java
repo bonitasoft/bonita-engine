@@ -85,9 +85,4 @@ public class SABoundaryEventInstanceImpl extends SACatchEventInstanceImpl implem
         return SBoundaryEventInstance.class;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SABoundaryEventInstance.class.getName();
-    }
-
 }

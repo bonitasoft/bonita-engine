@@ -35,11 +35,6 @@ public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements S
     }
 
     @Override
-    public String getDiscriminator() {
-        return SCustomUserInfoValue.class.getName();
-    }
-
-    @Override
     public long getUserId() {
         return userId;
     }

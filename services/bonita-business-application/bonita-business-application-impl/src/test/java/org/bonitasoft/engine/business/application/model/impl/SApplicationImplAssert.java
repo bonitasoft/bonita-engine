@@ -96,29 +96,6 @@ public class SApplicationImplAssert extends AbstractAssert<SApplicationImplAsser
   }
 
   /**
-   * Verifies that the actual SApplicationImpl's discriminator is equal to the given one.
-   * @param discriminator the given discriminator to compare the actual SApplicationImpl's discriminator to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SApplicationImpl's discriminator is not equal to the given one.
-   */
-  public SApplicationImplAssert hasDiscriminator(String discriminator) {
-    // check that actual SApplicationImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected discriminator of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualDiscriminator = actual.getDiscriminator();
-    if (!Objects.areEqual(actualDiscriminator, discriminator)) {
-      failWithMessage(assertjErrorMessage, actual, discriminator, actualDiscriminator);
-    }
-
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
    * Verifies that the actual SApplicationImpl's displayName is equal to the given one.
    * @param displayName the given displayName to compare the actual SApplicationImpl's displayName to.
    * @return this assertion object.

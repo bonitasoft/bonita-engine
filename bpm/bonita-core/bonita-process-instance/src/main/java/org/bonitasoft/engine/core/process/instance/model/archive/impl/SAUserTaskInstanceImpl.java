@@ -41,11 +41,6 @@ public class SAUserTaskInstanceImpl extends SAHumanTaskInstanceImpl implements S
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAUserTaskInstance.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "user";
     }

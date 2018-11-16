@@ -34,11 +34,6 @@ public class STokenImpl extends SPersistenceObjectImpl implements SToken {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SToken.class.getName();
-    }
-
-    @Override
     public long getProcessInstanceId() {
         return processInstanceId;
     }

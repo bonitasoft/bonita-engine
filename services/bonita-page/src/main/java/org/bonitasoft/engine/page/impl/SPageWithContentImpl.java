@@ -42,9 +42,4 @@ public class SPageWithContentImpl extends SPageImpl implements SPageWithContent 
         this.content = content;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SPageWithContentImpl.class.getName();
-    }
-
 }

@@ -27,11 +27,6 @@ public class SCustomUserInfoDefinitionImpl extends SSingleNamedElementImpl imple
     }
 
     @Override
-    public String getDiscriminator() {
-        return SCustomUserInfoDefinition.class.getName();
-    }
-
-    @Override
     public String toString() {
         return "SCustomUserInfoDefinitionImpl [getDescription()=" + this.getDescription() + ", getName()="
                 + this.getName() + ", getId()=" + this.getId() + "]";

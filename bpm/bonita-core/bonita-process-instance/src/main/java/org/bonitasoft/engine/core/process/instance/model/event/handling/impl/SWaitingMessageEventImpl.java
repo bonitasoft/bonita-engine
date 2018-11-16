@@ -52,11 +52,6 @@ public class SWaitingMessageEventImpl extends SWaitingEventImpl implements SWait
     }
 
     @Override
-    public String getDiscriminator() {
-        return SWaitingMessageEvent.class.getName();
-    }
-
-    @Override
     public String getMessageName() {
         return messageName;
     }

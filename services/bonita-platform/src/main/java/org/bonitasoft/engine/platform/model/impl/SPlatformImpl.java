@@ -113,11 +113,6 @@ public class SPlatformImpl implements SPlatform {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SPlatform.class.getName();
-    }
-
-    @Override
     public String getInformation() {
         return information;
     }

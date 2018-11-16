@@ -46,11 +46,6 @@ public class SALoopActivityInstanceImpl extends SAActivityInstanceImpl implement
     }
 
     @Override
-    public String getDiscriminator() {
-        return SALoopActivityInstance.class.getName();
-    }
-
-    @Override
     public int getLoopCounter() {
         return loopCounter;
     }

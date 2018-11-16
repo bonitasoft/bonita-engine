@@ -50,9 +50,4 @@ public final class SAXMLObjectDataInstanceImpl extends SADataInstanceImpl {
         this.value = XStreamFactory.getXStream().toXML(value);
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SAXMLObjectDataInstanceImpl.class.getSimpleName();
-    }
-
 }

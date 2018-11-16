@@ -38,11 +38,6 @@ public class SIconImpl implements SIcon {
     }
 
     @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
-    @Override
     public long getTenantId() {
         return tenantId;
     }

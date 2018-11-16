@@ -120,11 +120,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
         this.description = description;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
     public long getTenantId() {
         return tenantId;
     }

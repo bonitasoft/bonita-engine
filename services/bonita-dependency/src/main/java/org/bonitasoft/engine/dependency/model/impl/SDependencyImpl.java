@@ -108,11 +108,6 @@ public class SDependencyImpl implements SDependency {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SDependencyImpl.class.getName();
-    }
-
-    @Override
     public String toString() {
         return "SDependencyImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", fileName=" + fileName + ", description=" + description + "]";
     }

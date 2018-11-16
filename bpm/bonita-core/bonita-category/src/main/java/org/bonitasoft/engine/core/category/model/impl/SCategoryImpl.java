@@ -95,11 +95,6 @@ public class SCategoryImpl implements SCategory {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SCategoryImpl.class.getName();
-    }
-
-    @Override
     public String getName() {
         return this.name;
     }

@@ -37,11 +37,6 @@ public class BlobValueImpl implements BlobValue {
     }
 
     @Override
-    public String getDiscriminator() {
-        return BlobValueImpl.class.getName();
-    }
-
-    @Override
     public void setId(final long id) {
         this.id = id;
     }

@@ -45,9 +45,4 @@ public class SBooleanDataInstanceImpl extends SDataInstanceImpl {
         return value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SBooleanDataInstanceImpl.class.getSimpleName();
-    }
-
 }

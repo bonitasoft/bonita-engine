@@ -57,11 +57,6 @@ public class SProfileImpl implements SProfile {
         lastUpdatedBy = profile.getLastUpdatedBy();
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SProfileImpl.class.getName();
-    }
-
     public long getTenantId() {
         return tenantId;
     }

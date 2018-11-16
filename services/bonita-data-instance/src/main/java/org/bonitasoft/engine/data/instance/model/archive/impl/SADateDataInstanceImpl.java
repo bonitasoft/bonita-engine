@@ -38,11 +38,6 @@ public class SADateDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SADateDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Serializable getValue() {
         return value;
     }

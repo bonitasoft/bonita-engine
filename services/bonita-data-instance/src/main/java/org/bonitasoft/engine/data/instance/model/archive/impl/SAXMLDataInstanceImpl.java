@@ -41,11 +41,6 @@ public class SAXMLDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAXMLDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Serializable getValue() {
         return value;
     }

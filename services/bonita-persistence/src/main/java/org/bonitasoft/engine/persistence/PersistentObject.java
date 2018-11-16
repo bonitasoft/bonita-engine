@@ -23,8 +23,6 @@ public interface PersistentObject extends Serializable {
 
     long getId();
 
-    String getDiscriminator();
-
     void setId(long id);
 
     void setTenantId(long id);

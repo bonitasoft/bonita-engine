@@ -70,11 +70,6 @@ public class SExternalIdentityMappingImpl implements SExternalIdentityMapping {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SExternalIdentityMappingImpl.class.getName();
-    }
-
-    @Override
     public String getExternalId() {
         return externalId;
     }
