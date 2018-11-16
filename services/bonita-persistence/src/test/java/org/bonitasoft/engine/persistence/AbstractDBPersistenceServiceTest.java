@@ -133,11 +133,6 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public String getDiscriminator() {
-            return null;
-        }
-
-        @Override
         public void setId(final long id) {
 
         }
@@ -168,11 +163,6 @@ public class AbstractDBPersistenceServiceTest {
         @Override
         public long getId() {
             return 0;
-        }
-
-        @Override
-        public String getDiscriminator() {
-            return null;
         }
 
         @Override

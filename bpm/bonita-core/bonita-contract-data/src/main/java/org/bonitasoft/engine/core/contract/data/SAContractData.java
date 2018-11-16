@@ -66,8 +66,4 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
         this.value = value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SAContractData.class.getName();
-    }
 }

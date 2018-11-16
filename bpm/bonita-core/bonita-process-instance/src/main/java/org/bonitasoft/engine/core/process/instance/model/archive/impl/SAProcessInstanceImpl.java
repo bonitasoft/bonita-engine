@@ -80,11 +80,6 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAProcessInstance.class.getName();
-    }
-
-    @Override
     public long getProcessDefinitionId() {
         return processDefinitionId;
     }

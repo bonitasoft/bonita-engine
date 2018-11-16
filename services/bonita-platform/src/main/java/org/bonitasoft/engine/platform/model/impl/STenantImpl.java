@@ -116,11 +116,6 @@ public class STenantImpl implements STenant {
     }
 
     @Override
-    public String getDiscriminator() {
-        return STenant.class.getName();
-    }
-
-    @Override
     public String getStatus() {
         return status;
     }

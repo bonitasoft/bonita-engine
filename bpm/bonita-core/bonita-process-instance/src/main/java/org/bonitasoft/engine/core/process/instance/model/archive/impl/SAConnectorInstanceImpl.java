@@ -57,11 +57,6 @@ public class SAConnectorInstanceImpl extends SANamedElementImpl implements SACon
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAConnectorInstanceImpl.class.getName();
-    }
-
-    @Override
     public long getContainerId() {
         return containerId;
     }

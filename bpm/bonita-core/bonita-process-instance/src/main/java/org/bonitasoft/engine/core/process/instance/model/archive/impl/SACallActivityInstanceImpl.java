@@ -40,11 +40,6 @@ public class SACallActivityInstanceImpl extends SAActivityInstanceImpl implement
     }
 
     @Override
-    public String getDiscriminator() {
-        return SACallActivityInstance.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "call";
     }

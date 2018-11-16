@@ -89,26 +89,6 @@ public class SPageImplAssert extends AbstractAssert<SPageImplAssert, SPageImpl> 
   }
 
   /**
-   * Verifies that the actual SPageImpl's discriminator is equal to the given one.
-   * @param discriminator the given discriminator to compare the actual SPageImpl's discriminator to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPageImpl's discriminator is not equal to the given one.
-   */
-  public SPageImplAssert hasDiscriminator(String discriminator) {
-    // check that actual SPageImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // we overrides the default error message with a more explicit one
-    String errorMessage = format("\nExpected <%s> discriminator to be:\n  <%s>\n but was:\n  <%s>", actual, discriminator, actual.getDiscriminator());
-    
-    // check
-    if (!actual.getDiscriminator().equals(discriminator)) { throw new AssertionError(errorMessage); }
-
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
    * Verifies that the actual SPageImpl's displayName is equal to the given one.
    * @param displayName the given displayName to compare the actual SPageImpl's displayName to.
    * @return this assertion object.

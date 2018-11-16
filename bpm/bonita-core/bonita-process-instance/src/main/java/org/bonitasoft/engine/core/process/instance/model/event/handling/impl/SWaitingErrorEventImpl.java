@@ -40,11 +40,6 @@ public class SWaitingErrorEventImpl extends SWaitingEventImpl implements SWaitin
     }
 
     @Override
-    public String getDiscriminator() {
-        return SWaitingErrorEvent.class.getName();
-    }
-
-    @Override
     public String getErrorCode() {
         return errorCode;
     }

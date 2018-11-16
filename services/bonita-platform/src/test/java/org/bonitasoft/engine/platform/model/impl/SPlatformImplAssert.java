@@ -73,29 +73,6 @@ public class SPlatformImplAssert extends AbstractAssert<SPlatformImplAssert, SPl
   }
 
   /**
-   * Verifies that the actual SPlatformImpl's discriminator is equal to the given one.
-   * @param discriminator the given discriminator to compare the actual SPlatformImpl's discriminator to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual SPlatformImpl's discriminator is not equal to the given one.
-   */
-  public SPlatformImplAssert hasDiscriminator(String discriminator) {
-    // check that actual SPlatformImpl we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected discriminator of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    String actualDiscriminator = actual.getDiscriminator();
-    if (!Objects.areEqual(actualDiscriminator, discriminator)) {
-      failWithMessage(assertjErrorMessage, actual, discriminator, actualDiscriminator);
-    }
-
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
    * Verifies that the actual SPlatformImpl's id is equal to the given one.
    * @param id the given id to compare the actual SPlatformImpl's id to.
    * @return this assertion object.

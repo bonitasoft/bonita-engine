@@ -135,11 +135,6 @@ public class SContactInfoImpl extends SPersistentObjectImpl implements SContactI
     }
 
     @Override
-    public String getDiscriminator() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
     public String getEmail() {
         return email;
     }

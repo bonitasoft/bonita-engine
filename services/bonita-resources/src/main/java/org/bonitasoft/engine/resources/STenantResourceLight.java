@@ -55,11 +55,6 @@ public class STenantResourceLight implements PersistentObject {
     }
 
     @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
-    @Override
     public void setId(long id) {
         this.id = id;
     }

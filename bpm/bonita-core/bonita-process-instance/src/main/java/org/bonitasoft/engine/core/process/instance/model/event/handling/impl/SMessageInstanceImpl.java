@@ -59,11 +59,6 @@ public class SMessageInstanceImpl extends SPersistenceObjectImpl implements SMes
     }
 
     @Override
-    public String getDiscriminator() {
-        return SMessageInstance.class.getName();
-    }
-
-    @Override
     public String getMessageName() {
         return messageName;
     }

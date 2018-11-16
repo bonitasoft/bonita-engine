@@ -45,9 +45,4 @@ public final class SBlobDataInstanceImpl extends SDataInstanceImpl {
         this.value = (byte[]) value;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SBlobDataInstanceImpl.class.getSimpleName();
-    }
-
 }

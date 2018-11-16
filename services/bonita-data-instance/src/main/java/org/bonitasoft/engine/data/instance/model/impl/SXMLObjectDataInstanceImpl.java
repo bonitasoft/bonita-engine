@@ -45,10 +45,6 @@ public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
         this.value = convert(value);
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SXMLObjectDataInstanceImpl.class.getSimpleName();
-    }
 
     private String convert(final Serializable value) {
         return XStreamFactory.getXStream().toXML(value);

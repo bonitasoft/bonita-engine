@@ -48,11 +48,6 @@ public class SWaitingSignalEventImpl extends SWaitingEventImpl implements SWaiti
     }
 
     @Override
-    public String getDiscriminator() {
-        return SWaitingSignalEvent.class.getName();
-    }
-
-    @Override
     public SEventTriggerType getEventTriggerType() {
         return SEventTriggerType.SIGNAL;
     }

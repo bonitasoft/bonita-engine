@@ -66,11 +66,6 @@ public class SConnectorInstanceImpl extends SNamedElementImpl implements SConnec
     }
 
     @Override
-    public String getDiscriminator() {
-        return this.getClass().getName();
-    }
-
-    @Override
     public String getState() {
         return state;
     }

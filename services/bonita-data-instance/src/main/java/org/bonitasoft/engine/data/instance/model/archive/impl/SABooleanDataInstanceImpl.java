@@ -37,11 +37,6 @@ public class SABooleanDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SABooleanDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Boolean getValue() {
         return value;
     }

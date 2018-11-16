@@ -58,11 +58,6 @@ public class SQueriableLogParameterImpl implements SQueriableLogParameter {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SQueriableLogParameter.class.getName();
-    }
-
-    @Override
     public String getName() {
         return name;
     }

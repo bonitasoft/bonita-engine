@@ -84,11 +84,6 @@ public class SProfileEntryImpl implements SProfileEntry {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProfileEntryImpl.class.getName();
-    }
-
-    @Override
     public long getParentId() {
         return parentId;
     }

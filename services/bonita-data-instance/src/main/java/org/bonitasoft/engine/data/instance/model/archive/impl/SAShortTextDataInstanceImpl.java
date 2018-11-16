@@ -37,11 +37,6 @@ public class SAShortTextDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAShortTextDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Serializable getValue() {
         return value;
     }

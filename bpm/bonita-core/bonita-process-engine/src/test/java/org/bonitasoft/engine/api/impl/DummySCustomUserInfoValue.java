@@ -64,11 +64,6 @@ public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
     }
 
     @Override
-    public String getDiscriminator() {
-        throw new UnsupportedOperationException(MESSAGE);
-    }
-
-    @Override
     public void setId(long id) {
         throw new UnsupportedOperationException(MESSAGE);
     }

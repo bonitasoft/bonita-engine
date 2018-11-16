@@ -36,11 +36,6 @@ public class SAEndEventInstanceImpl extends SAThrowEventInstanceImpl implements 
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAEndEventInstance.class.getName();
-    }
-
-    @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.END_EVENT;
     }

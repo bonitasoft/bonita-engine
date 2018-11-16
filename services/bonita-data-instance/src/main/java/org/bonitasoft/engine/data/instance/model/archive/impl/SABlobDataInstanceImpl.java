@@ -45,11 +45,6 @@ public final class SABlobDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SABlobDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Serializable getValue() {
         return revert(value);
     }

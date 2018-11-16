@@ -94,11 +94,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProcessInstance.class.getName();
-    }
-
-    @Override
     public long getProcessDefinitionId() {
         return processDefinitionId;
     }

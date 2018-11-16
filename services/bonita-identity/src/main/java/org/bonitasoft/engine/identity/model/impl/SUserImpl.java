@@ -106,11 +106,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SUser.class.getName();
-    }
-
-    @Override
     public long getManagerUserId() {
         return managerUserId;
     }

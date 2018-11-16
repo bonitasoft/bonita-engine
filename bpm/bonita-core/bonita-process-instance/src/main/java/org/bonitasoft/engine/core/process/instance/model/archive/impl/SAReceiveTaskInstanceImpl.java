@@ -39,11 +39,6 @@ public class SAReceiveTaskInstanceImpl extends SAActivityInstanceImpl implements
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAReceiveTaskInstanceImpl.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "receive";
     }

@@ -40,11 +40,6 @@ public class SAAutomaticTaskInstanceImpl extends SAActivityInstanceImpl implemen
     }
 
     @Override
-    public String getDiscriminator() {
-        return SAAutomaticTaskInstanceImpl.class.getName();
-    }
-
-    @Override
     public String getKind() {
         return "auto";
     }

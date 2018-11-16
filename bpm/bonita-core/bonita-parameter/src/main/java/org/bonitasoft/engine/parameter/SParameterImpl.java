@@ -45,11 +45,6 @@ public class SParameterImpl implements SParameter {
     }
 
     @Override
-    public String getDiscriminator() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return name;
     }

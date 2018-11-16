@@ -85,11 +85,6 @@ public class SProfileMemberImpl implements SProfileMember {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProfileMember.class.getName();
-    }
-
-    @Override
     public long getProfileId() {
         return profileId;
     }

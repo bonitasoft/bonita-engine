@@ -87,9 +87,4 @@ public class SPlatformDependencyMappingImpl implements SDependencyMapping {
         return dependencyId;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SPlatformDependencyMappingImpl.class.getName();
-    }
-
 }

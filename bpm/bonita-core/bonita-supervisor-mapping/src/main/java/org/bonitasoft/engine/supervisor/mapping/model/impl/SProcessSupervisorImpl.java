@@ -60,11 +60,6 @@ public class SProcessSupervisorImpl implements SProcessSupervisor {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SProcessSupervisorImpl.class.getName();
-    }
-
-    @Override
     public long getProcessDefId() {
         return processDefId;
     }

@@ -45,11 +45,6 @@ public class SCommandImpl extends CommandDeployment implements SCommand {
         this.system = system;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return SCommandImpl.class.getName();
-    }
-
     public long getTenantId() {
         return this.tenantId;
     }

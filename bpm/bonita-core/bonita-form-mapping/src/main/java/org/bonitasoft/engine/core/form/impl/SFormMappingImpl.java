@@ -43,11 +43,6 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
         this.target = target;
     }
 
-    @Override
-    public String getDiscriminator() {
-        return getClass().getName();
-    }
-
     public Integer getType() {
         return type;
     }

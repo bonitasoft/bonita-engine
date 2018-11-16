@@ -37,11 +37,6 @@ public class SALongDataInstanceImpl extends SADataInstanceImpl {
     }
 
     @Override
-    public String getDiscriminator() {
-        return SALongDataInstanceImpl.class.getSimpleName();
-    }
-
-    @Override
     public Long getValue() {
         return value;
     }
