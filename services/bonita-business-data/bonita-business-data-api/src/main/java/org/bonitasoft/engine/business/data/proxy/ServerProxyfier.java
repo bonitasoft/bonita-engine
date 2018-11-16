@@ -17,18 +17,19 @@ package org.bonitasoft.engine.business.data.proxy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Colin Puy
@@ -169,23 +170,32 @@ public class ServerProxyfier {
     }
 
     public static Entity unProxifyIfNeeded(final Entity entity) {
+        Set<Entity> visitedEntities = new HashSet<>();
+        return unProxifyIfNeeded(entity, visitedEntities);
+    }
+
+    private static Entity unProxifyIfNeeded(Entity entity, Set<Entity> alreadyUnproxyfied) {
         Entity detachedEntity = entity;
         if (entity != null && isLazyMethodProxyfied(entity)) {
             detachedEntity = ((LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity)).getEntity();
         }
-        if (detachedEntity != null) {
+        if (detachedEntity == null) {
+            return null;
+        }
+        boolean wasNotAlreadyUnproxified = alreadyUnproxyfied.add(detachedEntity);
+        if (wasNotAlreadyUnproxified) {
             final Field[] declaredFields = detachedEntity.getClass().getDeclaredFields();
             for (final Field field : declaredFields) {
                 try {
                     if (Entity.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
-                        field.set(detachedEntity, unProxifyIfNeeded((Entity) field.get(detachedEntity)));
+                        field.set(detachedEntity, unProxifyIfNeeded((Entity) field.get(detachedEntity),alreadyUnproxyfied));
                     } else if (List.class.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         final List list = (List) field.get(detachedEntity);
                         if (list != null && !list.isEmpty() && Entity.class.isAssignableFrom(list.get(0).getClass())) {
                             final List<Entity> realEntities = ((List<Entity>) list).stream()
-                                    .map(ServerProxyfier::unProxifyIfNeeded).collect(Collectors.toList());
+                                    .map(element -> unProxifyIfNeeded(element,alreadyUnproxyfied)).collect(Collectors.toList());
                             list.clear();
                             list.addAll(realEntities);
                             field.set(detachedEntity, list);
