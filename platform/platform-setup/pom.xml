@@ -83,6 +83,10 @@
             <groupId>mysql</groupId>
         </dependency>
         <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
@@ -237,23 +241,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>sqlserver_drivers</id>
-            <activation>
-                <property>
-                    <name>sysprop.bonita.db.vendor</name>
-                    <value>sqlserver</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.microsoft.jdbc</groupId>
-                    <artifactId>sqlserver</artifactId>
-                    <version>6.0.8112.100_42</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>oracle_drivers</id>

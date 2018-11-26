@@ -80,6 +80,7 @@
         <docker-postgres-image>postgres:9.3</docker-postgres-image>
         <docker-mysql-image>mysql:5.5.49</docker-mysql-image>
         <docker-oracle-image>oracle:11g</docker-oracle-image>
+        <docker-sqlserver-image>ms-sqlserver:2019</docker-sqlserver-image>
 
         <!-- ************************ -->
         <!-- Sonar/Reporting settings -->
@@ -354,6 +355,11 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.26</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>7.0.0.jre8</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -907,23 +913,6 @@
                 </dependency>
             </dependencies>
         </profile>
-        <profile>
-            <id>sqlserver_drivers</id>
-            <activation>
-                <property>
-                    <name>sysprop.bonita.db.vendor</name>
-                    <value>sqlserver</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.microsoft.jdbc</groupId>
-                    <artifactId>sqlserver</artifactId>
-                    <version>6.0.8112.100_42</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
 
         <!-- Profiles use to run tests on docker images -->
         <profile>
@@ -970,6 +959,7 @@
                                 <db.vendor>postgres</db.vendor>
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
+                                <db.server.name>${docker.host.address}</db.server.name>
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
@@ -1027,6 +1017,7 @@
                                 <db.vendor>mysql</db.vendor>
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
+                                <db.server.name>${docker.host.address}</db.server.name>
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
@@ -1090,6 +1081,65 @@
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
                                 <db.database.name>xe</db.database.name>
+                                <db.server.name>${docker.host.address}</db.server.name>
+                                <db.server.port>${db.random.port}</db.server.port>
+                            </systemPropertyVariables>
+                            <includes>
+                                <include>${testSuite.name}</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sqlserver</id>
+            <properties>
+                <db.vendor>sqlserver</db.vendor>
+                <docker-container-alias>bonita-sqlserver-IT</docker-container-alias>
+            </properties>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>${docker-sqlserver-image}</name>
+                                    <alias>${docker-container-alias}</alias>
+                                    <run>
+                                        <namingStrategy>alias</namingStrategy>
+                                        <ports>
+                                            <port>db.random.port:1433</port>
+                                            <!--<port>db.tcpPort:51000</port>-->
+                                            <!--<port>db.rpcPort:135</port>-->
+                                        </ports>
+                                        <wait>
+                                            <time>${docker-timeout}</time>
+                                            <log>Bonita SQL Server initialization complete</log>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+                            <systemPropertyVariables>
+                                <sysprop.bonita.db.vendor>sqlserver</sysprop.bonita.db.vendor>
+                                <sysprop.bonita.bdm.db.vendor>sqlserver</sysprop.bonita.bdm.db.vendor>
+                                <db.vendor>sqlserver</db.vendor>
+                                <db.user>bonita</db.user>
+                                <db.password>bpm</db.password>
+                                <db.database.name>bonita</db.database.name>
+                                <db.server.name>${docker.host.address}</db.server.name>
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
@@ -1104,9 +1154,10 @@
             <!-- profile used to pull docker image from bonita internal repository: -->
             <id>bonita-internal</id>
             <properties>
-                <docker-postgres-image>registry.rd.lan/bonitasoft/postgres:9.3</docker-postgres-image>
+                <docker-postgres-image>registry.rd.lan/bonitasoft/postgres-9.3:1.2.4</docker-postgres-image>
                 <docker-mysql-image>registry.rd.lan/bonitasoft/mysql:5.5.49</docker-mysql-image>
                 <docker-oracle-image>registry.rd.lan/bonitasoft/oracle:11g</docker-oracle-image>
+                <docker-sqlserver-image>registry.rd.lan/bonitasoft/sqlserver-2019:1.1.1</docker-sqlserver-image>
                 <!-- turns on/off logs from docker image-->
                 <docker.showLogs>true</docker.showLogs>
                 <!-- global timeoout in millis allowed for docker image to start -->

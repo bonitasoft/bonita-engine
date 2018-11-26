@@ -40,6 +40,10 @@
                     <groupId>mysql</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.h2database</groupId>
                     <artifactId>h2</artifactId>
                 </exclusion>
@@ -81,6 +85,10 @@
                 <exclusion>
                     <artifactId>mysql-connector-java</artifactId>
                     <groupId>mysql</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.h2database</groupId>
