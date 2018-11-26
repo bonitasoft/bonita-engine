@@ -731,19 +731,12 @@ public class BPMInstancesCreator {
                 .setContainerType(dataContainerType.name()).setValue(dataValue).done();
     }
 
-    public boolean createDataInstances(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
-            final SExpressionContext sExpressionContext) throws SActivityStateExecutionException {
+    public boolean createDataInstances(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SActivityDefinition activityDefinition = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
         if (activityDefinition != null) {// can be null if the activity was added in runtime
-            final SExpressionContext expressionContext;
-            if (sExpressionContext == null) {
-                expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                        processDefinition.getId());
-            } else {
-                expressionContext = sExpressionContext;
-            }
-            return createDataInstances(activityDefinition, flowNodeInstance, expressionContext);
+            return createDataInstances(activityDefinition, flowNodeInstance, new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    processDefinition.getId()));
         }
         return false;
     }
