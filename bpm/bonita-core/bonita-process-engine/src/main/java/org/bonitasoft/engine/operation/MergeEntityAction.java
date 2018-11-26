@@ -35,7 +35,7 @@ public class MergeEntityAction implements EntityAction {
     @Override
     public Entity execute(final Entity entity, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         if (entity == null) {
-            throw new SEntityActionExecutionException("Unable to insert/update a null business data");
+            throw new SEntityActionExecutionException("Unable to insert/update a null business object instance");
         }
         try {
             return repository.merge(ServerProxyfier.unProxifyIfNeeded(entity));
@@ -48,7 +48,9 @@ public class MergeEntityAction implements EntityAction {
     public List<Entity> execute(final List<Entity> entities, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         final List<Entity> mergedEntities = new ArrayList<>();
         for (final Entity entity : entities) {
-            mergedEntities.add(execute(entity, businessDataContext));
+        	if(entity != null) {
+        		mergedEntities.add(execute(entity, businessDataContext));
+        	}
         }
         return mergedEntities;
     }
