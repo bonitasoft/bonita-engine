@@ -59,6 +59,10 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
@@ -228,6 +232,43 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+            <!--instance accounts:-->
+            <!--bonita (user bonita/bpm)-->
+            <!--business_data (user business_data/bpm)-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <keepContainer>true</keepContainer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sqlserver</id>
+            <properties>
+                <db.vendor>sqlserver</db.vendor>
+            </properties>
             <!--instance accounts:-->
             <!--bonita (user bonita/bpm)-->
             <!--business_data (user business_data/bpm)-->
