@@ -371,6 +371,18 @@
                 <version>1.16.20</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
+                <scope>runtime</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
