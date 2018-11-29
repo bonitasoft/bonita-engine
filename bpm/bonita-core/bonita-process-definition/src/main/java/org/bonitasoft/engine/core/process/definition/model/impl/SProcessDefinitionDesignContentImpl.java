@@ -14,42 +14,18 @@
 
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
 public class SProcessDefinitionDesignContentImpl implements SProcessDefinitionDesignContent {
 
     private long tenantId;
     private long id;
     private String content;
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

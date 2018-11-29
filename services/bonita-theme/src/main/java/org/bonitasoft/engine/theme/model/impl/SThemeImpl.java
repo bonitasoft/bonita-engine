@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.theme.model.impl;
 
-import java.util.Arrays;
-
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
@@ -22,23 +23,16 @@ import org.bonitasoft.engine.theme.model.SThemeType;
 /**
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SThemeImpl extends PersistentObjectId implements STheme {
 
-    private static final long serialVersionUID = -7340761293800942582L;
-
     private byte[] content;
-
     private byte[] cssContent;
-
     private boolean isDefault;
-
     private long lastUpdateDate;
-
     private SThemeType type;
-
-    public SThemeImpl() {
-        super();
-    }
 
     public SThemeImpl(final byte[] content, final boolean isDefault, final SThemeType type, final long lastUpdatedDate) {
         super();
@@ -53,100 +47,4 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         cssContent = theme.getCssContent();
     }
 
-    @Override
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(final byte[] content) {
-        this.content = content;
-    }
-
-    @Override
-    public byte[] getCssContent() {
-        return cssContent;
-    }
-
-    public void setCssContent(final byte[] cssContent) {
-        this.cssContent = cssContent;
-    }
-
-    @Override
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(final boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
-    @Override
-    public long getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(final long lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    @Override
-    public SThemeType getType() {
-        return type;
-    }
-
-    public void setType(final SThemeType type) {
-        this.type = type;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
-        result = prime * result + (isDefault ? 1231 : 1237);
-        result = prime * result + Arrays.hashCode(content);
-        result = prime * result + Arrays.hashCode(cssContent);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SThemeImpl other = (SThemeImpl) obj;
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        if (lastUpdateDate != other.lastUpdateDate) {
-            return false;
-        }
-        if (!Arrays.equals(content, other.content)) {
-            return false;
-        }
-        if (!Arrays.equals(cssContent, other.cssContent)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "SThemeImpl [id=" + getId() + ", content=" + Arrays.toString(content) + ", cssContent=" + Arrays.toString(cssContent) + ", isDefault="
-                + isDefault + ", lastUpdateDate=" + lastUpdateDate + ", type=" + type + "]";
-    }
 }

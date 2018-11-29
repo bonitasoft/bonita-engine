@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
@@ -22,28 +25,16 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SWaitingSignalEventImpl extends SWaitingEventImpl implements SWaitingSignalEvent {
 
-    private static final long serialVersionUID = -2199062045232102189L;
-
     private String signalName;
-
-    public SWaitingSignalEventImpl() {
-        super();
-    }
 
     public SWaitingSignalEventImpl(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
             final String flowNodeName, final String signalName) {
         super(eventType, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName);
-        this.signalName = signalName;
-    }
-
-    @Override
-    public String getSignalName() {
-        return signalName;
-    }
-
-    public void setSignalName(final String signalName) {
         this.signalName = signalName;
     }
 

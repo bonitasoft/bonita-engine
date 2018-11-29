@@ -13,103 +13,25 @@
  **/
 package org.bonitasoft.engine.core.category.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
 public class SProcessCategoryMappingImpl implements SProcessCategoryMapping {
 
-    private static final long serialVersionUID = 475782425337396808L;
-
     private long tenantId;
-
     private long id;
-
     private long categoryId;
-
     private long processId;
 
-    public SProcessCategoryMappingImpl() {
-        super();
-    }
 
     public SProcessCategoryMappingImpl(final long categoryId, final long processId) {
         this.categoryId = categoryId;
         this.processId = processId;
     }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public long getCategoryId() {
-        return categoryId;
-    }
-
-    @Override
-    public long getProcessId() {
-        return processId;
-    }
-
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    public void setCategoryId(final long categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public void setProcessId(final long processId) {
-        this.processId = processId;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (categoryId ^ (categoryId >>> 32));
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + (int) (processId ^ (processId >>> 32));
-        result = prime * result + (int) (tenantId ^ (tenantId >>> 32));
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SProcessCategoryMappingImpl other = (SProcessCategoryMappingImpl) obj;
-        if (categoryId != other.categoryId) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (processId != other.processId) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        return true;
-    }
-
 }

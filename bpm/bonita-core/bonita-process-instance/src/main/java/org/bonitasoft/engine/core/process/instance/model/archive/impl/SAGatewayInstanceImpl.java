@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
@@ -23,42 +26,19 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAGatewayInstanceImpl extends SAFlowNodeInstanceImpl implements SAGatewayInstance {
 
-    private static final long serialVersionUID = -3255817753577461503L;
-
     private SGatewayType gatewayType;
-
     private String hitBys = "";
-
-    public SAGatewayInstanceImpl() {
-        super();
-    }
 
     public SAGatewayInstanceImpl(final SGatewayInstance sGatewayInstance) {
         super(sGatewayInstance);
         gatewayType = sGatewayInstance.getGatewayType();
         hitBys = sGatewayInstance.getHitBys();
     }
-
-    public void setGatewayType(final SGatewayType gatewayType) {
-        this.gatewayType = gatewayType;
-    }
-
-    @Override
-    public SGatewayType getGatewayType() {
-        return gatewayType;
-    }
-
-    @Override
-    public String getHitBys() {
-        return hitBys;
-    }
-
-    public void setHitBys(final String hitBys) {
-        this.hitBys = hitBys;
-    }
-
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.GATEWAY;

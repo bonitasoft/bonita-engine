@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
@@ -22,13 +25,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAStartEventInstanceImpl extends SACatchEventInstanceImpl implements SAStartEventInstance {
-
-    private static final long serialVersionUID = 461897851088700885L;
-
-    public SAStartEventInstanceImpl() {
-        super();
-    }
 
     public SAStartEventInstanceImpl(final SStartEventInstance startEventInstance) {
         super(startEventInstance);

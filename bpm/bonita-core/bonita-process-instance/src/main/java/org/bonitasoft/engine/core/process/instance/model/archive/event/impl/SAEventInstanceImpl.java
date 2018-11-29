@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
@@ -21,13 +24,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SAEventInstanceImpl extends SAFlowNodeInstanceImpl implements SAEventInstance {
-
-    private static final long serialVersionUID = -2134357410983025781L;
-
-    public SAEventInstanceImpl() {
-        super();
-    }
 
     public SAEventInstanceImpl(final SEventInstance eventInstance) {
         super(eventInstance);

@@ -31,7 +31,10 @@
             <artifactId>bonita-log-technical</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

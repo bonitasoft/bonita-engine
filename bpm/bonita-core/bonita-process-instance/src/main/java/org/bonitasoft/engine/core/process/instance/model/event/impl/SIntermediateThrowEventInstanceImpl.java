@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance;
 
@@ -20,13 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThro
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SIntermediateThrowEventInstanceImpl extends SThrowEventInstanceImpl implements SIntermediateThrowEventInstance {
-
-    private static final long serialVersionUID = -7858545825600523724L;
-
-    public SIntermediateThrowEventInstanceImpl() {
-        super();
-    }
 
     public SIntermediateThrowEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

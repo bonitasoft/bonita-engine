@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
 
@@ -23,64 +27,19 @@ import org.bonitasoft.engine.identity.model.SUserLogin;
  * sequence id 27
  * @author Baptiste Mesta
  */
-public class SUserLoginImpl extends SPersistentObjectImpl implements SUserLogin {
+@Data
+@NoArgsConstructor
+@ToString(exclude = "sUser")
+@EqualsAndHashCode(exclude = "sUser")
+public class SUserLoginImpl implements SUserLogin {
 
+    private long id;
+    private long tenantId;
     private Long lastConnection;
-
     private SUser sUser;
-
-
-    public SUserLoginImpl() {
-        super();
-    }
 
     public SUserLoginImpl(Long lastConnection) {
         this.lastConnection = lastConnection;
     }
 
-    public SUser getsUser() {
-        return sUser;
-    }
-
-    public void setsUser(SUser sUser) {
-        this.sUser = sUser;
-    }
-
-    @Override
-    public Long getLastConnection() {
-        return lastConnection;
-    }
-
-    public void setLastConnection(Long lastConnection) {
-        this.lastConnection = lastConnection;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SUserLoginImpl)) return false;
-        if (!super.equals(o)) return false;
-
-        SUserLoginImpl that = (SUserLoginImpl) o;
-
-        if (lastConnection != null ? !lastConnection.equals(that.lastConnection) : that.lastConnection != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (lastConnection != null ? lastConnection.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "SUserLoginImpl{" +
-                "lastConnection=" + lastConnection +
-                '}';
-    }
 }

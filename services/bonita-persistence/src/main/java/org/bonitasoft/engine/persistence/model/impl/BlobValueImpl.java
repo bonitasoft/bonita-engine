@@ -15,78 +15,21 @@ package org.bonitasoft.engine.persistence.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.model.BlobValue;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
 public class BlobValueImpl implements BlobValue {
 
-    private static final long serialVersionUID = -7451235454786974186L;
-
     private long id;
-
     private Serializable value;
-
     private long tenantId;
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public Serializable getValue() {
-        return value;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BlobValueImpl other = (BlobValueImpl) obj;
-        if (id != other.id) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        return true;
-    }
-
-    public void setValue(final Serializable value) {
-        this.value = value;
-    }
 
 }

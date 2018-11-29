@@ -15,6 +15,9 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 
@@ -23,19 +26,14 @@ import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SXMLDataInstanceImpl extends SDataInstanceImpl implements SXMLDataInstance {
 
-    private static final long serialVersionUID = 5646725264914760542L;
-
     private String value;
-
     private String namespace;
-
     private String element;
-
-    public SXMLDataInstanceImpl() {
-        super();
-    }
 
     public SXMLDataInstanceImpl(final SXMLDataDefinition dataDefinition) {
         super(dataDefinition);
@@ -46,29 +44,6 @@ public class SXMLDataInstanceImpl extends SDataInstanceImpl implements SXMLDataI
     @Override
     public void setValue(final Serializable value) {
         this.value = (String) value;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String getNamespace() {
-        return namespace;
-    }
-
-    @Override
-    public String getElement() {
-        return element;
-    }
-
-    public void setNamespace(final String namespace) {
-        this.namespace = namespace;
-    }
-
-    public void setElement(final String element) {
-        this.element = element;
     }
 
 }

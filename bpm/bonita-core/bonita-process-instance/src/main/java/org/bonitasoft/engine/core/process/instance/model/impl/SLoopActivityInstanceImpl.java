@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 
@@ -21,17 +24,13 @@ import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SLoopActivityInstanceImpl extends SActivityInstanceImpl implements SLoopActivityInstance {
 
-    private static final long serialVersionUID = -2778635412407060681L;
-
     private int loopCounter;
-
     private int loopMax;
-
-    public SLoopActivityInstanceImpl() {
-        super();
-    }
 
     public SLoopActivityInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {
@@ -44,71 +43,11 @@ public class SLoopActivityInstanceImpl extends SActivityInstanceImpl implements 
     public SFlowNodeType getType() {
         return SFlowNodeType.LOOP_ACTIVITY;
     }
-
-    @Override
-    public int getLoopCounter() {
-        return loopCounter;
-    }
-
-    @Override
-    public void setLoopCounter(final int loopCounter) {
-        this.loopCounter = loopCounter;
-    }
-
-    @Override
-    public int getLoopMax() {
-        return loopMax;
-    }
-
-    public void setLoopMax(final int loopMax) {
-        this.loopMax = loopMax;
-    }
     
     @Override
     public boolean mustExecuteOnAbortOrCancelProcess() {
         // it's not necessary to execute it because this will be done when the child reaches the aborted state
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + loopCounter;
-        result = prime * result + loopMax;
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SLoopActivityInstanceImpl other = (SLoopActivityInstanceImpl) obj;
-        if (loopCounter != other.loopCounter) {
-            return false;
-        }
-        if (loopMax != other.loopMax) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("SLoopActivityInstanceImpl [loopCounter=");
-        builder.append(loopCounter);
-        builder.append(", loopMax=");
-        builder.append(loopMax);
-        builder.append("]");
-        return builder.toString();
     }
 
 }

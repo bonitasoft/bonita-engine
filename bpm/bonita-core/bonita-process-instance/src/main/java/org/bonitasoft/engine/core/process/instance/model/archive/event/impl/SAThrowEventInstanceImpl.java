@@ -13,18 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 
 /**
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SAThrowEventInstanceImpl extends SAEventInstanceImpl {
-
-    private static final long serialVersionUID = -8202111344442767347L;
-
-    public SAThrowEventInstanceImpl() {
-        super();
-    }
 
     public SAThrowEventInstanceImpl(final SThrowEventInstance sThrowEventInstance) {
         super(sThrowEventInstance);

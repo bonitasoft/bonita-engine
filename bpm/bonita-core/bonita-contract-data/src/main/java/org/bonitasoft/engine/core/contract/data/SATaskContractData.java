@@ -13,19 +13,19 @@
  **/
 package org.bonitasoft.engine.core.contract.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SATaskContractData extends SAContractData implements ArchivedPersistentObject {
-
-    private static final long serialVersionUID = 5105634271134688723L;
-
-    public SATaskContractData() {
-        super();
-    }
 
     public SATaskContractData(final SContractData contractData) {
         super(contractData);
@@ -40,7 +40,4 @@ public class SATaskContractData extends SAContractData implements ArchivedPersis
         return SATaskContractData.class;
     }
 
-    public long getUserTaskId() {
-        return scopeId;
-    }
 }

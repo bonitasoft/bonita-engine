@@ -15,21 +15,21 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SIntegerDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = 4369510522836874048L;
-
     private Integer value;
-
-    public SIntegerDataInstanceImpl() {
-        super();
-    }
 
     public SIntegerDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
@@ -21,13 +24,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SASendTaskInstanceImpl extends SAActivityInstanceImpl implements SASendTaskInstance {
-
-    private static final long serialVersionUID = -3621349327932816690L;
-
-    public SASendTaskInstanceImpl() {
-        super();
-    }
 
     public SASendTaskInstanceImpl(final SSendTaskInstance sSendTaskInstance) {
         super(sSendTaskInstance);

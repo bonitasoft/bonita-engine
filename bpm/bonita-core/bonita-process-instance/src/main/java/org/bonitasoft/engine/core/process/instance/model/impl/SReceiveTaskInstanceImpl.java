@@ -13,19 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 
 /**
  * @author Julien Molinaro
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SReceiveTaskInstanceImpl extends SActivityInstanceImpl implements SReceiveTaskInstance {
-
-    private static final long serialVersionUID = -3721211072415010571L;
-
-    public SReceiveTaskInstanceImpl() {
-        super();
-    }
 
     public SReceiveTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

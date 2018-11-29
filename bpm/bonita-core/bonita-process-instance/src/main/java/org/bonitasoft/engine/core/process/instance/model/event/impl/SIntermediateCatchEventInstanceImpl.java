@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 
@@ -20,13 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatc
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SIntermediateCatchEventInstanceImpl extends SCatchEventInstanceImpl implements SIntermediateCatchEventInstance {
-
-    private static final long serialVersionUID = -5942139184581444779L;
-
-    public SIntermediateCatchEventInstanceImpl() {
-        super();
-    }
 
     public SIntermediateCatchEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

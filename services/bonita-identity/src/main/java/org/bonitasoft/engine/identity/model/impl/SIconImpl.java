@@ -14,14 +14,15 @@
 
 package org.bonitasoft.engine.identity.model.impl;
 
-import java.util.Arrays;
-import java.util.Objects;
-
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.identity.model.SIcon;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
 public class SIconImpl implements SIcon {
 
     private long tenantId;
@@ -29,75 +30,9 @@ public class SIconImpl implements SIcon {
     private String mimeType;
     private byte[] content;
 
-    public SIconImpl() {
-    }
-
     public SIconImpl(String mimeType, byte[] content) {
         this.mimeType = mimeType;
         this.content = content;
     }
 
-    @Override
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    @Override
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        SIconImpl sIcon = (SIconImpl) o;
-        return tenantId == sIcon.tenantId &&
-                id == sIcon.id &&
-                Objects.equals(mimeType, sIcon.mimeType) &&
-                Arrays.equals(content, sIcon.content);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tenantId, id, mimeType, content);
-    }
-
-    @Override
-    public String toString() {
-        return "SIcon{" +
-                "tenantId=" + tenantId +
-                ", id=" + id +
-                ", mimeType='" + mimeType + '\'' +
-                '}';
-    }
 }

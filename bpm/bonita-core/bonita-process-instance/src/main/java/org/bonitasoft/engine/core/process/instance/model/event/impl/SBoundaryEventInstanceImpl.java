@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 
@@ -20,15 +23,12 @@ import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventIns
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SBoundaryEventInstanceImpl extends SCatchEventInstanceImpl implements SBoundaryEventInstance {
 
-    private static final long serialVersionUID = -9222619067525277584L;
-
     private long activityInstanceId;
-
-    public SBoundaryEventInstanceImpl() {
-        super();
-    }
 
     public SBoundaryEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {
@@ -41,44 +41,9 @@ public class SBoundaryEventInstanceImpl extends SCatchEventInstanceImpl implemen
     }
 
     @Override
-    public long getActivityInstanceId() {
-        return activityInstanceId;
-    }
-
-    public void setActivityInstanceId(final long activityInstanceId) {
-        this.activityInstanceId = activityInstanceId;
-    }
-    
-    @Override
     public boolean mustExecuteOnAbortOrCancelProcess() {
         //a boundary event never must be executed when the process instance is aborted because it will be aborted by the attached activity
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (activityInstanceId ^ activityInstanceId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SBoundaryEventInstanceImpl other = (SBoundaryEventInstanceImpl) obj;
-        if (activityInstanceId != other.activityInstanceId) {
-            return false;
-        }
-        return true;
     }
 
 }

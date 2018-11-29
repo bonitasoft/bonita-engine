@@ -13,34 +13,25 @@
  **/
 package org.bonitasoft.engine.platform.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.platform.model.SPlatform;
 
 /**
  * @author Charles Souillard
  */
+@Data
+@NoArgsConstructor
 public class SPlatformImpl implements SPlatform {
 
-    private static final long serialVersionUID = 1L;
-
     private long tenantId;
-
     private long id;
-
     private long created;
-
     private String createdBy;
-
     private String initialVersion;
-
     private String previousVersion;
-
     private String version;
-
     private String information;
-
-    private SPlatformImpl() {
-        // for mybatis
-    }
 
     public SPlatformImpl(final String version, final String previousVersion, final String initialVersion, final String createdBy, final long created) {
         this.version = version;
@@ -48,83 +39,6 @@ public class SPlatformImpl implements SPlatform {
         this.initialVersion = initialVersion;
         this.createdBy = createdBy;
         this.created = created;
-    }
-
-    public long getTenantId() {
-        return this.tenantId;
-    }
-
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public long getCreated() {
-        return this.created;
-    }
-
-    public void setCreated(final long created) {
-        this.created = created;
-    }
-
-    @Override
-    public String getCreatedBy() {
-        return this.createdBy;
-    }
-
-    public void setCreatedBy(final String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    @Override
-    public String getInitialVersion() {
-        return this.initialVersion;
-    }
-
-    public void setInitialVersion(final String initialVersion) {
-        this.initialVersion = initialVersion;
-    }
-
-    @Override
-    public String getPreviousVersion() {
-        return this.previousVersion;
-    }
-
-    public void setPreviousVersion(final String previousVersion) {
-        this.previousVersion = previousVersion;
-    }
-
-    @Override
-    public String getVersion() {
-        return this.version;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    @Override
-    public String getInformation() {
-        return information;
-    }
-
-    public void setInformation(final String information) {
-        this.information = information;
-    }
-
-    @Override
-    public String toString() {
-        return "SPlatformImpl [created=" + this.created + ", createdBy=" + this.createdBy + ", id=" + this.id + ", initialVersion=" + this.initialVersion
-                + ", previousVersion=" + this.previousVersion + ", version=" + this.version + "]";
     }
 
 }

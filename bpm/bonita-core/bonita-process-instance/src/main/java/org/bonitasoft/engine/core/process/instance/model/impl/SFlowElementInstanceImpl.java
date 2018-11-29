@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -21,36 +24,25 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SFlowElementInstanceImpl extends SNamedElementImpl implements SFlowElementInstance {
 
-    private static final long serialVersionUID = 4771702652977437892L;
-
     private long rootContainerId;
-
     private long parentContainerId;
-
     private SStateCategory stateCategory = SStateCategory.NORMAL;
-
     //process definition id
     private long logicalGroup1;
-
     //root process instance id
     private long logicalGroup2;
-
     //parent activity instance id
     private long logicalGroup3;
-
     //parent process instance id
     private long logicalGroup4;
-
     private String description;
-
     private boolean terminal;
-
     private boolean stable;
-
-    public SFlowElementInstanceImpl() {
-    }
 
     public SFlowElementInstanceImpl(final String name) {
         super(name);
@@ -63,16 +55,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
         this.parentContainerId = parentContainerId;
         this.logicalGroup1 = logicalGroup1;
         this.logicalGroup2 = logicalGroup2;
-    }
-
-    @Override
-    public long getParentContainerId() {
-        return parentContainerId;
-    }
-
-    @Override
-    public long getRootContainerId() {
-        return rootContainerId;
     }
 
     @Override
@@ -116,14 +98,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
         }
     }
 
-    public void setParentContainerId(final long parentContainerId) {
-        this.parentContainerId = parentContainerId;
-    }
-
-    public void setRootContainerId(final long rootContainerId) {
-        this.rootContainerId = rootContainerId;
-    }
-
     @Override
     public boolean isAborting() {
         return SStateCategory.ABORTING.equals(stateCategory);
@@ -133,16 +107,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
     public boolean isCanceling() {
         return SStateCategory.CANCELLING.equals(stateCategory);
     }
-
-    @Override
-    public SStateCategory getStateCategory() {
-        return stateCategory;
-    }
-
-    public void setStateCategory(final SStateCategory stateCategory) {
-        this.stateCategory = stateCategory;
-    }
-
     public void setLogicalGroup(final int index, final long value) {
         switch (index) {
             case 0:
@@ -160,106 +124,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
             default:
                 throw new IllegalArgumentException("Invalid index: the index must be 0, 1, 2 or 3");
         }
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public boolean isStable() {
-        return stable;
-    }
-
-    public void setStable(final boolean stable) {
-        this.stable = stable;
-    }
-
-    @Override
-    public boolean isTerminal() {
-        return terminal;
-    }
-
-    public void setTerminal(final boolean terminal) {
-        this.terminal = terminal;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (int) (logicalGroup1 ^ logicalGroup1 >>> 32);
-        result = prime * result + (int) (logicalGroup2 ^ logicalGroup2 >>> 32);
-        result = prime * result + (int) (logicalGroup3 ^ logicalGroup3 >>> 32);
-        result = prime * result + (int) (logicalGroup4 ^ logicalGroup4 >>> 32);
-        result = prime * result + (int) (parentContainerId ^ parentContainerId >>> 32);
-        result = prime * result + (int) (rootContainerId ^ rootContainerId >>> 32);
-        result = prime * result + (stable ? 1231 : 1237);
-        result = prime * result + (stateCategory == null ? 0 : stateCategory.hashCode());
-        result = prime * result + (terminal ? 1231 : 1237);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SFlowElementInstanceImpl other = (SFlowElementInstanceImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (logicalGroup1 != other.logicalGroup1) {
-            return false;
-        }
-        if (logicalGroup2 != other.logicalGroup2) {
-            return false;
-        }
-        if (logicalGroup3 != other.logicalGroup3) {
-            return false;
-        }
-        if (logicalGroup4 != other.logicalGroup4) {
-            return false;
-        }
-        if (parentContainerId != other.parentContainerId) {
-            return false;
-        }
-        if (rootContainerId != other.rootContainerId) {
-            return false;
-        }
-        if (stable != other.stable) {
-            return false;
-        }
-        if (stateCategory != other.stateCategory) {
-            return false;
-        }
-        if (terminal != other.terminal) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "SFlowElementInstanceImpl [rootContainerId=" + rootContainerId + ", parentContainerId=" + parentContainerId + ", stateCategory=" + stateCategory
-                + ", logicalGroup1=" + logicalGroup1 + ", logicalGroup2=" + logicalGroup2 + ", logicalGroup3=" + logicalGroup3 + ", logicalGroup4="
-                + logicalGroup4 + ", description=" + description + ", terminal=" + terminal + ", stable=" + stable + "]";
     }
 
 }

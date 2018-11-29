@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
@@ -22,15 +25,12 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SASubProcessActivityInstanceImpl extends SAActivityInstanceImpl implements SASubProcessActivityInstance {
 
-    private static final long serialVersionUID = -3846825095425055696L;
-
     private boolean triggeredByEvent;
-
-    public SASubProcessActivityInstanceImpl() {
-        super();
-    }
 
     public SASubProcessActivityInstanceImpl(final SSubProcessActivityInstance activityInstance) {
         super(activityInstance);
@@ -45,11 +45,6 @@ public class SASubProcessActivityInstanceImpl extends SAActivityInstanceImpl imp
     @Override
     public String getKind() {
         return "subProc";
-    }
-
-    @Override
-    public boolean isTriggeredByEvent() {
-        return triggeredByEvent;
     }
 
     @Override

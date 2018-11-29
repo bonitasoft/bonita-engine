@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 
@@ -20,13 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstan
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SStartEventInstanceImpl extends SCatchEventInstanceImpl implements SStartEventInstance {
-
-    private static final long serialVersionUID = -4961165255991429346L;
-
-    public SStartEventInstanceImpl() {
-        super();
-    }
 
     public SStartEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

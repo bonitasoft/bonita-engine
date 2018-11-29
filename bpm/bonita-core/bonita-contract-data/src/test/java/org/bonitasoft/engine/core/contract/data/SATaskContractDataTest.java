@@ -31,7 +31,7 @@ public class SATaskContractDataTest {
         assertThat(saTaskContractData.getTenantId()).isEqualTo(0L);
         assertThat(saTaskContractData.getId()).isEqualTo(0L);
         assertThat(saTaskContractData.getName()).isEqualTo("id");
-        assertThat(saTaskContractData.getUserTaskId()).isEqualTo(userTaskId);
+        assertThat(saTaskContractData.getScopeId()).isEqualTo(userTaskId);
         assertThat(saTaskContractData.getArchiveDate()).isEqualTo(0L);
         assertThat(saTaskContractData.getSourceObjectId()).isEqualTo(7548463269L);
         assertThat(saTaskContractData.getValue()).isEqualTo(15124245748545L);

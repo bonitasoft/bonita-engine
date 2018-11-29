@@ -13,40 +13,20 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SConnectorInstanceWithFailureInfoImpl extends SConnectorInstanceImpl implements SConnectorInstanceWithFailureInfo {
 
-    private static final long serialVersionUID = -5057879792315490243L;
-
     private String stackTrace;
-
     private String exceptionMessage;
-
-    @Override
-    public String getStackTrace() {
-        return stackTrace;
-    }
-
-    @Override
-    public String getExceptionMessage() {
-        return exceptionMessage;
-    }
-
-    public void setExceptionMessage(String message) {
-        this.exceptionMessage = message;
-    }
-
-    public void setStackTrace(String stackTrace) {
-        this.stackTrace = stackTrace;
-    }
-
-    @Override
-    public String toString() {
-        return "SConnectorInstanceImplWithFailureInfoImpl#" + getId();
-    }
 
 }

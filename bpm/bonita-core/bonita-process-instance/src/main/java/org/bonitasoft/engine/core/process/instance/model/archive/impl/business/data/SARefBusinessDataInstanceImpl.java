@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SARefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -21,39 +24,16 @@ import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 /**
  * @author Emmanuel Duchastenier
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SARefBusinessDataInstanceImpl extends SAPersistenceObjectImpl implements SARefBusinessDataInstance {
 
-    private static final long serialVersionUID = 6616497495062704471L;
-
     private String name;
-
     private String dataClassName;
-
-    public SARefBusinessDataInstanceImpl() {
-        super();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDataClassName() {
-        return dataClassName;
-    }
-
-    public void setDataClassName(final String dataClassName) {
-        this.dataClassName = dataClassName;
-    }
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SRefBusinessDataInstance.class;
     }
-
 }

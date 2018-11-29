@@ -13,19 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.comment.model.SSystemComment;
 
 /**
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SSystemCommentImpl extends SCommentImpl implements SSystemComment {
-
-    private static final long serialVersionUID = -8294077176495786761L;
-
-    public SSystemCommentImpl() {
-        super();
-    }
 
     public SSystemCommentImpl(final long processInstanceId, final String content) {
         super(processInstanceId, content);

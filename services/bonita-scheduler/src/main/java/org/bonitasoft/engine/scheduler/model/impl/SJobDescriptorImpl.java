@@ -13,22 +13,20 @@
  **/
 package org.bonitasoft.engine.scheduler.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SJobDescriptorImpl extends SPersistentObjectImpl implements SJobDescriptor {
 
-    private static final long serialVersionUID = -3239267050673207129L;
-
     private String jobClassName;
-
     private String jobName;
-
     private String description;
-    
     private boolean disallowConcurrentExecution;
-
-    public SJobDescriptorImpl() {
-    }
 
     public SJobDescriptorImpl(final String jobClassName, final String jobName, final String description, final boolean disallowConcurrentExecution) {
         super();
@@ -45,33 +43,6 @@ public class SJobDescriptorImpl extends SPersistentObjectImpl implements SJobDes
         this.disallowConcurrentExecution = disallowConcurrentExecution;
     }
 
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getJobClassName() {
-        return jobClassName;
-    }
-
-    @Override
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public void setJobClassName(final String jobClassName) {
-        this.jobClassName = jobClassName;
-    }
-
-    public void setJobName(final String jobName) {
-        this.jobName = jobName;
-    }
-    
     @Override
     public boolean disallowConcurrentExecution() {
         return disallowConcurrentExecution;

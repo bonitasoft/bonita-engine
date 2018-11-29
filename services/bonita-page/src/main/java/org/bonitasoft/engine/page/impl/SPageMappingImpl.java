@@ -19,12 +19,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, exclude = "authorizationRules")
 public class SPageMappingImpl extends PersistentObjectId implements SPageMapping {
 
     public static final String COMMA_DELIM = ",";
@@ -36,35 +42,6 @@ public class SPageMappingImpl extends PersistentObjectId implements SPageMapping
     private List<String> authorizationRules = new ArrayList<>();
     private long lastUpdateDate;
     private long lastUpdatedBy;
-
-    public SPageMappingImpl() {
-    }
-
-    @Override
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    @Override
-    public String getUrlAdapter() {
-        return urlAdapter;
-    }
-
-    public void setUrlAdapter(String urlAdapter) {
-        this.urlAdapter = urlAdapter;
-    }
-
-    public String getPageAuthorizRules() {
-        return pageAuthorizRules;
-    }
-
-    public void setPageAuthorizRules(String pageAuthorizRules) {
-        this.pageAuthorizRules = pageAuthorizRules;
-    }
 
     private void parseRules() {
         if (pageAuthorizRules != null) {
@@ -95,78 +72,5 @@ public class SPageMappingImpl extends PersistentObjectId implements SPageMapping
     public void setPageAuthorizationRules(List<String> rules) {
         authorizationRules = rules;
         buildRulesAsString();
-    }
-
-    @Override
-    public Long getPageId() {
-        return pageId;
-    }
-
-    public void setPageId(Long pageId) {
-        this.pageId = pageId;
-    }
-
-    @Override
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @Override
-    public long getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(long lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    @Override
-    public long getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
-
-    public void setLastUpdatedBy(long lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof SPageMappingImpl))
-            return false;
-        if (!super.equals(o))
-            return false;
-        SPageMappingImpl that = (SPageMappingImpl) o;
-        return Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
-                Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
-                Objects.equals(key, that.key) &&
-                Objects.equals(pageId, that.pageId) &&
-                Objects.equals(url, that.url) &&
-                Objects.equals(urlAdapter, that.urlAdapter) &&
-                Objects.equals(pageAuthorizRules, that.pageAuthorizRules);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), key, pageId, url, urlAdapter, lastUpdateDate, lastUpdatedBy, pageAuthorizRules);
-    }
-
-    @Override
-    public String toString() {
-        return "SPageMappingImpl{" +
-                "key='" + key + '\'' +
-                ", pageId=" + pageId +
-                ", url='" + url + '\'' +
-                ", urlAdapter='" + urlAdapter + '\'' +
-                ", pageAuthorizRules='" + pageAuthorizRules + '\'' +
-                ", authorizationRules=" + authorizationRules +
-                ", lastUpdateDate=" + lastUpdateDate +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                "} " + super.toString();
     }
 }

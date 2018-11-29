@@ -13,33 +13,28 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SConnectorInstanceImpl extends SNamedElementImpl implements SConnectorInstance {
 
-    private static final long serialVersionUID = 6815931350326178293L;
 
     private long containerId;
-
     private String connectorId;
-
     private String version;
-
     private ConnectorEvent activationEvent;
-
     private String state;
-
     private String containerType;
-
     private int executionOrder;
-
-    public SConnectorInstanceImpl() {
-        super();
-    }
 
     public SConnectorInstanceImpl(final String name, final long containerId, final String containerType, final String connectorId, final String version,
             final ConnectorEvent activationEvent) {
@@ -49,74 +44,6 @@ public class SConnectorInstanceImpl extends SNamedElementImpl implements SConnec
         this.connectorId = connectorId;
         this.version = version;
         this.activationEvent = activationEvent;
-    }
-
-    @Override
-    public String getConnectorId() {
-        return connectorId;
-    }
-
-    public void setConnectorId(final String connectorId) {
-        this.connectorId = connectorId;
-    }
-
-    @Override
-    public ConnectorEvent getActivationEvent() {
-        return activationEvent;
-    }
-
-    @Override
-    public String getState() {
-        return state;
-    }
-
-    public void setActivationEvent(final ConnectorEvent activationEvent) {
-        this.activationEvent = activationEvent;
-    }
-
-    public void setState(final String state) {
-        this.state = state;
-    }
-
-    @Override
-    public long getContainerId() {
-        return containerId;
-    }
-
-    public void setContainerId(final long containerId) {
-        this.containerId = containerId;
-    }
-
-    @Override
-    public String getContainerType() {
-        return containerType;
-    }
-
-    public void setContainerType(final String containerType) {
-        this.containerType = containerType;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    @Override
-    public int getExecutionOrder() {
-        return executionOrder;
-    }
-
-    public void setExecutionOrder(final int executionOrder) {
-        this.executionOrder = executionOrder;
-    }
-
-    @Override
-    public String toString() {
-        return "SConnectorInstanceImpl#" + getId();
     }
 
 }
