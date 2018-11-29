@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.data.instance;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -66,6 +69,7 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
     protected TransientDataService dataInstanceService;
 
+
     @Before
     public void setup() {
         expressionService = getTenantAccessor().getExpressionService();
@@ -77,7 +81,11 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
                 throw new RuntimeException(e);
             }
         }
-        dataInstanceService = new TransientDataServiceImpl(cacheService);
+        dataInstanceService = new TransientDataServiceImpl(cacheService,
+                getTenantAccessor().getExpressionResolverService(),
+                getTenantAccessor().getActivityInstanceService(),
+                getTenantAccessor().getProcessDefinitionService(),
+                getTenantAccessor().getTechnicalLoggerService());
     }
 
     @After

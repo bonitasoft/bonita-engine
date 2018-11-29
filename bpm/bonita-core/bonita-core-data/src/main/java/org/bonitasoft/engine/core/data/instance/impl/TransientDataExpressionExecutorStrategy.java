@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
@@ -30,7 +30,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingEx
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
@@ -81,28 +80,12 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
             try {
                 containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
                 containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
-                // TODO archived transient data?
-                // final Long time;
-                // if ((time = (Long) dependencyValues.get(TIME)) != null) {
-                // final List<SADataInstance> dataInstances = transientDataService.getSADataInstances(containerId, containerType, dataNames, time);
-                // for (final SADataInstance dataInstance : dataInstances) {
-                // dataNames.remove(dataInstance.getName());
-                // results.put(dataInstance.getName(), dataInstance.getValue());
-                // }
-                // }
                 for (final String name : dataNames) {
                     currentData = name;
-                    SDataInstance dataInstance;
-                    try {
-                        dataInstance = transientDataService.getDataInstance(name, containerId, containerType);
-                    } catch (final SDataInstanceNotFoundException e) {
-                        dataInstance = handleDataNotFound(name, containerId, containerType, e);
-                    }
+                    SDataInstance dataInstance = transientDataService.getDataInstance(name, containerId, containerType);
                     results.put(dataInstance.getName(), dataInstance.getValue());
                 }
                 return buildExpressionResultSameOrderAsInputList(expressions, results);
-            } catch (final SBonitaReadException e) {
-                throw new SExpressionEvaluationException("Can't read transient data", e, currentData);
             } catch (final SDataInstanceException e) {
                 throw new SExpressionEvaluationException("Can't read transient data", e, currentData);
             }
@@ -110,17 +93,10 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
         throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
     }
 
-    protected SDataInstance handleDataNotFound(final String name, final long containerId, final String containerType, final SDataInstanceNotFoundException e)
-            throws SDataInstanceNotFoundException, SBonitaReadException, SDataInstanceException {
-        throw e;
-    }
-
     private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {
-        final ArrayList<Object> list = new ArrayList<Object>(expressions.size());
-        for (final SExpression expression : expressions) {
-            list.add(results.get(expression.getContent()));
-        }
-        return list;
+        return expressions.stream()
+                .map(exp -> results.get(exp.getContent()))
+                .collect(Collectors.toList());
     }
 
     @Override
