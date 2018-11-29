@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance;
@@ -22,17 +25,13 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SALoopActivityInstanceImpl extends SAActivityInstanceImpl implements SALoopActivityInstance {
 
-    private static final long serialVersionUID = 2016946775219587242L;
-
     private int loopCounter;
-
     private int loopMax;
-
-    public SALoopActivityInstanceImpl() {
-        super();
-    }
 
     public SALoopActivityInstanceImpl(final SLoopActivityInstance sLoopActivityInstance) {
         super(sLoopActivityInstance);
@@ -43,54 +42,6 @@ public class SALoopActivityInstanceImpl extends SAActivityInstanceImpl implement
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.LOOP_ACTIVITY;
-    }
-
-    @Override
-    public int getLoopCounter() {
-        return loopCounter;
-    }
-
-    @Override
-    public int getLoopMax() {
-        return loopMax;
-    }
-
-    public void setLoopCounter(final int loopCounter) {
-        this.loopCounter = loopCounter;
-    }
-
-    public void setLoopMax(final int loopMax) {
-        this.loopMax = loopMax;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + loopCounter;
-        result = prime * result + loopMax;
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SALoopActivityInstanceImpl other = (SALoopActivityInstanceImpl) obj;
-        if (loopCounter != other.loopCounter) {
-            return false;
-        }
-        if (loopMax != other.loopMax) {
-            return false;
-        }
-        return true;
     }
 
     @Override

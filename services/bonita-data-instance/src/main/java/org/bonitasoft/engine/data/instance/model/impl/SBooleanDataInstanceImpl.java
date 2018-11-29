@@ -15,21 +15,21 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SBooleanDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = -6643607575403119321L;
-
     private Boolean value;
-
-    public SBooleanDataInstanceImpl() {
-        super();
-    }
 
     public SBooleanDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
@@ -38,11 +38,6 @@ public class SBooleanDataInstanceImpl extends SDataInstanceImpl {
     @Override
     public void setValue(final Serializable value) {
         this.value = (Boolean) value;
-    }
-
-    @Override
-    public Boolean getValue() {
-        return value;
     }
 
 }

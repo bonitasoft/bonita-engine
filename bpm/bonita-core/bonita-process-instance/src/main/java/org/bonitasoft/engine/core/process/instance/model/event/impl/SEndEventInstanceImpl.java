@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
 
@@ -20,13 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SEndEventInstanceImpl extends SThrowEventInstanceImpl implements SEndEventInstance {
-
-    private static final long serialVersionUID = -3373297539893080325L;
-
-    public SEndEventInstanceImpl() {
-        super();
-    }
 
     public SEndEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

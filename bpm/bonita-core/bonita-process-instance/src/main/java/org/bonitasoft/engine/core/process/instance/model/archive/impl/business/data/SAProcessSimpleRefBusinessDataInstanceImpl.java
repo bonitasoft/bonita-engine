@@ -13,24 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAProcessSimpleRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAProcessSimpleRefBusinessDataInstanceImpl extends SASimpleRefBusinessDataInstanceImpl implements SAProcessSimpleRefBusinessDataInstance {
 
-    private static final long serialVersionUID = -1612711169274459075L;
-
     private long processInstanceId;
-
-    @Override
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(final long processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
 
 }

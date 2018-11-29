@@ -13,23 +13,22 @@
  **/
 package org.bonitasoft.engine.scheduler.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
 public class SFailedJobImpl implements SFailedJob {
 
     private final long jobDescriptorId;
-
     private final String jobName;
-
     private final String description;
-
     private final long retryNumber;
-
     private final long lastUpdateDate;
-
     private final String lastMessage;
 
     public SFailedJobImpl(final long jobDescriptorId, final String jobName, final String description, final long retryNumber, final long lastUpdateDate,
@@ -40,36 +39,6 @@ public class SFailedJobImpl implements SFailedJob {
         this.retryNumber = retryNumber;
         this.lastUpdateDate = lastUpdateDate;
         this.lastMessage = lastMessage;
-    }
-
-    @Override
-    public long getJobDescriptorId() {
-        return jobDescriptorId;
-    }
-
-    @Override
-    public String getJobName() {
-        return jobName;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getLastMessage() {
-        return lastMessage;
-    }
-
-    @Override
-    public long getRetryNumber() {
-        return retryNumber;
-    }
-
-    @Override
-    public long getLastUpdateDate() {
-        return lastUpdateDate;
     }
 
 }

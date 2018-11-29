@@ -15,21 +15,21 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SFloatDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = 203297519682235643L;
-
     private Float value;
-
-    public SFloatDataInstanceImpl() {
-        super();
-    }
 
     public SFloatDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
@@ -38,11 +38,6 @@ public class SFloatDataInstanceImpl extends SDataInstanceImpl {
     @Override
     public void setValue(final Serializable value) {
         this.value = (Float) value;
-    }
-
-    @Override
-    public Float getValue() {
-        return value;
     }
 
 }

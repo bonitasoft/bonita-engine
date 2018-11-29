@@ -13,54 +13,20 @@
  **/
 package org.bonitasoft.engine.core.document.model.impl;
 
-import java.util.Arrays;
-
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.document.model.SDocument;
 
 /**
  * @author Nicolas Chabanoles
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SDocumentImpl extends SLightDocumentImpl implements SDocument {
 
-    private static final long serialVersionUID = 3494829428880067405L;
-
-
-
     private byte[] content;
-
-    public SDocumentImpl() {
-    }
-
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
-
-    @Override
-    public byte[] getContent() {
-        return content;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        SDocumentImpl sDocument = (SDocumentImpl) o;
-
-        if (!Arrays.equals(content, sDocument.content)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (content != null ? Arrays.hashCode(content) : 0);
-        return result;
-    }
-
 
 }

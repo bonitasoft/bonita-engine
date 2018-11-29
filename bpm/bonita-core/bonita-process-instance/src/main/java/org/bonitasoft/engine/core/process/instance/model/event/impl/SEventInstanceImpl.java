@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
@@ -20,13 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SEventInstanceImpl extends SFlowNodeInstanceImpl implements SEventInstance {
-
-    private static final long serialVersionUID = 2719962182085446506L;
-
-    public SEventInstanceImpl() {
-        super();
-    }
 
     public SEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

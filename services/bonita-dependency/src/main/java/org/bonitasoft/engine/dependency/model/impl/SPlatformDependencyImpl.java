@@ -13,87 +13,30 @@
  **/
 package org.bonitasoft.engine.dependency.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.dependency.model.SPlatformDependency;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
 public class SPlatformDependencyImpl implements SPlatformDependency {
 
-    private static final long serialVersionUID = -5880182078631771416L;
-
     private long id;
-
     private long tenantId;
-
     private String name;
-
     private String fileName;
-
     private String description;
-
     private byte[] value_;
-
-    public SPlatformDependencyImpl() {
-        // default constructor for hibernate
-    }
 
     public SPlatformDependencyImpl(final String name, final String fileName, final byte[] value) {
         super();
         this.name = name;
         this.fileName = fileName;
         value_ = value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setTenantId(final long id) {
-        this.tenantId = id;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public byte[] getValue_() {
-        return value_;
-    }
-
-    public void setValue_(final byte[] value_) {
-        this.value_ = value_;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setFileName(final String fileName) {
-        this.fileName = fileName;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getFileName() {
-        return fileName;
     }
 
     @Override

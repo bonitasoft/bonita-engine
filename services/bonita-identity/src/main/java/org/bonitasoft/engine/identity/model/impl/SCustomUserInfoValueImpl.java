@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 
 /**
@@ -20,88 +22,14 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements SCustomUserInfoValue {
+@Data
+@NoArgsConstructor
+public class SCustomUserInfoValueImpl implements SCustomUserInfoValue {
 
-    private static final long serialVersionUID = 1L;
-
+    private long id;
+    private long tenantId;
     protected long userId;
-
     protected long definitionId;
-
     protected String value;
-
-    public SCustomUserInfoValueImpl() {
-        super();
-    }
-
-    @Override
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final long userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public long getDefinitionId() {
-        return definitionId;
-    }
-
-    public void setDefinitionId(final long definitionId) {
-        this.definitionId = definitionId;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(final String value) {
-        this.value = value;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (definitionId ^ definitionId >>> 32);
-        result = prime * result + (int) (userId ^ userId >>> 32);
-        result = prime * result + (value == null ? 0 : value.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SCustomUserInfoValueImpl other = (SCustomUserInfoValueImpl) obj;
-        if (definitionId != other.definitionId) {
-            return false;
-        }
-        if (userId != other.userId) {
-            return false;
-        }
-        if (value == null) {
-            if (other.value != null) {
-                return false;
-            }
-        } else if (!value.equals(other.value)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "SCustomUserInfoValueImpl [definitionId=" + definitionId + ", userId=" + userId + ", value=" + value + ", getId()=" + getId() + "]";
-    }
 
 }

@@ -16,29 +16,24 @@ package org.bonitasoft.engine.data.instance.model.impl;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SDateDataInstanceImpl extends SDataInstanceImpl {
-
-    private static final long serialVersionUID = -2475669111573552620L;
 
     private Date value;
 
-    public SDateDataInstanceImpl() {
-        super();
-    }
-
     public SDateDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
-    }
-
-    @Override
-    public Date getValue() {
-        return value;
     }
 
     @Override

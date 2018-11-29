@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
-import java.util.Objects;
-
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.identity.model.SRole;
 
 /**
@@ -22,75 +23,19 @@ import org.bonitasoft.engine.identity.model.SRole;
  * @author Bole Zhang
  * @author Matthieu Chaffotte
  */
-public class SRoleImpl extends SNamedElementImpl implements SRole {
+@Data
+@NoArgsConstructor
+public class SRoleImpl implements SRole {
 
-    private static final long serialVersionUID = 1062675620062005462L;
 
+    private long id;
+    private long tenantId;
+    private String name;
+    private String description;
+    private String displayName;
     private long createdBy;
-
     private long creationDate;
-
     private long lastUpdate;
-
     private Long iconId;
 
-    public SRoleImpl() {
-        super();
-    }
-
-    public void setCreatedBy(final long createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreationDate(final long creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public void setLastUpdate(final long lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    @Override
-    public long getCreatedBy() {
-        return createdBy;
-    }
-
-    @Override
-    public long getCreationDate() {
-        return creationDate;
-    }
-
-    @Override
-    public long getLastUpdate() {
-        return lastUpdate;
-    }
-
-    @Override
-    public Long getIconId() {
-        return iconId;
-    }
-
-    public void setIconId(Long iconId) {
-        this.iconId = iconId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
-        SRoleImpl sRole = (SRoleImpl) o;
-        return createdBy == sRole.createdBy &&
-                creationDate == sRole.creationDate &&
-                lastUpdate == sRole.lastUpdate &&
-                Objects.equals(iconId, sRole.iconId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), createdBy, creationDate, lastUpdate, iconId);
-    }
 }

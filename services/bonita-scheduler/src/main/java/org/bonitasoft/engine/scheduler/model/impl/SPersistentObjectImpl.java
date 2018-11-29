@@ -13,60 +13,14 @@
  **/
 package org.bonitasoft.engine.scheduler.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
+@Data
+@NoArgsConstructor
 public abstract class SPersistentObjectImpl implements PersistentObject {
 
-    private static final long serialVersionUID = 1L;
-
-    public SPersistentObjectImpl() {
-    }
-
     private long id;
-
     private long tenantId;
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (this.id ^ this.id >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        final SPersistentObjectImpl other = (SPersistentObjectImpl) obj;
-        if (this.id != other.id) {
-            return false;
-        }
-        return true;
-    }
-
 }

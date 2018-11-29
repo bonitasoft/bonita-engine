@@ -13,66 +13,27 @@
  **/
 package org.bonitasoft.engine.scheduler.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 
 /**
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SJobLogImpl extends SPersistentObjectImpl implements SJobLog {
 
-    private static final long serialVersionUID = 3170527651672434929L;
-
     private long jobDescriptorId;
-
     private Long retryNumber = 0L;
-
     private Long lastUpdateDate;
-
     private String lastMessage;
-
-    public SJobLogImpl() {
-        super();
-    }
 
     public SJobLogImpl(final long jobDescriptorId) {
         super();
         this.jobDescriptorId = jobDescriptorId;
-    }
-
-    @Override
-    public long getJobDescriptorId() {
-        return jobDescriptorId;
-    }
-
-    public void setJobDescriptorId(final long jobDescriptorId) {
-        this.jobDescriptorId = jobDescriptorId;
-    }
-
-    @Override
-    public Long getRetryNumber() {
-        return retryNumber;
-    }
-
-    public void setRetryNumber(final Long retryNumber) {
-        this.retryNumber = retryNumber;
-    }
-
-    @Override
-    public Long getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(final Long lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    @Override
-    public String getLastMessage() {
-        return lastMessage;
-    }
-
-    public void setLastMessage(final String lastMessage) {
-        this.lastMessage = lastMessage;
     }
 
 }

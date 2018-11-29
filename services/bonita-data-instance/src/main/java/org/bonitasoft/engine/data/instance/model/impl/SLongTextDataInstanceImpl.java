@@ -15,29 +15,24 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SLongTextDataInstanceImpl extends SDataInstanceImpl {
-
-    private static final long serialVersionUID = 4245764246914138501L;
 
     private String value;
 
-    public SLongTextDataInstanceImpl() {
-        super();
-    }
-
     public SLongTextDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
-    }
-
-    @Override
-    public Serializable getValue() {
-        return value;
     }
 
     @Override

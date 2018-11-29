@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.supervisor.mapping.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 
 /**
@@ -21,25 +24,16 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
 public class SProcessSupervisorImpl implements SProcessSupervisor {
 
-    private static final long serialVersionUID = 5585086715395975025L;
-
     private long id;
-
     private long tenantId;
-
     private long processDefId;
-
     private long userId = -1;
-
     private long groupId = -1;
-
     private long roleId = -1;
-
-    public SProcessSupervisorImpl() {
-        super();
-    }
 
     public SProcessSupervisorImpl(final long processDefId) {
         this.processDefId = processDefId;
@@ -52,107 +46,6 @@ public class SProcessSupervisorImpl implements SProcessSupervisor {
         this.userId = userId;
         this.groupId = groupId;
         this.roleId = roleId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public long getProcessDefId() {
-        return processDefId;
-    }
-
-    @Override
-    public long getUserId() {
-        return userId;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public void setProcessDefId(final long processDefId) {
-        this.processDefId = processDefId;
-    }
-
-    public void setUserId(final long userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(final long groupId) {
-        this.groupId = groupId;
-    }
-
-    @Override
-    public long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(final long roleId) {
-        this.roleId = roleId;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (groupId ^ groupId >>> 32);
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (int) (processDefId ^ processDefId >>> 32);
-        result = prime * result + (int) (roleId ^ roleId >>> 32);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        result = prime * result + (int) (userId ^ userId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SProcessSupervisorImpl other = (SProcessSupervisorImpl) obj;
-        if (groupId != other.groupId) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (processDefId != other.processDefId) {
-            return false;
-        }
-        if (roleId != other.roleId) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        if (userId != other.userId) {
-            return false;
-        }
-        return true;
     }
 
 }

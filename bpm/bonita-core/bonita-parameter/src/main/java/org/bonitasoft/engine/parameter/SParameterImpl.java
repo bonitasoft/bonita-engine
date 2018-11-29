@@ -15,9 +15,14 @@ package org.bonitasoft.engine.parameter;
 
 import java.util.Objects;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
 public class SParameterImpl implements SParameter {
 
     private String name;
@@ -26,75 +31,10 @@ public class SParameterImpl implements SParameter {
     private long id;
     private long tenantId;
 
-    public SParameterImpl() {
-    }
-
     public SParameterImpl(String name, String value, long processDefinitionId) {
         this.name = name;
         this.value = value;
         this.processDefinitionId = processDefinitionId;
     }
 
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public long getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SParameterImpl that = (SParameterImpl) o;
-        return Objects.equals(processDefinitionId, that.processDefinitionId) &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(tenantId, that.tenantId) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, value, processDefinitionId, id, tenantId);
-    }
 }

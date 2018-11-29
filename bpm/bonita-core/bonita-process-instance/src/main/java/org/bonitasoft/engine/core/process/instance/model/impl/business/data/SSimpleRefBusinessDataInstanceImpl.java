@@ -13,28 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SSimpleRefBusinessDataInstanceImpl extends SRefBusinessDataInstanceImpl implements SSimpleRefBusinessDataInstance {
 
-    private static final long serialVersionUID = -6240483858780514216L;
-
     private Long dataId;
-
-    public SSimpleRefBusinessDataInstanceImpl() {
-        super();
-    }
-
-    @Override
-    public Long getDataId() {
-        return dataId;
-    }
-
-    public void setDataId(final Long dataId) {
-        this.dataId = dataId;
-    }
 
 }

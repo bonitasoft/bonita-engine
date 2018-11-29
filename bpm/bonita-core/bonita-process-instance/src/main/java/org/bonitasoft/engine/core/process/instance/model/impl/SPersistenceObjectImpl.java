@@ -13,64 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@Data
+@NoArgsConstructor
 public abstract class SPersistenceObjectImpl implements PersistentObject {
 
-    private static final long serialVersionUID = 1963528483109540503L;
-
     private long id;
-
     private long tenantId;
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SPersistenceObjectImpl other = (SPersistenceObjectImpl) obj;
-        if (id != other.id) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        return true;
-    }
 
 }

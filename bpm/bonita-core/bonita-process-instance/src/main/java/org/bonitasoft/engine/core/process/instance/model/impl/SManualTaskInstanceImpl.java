@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -22,12 +25,11 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SManualTaskInstanceImpl extends SHumanTaskInstanceImpl implements SManualTaskInstance {
 
-    private static final long serialVersionUID = -3537435744421627183L;
-
-    protected SManualTaskInstanceImpl() {
-    }
 
     public SManualTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,
             final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {

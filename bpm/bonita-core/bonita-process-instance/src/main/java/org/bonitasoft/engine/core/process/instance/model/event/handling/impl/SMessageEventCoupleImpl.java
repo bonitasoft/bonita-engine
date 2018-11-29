@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 
@@ -21,33 +23,18 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
 public class SMessageEventCoupleImpl implements SMessageEventCouple {
 
-    private static final long serialVersionUID = -2293612457423926547L;
-
     private long waitingMessageId;
+    private SBPMEventType waitingMessageEventType;
+    private long messageInstanceId;
 
-    private SBPMEventType eventType;
-
-    private long messageId;
-
-    public SMessageEventCoupleImpl() {
-    }
-
-    public SMessageEventCoupleImpl(final long waitingMessageId, final SBPMEventType eventType, final long messageId) {
+    public SMessageEventCoupleImpl(final long waitingMessageId, final SBPMEventType waitingMessageEventType, final long messageInstanceId) {
         this.waitingMessageId = waitingMessageId;
-        this.eventType = eventType;
-        this.messageId = messageId;
-    }
-
-    @Override
-    public long getWaitingMessageId() {
-        return this.waitingMessageId;
-    }
-
-    @Override
-    public long getMessageInstanceId() {
-        return messageId;
+        this.waitingMessageEventType = waitingMessageEventType;
+        this.messageInstanceId = messageInstanceId;
     }
 
     @Override
@@ -65,17 +52,4 @@ public class SMessageEventCoupleImpl implements SMessageEventCouple {
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public SBPMEventType getWaitingMessageEventType() {
-	    return eventType;
-    }
-
-    @Override
-    public String toString() {
-        return "SMessageEventCoupleImpl{" +
-                "waitingMessageId=" + waitingMessageId +
-                ", eventType=" + eventType +
-                ", messageId=" + messageId +
-                '}';
-    }
 }

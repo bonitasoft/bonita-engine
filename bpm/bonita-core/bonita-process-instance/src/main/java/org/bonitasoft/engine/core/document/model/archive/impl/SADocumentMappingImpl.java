@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.document.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
@@ -23,34 +26,13 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADocumentMapping {
 
-    private static final long serialVersionUID = 2868546403934325445L;
-
     private long archiveDate;
-
     private long sourceObjectId;
-
-    @Override
-    public long getArchiveDate() {
-        return archiveDate;
-    }
-
-    public void setArchiveDate(final long archiveDate) {
-        this.archiveDate = archiveDate;
-    }
-
-    @Override
-    public long getSourceObjectId() {
-        return sourceObjectId;
-    }
-
-    public void setSourceObjectId(final long sourceObjectId) {
-        this.sourceObjectId = sourceObjectId;
-    }
-
-    public SADocumentMappingImpl() {
-    }
 
     public SADocumentMappingImpl(final long documentId, final long processInstanceId, final long archiveDate, final long sourceObjectId, final String name,
             final String description, final String version) {
@@ -66,43 +48,4 @@ public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADoc
         return SDocumentMapping.class;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        final SADocumentMappingImpl that = (SADocumentMappingImpl) o;
-
-        if (archiveDate != that.archiveDate) {
-            return false;
-        }
-        if (sourceObjectId != that.sourceObjectId) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (int) (archiveDate ^ archiveDate >>> 32);
-        result = 31 * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "SADocumentMappingImpl{" +
-                "archiveDate=" + archiveDate +
-                ", sourceObjectId=" + sourceObjectId +
-                '}';
-    }
 }

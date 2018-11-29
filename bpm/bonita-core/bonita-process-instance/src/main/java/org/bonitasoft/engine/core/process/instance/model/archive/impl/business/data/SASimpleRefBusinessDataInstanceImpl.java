@@ -13,28 +13,20 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SASimpleRefBusinessDataInstance;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SASimpleRefBusinessDataInstanceImpl extends SARefBusinessDataInstanceImpl implements SASimpleRefBusinessDataInstance {
-
-    private static final long serialVersionUID = -6240483858780514216L;
 
     private Long dataId;
 
-    public SASimpleRefBusinessDataInstanceImpl() {
-        super();
-    }
-
-    @Override
-    public Long getDataId() {
-        return dataId;
-    }
-
-    public void setDataId(final Long dataId) {
-        this.dataId = dataId;
-    }
 
 }

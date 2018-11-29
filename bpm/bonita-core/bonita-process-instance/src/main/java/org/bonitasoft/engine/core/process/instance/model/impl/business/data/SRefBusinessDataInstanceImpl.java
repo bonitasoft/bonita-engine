@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObjectImpl;
 
@@ -21,34 +24,12 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObject
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl implements SRefBusinessDataInstance {
 
-    private static final long serialVersionUID = 6616497495062704471L;
-
     private String name;
-
     private String dataClassName;
-
-    public SRefBusinessDataInstanceImpl() {
-        super();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDataClassName() {
-        return dataClassName;
-    }
-
-    public void setDataClassName(final String dataClassName) {
-        this.dataClassName = dataClassName;
-    }
 
 }

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 
@@ -20,14 +23,12 @@ import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInst
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SSubProcessActivityInstanceImpl extends SActivityInstanceImpl implements SSubProcessActivityInstance {
 
-    private static final long serialVersionUID = 8835089516258605719L;
-
     private boolean triggeredByEvent;
-
-    public SSubProcessActivityInstanceImpl() {
-    }
 
     public SSubProcessActivityInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2, final boolean triggeredByEvent) {
@@ -38,11 +39,6 @@ public class SSubProcessActivityInstanceImpl extends SActivityInstanceImpl imple
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.SUB_PROCESS;
-    }
-
-    @Override
-    public boolean isTriggeredByEvent() {
-        return triggeredByEvent;
     }
 
 }

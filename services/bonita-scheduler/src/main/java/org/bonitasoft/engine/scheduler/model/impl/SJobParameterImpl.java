@@ -15,50 +15,23 @@ package org.bonitasoft.engine.scheduler.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SJobParameterImpl extends SPersistentObjectImpl implements SJobParameter {
 
-    private static final long serialVersionUID = 3170527651672434929L;
-
     private long jobDescriptorId;
-
     private String key;
-
     private Serializable value;
-
-    public SJobParameterImpl() {
-    }
 
     public SJobParameterImpl(final String key, final Serializable value) {
         this.key = key;
-        this.value = value;
-    }
-
-    @Override
-    public long getJobDescriptorId() {
-        return jobDescriptorId;
-    }
-
-    public void setJobDescriptorId(final long jobDescriptorId) {
-        this.jobDescriptorId = jobDescriptorId;
-    }
-
-    @Override
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(final String key) {
-        this.key = key;
-    }
-
-    @Override
-    public Serializable getValue() {
-        return value;
-    }
-
-    public void setValue(final Serializable value) {
         this.value = value;
     }
 

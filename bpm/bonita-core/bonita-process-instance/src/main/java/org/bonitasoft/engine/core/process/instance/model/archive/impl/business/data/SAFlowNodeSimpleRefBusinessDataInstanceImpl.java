@@ -13,23 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.data;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAFlowNodeSimpleRefBusinessDataInstance;
 
 /**
  * @author Emmanuel Duchastenier
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAFlowNodeSimpleRefBusinessDataInstanceImpl extends SASimpleRefBusinessDataInstanceImpl implements SAFlowNodeSimpleRefBusinessDataInstance {
 
-    private static final long serialVersionUID = 5486560338692349006L;
-
     private long flowNodeInstanceId;
-
-    @Override
-    public long getFlowNodeInstanceId() {
-        return flowNodeInstanceId;
-    }
-
-    public void setFlowNodeInstanceId(final long flowNodeInstanceId) {
-        this.flowNodeInstanceId = flowNodeInstanceId;
-    }
 }

@@ -15,28 +15,19 @@ package org.bonitasoft.engine.core.process.instance.model.archive.impl.business.
 
 import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.archive.business.data.SAMultiRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SAMultiRefBusinessDataInstanceImpl extends SARefBusinessDataInstanceImpl implements SAMultiRefBusinessDataInstance {
 
-    private static final long serialVersionUID = -7182225911903915352L;
-
     private List<Long> dataIds;
-
-    public SAMultiRefBusinessDataInstanceImpl() {
-        super();
-    }
-
-    public void setDataIds(final List<Long> dataIds) {
-        this.dataIds = dataIds;
-    }
-
-    @Override
-    public List<Long> getDataIds() {
-        return dataIds;
-    }
 
 }

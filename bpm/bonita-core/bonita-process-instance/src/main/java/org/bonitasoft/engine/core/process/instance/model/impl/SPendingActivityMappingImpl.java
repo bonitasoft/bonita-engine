@@ -13,53 +13,25 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SPendingActivityMappingImpl extends SPersistenceObjectImpl implements SPendingActivityMapping {
 
-    private static final long serialVersionUID = 5099656536197259953L;
-
     private long activityId;
-
     private long actorId;
-
     private long userId;
-
-    public SPendingActivityMappingImpl() {
-    }
 
     public SPendingActivityMappingImpl(final long activityId) {
         this.activityId = activityId;
-    }
-
-    @Override
-    public long getActivityId() {
-        return activityId;
-    }
-
-    @Override
-    public long getActorId() {
-        return actorId;
-    }
-
-    @Override
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setActivityId(final long activityId) {
-        this.activityId = activityId;
-    }
-
-    public void setActorId(final long actorId) {
-        this.actorId = actorId;
-    }
-
-    public void setUserId(final long userId) {
-        this.userId = userId;
     }
 
 }

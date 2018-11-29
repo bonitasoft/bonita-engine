@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObjectImpl;
 
@@ -20,15 +23,15 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SPersistenceObject
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class STimerEventTriggerInstanceImpl extends SPersistenceObjectImpl implements STimerEventTriggerInstance {
 
     private long eventInstanceId;
     private long executionDate;
     private String jobTriggerName;
     private String eventInstanceName;
-
-    public STimerEventTriggerInstanceImpl() {
-    }
 
     public STimerEventTriggerInstanceImpl(final long eventInstanceId, final String eventInstanceName, final long executionDate, final String jobTriggerName) {
         this.eventInstanceId = eventInstanceId;
@@ -37,35 +40,4 @@ public class STimerEventTriggerInstanceImpl extends SPersistenceObjectImpl imple
         this.setJobTriggerName(jobTriggerName);
     }
 
-    @Override
-    public long getEventInstanceId() {
-        return this.eventInstanceId;
-    }
-
-    protected void setEventInstanceId(final long eventInstanceId) {
-        this.eventInstanceId = eventInstanceId;
-    }
-
-    @Override
-    public long getExecutionDate() {
-        return executionDate;
-    }
-
-    public void setExecutionDate(long executionDate) {
-        this.executionDate = executionDate;
-    }
-
-    @Override
-    public String getJobTriggerName() {
-        return jobTriggerName;
-    }
-
-    public void setJobTriggerName(String jobTriggerName) {
-        this.jobTriggerName = jobTriggerName;
-    }
-
-    @Override
-    public String getEventInstanceName() {
-        return eventInstanceName;
-    }
 }

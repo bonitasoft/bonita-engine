@@ -13,23 +13,20 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 
 /**
  * @author Anthony Birembaut
  * @author Matthieu Chaffotte
  */
-public class SCustomUserInfoDefinitionImpl extends SSingleNamedElementImpl implements SCustomUserInfoDefinition {
+@Data
+@NoArgsConstructor
+public class SCustomUserInfoDefinitionImpl implements SCustomUserInfoDefinition {
 
-    private static final long serialVersionUID = 1L;
-
-    public SCustomUserInfoDefinitionImpl() {
-    }
-
-    @Override
-    public String toString() {
-        return "SCustomUserInfoDefinitionImpl [getDescription()=" + this.getDescription() + ", getName()="
-                + this.getName() + ", getId()=" + this.getId() + "]";
-    }
-
+    private long id;
+    private long tenantId;
+    private String name;
+    private String description;
 }
