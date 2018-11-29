@@ -14,21 +14,42 @@
 package org.bonitasoft.engine.core.data.instance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
+import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,8 +58,24 @@ public class TransientDataServiceImplTest {
     @Mock
     private CacheService cacheService;
 
+    @Mock
+    private TechnicalLoggerService logger;
+
+    @Mock
+    private ExpressionResolverService expressionResolverService;
+
+    @Mock
+    private FlowNodeInstanceService flowNodeInstanceService;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+
     @InjectMocks
+    @Spy
     private TransientDataServiceImpl transientDataServiceImpl;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void before() {
@@ -58,7 +95,8 @@ public class TransientDataServiceImplTest {
         verify(cacheService, times(1)).store("transient_data", "name:42:containerType", data);
     }
 
-    private SShortTextDataInstanceImpl createData(final long id, final int containerId, final String name, final String containerType) throws SCacheException {
+    private SShortTextDataInstanceImpl createData(final long id, final int containerId, final String name,
+                                                  final String containerType) throws SCacheException {
         SShortTextDataInstanceImpl data = new SShortTextDataInstanceImpl();
         data.setId(id);
         data.setName(name);
@@ -131,4 +169,71 @@ public class TransientDataServiceImplTest {
         assertThat(dataInstances.get(0)).isEqualTo(data);
     }
 
+    @Test
+    public void should_reevaluate_a_transient_data_instance_if_not_found_in_cache_but_data_definition_exists()
+            throws Exception {
+        // given
+        SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
+        SDataDefinition dataDef = mock(SDataDefinition.class);
+        when(dataDef.getName()).thenReturn("name");
+        SExpression defaultValueExpression = mock(SExpression.class);
+        when(dataDef.getDefaultValueExpression()).thenReturn(defaultValueExpression);
+        SActivityDefinition activityDefinition = flowNodeDefinition(dataDef);
+        SProcessDefinition processDef = mock(SProcessDefinition.class);
+        SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
+        when(processDef.getProcessContainer()).thenReturn(container);
+        when(container.getFlowNode(42)).thenReturn(activityDefinition);
+        when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDef);
+        when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
+        when(expressionResolverService.evaluate(eq(defaultValueExpression), notNull())).thenReturn("new data value");
+
+        // when
+        transientDataServiceImpl.getDataInstance("name", 42, "ctype");
+
+        // then
+        verify(expressionResolverService).evaluate(eq(defaultValueExpression), notNull());
+        ArgumentCaptor<SDataInstance> argumentCaptor = ArgumentCaptor.forClass(SDataInstance.class);
+        verify(transientDataServiceImpl).createDataInstance(argumentCaptor.capture());
+        SDataInstance dataInstance = argumentCaptor.getValue();
+        verify(cacheService).store(TransientDataServiceImpl.TRANSIENT_DATA_CACHE_NAME,
+                TransientDataServiceImpl.getKey(dataInstance), dataInstance);
+    }
+
+
+    @Test
+    public void should_throw_a_SDataInstanceException_when_trying_reevaluate_a_data_not_defined()
+            throws Exception {
+        // given
+        SFlowNodeInstance flowNodeInstance = flowNodeInstance(42, 1);
+        SActivityDefinition activityDefinition = flowNodeDefinition();
+        SProcessDefinition processDef = mock(SProcessDefinition.class);
+        SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
+        when(processDef.getProcessContainer()).thenReturn(container);
+        when(container.getFlowNode(42)).thenReturn(activityDefinition);
+        when(processDefinitionService.getProcessDefinition(1)).thenReturn(processDef);
+        when(flowNodeInstanceService.getFlowNodeInstance(42)).thenReturn(flowNodeInstance);
+
+        // then
+        expectedException.expect(SDataInstanceException.class);
+
+        // when
+        transientDataServiceImpl.getDataInstance("name", 42, "ctype");
+    }
+
+    private SFlowNodeInstance flowNodeInstance(long defId, long processDefId) {
+        SFlowNodeInstance instance = mock(SFlowNodeInstance.class);
+        when(instance.getFlowNodeDefinitionId()).thenReturn(defId);
+        when(instance.getProcessDefinitionId()).thenReturn(processDefId);
+        return instance;
+    }
+
+    private SActivityDefinition flowNodeDefinition(SDataDefinition... dataDefs) {
+        SActivityDefinition definition = mock(SActivityDefinition.class);
+        if (dataDefs.length > 0) {
+            when(definition.getSDataDefinitions()).thenReturn(Arrays.asList(dataDefs));
+        } else {
+            when(definition.getSDataDefinitions()).thenReturn(Collections.emptyList());
+        }
+        return definition;
+    }
 }
