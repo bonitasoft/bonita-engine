@@ -13,61 +13,24 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
 
 /**
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class STokenImpl extends SPersistenceObjectImpl implements SToken {
 
-    private static final long serialVersionUID = 2003206305995006614L;
-
     private long processInstanceId;
-
-    public STokenImpl() {
-        super();
-    }
 
     public STokenImpl(final long processInstanceId) {
         super();
         this.processInstanceId = processInstanceId;
-    }
-
-    @Override
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (processInstanceId ^ processInstanceId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final STokenImpl other = (STokenImpl) obj;
-        if (processInstanceId != other.processInstanceId) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "STokenImpl [processInstanceId=" + processInstanceId + "]";
     }
 
 }

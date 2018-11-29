@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
@@ -22,13 +25,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAAutomaticTaskInstanceImpl extends SAActivityInstanceImpl implements SAAutomaticTaskInstance {
-
-    private static final long serialVersionUID = -2264363298375029324L;
-
-    public SAAutomaticTaskInstanceImpl() {
-        super();
-    }
 
     public SAAutomaticTaskInstanceImpl(final SAutomaticTaskInstance sAutomaticTaskInstance) {
         super(sAutomaticTaskInstance);

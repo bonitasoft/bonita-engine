@@ -13,19 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.comment.model.SHumanComment;
 
 /**
  * @author Hongwen Zang
  * 
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SHumanCommentImpl extends SCommentImpl implements SHumanComment {
-
-    private static final long serialVersionUID = -5266770170641413057L;
-
-    public SHumanCommentImpl() {
-        super();
-    }
 
     public SHumanCommentImpl(long processInstanceId, String content) {
         super(processInstanceId, content);

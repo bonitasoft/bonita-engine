@@ -14,15 +14,19 @@
 
 package org.bonitasoft.engine.resources;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SBARResource extends SBARResourceLight {
 
     private byte[] content;
-
-    public SBARResource() {
-    }
 
     public SBARResource(String name, BARResourceType type, long processDefinitionId, byte[] content) {
         this.name = name;
@@ -31,11 +35,4 @@ public class SBARResource extends SBARResourceLight {
         this.content = content;
     }
 
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
 }

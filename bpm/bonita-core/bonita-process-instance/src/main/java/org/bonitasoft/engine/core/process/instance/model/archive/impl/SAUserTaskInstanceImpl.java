@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
@@ -23,13 +26,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAUserTaskInstanceImpl extends SAHumanTaskInstanceImpl implements SAUserTaskInstance {
-
-    private static final long serialVersionUID = 7313526050276993565L;
-
-    public SAUserTaskInstanceImpl() {
-        super();
-    }
 
     public SAUserTaskInstanceImpl(final SUserTaskInstance sUserTaskInstance) {
         super(sUserTaskInstance);

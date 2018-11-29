@@ -13,33 +13,25 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageWithContent;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SPageWithContentImpl extends SPageImpl implements SPageWithContent {
 
-    private static final long serialVersionUID = -5601507328546725517L;
-
     private byte[] content;
-
-    public SPageWithContentImpl() {
-    }
 
     public SPageWithContentImpl(final SPage sPage, final byte[] pagContent) {
         super(sPage);
         setContent(pagContent);
-    }
-
-    @Override
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(final byte[] content) {
-        this.content = content;
     }
 
 }

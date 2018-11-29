@@ -13,19 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SSendTaskInstanceImpl extends SActivityInstanceImpl implements SSendTaskInstance {
-
-    private static final long serialVersionUID = -1640182325320281286L;
-
-    public SSendTaskInstanceImpl() {
-        super();
-    }
 
     public SSendTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

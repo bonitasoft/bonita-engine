@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 
 /**
@@ -20,53 +23,15 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SActivityInstanceImpl extends SFlowNodeInstanceImpl implements SActivityInstance {
 
-    private static final long serialVersionUID = 4599639229663431703L;
-
     private long abortedByBoundary = 0;
-
-    public SActivityInstanceImpl() {
-    }
 
     public SActivityInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, logicalGroup1, logicalGroup2);
     }
-
-    @Override
-    public long getAbortedByBoundary() {
-        return abortedByBoundary;
-    }
-
-    public void setAbortedByBoundary(final long abortedByBoundaryEventId) {
-        abortedByBoundary = abortedByBoundaryEventId;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (abortedByBoundary ^ abortedByBoundary >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SActivityInstanceImpl other = (SActivityInstanceImpl) obj;
-        if (abortedByBoundary != other.abortedByBoundary) {
-            return false;
-        }
-        return true;
-    }
-
 }

@@ -13,37 +13,27 @@
  **/
 package org.bonitasoft.engine.platform.model.impl;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.platform.model.STenant;
 
 /**
  * @author Charles Souillard
  */
+@Data
+@NoArgsConstructor
 public class STenantImpl implements STenant {
 
-    private static final long serialVersionUID = 1L;
-
     private long tenantId;
-
     private long id;
-
     private String name;
-
     private String description;
-
     private String iconName;
-
     private String iconPath;
-
     private String status;
-
     private long created;
-
     private String createdBy;
-
     private boolean defaultTenant;
-
-    private STenantImpl() {
-    }
 
     public STenantImpl(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
         super();
@@ -54,15 +44,6 @@ public class STenantImpl implements STenant {
         this.defaultTenant = defaultTenant;
     }
 
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
     @Override
     public boolean isActivated() {
         // the tenant is activated as soon as it is not deactivated (but it can be paused)
@@ -70,96 +51,8 @@ public class STenantImpl implements STenant {
     }
 
     @Override
-    public long getCreated() {
-        return created;
-    }
-
-    public void setCreated(final long created) {
-        this.created = created;
-    }
-
-    @Override
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(final String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(final String status) {
-        this.status = status;
-    }
-
-    @Override
-    public String getIconName() {
-        return iconName;
-    }
-
-    public void setIconName(final String iconName) {
-        this.iconName = iconName;
-    }
-
-    @Override
-    public String getIconPath() {
-        return iconPath;
-    }
-
-    public void setIconPath(final String iconPath) {
-        this.iconPath = iconPath;
-    }
-
-    @Override
-    public boolean isDefaultTenant() {
-        return defaultTenant;
-    }
-
-    public void setDefaultTenant(final boolean defaultTenant) {
-        this.defaultTenant = defaultTenant;
-    }
-
-    @Override
     public boolean isPaused() {
         return PAUSED.equals(status);
     }
 
-    @Override
-    public String toString() {
-        return "STenantImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", iconName=" + iconName
-                + ", iconPath=" + iconPath + ", status=" + status + ", created=" + created + ", createdBy=" + createdBy + ", defaultTenant=" + defaultTenant
-                + "]";
-    }
 }

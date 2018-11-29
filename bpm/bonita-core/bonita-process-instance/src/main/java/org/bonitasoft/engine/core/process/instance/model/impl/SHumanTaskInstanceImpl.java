@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 
@@ -20,70 +23,23 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SHumanTaskInstanceImpl extends SActivityInstanceImpl implements SHumanTaskInstance {
 
-    private static final long serialVersionUID = 6424178454905635309L;
-
     private long actorId;
-
     private long assigneeId;
-
     private Long expectedEndDate;
-
     private STaskPriority priority;
-
     private long claimedDate;
 
-    protected SHumanTaskInstanceImpl() {
-        super();
-    }
 
     public SHumanTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,
             final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
         super(name, flowNodeDefinitionId, rootContainerId, parenteContainerId, logicalGroup1, logicalGroup2);
         this.actorId = actorId;
         this.priority = priority;
-    }
-
-    public void setExpectedEndDate(final Long expectedEndDate) {
-        this.expectedEndDate = expectedEndDate;
-    }
-
-    public void setClaimedDate(final long claimedDate) {
-        this.claimedDate = claimedDate;
-    }
-
-    public void setPriority(final STaskPriority priority) {
-        this.priority = priority;
-    }
-
-    @Override
-    public STaskPriority getPriority() {
-        return priority;
-    }
-
-    @Override
-    public Long getExpectedEndDate() {
-        return expectedEndDate;
-    }
-
-    @Override
-    public long getClaimedDate() {
-        return claimedDate;
-    }
-
-    @Override
-    public long getActorId() {
-        return actorId;
-    }
-
-    @Override
-    public long getAssigneeId() {
-        return assigneeId;
-    }
-
-    public void setAssigneeId(final long userId) {
-        assigneeId = userId;
     }
 
 }

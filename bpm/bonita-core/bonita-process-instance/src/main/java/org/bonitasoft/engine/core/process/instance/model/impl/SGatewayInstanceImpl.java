@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -22,17 +25,13 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
  * @author Feng Hui
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGatewayInstance {
 
-    private static final long serialVersionUID = 1683115469514401404L;
-
     private SGatewayType gatewayType;
-
     private String hitBys = "";
-
-    public SGatewayInstanceImpl() {
-        super();
-    }
 
     public SGatewayInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final SGatewayType gatewayType, final long logicalGroup1, final long logicalGroup2) {
@@ -51,26 +50,8 @@ public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGate
     }
 
     @Override
-    public SGatewayType getGatewayType() {
-        return gatewayType;
-    }
-
-    @Override
-    public String getHitBys() {
-        return hitBys;
-    }
-
-    @Override
     public boolean isFinished() {
         return hitBys != null && hitBys.startsWith(GatewayInstanceService.FINISH);
-    }
-
-    public void setGatewayType(final SGatewayType gatewayType) {
-        this.gatewayType = gatewayType;
-    }
-
-    public void setHitBys(final String hitBys) {
-        this.hitBys = hitBys;
     }
 
     @Override
@@ -82,40 +63,6 @@ public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGate
     public boolean mustExecuteOnAbortOrCancelProcess() {
         //always call execute when abort the gateway because the gateway that merge wait for the flow node in an unstable state
         // this fact is a little strange but a full cleanup of the flownode execution mechanism should be done in order to change that
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (gatewayType == null ? 0 : gatewayType.hashCode());
-        result = prime * result + (hitBys == null ? 0 : hitBys.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SGatewayInstanceImpl other = (SGatewayInstanceImpl) obj;
-        if (gatewayType != other.gatewayType) {
-            return false;
-        }
-        if (hitBys == null) {
-            if (other.hitBys != null) {
-                return false;
-            }
-        } else if (!hitBys.equals(other.hitBys)) {
-            return false;
-        }
         return true;
     }
 

@@ -15,13 +15,17 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * author Emmanuel Duchastenier
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SProcessContractData extends SContractData {
-
-    public SProcessContractData() {
-    }
 
     public SProcessContractData(final long processInstanceId, final String name, final Serializable value) {
         super(name, value, processInstanceId);

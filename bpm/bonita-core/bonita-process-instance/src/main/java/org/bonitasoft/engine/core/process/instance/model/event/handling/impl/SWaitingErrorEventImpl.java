@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.handling.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
@@ -21,17 +24,13 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SWaitingErrorEventImpl extends SWaitingEventImpl implements SWaitingErrorEvent {
 
-    private static final long serialVersionUID = -2162388716744764036L;
-
     private String errorCode;
-
     private long relatedActivityInstanceId;
-
-    public SWaitingErrorEventImpl() {
-        super();
-    }
 
     public SWaitingErrorEventImpl(final SBPMEventType eventType, final long processdefinitionId, final String processName, final long flowNodeDefinitionId,
             final String flowNodeName, final String errorCode) {
@@ -40,26 +39,8 @@ public class SWaitingErrorEventImpl extends SWaitingEventImpl implements SWaitin
     }
 
     @Override
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(final String errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    @Override
     public SEventTriggerType getEventTriggerType() {
         return SEventTriggerType.ERROR;
-    }
-
-    @Override
-    public long getRelatedActivityInstanceId() {
-        return relatedActivityInstanceId;
-    }
-
-    public void setRelatedActivityInstanceId(final long relatedActivityInstanceId) {
-        this.relatedActivityInstanceId = relatedActivityInstanceId;
     }
 
 }

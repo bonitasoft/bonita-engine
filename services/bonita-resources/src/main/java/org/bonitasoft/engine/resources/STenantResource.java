@@ -13,15 +13,19 @@
  **/
 package org.bonitasoft.engine.resources;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class STenantResource extends STenantResourceLight {
 
     private byte[] content;
-
-    public STenantResource() {
-    }
 
     public STenantResource(String name, TenantResourceType type, byte[] content, long lastUpdatedBy,
             long lastUpdateDate, STenantResourceState state) {
@@ -29,11 +33,4 @@ public class STenantResource extends STenantResourceLight {
         this.content = content;
     }
 
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
 }

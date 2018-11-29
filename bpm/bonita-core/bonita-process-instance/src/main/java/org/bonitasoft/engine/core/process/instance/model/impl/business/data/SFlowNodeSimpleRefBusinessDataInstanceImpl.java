@@ -14,24 +14,19 @@
 package org.bonitasoft.engine.core.process.instance.model.impl.business.data;
 
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SFlowNodeSimpleRefBusinessDataInstanceImpl extends SSimpleRefBusinessDataInstanceImpl implements SFlowNodeSimpleRefBusinessDataInstance {
 
-    private static final long serialVersionUID = 5486560338692349006L;
-
     private long flowNodeInstanceId;
-
-    @Override
-    public long getFlowNodeInstanceId() {
-        return flowNodeInstanceId;
-    }
-
-    public void setFlowNodeInstanceId(final long flowNodeInstanceId) {
-        this.flowNodeInstanceId = flowNodeInstanceId;
-    }
 
 }

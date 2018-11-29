@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
@@ -21,13 +24,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 /**
  * @author Julien Molinaro
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAReceiveTaskInstanceImpl extends SAActivityInstanceImpl implements SAReceiveTaskInstance {
-
-    private static final long serialVersionUID = -5156121041035813261L;
-
-    public SAReceiveTaskInstanceImpl() {
-        super();
-    }
 
     public SAReceiveTaskInstanceImpl(final SReceiveTaskInstance sReceiveTaskInstance) {
         super(sReceiveTaskInstance);

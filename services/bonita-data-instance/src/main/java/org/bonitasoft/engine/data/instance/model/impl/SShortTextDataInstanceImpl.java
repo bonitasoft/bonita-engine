@@ -15,6 +15,9 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 
@@ -22,17 +25,13 @@ import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWell
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SShortTextDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = -6988236601472065025L;
-
     public static final int MAX_LENGTH = 255;
-
     private String value;
-
-    public SShortTextDataInstanceImpl() {
-        super();
-    }
 
     public SShortTextDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
@@ -41,11 +40,6 @@ public class SShortTextDataInstanceImpl extends SDataInstanceImpl {
     @Override
     public void setValue(final Serializable value) {
         this.value = (String) value;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
     }
 
     @Override

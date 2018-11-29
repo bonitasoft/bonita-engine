@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
@@ -21,25 +24,17 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 /**
  * @author Elias Ricken de Medeiros
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAConnectorInstanceImpl extends SANamedElementImpl implements SAConnectorInstance {
 
-    private static final long serialVersionUID = -151513267181136782L;
-
     private long containerId;
-
     private String connectorId;
-
     private String version;
-
     private ConnectorEvent activationEvent;
-
     private String state;
-
     private String containerType;
-
-    public SAConnectorInstanceImpl() {
-        super();
-    }
 
     public SAConnectorInstanceImpl(final SConnectorInstance connectorInstance) {
         super(connectorInstance.getName(), connectorInstance.getId());
@@ -55,59 +50,4 @@ public class SAConnectorInstanceImpl extends SANamedElementImpl implements SACon
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
         return SConnectorInstance.class;
     }
-
-    @Override
-    public long getContainerId() {
-        return containerId;
-    }
-
-    public void setContainerId(final long containerId) {
-        this.containerId = containerId;
-    }
-
-    @Override
-    public String getConnectorId() {
-        return connectorId;
-    }
-
-    public void setConnectorId(final String connectorId) {
-        this.connectorId = connectorId;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    @Override
-    public ConnectorEvent getActivationEvent() {
-        return activationEvent;
-    }
-
-    public void setActivationEvent(final ConnectorEvent activationEvent) {
-        this.activationEvent = activationEvent;
-    }
-
-    @Override
-    public String getState() {
-        return state;
-    }
-
-    public void setState(final String state) {
-        this.state = state;
-    }
-
-    @Override
-    public String getContainerType() {
-        return containerType;
-    }
-
-    public void setContainerType(final String containerType) {
-        this.containerType = containerType;
-    }
-
 }

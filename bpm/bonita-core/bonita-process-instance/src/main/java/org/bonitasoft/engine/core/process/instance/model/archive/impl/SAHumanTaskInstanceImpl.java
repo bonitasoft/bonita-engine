@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
@@ -20,22 +23,16 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInst
 /**
  * @author Baptiste Mesta
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SAHumanTaskInstanceImpl extends SAActivityInstanceImpl implements SAHumanTaskInstance {
 
-    private static final long serialVersionUID = -2180651319743796704L;
-
     private long actorId;
-
     private long assigneeId;
-
     private long claimedDate;
-
     private Long expectedEndDate;
-
     private STaskPriority priority;
-
-    public SAHumanTaskInstanceImpl() {
-    }
 
     public SAHumanTaskInstanceImpl(final SHumanTaskInstance sHumanTaskInstance) {
         super(sHumanTaskInstance);
@@ -44,93 +41,6 @@ public abstract class SAHumanTaskInstanceImpl extends SAActivityInstanceImpl imp
         priority = sHumanTaskInstance.getPriority();
         expectedEndDate = sHumanTaskInstance.getExpectedEndDate();
         claimedDate = sHumanTaskInstance.getClaimedDate();
-    }
-
-    @Override
-    public long getActorId() {
-        return actorId;
-    }
-
-    public void setActorId(final long actorId) {
-        this.actorId = actorId;
-    }
-
-    @Override
-    public long getAssigneeId() {
-        return assigneeId;
-    }
-
-    public void setAssigneeId(final long assigneeId) {
-        this.assigneeId = assigneeId;
-    }
-
-    @Override
-    public long getClaimedDate() {
-        return claimedDate;
-    }
-
-    public void setClaimedDate(long claimedDate) {
-        this.claimedDate = claimedDate;
-    }
-
-    @Override
-    public STaskPriority getPriority() {
-        return priority;
-    }
-
-    @Override
-    public Long getExpectedEndDate() {
-        return expectedEndDate;
-    }
-
-    public void setExpectedEndDate(final Long expectedEndDate) {
-        this.expectedEndDate = expectedEndDate;
-    }
-
-    public void setPriority(final STaskPriority priority) {
-        this.priority = priority;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (actorId ^ actorId >>> 32);
-        result = prime * result + (int) (assigneeId ^ assigneeId >>> 32);
-        result = prime * result + (int) (expectedEndDate ^ expectedEndDate >>> 32);
-        result = prime * result + (priority == null ? 0 : priority.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SAHumanTaskInstanceImpl other = (SAHumanTaskInstanceImpl) obj;
-        if (actorId != other.actorId) {
-            return false;
-        }
-        if (assigneeId != other.assigneeId) {
-            return false;
-        }
-        if (expectedEndDate != other.expectedEndDate) {
-            return false;
-        }
-        if (priority == null) {
-            if (other.priority != null) {
-                return false;
-            }
-        } else if (!priority.equals(other.priority)) {
-            return false;
-        }
-        return true;
     }
 
 }

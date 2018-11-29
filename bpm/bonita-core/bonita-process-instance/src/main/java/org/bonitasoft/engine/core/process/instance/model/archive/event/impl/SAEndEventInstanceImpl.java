@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
@@ -23,13 +26,10 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SAEndEventInstanceImpl extends SAThrowEventInstanceImpl implements SAEndEventInstance {
-
-    private static final long serialVersionUID = -5873130765741009308L;
-
-    public SAEndEventInstanceImpl() {
-        super();
-    }
 
     public SAEndEventInstanceImpl(final SEndEventInstance endEvent) {
         super(endEvent);

@@ -248,8 +248,8 @@ public class IdentityServiceImpl implements IdentityService {
 
     private void insertUserLogin(String methodName, SUser hashedUser, SUserLogBuilder logBuilder) throws SRecorderException {
         SUserLoginImpl sUserLogin = new SUserLoginImpl();
-        ((SUserImpl) hashedUser).setsUserLogin(sUserLogin);
-        sUserLogin.setsUser(hashedUser);
+        ((SUserImpl) hashedUser).setSUserLogin(sUserLogin);
+        sUserLogin.setSUser(hashedUser);
         sUserLogin.setId(hashedUser.getId());
         sUserLogin.setTenantId(((SUserImpl) hashedUser).getTenantId());
         recorder.recordInsert(new InsertRecord(sUserLogin), USER_LOGIN);

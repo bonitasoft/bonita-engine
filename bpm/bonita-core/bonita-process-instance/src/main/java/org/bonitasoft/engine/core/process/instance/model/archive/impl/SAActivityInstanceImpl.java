@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 
@@ -20,13 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
  * @author Elias Ricken de Medeiros
  * @author Bole Zhang
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SAActivityInstanceImpl extends SAFlowNodeInstanceImpl implements SAActivityInstance {
-
-    private static final long serialVersionUID = -6796085066522281027L;
-
-    public SAActivityInstanceImpl() {
-        super();
-    }
 
     public SAActivityInstanceImpl(final SActivityInstance activityInstance) {
         super(activityInstance);

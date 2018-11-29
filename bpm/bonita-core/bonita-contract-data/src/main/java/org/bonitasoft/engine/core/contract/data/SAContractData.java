@@ -15,21 +15,22 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 
 /**
  * author Emmanuel Duchastenier
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SAContractData extends SAPersistenceObjectImpl {
 
     protected String name;
-
     protected Serializable value;
-
     protected long scopeId;
-
-    public SAContractData() {
-    }
 
     public SAContractData(long sourceObjectId, String name, Serializable value, long scopeId) {
         super(sourceObjectId);
@@ -40,30 +41,6 @@ public abstract class SAContractData extends SAPersistenceObjectImpl {
 
     public SAContractData(SContractData contractData) {
         this(contractData.getId(), contractData.getName(), contractData.getValue(), contractData.getScopeId());
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public long getScopeId() {
-        return scopeId;
-    }
-
-    public void setScopeId(long scopeId) {
-        this.scopeId = scopeId;
-    }
-
-    public Serializable getValue() {
-        return value;
-    }
-
-    public void setValue(final Serializable value) {
-        this.value = value;
     }
 
 }

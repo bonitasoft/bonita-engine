@@ -13,17 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.impl;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public abstract class SThrowEventInstanceImpl extends SEventInstanceImpl {
-
-    private static final long serialVersionUID = -8202111344442767347L;
-
-    public SThrowEventInstanceImpl() {
-        super();
-    }
 
     public SThrowEventInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long logicalGroup1, final long logicalGroup2) {

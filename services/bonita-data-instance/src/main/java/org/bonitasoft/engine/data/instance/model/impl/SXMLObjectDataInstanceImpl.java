@@ -15,21 +15,21 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = 3477539801307784883L;
-
     private String value;
-
-    public SXMLObjectDataInstanceImpl() {
-        super();
-    }
 
     public SXMLObjectDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);

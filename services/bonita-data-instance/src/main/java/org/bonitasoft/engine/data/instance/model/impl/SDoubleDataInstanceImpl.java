@@ -15,21 +15,21 @@ package org.bonitasoft.engine.data.instance.model.impl;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class SDoubleDataInstanceImpl extends SDataInstanceImpl {
 
-    private static final long serialVersionUID = 203297519682235643L;
-
     private Double value;
-
-    public SDoubleDataInstanceImpl() {
-        super();
-    }
 
     public SDoubleDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
@@ -38,11 +38,6 @@ public class SDoubleDataInstanceImpl extends SDataInstanceImpl {
     @Override
     public void setValue(final Serializable value) {
         this.value = (Double) value;
-    }
-
-    @Override
-    public Double getValue() {
-        return value;
     }
 
 }
