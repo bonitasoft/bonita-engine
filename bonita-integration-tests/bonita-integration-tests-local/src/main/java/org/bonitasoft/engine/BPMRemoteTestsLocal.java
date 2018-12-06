@@ -25,6 +25,7 @@ import org.bonitasoft.engine.login.LoginAPIIT;
 import org.bonitasoft.engine.login.PlatformLoginAPIIT;
 import org.bonitasoft.engine.operation.OperationIT;
 import org.bonitasoft.engine.platform.command.PlatformCommandIT;
+import org.bonitasoft.engine.process.DeleteProcessInstancesIT;
 import org.bonitasoft.engine.process.ProcessTests;
 import org.bonitasoft.engine.profile.ProfileAllTest;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
@@ -49,6 +50,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TaskTests.class,
         MultiThreadCallsIT.class,
         ContractIT.class,
+        DeleteProcessInstancesIT.class,
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })

@@ -77,10 +77,10 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         try {
             flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(flowNodeInstanceId);
         } catch (SFlowNodeNotFoundException e) {
-            throw new SWorkPreconditionException("Flow node is already completed ( not found )");
+            throw new SWorkPreconditionException("Flow node " + flowNodeInstanceId + " is already completed ( not found )");
         }
         if (!flowNodeInstance.isTerminal()) {
-            throw new SWorkPreconditionException("Flow node is not in a terminal state");
+            throw new SWorkPreconditionException("Flow node " + flowNodeInstanceId + " is not yet completed");
         }
         return flowNodeInstance;
     }

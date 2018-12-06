@@ -17,8 +17,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -48,11 +50,6 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -95,13 +92,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return archiveService;
     }
 
-    protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    protected <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
 
     @Override
     public void setState(final SFlowNodeInstance flowNodeInstance, final FlowNodeState state) throws SFlowNodeModificationException {
@@ -265,6 +255,17 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             throw new SFlowNodeReadException(e);
         }
         return getUnmodifiableList(selectList);
+    }
+
+    @Override
+    public Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds) throws SBonitaReadException {
+        return new HashSet<>(getPersistenceService().selectList(new SelectListDescriptor<Long>("getSourceObjectIdsOfArchivedFlowNodeInstances",
+                Collections.<String, Object>singletonMap("sourceProcessInstanceIds", sourceProcessInstanceIds), SAFlowNodeInstance.class, QueryOptions.countQueryOptions())));
+    }
+
+    @Override
+    public void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException {
+        archiveService.deleteFromQuery("deleteArchivedFlowNodeInstances", Collections.<String, Object>singletonMap("sourceObjectIds", sourceObjectIds));
     }
 
     @Override
@@ -446,15 +447,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         try {
             recorder.recordDelete(new DeleteRecord(sFlowNodeInstance), FLOWNODE_INSTANCE);
         } catch (final SBonitaException e) {
-            throw new SFlowNodeDeletionException(e);
-        }
-    }
-
-    @Override
-    public void deleteArchivedFlowNodeInstance(final SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeDeletionException {
-        try {
-            recorder.recordDelete(new DeleteRecord(saFlowNodeInstance), ARCHIVED_FLOWNODE_INSTANCE);
-        } catch (final SRecorderException e) {
             throw new SFlowNodeDeletionException(e);
         }
     }

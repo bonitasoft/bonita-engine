@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.contract.data;
 
+import static java.util.Collections.singletonMap;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -112,6 +114,15 @@ public class ContractDataServiceImpl implements ContractDataService {
             }
         } catch (final SBonitaReadException sbre) {
             throw new SContractDataDeletionException(sbre);
+        }
+    }
+
+    @Override
+    public void deleteArchivedUserTaskData(List<Long> sourceUserTaskIds) throws SContractDataDeletionException {
+        try {
+            archiveService.deleteFromQuery("deleteArchivedTaskContractData", singletonMap("scopeIds", sourceUserTaskIds));
+        } catch (SRecorderException e) {
+            throw new SContractDataDeletionException(e);
         }
     }
 
@@ -245,6 +256,15 @@ public class ContractDataServiceImpl implements ContractDataService {
             }
         } catch (final SBonitaReadException sbre) {
             throw new SContractDataDeletionException(sbre);
+        }
+    }
+
+    @Override
+    public void deleteArchivedProcessData(List<Long> sourceProcessInstanceIds) throws SContractDataDeletionException {
+        try {
+            archiveService.deleteFromQuery("deleteArchivedProcessContractData", singletonMap("scopeIds", sourceProcessInstanceIds));
+        } catch (SRecorderException e) {
+            throw new SContractDataDeletionException(e);
         }
     }
 

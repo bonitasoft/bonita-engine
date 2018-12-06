@@ -80,28 +80,12 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     public void deleteProcessDefinition(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException, IOException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-
-        deleteArchivedProcessInstances(processDefinitionId, processInstanceService);
         tenantAccessor.getBusinessArchiveService().delete(processDefinitionId);
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
                     + processDefinitionId + ">");
         }
-    }
-
-    void deleteArchivedProcessInstances(long processDefinitionId, ProcessInstanceService processInstanceService) throws SBonitaException {
-        List<Long> sourceProcessInstanceIds;
-        do {
-            sourceProcessInstanceIds = processInstanceService.getSourceProcessInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId, 0,
-                    100, OrderByType.DESC);
-            for (final Long orgProcessId : sourceProcessInstanceIds) {
-                processInstanceService.deleteArchivedProcessInstanceElements(orgProcessId, processDefinitionId);
-                processInstanceService.deleteArchivedProcessInstancesOfProcessInstance(orgProcessId);
-            }
-
-        } while (!sourceProcessInstanceIds.isEmpty());
     }
 
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {

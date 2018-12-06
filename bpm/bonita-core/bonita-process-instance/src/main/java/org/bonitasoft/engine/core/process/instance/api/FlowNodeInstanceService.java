@@ -14,7 +14,9 @@
 package org.bonitasoft.engine.core.process.instance.api;
 
 import java.util.List;
+import java.util.Set;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -38,8 +40,6 @@ public interface FlowNodeInstanceService {
 
     String FLOWNODE_INSTANCE = "FLOWNODE_INSTANCE";
 
-    String ARCHIVED_FLOWNODE_INSTANCE = "ARCHIVED_FLOWNODE_INSTANCE";
-
     String ACTIVITYINSTANCE_STATE = "ACTIVITYINSTANCE_STATE";
 
     String ACTIVITY_INSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
@@ -51,8 +51,6 @@ public interface FlowNodeInstanceService {
     String MULTIINSTANCE_LOOPCARDINALITY_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
 
     String MULTIINSTANCE_NUMBEROFINSTANCE_MODIFIED = "MULTIINSTANCE_LOOPMAX_MODIFIED";
-
-    String ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED = "ACTIVITYINSTANCE_DISPLAY_DESCRIPTION_MODIFIED";
 
     String ACTIVITYINSTANCE_DISPLAY_NAME = "ACTIVITYINSTANCE_DISPLAY_NAME";
 
@@ -301,14 +299,6 @@ public interface FlowNodeInstanceService {
     void setExecuting(SFlowNodeInstance flowNodeInstance) throws SFlowNodeModificationException;
 
     /**
-     * @param saFlowNodeInstance
-     * @throws SFlowNodeReadException
-     * @throws SFlowNodeDeletionException
-     * @since 6.1
-     */
-    void deleteArchivedFlowNodeInstance(SAFlowNodeInstance saFlowNodeInstance) throws SFlowNodeReadException, SFlowNodeDeletionException;
-
-    /**
      * @param sFlowNodeInstance
      * @throws SFlowNodeReadException
      * @throws SFlowNodeDeletionException
@@ -335,4 +325,14 @@ public interface FlowNodeInstanceService {
      * @since 6.5
      */
     int getNumberOfFlowNodes(long rootContainerId) throws SBonitaReadException;
+
+    /**
+     * get all flow nodes contained in the list of root source process instance ids
+     * @param sourceProcessInstanceIds root source process instance ids
+     * @return list of root source process instance ids
+     * @throws SBonitaReadException
+     */
+    Set<Long> getSourceObjectIdsOfArchivedFlowNodeInstances(List<Long> sourceProcessInstanceIds) throws SBonitaReadException;
+
+    void deleteArchivedFlowNodeInstances(List<Long> sourceObjectIds) throws SBonitaException;
 }
