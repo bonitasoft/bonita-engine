@@ -82,37 +82,6 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<>("getSourceProcessInstanceIdsByProcessDefinitionId", parameters, SAProcessInstance.class, queryOptions);
     }
 
-    public static <T extends PersistentObject> SelectListDescriptor<T> getElements(final Class<T> clazz, final String elementName,
-            final QueryOptions queryOptions) {
-        final Map<String, Object> parameters = Collections.emptyMap();
-        return new SelectListDescriptor<>("get" + elementName + "s", parameters, clazz, queryOptions);
-    }
-
-    public static <T extends PersistentObject> SelectListDescriptor<T> getElements(final Class<T> clazz, final String elementName, final int fromIndex,
-            final int numberOfElements) {
-        final Map<String, Object> map = Collections.emptyMap();
-        return new SelectListDescriptor<>("get" + elementName + "s", map, clazz, new QueryOptions(fromIndex, numberOfElements));
-    }
-
-    /**
-     * Returns the list of all activities with specific state (within a Set of states), and for a specific process instance.
-     * 
-     * @param clazz
-     *        the <code>Class</code> of the persistent object.
-     * @param processInstanceId
-     *        the process
-     * @param stateIds
-     * @param queryOptions
-     * @return
-     */
-    public static <T extends PersistentObject> SelectListDescriptor<T> getActivitiesWithStates(final Class<T> clazz, final long processInstanceId,
-            final Set<Integer> stateIds, final QueryOptions queryOptions) {
-        final Map<String, Object> parameters = new HashMap<>(2);
-        parameters.put("stateIds", stateIds);
-        parameters.put("processInstanceId", processInstanceId);
-        return new SelectListDescriptor<>("getActivitiesWithStates", parameters, clazz, queryOptions);
-    }
-
     public static <T extends PersistentObject> SelectListDescriptor<T> getSpecificQueryWithParameters(final Class<T> clazz, final String queryName,
             final Map<String, Object> parameters, final QueryOptions queryOptions) {
         return new SelectListDescriptor<>(queryName, parameters, clazz, queryOptions);
@@ -262,21 +231,10 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<>("getMostRecentArchivedActivityInstance", parameters, SAActivityInstance.class);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfArchivedTasksSupervisedBy(final long supervisorId) {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-        return new SelectOneDescriptor<>("getNumberOfArchivedTasksSupervisedBy", parameters, SUserTaskInstance.class, Long.class);
-    }
-
     public static SelectListDescriptor<SHumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final int fromIndex, final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<>("searchAssignedTasksSupervisedBy", parameters, SHumanTaskInstance.class, queryOptions);
-    }
-
-    public static SelectListDescriptor<SHumanTaskInstance> searchArchivedTasksSupervisedBy(final long supervisorId, final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        return new SelectListDescriptor<>("searchArchivedTasksSupervisedBy", parameters, SHumanTaskInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<Map<String, Long>> getNumbersOfAssignedOpenTasks(final List<Long> userIds) {
@@ -299,21 +257,6 @@ public class SelectDescriptorBuilder {
         parameters.put("currentTime", System.currentTimeMillis());
         return new SelectOneDescriptor<>("getNumberOfPendingOverdueTasksForUser", parameters, SHumanTaskInstance.class, Long.class);
     }
-
-    public static SelectOneDescriptor<Long> getNumberOfTokensOfProcessInstance(final long processInstanceId) {
-        return new SelectOneDescriptor<>("getNumberOfTokensOfProcessInstance", Collections.singletonMap("processInstanceId", (Object) processInstanceId),
-                SToken.class, Long.class);
-    }
-
-    public static SelectListDescriptor<SToken> getTokensOfProcessInstance(final long processInstanceId, final QueryOptions queryOptions) {
-        return new SelectListDescriptor<>("getTokensOfProcessInstance", Collections.singletonMap("processInstanceId", (Object) processInstanceId),
-                SToken.class, queryOptions);
-    }
-
-    public static SelectListDescriptor<SToken> getTokens(final QueryOptions queryOptions) {
-        return new SelectListDescriptor<>("getTokens", Collections.<String, Object> emptyMap(), SToken.class, queryOptions);
-    }
-
     public static SelectListDescriptor<SToken> getToken(final long processInstanceId) {
         final Map<String, Object> singletonMap = new HashMap<>(1);
         singletonMap.put("processInstanceId", processInstanceId);

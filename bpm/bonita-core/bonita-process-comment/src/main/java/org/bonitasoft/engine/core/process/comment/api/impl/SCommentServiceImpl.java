@@ -74,20 +74,16 @@ public class SCommentServiceImpl implements SCommentService {
 
     private final Map<SystemCommentType, Boolean> systemCommentType;
 
-    private final EventService eventService;
-
     private final ArchiveService archiveService;
 
     public SCommentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final ArchiveService archiveService,
-            final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType,
-            final EventService eventService) {
+            final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType) {
         super();
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.systemCommentType = systemCommentType;
-        this.eventService = eventService;
         this.archiveService = archiveService;
     }
 
@@ -245,20 +241,8 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class)
-                .getProcessInstanceIdKey(), processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(
-                SACommentBuilderFactory.class).getIdKey(), OrderByType.ASC));
-        List<SAComment> searchArchivedComments = null;
-        // fromIndex always will be zero because the elements will be deleted
-        final QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, filters, null);
-        do {
-            searchArchivedComments = searchArchivedComments(queryOptions);
-            for (final SAComment saComment : searchArchivedComments) {
-                archiveService.recordDelete(new DeleteRecord(saComment));
-            }
-        } while (!searchArchivedComments.isEmpty());
+    public void deleteArchivedComments(List<Long> processInstanceIds) throws SBonitaException {
+        archiveService.deleteFromQuery("deleteArchiveCommentsOfProcessInstances", Collections.<String,Object>singletonMap("processInstanceIds", processInstanceIds));
     }
 
     @Override

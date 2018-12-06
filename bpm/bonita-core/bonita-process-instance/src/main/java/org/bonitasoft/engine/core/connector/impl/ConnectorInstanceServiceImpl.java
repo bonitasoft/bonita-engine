@@ -41,7 +41,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInsta
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -336,30 +335,11 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void deleteArchivedConnectorInstance(final SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException {
-        try {
-            recorder.recordDelete(new DeleteRecord(sConnectorInstance), CONNECTOR_INSTANCE);
-        } catch (final SRecorderException e) {
-            throw new SConnectorInstanceDeletionException(e);
-        }
-    }
-
-    @Override
-    public void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaReadException,
-            SConnectorInstanceDeletionException {
-        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType, true);
-        final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getIdKey(),
-                OrderByType.ASC);
-        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
-        List<SAConnectorInstance> connectorInstances;
-        do {
-            connectorInstances = searchArchivedConnectorInstance(queryOptions, persistenceService);
-            for (final SAConnectorInstance sConnectorInstance : connectorInstances) {
-                deleteArchivedConnectorInstance(sConnectorInstance);
-            }
-        } while (!connectorInstances.isEmpty());
-
+    public void deleteArchivedConnectorInstances(List<Long> containerIds, String containerType) throws SBonitaException {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("containerIds", containerIds);
+        map.put("containerType", containerType);
+        archiveService.deleteFromQuery("deleteArchivedConnectorInstances", map);
     }
 
     @Override
@@ -373,18 +353,5 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
                 deleteConnectorInstance(sConnectorInstance);
             }
         } while (!connetorInstances.isEmpty());
-    }
-
-    private List<FilterOption> buildFiltersForConnectors(final long containerId, final String containerType, final boolean archived) {
-        final List<FilterOption> filters = new ArrayList<>(2);
-        Class<? extends PersistentObject> persistentClass;
-        if (archived) {
-            persistentClass = SAConnectorInstance.class;
-        } else {
-            persistentClass = SConnectorInstance.class;
-        }
-        filters.add(new FilterOption(persistentClass, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getContainerIdKey(), containerId));
-        filters.add(new FilterOption(persistentClass, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getContainerTypeKey(), containerType));
-        return filters;
     }
 }

@@ -1215,8 +1215,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
@@ -1225,7 +1223,6 @@
           class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="activityService" ref="activityInstanceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
@@ -1237,8 +1234,8 @@
         <constructor-arg name="documentService" ref="documentService" />
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
     </bean>
-
     <bean id="gatewayInstanceService"
           class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
@@ -1290,7 +1287,6 @@
                 <entry key="STATE_CHANGE" value="true" />
             </map>
         </constructor-arg>
-        <constructor-arg name="eventService" ref="tenantEventService" />
     </bean>
 
 
@@ -1438,7 +1434,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="urlProvider" ref="documentURLProvider" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
