@@ -94,9 +94,6 @@ public class EntityCodeGeneratorTest {
         final JAnnotationUse tableAnnotation = iterator.next();
         assertThat(tableAnnotation.getAnnotationClass().fullName()).isEqualTo(Table.class.getName());
         assertThat(tableAnnotation.getAnnotationMembers()).hasSize(1);
-
-        assertThat(definedClass.getMethod("equals", new JType[] { definedClass.owner().ref(Object.class) })).isNotNull();
-        assertThat(definedClass.getMethod("hashCode", new JType[] {})).isNotNull();
     }
 
     @Test(expected = IllegalArgumentException.class)

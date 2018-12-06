@@ -91,4 +91,20 @@
         )
     </query>
 
+    <query name="getArchiveMappingsOfProcessInstances">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId IN (:processInstanceIds)
+    </query>
+    <query name="deleteArchiveDocumentsByIds">
+        DELETE
+        FROM org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl AS doc
+        WHERE doc.id IN (:ids)
+    </query>
+    <query name="deleteArchiveMappingsByIds">
+        DELETE
+        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.id IN (:ids)
+    </query>
+
 </hibernate-mapping>
