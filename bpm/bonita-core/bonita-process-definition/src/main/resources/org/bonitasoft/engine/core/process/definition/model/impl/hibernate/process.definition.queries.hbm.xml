@@ -84,8 +84,8 @@
 		AND actor.id = actor_member.actorId
 		AND actor_member.groupId IN (
 			SELECT groupe.id
-        	FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-        		 org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+        	FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+        		 org.bonitasoft.engine.identity.model.SGroup AS group0
         	WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 					OR groupe.id = :groupId )
         	AND group0.id = :groupId
@@ -96,8 +96,8 @@
         	WHERE am2.groupId != actor_member.groupId
         	AND am2.groupId NOT IN (
             	SELECT groupe.id
-                FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-                org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+                FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+                org.bonitasoft.engine.identity.model.SGroup AS group0
                 WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 					OR groupe.id = :groupId )
         	AND group0.id = :groupId
@@ -114,8 +114,8 @@
 		AND actor.id = actor_member.actorId
 		AND actor_member.groupId IN (
 			SELECT groupe.id
-        	FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-        		 org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+        	FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+        		 org.bonitasoft.engine.identity.model.SGroup AS group0
         	WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 					OR groupe.id IN (:groupIds) )
 			AND group0.id IN (:groupIds)
@@ -126,8 +126,8 @@
         	WHERE am2.groupId != actor_member.groupId
         	AND am2.groupId NOT IN (
             	SELECT groupe.id
-                FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS groupe,
-                org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group0
+                FROM org.bonitasoft.engine.identity.model.SGroup AS groupe,
+                org.bonitasoft.engine.identity.model.SGroup AS group0
                 WHERE ( CONCAT(groupe.parentPath,'/',groupe.name,'/') LIKE CONCAT('/',group0.name,'/','%')
 						OR groupe.id IN (:groupIds) )
                 AND group0.id IN (:groupIds)
@@ -278,7 +278,7 @@
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -310,7 +310,7 @@
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -339,7 +339,7 @@
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -368,7 +368,7 @@
 				AND ( actormember.userId = :userId
 				 	  OR actormember.id IN (
 							SELECT actormember.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 							WHERE um.userId = :userId
 							AND (
 								(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -396,18 +396,18 @@
 					actormember.userId = :managerUserId
 					OR EXISTS (
 						SELECT actormember.userId
-						FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+						FROM org.bonitasoft.engine.identity.model.SUser AS user
 						WHERE actormember.userId = user.id
 						AND user.managerUserId = :managerUserId
 					)
 					OR EXISTS (
 						SELECT actormember.id
-						FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE (
 							um.userId = :managerUserId
 							OR EXISTS (
 								SELECT user.id
-								FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+								FROM org.bonitasoft.engine.identity.model.SUser AS user
 								WHERE um.userId = user.id
 								AND user.managerUserId = :managerUserId
 							)
@@ -439,18 +439,18 @@
 					actormember.userId = :managerUserId
 					OR EXISTS (
 						SELECT actormember.userId
-						FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+						FROM org.bonitasoft.engine.identity.model.SUser AS user
 						WHERE actormember.userId = user.id
 						AND user.managerUserId = :managerUserId
 					)
 					OR EXISTS (
 						SELECT actormember.id
-						FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE (
 							um.userId = :managerUserId
 							OR EXISTS (
 								SELECT user.id
-								FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+								FROM org.bonitasoft.engine.identity.model.SUser AS user
 								WHERE um.userId = user.id
 								AND user.managerUserId = :managerUserId
 							)
@@ -484,7 +484,7 @@
 				AND ( actormember.userId = :userId
 					OR actormember.id IN (
 						SELECT actormember.id
-						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE um.userId = :userId
 						AND (
 							(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -515,7 +515,7 @@
 				AND ( actormember.userId = :userId
 					OR actormember.id IN (
 					 	SELECT actormember.id
-						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+						FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.SUserMembership as um
 						WHERE um.userId = :userId
 						AND (
 							(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -540,7 +540,7 @@
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -564,7 +564,7 @@
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -586,7 +586,7 @@
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -608,7 +608,7 @@
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -633,7 +633,7 @@
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -658,7 +658,7 @@
 			OR (
 				supervisor.id IN (
 					SELECT supervisor.id
-					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor, org.bonitasoft.engine.identity.model.SUserMembership as um
 					WHERE um.userId = :userId
 					AND (
 						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -738,7 +738,7 @@
         )
     </sql-query>
     <sql-query name="searchSUserWhoCanStartProcess">
-        <return alias="user_" class="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+        <return alias="user_" class="org.bonitasoft.engine.identity.model.SUser" />
         SELECT DISTINCT user_.*
         from
         actormember
@@ -797,7 +797,7 @@
 								actormember.userId = :userId
 		 	  					OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -843,7 +843,7 @@
 								actormember.userId = :userId
 		 	  					OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = :userId
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -865,12 +865,12 @@
         	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
         	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+        	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR EXISTS (
 				SELECT supervisor.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 				WHERE um.userId = :userId
 				AND (
 					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -904,7 +904,7 @@
 								actormember.userId = user.id
 			 	  				OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = user.id
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
@@ -926,12 +926,12 @@
         	 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
         	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
         	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+        	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE process_definition.processId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR EXISTS (
 				SELECT supervisor.id
-				FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+				FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 				WHERE um.userId = :userId
 				AND (
 					(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -965,7 +965,7 @@
 								actormember.userId = user.id
 			 	  				OR EXISTS (
 									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+									FROM org.bonitasoft.engine.identity.model.SUserMembership as um
 									WHERE um.userId = user.id
 									AND (
 										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)

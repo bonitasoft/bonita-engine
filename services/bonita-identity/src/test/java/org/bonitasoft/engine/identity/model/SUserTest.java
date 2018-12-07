@@ -11,20 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity.model.builder;
+package org.bonitasoft.engine.identity.model;
 
-import org.bonitasoft.engine.identity.model.SUserMembership;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- */
-public interface SUserMembershipBuilder {
+import org.bonitasoft.engine.identity.model.SUser;
+import org.junit.Test;
 
-    SUserMembershipBuilder setAssignedBy(long assignedBy);
+public class SUserTest {
 
-    SUserMembershipBuilder setAssignedDate(long assignDate);
 
-    SUserMembership done();
+    @Test
+    public void toString_should_not_display_password() throws Exception {
+        //given
+        final SUser sUser = new SUser();
+        sUser.setUserName("walter.bates");
+        sUser.setPassword("bpm");
 
+        //when
+        final String string = sUser.toString();
+
+        //then
+        assertThat(string).as("should not display password!").doesNotContain("password").doesNotContain("bpm");
+    }
 }

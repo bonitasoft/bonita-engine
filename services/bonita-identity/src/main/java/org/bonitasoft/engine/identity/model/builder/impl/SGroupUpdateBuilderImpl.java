@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -38,19 +39,19 @@ public class SGroupUpdateBuilderImpl implements SGroupUpdateBuilder {
 
     @Override
     public SGroupUpdateBuilder updateName(final String name) {
-        descriptor.addField(SGroupBuilderFactoryImpl.NAME, name);
+        descriptor.addField(SGroup.NAME, name);
         return this;
     }
 
     @Override
     public SGroupUpdateBuilder updateDisplayName(final String displayName) {
-        descriptor.addField(SGroupBuilderFactoryImpl.DISPLAY_NAME, displayName);
+        descriptor.addField(SGroup.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
     public SGroupUpdateBuilder updateDescription(final String description) {
-        descriptor.addField(SGroupBuilderFactoryImpl.DESCRIPTION, description);
+        descriptor.addField(SGroup.DESCRIPTION, description);
         return this;
     }
 
@@ -62,19 +63,19 @@ public class SGroupUpdateBuilderImpl implements SGroupUpdateBuilder {
 
     @Override
     public SGroupUpdateBuilder updateCreatedBy(final long createdBy) {
-        descriptor.addField(SGroupBuilderFactoryImpl.CREATED_BY, createdBy);
+        descriptor.addField(SGroup.CREATED_BY, createdBy);
         return this;
     }
 
     @Override
     public SGroupUpdateBuilder updateCreationDate(final long creationDate) {
-        descriptor.addField(SGroupBuilderFactoryImpl.CREATION_DATE, creationDate);
+        descriptor.addField(SGroup.CREATION_DATE, creationDate);
         return this;
     }
 
     @Override
     public SGroupUpdateBuilder updateLastUpdate(final long lastUpdate) {
-        descriptor.addField(SGroupBuilderFactoryImpl.LAST_UPDATE, lastUpdate);
+        descriptor.addField(SGroup.LAST_UPDATE, lastUpdate);
         return this;
     }
 

@@ -333,7 +333,7 @@ public interface IdentityService {
      * Get a {@link List} of child {@link SUser} from specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType} <i>order</i> order.
      * <p> For instance, getUsers(0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SUser} sorted by &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
@@ -346,7 +346,6 @@ public interface IdentityService {
      * @return a {@link List} of paginated {@link SUser}
      * @throws SIdentityException
      *         occurs on persistence layer access problem
-     * @see SUserBuilderFactory
      */
     List<SUser> getUsers(int fromIndex, int numberOfUsers, String field, OrderByType order) throws SIdentityException;
 
@@ -476,7 +475,7 @@ public interface IdentityService {
      * <p> For instance, getUsersWithRole(1,0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SUser} of the {@link SRole} with id '1' sorted by
      * &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param roleId
      *        The identifier of the {@link SRole}
@@ -503,7 +502,7 @@ public interface IdentityService {
      * by
      * &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param roleId
      *        The identifier of the {@link SRole}
@@ -529,7 +528,7 @@ public interface IdentityService {
      * sorted by
      * &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param roleId
      *        The identifier of the {@link SRole}
@@ -566,7 +565,7 @@ public interface IdentityService {
      * sorted by
      * &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param groupId
      *        Identifier of the {@link SGroup}
@@ -592,7 +591,7 @@ public interface IdentityService {
      * sorted by
      * &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param groupId
      *        Identifier of the {@link SGroup}
@@ -616,7 +615,7 @@ public interface IdentityService {
      * <p> For instance, getUsersInGroup(1,0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SUser} of the {@link SGroup} with id '1' sorted by
      * &quot;displayName&quot; in desc order
      * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
-     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     * <p> check {@link SUser} to get a list of available field keys to sort
      *
      * @param groupId
      *        Identifier of the {@link SGroup}

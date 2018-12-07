@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
@@ -48,9 +47,9 @@ public class SearchCustomUserInfoValuesTest {
     public void should_return_a_list_of_CustomUserInfoValues() {
         SearchCustomUserInfoValues search = new SearchCustomUserInfoValues(service, descriptor, options);
 
-        List<CustomUserInfoValue> result = search.convertToClientObjects(Arrays.<SCustomUserInfoValue> asList(
-                new DummySCustomUserInfoValue(1L, 3L, 1L, ""),
-                new DummySCustomUserInfoValue(2L, 4L, 1L, "")));
+        List<CustomUserInfoValue> result = search.convertToClientObjects(Arrays.asList(
+                SCustomUserInfoValue.builder().definitionId(3).build(),
+                SCustomUserInfoValue.builder().definitionId(4).build()));
 
         assertThat(result.get(0).getDefinitionId()).isEqualTo(3L);
         assertThat(result.get(1).getDefinitionId()).isEqualTo(4L);

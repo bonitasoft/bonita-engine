@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -37,37 +38,37 @@ public class SRoleUpdateBuilderImpl implements SRoleUpdateBuilder {
 
     @Override
     public SRoleUpdateBuilder updateName(final String name) {
-        descriptor.addField(SRoleBuilderFactoryImpl.NAME, name);
+        descriptor.addField(SRole.NAME, name);
         return this;
     }
 
     @Override
     public SRoleUpdateBuilder updateDisplayName(final String displayName) {
-        descriptor.addField(SRoleBuilderFactoryImpl.DISPLAY_NAME, displayName);
+        descriptor.addField(SRole.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
     public SRoleUpdateBuilder updateDescription(final String description) {
-        descriptor.addField(SRoleBuilderFactoryImpl.DESCRIPTION, description);
+        descriptor.addField(SRole.DESCRIPTION, description);
         return this;
     }
 
     @Override
     public SRoleUpdateBuilder updateCreatedBy(final long createdBy) {
-        descriptor.addField(SRoleBuilderFactoryImpl.CREATED_BY, createdBy);
+        descriptor.addField(SRole.CREATED_BY, createdBy);
         return this;
     }
 
     @Override
     public SRoleUpdateBuilder updateCreationDate(final long creationDate) {
-        descriptor.addField(SRoleBuilderFactoryImpl.CREATION_DATE, creationDate);
+        descriptor.addField(SRole.CREATION_DATE, creationDate);
         return this;
     }
 
     @Override
     public SRoleUpdateBuilder updateLastUpdate(final long lastUpdate) {
-        descriptor.addField(SRoleBuilderFactoryImpl.LAST_UPDATE, lastUpdate);
+        descriptor.addField(SRole.LAST_UPDATE, lastUpdate);
         return this;
     }
 }

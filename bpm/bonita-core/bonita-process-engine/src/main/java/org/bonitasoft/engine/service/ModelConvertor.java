@@ -259,14 +259,6 @@ import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilder;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilder;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedGroup;
 import org.bonitasoft.engine.identity.xml.ExportedRole;
@@ -1409,42 +1401,42 @@ public class ModelConvertor {
 
     public static SUser constructSUser(final UserCreator creator) {
         final long now = System.currentTimeMillis();
-        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
+        final SUser.SUserBuilder userBuilder = SUser.builder();
         final Map<UserField, Serializable> fields = creator.getFields();
-        userBuilder.setUserName((String) fields.get(UserField.NAME));
-        userBuilder.setPassword((String) fields.get(UserField.PASSWORD));
+        userBuilder.userName((String) fields.get(UserField.NAME));
+        userBuilder.password((String) fields.get(UserField.PASSWORD));
         final String firstName = (String) fields.get(UserField.FIRST_NAME);
         if (firstName != null) {
-            userBuilder.setFirstName(firstName);
+            userBuilder.firstName(firstName);
         }
         final String lastName = (String) fields.get(UserField.LAST_NAME);
         if (lastName != null) {
-            userBuilder.setLastName(lastName);
+            userBuilder.lastName(lastName);
         }
         final String jobTitle = (String) fields.get(UserField.JOB_TITLE);
         if (jobTitle != null) {
-            userBuilder.setJobTitle(jobTitle);
+            userBuilder.jobTitle(jobTitle);
         }
         final String title = (String) fields.get(UserField.TITLE);
         if (title != null) {
-            userBuilder.setTitle(title);
+            userBuilder.title(title);
         }
-        userBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
+        userBuilder.createdBy(SessionInfos.getUserIdFromSession());
 
         final Long managerUserId = (Long) fields.get(UserField.MANAGER_ID);
         if (managerUserId != null) {
-            userBuilder.setManagerUserId(managerUserId);
+            userBuilder.managerUserId(managerUserId);
         }
 
         final Boolean enabled = (Boolean) fields.get(UserField.ENABLED);
         if (enabled != null) {
-            userBuilder.setEnabled(enabled);
+            userBuilder.enabled(enabled);
         } else {
-            userBuilder.setEnabled(Boolean.TRUE);
+            userBuilder.enabled(Boolean.TRUE);
         }
-        userBuilder.setCreationDate(now);
-        userBuilder.setLastUpdate(now);
-        return userBuilder.done();
+        userBuilder.creationDate(now);
+        userBuilder.lastUpdate(now);
+        return userBuilder.build();
     }
 
     public static SContactInfo constructSUserContactInfo(final UserCreator creator, final long userId, final boolean personal) {
@@ -1455,153 +1447,153 @@ public class ModelConvertor {
             fields = creator.getProFields();
         }
         if (fields != null && !fields.isEmpty()) {
-            final SContactInfoBuilder contactInfoBuilder = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, personal);
+            final SContactInfo.SContactInfoBuilder contactInfoBuilder = SContactInfo.builder().userId(userId).personal(personal);
             final String address = (String) fields.get(ContactDataField.ADDRESS);
             if (address != null) {
-                contactInfoBuilder.setAddress(address);
+                contactInfoBuilder.address(address);
             }
             final String email = (String) fields.get(ContactDataField.EMAIL);
             if (email != null) {
-                contactInfoBuilder.setEmail(email);
+                contactInfoBuilder.email(email);
             }
             final String building = (String) fields.get(ContactDataField.BUILDING);
             if (building != null) {
-                contactInfoBuilder.setBuilding(building);
+                contactInfoBuilder.building(building);
             }
             final String city = (String) fields.get(ContactDataField.CITY);
             if (city != null) {
-                contactInfoBuilder.setCity(city);
+                contactInfoBuilder.city(city);
             }
             final String country = (String) fields.get(ContactDataField.COUNTRY);
             if (country != null) {
-                contactInfoBuilder.setCountry(country);
+                contactInfoBuilder.country(country);
             }
             final String fax = (String) fields.get(ContactDataField.FAX);
             if (fax != null) {
-                contactInfoBuilder.setFaxNumber(fax);
+                contactInfoBuilder.faxNumber(fax);
             }
             final String mobile = (String) fields.get(ContactDataField.MOBILE);
             if (mobile != null) {
-                contactInfoBuilder.setMobileNumber(mobile);
+                contactInfoBuilder.mobileNumber(mobile);
             }
             final String phone = (String) fields.get(ContactDataField.PHONE);
             if (phone != null) {
-                contactInfoBuilder.setPhoneNumber(phone);
+                contactInfoBuilder.phoneNumber(phone);
             }
             final String room = (String) fields.get(ContactDataField.ROOM);
             if (room != null) {
-                contactInfoBuilder.setRoom(room);
+                contactInfoBuilder.room(room);
             }
             final String state = (String) fields.get(ContactDataField.STATE);
             if (state != null) {
-                contactInfoBuilder.setState(state);
+                contactInfoBuilder.state(state);
             }
             final String website = (String) fields.get(ContactDataField.WEBSITE);
             if (website != null) {
-                contactInfoBuilder.setWebsite(website);
+                contactInfoBuilder.website(website);
             }
             final String zipCode = (String) fields.get(ContactDataField.ZIP_CODE);
             if (zipCode != null) {
-                contactInfoBuilder.setZipCode(zipCode);
+                contactInfoBuilder.zipCode(zipCode);
             }
-            return contactInfoBuilder.done();
+            return contactInfoBuilder.build();
         }
         return null;
     }
 
     public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final long userId) {
-        final SContactInfoBuilder contactInfoBuilder = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, isPersonal);
+        final SContactInfo.SContactInfoBuilder contactInfoBuilder = SContactInfo.builder().userId(userId).personal(isPersonal);
         if (isPersonal) {
-            contactInfoBuilder.setAddress(user.getPersonalAddress());
-            contactInfoBuilder.setBuilding(user.getPersonalBuilding());
-            contactInfoBuilder.setCity(user.getPersonalCity());
-            contactInfoBuilder.setCountry(user.getPersonalCountry());
-            contactInfoBuilder.setEmail(user.getPersonalEmail());
-            contactInfoBuilder.setFaxNumber(user.getPersonalFaxNumber());
-            contactInfoBuilder.setMobileNumber(user.getPersonalMobileNumber());
-            contactInfoBuilder.setPhoneNumber(user.getPersonalPhoneNumber());
-            contactInfoBuilder.setRoom(user.getPersonalRoom());
-            contactInfoBuilder.setState(user.getPersonalState());
-            contactInfoBuilder.setWebsite(user.getPersonalWebsite());
-            contactInfoBuilder.setZipCode(user.getPersonalZipCode());
+            contactInfoBuilder.address(user.getPersonalAddress());
+            contactInfoBuilder.building(user.getPersonalBuilding());
+            contactInfoBuilder.city(user.getPersonalCity());
+            contactInfoBuilder.country(user.getPersonalCountry());
+            contactInfoBuilder.email(user.getPersonalEmail());
+            contactInfoBuilder.faxNumber(user.getPersonalFaxNumber());
+            contactInfoBuilder.mobileNumber(user.getPersonalMobileNumber());
+            contactInfoBuilder.phoneNumber(user.getPersonalPhoneNumber());
+            contactInfoBuilder.room(user.getPersonalRoom());
+            contactInfoBuilder.state(user.getPersonalState());
+            contactInfoBuilder.website(user.getPersonalWebsite());
+            contactInfoBuilder.zipCode(user.getPersonalZipCode());
         } else {
-            contactInfoBuilder.setAddress(user.getProfessionalAddress());
-            contactInfoBuilder.setBuilding(user.getProfessionalBuilding());
-            contactInfoBuilder.setCity(user.getProfessionalCity());
-            contactInfoBuilder.setCountry(user.getProfessionalCountry());
-            contactInfoBuilder.setEmail(user.getProfessionalEmail());
-            contactInfoBuilder.setFaxNumber(user.getProfessionalFaxNumber());
-            contactInfoBuilder.setMobileNumber(user.getProfessionalMobileNumber());
-            contactInfoBuilder.setPhoneNumber(user.getProfessionalPhoneNumber());
-            contactInfoBuilder.setRoom(user.getProfessionalRoom());
-            contactInfoBuilder.setState(user.getProfessionalState());
-            contactInfoBuilder.setWebsite(user.getProfessionalWebsite());
-            contactInfoBuilder.setZipCode(user.getProfessionalZipCode());
+            contactInfoBuilder.address(user.getProfessionalAddress());
+            contactInfoBuilder.building(user.getProfessionalBuilding());
+            contactInfoBuilder.city(user.getProfessionalCity());
+            contactInfoBuilder.country(user.getProfessionalCountry());
+            contactInfoBuilder.email(user.getProfessionalEmail());
+            contactInfoBuilder.faxNumber(user.getProfessionalFaxNumber());
+            contactInfoBuilder.mobileNumber(user.getProfessionalMobileNumber());
+            contactInfoBuilder.phoneNumber(user.getProfessionalPhoneNumber());
+            contactInfoBuilder.room(user.getProfessionalRoom());
+            contactInfoBuilder.state(user.getProfessionalState());
+            contactInfoBuilder.website(user.getProfessionalWebsite());
+            contactInfoBuilder.zipCode(user.getProfessionalZipCode());
         }
-        return contactInfoBuilder.done();
+        return contactInfoBuilder.build();
     }
 
     public static SRole constructSRole(final RoleCreator creator) {
         final long now = System.currentTimeMillis();
-        final SRoleBuilder roleBuilder = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance();
-        roleBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
-        roleBuilder.setCreationDate(now).setLastUpdate(now);
+        final SRole.SRoleBuilder roleBuilder = SRole.builder();
+        roleBuilder.createdBy(SessionInfos.getUserIdFromSession());
+        roleBuilder.creationDate(now).lastUpdate(now);
         final Map<RoleField, Serializable> fields = creator.getFields();
-        roleBuilder.setName((String) fields.get(RoleField.NAME));
+        roleBuilder.name((String) fields.get(RoleField.NAME));
         final String displayName = (String) fields.get(RoleField.DISPLAY_NAME);
         if (displayName != null) {
-            roleBuilder.setDisplayName(displayName);
+            roleBuilder.displayName(displayName);
         }
         final String description = (String) fields.get(RoleField.DESCRIPTION);
         if (description != null) {
-            roleBuilder.setDescription(description);
+            roleBuilder.description(description);
         }
-        return roleBuilder.done();
+        return roleBuilder.build();
     }
 
     public static SRole constructSRole(final ExportedRole exportedRole) {
         final long now = System.currentTimeMillis();
-        final SRoleBuilder roleBuilder = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance();
-        roleBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
-        roleBuilder.setCreationDate(now).setLastUpdate(now);
-        roleBuilder.setName(exportedRole.getName());
-        roleBuilder.setDisplayName(exportedRole.getDisplayName());
-        roleBuilder.setDescription(exportedRole.getDescription());
-        return roleBuilder.done();
+        final SRole.SRoleBuilder roleBuilder = SRole.builder();
+        roleBuilder.createdBy(SessionInfos.getUserIdFromSession());
+        roleBuilder.creationDate(now).lastUpdate(now);
+        roleBuilder.name(exportedRole.getName());
+        roleBuilder.displayName(exportedRole.getDisplayName());
+        roleBuilder.description(exportedRole.getDescription());
+        return roleBuilder.build();
     }
 
     public static SGroup constructSGroup(final GroupCreator creator) {
         final long now = System.currentTimeMillis();
-        final SGroupBuilder groupBuilder = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance();
-        groupBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
-        groupBuilder.setCreationDate(now).setLastUpdate(now);
+        final SGroup.SGroupBuilder groupBuilder = SGroup.builder();
+        groupBuilder.createdBy(SessionInfos.getUserIdFromSession());
+        groupBuilder.creationDate(now).lastUpdate(now);
         final Map<GroupField, Serializable> fields = creator.getFields();
-        groupBuilder.setName((String) fields.get(GroupField.NAME));
+        groupBuilder.name((String) fields.get(GroupField.NAME));
         final String parentPath = (String) fields.get(GroupField.PARENT_PATH);
         if (parentPath != null && !parentPath.isEmpty()) {
-            groupBuilder.setParentPath(parentPath);
+            groupBuilder.parentPath(parentPath);
         }
         final String displayName = (String) fields.get(GroupField.DISPLAY_NAME);
         if (displayName != null) {
-            groupBuilder.setDisplayName(displayName);
+            groupBuilder.displayName(displayName);
         }
         final String description = (String) fields.get(GroupField.DESCRIPTION);
         if (description != null) {
-            groupBuilder.setDescription(description);
+            groupBuilder.description(description);
         }
-        return groupBuilder.done();
+        return groupBuilder.build();
     }
 
     public static SGroup constructSGroup(final ExportedGroup exportedGroup) {
         final long now = System.currentTimeMillis();
-        final SGroupBuilder groupBuilder = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance();
-        groupBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
-        groupBuilder.setCreationDate(now).setLastUpdate(now);
-        groupBuilder.setName(exportedGroup.getName());
-        groupBuilder.setParentPath(exportedGroup.getParentPath());
-        groupBuilder.setDisplayName(exportedGroup.getDisplayName());
-        groupBuilder.setDescription(exportedGroup.getDescription());
-        return groupBuilder.done();
+        final SGroup.SGroupBuilder groupBuilder = SGroup.builder();
+        groupBuilder.createdBy(SessionInfos.getUserIdFromSession());
+        groupBuilder.creationDate(now).lastUpdate(now);
+        groupBuilder.name(exportedGroup.getName());
+        groupBuilder.parentPath(exportedGroup.getParentPath());
+        groupBuilder.displayName(exportedGroup.getDisplayName());
+        groupBuilder.description(exportedGroup.getDescription());
+        return groupBuilder.build();
     }
 
     public static List<ProcessSupervisor> toProcessSupervisors(final List<SProcessSupervisor> sSupervisors) {

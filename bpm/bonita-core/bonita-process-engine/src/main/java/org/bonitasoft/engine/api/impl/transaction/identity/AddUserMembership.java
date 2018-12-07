@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.identity;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -21,7 +20,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 
 /**
  * @author Bole Zhang
@@ -55,8 +53,8 @@ public class AddUserMembership implements TransactionContentWithResult<SUserMemb
         final SUser user = identityService.getUser(userId);
         final SRole role = identityService.getRole(roleId);
         final SGroup group = identityService.getGroup(groupId);
-        userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), group.getId(), role.getId()).setAssignedBy(assignedBy)
-                .setAssignedDate(System.currentTimeMillis()).done();
+        userMembership = SUserMembership.builder().userId(user.getId()).groupId(group.getId()).roleId(role.getId()).assignedBy(assignedBy)
+                .assignedDate(System.currentTimeMillis()).build();
         identityService.createUserMembership(userMembership);
     }
 

@@ -23,7 +23,6 @@ import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -39,16 +38,12 @@ import org.bonitasoft.engine.search.identity.SearchCustomUserInfoValues;
  */
 public class SCustomUserInfoValueAPI {
 
-    private final SCustomUserInfoValueBuilderFactory creatorFactory;
-
     private final SCustomUserInfoValueUpdateBuilderFactory updaterFactory;
 
     private final IdentityService service;
 
     public SCustomUserInfoValueAPI(IdentityService service,
-            SCustomUserInfoValueBuilderFactory creatorFactory,
             SCustomUserInfoValueUpdateBuilderFactory updaterFactory) {
-        this.creatorFactory = creatorFactory;
         this.updaterFactory = updaterFactory;
         this.service = service;
     }
@@ -93,10 +88,10 @@ public class SCustomUserInfoValueAPI {
     }
 
     private SCustomUserInfoValue createValue(long definitionId, long userId, String value) {
-        return creatorFactory.createNewInstance()
-                .setDefinitionId(definitionId)
-                .setUserId(userId)
-                .setValue(value).done();
+        return SCustomUserInfoValue.builder()
+                .definitionId(definitionId)
+                .userId(userId)
+                .value(value).build();
     }
 
     private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaReadException {
@@ -105,8 +100,8 @@ public class SCustomUserInfoValueAPI {
                 1,
                 Collections.<OrderByOption>emptyList(),
                 Arrays.asList(
-                        new FilterOption(SCustomUserInfoValue.class, creatorFactory.getDefinitionIdKey(), definitionId),
-                        new FilterOption(SCustomUserInfoValue.class, creatorFactory.getUserIdKey(), userId)),
+                        new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.DEFINITION_ID, definitionId),
+                        new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID, userId)),
                 null));
         if(result.size() == 0) {
             return null;

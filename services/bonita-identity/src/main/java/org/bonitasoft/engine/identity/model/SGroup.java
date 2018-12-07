@@ -13,21 +13,47 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Anthony Birembaut
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SGroup extends SNamedElement, SHavingIcon {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SGroup implements PersistentObject, SHavingIcon {
 
-    String getPath();
+    public static final String PARENT_PATH = "parentPath";
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String DISPLAY_NAME = "displayName";
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATION_DATE = "creationDate";
+    public static final String LAST_UPDATE = "lastUpdate";
+    private long id;
+    private long tenantId;
+    private String name;
+    private String description;
+    private String displayName;
+    private String parentPath;
+    private long createdBy;
+    private long creationDate;
+    private long lastUpdate;
+    private Long iconId;
 
-    String getParentPath();
-
-    long getCreatedBy();
-
-    long getCreationDate();
-
-    long getLastUpdate();
+    public String getPath() {
+        if (parentPath == null) {
+            return "/" + getName();
+        }
+        return parentPath + "/" + getName();
+    }
 
 }

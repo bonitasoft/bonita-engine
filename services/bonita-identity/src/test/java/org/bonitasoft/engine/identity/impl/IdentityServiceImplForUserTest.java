@@ -27,10 +27,10 @@ import java.util.List;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.identity.model.SIcon;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
-import org.bonitasoft.engine.identity.model.impl.SIconImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -99,12 +99,12 @@ public class IdentityServiceImplForUserTest {
     public void setUp() throws SRecorderException {
         doReturn(sUserLogBuilder).when(identityServiceImpl).getUserLog(any(ActionType.class), anyString());
         doReturn(log).when(sUserLogBuilder).done();
-        SIconImpl newIcon = new SIconImpl("", null);
+        SIcon newIcon = new SIcon("", null);
         newIcon.setId(NEW_ICON_ID);
         doAnswer(invocation -> {
             ((InsertRecord) invocation.getArguments()[0]).getEntity().setId(NEW_ICON_ID);
             return null;
-        }).when(recorder).recordInsert(argThat(insertRecord -> insertRecord.getEntity() instanceof SIconImpl),
+        }).when(recorder).recordInsert(argThat(insertRecord -> insertRecord.getEntity() instanceof SIcon),
                 nullable(String.class));
     }
 
@@ -316,14 +316,14 @@ public class IdentityServiceImplForUserTest {
     @Test
     public void should_createUser_create_the_icon() throws Exception {
         //given
-        SUserImpl sUser = new SUserImpl();
+        SUser sUser = new SUser();
         sUser.setId(6543L);
 
         //when
         SUser user = identityServiceImpl.createUser(sUser, null, null, "test.jpg", "iconContent".getBytes());
         //then
         verify(recorder, times(3)).recordInsert(insertRecordArgumentCaptor.capture(), nullable(String.class));
-        SIconImpl sIcon = new SIconImpl("image/jpeg", "iconContent".getBytes());
+        SIcon sIcon = new SIcon("image/jpeg", "iconContent".getBytes());
         sIcon.setId(NEW_ICON_ID);
         assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
                 .hasSize(3)
@@ -342,7 +342,7 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.updateUser(USER_ID, new EntityUpdateDescriptor(), null, null, iconUpdateDescriptor);
         //then
         verify(recorder, times(1)).recordInsert(insertRecordArgumentCaptor.capture(), nullable(String.class));
-        SIconImpl newIcon = new SIconImpl("image/gif", "theContent".getBytes());
+        SIcon newIcon = new SIcon("image/gif", "theContent".getBytes());
         newIcon.setId(NEW_ICON_ID);
         assertThat(insertRecordArgumentCaptor.getAllValues()).extracting("entity")
                 .hasSize(1)
@@ -352,8 +352,8 @@ public class IdentityServiceImplForUserTest {
     @Test
     public void should_updateUser_create_new_icon_if_it_exists() throws Exception {
         //given
-        SUserImpl sUser = haveUser();
-        SIconImpl sIcon = haveIcon(sUser);
+        SUser sUser = haveUser();
+        SIcon sIcon = haveIcon(sUser);
         //when
         EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
         iconUpdateDescriptor.addField("filename", "theNewIcon.jpg");
@@ -365,7 +365,7 @@ public class IdentityServiceImplForUserTest {
         verify(recorder).recordDelete(deleteRecordArgumentCaptor.capture(), nullable(String.class));
         assertThat(updateRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sUser);
         assertThat(updateRecordArgumentCaptor.getValue().getFields()).containsOnly(entry("iconId", NEW_ICON_ID));
-        assertThat(insertRecordArgumentCaptor.getValue().getEntity()).isEqualToIgnoringGivenFields(new SIconImpl("image/jpeg", "updated content".getBytes()),
+        assertThat(insertRecordArgumentCaptor.getValue().getEntity()).isEqualToIgnoringGivenFields(new SIcon("image/jpeg", "updated content".getBytes()),
                 "id");
         assertThat(deleteRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sIcon);
     }
@@ -373,8 +373,8 @@ public class IdentityServiceImplForUserTest {
     @Test
     public void should_update_user_with_null_content_remove_the_icon() throws Exception {
         //given
-        SUserImpl sUser = haveUser();
-        SIconImpl sIcon = haveIcon(sUser);
+        SUser sUser = haveUser();
+        SIcon sIcon = haveIcon(sUser);
         //when
         EntityUpdateDescriptor iconUpdateDescriptor = new EntityUpdateDescriptor();
         iconUpdateDescriptor.addField("content", null);
@@ -388,8 +388,8 @@ public class IdentityServiceImplForUserTest {
         assertThat(deleteRecordArgumentCaptor.getValue().getEntity()).isEqualTo(sIcon);
     }
 
-    private SUserImpl haveUser() throws SUserNotFoundException {
-        SUserImpl sUser = new SUserImpl();
+    private SUser haveUser() throws SUserNotFoundException {
+        SUser sUser = new SUser();
         sUser.setId(USER_ID);
         doReturn(sUser).when(identityServiceImpl).getUser(USER_ID);
         return sUser;
@@ -398,8 +398,8 @@ public class IdentityServiceImplForUserTest {
     @Test
     public void should_deleteUser_delete_the_icon_if_it_exists() throws Exception {
         //given
-        SUserImpl sUser = haveUser();
-        SIconImpl icon = haveIcon(sUser);
+        SUser sUser = haveUser();
+        SIcon icon = haveIcon(sUser);
         //when
         identityServiceImpl.deleteUser(USER_ID);
         //then
@@ -410,7 +410,7 @@ public class IdentityServiceImplForUserTest {
     @Test
     public void should_deleteUser_not_delete_the_icon_if_it_does_not_exists() throws Exception {
         //given
-        SUserImpl sUser = haveUser();
+        SUser sUser = haveUser();
         //when
         identityServiceImpl.deleteUser(USER_ID);
         //then
@@ -418,9 +418,9 @@ public class IdentityServiceImplForUserTest {
         assertThat(deleteRecordArgumentCaptor.getAllValues()).extracting("entity").containsOnly(sUser);
     }
 
-    private SIconImpl haveIcon(SUserImpl sUser) throws SBonitaReadException {
+    private SIcon haveIcon(SUser sUser) throws SBonitaReadException {
         sUser.setIconId(ICON_ID);
-        SIconImpl icon = new SIconImpl("image/gif", "theContent".getBytes());
+        SIcon icon = new SIcon("image/gif", "theContent".getBytes());
         icon.setId(ICON_ID);
         doReturn(icon).when(identityServiceImpl).getIcon(ICON_ID);
         return icon;

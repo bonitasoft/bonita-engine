@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.entitymember.EntityMemberSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,15 +32,15 @@ public class SearchEntityMemberUserDescriptor extends SearchEntityMemberDescript
 
     public SearchEntityMemberUserDescriptor() {
         super();
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey()));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey()));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SUser.class, SUser.FIRST_NAME));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SUser.class, SUser.LAST_NAME));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SUser.class, SUser.USER_NAME));
 
         entityMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(3);
         final Set<String> userFields = new HashSet<String>(3);
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey());
+        userFields.add(SUser.FIRST_NAME);
+        userFields.add(SUser.LAST_NAME);
+        userFields.add(SUser.USER_NAME);
         entityMemberAllFields.put(SUser.class, userFields);
     }
 

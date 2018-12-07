@@ -23,7 +23,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -44,7 +43,7 @@ public class SearchCommentDescriptor extends SearchEntityDescriptor {
         commentKeys.put(SearchCommentsDescriptor.ID, new FieldDescriptor(SComment.class, sCommentBuilderFact.getIdKey()));
         commentKeys.put(SearchCommentsDescriptor.POSTDATE, new FieldDescriptor(SComment.class, sCommentBuilderFact.getPostDateKey()));
         commentKeys.put(SearchCommentsDescriptor.CONTENT, new FieldDescriptor(SComment.class, sCommentBuilderFact.getContentKey()));
-        commentKeys.put(SearchCommentsDescriptor.USER_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
+        commentKeys.put(SearchCommentsDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
         commentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> commentFields = new HashSet<String>(1);
         commentFields.add(sCommentBuilderFact.getContentKey());

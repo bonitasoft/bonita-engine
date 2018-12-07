@@ -18,12 +18,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -37,22 +34,22 @@ public class SearchUserDescriptor extends SearchEntityDescriptor {
 
     SearchUserDescriptor() {
         userKeys = new HashMap<String, FieldDescriptor>(8);
-        userKeys.put(UserSearchDescriptor.ID, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getIdKey()));
-        userKeys.put(UserSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
-        userKeys.put(UserSearchDescriptor.FIRST_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey()));
-        userKeys.put(UserSearchDescriptor.LAST_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey()));
-        userKeys.put(UserSearchDescriptor.ENABLED, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getEnabledKey()));
-        userKeys.put(UserSearchDescriptor.LAST_CONNECTION, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getLastConnectionKey()));
-        userKeys.put(UserSearchDescriptor.MANAGER_USER_ID, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getManagerUserIdKey()));
-        userKeys.put(UserSearchDescriptor.ROLE_ID, new FieldDescriptor(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getRoleIdKey()));
-        userKeys.put(UserSearchDescriptor.GROUP_ID, new FieldDescriptor(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getGroupIdKey()));
+        userKeys.put(UserSearchDescriptor.ID, new FieldDescriptor(SUser.class, SUser.ID));
+        userKeys.put(UserSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
+        userKeys.put(UserSearchDescriptor.FIRST_NAME, new FieldDescriptor(SUser.class, SUser.FIRST_NAME));
+        userKeys.put(UserSearchDescriptor.LAST_NAME, new FieldDescriptor(SUser.class, SUser.LAST_NAME));
+        userKeys.put(UserSearchDescriptor.ENABLED, new FieldDescriptor(SUser.class, SUser.ENABLED));
+        userKeys.put(UserSearchDescriptor.LAST_CONNECTION, new FieldDescriptor(SUser.class, SUser.LAST_CONNECTION));
+        userKeys.put(UserSearchDescriptor.MANAGER_USER_ID, new FieldDescriptor(SUser.class, SUser.MANAGER_USER_ID));
+        userKeys.put(UserSearchDescriptor.ROLE_ID, new FieldDescriptor(SUserMembership.class, SUserMembership.ROLE_ID));
+        userKeys.put(UserSearchDescriptor.GROUP_ID, new FieldDescriptor(SUserMembership.class, SUserMembership.GROUP_ID));
 
         userAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> userFields = new HashSet<String>(4);
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getJobTitleKey());
+        userFields.add(SUser.USER_NAME);
+        userFields.add(SUser.FIRST_NAME);
+        userFields.add(SUser.LAST_NAME);
+        userFields.add(SUser.JOB_TITLE);
         userAllFields.put(SUser.class, userFields);
     }
 

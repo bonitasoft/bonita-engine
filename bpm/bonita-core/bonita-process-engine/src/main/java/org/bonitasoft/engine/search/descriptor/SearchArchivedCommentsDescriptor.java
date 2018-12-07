@@ -23,7 +23,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -46,7 +45,7 @@ public class SearchArchivedCommentsDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.POSTDATE, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getPostDateKey()));
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getSourceObjectId()));
         searchEntityKeys.put(ArchivedCommentsSearchDescriptor.CONTENT, new FieldDescriptor(SAComment.class, saCommentBuilderFact.getContentKey()));
-        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
+        searchEntityKeys.put(ArchivedCommentsSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
 
         archivedCommentsAllFields = new HashMap<>(1);
         final Set<String> archivedCommentFields = new HashSet<>(1);

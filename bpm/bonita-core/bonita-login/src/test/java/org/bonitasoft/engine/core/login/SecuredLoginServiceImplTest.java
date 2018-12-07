@@ -45,7 +45,7 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -304,7 +304,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void should_login_with_existing_user() throws Exception {
-        SUserImpl user = havingUser("john", "bpm", 42L);
+        SUser user = havingUser("john", "bpm", 42L);
 
         SSession session = securedLoginServiceImpl.login(credentials("john", "bpm", 42));
 
@@ -316,7 +316,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void should_fail_if_user_is_disabled() throws Exception {
-        SUserImpl user = havingUser("john", "bpm", 42L);
+        SUser user = havingUser("john", "bpm", 42L);
         user.setEnabled(false);
         try {
             securedLoginServiceImpl.login(credentials("john", "bpm", 42L));
@@ -328,7 +328,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void should_update_last_connection_date_when_successfully_connected() throws Exception {
-        SUserImpl user = havingUser("john", "bpm", 42L);
+        SUser user = havingUser("john", "bpm", 42L);
 
         securedLoginServiceImpl.login(credentials("john", "bpm", 42));
 
@@ -337,7 +337,7 @@ public class SecuredLoginServiceImplTest {
 
     @Test
     public void should_have_profiles_in_session() throws Exception {
-        SUserImpl user = havingUser("myUser", "myPass", 43L);
+        SUser user = havingUser("myUser", "myPass", 43L);
         doReturn(profiles("User", "Administrator")).when(profileService).getProfilesOfUser(user.getId());
 
         SSession session = securedLoginServiceImpl.login(credentials("myUser", "myPass", 43L));
@@ -366,8 +366,8 @@ public class SecuredLoginServiceImplTest {
     }
 
 
-    private SUserImpl havingUser(String username, String password, long tenantId) throws Exception {
-        SUserImpl user = new SUserImpl();
+    private SUser havingUser(String username, String password, long tenantId) throws Exception {
+        SUser user = new SUser();
         user.setId(UUID.randomUUID().getLeastSignificantBits());
         user.setUserName(username);
         user.setPassword(password);

@@ -332,42 +332,42 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.11:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SUser" />
         <constructor-arg name="sequenceId" value="20" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SRole" />
         <constructor-arg name="sequenceId" value="21" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.21:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SGroup" />
         <constructor-arg name="sequenceId" value="22" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.22:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SUserMembership" />
         <constructor-arg name="sequenceId" value="23" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.23:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" />
         <constructor-arg name="sequenceId" value="24" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.24:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" />
         <constructor-arg name="sequenceId" value="25" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.25:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SContactInfo" />
         <constructor-arg name="sequenceId" value="26" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.26:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SIconImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.SIcon" />
         <constructor-arg name="sequenceId" value="27" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.27:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -1137,15 +1137,6 @@
                 <!-- services -->
                 <entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
                 <entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SRole" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SGroup" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SUserLogin" value="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" />
-                <entry key="org.bonitasoft.engine.identity.model.SIcon" value="org.bonitasoft.engine.identity.model.impl.SIconImpl" />
                 <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
                 <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
                 <entry key="org.bonitasoft.engine.scheduler.model.SJobDescriptor" value="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" />
