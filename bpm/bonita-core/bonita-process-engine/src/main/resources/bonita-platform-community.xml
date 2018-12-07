@@ -292,10 +292,6 @@
         <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
-    <bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">
-        <constructor-arg name="transactionService" ref="transactionService" />
-    </bean>
-
     <bean id="platformEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>

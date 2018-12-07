@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -510,6 +511,31 @@ public class HumanTasksIT extends TestWithUser {
         assertThat(manualTask.getExpectedEndDate()).as("should expression set expected end date").isNotNull();
         assertThat(manualTaskNullDueDate.getExpectedEndDate()).as("should have no due date").isNull();
         assertThat(taskToFail.getState()).isEqualTo(ActivityStates.FAILED_STATE);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+    
+    @Test
+    public void should_use_activity_expression_context_when_evaluating_default_value_expression() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+
+        ExpressionBuilder activityInstanceIdExpressionBuiler = new ExpressionBuilder();
+        activityInstanceIdExpressionBuiler.createGroovyScriptExpression("activityInstanceId", "activityInstanceId", Long.class.getName(),
+        		new ExpressionBuilder().createEngineConstant(ExpressionConstants.ACTIVITY_INSTANCE_ID));
+
+        builder.addUserTask("userTask", ACTOR_NAME).addLongData("myId", activityInstanceIdExpressionBuiler.done());
+   
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        //when
+        final HumanTaskInstance userTask = waitForUserTaskAndAssignIt(processInstance, "userTask", user);
+
+
+        //then
+        assertThat(getProcessAPI().getActivityDataInstance("myId", userTask.getId()).getValue()).as("should expression set activity instance id").isEqualTo(userTask.getId());
 
         disableAndDeleteProcess(processDefinition);
     }

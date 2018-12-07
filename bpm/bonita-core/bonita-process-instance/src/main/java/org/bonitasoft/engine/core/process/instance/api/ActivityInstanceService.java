@@ -54,8 +54,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     String ACTIVITYINSTANCE = "ACTIVITYINSTANCE";
 
-    String ARCHIVED_ACTIVITYINSTANCE = "ARCHIVED_ACTIVITYINSTANCE";
-
     String PENDINGACTIVITYMAPPING = "PENDINGACTIVITYMAPPING";
 
     /**
@@ -712,11 +710,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      */
     long getNumberOfPendingOrAssignedTasks(long userId, QueryOptions searchOptions) throws SBonitaReadException;
 
-    /**
-     * @param flowNodeInstanceId
-     *     delete pending mapping of this flow node
-     */
-    void deleteArchivedPendingMappings(long flowNodeInstanceId) throws SActivityModificationException;
 
     /**
      * @param activityInstance
@@ -726,47 +719,11 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      */
     void setAbortedByBoundaryEvent(SActivityInstance activityInstance, long boundaryEventId) throws SActivityModificationException;
 
-    /**
-     * @param processInstanceId
-     * @return
-     * @throws SBonitaReadException
-     * @since 6.0
-     */
-    int getNumberOfActivityInstances(long processInstanceId) throws SActivityReadException;
 
     List<Long> getPossibleUserIdsOfPendingTasks(long humanTaskInstanceId, int startIndex, int maxResults) throws SActivityReadException;
 
-    /**
-     * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
-     *
-     * @param supervisorId
-     *        The identifier of the supervisor
-     * @param entityClass
-     *        The type of the archived flow node to search for
-     * @param queryOptions
-     *        The search options to filter the results
-     * @return The number found, 0 if no matching search criteria
-     * @since 6.3
-     */
-    long getNumberOfArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass, QueryOptions queryOptions)
-            throws SBonitaReadException;
 
     boolean isTaskPendingForUser(long humanTaskInstanceId, long userId) throws SBonitaReadException;
-    /**
-     * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
-     *
-     * @param supervisorId
-     *        The identifier of the supervisor
-     * @param entityClass
-     *        The type of the archived flow node to search for
-     * @param queryOptions
-     *        The search options to filter the results
-     * @return The list of paginated results, according to the QueryOptions search criteria
-     * @since 6.3
-     */
-    List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass,
-            QueryOptions queryOptions)
-            throws SBonitaReadException;
 
     /**
      * Get total number of users according to specific query options, and who can start the task filtered with the search option
@@ -865,35 +822,11 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
-     * Delete archived flow node instances and their elements
-     *
-     * @param processInstanceId
-     * @throws SFlowNodeDeletionException
-     * @since 6.4.0
-     */
-    void deleteArchivedFlowNodeInstances(long processInstanceId) throws SFlowNodeDeletionException;
-
-    /**
      * @param parentActivityInstanceId
      * @param maxNumberOfResults
      * @return
      * @since 6.4.0
      */
     QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(long parentActivityInstanceId, int numberOfResults);
-
-
-
-
-    /**
-     * Returns the instance of the user task.
-     *
-     * @param userTaskInstanceId the identifier of the instance of the user task
-     * @return the instance of the user task
-     * @throws SActivityInstanceNotFoundException
-     *         if the identifier does not refer to an existing user task
-     * @throws SActivityReadException
-     *         if an exception occurs when retrieving the instance
-     */
-    SUserTaskInstance getUserTaskInstance(long userTaskInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
 }

@@ -59,14 +59,6 @@ public class MergeEntityActionTest {
         //then exception
     }
 
-    @Test(expected = SEntityActionExecutionException.class)
-    public void execute_should_throws_exception_when_list_contains_null_elements() throws Exception {
-        //when
-        mergeEntityAction.execute(Arrays.asList(mock(Entity.class), null), null);
-
-        //then exception
-    }
-
     @Test
     public void execute_should_return_list_of_merged_entities() throws Exception {
         //given
@@ -78,7 +70,7 @@ public class MergeEntityActionTest {
         given(repository.merge(entity2)).willReturn(mergedEntity2);
 
         //when
-        final List<Entity> actionResult = mergeEntityAction.execute(Arrays.asList(entity1, entity2), null);
+        final List<Entity> actionResult = mergeEntityAction.execute(Arrays.asList(entity1,null, entity2), null);
 
         //then
         assertThat(actionResult).containsExactly(mergedEntity1, mergedEntity2);

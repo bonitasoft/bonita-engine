@@ -94,4 +94,6 @@ public interface ExpressionService {
      *            the {@link ExpressionKind}
      */
     boolean mustPutEvaluatedExpressionInContext(ExpressionKind expressionKind);
+
+	void setExpressionExecutorStrategy(List<ExpressionExecutorStrategy> expressionStrategies);
 }

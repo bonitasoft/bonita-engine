@@ -251,6 +251,16 @@ public interface DataInstanceService {
     void deleteLocalArchivedDataInstances(long containerId, String dataInstanceContainerType) throws SDataInstanceException;
 
     /**
+     * Delete all local archived data instances for multiple containers having the same type
+     *
+     * @param containerIds containers
+     * @param dataInstanceContainerType type of the containers
+     * @throws SDataInstanceException
+     * @since 7.8
+     */
+    void deleteLocalArchivedDataInstances(List<Long> containerIds, String dataInstanceContainerType) throws SDataInstanceException;
+
+    /**
      * Delete all local active data instances for a specified container
      * 
      * @param containerId

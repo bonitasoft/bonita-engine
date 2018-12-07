@@ -26,4 +26,10 @@
 	FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
 	WHERE saComment.id = :id
   </query>
+
+	<query name="deleteArchiveCommentsOfProcessInstances">
+		DELETE
+		FROM org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl AS saComment
+		WHERE saComment.processInstanceId IN (:processInstanceIds)
+	</query>
 </hibernate-mapping>

@@ -376,10 +376,7 @@ public class StateBehaviors {
 
     public void createData(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         if (flowNodeInstance instanceof SActivityInstance) {
-            final String containerType = getParentContainerType(flowNodeInstance).name();
-            final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getParentContainerId(), containerType,
-                    processDefinition.getId());
-            bpmInstancesCreator.createDataInstances(processDefinition, flowNodeInstance, sExpressionContext);
+            bpmInstancesCreator.createDataInstances(processDefinition, flowNodeInstance);
         }
     }
 
