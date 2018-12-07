@@ -51,7 +51,7 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void should_proxify_an_entity() throws Exception {
+    public void should_proxify_an_entity() {
         final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         assertThat(proxy).isInstanceOf(ProxyObject.class);
@@ -59,7 +59,7 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void should_not_reproxify_a_server_proxy() throws Exception {
+    public void should_not_reproxify_a_server_proxy() {
         final PersonEntity originalProxy = serverProxyfier.proxify(new PersonEntity());
         final PersonEntity proxy = serverProxyfier.proxify(originalProxy);
 
@@ -73,7 +73,7 @@ public class ServerProxyfierTest {
         final Entity aProxy = (Entity) factory.create(new Class[0], new Object[0], new MethodHandler() {
 
             @Override
-            public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) throws Throwable {
+            public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) {
                 return null;
             }
         });
@@ -115,14 +115,14 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void unProxy_should_not_remove_a_proxy_on_a_null_entity() throws Exception {
+    public void unProxy_should_not_remove_a_proxy_on_a_null_entity() {
         final Entity entity = ServerProxyfier.unProxifyIfNeeded(null);
 
         assertThat(entity).isNull();
     }
 
     @Test
-    public void unProxy_should_not_remove_a_proxy_on_an_entity() throws Exception {
+    public void unProxy_should_not_remove_a_proxy_on_an_entity() {
         final PersonEntity proxy = new PersonEntity();
 
         final Entity entity = ServerProxyfier.unProxifyIfNeeded(proxy);
@@ -131,7 +131,7 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void unProxy_should_remove_a_proxy_on_an_entity() throws Exception {
+    public void unProxy_should_remove_a_proxy_on_an_entity() {
         final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         final Entity entity = ServerProxyfier.unProxifyIfNeeded(proxy);
@@ -140,7 +140,34 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void unProxy_should_remove_a_proxy_on_an_ref_attribute_of_an_entity() throws Exception {
+    public void should_unproxify_object_with_cycle() {
+        A a = new A();
+        B b = new B();
+        A aProxy = serverProxyfier.proxify(a);
+        B bProxy = serverProxyfier.proxify(b);
+        b.setA(aProxy);
+        a.setB(bProxy);
+
+        A unproxyfied = (A) ServerProxyfier.unProxifyIfNeeded(aProxy);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(unproxyfied)).isFalse();
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(unproxyfied.getB())).isFalse();
+    }
+
+    @Test
+    public void should_unproxify_object_directReferenceToItself() {
+        A a = new A();
+        A aProxy = serverProxyfier.proxify(a);
+        a.setA(aProxy);
+
+        A unproxyfied = (A) ServerProxyfier.unProxifyIfNeeded(aProxy);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(unproxyfied)).isFalse();
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(unproxyfied.getA())).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_ref_attribute_of_an_entity() {
         final Address proxy = serverProxyfier.proxify(new Address());
         final Employee employee = new Employee(10L, 45L, "John", "Doe");
         employee.setAddress(proxy);
@@ -151,7 +178,7 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void unProxy_should_remove_a_proxy_on_an_list_attribute_of_an_entity() throws Exception {
+    public void unProxy_should_remove_a_proxy_on_an_list_attribute_of_an_entity() {
         final List<Address> addresses = new ArrayList<>();
         addresses.add(new Address());
         addresses.add(serverProxyfier.proxify(new Address()));
@@ -166,7 +193,7 @@ public class ServerProxyfierTest {
     }
 
     @Test
-    public void should_return_null_when_proxifying_a_null_entity() throws Exception {
+    public void should_return_null_when_proxifying_a_null_entity() {
         final Entity proxy = serverProxyfier.proxify((Entity) null);
 
         assertThat(proxy).isNull();

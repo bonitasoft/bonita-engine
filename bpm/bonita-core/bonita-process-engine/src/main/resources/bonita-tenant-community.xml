@@ -802,37 +802,13 @@
     </bean>
 
     <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
-        <constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="checkExpressionReturnType" value="true" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
     </bean>
 
     <bean id="expressionExecutorStrategyProvider"
-          class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider">
-        <property name="expressionExecutors">
-            <list>
-                <ref bean="constantExpressionExecutorStrategy" />
-                <ref bean="groovyScriptExpressionExecutorStrategy" />
-                <ref bean="inputExpressionExecutorStrategy" />
-                <ref bean="dataExpressionExecutorStrategy" />
-                <ref bean="transientDataExpressionExecutorStrategy" />
-                <ref bean="patternExpressionExecutorStrategy" />
-                <ref bean="documentReferenceExpressionExecutorStrategy" />
-                <ref bean="documentListReferenceExpressionExecutorStrategy" />
-                <ref bean="engineConstantExpressionExecutorStrategy" />
-                <ref bean="listExpressionExecutorStrategy" />
-                <ref bean="conditionExpressionExecutorStrategy" />
-                <ref bean="javaMethodCallExpressionExecutorStrategy" />
-                <ref bean="parameterExpressionExecutorStrategy" />
-                <ref bean="xPathReadExpressionExecutorStrategy" />
-                <ref bean="businessDataExpressionExecutorStrategy" />
-                <ref bean="queryBusinessDataExpressionExecutorStrategy" />
-                <ref bean="businessObjectDAOExpressionStrategy" />
-                <ref bean="businessDataExpressionReferenceExecutorStrategy" />
-                <ref bean="contractInputExpressionExecutorStrategy" />
-            </list>
-        </property>
+          class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider" autowire="byType">
     </bean>
 
     <bean id="serverLazyLoader" class="org.bonitasoft.engine.business.data.proxy.ServerLazyLoader">
@@ -1030,9 +1006,6 @@
 
     <bean id="transientDataLeftOperandHandler" class="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">
         <constructor-arg name="transientDataService" ref="transientDataService" />
-        <constructor-arg name="flownodeInstanceService" ref="activityInstanceService" />
-        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
-        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
@@ -1242,8 +1215,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
@@ -1252,7 +1223,6 @@
           class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="activityService" ref="activityInstanceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
@@ -1264,8 +1234,8 @@
         <constructor-arg name="documentService" ref="documentService" />
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
     </bean>
-
     <bean id="gatewayInstanceService"
           class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
@@ -1317,7 +1287,6 @@
                 <entry key="STATE_CHANGE" value="true" />
             </map>
         </constructor-arg>
-        <constructor-arg name="eventService" ref="tenantEventService" />
     </bean>
 
 
@@ -1453,10 +1422,8 @@
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
     </bean>
 
-    <!-- depends on transientDataExpressionExecutorStrategy because if this bean is loaded before it cause a circular dependency -->
     <bean id="expressionResolverService"
-          class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl"
-          depends-on="transientDataExpressionExecutorStrategy">
+          class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl" >
         <constructor-arg name="expressionService" ref="expressionService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
@@ -1467,7 +1434,6 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="urlProvider" ref="documentURLProvider" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
@@ -1490,16 +1456,16 @@
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
         <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="transientDataExpressionExecutorStrategy"
-          class="org.bonitasoft.engine.expression.ReevaluatingTransientDataExpressionExecutorStrategy"
+          class="org.bonitasoft.engine.core.data.instance.impl.TransientDataExpressionExecutorStrategy"
           autowire="byType">
         <constructor-arg name="transientDataService" ref="transientDataService" />
-        <property name="flownodeInstanceService" ref="activityInstanceService" />
-        <property name="processDefinitionService" ref="processDefinitionService" />
-        <property name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="dataInstanceService" class="org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl">

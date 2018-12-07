@@ -29,7 +29,6 @@ import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -195,11 +194,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public FlowNodeStateManager getFlowNodeStateManager() {
         return beanAccessor.getService(FlowNodeStateManager.class);
-    }
-
-    @Override
-    public TransactionExecutor getTransactionExecutor() {
-        return beanAccessor.getService(TransactionExecutor.class);
     }
 
     @Override

@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -41,7 +40,7 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
  */
 public class ExpressionServiceImpl implements ExpressionService {
 
-    private final Map<ExpressionKind, ExpressionExecutorStrategy> expressionExecutorsMap;
+    private Map<ExpressionKind, ExpressionExecutorStrategy> expressionExecutorsMap = new HashMap<>();
 
     private final TechnicalLoggerService logger;
 
@@ -49,32 +48,38 @@ public class ExpressionServiceImpl implements ExpressionService {
 
     private final TimeTracker timeTracker;
 
-    public ExpressionServiceImpl(final ExpressionExecutorStrategyProvider expressionExecutorStrategyProvider, final TechnicalLoggerService logger,
-            final boolean checkExpressionReturnType, final TimeTracker timeTracker) {
+
+    public ExpressionServiceImpl(final TechnicalLoggerService logger, final boolean checkExpressionReturnType,
+                                 final TimeTracker timeTracker) {
         super();
-        final List<ExpressionExecutorStrategy> expressionExecutors = expressionExecutorStrategyProvider.getExpressionExecutors();
-        expressionExecutorsMap = new HashMap<>(expressionExecutors.size());
         this.checkExpressionReturnType = checkExpressionReturnType;
-        for (final ExpressionExecutorStrategy expressionExecutorStrategy : expressionExecutors) {
-            expressionExecutorsMap.put(expressionExecutorStrategy.getExpressionKind(), expressionExecutorStrategy);
-        }
         this.logger = logger;
         this.timeTracker = timeTracker;
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
-            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+    public void setExpressionExecutorStrategy(List<ExpressionExecutorStrategy> expressionExecutors) {
+        for (final ExpressionExecutorStrategy expressionExecutorStrategy : expressionExecutors) {
+            expressionExecutorsMap.put(expressionExecutorStrategy.getExpressionKind(), expressionExecutorStrategy);
+        }
+    }
+
+    @Override
+    public Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions,
+                           final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException {
         return evaluate(expression, new HashMap<String, Object>(1), resolvedExpressions, containerState);
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues,
+                           final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         final boolean isTraceEnable = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
 
         final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expression.getExpressionKind());
@@ -83,11 +88,14 @@ public class ExpressionServiceImpl implements ExpressionService {
         Object expressionResult = null;
         final long startTime = System.currentTimeMillis();
         try {
-            expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions, containerState);
+            expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions,
+                    containerState);
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION)) {
                 final long endTime = System.currentTimeMillis();
-                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, "Expression: " + expression + " - " + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy, endTime - startTime);
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, "Expression: " + expression + " - "
+                                + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy,
+                        endTime - startTime);
             }
         }
         if (mustCheckExpressionReturnType()) {
@@ -95,61 +103,70 @@ public class ExpressionServiceImpl implements ExpressionService {
         }
 
         if (isTraceEnable) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "evaluate"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "evaluate"));
         }
         return expressionResult;
     }
 
-    private void validateExpression(final ExpressionExecutorStrategy expressionExecutorStrategy, final SExpression expression)
-            throws SInvalidExpressionException {
+    private void validateExpression(final ExpressionExecutorStrategy expressionExecutorStrategy,
+                                    final SExpression expression) throws SInvalidExpressionException {
         try {
             // this will throw exception if the expression is invalid
             expressionExecutorStrategy.validate(expression);
         } catch (final SInvalidExpressionException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", "Invalid Expression : " + expression.getContent()));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(),
+                        "evaluate", "Invalid Expression : " + expression.getContent()));
             }
             throw e;
         }
     }
 
-    private ExpressionExecutorStrategy getStrategy(final ExpressionKind expressionKind) throws SExpressionTypeUnknownException {
+    private ExpressionExecutorStrategy getStrategy(final ExpressionKind expressionKind)
+            throws SExpressionTypeUnknownException {
         final ExpressionExecutorStrategy expressionExecutorStrategy = expressionExecutorsMap.get(expressionKind);
         if (expressionExecutorStrategy == null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", "Unable to find an executor for expression type " + expressionKind));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(),
+                        "evaluate", "Unable to find an executor for expression type " + expressionKind));
             }
-            throw new SExpressionTypeUnknownException("Unable to find an executor for expression type " + expressionKind);
+            throw new SExpressionTypeUnknownException(
+                    "Unable to find an executor for expression type " + expressionKind);
         }
         return expressionExecutorStrategy;
     }
 
     @Override
-    public List<Object> evaluate(final ExpressionKind expressionKind, final List<SExpression> expressions, final Map<String, Object> dependencyValues,
-            final Map<Integer, Object> resolvedExpressions, final ContainerState containerState) throws SExpressionTypeUnknownException,
-            SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public List<Object> evaluate(final ExpressionKind expressionKind, final List<SExpression> expressions,
+                                 final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions,
+                                 final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
         final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expressionKind);
 
         List<Object> list = null;
         final long startTime = System.currentTimeMillis();
         try {
-            list = expressionExecutorStrategy.evaluate(expressions, dependencyValues, resolvedExpressions, containerState);
+            list = expressionExecutorStrategy.evaluate(expressions, dependencyValues, resolvedExpressions,
+                    containerState);
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSIONS)) {
                 final long endTime = System.currentTimeMillis();
-                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, "Expressions: " + expressions + " - " + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy, endTime - startTime);
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, "Expressions: " + expressions + " - "
+                                + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy,
+                        endTime - startTime);
             }
         }
         if (list == null || list.size() != expressions.size()) {
-            final String exceptionMessage = "Result list size " + (list == null ? 0 : list.size()) + " is different from expression list size "
-                    + expressions.size();
+            final String exceptionMessage = "Result list size " + (list == null ? 0 : list.size())
+                    + " is different from expression list size " + expressions.size();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", exceptionMessage));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", exceptionMessage));
             }
             throw new SExpressionEvaluationException(exceptionMessage, null);
         }
@@ -159,7 +176,8 @@ public class ExpressionServiceImpl implements ExpressionService {
             }
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "evaluate"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                    LogUtil.getLogAfterMethod(this.getClass(), "evaluate"));
         }
         return list;
     }
@@ -173,5 +191,6 @@ public class ExpressionServiceImpl implements ExpressionService {
     public boolean mustPutEvaluatedExpressionInContext(final ExpressionKind expressionKind) {
         return expressionExecutorsMap.get(expressionKind).mustPutEvaluatedExpressionInContext();
     }
+
 
 }

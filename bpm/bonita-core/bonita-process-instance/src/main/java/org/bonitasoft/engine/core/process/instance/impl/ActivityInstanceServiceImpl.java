@@ -126,16 +126,10 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     private final SMultiInstanceActivityInstanceBuilderFactory sMultiInstanceActivityInstanceBuilder;
 
-    private final DataInstanceService dataInstanceService;
-
-    private final ConnectorInstanceService connectorInstanceService;
-
     public ActivityInstanceServiceImpl(final Recorder recorder, final PersistenceService persistenceService, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService, final ConnectorInstanceService connectorInstanceService, final EventService eventService,
+            final EventService eventService,
             final TechnicalLoggerService logger) {
         super(recorder, persistenceService, eventService, logger, archiveService);
-        this.dataInstanceService = dataInstanceService;
-        this.connectorInstanceService = connectorInstanceService;
         sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         sMultiInstanceActivityInstanceBuilder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
     }
@@ -354,15 +348,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         try {
         final List<SActivityInstance> selectList = getPersistenceService().selectList(descriptor);
         return getUnmodifiableList(selectList);
-        } catch (final SBonitaReadException e) {
-            throw new SActivityReadException(e);
-    }
-    }
-
-    @Override
-    public int getNumberOfActivityInstances(final long rootContainerId) throws SActivityReadException {
-        try {
-        return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfActivitiesFromProcessInstance(rootContainerId)).intValue();
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
     }
@@ -769,30 +754,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public void deleteArchivedPendingMappings(final long flowNodeInstanceId) {
-        // FIXME : archived pending mapping... first we need to have archived pending mapping and so on
-        // final SEventBuilder eventBuilder = BuilderFactory.get(SEventBuilderFactory.class);
-        // List<SPendingActivityMapping> mappings = null;
-        // try {
-        // while ((mappings = getPendingMappings(flowNodeInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
-        // for (final SPendingActivityMapping mapping : mappings) {
-        // final SPendingActivityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new pending activity mapping", mapping);
-        // final SDeleteEvent deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
-        // try {
-        // getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
-        // initiateLogBuilder(flowNodeInstanceId, SQueriableLog.STATUS_OK, logBuilder, "deletePendingMappings");
-        // } catch (final SRecorderException e) {
-        // initiateLogBuilder(flowNodeInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "deletePendingMappings");
-        // throw new SActivityModificationException(e);
-        // }
-        // }
-        // }
-        // } catch (final SActivityReadException e) {
-        // throw new SActivityModificationException(e);
-        // }
-    }
-
-    @Override
     public void setAbortedByBoundaryEvent(final SActivityInstance activityInstance, final long boundaryEventId) throws SActivityModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
@@ -829,27 +790,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         return aLong == 1;
     }
 
-    @Override
-    public long getNumberOfArchivedActivityInstancesSupervisedBy(final long supervisorId, final Class<? extends SAActivityInstance> entityClass,
-            final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
-            return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
-    }
-
-    @Override
-    public List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(final long supervisorId, final Class<? extends SAActivityInstance> entityClass,
-            final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", supervisorId);
-            return (List<SAActivityInstance>) getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaReadException(bre);
-        }
-    }
 
     @Override
     public long getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(final long humanTaskInstanceId, final QueryOptions searchOptions)
@@ -912,56 +852,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
      }
 
     @Override
-    public void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeDeletionException {
-        try {
-            deleteArchivedFlowNodeInstancesAndElements(processInstanceId);
-        } catch (final SFlowNodeDeletionException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SFlowNodeDeletionException(e);
-        }
-    }
-
-    private void deleteArchivedFlowNodeInstancesAndElements(final long processInstanceId) throws SFlowNodeReadException, SBonitaReadException,
-            SConnectorInstanceDeletionException, SDataInstanceException, SFlowNodeDeletionException {
-        Set<Long> sourceActivityIds = new HashSet<Long>();
-        List<SAFlowNodeInstance> saFlowNodeInstances;
-        do {
-            saFlowNodeInstances = getArchivedFlowNodeInstances(processInstanceId, 0, BATCH_SIZE);
-            sourceActivityIds = deleteArchivedFlowNodeInstancesAndElements(sourceActivityIds, saFlowNodeInstances);
-        } while (!saFlowNodeInstances.isEmpty());
-    }
-
-    private Set<Long> deleteArchivedFlowNodeInstancesAndElements(final Set<Long> sourceActivityIds, final List<SAFlowNodeInstance> saFlowNodeInstances)
-            throws SBonitaReadException, SConnectorInstanceDeletionException, SDataInstanceException, SFlowNodeDeletionException {
-        Set<Long> newSourceActivityIds = new HashSet<Long>(sourceActivityIds);
-        for (final SAFlowNodeInstance saFlowNodeInstance : saFlowNodeInstances) {
-            newSourceActivityIds = deleteArchivedFlowNodeInstanceAndElements(newSourceActivityIds, saFlowNodeInstance);
-        }
-        return newSourceActivityIds;
-    }
-
-    private Set<Long> deleteArchivedFlowNodeInstanceAndElements(final Set<Long> sourceActivityIds, final SAFlowNodeInstance saFlowNodeInstance)
-            throws SBonitaReadException, SConnectorInstanceDeletionException, SDataInstanceException, SFlowNodeDeletionException {
-        final Set<Long> newSourceActivityIds = new HashSet<Long>(sourceActivityIds);
-        if (saFlowNodeInstance instanceof SAActivityInstance && !sourceActivityIds.contains(saFlowNodeInstance.getSourceObjectId())) {
-            newSourceActivityIds.add(saFlowNodeInstance.getSourceObjectId());
-            deleteArchivedFlowNodeInstanceElements((SAActivityInstance) saFlowNodeInstance);
-        }
-        deleteArchivedFlowNodeInstance(saFlowNodeInstance);
-        return newSourceActivityIds;
-    }
-
-    private void deleteArchivedFlowNodeInstanceElements(final SAActivityInstance saActivityInstance) throws SBonitaReadException,
-            SConnectorInstanceDeletionException, SDataInstanceException {
-        dataInstanceService.deleteLocalArchivedDataInstances(saActivityInstance.getSourceObjectId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        connectorInstanceService.deleteArchivedConnectorInstances(saActivityInstance.getSourceObjectId(), SConnectorInstance.FLOWNODE_TYPE);
-        if (SFlowNodeType.USER_TASK.equals(saActivityInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(saActivityInstance.getType())) {
-            deleteArchivedPendingMappings(saActivityInstance.getSourceObjectId());
-        }
-    }
-
-    @Override
     public QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(final long parentActivityInstanceId, final int numberOfResults) {
         final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
@@ -975,23 +865,4 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         return new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
     }
 
-    @Override
-    public SUserTaskInstance getUserTaskInstance(final long userTaskInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
-        return getInstance(userTaskInstanceId, SUserTaskInstance.class);
-    }
-
-    private <T extends SActivityInstance> T getInstance(final long instanceId, final Class<T> instanceClass)
-            throws SActivityInstanceNotFoundException, SActivityReadException {
-        final SelectByIdDescriptor<T> descriptor = SelectDescriptorBuilder.getElementById(instanceClass, instanceClass.getSimpleName(),
-                instanceId);
-        try {
-            final T instance = getPersistenceService().selectById(descriptor);
-            if (instance == null) {
-                throw new SActivityInstanceNotFoundException(instanceId);
-            }
-            return instance;
-        } catch (final SBonitaReadException e) {
-            throw new SActivityReadException(e);
-        }
-    }
 }

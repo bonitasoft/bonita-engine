@@ -20,12 +20,10 @@ import java.util.Map;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
-import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.login.SLoginException;
 import org.bonitasoft.engine.core.login.TechnicalUser;
@@ -130,16 +128,20 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     protected STenant getTenant(final Long tenantId, final PlatformServiceAccessor platformServiceAccessor) throws SBonitaException {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
+        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
         // first call before create session: put the platform in cache if necessary
         final TransactionContentWithResult<STenant> getTenant;
-        if (tenantId == null) {
-            getTenant = new GetDefaultTenantInstance(platformService);
-        } else {
-            getTenant = new GetTenantInstance(tenantId, platformService);
+        try {
+            if (tenantId == null) {
+                return transactionService.executeInTransaction(platformService::getDefaultTenant);
+            } else {
+                return transactionService.executeInTransaction(() -> platformService.getTenant(tenantId));
+            }
+        } catch (SBonitaException | RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new SBonitaRuntimeException(e);
         }
-        platformTransactionExecutor.execute(getTenant);
-        return getTenant.getResult();
     }
 
     protected void checkUsernameAndPassword(final String userName, final String password) throws LoginException {
