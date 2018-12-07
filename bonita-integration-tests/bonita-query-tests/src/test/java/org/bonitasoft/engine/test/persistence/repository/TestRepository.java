@@ -50,12 +50,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl;
-import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
@@ -107,17 +101,17 @@ public class TestRepository {
     /**
      * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
      */
-    public SUser add(final SUserImpl user) {
+    public SUser add(final SUser user) {
         getSession().save(user);
         return (SUser) getSession().get(user.getClass(), new PersistentObjectId(user.getId(), user.getTenantId()));
     }
 
-    public SRole add(final SRoleImpl role) {
+    public SRole add(final SRole role) {
         getSession().save(role);
         return (SRole) getSession().get(role.getClass(), new PersistentObjectId(role.getId(), role.getTenantId()));
     }
 
-    public SGroup add(final SGroupImpl sGroup) {
+    public SGroup add(final SGroup sGroup) {
         getSession().save(sGroup);
         return (SGroup) getSession().get(sGroup.getClass(), new PersistentObjectId(sGroup.getId(), sGroup.getTenantId()));
     }
@@ -144,7 +138,7 @@ public class TestRepository {
         return (SActor) getSession().get(actor.getClass(), new PersistentObjectId(actor.getId(), actor.getTenantId()));
     }
 
-    public SUserMembership add(final SUserMembershipImpl membership) {
+    public SUserMembership add(final SUserMembership membership) {
         getSession().save(membership);
         return (SUserMembership) getSession().get(membership.getClass(), new PersistentObjectId(membership.getId(), membership.getTenantId()));
     }
@@ -199,12 +193,12 @@ public class TestRepository {
                 new PersistentObjectId(sTimerEventTriggerInstanceImpl.getId(), sTimerEventTriggerInstanceImpl.getTenantId()));
     }
 
-    public SCustomUserInfoDefinition add(final SCustomUserInfoDefinitionImpl infoDef) {
+    public SCustomUserInfoDefinition add(final SCustomUserInfoDefinition infoDef) {
         getSession().save(infoDef);
         return (SCustomUserInfoDefinition) getSession().get(infoDef.getClass(), new PersistentObjectId(infoDef.getId(), infoDef.getTenantId()));
     }
 
-    public SCustomUserInfoValue add(final SCustomUserInfoValueImpl infoValue) {
+    public SCustomUserInfoValue add(final SCustomUserInfoValue infoValue) {
         getSession().save(infoValue);
         return (SCustomUserInfoValue) getSession().get(infoValue.getClass(), new PersistentObjectId(infoValue.getId(), infoValue.getTenantId()));
     }

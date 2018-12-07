@@ -14,12 +14,12 @@
 
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
+import org.bonitasoft.engine.identity.model.SRole;
 
 /**
  * @author Danila Mazour
  */
-public class RoleBuilder extends PersistentObjectBuilder<SRoleImpl, RoleBuilder> {
+public class RoleBuilder extends PersistentObjectBuilder<SRole, RoleBuilder> {
 
     private String name;
 
@@ -33,8 +33,8 @@ public class RoleBuilder extends PersistentObjectBuilder<SRoleImpl, RoleBuilder>
     }
 
     @Override
-    SRoleImpl _build() {
-        SRoleImpl role = new SRoleImpl();
+    SRole _build() {
+        SRole role = new SRole();
         role.setName(this.name);
         role.setId(this.id);
         return role;

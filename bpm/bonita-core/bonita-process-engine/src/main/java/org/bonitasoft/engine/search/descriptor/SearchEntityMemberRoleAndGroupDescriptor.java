@@ -18,12 +18,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.entitymember.EntityMemberSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -36,17 +33,17 @@ public class SearchEntityMemberRoleAndGroupDescriptor extends SearchEntityMember
 
     public SearchEntityMemberRoleAndGroupDescriptor() {
         super();
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey()));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey()));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey()));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, SRole.NAME));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, SGroup.NAME));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SGroup.class, SGroup.PARENT_PATH));
 
         entityMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(2);
         final Set<String> roleFields = new HashSet<String>(1);
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getNameKey());
+        roleFields.add(SRole.NAME);
         entityMemberAllFields.put(SRole.class, roleFields);
         final Set<String> groupFields = new HashSet<String>(2);
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getNameKey());
-        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey());
+        groupFields.add(SGroup.NAME);
+        groupFields.add(SGroup.PARENT_PATH);
         entityMemberAllFields.put(SGroup.class, groupFields);
     }
 

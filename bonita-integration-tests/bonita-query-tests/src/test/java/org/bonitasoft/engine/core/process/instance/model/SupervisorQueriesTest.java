@@ -20,9 +20,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
-import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SRole;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.repository.SupervisorRepository;
@@ -54,14 +54,14 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_user() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
@@ -75,14 +75,14 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_group() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
@@ -96,14 +96,14 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_role() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);
@@ -117,14 +117,14 @@ public class SupervisorQueriesTest {
 
     @Test
     public void searchSProcessSupervisorWithSUserSGroupSRole_should_return_supervisors_mapped_through_group_and_role() {
-        SUserImpl user = aUser().withId(userId).build();
+        SUser user = aUser().withId(userId).build();
         user.setTenantId(tenantId);
         repository.add(user);
-        final SRoleImpl sRole = new SRoleImpl();
+        final SRole sRole = new SRole();
         sRole.setId(roleId);
         sRole.setTenantId(tenantId);
         repository.add(sRole);
-        final SGroupImpl sGroup = new SGroupImpl();
+        final SGroup sGroup = new SGroup();
         sGroup.setId(groupId);
         sGroup.setTenantId(tenantId);
         repository.add(sGroup);

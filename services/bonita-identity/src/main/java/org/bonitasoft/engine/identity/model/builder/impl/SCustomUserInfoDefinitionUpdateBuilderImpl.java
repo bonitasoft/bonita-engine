@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -36,19 +37,19 @@ public class SCustomUserInfoDefinitionUpdateBuilderImpl implements SCustomUserIn
 
     @Override
     public SCustomUserInfoDefinitionUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SCustomUserInfoDefinitionBuilderFactoryImpl.NAME, name);
+        this.descriptor.addField(SCustomUserInfoDefinition.NAME, name);
         return this;
     }
 
     @Override
     public SCustomUserInfoDefinitionUpdateBuilder updateDisplayName(final String displayName) {
-        this.descriptor.addField(SCustomUserInfoDefinitionBuilderFactoryImpl.DISPLAY_NAME, displayName);
+        this.descriptor.addField(SCustomUserInfoDefinition.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
     public SCustomUserInfoDefinitionUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SCustomUserInfoDefinitionBuilderFactoryImpl.DESCRIPTION, description);
+        this.descriptor.addField(SCustomUserInfoDefinition.DESCRIPTION, description);
         return this;
     }
 

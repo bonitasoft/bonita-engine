@@ -28,7 +28,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedGroup;
@@ -282,8 +281,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     private void addMembership(final ExportedUserMembership newMembership, final Long userId, final Long groupId, final Long roleId, final Long assignedBy)
             throws SUserMembershipCreationException {
         final long assignedDateAsLong = getAssignedDate(newMembership);
-        final SUserMembership sUserMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(userId, groupId, roleId)
-                .setAssignedBy(assignedBy).setAssignedDate(assignedDateAsLong).done();
+        final SUserMembership sUserMembership = SUserMembership.builder().userId(userId).groupId(groupId).roleId(roleId)
+                .assignedBy(assignedBy).assignedDate(assignedDateAsLong).build();
         identityService.createUserMembership(sUserMembership);
     }
 

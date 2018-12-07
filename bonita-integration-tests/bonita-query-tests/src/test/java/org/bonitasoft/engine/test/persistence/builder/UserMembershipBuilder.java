@@ -14,9 +14,10 @@
 package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
+import org.bonitasoft.engine.identity.model.SUserMembership;
+import org.bonitasoft.engine.identity.model.SUserMembership;
 
-public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembershipImpl, UserMembershipBuilder> {
+public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembership, UserMembershipBuilder> {
 
     private long groupId;
 
@@ -34,8 +35,8 @@ public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembersh
     }
 
     @Override
-    SUserMembershipImpl _build() {
-        SUserMembershipImpl membership = new SUserMembershipImpl();
+    SUserMembership _build() {
+        SUserMembership membership = new SUserMembership();
         membership.setGroupId(groupId);
         membership.setUserId(userId);
         membership.setRoleId(roleId);

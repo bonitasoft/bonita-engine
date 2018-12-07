@@ -27,7 +27,6 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -90,7 +89,7 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
 
     private SGroup createSGroup(final String groupName) throws SBonitaException {
         this.transactionService.begin();
-        final SGroup group = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance().setName(groupName).done();
+        final SGroup group = SGroup.builder().name(groupName).build();
         this.identityService.createGroup(group, null, null);
         this.transactionService.complete();
         return group;

@@ -54,7 +54,7 @@
         (
         SELECT supervisor.id
         FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+        org.bonitasoft.engine.identity.model.SUserMembership AS um
         WHERE um.userId = :userId
         AND (
         (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
@@ -79,7 +79,7 @@
         (
         SELECT supervisor.id
         FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+        org.bonitasoft.engine.identity.model.SUserMembership AS um
         WHERE um.userId = :userId
         AND (
         (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)

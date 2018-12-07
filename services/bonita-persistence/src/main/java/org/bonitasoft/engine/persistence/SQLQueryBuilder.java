@@ -71,7 +71,7 @@ public class SQLQueryBuilder extends QueryBuilder {
         } else {
             String hqlAlias = classAliasMappings.get(entityType.getName());
             String sqlAlias = hqlToSqlAlias.containsKey(hqlAlias) ? hqlAlias.replace("user", "user_") : hqlAlias;
-            Class<? extends PersistentObject> entityClass = interfaceToClassMapping.get(entityType.getName());
+            Class<? extends PersistentObject> entityClass = interfaceToClassMapping.getOrDefault(entityType.getName(), entityType);
             sqlQuery.addEntity(sqlAlias, entityClass.getName());
         }
     }

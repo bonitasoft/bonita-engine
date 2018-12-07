@@ -25,11 +25,8 @@ import java.util.Collections;
 import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.impl.SCustomUserInfoValueBuilderImpl;
 import org.bonitasoft.engine.identity.model.builder.impl.SCustomUserInfoValueUpdateBuilderImpl;
-import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
@@ -46,9 +43,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SCustomUserInfoValueAPITest {
 
     @Mock(answer = Answers.RETURNS_MOCKS)
-    private SCustomUserInfoValueBuilderFactory createFactory;
-
-    @Mock(answer = Answers.RETURNS_MOCKS)
     private SCustomUserInfoValueUpdateBuilderFactory updateFactory;
 
     @Mock(answer = Answers.RETURNS_MOCKS)
@@ -59,7 +53,7 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void update_should_call_service_to_update_custom_user_info_when_exist() throws Exception {
-        final DummySCustomUserInfoValue value = new DummySCustomUserInfoValue(1L);
+        final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(1).build();
         final SCustomUserInfoValueUpdateBuilderImpl builder = new SCustomUserInfoValueUpdateBuilderImpl(new EntityUpdateDescriptor());
         given(updateFactory.createNewInstance()).willReturn(builder);
 
@@ -70,13 +64,12 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void update_should_return_updated_value() throws Exception {
-        final DummySCustomUserInfoValue updatedValue = new DummySCustomUserInfoValue(2L, 1L, 1L, "update");
-        given(service.getCustomUserInfoValue(2L)).willReturn(updatedValue);
+        given(service.getCustomUserInfoValue(2L)).willReturn(SCustomUserInfoValue.builder().value("updated").build());
 
-        final SCustomUserInfoValue result = api.update(new DummySCustomUserInfoValue(2L),
+        final SCustomUserInfoValue result = api.update(SCustomUserInfoValue.builder().id(2).build(),
                 new CustomUserInfoValueUpdater("value"));
 
-        assertThat(result.getValue()).isEqualTo("update");
+        assertThat(result.getValue()).isEqualTo("updated");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -86,12 +79,12 @@ public class SCustomUserInfoValueAPITest {
 
     @Test(expected = IllegalArgumentException.class)
     public void update_should_throw_update_exception_when_updater_is_null() throws Exception {
-        api.update(new DummySCustomUserInfoValue(1L), null);
+        api.update(new SCustomUserInfoValue(), null);
     }
 
     @Test
     public void set_should_delete_CustomUserInfoValue_when_value_is_null() throws Exception {
-        final SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
+        final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(254).build();
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, null);
@@ -101,7 +94,7 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_delete_SCustomUserInfoValue_when_value_is_empty() throws Exception {
-        final SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
+        final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(254).build();
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, "");
@@ -111,8 +104,6 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_return_updated_value_when_value_is_deleted() throws Exception {
-        given(createFactory.createNewInstance()).willReturn(new SCustomUserInfoValueBuilderImpl(new SCustomUserInfoValueImpl()));
-
         final SCustomUserInfoValue value = api.set(1L, 2L, "");
 
         assertThat(value.getDefinitionId()).isEqualTo(1L);
@@ -122,7 +113,7 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void set_should_update_SCustomUserInfoValue_when_value_exist() throws Exception {
-        final SCustomUserInfoValue value = new DummySCustomUserInfoValue(642L);
+        final SCustomUserInfoValue value = SCustomUserInfoValue.builder().id(254).build();
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
         api.set(1L, 2L, "update");

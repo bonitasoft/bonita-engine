@@ -20,11 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.junit.Test;
 
 /**
@@ -59,8 +56,8 @@ public class AuthenticationServiceTest extends CommonBPMServicesTest {
 
     private SUser createUser(final String username, final String password) throws Exception {
         getTransactionService().begin();
-        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(username).setPassword(password);
-        final SUser user = identityService.createUser(userBuilder.done());
+        final SUser.SUserBuilder userBuilder = SUser.builder().userName(username).password(password);
+        final SUser user = identityService.createUser(userBuilder.build());
         getTransactionService().complete();
 
         return user;

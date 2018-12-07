@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.entitymember.EntityMemberSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,11 +32,11 @@ public class SearchEntityMemberRoleDescriptor extends SearchEntityMemberDescript
 
     public SearchEntityMemberRoleDescriptor() {
         super();
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey()));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, SRole.NAME));
 
         entityMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> roleFields = new HashSet<String>(1);
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getNameKey());
+        roleFields.add(SRole.NAME);
         entityMemberAllFields.put(SRole.class, roleFields);
     }
 

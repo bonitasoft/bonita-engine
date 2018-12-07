@@ -18,11 +18,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.identity.CustomUserInfoValueSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,18 +33,16 @@ public class SearchCustomUserInfoValueDescriptor extends SearchEntityDescriptor 
     private final Map<Class<? extends PersistentObject>, Set<String>> allFields;
 
     public SearchCustomUserInfoValueDescriptor() {
-        final SCustomUserInfoValueBuilderFactory keyprovider = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
-
         searchableKeys = new HashMap<String, FieldDescriptor>(3);
-        searchableKeys.put(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, new FieldDescriptor(SCustomUserInfoValue.class, keyprovider.getDefinitionIdKey()));
-        searchableKeys.put(CustomUserInfoValueSearchDescriptor.USER_ID, new FieldDescriptor(SCustomUserInfoValue.class, keyprovider.getUserIdKey()));
-        searchableKeys.put(CustomUserInfoValueSearchDescriptor.VALUE, new FieldDescriptor(SCustomUserInfoValue.class, keyprovider.getValueKey()));
+        searchableKeys.put(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.DEFINITION_ID));
+        searchableKeys.put(CustomUserInfoValueSearchDescriptor.USER_ID, new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID));
+        searchableKeys.put(CustomUserInfoValueSearchDescriptor.VALUE, new FieldDescriptor(SCustomUserInfoValue.class, SCustomUserInfoValue.VALUE));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(2);
-        fields.add(keyprovider.getDefinitionIdKey());
-        fields.add(keyprovider.getUserIdKey());
-        fields.add(keyprovider.getValueKey());
+        fields.add(SCustomUserInfoValue.DEFINITION_ID);
+        fields.add(SCustomUserInfoValue.USER_ID);
+        fields.add(SCustomUserInfoValue.VALUE);
 
         allFields.put(SConnectorInstance.class, fields);
     }

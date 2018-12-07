@@ -18,9 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
@@ -44,15 +42,15 @@ public class SearchProfileMemberUserDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(ProfileMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.ROLE_ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.USER_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.USER_ID));
         searchEntityKeys.put(ProfileMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SProfileMember.class, SProfileMemberBuilderFactory.GROUP_ID));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey()));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey()));
-        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SUser.class, SUser.FIRST_NAME));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SUser.class, SUser.LAST_NAME));
+        searchEntityKeys.put(ProfileMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SUser.class, SUser.USER_NAME));
 
         profileMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> userFields = new HashSet<String>(3);
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey());
-        userFields.add(BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey());
+        userFields.add(SUser.FIRST_NAME);
+        userFields.add(SUser.LAST_NAME);
+        userFields.add(SUser.USER_NAME);
         profileMemberAllFields.put(SUser.class, userFields);
     }
 

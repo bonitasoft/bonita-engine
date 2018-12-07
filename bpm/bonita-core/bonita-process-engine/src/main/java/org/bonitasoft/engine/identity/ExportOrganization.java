@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.model.SContactInfo;
@@ -30,7 +29,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedGroup;
@@ -211,9 +209,8 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     }
 
     private QueryOptions getQueryOptions(final long userId, final int fromIndex) {
-        final SCustomUserInfoValueBuilderFactory keyProvider = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
-        final OrderByOption orderByOption = new OrderByOption(SCustomUserInfoValue.class, keyProvider.getIdKey(), OrderByType.ASC);
-        final FilterOption filterOption = new FilterOption(SCustomUserInfoValue.class, keyProvider.getUserIdKey(), userId);
+        final OrderByOption orderByOption = new OrderByOption(SCustomUserInfoValue.class, SCustomUserInfoValue.ID, OrderByType.ASC);
+        final FilterOption filterOption = new FilterOption(SCustomUserInfoValue.class, SCustomUserInfoValue.USER_ID, userId);
         return new QueryOptions(fromIndex, maxResults, Collections.singletonList(orderByOption), Collections.singletonList(filterOption), null);
     }
 

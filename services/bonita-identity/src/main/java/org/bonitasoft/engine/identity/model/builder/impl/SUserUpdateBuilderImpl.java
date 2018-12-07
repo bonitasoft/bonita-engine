@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -41,61 +42,61 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
 
     @Override
     public SUserUpdateBuilder updateUserName(final String username) {
-        descriptor.addField(SUserBuilderFactoryImpl.USER_NAME, username);
+        descriptor.addField(SUser.USER_NAME, username);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updatePassword(final String password) {
-        descriptor.addField(SUserBuilderFactoryImpl.PASSWORD, password);
+        descriptor.addField(SUser.PASSWORD, password);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateFirstName(final String firstName) {
-        descriptor.addField(SUserBuilderFactoryImpl.FIRST_NAME, firstName);
+        descriptor.addField(SUser.FIRST_NAME, firstName);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateLastName(final String lastName) {
-        descriptor.addField(SUserBuilderFactoryImpl.LAST_NAME, lastName);
+        descriptor.addField(SUser.LAST_NAME, lastName);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateTitle(final String title) {
-        descriptor.addField(SUserBuilderFactoryImpl.TITLE, title);
+        descriptor.addField(SUser.TITLE, title);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateJobTitle(final String jobTitle) {
-        descriptor.addField(SUserBuilderFactoryImpl.JOB_TITLE, jobTitle);
+        descriptor.addField(SUser.JOB_TITLE, jobTitle);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateManagerUserId(final long managerUserId) {
-        descriptor.addField(SUserBuilderFactoryImpl.MANAGER_USER_ID, managerUserId);
+        descriptor.addField(SUser.MANAGER_USER_ID, managerUserId);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateLastUpdate(final long lastUpdate) {
-        descriptor.addField(SUserBuilderFactoryImpl.LAST_UPDATE, lastUpdate);
+        descriptor.addField(SUser.LAST_UPDATE, lastUpdate);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateLastConnection(final long lastConnection) {
-        descriptor.addField(SUserBuilderFactoryImpl.LAST_CONNECTION, lastConnection);
+        descriptor.addField(SUser.LAST_CONNECTION, lastConnection);
         return this;
     }
 
     @Override
     public SUserUpdateBuilder updateEnabled(final boolean enabled) {
-        descriptor.addField(SUserBuilderFactoryImpl.ENABLED, enabled);
+        descriptor.addField(SUser.ENABLED, enabled);
         return this;
     }
 }

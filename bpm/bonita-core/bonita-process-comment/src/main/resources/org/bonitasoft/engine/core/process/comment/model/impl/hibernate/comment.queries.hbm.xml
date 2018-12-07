@@ -21,14 +21,14 @@
 	<query name="searchSCommentwithSUser">
 		SELECT comment
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl AS comment,
-		     org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+		     org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE user.id = comment.userId
 	</query>
 
 	<query name="getNumberOfSCommentwithSUser">
 		SELECT count(comment)
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl AS comment,
-		     org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+		     org.bonitasoft.engine.identity.model.SUser AS user
 		WHERE user.id = comment.userId
 	</query>
 
@@ -42,7 +42,7 @@
 			OR supervisor.id IN (
 				SELECT DISTINCT processsupervisor.id
 				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
-					 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+					 org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 				WHERE user_membership.userId = :supervisorId
 				AND (
 					(processsupervisor.groupId = user_membership.groupId AND processsupervisor.roleId &lt;= 0)
@@ -77,7 +77,7 @@
 			OR supervisor.id IN (
 				SELECT DISTINCT processsupervisor.id
 				FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
-					 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership
+					 org.bonitasoft.engine.identity.model.SUserMembership AS user_membership
 				WHERE user_membership.userId = :supervisorId
 				AND (
 					(processsupervisor.groupId = user_membership.groupId AND processsupervisor.roleId &lt;= 0)
@@ -106,7 +106,7 @@
 	<query name="getNumberOfSCommentInvolvingUser">
 		SELECT count(DISTINCT comment.id)
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
+		org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE comment.userId = u.id
 		AND ( comment.userId = :userId
 		OR comment.processInstanceId IN (
@@ -122,7 +122,7 @@
 		OR comment.processInstanceId IN (
 			SELECT p.id
 			FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-				 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				 org.bonitasoft.engine.identity.model.SUser AS user
 			WHERE p.startedBy = user.id
 			AND user.id = comment.userId
 			AND user.id = :userId
@@ -130,7 +130,7 @@
 		OR comment.processInstanceId IN (
 			SELECT pi.id
 			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
-				 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				 org.bonitasoft.engine.identity.model.SUser AS user
 			WHERE pi.startedBy = user.id
 			AND user.id = comment.userId
 			AND user.id = :userId
@@ -140,7 +140,7 @@
 	<query name="searchSCommentInvolvingUser">
 		SELECT DISTINCT comment
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-		org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
+		org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE comment.userId = u.id
 		AND (comment.userId = :userId
 		OR comment.processInstanceId IN (
@@ -156,7 +156,7 @@
 		OR comment.processInstanceId IN (
 			SELECT p.id
 			FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-				 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				 org.bonitasoft.engine.identity.model.SUser AS user
 			WHERE p.startedBy = user.id
 			AND user.id = comment.userId
 			AND user.id = :userId
@@ -164,7 +164,7 @@
 		OR comment.processInstanceId IN (
 			SELECT pi.id
 			FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
-				 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+				 org.bonitasoft.engine.identity.model.SUser AS user
 			WHERE pi.startedBy = user.id
 			AND user.id = comment.userId
 			AND user.id = :userId
@@ -174,7 +174,7 @@
 	<query name="getNumberOfSCommentManagedBy">
 		SELECT count(DISTINCT comment.id)
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
+			org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE u.managerUserId = :managerUserId
 		AND (comment.userId = u.id
 			OR comment.processInstanceId IN (
@@ -190,13 +190,13 @@
 			OR comment.processInstanceId IN (
 				SELECT p.id
 				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+					 org.bonitasoft.engine.identity.model.SUser AS user
 				WHERE p.startedBy = u.id
 			)
 			OR comment.processInstanceId IN (
 				SELECT pi.sourceObjectId
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
-					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+					 org.bonitasoft.engine.identity.model.SUser AS user
 				WHERE pi.startedBy = u.id
 			)
 		)
@@ -205,7 +205,7 @@
 	<query name="searchSCommentManagedBy">
 		SELECT comment
 		FROM org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl AS comment,
-			org.bonitasoft.engine.identity.model.impl.SUserImpl AS u
+			org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE u.managerUserId = :managerUserId
 		AND (comment.userId = u.id
 			OR comment.processInstanceId IN (
@@ -221,13 +221,13 @@
 			OR comment.processInstanceId IN (
 				SELECT p.id
 				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+					 org.bonitasoft.engine.identity.model.SUser AS user
 				WHERE p.startedBy = u.id
 			)
 			OR comment.processInstanceId IN (
 				SELECT pi.sourceObjectId
 				FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS pi,
-					 org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+					 org.bonitasoft.engine.identity.model.SUser AS user
 				WHERE pi.startedBy = u.id
 			)
 		)

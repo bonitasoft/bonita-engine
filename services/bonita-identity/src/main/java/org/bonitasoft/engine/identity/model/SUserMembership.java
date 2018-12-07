@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -20,24 +24,49 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SUserMembership extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SUserMembership implements PersistentObject {
 
-    long getGroupId();
+    public static final String ID = "id";
+    public static final String USER_ID = "userId";
+    public static final String ROLE_ID = "roleId";
+    public static final String GROUP_ID = "groupId";
+    public static final String ASSIGNED_BY = "assignedBy";
+    public static final String ASSIGNED_DATE = "assignedDate";
+    private long id;
+    private long tenantId;
+    private long roleId;
+    private long groupId;
+    private long userId;
+    private long assignedBy;
+    private long assignedDate;
+    private String groupParentPath;
+    private transient String roleName;
+    private transient String groupName;
+    private transient String username;
 
-    String getGroupName();
+    public SUserMembership(final long id, final long userId, final long groupId, final long roleId, final long assignedBy, final long assignedDate,
+                               final String roleName, final String groupName, final String username, String groupParentPath) {
+        super();
+        setId(id);
+        this.userId = userId;
+        this.groupId = groupId;
+        this.roleId = roleId;
+        this.assignedBy = assignedBy;
+        this.assignedDate = assignedDate;
+        this.roleName = roleName;
+        this.groupName = groupName;
+        this.username = username;
+        this.groupParentPath = groupParentPath;
+    }
 
-    long getRoleId();
-
-    String getRoleName();
-
-    long getUserId();
-
-    String getUsername();
-
-    long getAssignedBy();
-
-    long getAssignedDate();
-
-    String getGroupParentPath();
+    public SUserMembership(final long userId, final long groupId, final long roleId) {
+        this.userId = userId;
+        this.groupId = groupId;
+        this.roleId = roleId;
+    }
 
 }

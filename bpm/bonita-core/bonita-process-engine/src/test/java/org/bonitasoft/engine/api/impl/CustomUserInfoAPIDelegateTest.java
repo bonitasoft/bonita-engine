@@ -51,9 +51,9 @@ public class CustomUserInfoAPIDelegateTest {
     @Test
     public void list_should_retrieve_CustomUserItems_for_a_given_user() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(
-                Arrays.<SCustomUserInfoDefinition> asList(
-                        new DummySCustomUserInfoDefinition(1L),
-                        new DummySCustomUserInfoDefinition(2L)));
+                Arrays.asList(
+                        SCustomUserInfoDefinition.builder().id(1).build(),
+                        SCustomUserInfoDefinition.builder().id(2).build()));
 
         List<CustomUserInfo> result = api.list(1L, 0, 2);
 
@@ -73,11 +73,12 @@ public class CustomUserInfoAPIDelegateTest {
     @Test
     public void list_should_retrieve_values_associated_to_definitions_for_a_given_user() throws Exception {
         List<SCustomUserInfoDefinition> list1 = Arrays.asList(
-                new DummySCustomUserInfoDefinition(1L, "definition 1", ""),
-                new DummySCustomUserInfoDefinition(2L, "definition 2", ""));
+                SCustomUserInfoDefinition.builder().id(1).name("definition 1").build(),
+                SCustomUserInfoDefinition.builder().id(2).name("definition 2").build()
+        );
         List<SCustomUserInfoValue> list2 = Arrays.asList(
-                new DummySCustomUserInfoValue(1L, 1L, 1L, "value 1"),
-                new DummySCustomUserInfoValue(2L, 2L, 1L, "value 2"));
+                SCustomUserInfoValue.builder().definitionId(1).value("value 1").build(),
+                SCustomUserInfoValue.builder().definitionId(2).value("value 2").build());
         doReturn(list1).when(service).getCustomUserInfoDefinitions(0, 2);
         doReturn(list2).when(service).searchCustomUserInfoValue(any());
 
@@ -90,7 +91,7 @@ public class CustomUserInfoAPIDelegateTest {
     @Test
     public void list_should_return_a_null_value_for_a_not_found_definition_matching_value() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Collections.singletonList(
-                new DummySCustomUserInfoDefinition(1L, "definition", "")));
+                SCustomUserInfoDefinition.builder().id(1).name("definition").build()));
         given(service.searchCustomUserInfoValue(any()))
                 .willReturn(Collections.emptyList());
 

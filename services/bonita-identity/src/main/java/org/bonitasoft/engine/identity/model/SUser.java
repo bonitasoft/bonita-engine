@@ -13,6 +13,11 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -22,33 +27,60 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
-public interface SUser extends PersistentObject, SHavingIcon {
+@Data
+@ToString(exclude = "password")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public class SUser implements PersistentObject, SHavingIcon {
 
-    String getUserName();
+    public static final String ID = "id";
+    public static final String MANAGER_USER_ID = "managerUserId";
+    public static final String JOB_TITLE = "jobTitle";
+    public static final String TITLE = "title";
+    public static final String LAST_NAME = "lastName";
+    public static final String FIRST_NAME = "firstName";
+    public static final String USER_NAME = "userName";
+    public static final String PASSWORD = "password";
+    public static final String LAST_UPDATE = "lastUpdate";
+    public static final String LAST_CONNECTION = "lastConnection";
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATION_DATE = "creationDate";
+    public static final String ENABLED = "enabled";
+    private long id;
+    private long tenantId;
+    private String firstName;
+    private String lastName;
+    private String password;
+    private String userName;
+    private long managerUserId;
+    private String title;
+    private String jobTitle;
+    private long creationDate;
+    private long createdBy;
+    private long lastUpdate;
+    private boolean enabled;
+    private SUserLogin sUserLogin;
+    private Long iconId;
 
-    String getPassword();
+    public SUser(final SUser user) {
+        firstName = user.getFirstName();
+        lastName = user.getLastName();
+        password = user.getPassword();
+        userName = user.getUserName();
+        jobTitle = user.getJobTitle();
+        managerUserId = user.getManagerUserId();
+        createdBy = user.getCreatedBy();
+        creationDate = user.getCreationDate();
+        lastUpdate = user.getLastUpdate();
+        title = user.getTitle();
+        enabled = user.isEnabled();
+        iconId = user.getIconId();
+    }
 
-    String getFirstName();
-
-    String getLastName();
-
-    String getTitle();
-
-    String getJobTitle();
-
-    /**
-     * @return The identifier of the manager. If at the creation of the user, the field is not setting, the value is 0.
-     */
-    long getManagerUserId();
-
-    long getCreationDate();
-
-    long getCreatedBy();
-
-    long getLastUpdate();
-
-    SUserLogin getSUserLogin();
-
-    boolean isEnabled();
+    // called by reflection
+    public void setLastConnection(final Long lastConnection) {
+        sUserLogin.setLastConnection(lastConnection);
+    }
 
 }
