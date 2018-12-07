@@ -149,9 +149,9 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public void deleteFromQuery(String queryName, Map<String, Object> parameters) throws SRecorderException {
+    public int deleteFromQuery(String queryName, Map<String, Object> parameters) throws SRecorderException {
         try {
-            definitiveArchivePersistenceService.update(queryName, parameters);
+            return definitiveArchivePersistenceService.update(queryName, parameters);
         } catch (SPersistenceException e) {
             throw new SRecorderException(e);
         }

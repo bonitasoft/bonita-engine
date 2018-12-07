@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +25,6 @@ import java.util.HashMap;
 
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -41,9 +43,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ExpressionServiceImplTest {
 
     @Mock
-    private ExpressionExecutorStrategyProvider expressionExecutorStrategyProvider;
-
-    @Mock
     private TechnicalLoggerService logger;
 
     @Mock
@@ -54,14 +53,14 @@ public class ExpressionServiceImplTest {
     @Before
     public void setUp() {
         when(logger.isLoggable(any(Class.class), any(TechnicalLogSeverity.class))).thenReturn(false);
-        when(expressionExecutorStrategyProvider.getExpressionExecutors()).thenReturn(Arrays.asList(expressionExecutorStrategy));
     }
 
     @Test
     public void evaluateInvalidExpressionFailsAtValidationStep() throws Exception {
         final SExpression expression = mock(SExpression.class);
         final TimeTracker timeTracker = mock(TimeTracker.class);
-        expressionService = new ExpressionServiceImpl(expressionExecutorStrategyProvider, logger, true, timeTracker);
+        expressionService = new ExpressionServiceImpl(logger, true, timeTracker);
+        expressionService.setExpressionExecutorStrategy(Arrays.asList(expressionExecutorStrategy));
         expressionService.evaluate(expression, Collections.<String,Object>singletonMap("processDefinitionId", 546l), new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
         verify(expressionExecutorStrategy, times(1)).validate(any(SExpression.class));
     }

@@ -468,7 +468,7 @@ public class ProcessDeletionIT extends TestWithUser {
     }
 
     @Test
-    public void deleteProcessInstanceAndNotArchivedProcessIntances() throws Exception {
+    public void should_delete_archived_version_of_process_instance() throws Exception {
         // deploy a simple process
         final String userTaskName = "step1";
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("myProcess", userTaskName);
@@ -483,7 +483,7 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // check that all archived process instance related to this process were deleted
         final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10);
-        assertEquals(1, archivedProcessInstanceList.size());
+        assertEquals(0, archivedProcessInstanceList.size());
     }
 
     @Test

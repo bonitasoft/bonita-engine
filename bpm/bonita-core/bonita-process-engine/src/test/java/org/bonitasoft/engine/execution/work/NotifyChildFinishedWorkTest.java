@@ -1,5 +1,14 @@
 package org.bonitasoft.engine.execution.work;
 
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+
+import java.util.Collections;
+import java.util.Map;
+
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -15,11 +24,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.util.Collections;
-import java.util.Map;
-
-import static org.mockito.Mockito.*;
 
 public class NotifyChildFinishedWorkTest {
 
@@ -58,7 +62,7 @@ public class NotifyChildFinishedWorkTest {
         doThrow(SFlowNodeNotFoundException.class).when(flowNodeInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
 
         expectedException.expect(SWorkPreconditionException.class);
-        expectedException.expectMessage("Flow node is already completed ( not found )");
+        expectedException.expectMessage("Flow node " + FLOW_NODE_INSTANCE_ID + " is already completed ( not found )");
 
         notifyChildFinishedWork.work(context);
     }
@@ -71,7 +75,7 @@ public class NotifyChildFinishedWorkTest {
 
 
         expectedException.expect(SWorkPreconditionException.class);
-        expectedException.expectMessage("Flow node is not in a terminal state");
+        expectedException.expectMessage("Flow node " + FLOW_NODE_INSTANCE_ID + " is not yet completed");
 
         notifyChildFinishedWork.work(context);
     }
