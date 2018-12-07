@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
-import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
@@ -78,9 +76,11 @@ import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
+import org.bonitasoft.engine.identity.model.SUserMembership;
+import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.resources.STenantResourceLight;
 import org.bonitasoft.engine.resources.STenantResourceState;
@@ -206,7 +206,7 @@ public class ModelConvertorTest {
     @Test
     public void should_convert_server_definition_into_client_definition() {
         final CustomUserInfoDefinitionImpl definition = ModelConvertor.convert(
-                new DummySCustomUserInfoDefinition(1L, "name", "description"));
+                SCustomUserInfoDefinition.builder().name("name").id(1).description("description").build());
 
         assertThat(definition.getId()).isEqualTo(1L);
         assertThat(definition.getName()).isEqualTo("name");
@@ -216,7 +216,7 @@ public class ModelConvertorTest {
     @Test
     public void should_convert_server_value_into_client_value() {
         final CustomUserInfoValue value = ModelConvertor.convert(
-                new DummySCustomUserInfoValue(2L, 2L, 1L, "value"));
+                SCustomUserInfoValue.builder().definitionId(2).userId(1).value("value").build());
 
         assertThat(value.getDefinitionId()).isEqualTo(2L);
         assertThat(value.getValue()).isEqualTo("value");
@@ -612,7 +612,7 @@ public class ModelConvertorTest {
     @Test
     public void should_set_the_parentPath_when_creating_a_UserMembership() {
         //given
-        SUserMembershipImpl sUserMembership = new SUserMembershipImpl(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
+        SUserMembership sUserMembership = new SUserMembership(257L,157L,357L,457L,557L,190119993L,"dummy rolename","dummy groupname","dummy username","Bonita/dummy");
         
         //when
         UserMembershipImpl userMembership = (UserMembershipImpl) toUserMembership(sUserMembership);

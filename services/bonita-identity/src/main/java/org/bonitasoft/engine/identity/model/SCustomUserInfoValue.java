@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -20,12 +24,20 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  */
-public interface SCustomUserInfoValue extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SCustomUserInfoValue implements PersistentObject {
 
-    long getUserId();
-    
-    long getDefinitionId();
-
-    String getValue();
+    public static final String ID = "id";
+    public static final String USER_ID = "userId";
+    public static final String DEFINITION_ID = "definitionId";
+    public static final String VALUE = "value";
+    private long id;
+    private long tenantId;
+    protected long userId;
+    protected long definitionId;
+    protected String value;
 
 }

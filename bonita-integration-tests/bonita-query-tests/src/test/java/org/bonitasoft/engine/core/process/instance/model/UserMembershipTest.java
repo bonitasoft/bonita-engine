@@ -26,7 +26,7 @@ import java.util.List;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
+import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,11 +53,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.getUserMembershipsByGroup(group);
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }
@@ -68,11 +68,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.getUserMembershipsByRole(role);
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }
@@ -83,11 +83,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.getUserMembershipsOfUser(user.getId());
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }
@@ -98,11 +98,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.getUserMembershipWithIds(role.getId(), group.getId(), user.getId());
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }
@@ -113,11 +113,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.getUserMemberships();
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }
@@ -128,11 +128,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.getSUserMembershipById(sUserMembership.getId());
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }
@@ -143,11 +143,11 @@ public class UserMembershipTest {
         SUser user = repository.add(aUser().withId(1L).withUserName("dummy username").build());
         SGroup group = repository.add(aGroup().forGroupId(258L).forGroupName("dummy groupName").forParentPath("bonita/devList").build());
         SRole role = repository.add(aRole().forRoleId(259L).forRoleName("dummy roleName").build());
-        SUserMembershipImpl sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
+        SUserMembership sUserMembership = aUserMembership().forUser(user).memberOf(group.getId(), role.getId()).build();
         repository.add(sUserMembership);
         List userMemberships = repository.searchUserMembership();
         assertThat(userMemberships).hasSize(1);
-        SUserMembershipImpl userMembership = (SUserMembershipImpl) userMemberships.get(0);
+        SUserMembership userMembership = (SUserMembership) userMemberships.get(0);
         assertThat(userMembership.getGroupParentPath()).isEqualTo("bonita/devList");
 
     }

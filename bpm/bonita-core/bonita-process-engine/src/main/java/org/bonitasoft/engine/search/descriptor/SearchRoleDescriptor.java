@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.RoleSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,15 +33,15 @@ public class SearchRoleDescriptor extends SearchEntityDescriptor {
 
     SearchRoleDescriptor() {
         roleKeys = new HashMap<>(5);
-        roleKeys.put(RoleSearchDescriptor.ID, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getIdKey()));
-        roleKeys.put(RoleSearchDescriptor.NAME, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey()));
-        roleKeys.put(RoleSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey()));
+        roleKeys.put(RoleSearchDescriptor.ID, new FieldDescriptor(SRole.class, SRole.ID));
+        roleKeys.put(RoleSearchDescriptor.NAME, new FieldDescriptor(SRole.class, SRole.NAME));
+        roleKeys.put(RoleSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SRole.class, SRole.DISPLAY_NAME));
 
         roleAllFields = new HashMap<>(1);
         final Set<String> roleFields = new HashSet<>(3);
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getNameKey());
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey());
-        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getDescriptionKey());
+        roleFields.add(SRole.NAME);
+        roleFields.add(SRole.DISPLAY_NAME);
+        roleFields.add(SRole.DESCRIPTION);
         roleAllFields.put(SRole.class, roleFields);
     }
 

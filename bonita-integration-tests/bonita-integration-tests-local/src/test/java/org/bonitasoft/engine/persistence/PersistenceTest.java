@@ -18,7 +18,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.junit.Before;
@@ -49,10 +50,10 @@ public class PersistenceTest extends CommonBPMServicesTest {
         changeTenant(tenant1Id);
         getTransactionService().begin();
 
-        final SUserImpl SUserImpl = buildSUserImpl("SUserImpl1FN", "SUserImpl1LN");
-        recorder.recordInsert(new InsertRecord(SUserImpl), "USER");
+        final SUser SUser = buildSUserImpl("SUserImpl1FN", "SUserImpl1LN");
+        recorder.recordInsert(new InsertRecord(SUser), "USER");
         try {
-            persistenceService.selectOne(new SelectOneDescriptor<SUserImpl>("wrong query", null, SUserImpl.class));
+            persistenceService.selectOne(new SelectOneDescriptor<SUser>("wrong query", null, SUser.class));
             fail("Exception expected");
         } catch (final Exception e) {
             getTransactionService().setRollbackOnly();
@@ -67,31 +68,31 @@ public class PersistenceTest extends CommonBPMServicesTest {
         final long tenant2Id = createTenant("tenant2");
         changeTenant(tenant1Id);
 
-        final SUserImpl SUserImpl1 = buildSUserImpl("user1Test", "password");
-        final SUserImpl SUserImpl2 = buildSUserImpl("user2Test", "password");
+        final SUser SUser1 = buildSUserImpl("user1Test", "password");
+        final SUser SUser2 = buildSUserImpl("user2Test", "password");
         getTransactionService().begin();
-        recorder.recordInsert(new InsertRecord(SUserImpl1), "USER");
-        checkSUserImpl(SUserImpl1, persistenceService.selectById(new SelectByIdDescriptor<>(SUserImpl.class, SUserImpl1.getId())));
+        recorder.recordInsert(new InsertRecord(SUser1), "USER");
+        checkSUserImpl(SUser1, persistenceService.selectById(new SelectByIdDescriptor<>(SUser.class, SUser1.getId())));
         getTransactionService().complete();
 
         changeTenant(tenant2Id);
         getTransactionService().begin();
         try {
-            checkSUserImpl(SUserImpl1,
-                    persistenceService.selectById(new SelectByIdDescriptor<>(SUserImpl.class, SUserImpl1.getId())));
+            checkSUserImpl(SUser1,
+                    persistenceService.selectById(new SelectByIdDescriptor<>(SUser.class, SUser1.getId())));
             fail("SUserImpl1 must not be found in tenant1");
         } catch (final AssertionError e) {
             // OK
         }
-        recorder.recordInsert(new InsertRecord(SUserImpl2), "USER");
+        recorder.recordInsert(new InsertRecord(SUser2), "USER");
         getTransactionService().complete();
 
         changeTenant(tenant1Id);
         getTransactionService().begin();
-        checkSUserImpl(SUserImpl1, persistenceService.selectById(new SelectByIdDescriptor<>(SUserImpl.class, SUserImpl1.getId())));
+        checkSUserImpl(SUser1, persistenceService.selectById(new SelectByIdDescriptor<>(SUser.class, SUser1.getId())));
         try {
-            checkSUserImpl(SUserImpl2,
-                    persistenceService.selectById(new SelectByIdDescriptor<>(SUserImpl.class, SUserImpl2.getId())));
+            checkSUserImpl(SUser2,
+                    persistenceService.selectById(new SelectByIdDescriptor<>(SUser.class, SUser2.getId())));
             fail("SUserImpl1 must not be found in default");
         } catch (final AssertionError e) {
             // OK
@@ -106,20 +107,20 @@ public class PersistenceTest extends CommonBPMServicesTest {
         final long tenant3Id = createTenant("testSearchWith3Tenants3");
         changeTenant(tenant1Id);
         getTransactionService().begin();
-        final SUserImpl SUserImpl1 = buildSUserImpl("tenantUserTest", "password");
-        recorder.recordInsert(new InsertRecord(SUserImpl1), "USER");
+        final SUser SUser1 = buildSUserImpl("tenantUserTest", "password");
+        recorder.recordInsert(new InsertRecord(SUser1), "USER");
         getTransactionService().complete();
 
         changeTenant(tenant2Id);
         getTransactionService().begin();
-        final SUserImpl SUserImpl2 = buildSUserImpl("tenantUserTest", "password");
-        recorder.recordInsert(new InsertRecord(SUserImpl2), "USER");
+        final SUser SUser2 = buildSUserImpl("tenantUserTest", "password");
+        recorder.recordInsert(new InsertRecord(SUser2), "USER");
         getTransactionService().complete();
 
         changeTenant(tenant3Id);
         getTransactionService().begin();
-        final SUserImpl SUserImpl3 = buildSUserImpl("tenantUserTest", "password");
-        recorder.recordInsert(new InsertRecord(SUserImpl3), "USER");
+        final SUser SUser3 = buildSUserImpl("tenantUserTest", "password");
+        recorder.recordInsert(new InsertRecord(SUser3), "USER");
         getTransactionService().complete();
     }
 
@@ -134,42 +135,42 @@ public class PersistenceTest extends CommonBPMServicesTest {
         final String lastName = "thePassword";
 
         getTransactionService().begin();
-        final SUserImpl SUserImpl1 = buildSUserImpl(firstName, lastName);
-        recorder.recordInsert(new InsertRecord(SUserImpl1), "USER");
-        assertEquals(1, SUserImpl1.getId());
+        final SUser SUser1 = buildSUserImpl(firstName, lastName);
+        recorder.recordInsert(new InsertRecord(SUser1), "USER");
+        assertEquals(1, SUser1.getId());
         getTransactionService().complete();
         changeTenant(tenant2Id);
 
         getTransactionService().begin();
-        final Long nbOfSUserImpl = persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUserImpl.class, Long.class));
+        final Long nbOfSUserImpl = persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUser.class, Long.class));
         getTransactionService().complete();
         getTransactionService().begin();
-        final SUserImpl SUserImpl2 = buildSUserImpl(firstName, lastName);
-        recorder.recordInsert(new InsertRecord(SUserImpl2), "USER");
-        assertEquals(1, SUserImpl2.getId());// not the same sequence as tenant 1
+        final SUser SUser2 = buildSUserImpl(firstName, lastName);
+        recorder.recordInsert(new InsertRecord(SUser2), "USER");
+        assertEquals(1, SUser2.getId());// not the same sequence as tenant 1
 
         getTransactionService().complete();
         for (int i = 0; i < 150; i++) {// this should not cause constraint violation
             getTransactionService().begin();
-            final SUserImpl SUserImpl = buildSUserImpl(firstName + i, lastName);
-            recorder.recordInsert(new InsertRecord(SUserImpl), "USER");
+            final SUser SUser = buildSUserImpl(firstName + i, lastName);
+            recorder.recordInsert(new InsertRecord(SUser), "USER");
             getTransactionService().complete();
         }
         getTransactionService().begin();
         assertEquals(Long.valueOf(151 + nbOfSUserImpl),
-                persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUserImpl.class, Long.class)));
+                persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfSUser", null, SUser.class, Long.class)));
         getTransactionService().complete();
     }
 
-    protected void checkSUserImpl(final SUserImpl expected, final SUserImpl actual) {
+    protected void checkSUserImpl(final SUser expected, final SUser actual) {
         assertThat(actual).as("SUserImpl").isNotNull();
         assertThat(actual.getId()).isEqualTo(expected.getId());
         assertThat(actual.getPassword()).isEqualTo(expected.getPassword());
         assertThat(actual.getUserName()).isEqualTo(expected.getUserName());
     }
 
-    protected SUserImpl buildSUserImpl(final String username, final String password) {
-        final SUserImpl user = new SUserImpl();
+    protected SUser buildSUserImpl(final String username, final String password) {
+        final SUser user = new SUser();
         user.setUserName(username);
         user.setPassword(password);
         return user;

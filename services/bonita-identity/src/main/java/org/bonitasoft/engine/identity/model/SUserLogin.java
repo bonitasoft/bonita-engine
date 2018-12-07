@@ -13,14 +13,27 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
-public interface SUserLogin extends PersistentObject {
+@Data
+@NoArgsConstructor
+@ToString(exclude = "sUser")
+@EqualsAndHashCode(exclude = "sUser")
+public class SUserLogin implements PersistentObject {
 
-    Long getLastConnection();
+    private long id;
+    private long tenantId;
+    private Long lastConnection;
+    private SUser sUser;
 
-    void setLastConnection(Long lastConnection);
+    public SUserLogin(Long lastConnection) {
+        this.lastConnection = lastConnection;
+    }
 }

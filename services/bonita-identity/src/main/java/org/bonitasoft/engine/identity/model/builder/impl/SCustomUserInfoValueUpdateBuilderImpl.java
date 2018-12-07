@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -36,7 +37,7 @@ public class SCustomUserInfoValueUpdateBuilderImpl implements SCustomUserInfoVal
 
     @Override
     public SCustomUserInfoValueUpdateBuilder updateValue(final String value) {
-        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.VALUE, value);
+        this.descriptor.addField(SCustomUserInfoValue.VALUE, value);
         return this;
     }
 }

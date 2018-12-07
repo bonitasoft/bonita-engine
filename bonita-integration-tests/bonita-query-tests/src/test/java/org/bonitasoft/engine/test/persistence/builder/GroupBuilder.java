@@ -14,12 +14,13 @@
 
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
+import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SGroup;
 
 /**
  * @author Danila Mazour
  */
-public class GroupBuilder extends PersistentObjectBuilder<SGroupImpl, GroupBuilder> {
+public class GroupBuilder extends PersistentObjectBuilder<SGroup, GroupBuilder> {
 
     private String name;
 
@@ -35,8 +36,8 @@ public class GroupBuilder extends PersistentObjectBuilder<SGroupImpl, GroupBuild
     }
 
     @Override
-    SGroupImpl _build() {
-        SGroupImpl group = new SGroupImpl();
+    SGroup _build() {
+        SGroup group = new SGroup();
         group.setId(this.id);
         group.setName(this.name);
         group.setParentPath(parentPath);

@@ -14,16 +14,24 @@
 
 package org.bonitasoft.engine.identity.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
-public interface SIcon extends PersistentObject {
+@Data
+@NoArgsConstructor
+public class SIcon implements PersistentObject {
 
-    long getTenantId();
+    private long tenantId;
+    private long id;
+    private String mimeType;
+    private byte[] content;
 
-    String getMimeType();
-
-    byte[] getContent();
+    public SIcon(String mimeType, byte[] content) {
+        this.mimeType = mimeType;
+        this.content = content;
+    }
 }

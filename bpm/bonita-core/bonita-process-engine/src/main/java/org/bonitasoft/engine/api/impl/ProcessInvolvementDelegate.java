@@ -41,7 +41,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -208,10 +207,9 @@ public class ProcessInvolvementDelegate {
 
     private List<SUser> getSubordinates(final long managerUserId, final IdentityService identityService) {
         final List<OrderByOption> userOrderBys = Collections
-                .singletonList(new OrderByOption(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getIdKey(),
+                .singletonList(new OrderByOption(SUser.class, SUser.ID,
                         OrderByType.ASC));
-        final List<FilterOption> userFilters = Collections.singletonList(new FilterOption(SUser.class, BuilderFactory.get(SUserBuilderFactory.class)
-                .getManagerUserIdKey(), managerUserId));
+        final List<FilterOption> userFilters = Collections.singletonList(new FilterOption(SUser.class, SUser.MANAGER_USER_ID, managerUserId));
         try {
             return identityService.searchUsers(new QueryOptions(0, Integer.MAX_VALUE, userOrderBys, userFilters, null));
         } catch (final SBonitaReadException e) {

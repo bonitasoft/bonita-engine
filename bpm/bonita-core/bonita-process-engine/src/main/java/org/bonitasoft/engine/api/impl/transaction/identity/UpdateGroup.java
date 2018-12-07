@@ -16,11 +16,9 @@ package org.bonitasoft.engine.api.impl.transaction.identity;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -51,15 +49,14 @@ public class UpdateGroup {
     public SGroup update() throws SIdentityException {
         SGroup sGroup = identityService.getGroup(groupId);
 
-        final SGroupBuilderFactory sGroupBuilderFactory = BuilderFactory.get(SGroupBuilderFactory.class);
         // if the parent path changes it's also necessary to change the children's parent path
-        final String parentPathKey = sGroupBuilderFactory.getParentPathKey();
-        final String nameKey = sGroupBuilderFactory.getNameKey();
+        final String parentPathKey = SGroup.PARENT_PATH;
+        final String nameKey = SGroup.NAME;
         final Map<String, Object> fields = changeDescriptor.getFields();
         if (fields.containsKey(parentPathKey) || fields.containsKey(nameKey)) {
             final String parentPath = fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : sGroup.getParentPath();
             final String groupName = fields.containsKey(nameKey) ? (String) fields.get(nameKey) : sGroup.getName();
-            updateChildren(sGroup, parentPath, sGroupBuilderFactory.getIdKey(), parentPathKey, groupName);
+            updateChildren(sGroup, parentPath, SGroup.ID, parentPathKey, groupName);
         }
         identityService.updateGroup(sGroup, changeDescriptor, iconUpdater);
         return sGroup;

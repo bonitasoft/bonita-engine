@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
+import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -36,19 +37,19 @@ public class SUserMembershipUpdateBuilderImpl implements SUserMembershipUpdateBu
 
     @Override
     public SUserMembershipUpdateBuilder updateUserId(final long userId) {
-        descriptor.addField(SUserMembershipBuilderFactoryImpl.USER_ID, userId);
+        descriptor.addField(SUserMembership.USER_ID, userId);
         return this;
     }
 
     @Override
     public SUserMembershipUpdateBuilder updateGroupId(final long groupId) {
-        descriptor.addField(SUserMembershipBuilderFactoryImpl.GROUP_ID, groupId);
+        descriptor.addField(SUserMembership.GROUP_ID, groupId);
         return this;
     }
 
     @Override
     public SUserMembershipUpdateBuilder updateRoleId(final long roleId) {
-        descriptor.addField(SUserMembershipBuilderFactoryImpl.ROLE_ID, roleId);
+        descriptor.addField(SUserMembership.ROLE_ID, roleId);
         return this;
     }
 }

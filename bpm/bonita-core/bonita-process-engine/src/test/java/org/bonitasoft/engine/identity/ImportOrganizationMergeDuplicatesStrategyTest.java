@@ -22,7 +22,7 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.xml.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.xml.ExportedUser;
@@ -60,13 +60,13 @@ public class ImportOrganizationMergeDuplicatesStrategyTest {
     private SCustomUserInfoDefinition infoDef;
     @Captor
     private ArgumentCaptor<EntityUpdateDescriptor> captor;
-    private SUserImpl manager;
+    private SUser manager;
 
     @Before
     public void setUp() {
         given(existingUser.getId()).willReturn(USER_ID);
         given(infoDef.getId()).willReturn(DEFINITION_ID);
-        manager = new SUserImpl();
+        manager = new SUser();
         manager.setId(MANAGER_ID);
         manager.setUserName("manager");
         userToImport = new ExportedUser();
