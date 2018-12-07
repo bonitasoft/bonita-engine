@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.data.instance.impl;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -48,6 +52,7 @@ import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceExceptio
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -69,10 +74,10 @@ public class TransientDataServiceImpl implements TransientDataService {
     private final ProcessDefinitionService processDefinitionService;
 
     public TransientDataServiceImpl(final CacheService cacheService,
-                                    ExpressionResolverService expressionResolverService,
-                                    FlowNodeInstanceService flowNodeInstanceService,
-                                    ProcessDefinitionService processDefinitionService,
-                                    TechnicalLoggerService logger) {
+            ExpressionResolverService expressionResolverService,
+            FlowNodeInstanceService flowNodeInstanceService,
+            ProcessDefinitionService processDefinitionService,
+            TechnicalLoggerService logger) {
         this.cacheService = cacheService;
         this.expressionResolverService = expressionResolverService;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -82,7 +87,7 @@ public class TransientDataServiceImpl implements TransientDataService {
 
     @Override
     public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId,
-                                                final String containerType) throws SDataInstanceException {
+            final String containerType) throws SDataInstanceException {
         final ArrayList<SDataInstance> data = new ArrayList<SDataInstance>(dataNames.size());
         for (final String dataName : dataNames) {
             data.add(getDataInstance(dataName, containerId, containerType));
@@ -209,8 +214,8 @@ public class TransientDataServiceImpl implements TransientDataService {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SActivityDefinition flowNode = (SActivityDefinition) processDefinition.getProcessContainer()
                 .getFlowNode(flowNodeDefinitionId);
-        final List<SDataDefinition> sDataDefinitions = flowNode.getSDataDefinitions();
-        SDataDefinition dataDefinition = sDataDefinitions.stream().filter(data -> Objects.equals(name, data.getName()))
+        SDataDefinition dataDefinition = getTransientData(containerId).stream()
+                .filter(data -> Objects.equals(name, data.getName()))
                 .findFirst()
                 .orElseThrow(() -> new SDataInstanceNotFoundException(
                         "Transient data was not found and we were unable to reevaluate it because it was not found in the definition, name=<"
@@ -220,15 +225,31 @@ public class TransientDataServiceImpl implements TransientDataService {
                 new SExpressionContext(containerId, containerType, processDefinitionId));
     }
 
+    private List<SDataDefinition> getTransientData(long containerId) throws SFlowNodeNotFoundException,
+            SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException {
+        SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
+        final long flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
+        final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final SActivityDefinition flowNode = (SActivityDefinition) processDefinition.getProcessContainer()
+                .getFlowNode(flowNodeDefinitionId);
+        return flowNode.getSDataDefinitions()
+                .stream()
+                .filter(SDataDefinition::isTransientData)
+                .collect(Collectors.toList());
+    }
+
     private void createDataInstance(SDataDefinition dataDefinition, final long containerId,
-                                    final DataInstanceContainer containerType, final SExpressionContext expressionContext)
+            final DataInstanceContainer containerType, final SExpressionContext expressionContext)
             throws SDataInstanceException, SExpressionException {
         Serializable dataValue = null;
         final SExpression defaultValueExpression = dataDefinition.getDefaultValueExpression();
         if (defaultValueExpression != null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                 logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        String.format("The value of the transient data %s of %s %s is reevaluated from its default value expression.", dataDefinition.getName(), containerId, containerType));
+                        String.format(
+                                "The value of the transient data %s of %s %s is reevaluated from its default value expression.",
+                                dataDefinition.getName(), containerId, containerType));
             }
             dataValue = (Serializable) expressionResolverService.evaluate(dataDefinition.getDefaultValueExpression(),
                     expressionContext);
@@ -253,30 +274,28 @@ public class TransientDataServiceImpl implements TransientDataService {
 
     @Override
     public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex,
-                                                final int numberOfResults) throws SDataInstanceException {
-        final String matchingKey = containerId + ":" + containerType;
-        final List<SDataInstance> dataInstances = new ArrayList<SDataInstance>();
+            final int numberOfResults) throws SDataInstanceException {
         try {
-            final List<?> cacheKeys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
-            for (int i = fromIndex; i < cacheKeys.size() && i < numberOfResults; i++) {
-                final Object key = cacheKeys.get(i);
-                if (((String) key).contains(matchingKey)) {
-                    final SDataInstance dataInstance = getDataInstance(
-                            ((String) key).substring(0, ((String) key).indexOf(":")), containerId, containerType);
-                    if (dataInstance != null) {
-                        dataInstances.add(dataInstance);
-                    }
-                }
-            }
-
-            if (!dataInstances.isEmpty()) {
-                return dataInstances;
-            }
-            return Collections.emptyList();
-            // throw new SDataInstanceException("No data instance found for container type "
-            // + containerType + " and container id " + containerId);
-        } catch (final SCacheException e) {
-            throw new SDataInstanceException("Impossible to get transient data: ", e);
+            return getTransientData(containerId).stream()
+                    .skip(fromIndex*numberOfResults)
+                    .limit(numberOfResults)
+                    .map(data -> {
+                        try {
+                            return getDataInstance(data.getName(), containerId, containerType);
+                        } catch (SDataInstanceException e) {
+                            throw new BonitaRuntimeException(
+                                    String.format("Transient data '%s' not found for container %s wit type %s",
+                                            data.getName(), containerId, containerType),
+                                    e);
+                        }
+                    })
+                    .collect(collectingAndThen(toList(), Collections::unmodifiableList));
+        } catch (SProcessDefinitionNotFoundException | SFlowNodeNotFoundException | SFlowNodeReadException
+                | SBonitaReadException e) {
+            throw new SDataInstanceException(
+                    String.format("An error occured while retrieving transient data for container %s wit type %s",
+                            containerId, containerType),
+                    e);
         }
     }
 
