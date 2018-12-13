@@ -158,7 +158,7 @@
                                <filter>
                                    <artifact>org.bonitasoft.engine.util:bonita-common-util</artifact>
                                    <excludes>
-                                       <exclude>org/bonitasoft/engine/bdm/model/*</exclude>
+                                       <exclude>**/*</exclude>
                                    </excludes>
                                </filter>
                            </filters>
