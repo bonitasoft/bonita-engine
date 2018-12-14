@@ -14,49 +14,187 @@
 
     <dependencies>
         <dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api</artifactId>
-			<version>${project.version}</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-impl</artifactId>
-			<version>${project.version}</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.util</groupId>
-            <artifactId>bonita-common-util</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- test: -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-fluent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
+
     <build>
+       <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/schemas</directory>
+                <excludes>
+                    <exclude>**/*.class</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-						<phase>package</phase>
                         <goals>
-							<goal>shade</goal>
+                            <goal>test-jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>form-mapping-schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
                         <configuration>
-							<artifactSet>
-								<includes>
-									<include>org.bonitasoft.engine.api:bonita-common-api</include>
-									<include>org.bonitasoft.engine.api:bonita-common-api-impl</include>
-                                    <include>org.bonitasoft.engine.util:bonita-common-util</include>
-								</includes>
-							</artifactSet>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createDependencyReducedPom>true</createDependencyReducedPom>
-							<keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
-							<createSourcesJar>true</createSourcesJar>
+                            <includes>
+                                <include>org/bonitasoft/engine/bpm/bar/form/model/*.java</include>
+                                <include>org/bonitasoft/engine/form/*.java</include>
+                                <!--<include>org/bonitasoft/engine/bpm/bar/actorMapping/*.java</include>-->
+                            </includes>
+                            <outputDirectory>${project.build.directory}/form-mapping-schemas</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>bdm-schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <includes>
+                                <include>org/bonitasoft/engine/bdm/model/**/*.java</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/bdm-schemas</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>application-schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <includes>
+                                <include>org/bonitasoft/engine/business/application/xml/**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>org/bonitasoft/engine/business/application/xml/ApplicationNodeBuilder.java
+                                </exclude>
+                            </excludes>
+                            <outputDirectory>${project.build.directory}/application-schemas</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>profiles-schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <includes>
+                                <include>org/bonitasoft/engine/profile/xml/**/*.java</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/profiles-schemas</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                       <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <target>
+                                <move file="${project.build.directory}/form-mapping-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/form-mapping.xsd" />
+                                <copy file="${project.build.directory}/bdm-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/bom.xsd" />
+                                <copy file="${project.build.directory}/application-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/application.xsd" />
+                                <copy file="${project.build.directory}/profiles-schemas/schema1.xsd"
+                                      toFile="${project.build.directory}/schemas/profiles.xsd" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
@@ -81,7 +219,108 @@
                                 <configuration>
                                     <doctitle>Bonita Engine ${project.version} common API</doctitle>
                                     <windowtitle>Bonita Engine ${project.version} common API</windowtitle>
-                                    <includeDependencySources>true</includeDependencySources>
+                                    <!--includeDependencySources>true</includeDependencySources-->
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- Use this profile to regenerate the XSD if needed -->
+            <id>xsd-generation</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jaxb2-maven-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>schemagen</goal>
+                                </goals>
+                                <phase>generate-sources</phase>
+                                <configuration>
+                                    <createJavaDocAnnotations>false</createJavaDocAnnotations>
+                                    <sources>
+                                        <source>src/main/java/org/bonitasoft/engine/operation/impl/OperationImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/operation/impl/LeftOperandImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/expression/impl/ExpressionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/userfilter/impl/UserFilterDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/internal/NamedDefinitionElementImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/internal/BaseDefinitionElementImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/contract/impl/InputDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/contract/impl/InputContainerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/contract/impl/ConstraintDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/contract/impl/ContractDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/parameter/impl/ParameterDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/document/impl/DocumentDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/document/impl/DocumentListDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/connector/impl/ConnectorDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/StandardLoopCharacteristicsImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/FlowNodeDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/MessageEventTriggerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/ReceiveTaskDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/SendTaskDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/ErrorEventTriggerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/ActivityDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/CatchEventDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/NameExpressionMap.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/NameExpressionPair.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/HumanTaskDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/CatchMessageEventTriggerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/ThrowEventDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/FlowElementContainerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/UserTaskDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/TaskDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/TransitionDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/EndEventDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/EventDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/GatewayDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/MultiInstanceLoopCharacteristicsImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/TimerEventTriggerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/CallActivityDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/SignalEventTriggerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/CorrelationDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/impl/internal/ThrowMessageEventTriggerDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/data/impl/TextDataDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/data/impl/DataDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/data/impl/XMLDataDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/process/impl/internal/ProcessDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/process/impl/internal/SubProcessDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/process/impl/internal/DesignProcessDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/process/impl/internal/IndexLabel.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/actor/impl/ActorDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/businessdata/impl/BusinessDataDefinitionImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/context/ContextEntryImpl.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/connector/ConnectorEvent.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/GatewayType.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/CallableElementType.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/flownode/TimerType.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/contract/Type.java</source>
+                                        <source>src/main/java/org/bonitasoft/engine/bpm/contract/InputDefinition.java</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                                <configuration>
+                                    <target>
+                                        <move file="${project.build.directory}/generated-resources/schemagen/schema1.xsd"
+                                              toFile="${project.basedir}/src/main/resources/ProcessDefinition.xsd" />
+                                    </target>
                                 </configuration>
                             </execution>
                         </executions>
