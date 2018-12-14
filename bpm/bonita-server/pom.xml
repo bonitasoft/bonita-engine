@@ -20,12 +20,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api-impl</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -71,8 +67,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -130,8 +126,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api-impl</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -146,8 +142,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.util</groupId>
-                    <artifactId>bonita-common-util</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -250,8 +246,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -265,8 +261,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>bonita-common-api</artifactId>
-                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -292,8 +288,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -374,12 +370,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api-impl</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -391,8 +383,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>bonita-common-api</artifactId>
-                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -478,8 +470,8 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -517,20 +509,6 @@
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>bonita-common-api</artifactId>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bonita-common-api-impl</artifactId>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bonita-common-util</artifactId>
-                    <groupId>org.bonitasoft.engine.util</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

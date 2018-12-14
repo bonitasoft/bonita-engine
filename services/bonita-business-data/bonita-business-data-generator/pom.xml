@@ -42,8 +42,8 @@
             <artifactId>hibernate-jpa-2.1-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.util</groupId>
-            <artifactId>bonita-common-util</artifactId>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -143,20 +143,16 @@
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>studio</shadedClassifierName>
                            <filters>
+                               <!-- exclude eclipse compiler because studio already have it in classpath -->
                                <filter>
                                    <artifact>org.eclipse.jdt.core.compiler:ecj</artifact>
                                    <excludes>
                                        <exclude>**</exclude>
                                    </excludes>
                                </filter>
+                               <!-- exclude bonita-common because studio already have it in classpath -->
                                <filter>
-                                   <artifact>org.bonitasoft.engine.util:bonita-common-util</artifact>
-                                   <excludes>
-                                       <exclude>org/bonitasoft/engine/api/**</exclude>
-                                   </excludes>
-                               </filter>
-                               <filter>
-                                   <artifact>org.bonitasoft.engine.util:bonita-common-util</artifact>
+                                   <artifact>org.bonitasoft.engine:bonita-common</artifact>
                                    <excludes>
                                        <exclude>**/*</exclude>
                                    </excludes>
