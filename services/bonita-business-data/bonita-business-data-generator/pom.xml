@@ -164,6 +164,8 @@
                                        <include>org/bonitasoft/engine/bdm/validator/rule/*</include>
                                        <include>org/bonitasoft/engine/bdm/validator/*</include>
                                        <include>org/bonitasoft/engine/bdm/*</include>
+                                       <include>org/bonitasoft/engine/io/IOUtils.*</include>
+                                       <include>org/bonitasoft/engine/xml/parser/*</include>
                                        <include>*</include>
                                    </includes>
                                </filter>
