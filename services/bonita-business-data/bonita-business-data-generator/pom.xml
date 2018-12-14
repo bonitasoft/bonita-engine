@@ -153,9 +153,19 @@
                                <!-- exclude bonita-common because studio already have it in classpath -->
                                <filter>
                                    <artifact>org.bonitasoft.engine:bonita-common</artifact>
-                                   <excludes>
-                                       <exclude>**/*</exclude>
-                                   </excludes>
+                                   <includes>
+                                       <include>com/bonitasoft/engine/bdm/*</include>
+                                       <include>com/bonitasoft/engine/bdm/dao/*</include>
+                                       <include>org/bonitasoft/engine/bdm/dao/*</include>
+                                       <include>org/bonitasoft/engine/bdm/lazy/*</include>
+                                       <include>org/bonitasoft/engine/bdm/model/field/*</include>
+                                       <include>org/bonitasoft/engine/bdm/serialization/*</include>
+                                       <include>org/bonitasoft/engine/bdm/validator/rule/composition/*</include>
+                                       <include>org/bonitasoft/engine/bdm/validator/rule/*</include>
+                                       <include>org/bonitasoft/engine/bdm/validator/*</include>
+                                       <include>org/bonitasoft/engine/bdm/*</include>
+                                       <include>*</include>
+                                   </includes>
                                </filter>
                            </filters>
                        </configuration>
