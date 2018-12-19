@@ -25,8 +25,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.util</groupId>
-            <artifactId>bonita-client-util</artifactId>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

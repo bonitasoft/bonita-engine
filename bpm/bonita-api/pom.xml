@@ -15,8 +15,7 @@
 	<name>Bonita API</name>
 
 	<modules>
-		<module>bonita-client-api</module>
-		<module>bonita-server-api-http</module>
+        <module>bonita-server-api-http</module>
 	</modules>
 
 </project>
