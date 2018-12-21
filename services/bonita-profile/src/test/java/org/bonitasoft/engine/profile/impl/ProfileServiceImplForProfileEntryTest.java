@@ -26,22 +26,17 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
 import org.bonitasoft.engine.profile.builder.impl.SProfileEntryUpdateBuilderImpl;
-import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -98,12 +93,12 @@ public class ProfileServiceImplForProfileEntryTest {
     }
 
     private SProfileEntry createProfileEntry(final long id) {
-        final SProfileEntryImpl entry = new SProfileEntryImpl();
+        final SProfileEntry entry = new SProfileEntry();
         entry.setId(id);
         return entry;
     }
     private SProfile profile(String name) {
-        final SProfileImpl profile = new SProfileImpl();
+        final SProfile profile = new SProfile();
         profile.setId(UUID.randomUUID().getLeastSignificantBits());
         profile.setName(name);
         return profile;

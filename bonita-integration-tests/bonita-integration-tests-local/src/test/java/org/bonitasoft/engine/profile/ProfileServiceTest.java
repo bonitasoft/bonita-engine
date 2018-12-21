@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserCreationException;
@@ -27,7 +26,6 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -63,7 +61,9 @@ public class ProfileServiceTest extends CommonBPMServicesTest {
     @Test
     public void getProfile() throws SBonitaException {
         getTransactionService().begin();
-        final SProfile profile = BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance("profile1", true, 0, 0, 0, 0).done();
+        final SProfile profile = SProfile.builder()
+                .name("profile1")
+                .isDefault(true).build();
         final SProfile createdProfile = profileService.createProfile(profile);
         final SProfile gotProfile = profileService.getProfile(createdProfile.getId());
         Assert.assertEquals(createdProfile, gotProfile);
@@ -79,8 +79,10 @@ public class ProfileServiceTest extends CommonBPMServicesTest {
     @Test
     public void getUserProfile() throws SBonitaException {
         getTransactionService().begin();
-        final SProfile profile = profileService.createProfile(BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance("profile1", true, 0, 0, 0, 0)
-                .done());
+        final SProfile profile = profileService.createProfile(SProfile.builder()
+                .name("profile1")
+                .isDefault(true)
+                .build());
 
         final List<OrderByOption> orderByOptions = getOrderByOptions();
         final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId",
@@ -127,8 +129,9 @@ public class ProfileServiceTest extends CommonBPMServicesTest {
     @Test
     public void getProfileOfUserFrom() throws SBonitaException {
         getTransactionService().begin();
-        final SProfile profile = profileService.createProfile(BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance("profile1", false, 0, 0, 0, 0)
-                .done());
+        final SProfile profile = profileService.createProfile(SProfile.builder()
+                .name("profile1")
+                .build());
 
         final SUser john = createUser("john", "bpm");
         final SUser jane = createUser("jane", "bpm");

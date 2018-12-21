@@ -23,8 +23,8 @@ import java.security.NoSuchAlgorithmException;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
-import org.bonitasoft.engine.theme.model.impl.SThemeImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,7 +86,7 @@ public class ThemeActionCalculatorTest {
         //given
         byte[] oldContent = { 1 };
         byte[] newContent = { 2 };
-        SThemeImpl theme = new SThemeImpl(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
+        STheme theme = new STheme(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
 
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(theme, newContent);
@@ -100,7 +100,7 @@ public class ThemeActionCalculatorTest {
         //given
         byte[] oldContent = { 1 };
         byte[] newContent = { 2 };
-        SThemeImpl theme = new SThemeImpl(oldContent, false, SThemeType.PORTAL, System.currentTimeMillis());
+        STheme theme = new STheme(oldContent, false, SThemeType.PORTAL, System.currentTimeMillis());
 
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(theme, newContent);
@@ -114,7 +114,7 @@ public class ThemeActionCalculatorTest {
         //given
         byte[] oldContent = { 1 };
         byte[] newContent = { 1 };
-        SThemeImpl theme = new SThemeImpl(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
+        STheme theme = new STheme(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
 
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(theme, newContent);
@@ -129,7 +129,7 @@ public class ThemeActionCalculatorTest {
         actionCalculator = spy(actionCalculator);
         byte[] oldContent = { 1 };
         byte[] newContent = { 1 };
-        SThemeImpl theme = new SThemeImpl(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
+        STheme theme = new STheme(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
         NoSuchAlgorithmException exception = new NoSuchAlgorithmException("msg");
         doThrow(exception).when(actionCalculator).md5(any());
         //when
@@ -145,7 +145,7 @@ public class ThemeActionCalculatorTest {
     public void calculate_should_return_none_when_the_new_content_is_null() throws Exception {
         //given
         byte[] oldContent = { 1 };
-        SThemeImpl theme = new SThemeImpl(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
+        STheme theme = new STheme(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
 
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(theme, null);
@@ -159,7 +159,7 @@ public class ThemeActionCalculatorTest {
         //given
         byte[] oldContent = { 1 };
         byte[] newContent = {};
-        SThemeImpl theme = new SThemeImpl(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
+        STheme theme = new STheme(oldContent, true, SThemeType.PORTAL, System.currentTimeMillis());
 
         //when
         ThemeActionCalculator.ThemeAction action = actionCalculator.calculateAction(theme, newContent);

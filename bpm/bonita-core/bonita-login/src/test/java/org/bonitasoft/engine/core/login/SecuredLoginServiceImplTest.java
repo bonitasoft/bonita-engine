@@ -45,11 +45,9 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.junit.Before;
@@ -352,7 +350,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     private SProfile profile(String name) {
-        SProfileImpl sProfile = new SProfileImpl();
+        SProfile sProfile = new SProfile();
         sProfile.setName(name);
         return sProfile;
     }

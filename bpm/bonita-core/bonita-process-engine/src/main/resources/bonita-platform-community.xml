@@ -402,22 +402,22 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.90:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.theme.model.STheme" />
         <constructor-arg name="sequenceId" value="9890" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9890:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.SProfile" />
         <constructor-arg name="sequenceId" value="9990" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9990:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.SProfileEntry" />
         <constructor-arg name="sequenceId" value="9991" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9991:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.SProfileMember" />
         <constructor-arg name="sequenceId" value="9992" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9992:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -565,7 +565,7 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10060:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" />
         <constructor-arg name="sequenceId" value="10070" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10070:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -1155,10 +1155,6 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" />
-                <entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
-                <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
-                <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
-                <entry key="org.bonitasoft.engine.theme.model.STheme" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
 
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
@@ -1229,7 +1225,6 @@
                 <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
                 <entry key="org.bonitasoft.engine.core.process.comment.model.SHumanComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" />
                 <entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
-                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
                 <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
                 <entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
                 <entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />

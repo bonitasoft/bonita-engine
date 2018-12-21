@@ -21,8 +21,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.theme.ThemeRetriever;
 import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.theme.builder.SThemeBuilder;
-import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilder;
 import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilderFactory;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
@@ -98,9 +96,9 @@ public class ThemeServiceStartupHelper {
 
     STheme buildSTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
         final long lastUpdateDate = System.currentTimeMillis();
-        final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip, true, type, lastUpdateDate);
-        sThemeBuilder.setCSSContent(defaultThemeCss);
-        return sThemeBuilder.done();
+        final STheme.SThemeBuilder sThemeBuilder = STheme.builder().content(defaultThemeZip).isDefault(true).type(type).lastUpdateDate(lastUpdateDate);
+        sThemeBuilder.cssContent(defaultThemeCss);
+        return sThemeBuilder.build();
     }
 
     byte[] getFileContent(final String fileName) throws IOException {

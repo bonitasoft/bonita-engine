@@ -13,31 +13,57 @@
  **/
 package org.bonitasoft.engine.profile.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SProfileEntry extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public class SProfileEntry implements PersistentObject {
 
-    long getParentId();
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String PROFILE_ID = "profileId";
+    public static final String PARENT_ID = "parentId";
+    public static final String PAGE = "page";
+    public static final String INDEX = "index";
+    public static final String TYPE = "type";
+    public static final String CUSTOM = "custom";
+    private long id;
+    private long tenantId;
+    private long profileId;
+    private long parentId;
+    private String name;
+    private String description;
+    private long index;
+    private String type;
+    private String page;
+    private boolean custom;
 
-    long getProfileId();
+    public SProfileEntry(final String name, final long profileId) {
+        this.name = name;
+        this.profileId = profileId;
+    }
 
-    long getIndex();
-
-    String getName();
-
-    String getDescription();
-
-    String getType();
-
-    String getPage();
-
-    /**
-     * 
-     * @return true if the page is a custom page
-     */
-    boolean isCustom();
+    public SProfileEntry(final SProfileEntry profileEntry) {
+        super();
+        id = profileEntry.getId();
+        name = profileEntry.getName();
+        description = profileEntry.getDescription();
+        profileId = profileEntry.getProfileId();
+        parentId = profileEntry.getParentId();
+        index = profileEntry.getIndex();
+        page = profileEntry.getPage();
+        type = profileEntry.getType();
+        custom = profileEntry.isCustom();
+    }
 
 }

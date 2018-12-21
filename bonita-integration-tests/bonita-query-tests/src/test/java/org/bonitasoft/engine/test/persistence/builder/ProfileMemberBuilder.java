@@ -14,12 +14,12 @@
 
 package org.bonitasoft.engine.test.persistence.builder;
 
-import org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl;
+import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class ProfileMemberBuilder extends PersistentObjectBuilder<SProfileMemberImpl, ProfileMemberBuilder> {
+public class ProfileMemberBuilder extends PersistentObjectBuilder<SProfileMember, ProfileMemberBuilder> {
 
     private long userId = -1;
 
@@ -39,8 +39,8 @@ public class ProfileMemberBuilder extends PersistentObjectBuilder<SProfileMember
     }
 
     @Override
-    SProfileMemberImpl _build() {
-        SProfileMemberImpl profileMember = new SProfileMemberImpl();
+    SProfileMember _build() {
+        SProfileMember profileMember = new SProfileMember();
         profileMember.setProfileId(profileId);
         profileMember.setGroupId(groupId);
         profileMember.setRoleId(roleId);

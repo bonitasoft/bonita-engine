@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.theme.ThemeSearchDescriptor;
-import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.model.STheme;
 
 /**
@@ -34,13 +33,13 @@ public class SearchThemeDescriptor extends SearchEntityDescriptor {
 
     public SearchThemeDescriptor() {
         searchEntityKeys = new HashMap<String, FieldDescriptor>(1);
-        searchEntityKeys.put(ThemeSearchDescriptor.ID, new FieldDescriptor(STheme.class, SThemeBuilderFactory.ID));
-        searchEntityKeys.put(ThemeSearchDescriptor.IS_DEFAULT, new FieldDescriptor(STheme.class, SThemeBuilderFactory.IS_DEFAULT));
-        searchEntityKeys.put(ThemeSearchDescriptor.TYPE, new FieldDescriptor(STheme.class, SThemeBuilderFactory.TYPE));
+        searchEntityKeys.put(ThemeSearchDescriptor.ID, new FieldDescriptor(STheme.class, STheme.ID));
+        searchEntityKeys.put(ThemeSearchDescriptor.IS_DEFAULT, new FieldDescriptor(STheme.class, STheme.IS_DEFAULT));
+        searchEntityKeys.put(ThemeSearchDescriptor.TYPE, new FieldDescriptor(STheme.class, STheme.TYPE));
 
         themeAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(3);
-        fields.add(SThemeBuilderFactory.TYPE);
+        fields.add(STheme.TYPE);
         themeAllFields.put(STheme.class, fields);
     }
 

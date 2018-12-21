@@ -31,7 +31,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.test.persistence.repository.ProfileRepository;
 import org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class ProfilesTest {
         final SUser user = aUser().build();
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(user.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
@@ -83,7 +82,7 @@ public class ProfilesTest {
         repository.add(role);
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withRoleId(role.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
@@ -104,7 +103,7 @@ public class ProfilesTest {
         repository.add(group);
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withGroupId(group.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
@@ -127,7 +126,7 @@ public class ProfilesTest {
         repository.add(role);
         repository.add(user);
         final String profileName = "retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withGroupId(group.getId())
                 .withRoleId(role.getId()).build());
@@ -146,7 +145,7 @@ public class ProfilesTest {
         final SUser user = aUser().build();
         repository.add(user);
         final String profileName = "should not be retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
 
@@ -163,7 +162,7 @@ public class ProfilesTest {
         final SUser user = aUser().build();
         repository.add(user);
         final String profileName = "should not be retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(user.getId()).build());
 
@@ -181,7 +180,7 @@ public class ProfilesTest {
         final SUser userAsked = aUser().build();
         repository.add(userMapped);
         final String profileName = "should not be retrieved";
-        final SProfileImpl profile = aProfile().withName(profileName).build();
+        final SProfile profile = aProfile().withName(profileName).build();
         repository.add(profile);
         repository.add(aProfileMember().withProfileId(profile.getId()).withUserId(userMapped.getId()).build());
         repository.add(aProfileEntry().withProfileId(profile.getId()).build());
