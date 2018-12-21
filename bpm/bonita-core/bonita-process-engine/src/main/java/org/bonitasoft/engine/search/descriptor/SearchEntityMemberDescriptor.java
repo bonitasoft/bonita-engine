@@ -16,10 +16,8 @@ package org.bonitasoft.engine.search.descriptor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.entitymember.EntityMemberSearchDescriptor;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilderFactory;
 import org.bonitasoft.engine.identity.model.SUser;
 
 /**
@@ -30,12 +28,11 @@ public abstract class SearchEntityMemberDescriptor extends SearchEntityDescripto
     private final Map<String, FieldDescriptor> fieldDescriptorMap;
 
     public SearchEntityMemberDescriptor() {
-        final SExternalIdentityMappingBuilderFactory fact = BuilderFactory.get(SExternalIdentityMappingBuilderFactory.class);
         fieldDescriptorMap = new HashMap<String, FieldDescriptor>(4);
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.EXTERNAL_ID, new FieldDescriptor(SExternalIdentityMapping.class, fact.getExternalIdKey()));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_ID, new FieldDescriptor(SExternalIdentityMapping.class, fact.getUserIdKey()));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SExternalIdentityMapping.class, fact.getGroupIdKey()));
-        fieldDescriptorMap.put(EntityMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SExternalIdentityMapping.class, fact.getRoleIdKey()));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.EXTERNAL_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.EXTERNAL_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.USER_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.GROUP_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.GROUP_ID_KEY));
+        fieldDescriptorMap.put(EntityMemberSearchDescriptor.ROLE_ID, new FieldDescriptor(SExternalIdentityMapping.class, SExternalIdentityMapping.ROLE_ID_KEY));
         fieldDescriptorMap.put(EntityMemberSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, SUser.USER_NAME));
     }
 

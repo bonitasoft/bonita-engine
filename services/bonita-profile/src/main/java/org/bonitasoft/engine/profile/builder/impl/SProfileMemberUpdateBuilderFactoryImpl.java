@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.profile.builder.impl;
 
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileMemberUpdateBuilder;
+import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -35,37 +35,37 @@ public class SProfileMemberUpdateBuilderFactoryImpl implements SProfileMemberUpd
 
     @Override
     public SProfileMemberUpdateBuilder setGroupId(final long groupId) {
-        descriptor.addField(SProfileMemberBuilderFactory.GROUP_ID, groupId);
+        descriptor.addField(SProfileMember.GROUP_ID, groupId);
         return this;
     }
 
     @Override
     public SProfileMemberUpdateBuilder setRoleId(final long roleId) {
-        descriptor.addField(SProfileMemberBuilderFactory.ROLE_ID, roleId);
+        descriptor.addField(SProfileMember.ROLE_ID, roleId);
         return this;
     }
 
     @Override
     public SProfileMemberUpdateBuilder setUserId(final long userId) {
-        descriptor.addField(SProfileMemberBuilderFactory.USER_ID, userId);
+        descriptor.addField(SProfileMember.USER_ID, userId);
         return this;
     }
 
     @Override
     public SProfileMemberUpdateBuilder setDisplayNamePart1(final String displayNamePart1) {
-        descriptor.addField(SProfileMemberBuilderFactory.DISPLAY_NAME_PART1, displayNamePart1);
+        descriptor.addField(SProfileMember.DISPLAY_NAME_PART1, displayNamePart1);
         return this;
     }
 
     @Override
     public SProfileMemberUpdateBuilder setDisplayNamePart2(final String displayNamePart2) {
-        descriptor.addField(SProfileMemberBuilderFactory.DISPLAY_NAME_PART2, displayNamePart2);
+        descriptor.addField(SProfileMember.DISPLAY_NAME_PART2, displayNamePart2);
         return this;
     }
 
     @Override
     public SProfileMemberUpdateBuilder setDisplayNamePart3(final String displayNamePart3) {
-        descriptor.addField(SProfileMemberBuilderFactory.DISPLAY_NAME_PART3, displayNamePart3);
+        descriptor.addField(SProfileMember.DISPLAY_NAME_PART3, displayNamePart3);
         return this;
     }
 

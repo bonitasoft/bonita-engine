@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.profile.builder.impl;
 
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
+import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -30,31 +30,31 @@ public class SProfileUpdateBuilderImpl implements SProfileUpdateBuilder {
 
     @Override
     public SProfileUpdateBuilder setName(final String name) {
-        descriptor.addField(SProfileBuilderFactory.NAME, name);
+        descriptor.addField(SProfile.NAME, name);
         return this;
     }
 
     @Override
     public SProfileUpdateBuilder setDescription(final String description) {
-        descriptor.addField(SProfileBuilderFactory.DESCRIPTION, description);
+        descriptor.addField(SProfile.DESCRIPTION, description);
         return this;
     }
 
     @Override
     public SProfileUpdateBuilder setIconPath(final String iconPath) {
-        descriptor.addField(SProfileBuilderFactory.ICON_PATH, iconPath);
+        descriptor.addField(SProfile.ICON_PATH, iconPath);
         return this;
     }
 
     @Override
     public SProfileUpdateBuilder setLastUpdateDate(final long lastUpdateDate) {
-        descriptor.addField(SProfileBuilderFactory.LAST_UPDATE_DATE, lastUpdateDate);
+        descriptor.addField(SProfile.LAST_UPDATE_DATE, lastUpdateDate);
         return this;
     }
 
     @Override
     public SProfileUpdateBuilder setLastUpdatedBy(final long lastUpdatedBy) {
-        descriptor.addField(SProfileBuilderFactory.LAST_UPDATED_BY, lastUpdatedBy);
+        descriptor.addField(SProfile.LAST_UPDATED_BY, lastUpdatedBy);
         return this;
     }
 

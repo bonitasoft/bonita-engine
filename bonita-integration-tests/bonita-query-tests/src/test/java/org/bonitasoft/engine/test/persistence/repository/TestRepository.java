@@ -56,9 +56,6 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
-import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
-import org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl;
 import org.bonitasoft.engine.resources.SBARResource;
 import org.bonitasoft.engine.resources.STenantResource;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -245,19 +242,19 @@ public class TestRepository {
                 new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
     }
 
-    public SProfile add(final SProfileImpl profile) {
+    public SProfile add(final SProfile profile) {
         getSession().save(profile);
         return (SProfile) getSession().get(profile.getClass(),
                 new PersistentObjectId(profile.getId(), profile.getTenantId()));
     }
 
-    public SProfileEntry add(SProfileEntryImpl profileEntry) {
+    public SProfileEntry add(SProfileEntry profileEntry) {
         getSession().save(profileEntry);
         return (SProfileEntry) getSession().get(profileEntry.getClass(),
                 new PersistentObjectId(profileEntry.getId(), profileEntry.getTenantId()));
     }
 
-    public SProfileMember add(SProfileMemberImpl profileMember) {
+    public SProfileMember add(SProfileMember profileMember) {
         getSession().save(profileMember);
         return (SProfileMember) getSession().get(profileMember.getClass(),
                 new PersistentObjectId(profileMember.getId(), profileMember.getTenantId()));

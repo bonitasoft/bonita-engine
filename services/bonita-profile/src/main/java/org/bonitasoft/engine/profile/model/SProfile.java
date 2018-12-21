@@ -13,26 +13,55 @@
  **/
 package org.bonitasoft.engine.profile.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface SProfile extends PersistentObject {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
+public class SProfile implements PersistentObject {
 
-    boolean isDefault();
+    public static final String PROFILE_IDS = "profileIds";
+    public static final String ICON_PATH = "iconPath";
+    public static final String DESCRIPTION = "description";
+    public static final String NAME = "name";
+    public static final String ID = "id";
+    public static final String IS_DEFAULT = "isDefault";
+    public static final String CREATION_DATE = "creationDate";
+    public static final String CREATED_BY = "createdBy";
+    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    public static final String LAST_UPDATED_BY = "lastUpdatedBy";
+    private long id;
+    private long tenantId;
+    private boolean isDefault;
+    private String name;
+    private String description;
+    private long creationDate;
+    private long createdBy;
+    private long lastUpdateDate;
+    private long lastUpdatedBy;
 
-    String getName();
+    public SProfile(final SProfile profile) {
+        super();
+        tenantId = profile.getTenantId();
+        id = profile.getId();
+        isDefault = profile.isDefault();
+        name = profile.getName();
+        description = profile.getDescription();
+        creationDate = profile.getCreationDate();
+        createdBy = profile.getCreatedBy();
+        lastUpdateDate = profile.getLastUpdateDate();
+        lastUpdatedBy = profile.getLastUpdatedBy();
+    }
 
-    String getDescription();
 
-    long getCreationDate();
-
-    long getCreatedBy();
-
-    long getLastUpdateDate();
-
-    long getLastUpdatedBy();
 
 }

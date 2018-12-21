@@ -21,7 +21,6 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorMemberDeletionException;
 import org.bonitasoft.engine.actor.mapping.SActorMemberNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
@@ -30,7 +29,6 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
@@ -75,10 +73,9 @@ public class DeleteWithActorMembers {
     }
 
     protected void deleteProfileMembersOfUser(final long id) throws SBonitaException {
-        final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembersOfUser;
         do {
-            profileMembersOfUser = profileService.getProfileMembersOfUser(id, 0, BATCH_SIZE, field, OrderByType.ASC);
+            profileMembersOfUser = profileService.getProfileMembersOfUser(id, 0, BATCH_SIZE, SProfileMember.ID, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembersOfUser) {
                 profileService.deleteProfileMember(sProfileMember);
             }
@@ -122,10 +119,9 @@ public class DeleteWithActorMembers {
     }
 
     protected void deleteProfileMembersOfGroup(final long groupId) throws SBonitaException {
-        final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfGroup(groupId, 0, BATCH_SIZE, field, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfGroup(groupId, 0, BATCH_SIZE, SProfileMember.ID, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }
@@ -167,10 +163,9 @@ public class DeleteWithActorMembers {
     }
 
     protected void deleteProfileMembersOfRole(final long roleId) throws SBonitaException {
-        final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembers;
         do {
-            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, BATCH_SIZE, field, OrderByType.ASC);
+            profileMembers = profileService.getProfileMembersOfRole(roleId, 0, BATCH_SIZE, SProfileMember.ID, OrderByType.ASC);
             for (final SProfileMember sProfileMember : profileMembers) {
                 profileService.deleteProfileMember(sProfileMember);
             }

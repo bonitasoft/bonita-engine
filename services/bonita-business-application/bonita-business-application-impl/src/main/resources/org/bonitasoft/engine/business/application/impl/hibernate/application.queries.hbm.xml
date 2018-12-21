@@ -115,7 +115,7 @@
         FROM org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl as applicationPage,
         org.bonitasoft.engine.business.application.model.impl.SApplicationImpl as application,
         org.bonitasoft.engine.page.impl.SPageImpl as page,
-        org.bonitasoft.engine.profile.model.impl.SProfileImpl as profile
+        org.bonitasoft.engine.profile.model.SProfile as profile
         WHERE
         profile.name = :profileName
         AND application.profileId = profile.id

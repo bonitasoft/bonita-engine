@@ -283,8 +283,6 @@ import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileMemberCreator.ProfileMemberField;
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.impl.ProfileEntryImpl;
 import org.bonitasoft.engine.profile.impl.ProfileImpl;
 import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
@@ -2050,21 +2048,20 @@ public class ModelConvertor {
 
     public static SProfileMember constructSProfileMember(final ProfileMemberCreator creator) {
         final Map<ProfileMemberField, Serializable> fields = creator.getFields();
-        final SProfileMemberBuilder newSProfileMemberBuilder = BuilderFactory.get(SProfileMemberBuilderFactory.class).createNewInstance(
-                (Long) fields.get(ProfileMemberField.PROFILE_ID));
+        final SProfileMember.SProfileMemberBuilder newSProfileMemberBuilder = SProfileMember.builder().profileId((Long) fields.get(ProfileMemberField.PROFILE_ID));
         final Long groupeId = (Long) fields.get(ProfileMemberField.GROUP_ID);
         if (groupeId != null) {
-            newSProfileMemberBuilder.setGroupId(groupeId);
+            newSProfileMemberBuilder.groupId(groupeId);
         }
         final Long roleId = (Long) fields.get(ProfileMemberField.ROLE_ID);
         if (roleId != null) {
-            newSProfileMemberBuilder.setRoleId(roleId);
+            newSProfileMemberBuilder.roleId(roleId);
         }
         final Long userId = (Long) fields.get(ProfileMemberField.USER_ID);
         if (userId != null) {
-            newSProfileMemberBuilder.setUserId(userId);
+            newSProfileMemberBuilder.userId(userId);
         }
-        return newSProfileMemberBuilder.done();
+        return newSProfileMemberBuilder.build();
     }
 
     public static List<FailedJob> toFailedJobs(final List<SFailedJob> sFailedJobs) {
