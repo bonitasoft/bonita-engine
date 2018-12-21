@@ -24,8 +24,6 @@ import org.bonitasoft.engine.entitymember.EntityMember;
 import org.bonitasoft.engine.entitymember.impl.EntityMemberImpl;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilder;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilderFactory;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -67,9 +65,9 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
     protected SExternalIdentityMapping addExternalIdentityMapping(final String externalId, final long userId, final long roleId, final long groupId,
             final String kind, final MemberType memberType) throws SBonitaException {
-        final SExternalIdentityMappingBuilder builder = BuilderFactory.get(SExternalIdentityMappingBuilderFactory.class).createNewInstance(externalId)
-                .setGroupId(groupId);
-        builder.setKind(kind).setRoleId(roleId).setUserId(userId);
+        final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder = SExternalIdentityMapping.builder().externalId(externalId)
+                .groupId(groupId);
+        builder.kind(kind).roleId(roleId).userId(userId);
         final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
         transactionContent.execute();
         return transactionContent.getResult();
@@ -101,7 +99,7 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
     class CreateExternalIdentityMapping implements TransactionContentWithResult<SExternalIdentityMapping> {
 
-        private final SExternalIdentityMappingBuilder builder;
+        private final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder;
 
         private final MemberType memberType;
 
@@ -113,7 +111,7 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
         SExternalIdentityMapping mapping;
 
-        CreateExternalIdentityMapping(final SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
+        CreateExternalIdentityMapping(final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
                 final long roleId) {
             this.builder = builder;
             this.memberType = memberType;
@@ -125,7 +123,7 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
         @Override
         public void execute() throws SBonitaException {
             setDisplayNames(builder, memberType, userId, groupId, roleId);
-            mapping = builder.done();
+            mapping = builder.build();
             serviceAccessor.getExternalIdentityMappingService().createExternalIdentityMapping(mapping);
             // Let's retrieve the created mapping from its id, updated by the persistence service:
             final String querySuffix = getQuerySuffix(memberType);
@@ -203,38 +201,38 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
         return list;
     }
 
-    private void setDisplayNames(final SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
+    private void setDisplayNames(final SExternalIdentityMapping.SExternalIdentityMappingBuilder builder, final MemberType memberType, final long userId, final long groupId,
             final long roleId) throws SUserNotFoundException, SGroupNotFoundException, SRoleNotFoundException {
         switch (memberType) {
             case USER:
                 final SUser user = serviceAccessor.getIdentityService().getUser(userId);
-                builder.setUserId(userId);
-                builder.setDisplayNamePart1(user.getFirstName());
-                builder.setDisplayNamePart2(user.getLastName());
-                builder.setDisplayNamePart3(user.getUserName());
+                builder.userId(userId);
+                builder.displayNamePart1(user.getFirstName());
+                builder.displayNamePart2(user.getLastName());
+                builder.displayNamePart3(user.getUserName());
                 break;
 
             case GROUP:
                 SGroup group = serviceAccessor.getIdentityService().getGroup(groupId);
-                builder.setGroupId(groupId);
-                builder.setDisplayNamePart1(group.getName());
-                builder.setDisplayNamePart2(group.getParentPath());
+                builder.groupId(groupId);
+                builder.displayNamePart1(group.getName());
+                builder.displayNamePart2(group.getParentPath());
                 break;
 
             case ROLE:
                 SRole role = serviceAccessor.getIdentityService().getRole(roleId);
-                builder.setRoleId(roleId);
-                builder.setDisplayNamePart1(role.getName());
+                builder.roleId(roleId);
+                builder.displayNamePart1(role.getName());
                 break;
 
             case MEMBERSHIP:
                 group = serviceAccessor.getIdentityService().getGroup(groupId);
                 role = serviceAccessor.getIdentityService().getRole(roleId);
-                builder.setGroupId(groupId);
-                builder.setRoleId(roleId);
-                builder.setDisplayNamePart1(role.getName());
-                builder.setDisplayNamePart2(group.getName());
-                builder.setDisplayNamePart3(group.getParentPath());
+                builder.groupId(groupId);
+                builder.roleId(roleId);
+                builder.displayNamePart1(role.getName());
+                builder.displayNamePart2(group.getName());
+                builder.displayNamePart3(group.getParentPath());
                 break;
             default:
                 throw new IllegalStateException();

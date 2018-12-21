@@ -24,8 +24,7 @@ import java.util.Collections;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
-import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.xml.ParentProfileEntryNode;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.xml.ProfilesNode;
@@ -53,12 +52,12 @@ public class ProfilesExporterTest {
     @Test
     public void should_convert_profiles_to_exported_version() throws Exception {
         //given
-        SProfileImpl profile1 = new SProfileImpl();
+        SProfile profile1 = new SProfile();
         profile1.setName("MyProfile1");
-        SProfileImpl profile2 = new SProfileImpl();
+        SProfile profile2 = new SProfile();
         profile2.setName("MyProfile2");
         //when
-        ProfilesNode exportedProfiles = profilesExporter.toProfiles(Arrays.asList((SProfile) profile1, profile2));
+        ProfilesNode exportedProfiles = profilesExporter.toProfiles(Arrays.asList(profile1, profile2));
         //then
         assertThat(exportedProfiles.getProfiles()).containsOnly(new ProfileNode("MyProfile1", false), new ProfileNode("MyProfile2", false));
     }
@@ -66,12 +65,12 @@ public class ProfilesExporterTest {
     @Test
     public void should_convert_profile_having_profile_entry_to_exported_version() throws Exception {
         //given
-        SProfileImpl profile1 = new SProfileImpl();
+        SProfile profile1 = new SProfile();
         profile1.setName("MyProfile1");
         profile1.setId(12L);
-        SProfileEntryImpl sProfileEntry1 = new SProfileEntryImpl();
+        SProfileEntry sProfileEntry1 = new SProfileEntry();
         sProfileEntry1.setName("p1");
-        SProfileEntryImpl sProfileEntry2 = new SProfileEntryImpl();
+        SProfileEntry sProfileEntry2 = new SProfileEntry();
         sProfileEntry2.setName("p2");
         doReturn(Arrays.asList(sProfileEntry1, sProfileEntry2)).doReturn(Collections.emptyList()).when(profileService)
                 .searchProfileEntries(any(QueryOptions.class));

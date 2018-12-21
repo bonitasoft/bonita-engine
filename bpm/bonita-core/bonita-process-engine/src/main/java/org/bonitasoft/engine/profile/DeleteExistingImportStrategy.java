@@ -22,7 +22,6 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.xml.ProfileNode;
 import org.bonitasoft.engine.profile.model.SProfile;
 
@@ -38,7 +37,7 @@ public class DeleteExistingImportStrategy extends ProfileImportStrategy {
     @Override
     public void beforeImport() throws ExecutionException {
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(new OrderByOption(SProfile.class,
-                SProfileBuilderFactory.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
+                SProfile.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
         // delete all profiles
         try {
             List<SProfile> profiles;
