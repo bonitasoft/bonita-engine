@@ -77,7 +77,7 @@
         <junit.platform.version>1.1.1</junit.platform.version>
 
         <!-- use -Dkey=value or activate profile in settings.xml to override -->
-        <docker-postgres-image>postgres:9.3</docker-postgres-image>
+        <docker-postgres-image>postgres:11.1</docker-postgres-image>
         <docker-mysql-image>mysql:5.5.49</docker-mysql-image>
         <docker-oracle-image>oracle:11g</docker-oracle-image>
         <docker-sqlserver-image>ms-sqlserver:2019</docker-sqlserver-image>
@@ -364,7 +364,7 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.3-1102-jdbc41</version>
+                <version>42.2.5</version>
             </dependency>
             <dependency>
                 <groupId>net.jodah</groupId>
@@ -959,10 +959,13 @@
                                 <db.vendor>postgres</db.vendor>
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.name>${docker.host.address}</db.server.name>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <include>${testSuite.name}</include>
                             </includes>
                         </configuration>
@@ -1017,10 +1020,13 @@
                                 <db.vendor>mysql</db.vendor>
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.name>${docker.host.address}</db.server.name>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <include>${testSuite.name}</include>
                             </includes>
                         </configuration>
@@ -1060,6 +1066,9 @@
                                         <ports>
                                             <port>db.random.port:1521</port>
                                         </ports>
+                                        <env>
+                                            <ORACLE_DISABLE_ASYNCH_IO>true</ORACLE_DISABLE_ASYNCH_IO>
+                                        </env>
                                         <wait>
                                             <time>${docker-timeout}</time>
                                             <log>end of customization</log>
@@ -1081,10 +1090,13 @@
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
                                 <db.database.name>xe</db.database.name>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.name>${docker.host.address}</db.server.name>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <include>${testSuite.name}</include>
                             </includes>
                         </configuration>
@@ -1139,10 +1151,13 @@
                                 <db.user>bonita</db.user>
                                 <db.password>bpm</db.password>
                                 <db.database.name>bonita</db.database.name>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.name>${docker.host.address}</db.server.name>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <db.server.port>${db.random.port}</db.server.port>
                             </systemPropertyVariables>
                             <includes>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <include>${testSuite.name}</include>
                             </includes>
                         </configuration>
@@ -1154,14 +1169,14 @@
             <!-- profile used to pull docker image from bonita internal repository: -->
             <id>bonita-internal</id>
             <properties>
-                <docker-postgres-image>registry.rd.lan/bonitasoft/postgres-9.3:1.2.4</docker-postgres-image>
-                <docker-mysql-image>registry.rd.lan/bonitasoft/mysql:5.5.49</docker-mysql-image>
-                <docker-oracle-image>registry.rd.lan/bonitasoft/oracle:11g</docker-oracle-image>
-                <docker-sqlserver-image>registry.rd.lan/bonitasoft/sqlserver-2019:1.1.1</docker-sqlserver-image>
+                <docker-postgres-image>registry.rd.lan/bonitasoft/postgres-11:0.0.1</docker-postgres-image>
+                <docker-mysql-image>registry.rd.lan/bonitasoft/mysql-5.5.61:1.1.2</docker-mysql-image>
+                <docker-oracle-image>registry.rd.lan/bonitasoft/oracle-11g:1.3.0</docker-oracle-image>
+                <docker-sqlserver-image>registry.rd.lan/bonitasoft/sqlserver-2019:1.1.4</docker-sqlserver-image>
                 <!-- turns on/off logs from docker image-->
                 <docker.showLogs>true</docker.showLogs>
-                <!-- global timeoout in millis allowed for docker image to start -->
-                <docker-timeout>380000</docker-timeout>
+                <!-- global timeout in millis allowed for docker image to start -->
+                <docker-timeout>180000</docker-timeout>
             </properties>
         </profile>
     </profiles>
