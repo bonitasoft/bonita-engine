@@ -18,11 +18,16 @@ import static org.bonitasoft.engine.test.EJBContainerFactory.setAPIType;
 import static org.bonitasoft.engine.test.EJBContainerFactory.setupBonitaSysProps;
 import static org.bonitasoft.engine.test.EJBContainerFactory.startTomee;
 
+import java.net.URL;
+import java.util.Enumeration;
+
 import org.bonitasoft.engine.BPMRemoteTestsForServers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Baptiste Mesta
@@ -31,8 +36,19 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ BPMRemoteTestsForServers.class })
 public class EJBIT {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EJBIT.class);
+
     @BeforeClass
     public static void start() throws Exception {
+        LOG.info("Listing ejb-jar.xml files available in the classpath");
+        Enumeration<URL> ejbJars = EJBIT.class.getClassLoader().getResources("META-INF/ejb-jar.xml");
+        while (ejbJars.hasMoreElements()) {
+            URL url = ejbJars.nextElement();
+            LOG.info("app = {}", url);
+        }
+        LOG.info("Listing done");
+
+
         setupBonitaSysProps();
         startTomee();
 
@@ -47,7 +63,7 @@ public class EJBIT {
             TestEngineImpl.getInstance().stop();
         } catch (Exception e) {
             // no need to fail the shutdown for that:
-            e.printStackTrace();
+            LOG.warn("Unable to stop the engine, ignoring the error", e);
         }
     }
 
