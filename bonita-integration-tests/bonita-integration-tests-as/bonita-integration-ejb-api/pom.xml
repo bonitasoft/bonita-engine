@@ -13,6 +13,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>99.0-does-not-exist</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-deploy-ejb3</artifactId>
             <version>${project.version}</version>
@@ -23,11 +38,17 @@
             <artifactId>bonita-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--  must be declared after bonita-server do to eclipse compiler and javaee-api -->
         <dependency>
             <groupId>org.apache.openejb</groupId>
             <artifactId>tomee-embedded</artifactId>
             <version>1.7.5</version>
+            <exclusions>
+                <!-- we want to use logback -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.test</groupId>

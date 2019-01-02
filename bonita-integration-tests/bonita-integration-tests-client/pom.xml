@@ -120,6 +120,12 @@
             <groupId>net.jodah</groupId>
             <artifactId>concurrentunit</artifactId>
         </dependency>
+        <!-- Required by Java 11 -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
