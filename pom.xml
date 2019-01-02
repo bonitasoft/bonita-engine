@@ -410,21 +410,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>${jaxb.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-    </dependencies>
-
     <build>
         <pluginManagement>
             <plugins>
