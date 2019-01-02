@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine.test;
 
-import javax.ejb.embeddable.EJBContainer;
-import javax.naming.Context;
 import java.util.Collections;
 import java.util.Properties;
+
+import javax.ejb.embeddable.EJBContainer;
+import javax.naming.Context;
 
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.util.APITypeManager;
@@ -33,6 +34,14 @@ public class EJBContainerFactory {
         Properties props = new Properties();
         props.setProperty(EJBContainer.PROVIDER, "tomee-embedded");
         props.setProperty("tomee.ejbcontainer.http.port", "0");//random port
+
+        // by default these settings will only affect which jars OpenEJB will scan for annotated components when no descriptor is found.
+        // Force configuration to use these settings to also filter out jars that do contain descriptors
+        props.setProperty("openejb.deployments.classpath.filter.descriptors", "true");
+        props.setProperty("openejb.exclude-include.order=", "include-exclude"); //Defines the processing order
+        props.setProperty("openejb.deployments.classpath.include",".*bonita-deploy-ejb3.*"); // project where Bonita ejb-jars.xml file are stored
+        props.setProperty("openejb.deployments.classpath.exclude","");
+
         EJBContainer ejbContainer = EJBContainer.createEJBContainer(props);
         Context ctx = ejbContainer.getContext();
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, TomeeContextFactory.class.getName());

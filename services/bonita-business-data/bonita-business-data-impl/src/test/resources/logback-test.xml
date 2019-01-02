@@ -1,0 +1,60 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>|%d{HH:mm:ss.SSS}|%thread|%-5level|%logger{16}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.bonitasoft" level="INFO" />
+    <logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="WARN" />
+    <logger name="org.hibernate.cache.ehcache.AbstractEhcacheRegionFactory" level="ERROR" />
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+    </root>
+    <!-- Show events of synchro repository -->
+    <!-- <logger name="org.bonitasoft.engine.test.synchro.SynchroRepository" level="DEBUG" /> -->
+
+    <!-- Show stack traces when there is error on jobs -->
+    <!-- <logger name="org.bonitasoft.engine.scheduler.impl.JobWrapper" level="DEBUG" /> -->
+
+    <!-- Show lock acquire/release -->
+    <!--<logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="TRACE" />-->
+    <!--<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="TRACE" />-->
+    <!--<logger name="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl" level="TRACE" />-->
+    <!--<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="DEBUG" />-->
+    <!---<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="DEBUG" />-->
+    <!--<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="DEBUG" />-->
+    <!--<logger name="org.bonitasoft.engine.recorder.impl.RecorderImpl" level="DEBUG" />-->
+    <!--<logger name="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl" level="DEBUG" />-->
+    <!--<logger name="org.bonitasoft.engine.execution.work.TxBonitaWork" level="DEBUG" />-->
+    <!--<logger name="org.bonitasoft.engine.execution.work.LockProcessInstanceWork" level="DEBUG" />-->
+    <!--<logger name="org.bonitasoft.engine.work.ExecutorWorkService" level="DEBUG" />-->
+    <!--<logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR"/>-->
+
+
+    <!-- Quartz log for job lifecycle -->
+    <!-- <property name="baseLogFileName" value="target/log/quartzJobs" />
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${baseLogFileName}.log</file>
+
+        Support multiple-JVM writing to the same log file
+        <prudent>true</prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${baseLogFileName}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>|%d{HH:mm:ss.SSS}| %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.bonitasoft.engine.scheduler.impl.FileJobListener" level="INFO">
+        <appender-ref ref="FILE" />
+    </logger> -->
+
+</configuration>
