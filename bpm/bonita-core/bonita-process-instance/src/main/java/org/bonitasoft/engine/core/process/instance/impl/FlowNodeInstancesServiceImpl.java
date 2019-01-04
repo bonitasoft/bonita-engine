@@ -232,15 +232,20 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstances(final long parentProcessInstanceId, final int fromIndex, final int maxResults)
-            throws SFlowNodeReadException {
+    public List<SFlowNodeInstance> getFlowNodeInstancesOfProcess(final long parentProcessInstanceId, final int fromIndex, final int maxResults) throws SBonitaReadException {
         List<SFlowNodeInstance> selectList;
-        try {
-            selectList = getPersistenceService().selectList(
-                    SelectDescriptorBuilder.getFlowNodesFromProcessInstance(parentProcessInstanceId, fromIndex, maxResults));
-        } catch (final SBonitaReadException e) {
-            throw new SFlowNodeReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", parentProcessInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
+        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfProcess", parameters, SFlowNodeInstance.class, queryOptions));
+        return getUnmodifiableList(selectList);
+    }
+
+    @Override
+    public List<SFlowNodeInstance> getFlowNodeInstancesOfActivity(long parentActivityInstanceId, int fromIndex, int maxResults) throws SBonitaReadException {
+        List<SFlowNodeInstance> selectList;
+        final Map<String, Object> parameters = Collections.singletonMap("parentActivityInstanceId", parentActivityInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
+        selectList = getPersistenceService().selectList(new SelectListDescriptor<>("getFlowNodeInstancesOfActivity", parameters, SFlowNodeInstance.class, queryOptions));
         return getUnmodifiableList(selectList);
     }
 

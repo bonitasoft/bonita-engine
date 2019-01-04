@@ -16,7 +16,10 @@ package org.bonitasoft.engine.execution;
 
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
 import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.CANCELLING;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,11 +30,11 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -48,10 +51,8 @@ public class ProcessInstanceInterruptorTest {
     private FlowNodeInstanceService flowNodeInstanceService;
     @Mock
     private ContainerRegistry containerRegistry;
-    @Mock
-    private TechnicalLoggerService technicalLoggerService;
+    private TechnicalLoggerService technicalLoggerService = new TechnicalLoggerSLF4JImpl();
 
-    @InjectMocks
     private ProcessInstanceInterruptor processInstanceInterruptor;
 
     private long PROCESS_INSTANCE_ID = 5348927512390L;
@@ -61,6 +62,7 @@ public class ProcessInstanceInterruptorTest {
 
     @Before
     public void before() throws Exception {
+        processInstanceInterruptor = new ProcessInstanceInterruptor(processInstanceService, flowNodeInstanceService, containerRegistry, technicalLoggerService);
         flownode1_stable = new SUserTaskInstanceImpl("user1", 532654L, 54336L, 5643456L, 897523454L, STaskPriority.ABOVE_NORMAL, PROCESS_DEFINITION_ID, 67547L);
         flownode1_stable.setId(9846769L);
         flownode1_stable.setLogicalGroup(3, PROCESS_INSTANCE_ID);
@@ -73,7 +75,7 @@ public class ProcessInstanceInterruptorTest {
         flownode3_stable.setId(543522L);
         flownode3_stable.setLogicalGroup(3, PROCESS_INSTANCE_ID);
         flownode3_stable.setStable(true);
-        doReturn(Arrays.asList(flownode1_stable, flownode2_unstable, flownode3_stable)).when(flowNodeInstanceService).getFlowNodeInstances(PROCESS_INSTANCE_ID, 0, Integer.MAX_VALUE);
+        doReturn(Arrays.asList(flownode1_stable, flownode2_unstable, flownode3_stable)).when(flowNodeInstanceService).getFlowNodeInstancesOfProcess(PROCESS_INSTANCE_ID, 0, Integer.MAX_VALUE);
     }
 
     @Test
@@ -98,7 +100,7 @@ public class ProcessInstanceInterruptorTest {
     @Test
     public void should_not_interrupt_excluded_flownode() throws Exception {
         //given
-        doReturn(Arrays.asList(flownode1_stable, flownode2_unstable)).when(flowNodeInstanceService).getFlowNodeInstances(PROCESS_INSTANCE_ID, 0, Integer.MAX_VALUE);
+        doReturn(Arrays.asList(flownode1_stable, flownode2_unstable)).when(flowNodeInstanceService).getFlowNodeInstancesOfProcess(PROCESS_INSTANCE_ID, 0, Integer.MAX_VALUE);
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING, flownode3_stable.getId());
         //then
@@ -137,7 +139,7 @@ public class ProcessInstanceInterruptorTest {
         sGatewayInstance.setLogicalGroup(3, PROCESS_INSTANCE_ID);
         sGatewayInstance.setStable(false);
         sGatewayInstance.setTerminal(false);
-        doReturn(Collections.singletonList(sGatewayInstance)).when(flowNodeInstanceService).getFlowNodeInstances(PROCESS_INSTANCE_ID,0,Integer.MAX_VALUE);
+        doReturn(Collections.singletonList(sGatewayInstance)).when(flowNodeInstanceService).getFlowNodeInstancesOfProcess(PROCESS_INSTANCE_ID,0,Integer.MAX_VALUE);
         //when
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, ABORTING);
         //then
@@ -164,6 +166,33 @@ public class ProcessInstanceInterruptorTest {
         processInstanceInterruptor.interruptProcessInstance(PROCESS_INSTANCE_ID, CANCELLING);
         //then
         verify(processInstanceService).setStateCategory(processInstance, CANCELLING);
+    }
+
+    @Test
+    public void should_abort_children_of_flow_node_instance() throws Exception {
+        SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl();
+        sUserTaskInstance.setId(42L);
+        sUserTaskInstance.setTokenCount(2);
+        doReturn(Arrays.asList(flownode1_stable, flownode2_unstable)).when(flowNodeInstanceService).getFlowNodeInstancesOfActivity(sUserTaskInstance.getId(), 0, Integer.MAX_VALUE);
+
+        processInstanceInterruptor.interruptChildrenOfFlowNodeInstance(sUserTaskInstance, ABORTING);
+
+        verify(flowNodeInstanceService).setStateCategory(flownode1_stable, ABORTING);
+        verify(flowNodeInstanceService).setStateCategory(flownode2_unstable, ABORTING);
+        verify(containerRegistry).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode1_stable.getId());
+        verify(containerRegistry, never()).executeFlowNode(PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID, flownode2_unstable.getId());
+    }
+
+    @Test
+    public void should_not_search_for_children_when_flow_node_does_not_have_children() throws Exception {
+        SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl();
+        sUserTaskInstance.setId(42L);
+        sUserTaskInstance.setTokenCount(0);
+
+        processInstanceInterruptor.interruptChildrenOfFlowNodeInstance(sUserTaskInstance, ABORTING);
+
+        verifyZeroInteractions(flowNodeInstanceService);
+        verifyZeroInteractions(containerRegistry);
     }
 
 }
