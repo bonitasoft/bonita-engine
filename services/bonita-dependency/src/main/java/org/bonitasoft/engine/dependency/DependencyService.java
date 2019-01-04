@@ -15,6 +15,7 @@ package org.bonitasoft.engine.dependency;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.bonitasoft.engine.dependency.model.SDependency;
@@ -90,7 +91,9 @@ public interface DependencyService {
 
     /**
      * Refresh classloader after a dependency update
-     * difference with #refreshClassLoader is that this one is done on all nodes
+     * difference with #refreshClassLoader is that this one is done on all nodes and after transaction
+     *
+     * Multiple call to this method will have no effects, it will only register the refresh to be done after the transaction.
      *
      * @param type
      * @param id
