@@ -13,7 +13,13 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.commons.Pair.pair;
+import static org.bonitasoft.engine.dependency.model.ScopeType.PROCESS;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +30,6 @@ import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -37,9 +42,12 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -67,6 +75,10 @@ public class DependencyServiceImplTest {
     private BroadcastService broadcastService;
     @Mock
     private ReadSessionAccessor readSessionAccessor;
+    @Mock
+    private UserTransactionService userTransactionService;
+    @Captor
+    private ArgumentCaptor<RefreshClassloaderSynchronization> synchronizationArgumentCaptor;
     @InjectMocks
     private DependencyServiceImpl dependencyServiceImpl;
 
@@ -138,14 +150,14 @@ public class DependencyServiceImplTest {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenReturn(sDependencies);
 
-        Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, 1, 100));
+        Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, PROCESS, 1, 100));
     }
 
     @Test(expected = SDependencyException.class)
     public final void getDependencyIdsThrowException() throws SBonitaReadException, SDependencyException {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
-        dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, 1, 100);
+        dependencyServiceImpl.getDependencyIds(54156L, PROCESS, 1, 100);
     }
 
     /**
@@ -200,6 +212,53 @@ public class DependencyServiceImplTest {
     public void deleteDependencyWithReadExceptionShouldThrowSDependencyNotFoundException() throws Exception {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SDependency>> any());
         dependencyServiceImpl.deleteDependency("notFound");
+    }
+
+    @Test
+    public void should_refresh_classloader_after_transaction() throws Exception{
+        doNothing().when(userTransactionService).registerBonitaSynchronization(synchronizationArgumentCaptor.capture());
+
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+
+        assertThat(synchronizationArgumentCaptor.getValue()).isInstanceOf(RefreshClassloaderSynchronization.class);
+    }
+
+
+    @Test
+    public void should_refresh_classloader_after_transaction_only_once_per_transaction() throws Exception{
+        doNothing().when(userTransactionService).registerBonitaSynchronization(synchronizationArgumentCaptor.capture());
+
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+
+        assertThat(synchronizationArgumentCaptor.getAllValues()).hasSize(1);
+    }
+    @Test
+    public void should_refresh_multiple_classloaders_after_transaction() throws Exception{
+        doNothing().when(userTransactionService).registerBonitaSynchronization(synchronizationArgumentCaptor.capture());
+
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 41);
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 43);
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+
+        assertThat(synchronizationArgumentCaptor.getAllValues()).hasSize(1);
+        assertThat(synchronizationArgumentCaptor.getValue().getIds())
+                .containsExactlyInAnyOrder(pair(PROCESS, 41L), pair(PROCESS, 42L), pair(PROCESS, 43L));
+    }
+
+    @Test
+    public void should_refresh_classloader_after_transaction_once_per_transaction() throws Exception{
+        doNothing().when(userTransactionService).registerBonitaSynchronization(synchronizationArgumentCaptor.capture());
+
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+        // Simulate an end + begin of a transaction:
+        dependencyServiceImpl.removeRefreshClassLoaderSynchronization();
+        dependencyServiceImpl.refreshClassLoaderAfterUpdate(PROCESS, 42);
+
+        assertThat(synchronizationArgumentCaptor.getAllValues()).hasSize(2);
     }
 
 }

@@ -1445,13 +1445,13 @@
     <bean id="dependencyService" class="org.bonitasoft.engine.dependency.impl.DependencyServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="queriableLoggerService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="broadcastService" ref="broadcastService" />
         <constructor-arg name="readSessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
+        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">

@@ -40,8 +40,6 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderF
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilderFactory;
 import org.bonitasoft.engine.home.BonitaResource;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -61,10 +59,12 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
@@ -75,20 +75,18 @@ public class DependencyServiceImpl extends AbstractDependencyService {
 
     private final ReadPersistenceService persistenceService;
     private final Recorder recorder;
-    private final EventService eventService;
-    private final TechnicalLoggerService logger;
     private final QueriableLoggerService queriableLoggerService;
     private final ClassLoaderService classLoaderService;
     private ReadSessionAccessor readSessionAccessor;
 
-    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-                                 final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
-                                 BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor, UserTransactionService userTransactionService) {
-        super(broadcastService, userTransactionService, persistenceService);
+    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
+                                 final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService,
+                                 BroadcastService broadcastService, ReadSessionAccessor readSessionAccessor,
+                                 UserTransactionService userTransactionService, BonitaTaskExecutor bonitaTaskExecutor,
+                                 SessionAccessor sessionAccessor) {
+        super(broadcastService, userTransactionService, persistenceService, bonitaTaskExecutor, sessionAccessor);
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
-        this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.classLoaderService = classLoaderService;
         this.readSessionAccessor = readSessionAccessor;

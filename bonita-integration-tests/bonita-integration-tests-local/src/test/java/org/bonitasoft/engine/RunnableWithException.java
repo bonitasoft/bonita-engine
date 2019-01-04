@@ -16,8 +16,8 @@ package org.bonitasoft.engine;
 /**
  * @author Baptiste Mesta
  */
-public interface RunnableWithExceptions<T extends Exception, U> {
+public interface RunnableWithException {
 
-    void run(U argument) throws T;
+    void run() throws Exception;
 
 }
