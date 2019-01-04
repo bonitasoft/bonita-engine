@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
@@ -38,7 +39,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STim
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
 import org.bonitasoft.engine.dependency.model.SDependency;
@@ -162,9 +162,9 @@ public class TestRepository {
                 new PersistentObjectId(sProcessDefinitionDeployInfoImpl.getId(), sProcessDefinitionDeployInfoImpl.getTenantId()));
     }
 
-    public SProcessInstanceImpl add(final SProcessInstanceImpl sProcessInstance) {
+    public SProcessInstance add(final SProcessInstance sProcessInstance) {
         getSession().save(sProcessInstance);
-        return (SProcessInstanceImpl) getSession().get(sProcessInstance.getClass(),
+        return (SProcessInstance) getSession().get(sProcessInstance.getClass(),
                 new PersistentObjectId(sProcessInstance.getId(), sProcessInstance.getTenantId()));
     }
 

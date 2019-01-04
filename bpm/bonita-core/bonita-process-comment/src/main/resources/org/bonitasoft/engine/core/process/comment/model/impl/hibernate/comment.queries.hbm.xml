@@ -54,7 +54,7 @@
 		AND (
 			comment.processInstanceId IN (
 				SELECT DISTINCT pi.id
-				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS pi
+				FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS pi
 				WHERE pi.processDefinitionId = supervisor.processDefId
 				AND pi.tenantId = supervisor.tenantId
 			)
@@ -89,7 +89,7 @@
 		AND (
 			comment.processInstanceId IN (
 				SELECT DISTINCT pi.id
-				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS pi
+				FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS pi
 				WHERE pi.processDefinitionId = supervisor.processDefId
 				AND pi.tenantId = supervisor.tenantId
 			)
@@ -121,7 +121,7 @@
 		)
 		OR comment.processInstanceId IN (
 			SELECT p.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 				 org.bonitasoft.engine.identity.model.SUser AS user
 			WHERE p.startedBy = user.id
 			AND user.id = comment.userId
@@ -155,7 +155,7 @@
 		)
 		OR comment.processInstanceId IN (
 			SELECT p.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 				 org.bonitasoft.engine.identity.model.SUser AS user
 			WHERE p.startedBy = user.id
 			AND user.id = comment.userId
@@ -189,7 +189,7 @@
 			)
 			OR comment.processInstanceId IN (
 				SELECT p.id
-				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+				FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 					 org.bonitasoft.engine.identity.model.SUser AS user
 				WHERE p.startedBy = u.id
 			)
@@ -220,7 +220,7 @@
 			)
 			OR comment.processInstanceId IN (
 				SELECT p.id
-				FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+				FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 					 org.bonitasoft.engine.identity.model.SUser AS user
 				WHERE p.startedBy = u.id
 			)

@@ -1431,45 +1431,45 @@
 	<!-- Process Instance  -->
 	<query name="getNumberOfSProcessInstance">
 		SELECT COUNT(DISTINCT p)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 	</query>
 	
 	<query name="searchSProcessInstance">
 		SELECT DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 	</query>
 	
 	<query name="getNumberOfSProcessInstancewithSUserTaskInstance">
 		SELECT COUNT(DISTINCT p)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			 org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
 		WHERE p.id = a.logicalGroup4
 	</query>
 	
 	<query name="searchSProcessInstancewithSUserTaskInstance">
 		SELECT DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			 org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
 		WHERE p.id = a.logicalGroup4
 	</query>
 
 	<query name="getNumberOfSProcessInstancewithSProcessSupervisor">
 		SELECT COUNT(DISTINCT p.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
 	<query name="searchSProcessInstancewithSProcessSupervisor">
 		SELECT DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 		org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
 		WHERE p.processDefinitionId = processsupervisor.processDefId
 	</query>
 
     <query name="getNumberOfSProcessInstancewithSProcessSupervisorSUserTaskInstance">
         SELECT COUNT(DISTINCT p.id)
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
              org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
              org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
         WHERE p.processDefinitionId = processsupervisor.processDefId
@@ -1478,7 +1478,7 @@
 
     <query name="searchSProcessInstancewithSProcessSupervisorSUserTaskInstance">
         SELECT DISTINCT p
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
              org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor,
              org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
         WHERE p.processDefinitionId = processsupervisor.processDefId
@@ -1487,7 +1487,7 @@
 
 	<query name="getNumberOfSProcessInstanceFailed">
 		SELECT COUNT(DISTINCT p)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (
             p.stateId = 7 
             OR EXISTS (
@@ -1501,7 +1501,7 @@
 	
 	<query name="searchSProcessInstanceFailed">
 		SELECT DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (
             p.stateId = 7 
             OR EXISTS (
@@ -1515,33 +1515,33 @@
 	
 	<query name="getProcessInstancesInStates">
 		SELECT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE p.stateId IN (:stateIds)
 	</query>
 
 	<query name="getNumberOfChildInstancesOfProcessInstance">
 		SELECT COUNT(p)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
 	
 	<query name="getChildInstanceIdsOfProcessInstance">
 		SELECT p.id
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
 
 	<query name="getChildOfActivity">
 		SELECT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE p.callerId = :activityInstanceId
 	</query>
     
     <query name="getNumberOfSProcessInstanceFailedAndSupervisedBy">
         SELECT COUNT(DISTINCT p.id)
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
              org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
         WHERE (
             p.stateId = 7 
@@ -1571,7 +1571,7 @@
 
     <query name="searchSProcessInstanceFailedAndSupervisedBy">
         SELECT DISTINCT p
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
              org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
         WHERE (
             p.stateId = 7 
@@ -1601,7 +1601,7 @@
 	
 	<query name="getNumberOfSProcessInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT p.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE p.stateId != 6
 		AND p.processDefinitionId = supervisor.processDefId
@@ -1623,7 +1623,7 @@
 
 	<query name="searchSProcessInstanceSupervisedBy">
 		SELECT DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE p.stateId != 6
 		AND p.processDefinitionId = supervisor.processDefId
@@ -1645,7 +1645,7 @@
 
 	<query name="getNumberOfSProcessInstanceInvolvingUser">
 		select COUNT(DISTINCT p.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (EXISTS 
 				(SELECT at.id 
 					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
@@ -1657,7 +1657,7 @@
 
 	<query name="searchSProcessInstanceInvolvingUser">
 		select DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
 		WHERE (EXISTS 
 				(SELECT at.id 
 					FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS at
@@ -1669,7 +1669,7 @@
 
 	<query name="getNumberOfSProcessInstanceInvolvingUsersManagedBy">
 		SELECT COUNT(DISTINCT p.id)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			 org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
@@ -1683,7 +1683,7 @@
 
 	<query name="searchSProcessInstanceInvolvingUsersManagedBy">
 		SELECT DISTINCT p
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+		FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
 			 org.bonitasoft.engine.identity.model.SUser AS u
 		WHERE (p.id IN 
 				(SELECT at.logicalGroup2
@@ -1829,7 +1829,7 @@
 	<query name="getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor">
         SELECT COUNT(DISTINCT a)
         FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
@@ -1874,7 +1874,7 @@
 	<query name="searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor">
         SELECT DISTINCT(a)
         FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
@@ -1919,7 +1919,7 @@
  	<query name="getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess">
         SELECT COUNT(DISTINCT a)
         FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
         	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
@@ -1965,7 +1965,7 @@
 	<query name="searchSHumanTaskInstanceAssignedAndPendingByRootProcess">
         SELECT DISTINCT(a)
         FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+        	 org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p,
         	 org.bonitasoft.engine.identity.model.SUser as user
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
@@ -2024,7 +2024,7 @@
     
     <query name="countProcessInstancesOfProcessDefinition">
         SELECT COUNT(DISTINCT p)
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        FROM org.bonitasoft.engine.core.process.instance.model.SProcessInstance AS p
         WHERE p.processDefinitionId = :processDefinitionId
     </query>
 
