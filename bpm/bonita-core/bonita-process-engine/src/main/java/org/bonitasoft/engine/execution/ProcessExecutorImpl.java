@@ -601,7 +601,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                             + "> executed a branch that is finished but there is still <"
                             + numberOfFlowNode + "> to execute");
                     logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG,
-                            activityInstanceService.getFlowNodeInstances(processInstanceId, 0, numberOfFlowNode).toString());
+                            activityInstanceService.getFlowNodeInstancesOfProcess(processInstanceId, 0, numberOfFlowNode).toString());
                 }
                 return;
             }

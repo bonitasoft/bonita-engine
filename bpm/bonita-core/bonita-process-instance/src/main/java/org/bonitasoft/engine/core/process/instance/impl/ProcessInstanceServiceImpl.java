@@ -376,11 +376,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         dataInstanceService.deleteLocalDataInstances(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString(), dataPresent);
     }
 
-    private void deleteFlowNodeInstances(final long processInstanceId, final SProcessDefinition processDefinition) throws SFlowNodeReadException,
-            SProcessInstanceModificationException {
+    private void deleteFlowNodeInstances(final long processInstanceId, final SProcessDefinition processDefinition) throws SProcessInstanceModificationException, SFlowNodeReadException, SBonitaReadException {
         List<SFlowNodeInstance> activityInstances;
         do {
-            activityInstances = activityService.getFlowNodeInstances(processInstanceId, 0, BATCH_SIZE);
+            activityInstances = activityService.getFlowNodeInstancesOfProcess(processInstanceId, 0, BATCH_SIZE);
             for (final SFlowNodeInstance activityInstance : activityInstances) {
                 deleteFlowNodeInstance(activityInstance, processDefinition);
             }

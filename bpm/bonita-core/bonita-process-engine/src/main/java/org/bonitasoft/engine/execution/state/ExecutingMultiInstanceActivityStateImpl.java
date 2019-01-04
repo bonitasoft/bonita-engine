@@ -13,13 +13,12 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import static org.bonitasoft.engine.core.process.instance.model.SStateCategory.ABORTING;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -32,20 +31,14 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecu
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 
 /**
  * @author Baptiste Mesta
@@ -130,7 +123,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 if (completionCondition != null) {
                     final boolean complete = (Boolean) expressionResolverService.evaluate(completionCondition, sExpressionContext);
                     if (complete) {
-                        abortNonCompletedChildren(miActivity);
+                        stateBehaviors.interruptSubActivities(miActivity, ABORTING);
                         if (miActivity.isSequential()) {
                             return true;
                         }
@@ -158,36 +151,6 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
-    }
-
-    private boolean abortNonCompletedChildren(final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
-        final int numberOfResults = 100;
-        long count = 0;
-        List<SActivityInstance> children;
-        boolean hasChildren = false;
-        final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        do {
-            final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, keyProvider.getNameKey(), OrderByType.ASC);
-            final List<FilterOption> filters = new ArrayList<>(2);
-            filters.add(new FilterOption(SActivityInstance.class, keyProvider.getParentActivityInstanceKey(), flowNodeInstance.getId()));
-            filters.add(new FilterOption(SActivityInstance.class, keyProvider.getTerminalKey(), false));
-            filters.add(new FilterOption(SActivityInstance.class, keyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-            final QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
-            final QueryOptions countOptions = new QueryOptions(0, numberOfResults, null, filters, null);
-            children = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);
-            count = activityInstanceService.getNumberOfActivityInstances(SActivityInstance.class, countOptions);
-            if (count > 0) {
-                hasChildren = true;
-            }
-            for (final SActivityInstance child : children) {
-                activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
-                if (child.isStable()) {
-                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), child.getLogicalGroup(3), child.getId());
-                }
-            }
-
-        } while (count > children.size());
-        return hasChildren;
     }
 
     @Override

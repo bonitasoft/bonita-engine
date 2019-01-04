@@ -56,13 +56,6 @@ public class SelectDescriptorBuilder {
         return new SelectByIdDescriptor<>(clazz, id);
     }
 
-    public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long parentProcessInstanceId, final int fromIndex,
-            final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", (Object) parentProcessInstanceId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        return new SelectListDescriptor<>("getFlowNodesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
-    }
-
     public static SelectListDescriptor<SAFlowNodeInstance> getArchivedFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex,
             final int maxResults) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);

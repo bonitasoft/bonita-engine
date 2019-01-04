@@ -39,11 +39,18 @@
 		WHERE a.rootContainerId = :rootContainerId
 	</query>
 
-	<query name="getFlowNodesFromProcessInstance">
+	<query name="getFlowNodeInstancesOfProcess">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.logicalGroup4 = :parentProcessInstanceId
-        ORDER BY f.id ASC
+		ORDER BY f.id ASC
+	</query>
+
+	<query name="getFlowNodeInstancesOfActivity">
+		SELECT f
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE f.logicalGroup3 = :parentActivityInstanceId
+		ORDER BY f.id ASC
 	</query>
 
 	<query name="getNumberOfFlowNodesInAllStates">
