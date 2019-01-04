@@ -20,13 +20,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.bonitasoft.engine.classloader.listeners.ClassReflectorClearer;
 import org.bonitasoft.engine.classloader.listeners.JacksonCacheClearer;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
