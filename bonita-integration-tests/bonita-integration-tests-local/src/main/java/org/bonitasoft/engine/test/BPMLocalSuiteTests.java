@@ -32,6 +32,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DataInstanceIntegrationLocalIT.class,
         GatewayExecutionLocalIT.class,
         ThemeIT.class,
+        ClassLoaderIT.class,
         PermissionAPIIT.class
 })
 @RunWith(Suite.class)
