@@ -149,6 +149,7 @@
             <list>
                 <ref bean="classLoaderService" />
                 <ref bean="platformCacheService" />
+                <ref bean="bonitaTaskExecutor" />
             </list>
         </property>
         <property name="jobListeners">
@@ -203,6 +204,8 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="broadcastService" ref="broadcastService" />
         <constructor-arg name="userTransactionService" ref="transactionService" />
+        <constructor-arg name="bonitaTaskExecutor" ref="bonitaTaskExecutor" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
     <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
@@ -279,6 +282,8 @@
 
     <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal">
     </bean>
+
+    <bean id="bonitaTaskExecutor" class="org.bonitasoft.engine.service.BonitaTaskExecutor"/>
 
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />

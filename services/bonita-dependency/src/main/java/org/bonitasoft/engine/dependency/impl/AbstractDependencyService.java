@@ -34,8 +34,10 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.service.BonitaTaskExecutor;
 import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
@@ -43,15 +45,23 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  * @author Baptiste Mesta
  */
 public abstract class AbstractDependencyService implements DependencyService {
+
+    private final Object synchroLock = new Object();
+    private final ThreadLocal<RefreshClassloaderSynchronization> currentRefreshTask = new ThreadLocal<>();
     protected static final int BATCH_SIZE = 100;
     private BroadcastService broadcastService;
     private UserTransactionService userTransactionService;
     private ReadPersistenceService persistenceService;
+    private BonitaTaskExecutor bonitaTaskExecutor;
+    private SessionAccessor sessionAccessor;
 
-    public AbstractDependencyService(BroadcastService broadcastService, UserTransactionService userTransactionService, ReadPersistenceService persistenceService) {
+    public AbstractDependencyService(BroadcastService broadcastService, UserTransactionService userTransactionService,
+                                     ReadPersistenceService persistenceService, BonitaTaskExecutor bonitaTaskExecutor, SessionAccessor sessionAccessor) {
         this.broadcastService = broadcastService;
         this.userTransactionService = userTransactionService;
         this.persistenceService = persistenceService;
+        this.bonitaTaskExecutor = bonitaTaskExecutor;
+        this.sessionAccessor = sessionAccessor;
     }
 
     protected abstract void delete(SDependency dependency) throws SDependencyDeletionException;
@@ -69,17 +79,29 @@ public abstract class AbstractDependencyService implements DependencyService {
 
     @Override
     public void refreshClassLoaderAfterUpdate(final ScopeType type, final long id) throws SDependencyException {
-        refreshClassLoader(type, id);
         try {
-            registerRefreshOnOtherNodes(type, id);
+            registerRefreshOnAllNodes(type, id);
         } catch (Exception e) {
             throw new SDependencyException(e);
         }
     }
 
-    private void registerRefreshOnOtherNodes(ScopeType type, long id) throws STenantIdNotSetException, STransactionNotFoundException {
-        final AbstractRefreshClassLoaderTask callable = getRefreshClassLoaderTask(type, id);
-        userTransactionService.registerBonitaSynchronization(new RefreshClassloaderSynchronization(broadcastService, callable, getTenantId()));
+    private void registerRefreshOnAllNodes(ScopeType type, long id) throws STenantIdNotSetException, STransactionNotFoundException {
+        synchronized (synchroLock) {
+            RefreshClassloaderSynchronization refreshTaskSynchronization = currentRefreshTask.get();
+            if (refreshTaskSynchronization == null) {
+                AbstractRefreshClassLoaderTask callable = getRefreshClassLoaderTask(type, id);
+                refreshTaskSynchronization = new RefreshClassloaderSynchronization(this, bonitaTaskExecutor, userTransactionService, broadcastService, sessionAccessor, callable, getTenantId(), type, id);
+                userTransactionService.registerBonitaSynchronization(refreshTaskSynchronization);
+                currentRefreshTask.set(refreshTaskSynchronization);
+            }else{
+                refreshTaskSynchronization.addClassloader(type, id);
+            }
+        }
+    }
+
+    void removeRefreshClassLoaderSynchronization() {
+        currentRefreshTask.remove();
     }
 
     protected abstract AbstractRefreshClassLoaderTask getRefreshClassLoaderTask(final ScopeType type, final long id);
