@@ -437,7 +437,7 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10001:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" />
         <constructor-arg name="sequenceId" value="10010" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10010:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -1178,7 +1178,6 @@
                 <!-- bpm -->
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
